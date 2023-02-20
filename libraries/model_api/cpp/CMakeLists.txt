@@ -2,6 +2,74 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-add_subdirectory(utils)
-add_subdirectory(models)
-add_subdirectory(pipelines)
+cmake_minimum_required(VERSION 3.10)
+
+# Multi config generators such as Visual Studio ignore CMAKE_BUILD_TYPE. Multi config generators are configured with
+# CMAKE_CONFIGURATION_TYPES, but limiting options in it completely removes such build options
+get_property(GENERATOR_IS_MULTI_CONFIG_VAR GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(NOT GENERATOR_IS_MULTI_CONFIG_VAR AND NOT DEFINED CMAKE_BUILD_TYPE)
+    message(STATUS "CMAKE_BUILD_TYPE not defined, 'Release' will be used")
+    # Setting CMAKE_BUILD_TYPE as CACHE must go before project(). Otherwise project() sets its value and set() doesn't take an effect
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ...")
+endif()
+
+project(model_api)
+
+if(WIN32)
+    if(NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+        message(FATAL_ERROR "Only 64-bit supported on Windows")
+    endif()
+
+    add_definitions(-DNOMINMAX)
+endif()
+
+set(model_api_VERSION 0.0.0)
+
+find_package(OpenCV REQUIRED COMPONENTS core imgproc)
+find_package(OpenVINO REQUIRED COMPONENTS Runtime)
+
+file(GLOB MODELS_SOURCES ./models/src/*.cpp)
+file(GLOB MODELS_HEADERS ./models/include/models/*.h)
+file(GLOB_RECURSE UTILS_HEADERS ./utils/include/*)
+file(GLOB_RECURSE UTILS_SOURCES ./utils/src/*.cpp)
+
+# Create named folders for the sources within the .vcproj
+# Empty name lists them directly under the .vcproj
+source_group("models/src" FILES ${MODELS_SOURCES})
+source_group("models/include" FILES ${MODELS_HEADERS})
+source_group("uutils/src" FILES ${UTILS_SOURCES})
+source_group("utils/include" FILES ${UTILS_HEADERS})
+
+add_library(model_api STATIC ${MODELS_SOURCES} ${UTILS_SOURCES})
+target_include_directories(model_api PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/models/include>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/utils/include>" "$<INSTALL_INTERFACE:include>")
+target_link_libraries(model_api PUBLIC openvino::runtime opencv_core opencv_imgproc)
+
+include(GenerateExportHeader)
+
+generate_export_header(model_api)
+set_property(TARGET model_api PROPERTY VERSION ${model_api_VERSION})
+set_property(TARGET model_api PROPERTY SOVERSION 3)
+set_property(TARGET model_api PROPERTY INTERFACE_model_api_MAJOR_VERSION 3)
+set_property(TARGET model_api APPEND PROPERTY COMPATIBLE_INTERFACE_STRING model_api_MAJOR_VERSION)
+
+install(TARGETS model_api EXPORT model_apiTargets
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/models/include/" "${CMAKE_CURRENT_SOURCE_DIR}/utils/include/"
+    DESTINATION include COMPONENT Devel)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file("${CMAKE_CURRENT_BINARY_DIR}/model_apiConfigVersion.cmake" VERSION ${model_api_VERSION} COMPATIBILITY AnyNewerVersion)
+
+export(EXPORT model_apiTargets FILE "${CMAKE_CURRENT_BINARY_DIR}/model_apiTargets.cmake")
+configure_file(cmake/model_apiConfig.cmake "${CMAKE_CURRENT_BINARY_DIR}/model_apiConfig.cmake" COPYONLY)
+
+set(ConfigPackageLocation lib/cmake/model_api)
+install(EXPORT model_apiTargets FILE model_apiTargets.cmake DESTINATION ${ConfigPackageLocation})
+install(FILES cmake/model_apiConfig.cmake "${CMAKE_CURRENT_BINARY_DIR}/model_apiConfigVersion.cmake"
+    DESTINATION ${ConfigPackageLocation} COMPONENT Devel)
+
+set(CPACK_PACKAGE_VERSION ${model_api_VERSION})
+include(CPack)
