@@ -3,4 +3,4 @@ opencv-python
 scipy>=1.5.4,<1.9.0
 openvino>=2022.3
 openvino-dev>=2022.3
-omz_tools @ git+https://github.com/Wovchena/open_model_zoo.git@dynamic-omz_tools#egg=omz_tools&subdirectory=tools/model_tools
+omz_tools @ git+https://github.com/openvinotoolkit/open_model_zoo.git@master#egg=omz_tools&subdirectory=tools/model_tools
