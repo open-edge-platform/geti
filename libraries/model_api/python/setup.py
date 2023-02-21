@@ -44,6 +44,7 @@ TESTS_REQUIRE = [
     "tensorflow",
     "torch",
     "torchvision",
+    "protobuf~=3.20",
 ]
 
 EXTRAS_REQUIRE = {

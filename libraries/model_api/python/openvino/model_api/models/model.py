@@ -156,7 +156,7 @@ class Model:
                 max_num_requests=max_num_requests,
                 precision=precision,
                 download_dir=download_dir,
-                cache_dir=download_dir,
+                cache_dir=cache_dir,
             )
         if model_type is None:
             model_type = model_adapter.get_rt_info(["model_info", "model_type"])
