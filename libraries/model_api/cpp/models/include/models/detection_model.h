@@ -21,6 +21,11 @@
 #include <vector>
 
 #include "models/image_model.h"
+#include "input_data.h"
+#include "results.h"
+
+struct DetectionResult;
+struct ImageInputData;
 
 class DetectionModel : public ImageModel {
 public:
@@ -42,6 +47,8 @@ public:
     static std::unique_ptr<DetectionModel> create_model(const std::string& modelFileName, std::shared_ptr<ov::Core> core = nullptr, std::string model_type = "", float confidence_threshold = -std::numeric_limits<float>::infinity(), std::vector<std::string> labels = {});
 
     static std::vector<std::string> loadLabels(const std::string& labelFilename);
+
+    virtual std::unique_ptr<DetectionResult> infer(const ImageInputData& inputData);
 
     std::vector<std::string> labels;
 protected:

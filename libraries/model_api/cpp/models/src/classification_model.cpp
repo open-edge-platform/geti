@@ -32,6 +32,7 @@
 #include <utils/slog.hpp>
 
 #include "models/results.h"
+#include "models/input_data.h"
 
 ClassificationModel::ClassificationModel(const std::string& modelFileName,
                                          size_t nTop,
@@ -193,4 +194,9 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     ppp.output("indices").tensor().set_element_type(ov::element::i32);
     ppp.output("scores").tensor().set_element_type(ov::element::f32);
     model = ppp.build();
+}
+
+std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {
+    auto result = ModelBase::infer(static_cast<const InputData&>(inputData));
+    return std::unique_ptr<ClassificationResult>(static_cast<ClassificationResult*>(result.release()));
 }
