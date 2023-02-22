@@ -81,7 +81,7 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
                                             FLAGS_auto_resize,
                                             static_cast<float>(FLAGS_iou_t),
                                             FLAGS_layout));
-    } else if (model_type == "ssd") {
+    } else if (model_type == "ssd" || model_type == "SSD") {
         return std::unique_ptr<DetectionModel>(new ModelSSD(modelFileName, static_cast<float>(confidence_threshold), FLAGS_auto_resize, labels, FLAGS_layout));
     } else if (model_type == "yolo") {
         bool FLAGS_yolo_af = true;  // Use advanced postprocessing/filtering algorithm for YOLO
