@@ -22,7 +22,7 @@ from .background_matting import (
 )
 from .bert import BertEmbedding, BertNamedEntityRecognition, BertQuestionAnswering
 from .centernet import CenterNet
-from .classification import Classification
+from .classification import ClassificationModel
 from .ctpn import CTPN
 from .deblurring import Deblurring
 from .detection_model import DetectionModel
@@ -72,7 +72,7 @@ __all__ = [
     "BertNamedEntityRecognition",
     "BertQuestionAnswering",
     "CenterNet",
-    "Classification",
+    "ClassificationModel",
     "CTPN",
     "Deblurring",
     "DetectionModel",

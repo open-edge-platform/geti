@@ -21,7 +21,7 @@ from .types import ListValue, NumericalValue, StringValue
 from .utils import softmax
 
 
-class Classification(ImageModel):
+class ClassificationModel(ImageModel):
     __model__ = "Classification"
 
     def __init__(self, model_adapter, configuration=None, preload=False):
