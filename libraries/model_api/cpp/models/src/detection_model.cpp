@@ -42,7 +42,7 @@ DetectionModel::DetectionModel(const std::string& modelFileName,
       labels(labels),
       confidenceThreshold(confidenceThreshold) {}
 
-std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFileName, std::shared_ptr<ov::Core> core, std::string model_type, float confidence_threshold, std::vector<std::string> labels) {
+std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFileName, std::string model_type, const ov::AnyMap& configuration, std::shared_ptr<ov::Core> core) {
     if (!core) {
         core.reset(new ov::Core{});
     }
@@ -50,61 +50,89 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
     if (model_type.empty()) {
         model_type = model->get_rt_info<std::string>("model_info", "model_type");
     }
-    if (-std::numeric_limits<float>::infinity() == confidence_threshold) {
+    auto confidence_threshold_iter = configuration.find("confidence_threshold");
+    float confidence_threshold = 0.5;
+    if (confidence_threshold_iter == configuration.end()) {
         confidence_threshold = stof(model->get_rt_info<std::string>("model_info", "confidence_threshold"));
+    } else {
+        confidence_threshold = confidence_threshold_iter->second.as<float>();
     }
-    if (labels.empty()) {
+    auto labels_iter = configuration.find("labels");
+    std::vector<std::string> labels;
+    if (labels_iter == configuration.end()) {
         labels = split(model->get_rt_info<std::string>("model_info", "labels"), ' ');
+    } else {
+        labels = labels_iter->second.as<std::vector<std::string>>();
     }
-    std::string FLAGS_layout;
-    bool FLAGS_auto_resize = false;
-    float FLAGS_iou_t = 0.5;
+    auto layout_iter = configuration.find("layout");
+    std::string layout;
+    if (layout_iter != configuration.end()) {
+        layout = layout_iter->second.as<std::string>();
+    }
+    auto auto_resize_iter = configuration.find("auto_resize");
+    bool auto_resize = false;
+    if (auto_resize_iter != configuration.end()) {
+        auto_resize = auto_resize_iter->second.as<bool>();
+    }
+    auto iou_t_iter = configuration.find("iou_t");
+    float iou_t = 0.5;
+    if (iou_t_iter != configuration.end()) {
+        iou_t = iou_t_iter->second.as<bool>();
+    }
+    auto anchors_iter = configuration.find("anchors");
     std::vector<float> anchors;
+    if (anchors_iter != configuration.end()) {
+        anchors = anchors_iter->second.as<std::vector<float>>();
+    }
+    auto masks_iter = configuration.find("masks");
     std::vector<int64_t> masks;
+    if (masks_iter != configuration.end()) {
+        masks = masks_iter->second.as<std::vector<int64_t>>();
+    }
     if (model_type == "centernet") {
-        return std::unique_ptr<DetectionModel>(new ModelCenterNet(modelFileName, static_cast<float>(confidence_threshold), labels, FLAGS_layout));
+        return std::unique_ptr<DetectionModel>(new ModelCenterNet(modelFileName, confidence_threshold, labels, layout));
     } else if (model_type == "faceboxes") {
         return std::unique_ptr<DetectionModel>(new ModelFaceBoxes(modelFileName,
-                                        static_cast<float>(confidence_threshold),
-                                        FLAGS_auto_resize,
-                                        static_cast<float>(FLAGS_iou_t),
-                                        FLAGS_layout));
+                                        confidence_threshold,
+                                        auto_resize,
+                                        iou_t,
+                                        layout));
     } else if (model_type == "retinaface") {
         return std::unique_ptr<DetectionModel>(new ModelRetinaFace(modelFileName,
-                                        static_cast<float>(confidence_threshold),
-                                        FLAGS_auto_resize,
-                                        static_cast<float>(FLAGS_iou_t),
-                                        FLAGS_layout));
+                                        confidence_threshold,
+                                        auto_resize,
+                                        iou_t,
+                                        layout));
     } else if (model_type == "retinaface-pytorch") {
         return std::unique_ptr<DetectionModel>(new ModelRetinaFacePT(modelFileName,
-                                            static_cast<float>(confidence_threshold),
-                                            FLAGS_auto_resize,
-                                            static_cast<float>(FLAGS_iou_t),
-                                            FLAGS_layout));
+                                            confidence_threshold,
+                                            auto_resize,
+                                            iou_t,
+                                            layout));
     } else if (model_type == "ssd" || model_type == "SSD") {
-        return std::unique_ptr<DetectionModel>(new ModelSSD(modelFileName, static_cast<float>(confidence_threshold), FLAGS_auto_resize, labels, FLAGS_layout));
+        return std::unique_ptr<DetectionModel>(new ModelSSD(modelFileName, confidence_threshold, auto_resize, labels, layout));
     } else if (model_type == "yolo") {
         bool FLAGS_yolo_af = true;  // Use advanced postprocessing/filtering algorithm for YOLO
         return std::unique_ptr<DetectionModel>(new ModelYolo(modelFileName,
-                                    static_cast<float>(confidence_threshold),
-                                    FLAGS_auto_resize,
+                                    confidence_threshold,
+                                    auto_resize,
                                     FLAGS_yolo_af,
-                                    static_cast<float>(FLAGS_iou_t),
+                                    iou_t,
                                     labels,
                                     anchors,
                                     masks,
-                                    FLAGS_layout));
+                                    layout));
     } else if (model_type == "yolov3-onnx") {
         return std::unique_ptr<DetectionModel>(new ModelYoloV3ONNX(modelFileName,
-                                        static_cast<float>(confidence_threshold),
+                                        confidence_threshold,
                                         labels,
-                                        FLAGS_layout));
+                                        layout));
     } else if (model_type == "yolox") {
         return std::unique_ptr<DetectionModel>(new ModelYoloX(modelFileName,
-                                    static_cast<float>(confidence_threshold),
-                                    static_cast<float>(FLAGS_iou_t),
+                                    confidence_threshold,
+                                    iou_t,
                                     labels,
-                                    FLAGS_layout));
+                                    layout));
     } else {
         throw std::runtime_error{"No model type or invalid model type (-at) provided: " + model_type};
     }
