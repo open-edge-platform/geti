@@ -110,7 +110,7 @@ class Model:
         preload=True,
         core=None,
         weights_path=None,
-        model_parameters={},
+        adaptor_parameters={},
         device="AUTO",
         nstreams="1",
         nthreads=None,
@@ -120,21 +120,26 @@ class Model:
         cache_dir=None,
     ):
         """
+        Create an instance of the Model API model
+
         Args:
-            model: instance of ModelAdapter subclass, OVMS URL, path to model or name from Open Model Zoo
-            configuration: model wrapper config, for example confidence_threshold, labels
-            model_type: name of model wrapper to create
-            preload: whether to call load_model(). May be set to false to reshape model before loading
-            core: openvino.runtim.Core instance, passed to OpenvinoAdapter
-            weights_path: passed to OpenvinoAdapter
-            model_parameters: passed to OpenvinoAdapter
-            device: passed to OpenvinoAdapter
-            nstreams: passed to OpenvinoAdapter
-            nthreads: passed to OpenvinoAdapter
-            max_num_requests: passed to OpenvinoAdapter
-            precision: passed to OpenvinoAdapter
-            download_dir: passed to OpenvinoAdapter
-            cache_dir: passed to OpenvinoAdapter
+            model (str): model name from OpenVINO Model Zoo, path to model, OVMS URL
+            configuration (:obj:`dict`, optional): dictionary of model config with model properties, for example confidence_threshold, labels
+            model_type (:obj:`str`, optional): name of model wrapper to create (e.g. "ssd")
+            preload (:obj:`bool`, optional): whether to call load_model(). Can be set to false to reshape model before loading
+            core (optional): openvino.runtime.Core instance, passed to OpenvinoAdapter
+            weights_path (:obj:`str`, optional): path to .bin file with model weights
+            adaptor_parameters (:obj:`dict`, optional): parameters of ModelAdaptor
+            device (:obj:`str`, optional): name of OpenVINO device (e.g. "CPU, GPU")
+            nstreams (:obj:`int`, optional): number of inference streams
+            nthreads (:obj:`int`, optional): number of threads to use for inference on CPU
+            max_num_requests (:obj:`int`, optional): number of infer requests for asynchronous inference
+            precision (:obj:`str`, optional): inference precision (e.g. "FP16")
+            download_dir (:obj:`str`, optional): directory where to store downloaded models
+            cache_dir (:obj:`str`, optional): directory where to store compiled models to reduce the load time before the inference
+
+        Returns:
+            Model objcet
         """
         if isinstance(model, ModelAdapter):
             model_adapter = model
@@ -150,7 +155,7 @@ class Model:
                 core=core,
                 model=model,
                 weights_path=weights_path,
-                model_parameters=model_parameters,
+                model_parameters=adaptor_parameters,
                 device=device,
                 plugin_config=plugin_config,
                 max_num_requests=max_num_requests,
