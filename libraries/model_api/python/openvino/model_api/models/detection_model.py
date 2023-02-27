@@ -124,7 +124,6 @@ class DetectionModel(ImageModel):
                 detection.str_label = f"#{detection.id}"
         else:
             for detection in detections:
-                print(f"detection.id: {detection.id}")
                 detection.str_label = self.labels[detection.id]
         return detections
 
