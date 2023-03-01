@@ -29,7 +29,7 @@ class Metadata:
     meta: Dict = field(default_factory=dict)
 
 
-class ModelAdapter(metaclass=abc.ABCMeta):
+class InferenceAdapter(metaclass=abc.ABCMeta):
     """
     An abstract Model Adapter with the following interface:
 

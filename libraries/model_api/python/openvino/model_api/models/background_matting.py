@@ -23,8 +23,8 @@ from .image_model import ImageModel
 class VideoBackgroundMatting(ImageModel):
     __model__ = "Robust-video-matting"
 
-    def __init__(self, model_adapter, configuration, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self._check_io_number((5,), (6,))
         self.output_blob_name = self._get_outputs()
         self.rec_map = self.get_inputs_map()
@@ -93,8 +93,8 @@ class VideoBackgroundMatting(ImageModel):
 class ImageMattingWithBackground(ImageModel):
     __model__ = "Background-matting"
 
-    def __init__(self, model_adapter, configuration, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self._check_io_number((2,), (2, 3))
         self.output_blob_name = self._get_outputs()
         self.n, self.c, self.h, self.w = self.set_input_shape()
@@ -160,8 +160,8 @@ class ImageMattingWithBackground(ImageModel):
 class PortraitBackgroundMatting(ImageModel):
     __model__ = "Portrait-matting"
 
-    def __init__(self, model_adapter, configuration, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)
         self.output_blob_name = self._get_outputs()
 

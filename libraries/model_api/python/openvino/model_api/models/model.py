@@ -17,7 +17,7 @@
 import logging as log
 import re
 
-from openvino.model_api.adapters.model_adapter import ModelAdapter
+from openvino.model_api.adapters.inference_adapter import InferenceAdapter
 from openvino.model_api.adapters.openvino_adapter import (
     OpenvinoAdapter,
     create_core,
@@ -53,7 +53,7 @@ class Model:
 
     Attributes:
         logger (Logger): instance of the Logger
-        model_adapter (ModelAdapter): allows working with the specified executor
+        inference_adapter (ModelAdapter): allows working with the specified executor
         inputs (dict): keeps the model inputs names and `Metadata` structure for each one
         outputs (dict): keeps the model outputs names and `Metadata` structure for each one
         model_loaded (bool): a flag whether the model is loaded to device
@@ -61,11 +61,11 @@ class Model:
 
     __model__ = None  # Abstract wrapper has no name
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=None, preload=False):
         """Model constructor
 
         Args:
-            model_adapter (ModelAdapter): allows working with the specified executor
+            inference_adapter (ModelAdapter): allows working with the specified executor
             configuration (dict, optional): it contains values for parameters accepted by specific
               wrapper (`confidence_threshold`, `labels` etc.) which are set as data attributes
             preload (bool, optional): a flag whether the model is loaded to device while
@@ -75,9 +75,9 @@ class Model:
             WrapperError: if the wrapper configuration is incorrect
         """
         self.logger = log.getLogger()
-        self.model_adapter = model_adapter
-        self.inputs = self.model_adapter.get_input_layers()
-        self.outputs = self.model_adapter.get_output_layers()
+        self.inference_adapter = inference_adapter
+        self.inputs = self.inference_adapter.get_input_layers()
+        self.outputs = self.inference_adapter.get_output_layers()
         for name, parameter in self.parameters().items():
             self.__setattr__(name, parameter.default_value)
         self._load_config(configuration)
@@ -141,17 +141,17 @@ class Model:
         Returns:
             Model objcet
         """
-        if isinstance(model, ModelAdapter):
-            model_adapter = model
+        if isinstance(model, InferenceAdapter):
+            inference_adapter = model
         elif isinstance(model, str) and re.compile(
             r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9_-]+(\:\d+)*"
         ).fullmatch(model):
-            model_adapter = OVMSAdapter(model)
+            inference_adapter = OVMSAdapter(model)
         else:
             if core is None:
                 core = create_core()
                 plugin_config = get_user_config(device, nstreams, nthreads)
-            model_adapter = OpenvinoAdapter(
+            inference_adapter = OpenvinoAdapter(
                 core=core,
                 model=model,
                 weights_path=weights_path,
@@ -164,9 +164,9 @@ class Model:
                 cache_dir=cache_dir,
             )
         if model_type is None:
-            model_type = model_adapter.get_rt_info(["model_info", "model_type"])
+            model_type = inference_adapter.get_rt_info(["model_info", "model_type"])
         Model = cls.get_model(model_type)
-        return Model(model_adapter, configuration, preload)
+        return Model(inference_adapter, configuration, preload)
 
     @classmethod
     def get_subclasses(cls):
@@ -227,12 +227,12 @@ class Model:
         parameters = self.parameters()
         for name, param in parameters.items():
             try:
-                str_val = self.model_adapter.get_rt_info(["model_info", name])
+                str_val = self.inference_adapter.get_rt_info(["model_info", name])
                 value = param.from_str(str_val)
                 self.__setattr__(name, value)
             except (
                 RuntimeError
-            ) as error:  # model_adapter is not openvino adapter or IR doesn't contain requested rt_info
+            ) as error:  # inference_adapter is not openvino adapter or IR doesn't contain requested rt_info
                 if (
                     str(error)
                     != "Cannot get runtime attribute. Path to runtime attribute is incorrect."
@@ -372,7 +372,7 @@ class Model:
     def load(self, force=False):
         if not self.model_loaded or force:
             self.model_loaded = True
-            self.model_adapter.load_model()
+            self.inference_adapter.load_model()
 
     def reshape(self, new_shape):
         if self.model_loaded:
@@ -381,9 +381,9 @@ class Model:
                 "should be reloaded after reshaping.",
             )
             self.model_loaded = False
-        self.model_adapter.reshape_model(new_shape)
-        self.inputs = self.model_adapter.get_input_layers()
-        self.outputs = self.model_adapter.get_output_layers()
+        self.inference_adapter.reshape_model(new_shape)
+        self.inputs = self.inference_adapter.get_input_layers()
+        self.outputs = self.inference_adapter.get_output_layers()
 
     def infer_sync(self, dict_data):
         if not self.model_loaded:
@@ -391,7 +391,7 @@ class Model:
                 "The model is not loaded to the device. Please, create the wrapper "
                 "with preload=True option or call load() method before infer_sync()"
             )
-        return self.model_adapter.infer_sync(dict_data)
+        return self.inference_adapter.infer_sync(dict_data)
 
     def infer_async_raw(self, dict_data, callback_data):
         if not self.model_loaded:
@@ -399,7 +399,7 @@ class Model:
                 "The model is not loaded to the device. Please, create the wrapper "
                 "with preload=True option or call load() method before infer_async()"
             )
-        self.model_adapter.infer_async(dict_data, callback_data)
+        self.inference_adapter.infer_async(dict_data, callback_data)
 
     def infer_async(self, input_data, user_data):
         if not self.model_loaded:
@@ -408,11 +408,11 @@ class Model:
                 "with preload=True option or call load() method before infer_async()"
             )
         dict_data, meta = self.preprocess(input_data)
-        self.model_adapter.infer_async(
+        self.inference_adapter.infer_async(
             dict_data,
             (
                 meta,
-                self.model_adapter.get_raw_result,
+                self.inference_adapter.get_raw_result,
                 self.postprocess,
                 self.callback_fn,
                 user_data,
@@ -428,16 +428,16 @@ class Model:
 
     def set_callback(self, callback_fn):
         self.callback_fn = callback_fn
-        self.model_adapter.set_callback(Model.process_callback)
+        self.inference_adapter.set_callback(Model.process_callback)
 
     def is_ready(self):
-        return self.model_adapter.is_ready()
+        return self.inference_adapter.is_ready()
 
     def await_all(self):
-        self.model_adapter.await_all()
+        self.inference_adapter.await_all()
 
     def await_any(self):
-        self.model_adapter.await_any()
+        self.inference_adapter.await_any()
 
     def log_layers_info(self):
         """Prints the shape, precision and layout for all model inputs/outputs."""

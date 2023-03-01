@@ -123,11 +123,11 @@ input_data = cv2.imread("sample.png")
 model_path = "public/mobilenet-ssd/FP32/mobilenet-ssd.xml"
 
 # create adapter for OpenVINO™ runtime, pass the model path
-model_adapter = OpenvinoAdapter(create_core(), model_path, device="CPU")
+inference_adapter = OpenvinoAdapter(create_core(), model_path, device="CPU")
 
 # create model API wrapper for SSD architecture
 # preload=True loads the model on CPU inside the adapter
-ssd_model = SSD(model_adapter, preload=True)
+ssd_model = SSD(inference_adapter, preload=True)
 
 # apply input preprocessing, sync inference, model output postprocessing
 results = ssd_model(input_data)

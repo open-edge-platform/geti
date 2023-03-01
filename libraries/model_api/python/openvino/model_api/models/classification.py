@@ -24,8 +24,8 @@ from .utils import softmax
 class ClassificationModel(ImageModel):
     __model__ = "Classification"
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)
         if self.path_to_labels:
             self.labels = self._load_labels(self.path_to_labels)

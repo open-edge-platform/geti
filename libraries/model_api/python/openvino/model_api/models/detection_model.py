@@ -28,13 +28,13 @@ class DetectionModel(ImageModel):
     The `postprocess` method must be implemented in a specific inherited wrapper.
     """
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=None, preload=False):
         """Detection Model constructor
 
         It extends the `ImageModel` construtor.
 
         Args:
-            model_adapter (ModelAdapter): allows working with the specified executor
+            inference_adapter (ModelAdapter): allows working with the specified executor
             configuration (dict, optional): it contains values for parameters accepted by specific
               wrapper (`confidence_threshold`, `labels` etc.) which are set as data attributes
             preload (bool, optional): a flag whether the model is loaded to device while
@@ -44,7 +44,7 @@ class DetectionModel(ImageModel):
             WrapperError: if the model has more than 1 image inputs
         """
 
-        super().__init__(model_adapter, configuration, preload)
+        super().__init__(inference_adapter, configuration, preload)
 
         if not self.image_blob_name:
             self.raise_error(

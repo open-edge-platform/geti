@@ -25,8 +25,8 @@ from .utils import resize_image
 class HpeAssociativeEmbedding(ImageModel):
     __model__ = "HPE-assosiative-embedding"
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload=False)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload=False)
         self.heatmaps_blob_name = find_layer_by_name("heatmaps", self.outputs)
         try:
             self.nms_heatmaps_blob_name = find_layer_by_name(

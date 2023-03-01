@@ -26,7 +26,7 @@ class AsyncPipeline:
 
         self.completed_results = {}
         self.callback_exceptions = []
-        self.model.model_adapter.set_callback(self.callback)
+        self.model.inference_adapter.set_callback(self.callback)
 
         self.preprocess_metrics = PerformanceMetrics()
         self.inference_metrics = PerformanceMetrics()
@@ -36,7 +36,7 @@ class AsyncPipeline:
         try:
             id, meta, preprocessing_meta, start_time = callback_args
             self.completed_results[id] = (
-                self.model.model_adapter.copy_raw_result(request),
+                self.model.inference_adapter.copy_raw_result(request),
                 meta,
                 preprocessing_meta,
                 start_time,

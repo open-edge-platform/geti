@@ -28,11 +28,11 @@ import re
 
 import numpy as np
 
-from .model_adapter import Metadata, ModelAdapter
+from .inference_adapter import InferenceAdapter, Metadata
 from .utils import Layout
 
 
-class OVMSAdapter(ModelAdapter):
+class OVMSAdapter(InferenceAdapter):
     """
     Class that allows working with models served by the OpenVINO Model Server
     """

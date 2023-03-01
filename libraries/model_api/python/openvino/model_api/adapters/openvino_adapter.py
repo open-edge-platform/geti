@@ -35,7 +35,7 @@ try:
 except ImportError:
     openvino_absent = True
 
-from .model_adapter import Metadata, ModelAdapter
+from .inference_adapter import InferenceAdapter, Metadata
 from .utils import (
     Layout,
     crop_resize,
@@ -122,7 +122,7 @@ def get_user_config(
     return config
 
 
-class OpenvinoAdapter(ModelAdapter):
+class OpenvinoAdapter(InferenceAdapter):
     """
     Works with OpenVINO model
     """

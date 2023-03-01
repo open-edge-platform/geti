@@ -42,13 +42,13 @@ class ImageModel(Model):
         input_transform (InputTransform): instance of the `InputTransform` for image normalization
     """
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=None, preload=False):
         """Image model constructor
 
         It extends the `Model` constructor.
 
         Args:
-            model_adapter (ModelAdapter): allows working with the specified executor
+            inference_adapter (ModelAdapter): allows working with the specified executor
             configuration (dict, optional): it contains values for parameters accepted by specific
               wrapper (`confidence_threshold`, `labels` etc.) which are set as data attributes
             preload (bool, optional): a flag whether the model is loaded to device while
@@ -57,7 +57,7 @@ class ImageModel(Model):
         Raises:
             WrapperError: if the wrapper failed to define appropriate inputs for images
         """
-        super().__init__(model_adapter, configuration, preload)
+        super().__init__(inference_adapter, configuration, preload)
         self.image_blob_names, self.image_info_blob_names = self._get_inputs()
         self.image_blob_name = self.image_blob_names[0]
 
@@ -73,7 +73,7 @@ class ImageModel(Model):
 
         if self.embed_preprocessing:
             layout = self.inputs[self.image_blob_name].layout
-            model_adapter.embed_preprocessing(
+            inference_adapter.embed_preprocessing(
                 layout=layout,
                 resize_mode=self.resize_type,
                 interpolation_mode="LINEAR",

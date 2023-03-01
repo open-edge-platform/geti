@@ -31,13 +31,13 @@ from .types import NumericalValue
 class OpenPose(ImageModel):
     __model__ = "OpenPose"
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload=False)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload=False)
         self.pooled_heatmaps_blob_name = "pooled_heatmaps"
         self.heatmaps_blob_name = "heatmaps"
         self.pafs_blob_name = "pafs"
 
-        function = self.model_adapter.model
+        function = self.inference_adapter.model
         paf = function.get_output_op(0)
         paf_shape = paf.output(0).get_shape()
         heatmap = function.get_output_op(1)
@@ -77,10 +77,10 @@ class OpenPose(ImageModel):
         pooled_heatmap.output(0).get_tensor().set_names(
             {self.pooled_heatmaps_blob_name}
         )
-        self.model_adapter.model.add_outputs([pooled_heatmap.output(0)])
+        self.inference_adapter.model.add_outputs([pooled_heatmap.output(0)])
 
-        self.inputs = self.model_adapter.get_input_layers()
-        self.outputs = self.model_adapter.get_output_layers()
+        self.inputs = self.inference_adapter.get_input_layers()
+        self.outputs = self.inference_adapter.get_output_layers()
 
         self.output_scale = (
             self.inputs[self.image_blob_name].shape[-2]

@@ -138,8 +138,8 @@ class YOLO(DetectionModel):
 
                 self.use_input_size = True  # Weak way to determine but the only one.
 
-    def __init__(self, model_adapter, configuration, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self.is_tiny = (
             len(self.outputs) == 2
         )  # Weak way to distinguish between YOLOv4 and YOLOv4-tiny
@@ -150,7 +150,7 @@ class YOLO(DetectionModel):
 
     def _get_output_info(self):
         output_info = {}
-        yolo_regions = self.model_adapter.operations_by_type("RegionYolo")
+        yolo_regions = self.inference_adapter.operations_by_type("RegionYolo")
         for name, info in self.outputs.items():
             shape = info.shape
             if len(shape) == 2:
@@ -333,8 +333,8 @@ class YoloV4(YOLO):
             self.anchors = masked_anchors
             self.use_input_size = True
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
 
     def _get_output_info(self):
         if not self.anchors:
@@ -414,8 +414,8 @@ class YOLOF(YOLO):
             self.output_layout = "NCHW"
             self.use_input_size = True
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
 
     def _get_output_info(self):
         anchors = ANCHORS["YOLOF"]
@@ -456,8 +456,8 @@ class YOLOF(YOLO):
 class YOLOX(DetectionModel):
     __model__ = "YOLOX"
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)
         self.output_blob_name = next(iter(self.outputs))
 
@@ -571,8 +571,8 @@ class YOLOX(DetectionModel):
 class YoloV3ONNX(DetectionModel):
     __model__ = "YOLOv3-ONNX"
 
-    def __init__(self, model_adapter, configuration=None, preload=False):
-        super().__init__(model_adapter, configuration, preload)
+    def __init__(self, inference_adapter, configuration=None, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
         self.image_info_blob_name = (
             self.image_info_blob_names[0]
             if len(self.image_info_blob_names) == 1
@@ -588,7 +588,7 @@ class YoloV3ONNX(DetectionModel):
 
         if self.embed_preprocessing:
             layout = "NHWC" if self.nchw_layout else "NCHW"
-            model_adapter.embed_preprocessing(
+            inference_adapter.embed_preprocessing(
                 image_layout=layout,
                 resize_mode="standard",
                 interpolation_mode="CUBIC",
