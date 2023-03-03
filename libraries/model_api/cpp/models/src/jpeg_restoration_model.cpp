@@ -36,11 +36,11 @@
 #include "models/jpeg_restoration_model.h"
 #include "models/results.h"
 
-JPEGRestorationModel::JPEGRestorationModel(const std::string& modelFileName,
+JPEGRestorationModel::JPEGRestorationModel(const std::string& modelFile,
                                            const cv::Size& inputImgSize,
                                            bool _jpegCompression,
                                            const std::string& layout)
-    : ImageModel(modelFileName, false, layout) {
+    : ImageModel(modelFile, false, layout) {
     netInputHeight = inputImgSize.height;
     netInputWidth = inputImgSize.width;
     jpegCompression = _jpegCompression;
@@ -52,7 +52,7 @@ void JPEGRestorationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& mode
     if (model->inputs().size() != 1) {
         throw std::logic_error("The JPEG Restoration model wrapper supports topologies with only 1 input");
     }
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
 
     const ov::Shape& inputShape = model->input().get_shape();
     const ov::Layout& inputLayout = getInputLayout(model->input());
@@ -79,7 +79,7 @@ void JPEGRestorationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& mode
         throw std::logic_error("3-channel 4-dimensional model's output is expected");
     }
 
-    outputsNames.push_back(model->output().get_any_name());
+    outputNames.push_back(model->output().get_any_name());
     ppp.output().tensor().set_element_type(ov::element::f32);
     model = ppp.build();
 
@@ -109,7 +109,7 @@ void JPEGRestorationModel::changeInputSize(std::shared_ptr<ov::Model>& model) {
 }
 
 std::shared_ptr<InternalModelData> JPEGRestorationModel::preprocess(const InputData& inputData,
-                                                                    ov::InferRequest& request) {
+                                                                    InferenceInput& input) {
     cv::Mat image = inputData.asRef<ImageInputData>().inputImage;
     const size_t h = image.rows;
     const size_t w = image.cols;
@@ -129,7 +129,7 @@ std::shared_ptr<InternalModelData> JPEGRestorationModel::preprocess(const InputD
         slog::warn << "\tChosen model aspect ratio doesn't match image aspect ratio" << slog::endl;
         cv::resize(image, resizedImage, cv::Size(netInputWidth, netInputHeight));
     }
-    request.set_input_tensor(wrapMat2Tensor(resizedImage));
+    input.emplace(inputNames[0], wrapMat2Tensor(resizedImage));
 
     return std::make_shared<InternalImageModelData>(image.cols, image.rows);
 }

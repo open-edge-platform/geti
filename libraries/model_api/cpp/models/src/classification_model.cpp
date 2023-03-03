@@ -34,19 +34,19 @@
 #include "models/results.h"
 #include "models/input_data.h"
 
-ClassificationModel::ClassificationModel(const std::string& modelFileName,
+ClassificationModel::ClassificationModel(const std::string& modelFile,
                                          size_t nTop,
                                          bool useAutoResize,
                                          const std::vector<std::string>& labels,
                                          const std::string& layout)
-    : ImageModel(modelFileName, useAutoResize, layout),
+    : ImageModel(modelFile, useAutoResize, layout),
       nTop(nTop),
       labels(labels) {}
 
 std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& infResult) {
-    const ov::Tensor& indicesTensor = infResult.outputsData.find(outputsNames[0])->second;
+    const ov::Tensor& indicesTensor = infResult.outputsData.find(outputNames[0])->second;
     const int* indicesPtr = indicesTensor.data<int>();
-    const ov::Tensor& scoresTensor = infResult.outputsData.find(outputsNames[1])->second;
+    const ov::Tensor& scoresTensor = infResult.outputsData.find(outputNames[1])->second;
     const float* scoresPtr = scoresTensor.data<float>();
 
     ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
@@ -93,7 +93,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
         throw std::logic_error("Classification model wrapper supports topologies with only 1 input");
     }
     const auto& input = model->input();
-    inputsNames.push_back(input.get_any_name());
+    inputNames.push_back(input.get_any_name());
 
     const ov::Shape& inputShape = input.get_shape();
     const ov::Layout& inputLayout = getInputLayout(input);
@@ -185,9 +185,9 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
 
     // manually set output tensors name for created topK node
     model->outputs()[0].set_names({"indices"});
-    outputsNames.push_back("indices");
+    outputNames.push_back("indices");
     model->outputs()[1].set_names({"scores"});
-    outputsNames.push_back("scores");
+    outputNames.push_back("scores");
 
     // set output precisions
     ppp = ov::preprocess::PrePostProcessor(model);

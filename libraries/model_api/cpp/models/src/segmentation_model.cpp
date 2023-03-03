@@ -32,8 +32,8 @@
 #include "models/input_data.h"
 #include "models/results.h"
 
-SegmentationModel::SegmentationModel(const std::string& modelFileName, bool useAutoResize, const std::string& layout)
-    : ImageModel(modelFileName, useAutoResize, layout) {}
+SegmentationModel::SegmentationModel(const std::string& modelFile, bool useAutoResize, const std::string& layout)
+    : ImageModel(modelFile, useAutoResize, layout) {}
 
 std::vector<std::string> SegmentationModel::loadLabels(const std::string& labelFilename) {
     std::vector<std::string> labelsList;
@@ -61,7 +61,7 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
         throw std::logic_error("Segmentation model wrapper supports topologies with only 1 input");
     }
     const auto& input = model->input();
-    inputsNames.push_back(input.get_any_name());
+    inputNames.push_back(input.get_any_name());
 
     const ov::Layout& inputLayout = getInputLayout(input);
     const ov::Shape& inputShape = input.get_shape();
@@ -89,7 +89,7 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
     }
 
     const auto& output = model->output();
-    outputsNames.push_back(output.get_any_name());
+    outputNames.push_back(output.get_any_name());
 
     const ov::Shape& outputShape = output.get_shape();
     ov::Layout outputLayout("");

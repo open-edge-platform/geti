@@ -31,10 +31,10 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-DeblurringModel::DeblurringModel(const std::string& modelFileName,
+DeblurringModel::DeblurringModel(const std::string& modelFile,
                                  const cv::Size& inputImgSize,
                                  const std::string& layout)
-    : ImageModel(modelFileName, false, layout) {
+    : ImageModel(modelFile, false, layout) {
     netInputHeight = inputImgSize.height;
     netInputWidth = inputImgSize.width;
 }
@@ -46,7 +46,7 @@ void DeblurringModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
         throw std::logic_error("Deblurring model wrapper supports topologies with only 1 input");
     }
 
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
 
     const ov::Shape& inputShape = model->input().get_shape();
     const ov::Layout& inputLayout = getInputLayout(model->input());
@@ -66,7 +66,7 @@ void DeblurringModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
         throw std::logic_error("Deblurring model wrapper supports topologies with only 1 output");
     }
 
-    outputsNames.push_back(model->output().get_any_name());
+    outputNames.push_back(model->output().get_any_name());
 
     const ov::Shape& outputShape = model->output().get_shape();
     const ov::Layout outputLayout("NCHW");
@@ -105,7 +105,7 @@ void DeblurringModel::changeInputSize(std::shared_ptr<ov::Model>& model) {
     model->reshape(inputShape);
 }
 
-std::shared_ptr<InternalModelData> DeblurringModel::preprocess(const InputData& inputData, ov::InferRequest& request) {
+std::shared_ptr<InternalModelData> DeblurringModel::preprocess(const InputData& inputData, InferenceInput& input) {
     auto& image = inputData.asRef<ImageInputData>().inputImage;
     size_t h = image.rows;
     size_t w = image.cols;
@@ -119,7 +119,7 @@ std::shared_ptr<InternalModelData> DeblurringModel::preprocess(const InputData& 
         slog::warn << "\tChosen model aspect ratio doesn't match image aspect ratio" << slog::endl;
         cv::resize(image, resizedImage, cv::Size(netInputWidth, netInputHeight));
     }
-    request.set_input_tensor(wrapMat2Tensor(resizedImage));
+    input.emplace(inputNames[0], wrapMat2Tensor(resizedImage));
 
     return std::make_shared<InternalImageModelData>(image.cols, image.rows);
 }

@@ -32,16 +32,20 @@ file(GLOB MODELS_SOURCES ./models/src/*.cpp)
 file(GLOB MODELS_HEADERS ./models/include/models/*.h)
 file(GLOB_RECURSE UTILS_HEADERS ./utils/include/*)
 file(GLOB_RECURSE UTILS_SOURCES ./utils/src/*.cpp)
+file(GLOB_RECURSE ADAPTERS_HEADERS ./adapters/include/*)
+file(GLOB_RECURSE ADAPTERS_SOURCES ./adapters/src/*.cpp)
 
 # Create named folders for the sources within the .vcproj
 # Empty name lists them directly under the .vcproj
 source_group("models/src" FILES ${MODELS_SOURCES})
 source_group("models/include" FILES ${MODELS_HEADERS})
-source_group("uutils/src" FILES ${UTILS_SOURCES})
+source_group("utils/src" FILES ${UTILS_SOURCES})
 source_group("utils/include" FILES ${UTILS_HEADERS})
+source_group("adapters/src" FILES ${ADAPTERS_SOURCES})
+source_group("adapters/include" FILES ${ADAPTERS_HEADERS})
 
-add_library(model_api STATIC ${MODELS_SOURCES} ${UTILS_SOURCES})
-target_include_directories(model_api PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/models/include>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/utils/include>" "$<INSTALL_INTERFACE:include>")
+add_library(model_api STATIC ${MODELS_SOURCES} ${UTILS_SOURCES} ${ADAPTERS_SOURCES})
+target_include_directories(model_api PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/models/include>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/utils/include>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/adapters/include>" "$<INSTALL_INTERFACE:include>")
 target_link_libraries(model_api PUBLIC openvino::runtime opencv_core opencv_imgproc)
 
 include(GenerateExportHeader)
@@ -57,7 +61,7 @@ install(TARGETS model_api EXPORT model_apiTargets
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
     INCLUDES DESTINATION include)
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/models/include/" "${CMAKE_CURRENT_SOURCE_DIR}/utils/include/"
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/models/include/" "${CMAKE_CURRENT_SOURCE_DIR}/utils/include/" "${CMAKE_CURRENT_SOURCE_DIR}/adapters/include/"
     DESTINATION include COMPONENT Devel)
 
 include(CMakePackageConfigHelpers)

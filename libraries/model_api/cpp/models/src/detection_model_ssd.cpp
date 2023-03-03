@@ -33,28 +33,31 @@
 
 struct InputData;
 
-ModelSSD::ModelSSD(const std::string& modelFileName,
+ModelSSD::ModelSSD(const std::string& modelFile,
                    float confidenceThreshold,
                    bool useAutoResize,
                    const std::vector<std::string>& labels,
                    const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, useAutoResize, labels, layout) {}
+    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, labels, layout) {}
 
-std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, ov::InferRequest& request) {
-    if (inputsNames.size() > 1) {
-        const auto& imageInfoTensor = request.get_tensor(inputsNames[1]);
-        const auto info = imageInfoTensor.data<float>();
-        info[0] = static_cast<float>(netInputHeight);
-        info[1] = static_cast<float>(netInputWidth);
-        info[2] = 1;
-        request.set_tensor(inputsNames[1], imageInfoTensor);
+std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
+    if (inputNames.size() > 1) {
+        cv::Mat info(cv::Size(1, 3), CV_32SC1);
+        info.at<int>(0, 0) = static_cast<float>(netInputHeight);
+        info.at<int>(0, 1) = static_cast<float>(netInputWidth);
+        info.at<int>(0, 2) = 1;
+        auto allocator = std::make_shared<SharedTensorAllocator>(info);
+        ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 3}),  ov::Allocator(allocator));
+
+        input.emplace(inputNames[1], infoInput);
+
     }
 
-    return DetectionModel::preprocess(inputData, request);
+    return DetectionModel::preprocess(inputData, input);
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocess(InferenceResult& infResult) {
-    return outputsNames.size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
+    return outputNames.size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& infResult) {
@@ -106,10 +109,10 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult& infResult) {
-    const float* boxes = infResult.outputsData[outputsNames[0]].data<float>();
-    size_t detectionsNum = infResult.outputsData[outputsNames[0]].get_shape()[detectionsNumId];
-    const float* labels = infResult.outputsData[outputsNames[1]].data<float>();
-    const float* scores = outputsNames.size() > 2 ? infResult.outputsData[outputsNames[2]].data<float>() : nullptr;
+    const float* boxes = infResult.outputsData[outputNames[0]].data<float>();
+    size_t detectionsNum = infResult.outputsData[outputNames[0]].get_shape()[detectionsNumId];
+    const float* labels = infResult.outputsData[outputNames[1]].data<float>();
+    const float* scores = outputNames.size() > 2 ? infResult.outputsData[outputNames[2]].data<float>() : nullptr;
 
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
@@ -159,10 +162,10 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
         ov::Layout inputLayout = getInputLayout(input);
 
         if (shape.size() == 4) {  // 1st input contains images
-            if (inputsNames.empty()) {
-                inputsNames.push_back(inputTensorName);
+            if (inputNames.empty()) {
+                inputNames.push_back(inputTensorName);
             } else {
-                inputsNames[0] = inputTensorName;
+                inputNames[0] = inputTensorName;
             }
 
             inputTransform.setPrecision(ppp, inputTensorName);
@@ -182,8 +185,8 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             netInputWidth = shape[ov::layout::width_idx(inputLayout)];
             netInputHeight = shape[ov::layout::height_idx(inputLayout)];
         } else if (shape.size() == 2) {  // 2nd input contains image info
-            inputsNames.resize(2);
-            inputsNames[1] = inputTensorName;
+            inputNames.resize(2);
+            inputNames[1] = inputTensorName;
             ppp.input(inputTensorName).tensor().set_element_type(ov::element::f32);
         } else {
             throw std::logic_error("Unsupported " + std::to_string(input.get_shape().size()) +
@@ -206,7 +209,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
 
 void ModelSSD::prepareSingleOutput(std::shared_ptr<ov::Model>& model) {
     const auto& output = model->output();
-    outputsNames.push_back(output.get_any_name());
+    outputNames.push_back(output.get_any_name());
 
     const ov::Shape& shape = output.get_shape();
     const ov::Layout& layout("NCHW");
@@ -230,25 +233,25 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
         const auto& tensorNames = output.get_names();
         for (const auto& name : tensorNames) {
             if (name.find("boxes") != std::string::npos) {
-                outputsNames.push_back(name);
+                outputNames.push_back(name);
                 break;
             } else if (name.find("labels") != std::string::npos) {
-                outputsNames.push_back(name);
+                outputNames.push_back(name);
                 break;
             } else if (name.find("scores") != std::string::npos) {
-                outputsNames.push_back(name);
+                outputNames.push_back(name);
                 break;
             }
         }
     }
-    if (outputsNames.size() != 2 && outputsNames.size() != 3) {
+    if (outputNames.size() != 2 && outputNames.size() != 3) {
         throw std::logic_error("SSD model wrapper must have 2 or 3 outputs, but had " +
-                               std::to_string(outputsNames.size()));
+                               std::to_string(outputNames.size()));
     }
-    std::sort(outputsNames.begin(), outputsNames.end());
+    std::sort(outputNames.begin(), outputNames.end());
 
     ov::preprocess::PrePostProcessor ppp(model);
-    const auto& boxesShape = model->output(outputsNames[0]).get_partial_shape().get_max_shape();
+    const auto& boxesShape = model->output(outputNames[0]).get_partial_shape().get_max_shape();
 
     ov::Layout boxesLayout;
     if (boxesShape.size() == 2) {
@@ -272,9 +275,9 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
                                std::to_string(boxesShape.size()));
     }
 
-    ppp.output(outputsNames[0]).tensor().set_layout(boxesLayout);
+    ppp.output(outputNames[0]).tensor().set_layout(boxesLayout);
 
-    for (const auto& outName : outputsNames) {
+    for (const auto& outName : outputNames) {
         ppp.output(outName).tensor().set_element_type(ov::element::f32);
     }
     model = ppp.build();

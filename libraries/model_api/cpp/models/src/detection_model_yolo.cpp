@@ -98,7 +98,7 @@ static inline float linear(float x) {
     return x;
 }
 
-ModelYolo::ModelYolo(const std::string& modelFileName,
+ModelYolo::ModelYolo(const std::string& modelFile,
                      float confidenceThreshold,
                      bool useAutoResize,
                      bool useAdvancedPostprocessing,
@@ -107,7 +107,7 @@ ModelYolo::ModelYolo(const std::string& modelFileName,
                      const std::vector<float>& anchors,
                      const std::vector<int64_t>& masks,
                      const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, useAutoResize, labels, layout),
+    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, labels, layout),
       boxIOUThreshold(boxIOUThreshold),
       useAdvancedPostprocessing(useAdvancedPostprocessing),
       yoloVersion(YOLO_V3),
@@ -144,7 +144,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ppp.input().model().set_layout(inputLayout);
 
     //--- Reading image input parameters
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
     netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
     netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
 
@@ -163,7 +163,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             // yolo-v1-tiny-tf out shape is [1, 21125] thus set layout only for 4 dim tensors
             ppp.output(out.get_any_name()).tensor().set_layout("NCHW");
         }
-        outputsNames.push_back(out.get_any_name());
+        outputNames.push_back(out.get_any_name());
         outShapes[out.get_any_name()] = out.get_shape();
     }
     model = ppp.build();
@@ -192,7 +192,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     }
 
     if (!isRegionFound) {
-        switch (outputsNames.size()) {
+        switch (outputNames.size()) {
             case 1:
                 yoloVersion = YOLOF;
                 break;
@@ -215,14 +215,14 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                      std::to_string(num * outputs.size()));
         }
 
-        std::sort(outputsNames.begin(),
-                  outputsNames.end(),
+        std::sort(outputNames.begin(),
+                  outputNames.end(),
                   [&outShapes, this](const std::string& x, const std::string& y) {
                       return outShapes[x][ov::layout::height_idx(yoloRegionLayout)] >
                              outShapes[y][ov::layout::height_idx(yoloRegionLayout)];
                   });
 
-        for (const auto& name : outputsNames) {
+        for (const auto& name : outputNames) {
             const auto& shape = outShapes[name];
             if (shape[ov::layout::channels_idx(yoloRegionLayout)] % num != 0) {
                 throw std::logic_error(std::string("Output tensor ") + name + " has wrong channel dimension");

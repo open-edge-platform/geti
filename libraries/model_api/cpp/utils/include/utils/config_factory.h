@@ -28,7 +28,7 @@ struct ModelConfig {
     std::string cpuExtensionsPath;
     std::string clKernelsConfigPath;
     unsigned int maxAsyncRequests;
-    ov::AnyMap compiledModelConfig;
+    ov::AnyMap compilationConfig;
 
     std::set<std::string> getDevices();
     std::map<std::string, std::string> getLegacyConfig();

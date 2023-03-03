@@ -36,7 +36,7 @@ class ModelFaceBoxes : public DetectionModel {
 public:
     static const int INIT_VECTOR_SIZE = 200;
 
-    ModelFaceBoxes(const std::string& modelFileName,
+    ModelFaceBoxes(const std::string& modelFile,
                    float confidenceThreshold,
                    bool useAutoResize,
                    float boxIOUThreshold,

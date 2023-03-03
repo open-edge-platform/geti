@@ -31,12 +31,12 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-ModelRetinaFace::ModelRetinaFace(const std::string& modelFileName,
+ModelRetinaFace::ModelRetinaFace(const std::string& modelFile,
                                  float confidenceThreshold,
                                  bool useAutoResize,
                                  float boxIOUThreshold,
                                  const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, useAutoResize, {"Face"}, layout),  // Default label is "Face"
+    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, {"Face"}, layout),  // Default label is "Face"
       shouldDetectMasks(false),
       shouldDetectLandmarks(false),
       boxIOUThreshold(boxIOUThreshold),
@@ -74,7 +74,7 @@ void ModelRetinaFace::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ppp.input().model().set_layout(inputLayout);
 
     // --------------------------- Reading image input parameters -------------------------------------------
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
     netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
     netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
 
@@ -89,7 +89,7 @@ void ModelRetinaFace::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     std::vector<size_t> outputsSizes[OUT_MAX];
     for (const auto& output : model->outputs()) {
         auto outTensorName = output.get_any_name();
-        outputsNames.push_back(outTensorName);
+        outputNames.push_back(outTensorName);
         ppp.output(outTensorName).tensor().set_element_type(ov::element::f32).set_layout(outputLayout);
 
         OutputType type = OUT_MAX;
@@ -118,7 +118,7 @@ void ModelRetinaFace::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                 break;
             }
         }
-        separateOutputsNames[type].insert(separateOutputsNames[type].begin() + i, outTensorName);
+        separateoutputNames[type].insert(separateoutputNames[type].begin() + i, outTensorName);
         outputsSizes[type].insert(outputsSizes[type].begin() + i, num);
     }
     model = ppp.build();
@@ -329,8 +329,8 @@ std::unique_ptr<ResultBase> ModelRetinaFace::postprocess(InferenceResult& infRes
     // --------------------------- Gather & Filter output from all levels
     // ----------------------------------------------------------
     for (size_t idx = 0; idx < anchorCfg.size(); ++idx) {
-        const auto boxRaw = infResult.outputsData[separateOutputsNames[OUT_BOXES][idx]];
-        const auto scoresRaw = infResult.outputsData[separateOutputsNames[OUT_SCORES][idx]];
+        const auto boxRaw = infResult.outputsData[separateoutputNames[OUT_BOXES][idx]];
+        const auto scoresRaw = infResult.outputsData[separateoutputNames[OUT_SCORES][idx]];
         auto s = anchorCfg[idx].stride;
         auto anchorNum = anchorsFpn[s].size();
 
@@ -338,11 +338,11 @@ std::unique_ptr<ResultBase> ModelRetinaFace::postprocess(InferenceResult& infRes
         filterScores(scores, validIndices, scoresRaw, anchorNum);
         filterBoxes(boxes, validIndices, boxRaw, anchorNum, anchors[idx]);
         if (shouldDetectLandmarks) {
-            const auto landmarksRaw = infResult.outputsData[separateOutputsNames[OUT_LANDMARKS][idx]];
+            const auto landmarksRaw = infResult.outputsData[separateoutputNames[OUT_LANDMARKS][idx]];
             filterLandmarks(landmarks, validIndices, landmarksRaw, anchorNum, anchors[idx], landmarkStd);
         }
         if (shouldDetectMasks) {
-            const auto masksRaw = infResult.outputsData[separateOutputsNames[OUT_MASKSCORES][idx]];
+            const auto masksRaw = infResult.outputsData[separateoutputNames[OUT_MASKSCORES][idx]];
             filterMasksScores(masks, validIndices, masksRaw, anchorNum);
         }
     }

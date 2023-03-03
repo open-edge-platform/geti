@@ -36,11 +36,11 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-ModelCenterNet::ModelCenterNet(const std::string& modelFileName,
+ModelCenterNet::ModelCenterNet(const std::string& modelFile,
                                float confidenceThreshold,
                                const std::vector<std::string>& labels,
                                const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, false, labels, layout) {}
+    : DetectionModel(modelFile, confidenceThreshold, false, labels, layout) {}
 
 void ModelCenterNet::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------
@@ -63,7 +63,7 @@ void ModelCenterNet::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ppp.input().model().set_layout(inputLayout);
 
     // --------------------------- Reading image input parameters -------------------------------------------
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
     netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
     netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
 
@@ -75,10 +75,10 @@ void ModelCenterNet::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     const ov::Layout outLayout{"NCHW"};
     for (const auto& output : model->outputs()) {
         auto outTensorName = output.get_any_name();
-        outputsNames.push_back(outTensorName);
+        outputNames.push_back(outTensorName);
         ppp.output(outTensorName).tensor().set_element_type(ov::element::f32).set_layout(outLayout);
     }
-    std::sort(outputsNames.begin(), outputsNames.end());
+    std::sort(outputNames.begin(), outputNames.end());
     model = ppp.build();
 }
 
@@ -129,11 +129,11 @@ cv::Mat getAffineTransform(float centerX,
     return trans;
 }
 
-std::shared_ptr<InternalModelData> ModelCenterNet::preprocess(const InputData& inputData, ov::InferRequest& request) {
+std::shared_ptr<InternalModelData> ModelCenterNet::preprocess(const InputData& inputData, InferenceInput& input) {
     auto& img = inputData.asRef<ImageInputData>().inputImage;
     const auto& resizedImg = resizeImageExt(img, netInputWidth, netInputHeight, RESIZE_KEEP_ASPECT_LETTERBOX);
 
-    request.set_input_tensor(wrapMat2Tensor(inputTransform(resizedImg)));
+    input.emplace(inputNames[0], wrapMat2Tensor(inputTransform(resizedImg)));
     return std::make_shared<InternalImageModelData>(img.cols, img.rows);
 }
 
@@ -259,15 +259,15 @@ void transform(std::vector<ModelCenterNet::BBox>& boxes,
 
 std::unique_ptr<ResultBase> ModelCenterNet::postprocess(InferenceResult& infResult) {
     // --------------------------- Filter data and get valid indices ---------------------------------
-    const auto& heatmapTensor = infResult.outputsData[outputsNames[0]];
+    const auto& heatmapTensor = infResult.outputsData[outputNames[0]];
     const auto& heatmapTensorShape = heatmapTensor.get_shape();
     const auto chSize = heatmapTensorShape[2] * heatmapTensorShape[3];
     const auto scores = filterScores(heatmapTensor, confidenceThreshold);
 
-    const auto& regressionTensor = infResult.outputsData[outputsNames[1]];
+    const auto& regressionTensor = infResult.outputsData[outputNames[1]];
     const auto reg = filterReg(regressionTensor, scores, chSize);
 
-    const auto& whTensor = infResult.outputsData[outputsNames[2]];
+    const auto& whTensor = infResult.outputsData[outputNames[2]];
     const auto wh = filterWH(whTensor, scores, chSize);
 
     // --------------------------- Calculate bounding boxes & apply inverse affine transform ----------

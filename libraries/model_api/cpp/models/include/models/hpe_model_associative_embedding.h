@@ -39,13 +39,13 @@ struct ResultBase;
 class HpeAssociativeEmbedding : public ImageModel {
 public:
     /// Constructor
-    /// @param modelFileName name of model to load
+    /// @param modelFile name of model to load
     /// @param aspectRatio - the ratio of input width to its height.
     /// @param targetSize - the length of a short image side used for model reshaping.
     /// @param confidenceThreshold - threshold to eliminate low-confidence poses.
     /// Any pose with confidence lower than this threshold will be ignored.
     /// @param layout - model input layout
-    HpeAssociativeEmbedding(const std::string& modelFileName,
+    HpeAssociativeEmbedding(const std::string& modelFile,
                             double aspectRatio,
                             int targetSize,
                             float confidenceThreshold,
@@ -55,7 +55,7 @@ public:
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
-    std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, ov::InferRequest& request) override;
+    std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
 
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
@@ -79,7 +79,7 @@ protected:
 
     void changeInputSize(std::shared_ptr<ov::Model>& model);
 
-    std::string findTensorByName(const std::string& tensorName, const std::vector<std::string>& outputsNames);
+    std::string findTensorByName(const std::string& tensorName, const std::vector<std::string>& outputNames);
 
     std::vector<cv::Mat> split(float* data, const ov::Shape& shape);
 

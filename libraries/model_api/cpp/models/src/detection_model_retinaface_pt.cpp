@@ -34,12 +34,12 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-ModelRetinaFacePT::ModelRetinaFacePT(const std::string& modelFileName,
+ModelRetinaFacePT::ModelRetinaFacePT(const std::string& modelFile,
                                      float confidenceThreshold,
                                      bool useAutoResize,
                                      float boxIOUThreshold,
                                      const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, useAutoResize, {"Face"}, layout),  // Default label is "Face"
+    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, {"Face"}, layout),  // Default label is "Face"
       landmarksNum(0),
       boxIOUThreshold(boxIOUThreshold) {}
 
@@ -73,7 +73,7 @@ void ModelRetinaFacePT::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
     ppp.input().model().set_layout(inputLayout);
 
     // --------------------------- Reading image input parameters -------------------------------------------
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
     netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
     netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
 
@@ -84,27 +84,27 @@ void ModelRetinaFacePT::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
 
     landmarksNum = 0;
 
-    outputsNames.resize(2);
+    outputNames.resize(2);
     std::vector<uint32_t> outputsSizes[OUT_MAX];
     const ov::Layout chw("CHW");
     const ov::Layout nchw("NCHW");
     for (auto& output : model->outputs()) {
         auto outTensorName = output.get_any_name();
-        outputsNames.push_back(outTensorName);
+        outputNames.push_back(outTensorName);
         ppp.output(outTensorName)
             .tensor()
             .set_element_type(ov::element::f32)
             .set_layout(output.get_shape().size() == 4 ? nchw : chw);
 
         if (outTensorName.find("bbox") != std::string::npos) {
-            outputsNames[OUT_BOXES] = outTensorName;
+            outputNames[OUT_BOXES] = outTensorName;
         } else if (outTensorName.find("cls") != std::string::npos) {
-            outputsNames[OUT_SCORES] = outTensorName;
+            outputNames[OUT_SCORES] = outTensorName;
         } else if (outTensorName.find("landmark") != std::string::npos) {
             // Landmarks might be optional, if it is present, resize names array to fit landmarks output name to the
             // last item of array Considering that other outputs names are already filled in or will be filled later
-            outputsNames.resize(std::max(outputsNames.size(), (size_t)OUT_LANDMARKS + 1));
-            outputsNames[OUT_LANDMARKS] = outTensorName;
+            outputNames.resize(std::max(outputNames.size(), (size_t)OUT_LANDMARKS + 1));
+            outputNames[OUT_LANDMARKS] = outTensorName;
             landmarksNum =
                 output.get_shape()[ov::layout::width_idx(chw)] / 2;  // Each landmark consist of 2 variables (x and y)
         } else {
@@ -112,7 +112,7 @@ void ModelRetinaFacePT::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
         }
     }
 
-    if (outputsNames[OUT_BOXES] == "" || outputsNames[OUT_SCORES] == "") {
+    if (outputNames[OUT_BOXES] == "" || outputNames[OUT_SCORES] == "") {
         throw std::logic_error("Bbox or cls layers are not found");
     }
 
@@ -229,14 +229,14 @@ std::vector<Anchor> ModelRetinaFacePT::getFilteredProposals(const ov::Tensor& bo
 
 std::unique_ptr<ResultBase> ModelRetinaFacePT::postprocess(InferenceResult& infResult) {
     // (raw_output, scale_x, scale_y, face_prob_threshold, image_size):
-    const auto boxesTensor = infResult.outputsData[outputsNames[OUT_BOXES]];
-    const auto scoresTensor = infResult.outputsData[outputsNames[OUT_SCORES]];
+    const auto boxesTensor = infResult.outputsData[outputNames[OUT_BOXES]];
+    const auto scoresTensor = infResult.outputsData[outputNames[OUT_SCORES]];
 
     const auto& validIndicies = filterByScore(scoresTensor, confidenceThreshold);
     const auto& scores = getFilteredScores(scoresTensor, validIndicies);
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
-    const auto& landmarks = landmarksNum ? getFilteredLandmarks(infResult.outputsData[outputsNames[OUT_LANDMARKS]],
+    const auto& landmarks = landmarksNum ? getFilteredLandmarks(infResult.outputsData[outputNames[OUT_LANDMARKS]],
                                                                 validIndicies,
                                                                 internalData.inputImgWidth,
                                                                 internalData.inputImgHeight)

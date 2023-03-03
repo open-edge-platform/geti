@@ -42,14 +42,14 @@ const cv::Vec3f HpeAssociativeEmbedding::meanPixel = cv::Vec3f::all(128);
 const float HpeAssociativeEmbedding::detectionThreshold = 0.1f;
 const float HpeAssociativeEmbedding::tagThreshold = 1.0f;
 
-HpeAssociativeEmbedding::HpeAssociativeEmbedding(const std::string& modelFileName,
+HpeAssociativeEmbedding::HpeAssociativeEmbedding(const std::string& modelFile,
                                                  double aspectRatio,
                                                  int targetSize,
                                                  float confidenceThreshold,
                                                  const std::string& layout,
                                                  float delta,
                                                  RESIZE_MODE resizeMode)
-    : ImageModel(modelFileName, false, layout),
+    : ImageModel(modelFile, false, layout),
       aspectRatio(aspectRatio),
       targetSize(targetSize),
       confidenceThreshold(confidenceThreshold),
@@ -64,7 +64,7 @@ void HpeAssociativeEmbedding::prepareInputsOutputs(std::shared_ptr<ov::Model>& m
     if (model->inputs().size() != 1) {
         throw std::logic_error("HPE AE model wrapper supports topologies with only 1 input.");
     }
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
 
     const ov::Shape& inputShape = model->input().get_shape();
     const ov::Layout& inputLayout = getInputLayout(model->input());
@@ -90,7 +90,7 @@ void HpeAssociativeEmbedding::prepareInputsOutputs(std::shared_ptr<ov::Model>& m
         ppp.output(outTensorName).tensor().set_element_type(ov::element::f32);
 
         for (const auto& name : output.get_names()) {
-            outputsNames.push_back(name);
+            outputNames.push_back(name);
         }
 
         const ov::Shape& outputShape = output.get_shape();
@@ -103,10 +103,10 @@ void HpeAssociativeEmbedding::prepareInputsOutputs(std::shared_ptr<ov::Model>& m
     }
     model = ppp.build();
 
-    embeddingsTensorName = findTensorByName("embeddings", outputsNames);
-    heatmapsTensorName = findTensorByName("heatmaps", outputsNames);
+    embeddingsTensorName = findTensorByName("embeddings", outputNames);
+    heatmapsTensorName = findTensorByName("heatmaps", outputNames);
     try {
-        nmsHeatmapsTensorName = findTensorByName("nms_heatmaps", outputsNames);
+        nmsHeatmapsTensorName = findTensorByName("nms_heatmaps", outputNames);
     } catch (const std::runtime_error&) { nmsHeatmapsTensorName = heatmapsTensorName; }
 
     changeInputSize(model);
@@ -135,14 +135,14 @@ void HpeAssociativeEmbedding::changeInputSize(std::shared_ptr<ov::Model>& model)
 }
 
 std::shared_ptr<InternalModelData> HpeAssociativeEmbedding::preprocess(const InputData& inputData,
-                                                                       ov::InferRequest& request) {
+                                                                       InferenceInput& input) {
     auto& image = inputData.asRef<ImageInputData>().inputImage;
     cv::Rect roi;
     auto paddedImage = resizeImageExt(image, inputLayerSize.width, inputLayerSize.height, resizeMode, interpolationMode, &roi);
     if (inputLayerSize.height - stride >= roi.height || inputLayerSize.width - stride >= roi.width) {
         slog::warn << "\tChosen model aspect ratio doesn't match image aspect ratio" << slog::endl;
     }
-    request.set_input_tensor(wrapMat2Tensor(paddedImage));
+    input.emplace(inputNames[0], wrapMat2Tensor(paddedImage));
 
     return std::make_shared<InternalScaleData>(paddedImage.cols,
                                                paddedImage.rows,
@@ -204,9 +204,9 @@ std::unique_ptr<ResultBase> HpeAssociativeEmbedding::postprocess(InferenceResult
 }
 
 std::string HpeAssociativeEmbedding::findTensorByName(const std::string& tensorName,
-                                                      const std::vector<std::string>& outputsNames) {
+                                                      const std::vector<std::string>& outputNames) {
     std::vector<std::string> suitableLayers;
-    for (auto& outputName : outputsNames) {
+    for (auto& outputName : outputNames) {
         if (outputName.rfind(tensorName, 0) == 0) {
             suitableLayers.push_back(outputName);
         }

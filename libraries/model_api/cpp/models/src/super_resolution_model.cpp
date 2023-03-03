@@ -35,10 +35,10 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-SuperResolutionModel::SuperResolutionModel(const std::string& modelFileName,
+SuperResolutionModel::SuperResolutionModel(const std::string& modelFile,
                                            const cv::Size& inputImgSize,
                                            const std::string& layout)
-    : ImageModel(modelFileName, false, layout) {
+    : ImageModel(modelFile, false, layout) {
     netInputHeight = inputImgSize.height;
     netInputWidth = inputImgSize.width;
 }
@@ -51,7 +51,7 @@ void SuperResolutionModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& mode
         throw std::logic_error("Super resolution model wrapper supports topologies with 1 or 2 inputs only");
     }
     std::string lrInputTensorName = inputs.begin()->get_any_name();
-    inputsNames.push_back(lrInputTensorName);
+    inputNames.push_back(lrInputTensorName);
     ov::Shape lrShape = inputs.begin()->get_shape();
     if (lrShape.size() != 4) {
         throw std::logic_error("Number of dimensions for an input must be 4");
@@ -72,14 +72,14 @@ void SuperResolutionModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& mode
     if (inputs.size() == 2) {
         std::string bicInputTensorName;
         bicInputTensorName = (++inputs.begin())->get_any_name();
-        inputsNames.push_back(bicInputTensorName);
+        inputNames.push_back(bicInputTensorName);
         ov::Shape bicShape = (++inputs.begin())->get_shape();
         if (bicShape.size() != 4) {
             throw std::logic_error("Number of dimensions for both inputs must be 4");
         }
         if (lrShape[widthId] >= bicShape[widthId] && lrShape[heightId] >= bicShape[heightId]) {
             std::swap(bicShape, lrShape);
-            inputsNames[0].swap(inputsNames[1]);
+            inputNames[0].swap(inputNames[1]);
         } else if (!(lrShape[widthId] <= bicShape[widthId] && lrShape[heightId] <= bicShape[heightId])) {
             throw std::logic_error("Each spatial dimension of one input must surpass or be equal to a spatial"
                                    "dimension of another input");
@@ -99,7 +99,7 @@ void SuperResolutionModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& mode
         throw std::logic_error("Super resolution model wrapper supports topologies with only 1 output");
     }
 
-    outputsNames.push_back(outputs.begin()->get_any_name());
+    outputNames.push_back(outputs.begin()->get_any_name());
     ppp.output().tensor().set_element_type(ov::element::f32);
     model = ppp.build();
 
@@ -144,32 +144,32 @@ void SuperResolutionModel::changeInputSize(std::shared_ptr<ov::Model>& model, in
 }
 
 std::shared_ptr<InternalModelData> SuperResolutionModel::preprocess(const InputData& inputData,
-                                                                    ov::InferRequest& request) {
+                                                                    InferenceInput& input) {
     auto imgData = inputData.asRef<ImageInputData>();
     auto& img = imgData.inputImage;
 
-    const ov::Tensor lrInputTensor = request.get_tensor(inputsNames[0]);
+    auto lrShape = inferenceAdapter->getInputShape(inputNames[0]);
     const ov::Layout layout("NHWC");
 
-    if (img.channels() != static_cast<int>(lrInputTensor.get_shape()[ov::layout::channels_idx(layout)])) {
+    if (img.channels() != static_cast<int>(lrShape[ov::layout::channels_idx(layout)])) {
         cv::cvtColor(img, img, cv::COLOR_BGR2GRAY);
     }
 
     if (static_cast<size_t>(img.cols) != netInputWidth || static_cast<size_t>(img.rows) != netInputHeight) {
         slog::warn << "\tChosen model aspect ratio doesn't match image aspect ratio" << slog::endl;
     }
-    const size_t height = lrInputTensor.get_shape()[ov::layout::height_idx(layout)];
-    const size_t width = lrInputTensor.get_shape()[ov::layout::width_idx(layout)];
+    const size_t height = lrShape[ov::layout::height_idx(layout)];
+    const size_t width = lrShape[ov::layout::width_idx(layout)];
     img = resizeImageExt(img, width, height);
-    request.set_tensor(inputsNames[0], wrapMat2Tensor(img));
+    input.emplace(inputNames[0], wrapMat2Tensor(img));
 
-    if (inputsNames.size() == 2) {
-        const ov::Tensor bicInputTensor = request.get_tensor(inputsNames[1]);
-        const int h = static_cast<int>(bicInputTensor.get_shape()[ov::layout::height_idx(layout)]);
-        const int w = static_cast<int>(bicInputTensor.get_shape()[ov::layout::width_idx(layout)]);
+    if (inputNames.size() == 2) {
+        auto bicShape = inferenceAdapter->getInputShape(inputNames[1]);
+        const int h = static_cast<int>(bicShape[ov::layout::height_idx(layout)]);
+        const int w = static_cast<int>(bicShape[ov::layout::width_idx(layout)]);
         cv::Mat resized;
         cv::resize(img, resized, cv::Size(w, h), 0, 0, cv::INTER_CUBIC);
-        request.set_tensor(inputsNames[1], wrapMat2Tensor(resized));
+        input.emplace(inputNames[1], wrapMat2Tensor(resized));
     }
 
     return std::make_shared<InternalImageModelData>(img.cols, img.rows);

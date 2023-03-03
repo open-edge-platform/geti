@@ -38,12 +38,12 @@ struct ResultBase;
 class HPEOpenPose : public ImageModel {
 public:
     /// Constructor
-    /// @param modelFileName name of model to load
+    /// @param modelFile name of model to load
     /// @param aspectRatio - the ratio of input width to its height.
     /// @param targetSize - the height used for model reshaping.
     /// @param confidenceThreshold - threshold to eliminate low-confidence keypoints.
     /// @param layout - model input layout
-    HPEOpenPose(const std::string& modelFileName,
+    HPEOpenPose(const std::string& modelFile,
                 double aspectRatio,
                 int targetSize,
                 float confidenceThreshold,
@@ -51,7 +51,7 @@ public:
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
-    std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, ov::InferRequest& request) override;
+    std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
 
     static const size_t keypointsNumber = 18;
 

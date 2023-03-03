@@ -35,12 +35,12 @@
 #include "utils/image_utils.h"
 #include "utils/nms.hpp"
 
-ModelYoloX::ModelYoloX(const std::string& modelFileName,
+ModelYoloX::ModelYoloX(const std::string& modelFile,
                                  float confidenceThreshold,
                                  float boxIOUThreshold,
                                  const std::vector<std::string>& labels,
                                  const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, false, labels, layout),
+    : DetectionModel(modelFile, confidenceThreshold, false, labels, layout),
       boxIOUThreshold(boxIOUThreshold) {
         resizeMode = RESIZE_KEEP_ASPECT;
 }
@@ -68,7 +68,7 @@ void ModelYoloX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ppp.input().model().set_layout(inputLayout);
 
     //--- Reading image input parameters
-    inputsNames.push_back(input.get_any_name());
+    inputNames.push_back(input.get_any_name());
     netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
     netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
     setStridesGrids();
@@ -78,7 +78,7 @@ void ModelYoloX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
         throw std::logic_error("YoloX model wrapper expects models that have only 1 output");
     }
     const auto& output = model->output();
-    outputsNames.push_back(output.get_any_name());
+    outputNames.push_back(output.get_any_name());
     const ov::Shape& shape = output.get_shape();
 
     if (shape.size() != 3) {
@@ -110,7 +110,7 @@ void ModelYoloX::setStridesGrids() {
 }
 
 std::shared_ptr<InternalModelData> ModelYoloX::preprocess(const InputData& inputData,
-                                                          ov::InferRequest& request) {
+                                                          InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;
     double scale = std::min(static_cast<double>(netInputWidth) / origImg.cols,
                             static_cast<double>(netInputHeight) / origImg.rows);
@@ -118,7 +118,7 @@ std::shared_ptr<InternalModelData> ModelYoloX::preprocess(const InputData& input
     cv::Mat resizedImage = resizeImageExt(origImg, netInputWidth, netInputHeight, resizeMode,
                                           interpolationMode, nullptr, cv::Scalar(114, 114, 114));
 
-    request.set_input_tensor(wrapMat2Tensor(resizedImage));
+    input.emplace(inputNames[0], wrapMat2Tensor(resizedImage));
     return std::make_shared<InternalScaleData>(origImg.cols, origImg.rows, scale, scale);
 }
 
@@ -127,7 +127,7 @@ std::unique_ptr<ResultBase> ModelYoloX::postprocess(InferenceResult& infResult) 
     const auto& scale = infResult.internalModelData->asRef<InternalScaleData>();
 
     // Get output tensor
-    const ov::Tensor& output = infResult.outputsData[outputsNames[0]];
+    const ov::Tensor& output = infResult.outputsData[outputNames[0]];
     const auto& outputShape = output.get_shape();
     float* outputPtr = output.data<float>();
 

@@ -49,7 +49,7 @@ public:
     /// @param useAutoResize - if true, image will be resized by openvino.
     /// @param boxIOUThreshold - threshold for NMS boxes filtering, varies in [0.0, 1.0] range.
     /// @param layout - model input layout
-    ModelRetinaFacePT(const std::string& modelFileName,
+    ModelRetinaFacePT(const std::string& modelFile,
                       float confidenceThreshold,
                       bool useAutoResize,
                       float boxIOUThreshold,

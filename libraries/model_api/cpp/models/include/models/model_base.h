@@ -25,6 +25,7 @@
 #include <utils/args_helper.hpp>
 #include <utils/config_factory.h>
 #include <utils/ocv_common.hpp>
+#include <adapters/inference_adapter.h>
 
 struct InferenceResult;
 struct InputData;
@@ -33,28 +34,26 @@ struct ResultBase;
 
 class ModelBase {
 public:
-    ModelBase(const std::string& modelFileName, const std::string& layout = "")
-        : isCompiled(false),
-          modelFileName(modelFileName),
+    ModelBase(const std::string& modelFile, const std::string& layout = "")
+        : modelFile(modelFile),
           inputsLayouts(parseLayoutString(layout)) {}
-
     virtual ~ModelBase() = default;
 
-    virtual std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, ov::InferRequest& request) = 0;
-    virtual ov::CompiledModel compileModel(const ModelConfig& config, ov::Core& core);
-    virtual void onLoadCompleted(const std::vector<ov::InferRequest>& requests) {}
+    void load(std::shared_ptr<InferenceAdapter> adapter = nullptr);
+
+    virtual std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) = 0;
     virtual std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) = 0;
     virtual std::unique_ptr<ResultBase> infer(const InputData& inputData);
 
-    const std::vector<std::string>& getOutputsNames() const {
-        return outputsNames;
+    const std::vector<std::string>& getoutputNames() const {
+        return outputNames;
     }
-    const std::vector<std::string>& getInputsNames() const {
-        return inputsNames;
+    const std::vector<std::string>& getinputNames() const {
+        return inputNames;
     }
 
-    std::string getModelFileName() {
-        return modelFileName;
+    std::string getmodelFile() {
+        return modelFile;
     }
 
     void setInputsPreprocessing(bool reverseInputChannels,
@@ -66,15 +65,14 @@ public:
 protected:
     virtual void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) = 0;
 
-    std::shared_ptr<ov::Model> prepareModel(ov::Core& core);
+    void prepareModel(ov::Core& core);
 
     InputTransform inputTransform = InputTransform();
-    std::vector<std::string> inputsNames;
-    std::vector<std::string> outputsNames;
-    ov::CompiledModel compiledModel;
-    ov::InferRequest inferRequest;
-    bool isCompiled;
-    std::string modelFileName;
+
+    std::vector<std::string> inputNames;
+    std::vector<std::string> outputNames;
+    std::string modelFile;
+    std::shared_ptr<InferenceAdapter> inferenceAdapter;
     ModelConfig config = {};
     std::map<std::string, ov::Layout> inputsLayouts;
     ov::Layout getInputLayout(const ov::Output<ov::Node>& input);

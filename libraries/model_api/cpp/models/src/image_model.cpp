@@ -24,22 +24,22 @@
 
 #include <utils/image_utils.h>
 #include <utils/ocv_common.hpp>
+#include <adapters/inference_adapter.h>
 
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
 
-ImageModel::ImageModel(const std::string& modelFileName, bool useAutoResize, const std::string& layout)
-    : ModelBase(modelFileName, layout),
+ImageModel::ImageModel(const std::string& modelFile, bool useAutoResize, const std::string& layout)
+    : ModelBase(modelFile, layout),
       useAutoResize(useAutoResize) {}
 
-std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& inputData, ov::InferRequest& request) {
+std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& inputData, InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;
     auto img = inputTransform(origImg);
 
     if (!useAutoResize) {
         // /* Resize and copy data from the image to the input tensor */
-        const ov::Tensor& frameTensor = request.get_tensor(inputsNames[0]);  // first input should be image
-        const ov::Shape& tensorShape = frameTensor.get_shape();
+        auto tensorShape = inferenceAdapter->getInputShape(inputNames[0]); // first input should be image
         const ov::Layout layout("NHWC");
         const size_t width = tensorShape[ov::layout::width_idx(layout)];
         const size_t height = tensorShape[ov::layout::height_idx(layout)];
@@ -52,6 +52,6 @@ std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& input
         }
         img = resizeImageExt(img, width, height, resizeMode, interpolationMode);
     }
-    request.set_tensor(inputsNames[0], wrapMat2Tensor(img));
+    input.emplace(inputNames[0], wrapMat2Tensor(img));
     return std::make_shared<InternalImageModelData>(origImg.cols, origImg.rows);
 }

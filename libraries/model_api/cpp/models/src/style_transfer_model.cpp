@@ -34,8 +34,8 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-StyleTransferModel::StyleTransferModel(const std::string& modelFileName, const std::string& layout)
-    : ImageModel(modelFileName, false, layout) {}
+StyleTransferModel::StyleTransferModel(const std::string& modelFile, const std::string& layout)
+    : ImageModel(modelFile, false, layout) {}
 
 void StyleTransferModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output ---------------------------------------------
@@ -44,7 +44,7 @@ void StyleTransferModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model)
         throw std::logic_error("Style transfer model wrapper supports topologies with only 1 input");
     }
 
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
 
     const ov::Shape& inputShape = model->input().get_shape();
     ov::Layout inputLayout = getInputLayout(model->input());
@@ -68,7 +68,7 @@ void StyleTransferModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model)
     if (outputs.size() != 1) {
         throw std::logic_error("Style transfer model wrapper supports topologies with only 1 output");
     }
-    outputsNames.push_back(model->output().get_any_name());
+    outputNames.push_back(model->output().get_any_name());
 
     const ov::Shape& outputShape = model->output().get_shape();
     ov::Layout outputLayout{"NCHW"};

@@ -57,7 +57,7 @@ setup(
     version="0.1.0",
     author="Intel® Corporation",
     license="OSI Approved :: Apache Software License",
-    url="https://github.com/openvinotoolkit/open_model_zoo/tree/develop/demos/common/python/openvino",
+    url="https://github.com/openvinotoolkit/model_api",
     description="Model API: model wrappers and pipelines for inference with OpenVINO",
     python_requires=">=3.7",
     classifiers=[

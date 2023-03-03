@@ -32,9 +32,9 @@ struct ResultBase;
 class StyleTransferModel : public ImageModel {
 public:
     /// Constructor
-    /// @param modelFileName name of model to load
+    /// @param modelFile name of model to load
     /// @param layout - model input layout
-    StyleTransferModel(const std::string& modelFileName, const std::string& layout = "");
+    StyleTransferModel(const std::string& modelFile, const std::string& layout = "");
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 

@@ -64,7 +64,7 @@ protected:
 
     enum OutputType { OUT_BOXES, OUT_SCORES, OUT_LANDMARKS, OUT_MASKSCORES, OUT_MAX };
 
-    std::vector<std::string> separateOutputsNames[OUT_MAX];
+    std::vector<std::string> separateoutputNames[OUT_MAX];
     const std::vector<AnchorCfgLine> anchorCfg;
     std::map<int, std::vector<Anchor>> anchorsFpn;
     std::vector<std::vector<Anchor>> anchors;

@@ -42,12 +42,12 @@ const float HPEOpenPose::midPointsScoreThreshold = 0.05f;
 const float HPEOpenPose::foundMidPointsRatioThreshold = 0.8f;
 const float HPEOpenPose::minSubsetScore = 0.2f;
 
-HPEOpenPose::HPEOpenPose(const std::string& modelFileName,
+HPEOpenPose::HPEOpenPose(const std::string& modelFile,
                          double aspectRatio,
                          int targetSize,
                          float confidenceThreshold,
                          const std::string& layout)
-    : ImageModel(modelFileName, false, layout),
+    : ImageModel(modelFile, false, layout),
       aspectRatio(aspectRatio),
       targetSize(targetSize),
       confidenceThreshold(confidenceThreshold) {
@@ -61,7 +61,7 @@ void HPEOpenPose::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     if (model->inputs().size() != 1) {
         throw std::logic_error("HPE OpenPose model wrapper supports topologies with only 1 input");
     }
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
     const ov::Shape& inputShape = model->input().get_shape();
     const ov::Layout& inputLayout = getInputLayout(model->input());
 
@@ -84,7 +84,7 @@ void HPEOpenPose::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     for (const auto& output : model->outputs()) {
         const auto& outTensorName = output.get_any_name();
         ppp.output(outTensorName).tensor().set_element_type(ov::element::f32).set_layout(outputLayout);
-        outputsNames.push_back(outTensorName);
+        outputNames.push_back(outTensorName);
     }
     model = ppp.build();
 
@@ -97,7 +97,7 @@ void HPEOpenPose::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ov::Shape pafsOutputShape = model->outputs().back().get_shape();
     if (heatmapsOutputShape[channelsId] > pafsOutputShape[channelsId]) {
         std::swap(heatmapsOutputShape, pafsOutputShape);
-        std::swap(outputsNames[0], outputsNames[1]);
+        std::swap(outputNames[0], outputNames[1]);
     }
 
     if (heatmapsOutputShape.size() != 4 || heatmapsOutputShape[batchId] != 1 ||
@@ -138,7 +138,7 @@ void HPEOpenPose::changeInputSize(std::shared_ptr<ov::Model>& model) {
     model->reshape(inputShape);
 }
 
-std::shared_ptr<InternalModelData> HPEOpenPose::preprocess(const InputData& inputData, ov::InferRequest& request) {
+std::shared_ptr<InternalModelData> HPEOpenPose::preprocess(const InputData& inputData, InferenceInput& input) {
     auto& image = inputData.asRef<ImageInputData>().inputImage;
     cv::Rect roi;
     auto paddedImage =
@@ -150,7 +150,8 @@ std::shared_ptr<InternalModelData> HPEOpenPose::preprocess(const InputData& inpu
         slog::warn << "\tChosen model aspect ratio doesn't match image aspect ratio" << slog::endl;
     }
 
-    request.set_input_tensor(wrapMat2Tensor(paddedImage));
+    input.emplace(inputNames[0], wrapMat2Tensor(paddedImage));
+
     return std::make_shared<InternalScaleData>(paddedImage.cols,
                                                paddedImage.rows,
                                                image.cols / static_cast<float>(roi.width),
@@ -160,8 +161,8 @@ std::shared_ptr<InternalModelData> HPEOpenPose::preprocess(const InputData& inpu
 std::unique_ptr<ResultBase> HPEOpenPose::postprocess(InferenceResult& infResult) {
     HumanPoseResult* result = new HumanPoseResult(infResult.frameId, infResult.metaData);
 
-    const auto& heatMapsMapped = infResult.outputsData[outputsNames[0]];
-    const auto& outputMapped = infResult.outputsData[outputsNames[1]];
+    const auto& heatMapsMapped = infResult.outputsData[outputNames[0]];
+    const auto& outputMapped = infResult.outputsData[outputNames[1]];
 
     const ov::Shape& outputShape = outputMapped.get_shape();
     const ov::Shape& heatMapShape = heatMapsMapped.get_shape();

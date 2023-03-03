@@ -34,7 +34,7 @@ class Detection:
         return self.xmin, self.ymin, self.xmax, self.ymax
 
     def __to_str(self):
-        return f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score}, {self.id}, {self.str_label})"
+        return f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score:.3f}, {self.id}, {self.str_label})"
 
     def __str__(self):
         return self.__to_str()

@@ -56,7 +56,7 @@ public:
     enum YoloVersion { YOLO_V1V2, YOLO_V3, YOLO_V4, YOLO_V4_TINY, YOLOF };
 
     /// Constructor.
-    /// @param modelFileName name of model to load
+    /// @param modelFile name of model to load
     /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
     /// Any detected object with confidence lower than this threshold will be ignored.
     /// @param useAutoResize - if true, image will be resized by openvino.
@@ -70,7 +70,7 @@ public:
     /// @param anchors - vector of anchors coordinates. Required for YOLOv4, for other versions it may be omitted.
     /// @param masks - vector of masks values. Required for YOLOv4, for other versions it may be omitted.
     /// @param layout - model input layout
-    ModelYolo(const std::string& modelFileName,
+    ModelYolo(const std::string& modelFile,
               float confidenceThreshold,
               bool useAutoResize,
               bool useAdvancedPostprocessing = true,

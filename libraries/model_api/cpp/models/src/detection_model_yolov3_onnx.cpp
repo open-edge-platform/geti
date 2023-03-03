@@ -34,11 +34,11 @@
 #include "models/results.h"
 #include "utils/image_utils.h"
 
-ModelYoloV3ONNX::ModelYoloV3ONNX(const std::string& modelFileName,
+ModelYoloV3ONNX::ModelYoloV3ONNX(const std::string& modelFile,
                                  float confidenceThreshold,
                                  const std::vector<std::string>& labels,
                                  const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, false, labels, layout) {
+    : DetectionModel(modelFile, confidenceThreshold, false, labels, layout) {
         interpolationMode = cv::INTER_CUBIC;
         resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;
     }
@@ -53,7 +53,7 @@ void ModelYoloV3ONNX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     }
 
     ov::preprocess::PrePostProcessor ppp(model);
-    inputsNames.reserve(inputs.size());
+    inputNames.reserve(inputs.size());
     for (auto& input : inputs) {
         const ov::Shape& currentShape = input.get_shape();
         std::string currentName = input.get_any_name();
@@ -63,7 +63,7 @@ void ModelYoloV3ONNX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             if (currentShape[ov::layout::channels_idx(currentLayout)] != 3) {
                 throw std::logic_error("Expected 4D image input with 3 channels");
             }
-            inputsNames[0] = currentName;
+            inputNames[0] = currentName;
             netInputWidth = currentShape[ov::layout::width_idx(currentLayout)];
             netInputHeight = currentShape[ov::layout::height_idx(currentLayout)];
             ppp.input(currentName).tensor().set_element_type(ov::element::u8).set_layout({"NHWC"});
@@ -71,7 +71,7 @@ void ModelYoloV3ONNX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             if (currentShape[ov::layout::channels_idx(currentLayout)] != 2) {
                 throw std::logic_error("Expected 2D image info input with 2 channels");
             }
-            inputsNames[1] = currentName;
+            inputNames[1] = currentName;
             ppp.input(currentName).tensor().set_element_type(ov::element::i32);
         }
         ppp.input(currentName).model().set_layout(currentLayout);
@@ -99,13 +99,13 @@ void ModelYoloV3ONNX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             throw std::logic_error("Expected shapes [:,:,4], [:,"
                 + std::to_string(numberOfClasses) + ",:] and [:,3] for outputs");
         }
-        outputsNames.push_back(currentName);
+        outputNames.push_back(currentName);
     }
     model = ppp.build();
 }
 
 std::shared_ptr<InternalModelData> ModelYoloV3ONNX::preprocess(const InputData& inputData,
-                                                               ov::InferRequest& request) {
+                                                               InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;
 
     cv::Mat info(cv::Size(1, 2), CV_32SC1);
@@ -114,9 +114,9 @@ std::shared_ptr<InternalModelData> ModelYoloV3ONNX::preprocess(const InputData& 
     auto allocator = std::make_shared<SharedTensorAllocator>(info);
     ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 2}),  ov::Allocator(allocator));
 
-    request.set_tensor(inputsNames[1], infoInput);
+     input.emplace(inputNames[1], infoInput);
 
-    return ImageModel::preprocess(inputData, request);
+    return ImageModel::preprocess(inputData, input);
 }
 
 namespace {

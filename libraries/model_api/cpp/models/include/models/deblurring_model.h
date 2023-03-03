@@ -36,12 +36,12 @@ struct ResultBase;
 class DeblurringModel : public ImageModel {
 public:
     /// Constructor
-    /// @param modelFileName name of model to load
+    /// @param modelFile name of model to load
     /// @param inputImgSize size of image to set model input shape
     /// @param layout - model input layout
-    DeblurringModel(const std::string& modelFileName, const cv::Size& inputImgSize, const std::string& layout = "");
+    DeblurringModel(const std::string& modelFile, const cv::Size& inputImgSize, const std::string& layout = "");
 
-    std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, ov::InferRequest& request) override;
+    std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
 protected:

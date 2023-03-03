@@ -30,12 +30,12 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-ModelFaceBoxes::ModelFaceBoxes(const std::string& modelFileName,
+ModelFaceBoxes::ModelFaceBoxes(const std::string& modelFile,
                                float confidenceThreshold,
                                bool useAutoResize,
                                float boxIOUThreshold,
                                const std::string& layout)
-    : DetectionModel(modelFileName, confidenceThreshold, useAutoResize, {"Face"}, layout),
+    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, {"Face"}, layout),
       maxProposalsCount(0),
       boxIOUThreshold(boxIOUThreshold),
       variance({0.1f, 0.2f}),
@@ -72,7 +72,7 @@ void ModelFaceBoxes::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ppp.input().model().set_layout(inputLayout);
 
     // --------------------------- Reading image input parameters -------------------------------------------
-    inputsNames.push_back(model->input().get_any_name());
+    inputNames.push_back(model->input().get_any_name());
     netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
     netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
 
@@ -85,10 +85,10 @@ void ModelFaceBoxes::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     maxProposalsCount = model->outputs().front().get_shape()[ov::layout::height_idx(outputLayout)];
     for (const auto& output : model->outputs()) {
         const auto outTensorName = output.get_any_name();
-        outputsNames.push_back(outTensorName);
+        outputNames.push_back(outTensorName);
         ppp.output(outTensorName).tensor().set_element_type(ov::element::f32).set_layout(outputLayout);
     }
-    std::sort(outputsNames.begin(), outputsNames.end());
+    std::sort(outputNames.begin(), outputNames.end());
     model = ppp.build();
 
     // --------------------------- Calculating anchors ----------------------------------------------------
@@ -220,11 +220,11 @@ std::vector<Anchor> filterBoxes(const ov::Tensor& boxesTensor,
 
 std::unique_ptr<ResultBase> ModelFaceBoxes::postprocess(InferenceResult& infResult) {
     // Filter scores and get valid indices for bounding boxes
-    const auto scoresTensor = infResult.outputsData[outputsNames[1]];
+    const auto scoresTensor = infResult.outputsData[outputNames[1]];
     const auto scores = filterScores(scoresTensor, confidenceThreshold);
 
     // Filter bounding boxes on indices
-    auto boxesTensor = infResult.outputsData[outputsNames[0]];
+    auto boxesTensor = infResult.outputsData[outputNames[0]];
     std::vector<Anchor> boxes = filterBoxes(boxesTensor, anchors, scores.first, variance);
 
     // Apply Non-maximum Suppression
