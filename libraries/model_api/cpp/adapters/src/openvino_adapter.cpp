@@ -47,7 +47,6 @@ InferenceOutput OpenVINOInferenceAdapter::infer(const InferenceInput& input) {
     inferRequest.infer();
 
     // Processing output blobs
-    //auto output = std::make_unique<InferenceOutput>();
     InferenceOutput output;
     for (const auto& item : outputNames) {
         output.emplace(item, inferRequest.get_tensor(item));
