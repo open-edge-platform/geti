@@ -34,7 +34,7 @@ class DetectionModel(ImageModel):
         It extends the `ImageModel` construtor.
 
         Args:
-            inference_adapter (ModelAdapter): allows working with the specified executor
+            inference_adapter (InferenceAdapter): allows working with the specified executor
             configuration (dict, optional): it contains values for parameters accepted by specific
               wrapper (`confidence_threshold`, `labels` etc.) which are set as data attributes
             preload (bool, optional): a flag whether the model is loaded to device while

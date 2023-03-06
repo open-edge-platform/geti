@@ -1,6 +1,6 @@
 # OpenVINO Model Server Adapter
 
-The `OVMSAdapter` implements `ModelAdapter` interface. The `OVMSAdapter` makes it possible to use Model API with models hosted in OpenVINO Model Server.
+The `OVMSAdapter` implements `InferenceAdapter` interface. The `OVMSAdapter` makes it possible to use Model API with models hosted in OpenVINO Model Server.
 
 ## Prerequisites
 

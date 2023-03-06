@@ -37,7 +37,7 @@ class Model:
     """An abstract model wrapper
 
     The abstract model wrapper is free from any executor dependencies.
-    It sets the `ModelAdapter` instance with the provided model
+    It sets the `InferenceAdapter` instance with the provided model
     and defines model inputs/outputs.
 
     Next, it loads the provided configuration variables and sets it as wrapper attributes.
@@ -53,7 +53,7 @@ class Model:
 
     Attributes:
         logger (Logger): instance of the Logger
-        inference_adapter (ModelAdapter): allows working with the specified executor
+        inference_adapter (InferenceAdapter): allows working with the specified executor
         inputs (dict): keeps the model inputs names and `Metadata` structure for each one
         outputs (dict): keeps the model outputs names and `Metadata` structure for each one
         model_loaded (bool): a flag whether the model is loaded to device
@@ -65,7 +65,7 @@ class Model:
         """Model constructor
 
         Args:
-            inference_adapter (ModelAdapter): allows working with the specified executor
+            inference_adapter (InferenceAdapter): allows working with the specified executor
             configuration (dict, optional): it contains values for parameters accepted by specific
               wrapper (`confidence_threshold`, `labels` etc.) which are set as data attributes
             preload (bool, optional): a flag whether the model is loaded to device while
