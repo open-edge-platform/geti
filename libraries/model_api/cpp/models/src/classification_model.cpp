@@ -35,13 +35,56 @@
 #include "models/input_data.h"
 
 ClassificationModel::ClassificationModel(const std::string& modelFile,
-                                         size_t nTop,
+                                         size_t topk,
                                          bool useAutoResize,
                                          const std::vector<std::string>& labels,
                                          const std::string& layout)
     : ImageModel(modelFile, useAutoResize, layout),
-      nTop(nTop),
+      topk(topk),
       labels(labels) {}
+
+std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, std::shared_ptr<InferenceAdapter> adapter, const ov::AnyMap& configuration) {
+    std::shared_ptr<ov::Model> model = ov::Core{}.read_model(modelFile);
+    if (model->has_rt_info("model_info", "model_type") ) {
+        std::string modelType = model->get_rt_info<std::string>("model_info", "model_type");
+        if ("Classification" != modelType) {
+            throw std::runtime_error("Model xml claims the model type is not Classificaction but " + modelType);
+        }
+    }
+    auto topk_iter = configuration.find("topk");
+    size_t topk = 1;
+    if (topk_iter == configuration.end()) {
+        if (model->has_rt_info<std::string>("model_info", "topk")) {
+            topk = stoi(model->get_rt_info<std::string>("model_info", "topk"));
+        }
+    } else {
+        topk = topk_iter->second.as<size_t>();
+    }
+    auto labels_iter = configuration.find("labels");
+    std::vector<std::string> labels;
+    if (labels_iter == configuration.end()) {
+        if (!model->has_rt_info<std::string>("model_info", "labels")) {
+            throw std::runtime_error("configuraiot arg or model xml or must contain model_info/labesl rt_info");
+        }
+        labels = split(model->get_rt_info<std::string>("model_info", "labels"), ' ');
+    } else {
+        labels = labels_iter->second.as<std::vector<std::string>>();
+    }
+    auto layout_iter = configuration.find("layout");
+    std::string layout;
+    if (layout_iter != configuration.end()) {
+        layout = layout_iter->second.as<std::string>();
+    }
+    auto auto_resize_iter = configuration.find("auto_resize");
+    bool auto_resize = false;
+    if (auto_resize_iter != configuration.end()) {
+        auto_resize = auto_resize_iter->second.as<bool>();
+    }
+
+    std::unique_ptr<ClassificationModel> classificationModel{new ClassificationModel(modelFile, topk, auto_resize, labels, layout)};
+    classificationModel->load(adapter);
+    return classificationModel;
+}
 
 std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& infResult) {
     const ov::Tensor& indicesTensor = infResult.outputsData.find(outputNames[0])->second;
@@ -143,9 +186,9 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     }
 
     size_t classesNum = outputShape[ov::layout::channels_idx(outputLayout)];
-    if (nTop > classesNum) {
+    if (topk > classesNum) {
         throw std::logic_error("The model provides " + std::to_string(classesNum) + " classes, but " +
-                               std::to_string(nTop) + " labels are requested to be predicted");
+                               std::to_string(topk) + " labels are requested to be predicted");
     }
     if (classesNum == labels.size() + 1) {
         labels.insert(labels.begin(), "other");
@@ -171,7 +214,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     } else {
         softmaxNode = *softmaxNodeIt;
     }
-    const auto k = std::make_shared<ov::op::v0::Constant>(ov::element::i32, ov::Shape{}, std::vector<size_t>{nTop});
+    const auto k = std::make_shared<ov::op::v0::Constant>(ov::element::i32, ov::Shape{}, std::vector<size_t>{topk});
     std::shared_ptr<ov::Node> topkNode = std::make_shared<ov::op::v3::TopK>(softmaxNode,
                                                                             k,
                                                                             1,

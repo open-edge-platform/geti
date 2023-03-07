@@ -257,14 +257,15 @@ class Model:
                     f'The parameter "{name}" not found in {self.__model__} wrapper, will be omitted'
                 )
 
-    def raise_error(self, message):
+    @classmethod
+    def raise_error(cls, message):
         """Raises the WrapperError.
 
         Args:
             message (str): error message to be shown in the following format:
               "WrapperName: message"
         """
-        raise WrapperError(self.__model__, message)
+        raise WrapperError(cls.__model__, message)
 
     def preprocess(self, inputs):
         """Interface for preprocess method.
