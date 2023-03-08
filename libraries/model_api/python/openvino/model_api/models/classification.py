@@ -71,7 +71,6 @@ class ClassificationModel(ImageModel):
     @classmethod
     def parameters(cls):
         parameters = super().parameters()
-        parameters["resize_type"].update_default_value("crop")
         parameters.update(
             {
                 "topk": NumericalValue(value_type=int, default_value=1, min=1),
@@ -85,13 +84,13 @@ class ClassificationModel(ImageModel):
 
     def postprocess(self, outputs, meta):
         outputs = outputs[self.out_layer_name].squeeze()
+        if not np.isclose(np.sum(outputs), 1.0, atol=0.01):
+            outputs = softmax(outputs)
         indices = np.argpartition(outputs, -self.topk)[-self.topk :]
         scores = outputs[indices]
 
         desc_order = scores.argsort()[::-1]
         scores = scores[desc_order]
         indices = indices[desc_order]
-        if not np.isclose(np.sum(outputs), 1.0, atol=0.01):
-            scores = softmax(scores)
         labels = [self.labels[i] if self.labels else "" for i in indices]
         return list(zip(indices, labels, scores))

@@ -406,7 +406,6 @@ class OpenvinoAdapter(InferenceAdapter):
             ppp.input(input_idx).preprocess().scale(scale)
 
         self.model = ppp.build()
-        # ov.serialize(self.model, "tmp.xml")
         self.load_model()
 
 
