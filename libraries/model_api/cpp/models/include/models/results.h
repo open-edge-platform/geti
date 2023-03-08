@@ -81,6 +81,14 @@ struct ClassificationResult : public ResultBase {
         float score;
 
         Classification(unsigned int id, const std::string& label, float score) : id(id), label(label), score(score) {}
+
+        friend std::ostream& operator<< (std::ostream& stream, const Classification& prediction)
+        {
+            stream << "(" << prediction.id << ", " << prediction.label << ", ";
+            stream << std::fixed;
+            stream << std::setprecision(3) << prediction.score << ")";
+            return stream;
+        }
     };
 
     std::vector<Classification> topLabels;
@@ -90,6 +98,16 @@ struct DetectedObject : public cv::Rect2f {
     unsigned int labelID;
     std::string label;
     float confidence;
+
+    friend std::ostream& operator<< (std::ostream& stream, const DetectedObject& detection)
+    {
+        stream << "(" << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width) 
+            << ", " << int(detection.y + detection.height) << ", ";
+        stream << std::fixed;
+        stream << std::setprecision(3) << detection.confidence << ", ";
+        stream << std::setprecision(-1) << detection.labelID << ", " << detection.label << ")";
+        return stream;
+    }
 };
 
 struct DetectionResult : public ResultBase {
