@@ -85,8 +85,23 @@ class Model:
         if preload:
             self.load()
 
+    def get_model(self):
+        """Returns the ov.Model object stored in the InferenceAdapter.
+
+        Note: valid only for local inference
+
+        Returns:
+            ov.Model object
+        Raises:
+            RuntimeError: in case of remote inference (serving)
+        """
+        if isinstance(self.inference_adapter, OpenvinoAdapter):
+            return self.inference_adapter.get_model()
+
+        raise RuntimeError("get_model() is not supported for remote inference")
+
     @classmethod
-    def get_model(cls, name):
+    def _get_model_class(cls, name):
         subclasses = [
             subclass for subclass in cls.get_subclasses() if subclass.__model__
         ]
@@ -165,7 +180,7 @@ class Model:
             )
         if model_type is None:
             model_type = inference_adapter.get_rt_info(["model_info", "model_type"])
-        Model = cls.get_model(model_type)
+        Model = cls._get_model_class(model_type)
         return Model(inference_adapter, configuration, preload)
 
     @classmethod
