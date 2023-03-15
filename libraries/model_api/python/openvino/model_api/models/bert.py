@@ -180,7 +180,9 @@ class BertQuestionAnswering(Bert):
                     description="Comma-separated names of output layers"
                 ),
                 "max_answer_token_num": NumericalValue(value_type=int),
-                "squad_ver": StringValue(),
+                "squad_ver": StringValue(
+                    description="SQuAD dataset version used for training. Affects postprocessing"
+                ),
             }
         )
         return parameters

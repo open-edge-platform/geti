@@ -63,7 +63,7 @@ class DetectionModel(ImageModel):
             {
                 "confidence_threshold": NumericalValue(
                     default_value=0.5,
-                    description="Threshold value for detection box confidence",
+                    description="Probability threshold value for bounding box filtering",
                 ),
                 "labels": ListValue(description="List of class labels"),
                 "path_to_labels": StringValue(

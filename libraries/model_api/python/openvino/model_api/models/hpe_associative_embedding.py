@@ -91,11 +91,23 @@ class HpeAssociativeEmbedding(ImageModel):
         parameters = super().parameters()
         parameters.update(
             {
-                "target_size": NumericalValue(value_type=int, min=1),
-                "aspect_ratio": NumericalValue(),
-                "confidence_threshold": NumericalValue(),
+                "target_size": NumericalValue(
+                    value_type=int,
+                    min=1,
+                    description="Image resolution which is going to be processed. Reshapes network to match a given size",
+                ),
+                "aspect_ratio": NumericalValue(
+                    description="Image aspect ratio which is going to be processed. Reshapes network to match a given size"
+                ),
+                "confidence_threshold": NumericalValue(
+                    description="Pose confidence threshold"
+                ),
                 "delta": NumericalValue(default_value=0.0),
-                "size_divisor": NumericalValue(default_value=32, value_type=int),
+                "size_divisor": NumericalValue(
+                    default_value=32,
+                    value_type=int,
+                    description="Width and height of the rehaped model will be a multiple of this value",
+                ),
                 "padding_mode": StringValue(
                     default_value="right_bottom", choices=("center", "right_bottom")
                 ),

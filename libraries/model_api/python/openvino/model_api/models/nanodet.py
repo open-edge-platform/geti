@@ -53,7 +53,8 @@ class NanoDet(DetectionModel):
         parameters.update(
             {
                 "iou_threshold": NumericalValue(
-                    default_value=0.6, description="Threshold for NMS filtering"
+                    default_value=0.6,
+                    description="Threshold for non-maximum suppression (NMS) intersection over union (IOU) filtering",
                 ),
                 "num_classes": NumericalValue(
                     default_value=80, value_type=int, description="Number of classes"

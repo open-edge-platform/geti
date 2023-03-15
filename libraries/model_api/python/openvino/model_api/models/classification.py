@@ -73,7 +73,12 @@ class ClassificationModel(ImageModel):
         parameters = super().parameters()
         parameters.update(
             {
-                "topk": NumericalValue(value_type=int, default_value=1, min=1),
+                "topk": NumericalValue(
+                    value_type=int,
+                    default_value=1,
+                    min=1,
+                    description="Number of most likely labels",
+                ),
                 "labels": ListValue(description="List of class labels"),
                 "path_to_labels": StringValue(
                     description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter"
