@@ -35,10 +35,11 @@ struct InputData;
 
 ModelSSD::ModelSSD(const std::string& modelFile,
                    float confidenceThreshold,
+                   const std::string& resize_type,
                    bool useAutoResize,
                    const std::vector<std::string>& labels,
                    const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, labels, layout) {}
+    : DetectionModel(modelFile, confidenceThreshold, resize_type, useAutoResize, labels, layout) {}
 
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
@@ -50,9 +51,7 @@ std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputDa
         ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 3}),  ov::Allocator(allocator));
 
         input.emplace(inputNames[1], infoInput);
-
     }
-
     return DetectionModel::preprocess(inputData, input);
 }
 
@@ -69,6 +68,18 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
     auto retVal = std::unique_ptr<ResultBase>(result);
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
+    float floatInputImgWidth = internalData.inputImgWidth,
+         floatInputImgHeight = internalData.inputImgHeight;
+    float invertedScaleX = floatInputImgWidth / netInputWidth,
+          invertedScaleY = floatInputImgHeight / netInputHeight;
+    int padLeft = 0, padTop = 0;
+    if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
+        invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
+        if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
+            padLeft = (netInputWidth - floatInputImgWidth / invertedScaleX) / 2;
+            padTop = (netInputHeight - floatInputImgHeight / invertedScaleY) / 2;
+        }
+    }
 
     for (size_t i = 0; i < detectionsNum; i++) {
         float image_id = detections[i * objectSize + 0];
@@ -85,22 +96,21 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
             desc.confidence = confidence;
             desc.labelID = static_cast<int>(detections[i * objectSize + 1]);
             desc.label = getLabelName(desc.labelID);
-
-            desc.x = clamp(detections[i * objectSize + 3] * internalData.inputImgWidth,
-                           0.f,
-                           static_cast<float>(internalData.inputImgWidth));
-            desc.y = clamp(detections[i * objectSize + 4] * internalData.inputImgHeight,
-                           0.f,
-                           static_cast<float>(internalData.inputImgHeight));
-            desc.width = clamp(detections[i * objectSize + 5] * internalData.inputImgWidth,
-                               0.f,
-                               static_cast<float>(internalData.inputImgWidth)) -
-                         desc.x;
-            desc.height = clamp(detections[i * objectSize + 6] * internalData.inputImgHeight,
-                                0.f,
-                                static_cast<float>(internalData.inputImgHeight)) -
-                          desc.y;
-
+            desc.x = clamp(
+                round((detections[i * objectSize + 3] * netInputWidth - padLeft) * invertedScaleX),
+                0.f,
+                floatInputImgWidth);
+            desc.y = clamp(
+                round((detections[i * objectSize + 4] * netInputHeight - padTop) * invertedScaleY),
+                0.f,
+                floatInputImgHeight);
+            desc.width = clamp(
+                round((detections[i * objectSize + 5] * netInputWidth - padLeft) * invertedScaleX - desc.x),
+                0.f,
+                floatInputImgWidth);
+            desc.height = clamp(
+                round((detections[i * objectSize + 6] * netInputHeight - padTop) * invertedScaleY - desc.y),
+                0.f, floatInputImgHeight);
             result->objects.push_back(desc);
         }
     }

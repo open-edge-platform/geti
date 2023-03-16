@@ -40,10 +40,8 @@ ModelYoloX::ModelYoloX(const std::string& modelFile,
                                  float boxIOUThreshold,
                                  const std::vector<std::string>& labels,
                                  const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, false, labels, layout),
-      boxIOUThreshold(boxIOUThreshold) {
-        resizeMode = RESIZE_KEEP_ASPECT;
-}
+    : DetectionModel(modelFile, confidenceThreshold, "fit_to_window", false, labels, layout),
+      boxIOUThreshold(boxIOUThreshold) {}
 
 void ModelYoloX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

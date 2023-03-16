@@ -33,7 +33,7 @@
 #include "models/results.h"
 
 SegmentationModel::SegmentationModel(const std::string& modelFile, bool useAutoResize, const std::string& layout)
-    : ImageModel(modelFile, useAutoResize, layout) {}
+    : ImageModel(modelFile, "standard", useAutoResize, layout) {}
 
 std::vector<std::string> SegmentationModel::loadLabels(const std::string& labelFilename) {
     std::vector<std::string> labelsList;

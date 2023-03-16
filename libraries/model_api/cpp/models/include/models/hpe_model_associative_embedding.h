@@ -51,7 +51,7 @@ public:
                             float confidenceThreshold,
                             const std::string& layout = "",
                             float delta = 0.0,
-                            RESIZE_MODE resizeMode = RESIZE_KEEP_ASPECT);
+                            const std::string& resize_type = "fit_to_window");
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 

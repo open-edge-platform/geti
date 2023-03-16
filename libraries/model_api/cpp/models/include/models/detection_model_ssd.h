@@ -45,6 +45,7 @@ public:
     /// @param layout - model input layout
     ModelSSD(const std::string& modelFile,
              float confidenceThreshold,
+             const std::string& resize_type,
              bool useAutoResize,
              const std::vector<std::string>& labels = std::vector<std::string>(),
              const std::string& layout = "");

@@ -38,7 +38,7 @@ cv::Mat resizeImageExt(const cv::Mat& mat, int width, int height, RESIZE_MODE re
     {
         double scale = std::min(static_cast<double>(width) / mat.cols, static_cast<double>(height) / mat.rows);
         cv::Mat resizedImage;
-        cv::resize(mat, resizedImage, cv::Size(0, 0), scale, scale, interpolationMode);
+        cv::resize(mat, resizedImage, {int(mat.cols * scale), int(mat.rows * scale)}, 0, 0, interpolationMode);
 
         int dx = resizeMode == RESIZE_KEEP_ASPECT ? 0 : (width - resizedImage.cols) / 2;
         int dy = resizeMode == RESIZE_KEEP_ASPECT ? 0 : (height - resizedImage.rows) / 2;

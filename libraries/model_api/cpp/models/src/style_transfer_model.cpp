@@ -35,7 +35,7 @@
 #include "models/results.h"
 
 StyleTransferModel::StyleTransferModel(const std::string& modelFile, const std::string& layout)
-    : ImageModel(modelFile, false, layout) {}
+    : ImageModel(modelFile, "standard", false, layout) {}
 
 void StyleTransferModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output ---------------------------------------------

@@ -38,9 +38,8 @@ ModelYoloV3ONNX::ModelYoloV3ONNX(const std::string& modelFile,
                                  float confidenceThreshold,
                                  const std::vector<std::string>& labels,
                                  const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, false, labels, layout) {
+    : DetectionModel(modelFile, confidenceThreshold, "fit_to_window_letterbox", false, labels, layout) {
         interpolationMode = cv::INTER_CUBIC;
-        resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;
     }
 
 

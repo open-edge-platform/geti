@@ -123,19 +123,11 @@ def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
         opset.subtract(opset.constant(h, dtype=np.int32), nh),
         opset.constant(2, dtype=np.int32),
     )
-    dx_border = opset.add(
-        dx,
-        opset.mod(
-            opset.subtract(opset.constant(w, dtype=np.int32), nw),
-            opset.constant(2, dtype=np.int32),
-        ),
+    dx_border = opset.subtract(
+        opset.subtract(opset.constant(w, dtype=np.int32), nw), dx
     )
-    dy_border = opset.add(
-        dy,
-        opset.mod(
-            opset.subtract(opset.constant(h, dtype=np.int32), nh),
-            opset.constant(2, dtype=np.int32),
-        ),
+    dy_border = opset.subtract(
+        opset.subtract(opset.constant(h, dtype=np.int32), nh), dy
     )
     pads_begin = opset.concat(
         [

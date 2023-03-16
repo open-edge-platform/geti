@@ -34,7 +34,7 @@
 DeblurringModel::DeblurringModel(const std::string& modelFile,
                                  const cv::Size& inputImgSize,
                                  const std::string& layout)
-    : ImageModel(modelFile, false, layout) {
+    : ImageModel(modelFile, "standard", false, layout) {
     netInputHeight = inputImgSize.height;
     netInputWidth = inputImgSize.width;
 }

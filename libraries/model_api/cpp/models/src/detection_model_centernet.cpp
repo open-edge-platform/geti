@@ -40,7 +40,7 @@ ModelCenterNet::ModelCenterNet(const std::string& modelFile,
                                float confidenceThreshold,
                                const std::vector<std::string>& labels,
                                const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, false, labels, layout) {}
+    : DetectionModel(modelFile, confidenceThreshold, "fit_to_window_letterbox", false, labels, layout) {}
 
 void ModelCenterNet::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

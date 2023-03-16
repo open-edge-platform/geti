@@ -36,10 +36,11 @@
 
 ClassificationModel::ClassificationModel(const std::string& modelFile,
                                          size_t topk,
+                                         const std::string& resize_type,
                                          bool useAutoResize,
                                          const std::vector<std::string>& labels,
                                          const std::string& layout)
-    : ImageModel(modelFile, useAutoResize, layout),
+    : ImageModel(modelFile, resize_type, useAutoResize, layout),
       topk(topk),
       labels(labels) {}
 
@@ -80,8 +81,17 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std
     if (auto_resize_iter != configuration.end()) {
         auto_resize = auto_resize_iter->second.as<bool>();
     }
+    auto resize_type_iter = configuration.find("resize_type");
+    std::string resize_type = "standard";
+    if (resize_type_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "resize_type")) {
+            resize_type = model->get_rt_info<std::string>("model_info", "resize_type");
+        }
+    } else {
+        resize_type = resize_type_iter->second.as<std::string>();
+    }
 
-    std::unique_ptr<ClassificationModel> classificationModel{new ClassificationModel(modelFile, topk, auto_resize, labels, layout)};
+    std::unique_ptr<ClassificationModel> classificationModel{new ClassificationModel(modelFile, topk, resize_type, auto_resize, labels, layout)};
     classificationModel->load(adapter);
     return classificationModel;
 }

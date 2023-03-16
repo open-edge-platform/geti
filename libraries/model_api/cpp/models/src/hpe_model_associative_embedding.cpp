@@ -48,13 +48,12 @@ HpeAssociativeEmbedding::HpeAssociativeEmbedding(const std::string& modelFile,
                                                  float confidenceThreshold,
                                                  const std::string& layout,
                                                  float delta,
-                                                 RESIZE_MODE resizeMode)
-    : ImageModel(modelFile, false, layout),
+                                                 const std::string& resize_type)
+    : ImageModel(modelFile, resize_type, false, layout),
       aspectRatio(aspectRatio),
       targetSize(targetSize),
       confidenceThreshold(confidenceThreshold),
       delta(delta) {
-        this->resizeMode = resizeMode;
         interpolationMode = cv::INTER_CUBIC;
       }
 

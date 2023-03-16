@@ -35,10 +35,11 @@
 
 DetectionModel::DetectionModel(const std::string& modelFile,
                                float confidenceThreshold,
+                               const std::string& resize_type,
                                bool useAutoResize,
                                const std::vector<std::string>& labels,
                                const std::string& layout)
-    : ImageModel(modelFile, useAutoResize, layout),
+    : ImageModel(modelFile, resize_type, useAutoResize, layout),
       labels(labels),
       confidenceThreshold(confidenceThreshold) {}
 
@@ -86,6 +87,15 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
     if (masks_iter != configuration.end()) {
         masks = masks_iter->second.as<std::vector<int64_t>>();
     }
+    auto resize_type_iter = configuration.find("resize_type");
+    std::string resize_type = "standard";
+    if (resize_type_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "resize_type")) {
+            resize_type = model->get_rt_info<std::string>("model_info", "resize_type");
+        }
+    } else {
+        resize_type = resize_type_iter->second.as<std::string>();
+    }
 
     std::unique_ptr<DetectionModel> detectionModel;
     if (model_type == "centernet") {
@@ -108,7 +118,7 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
                                             iou_t,
                                             layout));
     } else if (model_type == "ssd" || model_type == "SSD") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(modelFile, confidence_threshold, auto_resize, labels, layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(modelFile, confidence_threshold, resize_type, auto_resize, labels, layout));
     } else if (model_type == "yolo") {
         bool FLAGS_yolo_af = true;  // Use advanced postprocessing/filtering algorithm for YOLO
         detectionModel = std::unique_ptr<DetectionModel>(new ModelYolo(modelFile,

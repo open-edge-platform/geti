@@ -151,21 +151,23 @@ def resize_detections_with_aspect_ratio(
 
 
 def resize_detections_letterbox(detections, original_image_size, resized_image_size):
-    scales = [x / y for x, y in zip(resized_image_size, original_image_size)]
-    scale = min(scales)
-    scales = (scale / scales[0], scale / scales[1])
-    offset = [0.5 * (1 - x) for x in scales]
+    inverted_scale = max(
+        original_image_size[0] / resized_image_size[0],
+        original_image_size[1] / resized_image_size[1],
+    )
+    pad_left = (resized_image_size[0] - original_image_size[0] / inverted_scale) // 2
+    pad_top = (resized_image_size[1] - original_image_size[1] / inverted_scale) // 2
     for detection in detections:
         detection.xmin = (
-            (detection.xmin - offset[0]) / scales[0]
-        ) * original_image_size[0]
-        detection.xmax = (
-            (detection.xmax - offset[0]) / scales[0]
-        ) * original_image_size[0]
+            detection.xmin * resized_image_size[0] - pad_left
+        ) * inverted_scale
         detection.ymin = (
-            (detection.ymin - offset[1]) / scales[1]
-        ) * original_image_size[1]
+            detection.ymin * resized_image_size[1] - pad_top
+        ) * inverted_scale
+        detection.xmax = (
+            detection.xmax * resized_image_size[0] - pad_left
+        ) * inverted_scale
         detection.ymax = (
-            (detection.ymax - offset[1]) / scales[1]
-        ) * original_image_size[1]
+            detection.ymax * resized_image_size[1] - pad_top
+        ) * inverted_scale
     return detections

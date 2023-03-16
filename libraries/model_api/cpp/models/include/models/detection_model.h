@@ -39,6 +39,7 @@ public:
     /// @param layout - model input layout
     DetectionModel(const std::string& modelFile,
                    float confidenceThreshold,
+                   const std::string& resize_type,
                    bool useAutoResize,
                    const std::vector<std::string>& labels,
                    const std::string& layout = "");

@@ -47,11 +47,10 @@ HPEOpenPose::HPEOpenPose(const std::string& modelFile,
                          int targetSize,
                          float confidenceThreshold,
                          const std::string& layout)
-    : ImageModel(modelFile, false, layout),
+    : ImageModel(modelFile, "fit_to_window", false, layout),
       aspectRatio(aspectRatio),
       targetSize(targetSize),
       confidenceThreshold(confidenceThreshold) {
-        resizeMode = RESIZE_KEEP_ASPECT;
         interpolationMode = cv::INTER_CUBIC;
       }
 

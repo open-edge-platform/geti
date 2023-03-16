@@ -45,10 +45,10 @@ class Detection:
 
 def clip_detections(detections, size):
     for detection in detections:
-        detection.xmin = max(int(detection.xmin), 0)
-        detection.ymin = max(int(detection.ymin), 0)
-        detection.xmax = min(int(detection.xmax), size[1])
-        detection.ymax = min(int(detection.ymax), size[0])
+        detection.xmin = min(max(round(detection.xmin), 0), size[1])
+        detection.ymin = min(max(round(detection.ymin), 0), size[0])
+        detection.xmax = min(max(round(detection.xmax), 0), size[1])
+        detection.ymax = min(max(round(detection.ymax), 0), size[0])
     return detections
 
 
@@ -156,13 +156,12 @@ def resize_image_letterbox(image, size, interpolation=cv2.INTER_LINEAR):
     image = cv2.resize(image, (nw, nh), interpolation=interpolation)
     dx = (w - nw) // 2
     dy = (h - nh) // 2
-    resized_image = np.pad(
+    return np.pad(
         image,
-        ((dy, dy + (h - nh) % 2), (dx, dx + (w - nw) % 2), (0, 0)),
+        ((dy, h - nh - dy), (dx, w - nw - dx), (0, 0)),
         mode="constant",
         constant_values=0,
     )
-    return resized_image
 
 
 def crop_resize(image, size):

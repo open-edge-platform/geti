@@ -31,13 +31,6 @@ class SSD(DetectionModel):
         )
         self.output_parser = self._get_output_parser(self.image_blob_name)
 
-    @classmethod
-    def parameters(cls):
-        parameters = super().parameters()
-        parameters["resize_type"].update_default_value("standard")
-        parameters["confidence_threshold"].update_default_value(0.5)
-        return parameters
-
     def preprocess(self, inputs):
         dict_inputs, meta = super().preprocess(inputs)
         if self.image_info_blob_name:
@@ -45,7 +38,7 @@ class SSD(DetectionModel):
         return dict_inputs, meta
 
     def postprocess(self, outputs, meta):
-        detections = self._parse_outputs(outputs, meta)
+        detections = self._parse_outputs(outputs)
         detections = self._resize_detections(detections, meta)
         detections = self._add_label_names(detections)
         return detections
@@ -77,7 +70,7 @@ class SSD(DetectionModel):
             pass
         self.raise_error("Unsupported model outputs")
 
-    def _parse_outputs(self, outputs, meta):
+    def _parse_outputs(self, outputs):
         detections = self.output_parser(outputs)
 
         detections = [d for d in detections if d.score > self.confidence_threshold]

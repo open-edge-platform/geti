@@ -29,9 +29,30 @@
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
 
-ImageModel::ImageModel(const std::string& modelFile, bool useAutoResize, const std::string& layout)
+ImageModel::ImageModel(const std::string& modelFile, const std::string& resize_type, bool useAutoResize, const std::string& layout)
     : ModelBase(modelFile, layout),
-      useAutoResize(useAutoResize) {}
+      useAutoResize(useAutoResize) {
+        if ("crop" == resize_type) {
+            throw std::runtime_error("crop resize_type is not implemented");
+        } else if ("standard" == resize_type) {
+            interpolationMode = cv::INTER_LINEAR;
+            resizeMode = RESIZE_FILL;
+        } else if ("fit_to_window" == resize_type) {
+            if (useAutoResize) {
+                throw std::runtime_error("useAutoResize supports only standard resize_type");
+            }
+            interpolationMode = cv::INTER_LINEAR;
+            resizeMode = RESIZE_KEEP_ASPECT;
+        } else if ("fit_to_window_letterbox" == resize_type) {
+            if (useAutoResize) {
+                throw std::runtime_error("useAutoResize supports only standard resize_type");
+            }
+            interpolationMode = cv::INTER_LINEAR;
+            resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;
+        } else {
+            throw std::runtime_error("Unknown value for resize_type arg");
+        }
+    }
 
 std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& inputData, InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;

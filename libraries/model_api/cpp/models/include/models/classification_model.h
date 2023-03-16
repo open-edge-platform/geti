@@ -43,6 +43,7 @@ public:
     /// @param layout - model input layout
     ClassificationModel(const std::string& modelFile,
                         size_t topk,
+                        const std::string& resize_type,
                         bool useAutoResize,
                         const std::vector<std::string>& labels,
                         const std::string& layout = "");

@@ -107,7 +107,7 @@ ModelYolo::ModelYolo(const std::string& modelFile,
                      const std::vector<float>& anchors,
                      const std::vector<int64_t>& masks,
                      const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, labels, layout),
+    : DetectionModel(modelFile, confidenceThreshold, "standard", useAutoResize, labels, layout),
       boxIOUThreshold(boxIOUThreshold),
       useAdvancedPostprocessing(useAdvancedPostprocessing),
       yoloVersion(YOLO_V3),

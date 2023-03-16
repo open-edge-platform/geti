@@ -35,7 +35,7 @@ ModelFaceBoxes::ModelFaceBoxes(const std::string& modelFile,
                                bool useAutoResize,
                                float boxIOUThreshold,
                                const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, useAutoResize, {"Face"}, layout),
+    : DetectionModel(modelFile, confidenceThreshold, "standard", useAutoResize, {"Face"}, layout),
       maxProposalsCount(0),
       boxIOUThreshold(boxIOUThreshold),
       variance({0.1f, 0.2f}),
