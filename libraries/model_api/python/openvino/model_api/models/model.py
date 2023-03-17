@@ -124,7 +124,7 @@ class Model:
         configuration={},
         preload=True,
         core=None,
-        weights_path=None,
+        weights_path="",
         adaptor_parameters={},
         device="AUTO",
         nstreams="1",
@@ -469,3 +469,20 @@ class Model:
                     name, metadata.shape, metadata.precision, metadata.layout
                 )
             )
+
+    def get_model(self):
+        model = self.inference_adapter.get_model()
+        model.set_rt_info(self.__model__, ["model_info", "model_type"])
+        for name in self.parameters():
+            if [] == getattr(self, name):
+                # ov cant serialize empty list. Replace it with ""
+                # TODO: remove when Anastasia Kuporosova fixes that
+                model.set_rt_info("", ["model_info", name])
+            else:
+                model.set_rt_info(getattr(self, name), ["model_info", name])
+        return model
+
+    def save(self, xml_path, bin_path="", version="UNSPECIFIED"):
+        import openvino.runtime as ov
+
+        ov.serialize(self.get_model(), xml_path, bin_path, version)

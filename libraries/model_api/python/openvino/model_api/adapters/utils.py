@@ -19,7 +19,7 @@ from typing import Optional
 
 import numpy as np
 import openvino.runtime as ov
-from openvino.runtime import Output, layout_helpers
+from openvino.runtime import Output, Type, layout_helpers
 from openvino.runtime import opset10 as opset
 from openvino.runtime.utils.decorators import custom_preprocess_function
 
@@ -101,8 +101,8 @@ def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
         opset.gather(image_shape, opset.constant(h_axis), axis=0),
         destination_type="f32",
     )
-    w_ratio = opset.divide(opset.constant(w, dtype=float), iw)
-    h_ratio = opset.divide(opset.constant(h, dtype=float), ih)
+    w_ratio = opset.divide(opset.constant(w, dtype=Type.f32), iw)
+    h_ratio = opset.divide(opset.constant(h, dtype=Type.f32), ih)
     scale = opset.minimum(w_ratio, h_ratio)
     nw = opset.convert(opset.multiply(iw, scale), destination_type="i32")
     nh = opset.convert(opset.multiply(ih, scale), destination_type="i32")

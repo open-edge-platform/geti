@@ -89,11 +89,11 @@ class ImageModel(Model):
         parameters.update(
             {
                 "mean_values": ListValue(
-                    default_value=None,
+                    default_value=[],
                     description="Normalization values, which will be subtracted from image channels for image-input layer during preprocessing",
                 ),
                 "scale_values": ListValue(
-                    default_value=None,
+                    default_value=[],
                     description="Normalization values, which will divide the image channels for image-input layer",
                 ),
                 "reverse_input_channels": BooleanValue(

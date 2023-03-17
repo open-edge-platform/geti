@@ -103,8 +103,10 @@ class NumericalValue(BaseValue):
 
 
 class StringValue(BaseValue):
-    def __init__(self, choices=(), **kwargs):
-        super().__init__(**kwargs)
+    def __init__(
+        self, choices=(), description="No description available", default_value=""
+    ):
+        super().__init__(description, default_value)
         self.choices = choices
         for choice in self.choices:
             if not isinstance(choice, str):
@@ -161,8 +163,10 @@ class BooleanValue(BaseValue):
 
 
 class ListValue(BaseValue):
-    def __init__(self, value_type=None, **kwargs) -> None:
-        super().__init__(**kwargs)
+    def __init__(
+        self, value_type=None, description="No description available", default_value=[]
+    ) -> None:
+        super().__init__(description, default_value)
         self.value_type = value_type
 
     def from_str(self, value):
