@@ -35,15 +35,28 @@ public:
     /// @param modelFile name of model to load
     /// @param useAutoResize - if true, image is resized by openvino
     /// @param layout - model input layout
-    ImageModel(const std::string& modelFile, const std::string& resize_type, bool useAutoResize, const std::string& layout = "");
+    ImageModel(const std::string& modelFile,
+               const std::string& resize_type,
+               bool useAutoResize,
+               const std::string& layout = "");
+
+    ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ImageModel(std::shared_ptr<InferenceAdapter>& adapter);
+    using ModelBase::ModelBase;
 
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
 
+    static std::vector<std::string> loadLabels(const std::string& labelFilename);
+
 protected:
-    bool useAutoResize;
+    RESIZE_MODE selectResizeMode(const std::string& resize_type);
+
+protected:
+    std::vector<std::string> labels = {};
+    bool useAutoResize = false;
 
     size_t netInputHeight = 0;
     size_t netInputWidth = 0;
-    cv::InterpolationFlags interpolationMode;
-    RESIZE_MODE resizeMode;
+    cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR;
+    RESIZE_MODE resizeMode = RESIZE_FILL;
 };

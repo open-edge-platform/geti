@@ -30,17 +30,25 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-ModelFaceBoxes::ModelFaceBoxes(const std::string& modelFile,
-                               float confidenceThreshold,
-                               bool useAutoResize,
-                               float boxIOUThreshold,
-                               const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, "standard", useAutoResize, {"Face"}, layout),
-      maxProposalsCount(0),
-      boxIOUThreshold(boxIOUThreshold),
-      variance({0.1f, 0.2f}),
-      steps({32, 64, 128}),
-      minSizes({{32, 64, 128}, {256}, {512}}) {}
+
+void ModelFaceBoxes::initDefaultParameters(const ov::AnyMap& configuration) {
+    resizeMode = RESIZE_FILL; // Ignore resize_type for now
+    auto labels_string = configuration.find("labels"); // Override default if it is not set
+    if (labels_string == configuration.end()) {
+        labels = {"Face"};
+    }
+}
+
+ModelFaceBoxes::ModelFaceBoxes(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : DetectionModelExt(model, configuration) {
+    initDefaultParameters(configuration);
+}
+
+ModelFaceBoxes::ModelFaceBoxes(std::shared_ptr<InferenceAdapter>& adapter)
+    : DetectionModelExt(adapter) {
+    auto configuration = adapter->getModelConfig();
+    initDefaultParameters(configuration);
+}
 
 void ModelFaceBoxes::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

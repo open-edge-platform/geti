@@ -39,8 +39,6 @@ public:
     /// @param layout - model input layout
     SegmentationModel(const std::string& modelFile, bool useAutoResize, const std::string& layout = "");
 
-    static std::vector<std::string> loadLabels(const std::string& labelFilename);
-
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
     virtual std::unique_ptr<ImageResult> infer(const ImageInputData& inputData);

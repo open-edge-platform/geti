@@ -28,31 +28,16 @@ struct InferenceAdatper;
 
 class DetectionModel : public ImageModel {
 public:
-    /// Constructor
-    /// @param modelFile name of model to load
-    /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param useAutoResize - if true, image will be resized by openvino.
-    /// Otherwise, image will be preprocessed and resized using OpenCV routines.
-    /// @param labels - array of labels for every class. If this array is empty or contains less elements
-    /// than actual classes number, default "Label #N" will be shown for missing items.
-    /// @param layout - model input layout
-    DetectionModel(const std::string& modelFile,
-                   float confidenceThreshold,
-                   const std::string& resize_type,
-                   bool useAutoResize,
-                   const std::vector<std::string>& labels,
-                   const std::string& layout = "");
+    DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    DetectionModel(std::shared_ptr<InferenceAdapter>& adapter);
 
-    static std::unique_ptr<DetectionModel> create_model(const std::string& modelFile, std::shared_ptr<InferenceAdapter> adapter = nullptr, std::string model_type = "", const ov::AnyMap& configuration = {});
-
-    static std::vector<std::string> loadLabels(const std::string& labelFilename);
+    static std::unique_ptr<DetectionModel> create_model(const std::string& modelFile, std::string model_type = "", const ov::AnyMap& configuration = {});
+    static std::unique_ptr<DetectionModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     virtual std::unique_ptr<DetectionResult> infer(const ImageInputData& inputData);
 
-    std::vector<std::string> labels;
 protected:
-    float confidenceThreshold;
+    float confidenceThreshold = 0.5f;
 
     std::string getLabelName(int labelID) {
         return (size_t)labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);

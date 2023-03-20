@@ -33,139 +33,97 @@
 #include "models/input_data.h"
 #include "models/results.h"
 
-DetectionModel::DetectionModel(const std::string& modelFile,
-                               float confidenceThreshold,
-                               const std::string& resize_type,
-                               bool useAutoResize,
-                               const std::vector<std::string>& labels,
-                               const std::string& layout)
-    : ImageModel(modelFile, resize_type, useAutoResize, layout),
-      labels(labels),
-      confidenceThreshold(confidenceThreshold) {}
 
-std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFile, std::shared_ptr<InferenceAdapter> adapter, std::string model_type, const ov::AnyMap& configuration) {
-    std::shared_ptr<ov::Model> model = ov::Core{}.read_model(modelFile);
-    if (model_type.empty()) {
-        model_type = model->get_rt_info<std::string>("model_info", "model_type");
-    }
+DetectionModel::DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : ImageModel(model, configuration) {
     auto confidence_threshold_iter = configuration.find("confidence_threshold");
-    float confidence_threshold = 0.5;
     if (confidence_threshold_iter == configuration.end()) {
-        confidence_threshold = stof(model->get_rt_info<std::string>("model_info", "confidence_threshold"));
-    } else {
-        confidence_threshold = confidence_threshold_iter->second.as<float>();
-    }
-    auto labels_iter = configuration.find("labels");
-    std::vector<std::string> labels;
-    if (labels_iter == configuration.end()) {
-        labels = split(model->get_rt_info<std::string>("model_info", "labels"), ' ');
-    } else {
-        labels = labels_iter->second.as<std::vector<std::string>>();
-    }
-    auto layout_iter = configuration.find("layout");
-    std::string layout;
-    if (layout_iter != configuration.end()) {
-        layout = layout_iter->second.as<std::string>();
-    }
-    auto auto_resize_iter = configuration.find("auto_resize");
-    bool auto_resize = false;
-    if (auto_resize_iter != configuration.end()) {
-        auto_resize = auto_resize_iter->second.as<bool>();
-    }
-    auto iou_t_iter = configuration.find("iou_t");
-    float iou_t = 0.5;
-    if (iou_t_iter != configuration.end()) {
-        iou_t = iou_t_iter->second.as<bool>();
-    }
-    auto anchors_iter = configuration.find("anchors");
-    std::vector<float> anchors;
-    if (anchors_iter != configuration.end()) {
-        anchors = anchors_iter->second.as<std::vector<float>>();
-    }
-    auto masks_iter = configuration.find("masks");
-    std::vector<int64_t> masks;
-    if (masks_iter != configuration.end()) {
-        masks = masks_iter->second.as<std::vector<int64_t>>();
-    }
-    auto resize_type_iter = configuration.find("resize_type");
-    std::string resize_type = "standard";
-    if (resize_type_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "resize_type")) {
-            resize_type = model->get_rt_info<std::string>("model_info", "resize_type");
+        if (model->has_rt_info("model_info", "confidence_threshold")) {
+            confidenceThreshold = stof(model->get_rt_info<std::string>("model_info", "confidence_threshold"));
         }
     } else {
-        resize_type = resize_type_iter->second.as<std::string>();
+        confidenceThreshold = confidence_threshold_iter->second.as<float>();
+    }
+}
+
+DetectionModel::DetectionModel(std::shared_ptr<InferenceAdapter>& adapter)
+   : ImageModel(adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto confidence_threshold_iter = configuration.find("confidence_threshold");
+    if (confidence_threshold_iter == configuration.end()) {
+        confidenceThreshold = confidence_threshold_iter->second.as<float>();
+    }
+}
+
+std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFile, std::string model_type, const ov::AnyMap& configuration) {
+    auto core = ov::Core();
+    std::shared_ptr<ov::Model> model = core.read_model(modelFile);
+    if (model_type.empty()) {
+        try {
+            if (model->has_rt_info("model_info", "model_type") ) {
+                model_type = model->get_rt_info<std::string>("model_info", "model_type");
+            }
+        } catch (const std::exception& e) {
+            slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
+        }
     }
 
     std::unique_ptr<DetectionModel> detectionModel;
-    if (model_type == "centernet") {
-    } else if (model_type == "faceboxes") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelFaceBoxes(modelFile,
-                                        confidence_threshold,
-                                        auto_resize,
-                                        iou_t,
-                                        layout));
+    if (model_type == "faceboxes") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelFaceBoxes(model, configuration));
     } else if (model_type == "retinaface") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFace(modelFile,
-                                        confidence_threshold,
-                                        auto_resize,
-                                        iou_t,
-                                        layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFace(model, configuration));
     } else if (model_type == "retinaface-pytorch") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFacePT(modelFile,
-                                            confidence_threshold,
-                                            auto_resize,
-                                            iou_t,
-                                            layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFacePT(model, configuration));
     } else if (model_type == "ssd" || model_type == "SSD") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(modelFile, confidence_threshold, resize_type, auto_resize, labels, layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(model, configuration));
     } else if (model_type == "yolo") {
-        bool FLAGS_yolo_af = true;  // Use advanced postprocessing/filtering algorithm for YOLO
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelYolo(modelFile,
-                                    confidence_threshold,
-                                    auto_resize,
-                                    FLAGS_yolo_af,
-                                    iou_t,
-                                    labels,
-                                    anchors,
-                                    masks,
-                                    layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelYolo(model, configuration));
     } else if (model_type == "yolov3-onnx") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloV3ONNX(modelFile,
-                                        confidence_threshold,
-                                        labels,
-                                        layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloV3ONNX(model, configuration));
     } else if (model_type == "yolox") {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloX(modelFile,
-                                    confidence_threshold,
-                                    iou_t,
-                                    labels,
-                                    layout));
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloX(model, configuration));
+    } else if (model_type == "centernet") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelCenterNet(model, configuration));
     } else {
-        throw std::runtime_error{"No model type or invalid model type (-at) provided: " + model_type};
+        throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
-
-    detectionModel->load(adapter);
+    
+    detectionModel->prepare();
+    detectionModel->load(core);
     return detectionModel;
 }
 
-std::vector<std::string> DetectionModel::loadLabels(const std::string& labelFilename) {
-    std::vector<std::string> labelsList;
-
-    /* Read labels (if any) */
-    if (!labelFilename.empty()) {
-        std::ifstream inputFile(labelFilename);
-        if (!inputFile.is_open())
-            throw std::runtime_error("Can't open the labels file: " + labelFilename);
-        std::string label;
-        while (std::getline(inputFile, label)) {
-            labelsList.push_back(label);
-        }
-        if (labelsList.empty())
-            throw std::logic_error("File is empty: " + labelFilename);
+std::unique_ptr<DetectionModel> DetectionModel::create_model(std::shared_ptr<InferenceAdapter>& adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto model_type_iter = configuration.find("model_type");
+    std::string model_type;
+    if (model_type_iter != configuration.end()) {
+        model_type = model_type_iter->second.as<std::string>();
     }
 
-    return labelsList;
+    std::unique_ptr<DetectionModel> detectionModel;
+    if (model_type == "faceboxes") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelFaceBoxes(adapter));
+    } else if (model_type == "retinaface") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFace(adapter));
+    } else if (model_type == "retinaface-pytorch") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFacePT(adapter));
+    } else if (model_type == "ssd" || model_type == "SSD") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(adapter));
+    } else if (model_type == "yolo") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelYolo(adapter));
+    } else if (model_type == "yolov3-onnx") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloV3ONNX(adapter));
+    } else if (model_type == "yolox") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloX(adapter));
+    } else if (model_type == "centernet") {
+        detectionModel = std::unique_ptr<DetectionModel>(new ModelCenterNet(adapter));
+    } else {
+        throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
+    }
+    
+    return detectionModel;
 }
 
 std::unique_ptr<DetectionResult> DetectionModel::infer(const ImageInputData& inputData) {

@@ -24,7 +24,7 @@
 
 #include <utils/nms.hpp>
 
-#include "models/detection_model.h"
+#include "models/detection_model_ext.h"
 
 namespace ov {
 class Model;
@@ -32,24 +32,23 @@ class Model;
 struct InferenceResult;
 struct ResultBase;
 
-class ModelFaceBoxes : public DetectionModel {
+class ModelFaceBoxes : public DetectionModelExt {
 public:
     static const int INIT_VECTOR_SIZE = 200;
 
-    ModelFaceBoxes(const std::string& modelFile,
-                   float confidenceThreshold,
-                   bool useAutoResize,
-                   float boxIOUThreshold,
-                   const std::string& layout = "");
+    ModelFaceBoxes(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ModelFaceBoxes(std::shared_ptr<InferenceAdapter>& adapter);
+    using DetectionModelExt::DetectionModelExt;
+
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
 protected:
-    size_t maxProposalsCount;
-    const float boxIOUThreshold;
-    const std::vector<float> variance;
-    const std::vector<int> steps;
-    const std::vector<std::vector<int>> minSizes;
+    size_t maxProposalsCount = 0;
+    const std::vector<float> variance = {0.1f, 0.2f};
+    const std::vector<int> steps = {32, 64, 128};
+    const std::vector<std::vector<int>> minSizes = {{32, 64, 128}, {256}, {512}};
     std::vector<Anchor> anchors;
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void priorBoxes(const std::vector<std::pair<size_t, size_t>>& featureMaps);
+    void initDefaultParameters(const ov::AnyMap& configuration);
 };

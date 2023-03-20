@@ -34,14 +34,25 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-ModelRetinaFacePT::ModelRetinaFacePT(const std::string& modelFile,
-                                     float confidenceThreshold,
-                                     bool useAutoResize,
-                                     float boxIOUThreshold,
-                                     const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, "standard", useAutoResize, {"Face"}, layout),  // Default label is "Face"
-      landmarksNum(0),
-      boxIOUThreshold(boxIOUThreshold) {}
+
+void ModelRetinaFacePT::initDefaultParameters(const ov::AnyMap& configuration) {
+    resizeMode = RESIZE_FILL; // Ignore resize_type for now
+    auto labels_string = configuration.find("labels"); // Override default if it is not set
+    if (labels_string == configuration.end()) {
+        labels = {"Face"};
+    }
+}
+
+ModelRetinaFacePT::ModelRetinaFacePT(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : DetectionModelExt(model, configuration) {
+    initDefaultParameters(configuration);
+}
+
+ModelRetinaFacePT::ModelRetinaFacePT(std::shared_ptr<InferenceAdapter>& adapter)
+    : DetectionModelExt(adapter) {
+    auto configuration = adapter->getModelConfig();
+    initDefaultParameters(configuration);
+}
 
 void ModelRetinaFacePT::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

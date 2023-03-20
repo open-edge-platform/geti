@@ -22,7 +22,7 @@
 
 #include <utils/nms.hpp>
 
-#include "models/detection_model.h"
+#include "models/detection_model_ext.h"
 
 namespace ov {
 class Model;
@@ -30,22 +30,15 @@ class Model;
 struct InferenceResult;
 struct ResultBase;
 
-class ModelRetinaFace : public DetectionModel {
+class ModelRetinaFace : public DetectionModelExt {
 public:
     static const int LANDMARKS_NUM = 5;
     static const int INIT_VECTOR_SIZE = 200;
-    /// Loads model and performs required initialization
-    /// @param model_name name of model to load
-    /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param useAutoResize - if true, image will be resized by openvino.
-    /// @param boxIOUThreshold - threshold for NMS boxes filtering, varies in [0.0, 1.0] range.
-    /// @param layout - model input layout
-    ModelRetinaFace(const std::string& model_name,
-                    float confidenceThreshold,
-                    bool useAutoResize,
-                    float boxIOUThreshold,
-                    const std::string& layout = "");
+    
+    ModelRetinaFace(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ModelRetinaFace(std::shared_ptr<InferenceAdapter>& adapter);
+    using DetectionModelExt::DetectionModelExt;
+
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
 protected:
@@ -56,19 +49,20 @@ protected:
         std::vector<int> ratios;
     };
 
-    bool shouldDetectMasks;
-    bool shouldDetectLandmarks;
-    const float boxIOUThreshold;
-    const float maskThreshold;
-    float landmarkStd;
+    bool shouldDetectMasks = false;
+    bool shouldDetectLandmarks = false;
+    const float maskThreshold = 0.8f;
+    float landmarkStd = 1.0f;
 
     enum OutputType { OUT_BOXES, OUT_SCORES, OUT_LANDMARKS, OUT_MASKSCORES, OUT_MAX };
 
     std::vector<std::string> separateoutputNames[OUT_MAX];
-    const std::vector<AnchorCfgLine> anchorCfg;
+    const std::vector<AnchorCfgLine> anchorCfg = {
+        {32, {32, 16}, 16, {1}}, {16, {8, 4}, 16, {1}}, {8, {2, 1}, 16, {1}}};
     std::map<int, std::vector<Anchor>> anchorsFpn;
     std::vector<std::vector<Anchor>> anchors;
 
     void generateAnchorsFpn();
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
+    void initDefaultParameters(const ov::AnyMap& configuration);
 };

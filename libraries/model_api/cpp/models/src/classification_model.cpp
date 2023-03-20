@@ -34,66 +34,65 @@
 #include "models/results.h"
 #include "models/input_data.h"
 
-ClassificationModel::ClassificationModel(const std::string& modelFile,
-                                         size_t topk,
-                                         const std::string& resize_type,
-                                         bool useAutoResize,
-                                         const std::vector<std::string>& labels,
-                                         const std::string& layout)
-    : ImageModel(modelFile, resize_type, useAutoResize, layout),
-      topk(topk),
-      labels(labels) {}
-
-std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, std::shared_ptr<InferenceAdapter> adapter, const ov::AnyMap& configuration) {
-    std::shared_ptr<ov::Model> model = ov::Core{}.read_model(modelFile);
-    if (model->has_rt_info("model_info", "model_type") ) {
-        std::string modelType = model->get_rt_info<std::string>("model_info", "model_type");
-        if ("Classification" != modelType) {
-            throw std::runtime_error("Model xml claims the model type is not Classificaction but " + modelType);
-        }
-    }
+ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : ImageModel(model, configuration) {
     auto topk_iter = configuration.find("topk");
-    size_t topk = 1;
     if (topk_iter == configuration.end()) {
-        if (model->has_rt_info<std::string>("model_info", "topk")) {
+        if (model->has_rt_info("model_info", "topk")) {
             topk = stoi(model->get_rt_info<std::string>("model_info", "topk"));
         }
     } else {
         topk = topk_iter->second.as<size_t>();
     }
-    auto labels_iter = configuration.find("labels");
-    std::vector<std::string> labels;
-    if (labels_iter == configuration.end()) {
-        if (!model->has_rt_info<std::string>("model_info", "labels")) {
-            throw std::runtime_error("configuraiot arg or model xml or must contain model_info/labesl rt_info");
+}
+
+ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter)
+    : ImageModel(adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto topk_iter = configuration.find("topk");
+    if (topk_iter != configuration.end()) {
+        topk = topk_iter->second.as<size_t>();
+    }
+}
+
+std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration) {
+    auto core = ov::Core();
+    std::shared_ptr<ov::Model> model = core.read_model(modelFile);
+    
+    // Check model_type in the rt_info, ignore configuration
+    std::string model_type = "Classification";
+    try {
+        if (model->has_rt_info("model_info", "model_type") ) {
+            model_type = model->get_rt_info<std::string>("model_info", "model_type");
         }
-        labels = split(model->get_rt_info<std::string>("model_info", "labels"), ' ');
-    } else {
-        labels = labels_iter->second.as<std::vector<std::string>>();
+    } catch (const std::exception& e) {
+        slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
     }
-    auto layout_iter = configuration.find("layout");
-    std::string layout;
-    if (layout_iter != configuration.end()) {
-        layout = layout_iter->second.as<std::string>();
-    }
-    auto auto_resize_iter = configuration.find("auto_resize");
-    bool auto_resize = false;
-    if (auto_resize_iter != configuration.end()) {
-        auto_resize = auto_resize_iter->second.as<bool>();
-    }
-    auto resize_type_iter = configuration.find("resize_type");
-    std::string resize_type = "standard";
-    if (resize_type_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "resize_type")) {
-            resize_type = model->get_rt_info<std::string>("model_info", "resize_type");
-        }
-    } else {
-        resize_type = resize_type_iter->second.as<std::string>();
+    
+    if (model_type != "Classification") {
+        throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
 
-    std::unique_ptr<ClassificationModel> classificationModel{new ClassificationModel(modelFile, topk, resize_type, auto_resize, labels, layout)};
-    classificationModel->load(adapter);
-    return classificationModel;
+    std::unique_ptr<ClassificationModel> classifier{new ClassificationModel(model, configuration)};
+    classifier->prepare();
+    classifier->load(core);
+    return classifier;
+}
+
+std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shared_ptr<InferenceAdapter>& adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto model_type_iter = configuration.find("model_type");
+    std::string model_type = "Classification";
+    if (model_type_iter != configuration.end()) {
+        model_type = model_type_iter->second.as<std::string>();
+    }
+
+    if (model_type != "Classification") {
+        throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
+    }
+
+    std::unique_ptr<ClassificationModel> classifier{new ClassificationModel(adapter)};
+    return classifier;
 }
 
 std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& infResult) {
@@ -115,28 +114,6 @@ std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& in
     }
 
     return retVal;
-}
-
-std::vector<std::string> ClassificationModel::loadLabels(const std::string& labelFilename) {
-    std::vector<std::string> labels;
-
-    /* Read labels */
-    std::ifstream inputFile(labelFilename);
-    if (!inputFile.is_open())
-        throw std::runtime_error("Can't open the labels file: " + labelFilename);
-    std::string labelsLine;
-    while (std::getline(inputFile, labelsLine)) {
-        size_t labelBeginIdx = labelsLine.find(' ');
-        size_t labelEndIdx = labelsLine.find(',');  // can be npos when class has only one label
-        if (labelBeginIdx == std::string::npos) {
-            throw std::runtime_error("The labels file has incorrect format.");
-        }
-        labels.push_back(labelsLine.substr(labelBeginIdx + 1, labelEndIdx - (labelBeginIdx + 1)));
-    }
-    if (labels.empty())
-        throw std::logic_error("File is empty: " + labelFilename);
-
-    return labels;
 }
 
 void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {

@@ -26,13 +26,13 @@
 #include <openvino/op/region_yolo.hpp>
 #include <openvino/openvino.hpp>
 
-#include "models/detection_model.h"
+#include "models/detection_model_ext.h"
 
 struct DetectedObject;
 struct InferenceResult;
 struct ResultBase;
 
-class ModelYolo : public DetectionModel {
+class ModelYolo : public DetectionModelExt {
 protected:
     class Region {
     public:
@@ -55,30 +55,9 @@ protected:
 public:
     enum YoloVersion { YOLO_V1V2, YOLO_V3, YOLO_V4, YOLO_V4_TINY, YOLOF };
 
-    /// Constructor.
-    /// @param modelFile name of model to load
-    /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param useAutoResize - if true, image will be resized by openvino.
-    /// Otherwise, image will be preprocessed and resized using OpenCV routines.
-    /// @param useAdvancedPostprocessing - if true, an advanced algorithm for filtering/postprocessing will be used
-    /// (with better processing of multiple crossing objects). Otherwise, classic algorithm will be used.
-    /// @param boxIOUThreshold - threshold to treat separate output regions as one object for filtering
-    /// during postprocessing (only one of them should stay). The default value is 0.5
-    /// @param labels - array of labels for every class. If this array is empty or contains less elements
-    /// than actual classes number, default "Label #N" will be shown for missing items.
-    /// @param anchors - vector of anchors coordinates. Required for YOLOv4, for other versions it may be omitted.
-    /// @param masks - vector of masks values. Required for YOLOv4, for other versions it may be omitted.
-    /// @param layout - model input layout
-    ModelYolo(const std::string& modelFile,
-              float confidenceThreshold,
-              bool useAutoResize,
-              bool useAdvancedPostprocessing = true,
-              float boxIOUThreshold = 0.5,
-              const std::vector<std::string>& labels = std::vector<std::string>(),
-              const std::vector<float>& anchors = std::vector<float>(),
-              const std::vector<int64_t>& masks = std::vector<int64_t>(),
-              const std::string& layout = "");
+    ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ModelYolo(std::shared_ptr<InferenceAdapter>& adapter);
+    using DetectionModelExt::DetectionModelExt;
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
@@ -98,10 +77,10 @@ protected:
 
     std::map<std::string, Region> regions;
     double boxIOUThreshold;
-    bool useAdvancedPostprocessing;
+    bool useAdvancedPostprocessing = true;
     bool isObjConf = 1;
-    YoloVersion yoloVersion;
-    const std::vector<float> presetAnchors;
-    const std::vector<int64_t> presetMasks;
+    YoloVersion yoloVersion = YOLO_V3;
+    std::vector<float> presetAnchors;
+    std::vector<int64_t> presetMasks;
     ov::Layout yoloRegionLayout = "NCHW";
 };

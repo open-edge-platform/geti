@@ -34,14 +34,22 @@
 #include "models/results.h"
 #include "utils/image_utils.h"
 
-ModelYoloV3ONNX::ModelYoloV3ONNX(const std::string& modelFile,
-                                 float confidenceThreshold,
-                                 const std::vector<std::string>& labels,
-                                 const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, "fit_to_window_letterbox", false, labels, layout) {
-        interpolationMode = cv::INTER_CUBIC;
-    }
 
+void ModelYoloV3ONNX::initDefaultParameters(const ov::AnyMap& configuration) {
+    resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX; // Ignore configuration for now
+    useAutoResize = false;
+}
+
+ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : DetectionModel(model, configuration) {
+    initDefaultParameters(configuration);
+}
+
+ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<InferenceAdapter>& adapter)
+    : DetectionModel(adapter) {
+    auto configuration = adapter->getModelConfig();
+    initDefaultParameters(configuration);
+}
 
 void ModelYoloV3ONNX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

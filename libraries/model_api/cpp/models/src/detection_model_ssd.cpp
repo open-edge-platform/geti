@@ -33,14 +33,6 @@
 
 struct InputData;
 
-ModelSSD::ModelSSD(const std::string& modelFile,
-                   float confidenceThreshold,
-                   const std::string& resize_type,
-                   bool useAutoResize,
-                   const std::vector<std::string>& labels,
-                   const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, resize_type, useAutoResize, labels, layout) {}
-
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
         cv::Mat info(cv::Size(1, 3), CV_32SC1);

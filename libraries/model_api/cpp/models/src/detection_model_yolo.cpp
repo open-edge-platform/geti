@@ -98,21 +98,43 @@ static inline float linear(float x) {
     return x;
 }
 
-ModelYolo::ModelYolo(const std::string& modelFile,
-                     float confidenceThreshold,
-                     bool useAutoResize,
-                     bool useAdvancedPostprocessing,
-                     float boxIOUThreshold,
-                     const std::vector<std::string>& labels,
-                     const std::vector<float>& anchors,
-                     const std::vector<int64_t>& masks,
-                     const std::string& layout)
-    : DetectionModel(modelFile, confidenceThreshold, "standard", useAutoResize, labels, layout),
-      boxIOUThreshold(boxIOUThreshold),
-      useAdvancedPostprocessing(useAdvancedPostprocessing),
-      yoloVersion(YOLO_V3),
-      presetAnchors(anchors),
-      presetMasks(masks) {}
+ModelYolo::ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : DetectionModelExt(model, configuration) {    
+    auto anchors_iter = configuration.find("anchors");
+    if (anchors_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "anchors")) {
+            //presetAnchors = model->get_rt_info().at("model_info").as<ov::VariantWrapper<ov::AnyMap>>().get().at("anchors").as<std::vector<float>>();
+            presetAnchors = model->get_rt_info<std::vector<float>>("model_info", "anchors");
+        }
+    } else {
+        presetAnchors = anchors_iter->second.as<std::vector<float>>();
+    }
+    auto masks_iter = configuration.find("masks");
+    if (masks_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "masks")) {
+            presetMasks = model->get_rt_info<std::vector<int64_t>>("model_info", "masks");
+        }
+    } else {
+        presetMasks = masks_iter->second.as<std::vector<int64_t>>();
+    }
+
+    resizeMode = RESIZE_FILL; // Ignore resize_type for now
+}
+
+ModelYolo::ModelYolo(std::shared_ptr<InferenceAdapter>& adapter)
+    : DetectionModelExt(adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto anchors_iter = configuration.find("anchors");
+    if (anchors_iter != configuration.end()) {
+        presetAnchors = anchors_iter->second.as<std::vector<float>>();
+    }
+    auto masks_iter = configuration.find("masks");
+    if (masks_iter != configuration.end()) {
+        presetMasks = masks_iter->second.as<std::vector<int64_t>>();
+    }
+
+    resizeMode = RESIZE_FILL; // Ignore resize_type for now
+}
 
 void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

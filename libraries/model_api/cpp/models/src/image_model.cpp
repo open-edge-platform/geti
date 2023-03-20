@@ -18,6 +18,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <fstream>
 
 #include <opencv2/core.hpp>
 #include <openvino/openvino.hpp>
@@ -29,30 +30,90 @@
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
 
-ImageModel::ImageModel(const std::string& modelFile, const std::string& resize_type, bool useAutoResize, const std::string& layout)
+ImageModel::ImageModel(const std::string& modelFile,
+                       const std::string& resize_type,
+                       bool useAutoResize,
+                       const std::string& layout)
     : ModelBase(modelFile, layout),
-      useAutoResize(useAutoResize) {
-        if ("crop" == resize_type) {
-            throw std::runtime_error("crop resize_type is not implemented");
-        } else if ("standard" == resize_type) {
-            interpolationMode = cv::INTER_LINEAR;
-            resizeMode = RESIZE_FILL;
-        } else if ("fit_to_window" == resize_type) {
-            if (useAutoResize) {
-                throw std::runtime_error("useAutoResize supports only standard resize_type");
-            }
-            interpolationMode = cv::INTER_LINEAR;
-            resizeMode = RESIZE_KEEP_ASPECT;
-        } else if ("fit_to_window_letterbox" == resize_type) {
-            if (useAutoResize) {
-                throw std::runtime_error("useAutoResize supports only standard resize_type");
-            }
-            interpolationMode = cv::INTER_LINEAR;
-            resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;
-        } else {
-            throw std::runtime_error("Unknown value for resize_type arg");
+      useAutoResize(useAutoResize),
+      resizeMode(selectResizeMode(resize_type)) {}
+
+RESIZE_MODE ImageModel::selectResizeMode(const std::string& resize_type) {
+    RESIZE_MODE resize = RESIZE_FILL;
+    if ("crop" == resize_type) {
+        throw std::runtime_error("crop resize_type is not implemented");
+    } else if ("standard" == resize_type) {
+        resize = RESIZE_FILL;
+    } else if ("fit_to_window" == resize_type) {
+        if (useAutoResize) {
+            throw std::runtime_error("useAutoResize supports only standard resize_type");
         }
+        resize = RESIZE_KEEP_ASPECT;
+    } else if ("fit_to_window_letterbox" == resize_type) {
+        if (useAutoResize) {
+            throw std::runtime_error("useAutoResize supports only standard resize_type");
+        }
+        resize = RESIZE_KEEP_ASPECT_LETTERBOX;
+    } else {
+        throw std::runtime_error("Unknown value for resize_type arg");
     }
+
+    return resize;
+}
+
+ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : ModelBase(model, configuration) {
+    auto auto_resize_iter = configuration.find("auto_resize");
+    if (auto_resize_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "auto_resize")) {
+            useAutoResize = model->get_rt_info<bool>("model_info", "auto_resize");
+        }
+    } else {
+        useAutoResize = auto_resize_iter->second.as<bool>();
+    }
+
+    auto resize_type_iter = configuration.find("resize_type");
+    std::string resize_type = "standard";
+    if (resize_type_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "resize_type")) {
+            resize_type = model->get_rt_info<std::string>("model_info", "resize_type");
+        }
+    } else {
+        resize_type = resize_type_iter->second.as<std::string>();
+    }
+    resizeMode = selectResizeMode(resize_type);
+
+    auto labels_iter = configuration.find("labels");
+    if (labels_iter == configuration.end()) {
+        if (!model->has_rt_info<std::string>("model_info", "labels")) {
+            throw std::runtime_error("Configuration or model rt_info should contain labels"); //TODO
+        }
+        labels = split(model->get_rt_info<std::string>("model_info", "labels"), ' ');
+    } else {
+        labels = labels_iter->second.as<std::vector<std::string>>();
+    }
+}
+
+ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
+    : ModelBase(adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto auto_resize_iter = configuration.find("auto_resize");
+    if (auto_resize_iter != configuration.end()) {
+        useAutoResize = auto_resize_iter->second.as<bool>();
+    }
+
+    auto resize_type_iter = configuration.find("resize_type");
+    std::string resize_type = "standard";
+    if (resize_type_iter != configuration.end()) {
+        resize_type = resize_type_iter->second.as<std::string>();
+    }
+    resizeMode = selectResizeMode(resize_type);
+
+    auto labels_iter = configuration.find("labels");
+    if (labels_iter != configuration.end()) {
+        labels = labels_iter->second.as<std::vector<std::string>>();
+    }
+}
 
 std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& inputData, InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;
@@ -75,4 +136,23 @@ std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& input
     }
     input.emplace(inputNames[0], wrapMat2Tensor(img));
     return std::make_shared<InternalImageModelData>(origImg.cols, origImg.rows);
+}
+
+std::vector<std::string> ImageModel::loadLabels(const std::string& labelFilename) {
+    std::vector<std::string> labelsList;
+
+    /* Read labels (if any) */
+    if (!labelFilename.empty()) {
+        std::ifstream inputFile(labelFilename);
+        if (!inputFile.is_open())
+            throw std::runtime_error("Can't open the labels file: " + labelFilename);
+        std::string label;
+        while (std::getline(inputFile, label)) {
+            labelsList.push_back(label);
+        }
+        if (labelsList.empty())
+            throw std::logic_error("File is empty: " + labelFilename);
+    }
+
+    return labelsList;
 }

@@ -25,7 +25,7 @@
 
 #include "utils/args_helper.hpp"
 
-std::set<std::string> ModelConfig::getDevices() {
+std::set<std::string> InferenceConfig::getDevices() {
     if (devices.empty()) {
         for (const std::string& device : parseDevices(deviceName)) {
             devices.insert(device);
@@ -35,7 +35,7 @@ std::set<std::string> ModelConfig::getDevices() {
     return devices;
 }
 
-ModelConfig ConfigFactory::getUserConfig(const std::string& flags_d,
+InferenceConfig ConfigFactory::getUserConfig(const std::string& flags_d,
                                          uint32_t flags_nireq,
                                          const std::string& flags_nstreams,
                                          uint32_t flags_nthreads) {
@@ -69,7 +69,7 @@ ModelConfig ConfigFactory::getUserConfig(const std::string& flags_d,
     return config;
 }
 
-ModelConfig ConfigFactory::getMinLatencyConfig(const std::string& flags_d, uint32_t flags_nireq) {
+InferenceConfig ConfigFactory::getMinLatencyConfig(const std::string& flags_d, uint32_t flags_nireq) {
     auto config = getCommonConfig(flags_d, flags_nireq);
     for (const auto& device : config.getDevices()) {
         if (device == "CPU") {  // CPU supports a few special performance-oriented keys
@@ -81,8 +81,8 @@ ModelConfig ConfigFactory::getMinLatencyConfig(const std::string& flags_d, uint3
     return config;
 }
 
-ModelConfig ConfigFactory::getCommonConfig(const std::string& flags_d, uint32_t flags_nireq) {
-    ModelConfig config;
+InferenceConfig ConfigFactory::getCommonConfig(const std::string& flags_d, uint32_t flags_nireq) {
+    InferenceConfig config;
 
     if (!flags_d.empty()) {
         config.deviceName = flags_d;
@@ -93,7 +93,7 @@ ModelConfig ConfigFactory::getCommonConfig(const std::string& flags_d, uint32_t 
     return config;
 }
 
-std::map<std::string, std::string> ModelConfig::getLegacyConfig() {
+std::map<std::string, std::string> InferenceConfig::getLegacyConfig() {
     std::map<std::string, std::string> config;
     for (const auto& item : compilationConfig) {
         config[item.first] = item.second.as<std::string>();

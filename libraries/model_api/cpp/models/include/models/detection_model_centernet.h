@@ -47,13 +47,13 @@ public:
     };
     static const int INIT_VECTOR_SIZE = 200;
 
-    ModelCenterNet(const std::string& modelFile,
-                   float confidenceThreshold,
-                   const std::vector<std::string>& labels = std::vector<std::string>(),
-                   const std::string& layout = "");
+    ModelCenterNet(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ModelCenterNet(std::shared_ptr<InferenceAdapter>& adapter);
+    
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
 protected:
+    void initDefaultParameters(const ov::AnyMap& configuration);
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
 };

@@ -34,22 +34,7 @@ struct ResultBase;
 
 class ModelSSD : public DetectionModel {
 public:
-    /// Constructor
-    /// @param modelFile name of model to load
-    /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param useAutoResize - if true, image will be resized by openvino.
-    /// Otherwise, image will be preprocessed and resized using OpenCV routines.
-    /// @param labels - array of labels for every class. If this array is empty or contains less elements
-    /// than actual classes number, default "Label #N" will be shown for missing items.
-    /// @param layout - model input layout
-    ModelSSD(const std::string& modelFile,
-             float confidenceThreshold,
-             const std::string& resize_type,
-             bool useAutoResize,
-             const std::vector<std::string>& labels = std::vector<std::string>(),
-             const std::string& layout = "");
-
+    using DetectionModel::DetectionModel;
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 

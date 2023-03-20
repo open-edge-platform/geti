@@ -22,7 +22,7 @@
 
 #include "adapters/inference_adapter.h"
 
-struct ModelConfig;
+struct InferenceConfig;
 
 class OpenVINOInferenceAdapter :public InferenceAdapter
 {
@@ -34,9 +34,12 @@ public:
     virtual void loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,
                                                     const std::string& device = "", const ov::AnyMap& compilationConfig = {}) override;
     virtual ov::Shape getInputShape(const std::string& inputName) const override;
+    virtual std::vector<std::string> getInputNames() const override;
+    virtual std::vector<std::string> getOutputNames() const override;
+    virtual const ov::AnyMap& getModelConfig() const override;
 
 protected:
-    virtual void initInputsOutputs();
+    void initInputsOutputs();
 
 protected:
     //Depends on the implmentation details but we should share the model state in this class
@@ -44,4 +47,5 @@ protected:
     std::vector<std::string> outputNames;
     ov::CompiledModel compiledModel;
     ov::InferRequest inferRequest;
+    ov::AnyMap modelConfig; // the content of model_info section of rt_info
 };

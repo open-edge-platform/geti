@@ -33,32 +33,18 @@ struct ImageInputData;
 
 class ClassificationModel : public ImageModel {
 public:
-    /// Constructor
-    /// @param modelFile name of model to load.
-    /// @param topk - number of top results.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param useAutoResize - if true, image will be resized by openvino.
-    /// Otherwise, image will be preprocessed and resized using OpenCV routines.
-    /// @param labels - array of labels for every class.
-    /// @param layout - model input layout
-    ClassificationModel(const std::string& modelFile,
-                        size_t topk,
-                        const std::string& resize_type,
-                        bool useAutoResize,
-                        const std::vector<std::string>& labels,
-                        const std::string& layout = "");
+    ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter);
 
-    static std::unique_ptr<ClassificationModel> create_model(const std::string& modelFile, std::shared_ptr<InferenceAdapter> adapter = nullptr, const ov::AnyMap& configuration = {});
+    static std::unique_ptr<ClassificationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {});
+    static std::unique_ptr<ClassificationModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
-
-    static std::vector<std::string> loadLabels(const std::string& labelFilename);
 
     virtual std::unique_ptr<ClassificationResult> infer(const ImageInputData& inputData);
 
 protected:
-    size_t topk;
-    std::vector<std::string> labels;
+    size_t topk = 1;
 
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
 };

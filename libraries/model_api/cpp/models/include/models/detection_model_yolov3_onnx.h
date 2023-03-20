@@ -25,23 +25,16 @@
 
 class ModelYoloV3ONNX: public DetectionModel {
 public:
-    /// Constructor.
-    /// @param modelFile name of model to load
-    /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param labels - array of labels for every class. If this array is empty or contains less elements
-    /// than actual classes number, default "Label #N" will be shown for missing items.
-    /// @param layout - model input layout
-    ModelYoloV3ONNX(const std::string& modelFile,
-                    float confidenceThreshold,
-                    const std::vector<std::string>& labels = std::vector<std::string>(),
-                    const std::string& layout = "");
+    ModelYoloV3ONNX(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ModelYoloV3ONNX(std::shared_ptr<InferenceAdapter>& adapter);
+    using DetectionModel::DetectionModel;
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
 
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
+    void initDefaultParameters(const ov::AnyMap& configuration);
 
     std::string boxesOutputName;
     std::string scoresOutputName;

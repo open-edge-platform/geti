@@ -34,12 +34,14 @@ struct ResultBase;
 
 class ModelBase {
 public:
-    ModelBase(const std::string& modelFile, const std::string& layout = "")
-        : modelFile(modelFile),
-          inputsLayouts(parseLayoutString(layout)) {}
+    ModelBase(const std::string& modelFile, const std::string& layout = "");
+    ModelBase(std::shared_ptr<InferenceAdapter>& adapter);
+    ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    
     virtual ~ModelBase() = default;
 
-    void load(std::shared_ptr<InferenceAdapter> adapter = nullptr);
+    std::shared_ptr<ov::Model> prepare();
+    void load(ov::Core& core);
 
     virtual std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) = 0;
     virtual std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) = 0;
@@ -52,28 +54,17 @@ public:
         return inputNames;
     }
 
-    std::string getmodelFile() {
-        return modelFile;
-    }
-
-    void setInputsPreprocessing(bool reverseInputChannels,
-                                const std::string& meanValues,
-                                const std::string& scaleValues) {
-        this->inputTransform = InputTransform(reverseInputChannels, meanValues, scaleValues);
-    }
-
 protected:
     virtual void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) = 0;
 
-    void prepareModel(ov::Core& core);
-
     InputTransform inputTransform = InputTransform();
 
+    std::shared_ptr<ov::Model> model;
     std::vector<std::string> inputNames;
     std::vector<std::string> outputNames;
     std::string modelFile;
     std::shared_ptr<InferenceAdapter> inferenceAdapter;
-    ModelConfig config = {};
+    InferenceConfig config = {};
     std::map<std::string, ov::Layout> inputsLayouts;
     ov::Layout getInputLayout(const ov::Output<ov::Node>& input);
 };

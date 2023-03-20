@@ -21,24 +21,14 @@
 
 #include <openvino/openvino.hpp>
 
-#include "models/detection_model.h"
+#include "models/detection_model_ext.h"
 
-class ModelYoloX: public DetectionModel {
+
+class ModelYoloX: public DetectionModelExt {
 public:
-    /// Constructor.
-    /// @param modelFile name of model to load
-    /// @param confidenceThreshold - threshold to eliminate low-confidence detections.
-    /// Any detected object with confidence lower than this threshold will be ignored.
-    /// @param boxIOUThreshold - threshold to treat separate output regions as one object for filtering
-    /// during postprocessing (only one of them should stay). The default value is 0.5
-    /// @param labels - array of labels for every class. If this array is empty or contains less elements
-    /// than actual classes number, default "Label #N" will be shown for missing items.
-    /// @param layout - model input layout
-    ModelYoloX(const std::string& modelFile,
-                    float confidenceThreshold,
-                    float boxIOUThreshold = 0.5,
-                    const std::vector<std::string>& labels = std::vector<std::string>(),
-                    const std::string& layout = "");
+    ModelYoloX(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    ModelYoloX(std::shared_ptr<InferenceAdapter>& adapter);
+    using DetectionModelExt::DetectionModelExt;
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
@@ -46,6 +36,7 @@ public:
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void setStridesGrids();
+    void initDefaultParameters(const ov::AnyMap& configuration);
 
     double boxIOUThreshold;
     std::vector<std::pair<size_t, size_t>> grids;
