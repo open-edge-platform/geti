@@ -155,7 +155,7 @@ std::unique_ptr<ResultBase> ModelYoloV3ONNX::postprocess(InferenceResult& infRes
     // Generate detection results
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
     size_t numberOfBoxes = indicesShape.size() == 3 ? indicesShape[1] : indicesShape[0];
-    int indicesStride = indicesShape.size() == 3 ? indicesShape[2] : indicesShape[1];
+    size_t indicesStride = indicesShape.size() == 3 ? indicesShape[2] : indicesShape[1];
 
     for (size_t i = 0; i < numberOfBoxes; ++i) {
         int batchInd = indicesData[i * indicesStride];

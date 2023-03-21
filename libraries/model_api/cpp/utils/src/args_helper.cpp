@@ -3,21 +3,9 @@
 //
 
 #include "utils/args_helper.hpp"
-#include "utils/slog.hpp"
-
-#ifdef _WIN32
-#include "w_dirent.hpp"
-#else
-#include <dirent.h>
-#endif
-
-#include <gflags/gflags.h>
-
-#include <sys/stat.h>
-#include <map>
 
 #include <algorithm>
-#include <cctype>
+#include <map>
 #include <sstream>
 
 std::vector<std::string> split(const std::string& s, char delim) {

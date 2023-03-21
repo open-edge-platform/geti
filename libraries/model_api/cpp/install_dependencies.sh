@@ -10,10 +10,7 @@ echo "deb https://apt.repos.intel.com/openvino/2022 focal main" | sudo tee /etc/
 apt update
 
 #Install OpenCV
-apt-get install libopencv-dev 
+apt-get install libopencv-dev
 
 # Install OpenVINO
 apt install openvino
-
-# Install GTest for CPP tests
-apt-get install libgtest-dev

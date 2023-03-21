@@ -36,8 +36,8 @@ struct InputData;
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
         cv::Mat info(cv::Size(1, 3), CV_32SC1);
-        info.at<int>(0, 0) = static_cast<float>(netInputHeight);
-        info.at<int>(0, 1) = static_cast<float>(netInputWidth);
+        info.at<int>(0, 0) = netInputHeight;
+        info.at<int>(0, 1) = netInputWidth;
         info.at<int>(0, 2) = 1;
         auto allocator = std::make_shared<SharedTensorAllocator>(info);
         ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 3}),  ov::Allocator(allocator));
@@ -60,16 +60,16 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
     auto retVal = std::unique_ptr<ResultBase>(result);
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
-    float floatInputImgWidth = internalData.inputImgWidth,
-         floatInputImgHeight = internalData.inputImgHeight;
+    float floatInputImgWidth = float(internalData.inputImgWidth),
+         floatInputImgHeight = float(internalData.inputImgHeight);
     float invertedScaleX = floatInputImgWidth / netInputWidth,
           invertedScaleY = floatInputImgHeight / netInputHeight;
     int padLeft = 0, padTop = 0;
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
         if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
-            padLeft = (netInputWidth - floatInputImgWidth / invertedScaleX) / 2;
-            padTop = (netInputHeight - floatInputImgHeight / invertedScaleY) / 2;
+            padLeft = (netInputWidth - int(floatInputImgWidth / invertedScaleX)) / 2;
+            padTop = (netInputHeight - int(floatInputImgHeight / invertedScaleY)) / 2;
         }
     }
 
