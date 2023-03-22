@@ -32,12 +32,13 @@ struct ImageInputData;
 #pragma once
 class SegmentationModel : public ImageModel {
 public:
-    /// Constructor
-    /// @param modelFile name of model to load
-    /// @param useAutoResize - if true, image will be resized by openvino.
-    /// Otherwise, image will be preprocessed and resized using OpenCV routines.
-    /// @param layout - model input layout
-    SegmentationModel(const std::string& modelFile, bool useAutoResize, const std::string& layout = "");
+    SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+        : ImageModel(model, configuration) {}
+    SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter)
+        : ImageModel(adapter) {}
+
+    static std::unique_ptr<SegmentationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {});
+    static std::unique_ptr<SegmentationModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 

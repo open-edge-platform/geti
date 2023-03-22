@@ -32,8 +32,45 @@
 #include "models/input_data.h"
 #include "models/results.h"
 
-SegmentationModel::SegmentationModel(const std::string& modelFile, bool useAutoResize, const std::string& layout)
-    : ImageModel(modelFile, "standard", useAutoResize, layout) {}
+std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration) {
+    auto core = ov::Core();
+    std::shared_ptr<ov::Model> model = core.read_model(modelFile);
+
+    // Check model_type in the rt_info, ignore configuration
+    std::string model_type = "segmentation";
+    try {
+        if (model->has_rt_info("model_info", "model_type") ) {
+            model_type = model->get_rt_info<std::string>("model_info", "model_type");
+        }
+    } catch (const std::exception& e) {
+        slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
+    }
+
+    if (model_type != "segmentation") {
+        throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
+    }
+
+    std::unique_ptr<SegmentationModel> segmentor{new SegmentationModel(model, configuration)};
+    segmentor->prepare();
+    segmentor->load(core);
+    return segmentor;
+}
+
+std::unique_ptr<SegmentationModel> SegmentationModel::create_model(std::shared_ptr<InferenceAdapter>& adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto model_type_iter = configuration.find("model_type");
+    std::string model_type = "segmentation";
+    if (model_type_iter != configuration.end()) {
+        model_type = model_type_iter->second.as<std::string>();
+    }
+
+    if (model_type != "segmentation") {
+        throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
+    }
+
+    std::unique_ptr<SegmentationModel> segmentor{new SegmentationModel(adapter)};
+    return segmentor;
+}
 
 void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output ---------------------------------------------
