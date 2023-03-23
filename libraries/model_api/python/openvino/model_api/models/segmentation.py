@@ -23,7 +23,7 @@ from .utils import load_labels
 
 
 class SegmentationModel(ImageModel):
-    __model__ = "segmentation"
+    __model__ = "Segmentation"
 
     def __init__(self, inference_adapter, configuration=None, preload=False):
         super().__init__(inference_adapter, configuration, preload)
