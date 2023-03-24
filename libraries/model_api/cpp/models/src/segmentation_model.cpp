@@ -32,12 +32,14 @@
 #include "models/input_data.h"
 #include "models/results.h"
 
-std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration) {
+std::string SegmentationModel::ModelType = "Segmentation";
+
+std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
 
     // Check model_type in the rt_info, ignore configuration
-    std::string model_type = "Segmentation";
+    std::string model_type = SegmentationModel::ModelType;
     try {
         if (model->has_rt_info("model_info", "model_type") ) {
             model_type = model->get_rt_info<std::string>("model_info", "model_type");
@@ -46,30 +48,38 @@ std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::st
         slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
     }
 
-    if (model_type != "Segmentation") {
+    if (model_type != SegmentationModel::ModelType) {
         throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
 
     std::unique_ptr<SegmentationModel> segmentor{new SegmentationModel(model, configuration)};
     segmentor->prepare();
-    segmentor->load(core);
+    if (preload) {
+        segmentor->load(core);
+    }
     return segmentor;
 }
 
 std::unique_ptr<SegmentationModel> SegmentationModel::create_model(std::shared_ptr<InferenceAdapter>& adapter) {
     auto configuration = adapter->getModelConfig();
     auto model_type_iter = configuration.find("model_type");
-    std::string model_type = "Segmentation";
+    std::string model_type = SegmentationModel::ModelType;
     if (model_type_iter != configuration.end()) {
         model_type = model_type_iter->second.as<std::string>();
     }
 
-    if (model_type != "Segmentation") {
+    if (model_type != SegmentationModel::ModelType) {
         throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
     }
 
     std::unique_ptr<SegmentationModel> segmentor{new SegmentationModel(adapter)};
     return segmentor;
+}
+
+void SegmentationModel::updateModelInfo() {
+    ImageModel::updateModelInfo();
+
+    model->set_rt_info(SegmentationModel::ModelType, "model_info", "model_type");
 }
 
 void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {

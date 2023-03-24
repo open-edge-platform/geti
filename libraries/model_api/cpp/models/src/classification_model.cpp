@@ -34,6 +34,8 @@
 #include "models/results.h"
 #include "models/input_data.h"
 
+std::string ClassificationModel::ModelType = "Classification";
+
 ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
     : ImageModel(model, configuration) {
     auto topk_iter = configuration.find("topk");
@@ -55,39 +57,48 @@ ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adap
     }
 }
 
-std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration) {
+void ClassificationModel::updateModelInfo() {
+    ImageModel::updateModelInfo();
+
+    model->set_rt_info(ClassificationModel::ModelType, "model_info", "model_type");
+    model->set_rt_info(topk, "model_info", "topk");
+}
+
+std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
     
     // Check model_type in the rt_info, ignore configuration
-    std::string model_type = "Classification";
+    std::string model_type = ClassificationModel::ModelType;
     try {
-        if (model->has_rt_info("model_info", "model_type") ) {
+        if (model->has_rt_info("model_info", "model_type")) {
             model_type = model->get_rt_info<std::string>("model_info", "model_type");
         }
     } catch (const std::exception& e) {
         slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
     }
     
-    if (model_type != "Classification") {
+    if (model_type != ClassificationModel::ModelType) {
         throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
 
     std::unique_ptr<ClassificationModel> classifier{new ClassificationModel(model, configuration)};
     classifier->prepare();
-    classifier->load(core);
+    if (preload) {
+        classifier->load(core);
+    }
     return classifier;
 }
 
 std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shared_ptr<InferenceAdapter>& adapter) {
     auto configuration = adapter->getModelConfig();
     auto model_type_iter = configuration.find("model_type");
-    std::string model_type = "Classification";
+    std::string model_type = ClassificationModel::ModelType;
     if (model_type_iter != configuration.end()) {
         model_type = model_type_iter->second.as<std::string>();
     }
 
-    if (model_type != "Classification") {
+    if (model_type != ClassificationModel::ModelType) {
         throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
     }
 
@@ -124,6 +135,14 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     }
     const auto& input = model->input();
     inputNames.push_back(input.get_any_name());
+
+    outputNames.push_back("indices");
+    outputNames.push_back("scores");
+
+    // Skip next steps if pre/postprocessing was embedded previously
+    if (embedded_processing) {
+        return;
+    }
 
     const ov::Shape& inputShape = input.get_shape();
     const ov::Layout& inputLayout = getInputLayout(input);
@@ -215,15 +234,14 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
 
     // manually set output tensors name for created topK node
     model->outputs()[0].set_names({"indices"});
-    outputNames.push_back("indices");
     model->outputs()[1].set_names({"scores"});
-    outputNames.push_back("scores");
 
     // set output precisions
     ppp = ov::preprocess::PrePostProcessor(model);
     ppp.output("indices").tensor().set_element_type(ov::element::i32);
     ppp.output("scores").tensor().set_element_type(ov::element::f32);
     model = ppp.build();
+    embedded_processing = true;
 }
 
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {

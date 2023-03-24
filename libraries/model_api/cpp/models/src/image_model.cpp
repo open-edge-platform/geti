@@ -92,6 +92,10 @@ ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
     } else {
         labels = labels_iter->second.as<std::vector<std::string>>();
     }
+
+    if (model->has_rt_info("model_info", "embedded_processing")) {
+        embedded_processing = model->get_rt_info<bool>("model_info", "embedded_processing");
+    }
 }
 
 ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
@@ -113,6 +117,24 @@ ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
     if (labels_iter != configuration.end()) {
         labels = labels_iter->second.as<std::vector<std::string>>();
     }
+
+    auto embedded_processing_iter = configuration.find("embedded_processing");
+    if (embedded_processing_iter != configuration.end()) {
+        embedded_processing = embedded_processing_iter->second.as<bool>();
+    }
+}
+
+void ImageModel::updateModelInfo() {
+    ModelBase::updateModelInfo();
+
+    model->set_rt_info(useAutoResize, "model_info", "auto_resize");
+    model->set_rt_info(formatResizeMode(resizeMode), "model_info", "resize_type");
+
+    if (!labels.empty()) {
+        model->set_rt_info(labels, "model_info", "labels");  
+    }
+
+    model->set_rt_info(embedded_processing, "model_info", "embedded_processing");
 }
 
 std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& inputData, InferenceInput& input) {

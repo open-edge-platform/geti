@@ -50,10 +50,12 @@ public:
 
 protected:
     RESIZE_MODE selectResizeMode(const std::string& resize_type);
+    void updateModelInfo() override;
 
 protected:
     std::vector<std::string> labels = {};
     bool useAutoResize = false;
+    bool embedded_processing = false;
 
     size_t netInputHeight = 0;
     size_t netInputWidth = 0;

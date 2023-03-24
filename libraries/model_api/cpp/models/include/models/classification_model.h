@@ -36,15 +36,17 @@ public:
     ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter);
 
-    static std::unique_ptr<ClassificationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {});
+    static std::unique_ptr<ClassificationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true);
     static std::unique_ptr<ClassificationModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
     virtual std::unique_ptr<ClassificationResult> infer(const ImageInputData& inputData);
+    static std::string ModelType;
 
 protected:
     size_t topk = 1;
 
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
+    void updateModelInfo() override;
 };

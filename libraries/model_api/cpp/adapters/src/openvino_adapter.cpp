@@ -38,10 +38,7 @@ void OpenVINOInferenceAdapter::loadModel(const std::shared_ptr<const ov::Model>&
 
     if (model->has_rt_info({"model_info"})) {
         modelConfig = model->get_rt_info<ov::AnyMap>("model_info");
-    } else {
-        slog::info << "No model_info is defined in the IR" << slog::endl;
     }
-
 }
 
 InferenceOutput OpenVINOInferenceAdapter::infer(const InferenceInput& input) {

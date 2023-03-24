@@ -31,6 +31,7 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
+std::string ModelRetinaFace::ModelType = "retinaface";
 
 void ModelRetinaFace::initDefaultParameters(const ov::AnyMap& configuration) {
     resizeMode = RESIZE_FILL; // Ignore resize_type for now
@@ -53,6 +54,11 @@ ModelRetinaFace::ModelRetinaFace(std::shared_ptr<InferenceAdapter>& adapter)
     initDefaultParameters(configuration);
 }
 
+void ModelRetinaFace::updateModelInfo() {
+    DetectionModelExt::updateModelInfo();
+
+    model->set_rt_info(ModelRetinaFace::ModelType, "model_info", "model_type");
+}
 
 void ModelRetinaFace::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

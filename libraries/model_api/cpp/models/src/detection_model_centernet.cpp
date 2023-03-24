@@ -36,6 +36,8 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
+std::string ModelCenterNet::ModelType = "centernet";
+
 void ModelCenterNet::initDefaultParameters(const ov::AnyMap& configuration) {
     resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX; // Ignore configuration for now
     useAutoResize = false;
@@ -50,6 +52,13 @@ ModelCenterNet::ModelCenterNet(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModel(adapter) {
     auto configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
+}
+
+
+void ModelCenterNet::updateModelInfo() {
+    DetectionModel::updateModelInfo();
+
+    model->set_rt_info(ModelCenterNet::ModelType, "model_info", "model_type");
 }
 
 void ModelCenterNet::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {

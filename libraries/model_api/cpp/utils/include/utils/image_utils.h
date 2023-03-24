@@ -24,6 +24,15 @@ enum RESIZE_MODE {
     RESIZE_KEEP_ASPECT_LETTERBOX
 };
 
+inline std::string formatResizeMode(RESIZE_MODE mode) {
+    switch (mode) {
+        case RESIZE_FILL:   return "standard";
+        case RESIZE_KEEP_ASPECT:   return "fit_to_window";
+        case RESIZE_KEEP_ASPECT_LETTERBOX: return "fit_to_window_letterbox";    
+        default:      return "unknown";
+    }
+}
+
 cv::Mat resizeImageExt(const cv::Mat& mat, int width, int height, RESIZE_MODE resizeMode = RESIZE_FILL,
                        cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR, cv::Rect* roi = nullptr,
                        cv::Scalar BorderConstant = cv::Scalar(0, 0, 0));

@@ -33,6 +33,8 @@
 
 struct InputData;
 
+std::string ModelSSD::ModelType = "ssd";
+
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
         cv::Mat info(cv::Size(1, 3), CV_32SC1);
@@ -283,4 +285,10 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
         ppp.output(outName).tensor().set_element_type(ov::element::f32);
     }
     model = ppp.build();
+}
+
+void ModelSSD::updateModelInfo() {
+    DetectionModel::updateModelInfo();
+
+    model->set_rt_info(ModelSSD::ModelType, "model_info", "model_type");
 }

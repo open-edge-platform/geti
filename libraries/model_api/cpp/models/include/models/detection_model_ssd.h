@@ -37,6 +37,7 @@ public:
     using DetectionModel::DetectionModel;
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
+    static std::string ModelType;
 
 protected:
     std::unique_ptr<ResultBase> postprocessSingleOutput(InferenceResult& infResult);
@@ -44,6 +45,7 @@ protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void prepareSingleOutput(std::shared_ptr<ov::Model>& model);
     void prepareMultipleOutputs(std::shared_ptr<ov::Model>& model);
+    void updateModelInfo() override;
     size_t objectSize = 0;
     size_t detectionsNumId = 0;
 };

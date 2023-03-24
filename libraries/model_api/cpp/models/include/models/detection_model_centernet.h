@@ -53,7 +53,10 @@ public:
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
+    static std::string ModelType;
+
 protected:
     void initDefaultParameters(const ov::AnyMap& configuration);
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
+    void updateModelInfo() override;
 };

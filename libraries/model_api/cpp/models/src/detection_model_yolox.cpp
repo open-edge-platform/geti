@@ -35,6 +35,7 @@
 #include "utils/image_utils.h"
 #include "utils/nms.hpp"
 
+std::string ModelYoloX::ModelType = "yolox";
 
 void ModelYoloX::initDefaultParameters(const ov::AnyMap& configuration) {
     resizeMode = RESIZE_KEEP_ASPECT; // Ignore configuration for now
@@ -50,6 +51,12 @@ ModelYoloX::ModelYoloX(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
     auto configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
+}
+
+void ModelYoloX::updateModelInfo() {
+    DetectionModelExt::updateModelInfo();
+
+    model->set_rt_info(ModelYoloX::ModelType, "model_info", "model_type");
 }
 
 void ModelYoloX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {

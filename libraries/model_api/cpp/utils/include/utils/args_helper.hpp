@@ -17,6 +17,7 @@
 #include <opencv2/core/types.hpp>
 #include <openvino/openvino.hpp>
 
+
 std::vector<std::string> split(const std::string& s, char delim);
 
 std::vector<std::string> parseDevices(const std::string& device_string);
@@ -25,3 +26,5 @@ std::map<std::string, int32_t> parseValuePerDevice(const std::set<std::string>& 
                                                    const std::string& values_string);
 
 std::map<std::string, ov::Layout> parseLayoutString(const std::string& layout_string);
+
+std::string formatLayouts(const std::map<std::string, ov::Layout>& layouts);

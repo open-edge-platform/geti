@@ -47,6 +47,7 @@ public:
     using DetectionModelExt::DetectionModelExt;
     
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
+    static std::string ModelType;
 
 protected:
     size_t landmarksNum = 0;
@@ -70,4 +71,5 @@ protected:
 
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void initDefaultParameters(const ov::AnyMap& configuration);
+    void updateModelInfo() override;
 };

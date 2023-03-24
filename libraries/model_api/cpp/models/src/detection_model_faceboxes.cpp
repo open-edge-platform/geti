@@ -30,6 +30,7 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
+std::string ModelFaceBoxes::ModelType = "faceboxes";
 
 void ModelFaceBoxes::initDefaultParameters(const ov::AnyMap& configuration) {
     resizeMode = RESIZE_FILL; // Ignore resize_type for now
@@ -48,6 +49,12 @@ ModelFaceBoxes::ModelFaceBoxes(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
     auto configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
+}
+
+void ModelFaceBoxes::updateModelInfo() {
+    DetectionModelExt::updateModelInfo();
+
+    model->set_rt_info(ModelFaceBoxes::ModelType, "model_info", "model_type");
 }
 
 void ModelFaceBoxes::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {

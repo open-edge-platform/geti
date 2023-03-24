@@ -29,3 +29,9 @@ DetectionModelExt::DetectionModelExt(std::shared_ptr<InferenceAdapter>& adapter)
         boxIOUThreshold = iou_t_iter->second.as<float>();
     }
 }
+
+void DetectionModelExt::updateModelInfo() {
+    DetectionModel::updateModelInfo();
+
+    model->set_rt_info(boxIOUThreshold, "model_info", "iou_t");
+}

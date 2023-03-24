@@ -32,5 +32,6 @@ public:
     DetectionModelExt(std::shared_ptr<InferenceAdapter>& adapter);
 
 protected:
+    void updateModelInfo() override;
     float boxIOUThreshold = 0.5f;
 };

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <map>
 #include <sstream>
+#include <vector>
 
 std::vector<std::string> split(const std::string& s, char delim) {
     std::vector<std::string> result;
@@ -86,4 +87,21 @@ std::map<std::string, ov::Layout> parseLayoutString(const std::string& layout_st
         throw std::invalid_argument("Can't parse input layout string: " + layout_string);
     }
     return layouts;
+}
+
+std::string formatLayouts(const std::map<std::string, ov::Layout>& layouts) {
+    // Serialize layout as "input0:NCHW,input1:NC"
+    std::string result;
+    for (const auto& layout : layouts) {
+        auto layout_string = layout.second.to_string();
+        layout_string.erase(layout_string.begin()); // remove "["
+        layout_string.pop_back(); // remove "]"
+        layout_string.erase(std::remove(layout_string.begin(), layout_string.end(), ','), 
+                            layout_string.end()); // remove ","
+        result += layout.first + ":" + layout_string + ",";
+    }
+    if (!result.empty()) {
+        result.pop_back();
+    }
+    return result;
 }

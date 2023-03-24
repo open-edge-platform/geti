@@ -33,7 +33,7 @@ class InferenceAdapter
 {
 
 public:
-    InferenceAdapter() {};
+    ~InferenceAdapter() = default;
 
     virtual InferenceOutput infer(const InferenceInput& input) = 0;
     virtual void loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,

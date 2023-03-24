@@ -32,11 +32,13 @@ public:
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
+    static std::string ModelType;
 
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void setStridesGrids();
     void initDefaultParameters(const ov::AnyMap& configuration);
+    void updateModelInfo() override;
 
     double boxIOUThreshold;
     std::vector<std::pair<size_t, size_t>> grids;

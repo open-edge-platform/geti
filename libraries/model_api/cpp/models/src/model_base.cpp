@@ -44,12 +44,16 @@ ModelBase::ModelBase(std::shared_ptr<InferenceAdapter>& adapter)
         layout = layout_iter->second.as<std::string>();
     }
     inputsLayouts = parseLayoutString(layout);
+
+    inputNames = adapter->getInputNames();
+    outputNames = adapter->getOutputNames();
 }
 
 ModelBase::ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
         : model(model) {
     auto layout_iter = configuration.find("layout");
     std::string layout = "";
+
     if (layout_iter != configuration.end()) {
        layout = layout_iter->second.as<std::string>();
     } else {
@@ -60,10 +64,24 @@ ModelBase::ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& config
     inputsLayouts = parseLayoutString(layout);
 }
 
+void ModelBase::updateModelInfo() {
+    if (!model) {
+        std::runtime_error("The ov::Model object is not accessible");
+    }
+
+    if (!inputsLayouts.empty()) {
+        auto layouts = formatLayouts(inputsLayouts);
+        model->set_rt_info(layouts, "model_info", "layout");
+    }
+}
+
 void ModelBase::load(ov::Core& core) {
     if (!inferenceAdapter) {
         inferenceAdapter = std::make_shared<OpenVINOInferenceAdapter>();
     }
+
+    // Update model_info erased by pre/postprocessing
+    updateModelInfo();
 
     inferenceAdapter->loadModel(model, core, config.deviceName, config.compilationConfig);
 }
@@ -94,8 +112,7 @@ ov::Layout ModelBase::getInputLayout(const ov::Output<ov::Node>& input) {
     return layout;
 }
 
-std::unique_ptr<ResultBase> ModelBase::infer(const InputData& inputData)
-{
+std::unique_ptr<ResultBase> ModelBase::infer(const InputData& inputData) {
     InferenceInput inputs;
     InferenceResult result;
     auto internalModelData = this->preprocess(inputData, inputs);
@@ -106,4 +123,13 @@ std::unique_ptr<ResultBase> ModelBase::infer(const InputData& inputData)
     auto retVal = this->postprocess(result);
     *retVal = static_cast<ResultBase&>(result);
     return retVal;
+}
+
+std::shared_ptr<ov::Model> ModelBase::getModel() {
+    if (!model) {
+        std::runtime_error(std::string("ov::Model is not accessible for the current model adapter: ") + typeid(inferenceAdapter).name());
+    }
+
+    updateModelInfo();
+    return model;
 }

@@ -34,6 +34,7 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
+std::string ModelRetinaFacePT::ModelType = "retinaface-pytorch";
 
 void ModelRetinaFacePT::initDefaultParameters(const ov::AnyMap& configuration) {
     resizeMode = RESIZE_FILL; // Ignore resize_type for now
@@ -53,6 +54,13 @@ ModelRetinaFacePT::ModelRetinaFacePT(std::shared_ptr<InferenceAdapter>& adapter)
     auto configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
+
+void ModelRetinaFacePT::updateModelInfo() {
+    DetectionModelExt::updateModelInfo();
+
+    model->set_rt_info(ModelRetinaFacePT::ModelType, "model_info", "model_type");
+}
+
 
 void ModelRetinaFacePT::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------

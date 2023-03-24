@@ -41,7 +41,8 @@ public:
     using DetectionModelExt::DetectionModelExt;
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
-
+    static std::string ModelType;
+    
 protected:
     size_t maxProposalsCount = 0;
     const std::vector<float> variance = {0.1f, 0.2f};
@@ -51,4 +52,5 @@ protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void priorBoxes(const std::vector<std::pair<size_t, size_t>>& featureMaps);
     void initDefaultParameters(const ov::AnyMap& configuration);
+    void updateModelInfo() override;
 };
