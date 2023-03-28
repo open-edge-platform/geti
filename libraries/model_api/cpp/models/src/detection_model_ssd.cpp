@@ -122,11 +122,23 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
     auto retVal = std::unique_ptr<ResultBase>(result);
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
+    float floatInputImgWidth = float(internalData.inputImgWidth),
+         floatInputImgHeight = float(internalData.inputImgHeight);
+    float invertedScaleX = floatInputImgWidth / netInputWidth,
+          invertedScaleY = floatInputImgHeight / netInputHeight;
+    int padLeft = 0, padTop = 0;
+    if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
+        invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
+        if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
+            padLeft = (netInputWidth - int(floatInputImgWidth / invertedScaleX)) / 2;
+            padTop = (netInputHeight - int(floatInputImgHeight / invertedScaleY)) / 2;
+        }
+    }
 
-    // In models with scores are stored in separate output, coordinates are normalized to [0,1]
+    // In models with scores stored in separate output coordinates are normalized to [0,1]
     // In other multiple-outputs models coordinates are normalized to [0,netInputWidth] and [0,netInputHeight]
-    float widthScale = static_cast<float>(internalData.inputImgWidth) / (scores ? 1 : netInputWidth);
-    float heightScale = static_cast<float>(internalData.inputImgHeight) / (scores ? 1 : netInputHeight);
+    float widthScale = scores ? netInputWidth : 1;
+    float heightScale = scores ? netInputHeight : 1;
 
     for (size_t i = 0; i < detectionsNum; i++) {
         float confidence = scores ? scores[i] : boxes[i * objectSize + 4];
@@ -138,17 +150,21 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
             desc.confidence = confidence;
             desc.labelID = static_cast<int>(labels[i]);
             desc.label = getLabelName(desc.labelID);
-
-            desc.x = clamp(boxes[i * objectSize] * widthScale, 0.f, static_cast<float>(internalData.inputImgWidth));
-            desc.y =
-                clamp(boxes[i * objectSize + 1] * heightScale, 0.f, static_cast<float>(internalData.inputImgHeight));
-            desc.width =
-                clamp(boxes[i * objectSize + 2] * widthScale, 0.f, static_cast<float>(internalData.inputImgWidth)) -
-                desc.x;
-            desc.height =
-                clamp(boxes[i * objectSize + 3] * heightScale, 0.f, static_cast<float>(internalData.inputImgHeight)) -
-                desc.y;
-
+            desc.x = clamp(
+                round((boxes[i * objectSize] * widthScale - padLeft) * invertedScaleX),
+                0.f,
+                floatInputImgWidth);
+            desc.y = clamp(
+                round((boxes[i * objectSize + 1] * heightScale - padTop) * invertedScaleY),
+                0.f,
+                floatInputImgHeight);
+            desc.width = clamp(
+                round((boxes[i * objectSize + 2] * widthScale - padLeft) * invertedScaleX - desc.x),
+                0.f,
+                floatInputImgWidth);
+            desc.height = clamp(
+                round((boxes[i * objectSize + 3] * heightScale - padTop) * invertedScaleY - desc.y),
+                0.f, floatInputImgHeight);
             result->objects.push_back(desc);
         }
     }
@@ -162,7 +178,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     ov::preprocess::PrePostProcessor ppp(model);
     for (const auto& input : model->inputs()) {
         auto inputTensorName = input.get_any_name();
-        const ov::Shape& shape = input.get_shape();
+        const ov::Shape& shape = input.get_partial_shape().get_max_shape();
         ov::Layout inputLayout = getInputLayout(input);
 
         if (shape.size() == 4) {  // 1st input contains images
@@ -193,7 +209,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             inputNames[1] = inputTensorName;
             ppp.input(inputTensorName).tensor().set_element_type(ov::element::f32);
         } else {
-            throw std::logic_error("Unsupported " + std::to_string(input.get_shape().size()) +
+            throw std::logic_error("Unsupported " + std::to_string(input.get_partial_shape().size()) +
                                    "D "
                                    "input layer '" +
                                    input.get_any_name() +
@@ -215,7 +231,7 @@ void ModelSSD::prepareSingleOutput(std::shared_ptr<ov::Model>& model) {
     const auto& output = model->output();
     outputNames.push_back(output.get_any_name());
 
-    const ov::Shape& shape = output.get_shape();
+    const ov::Shape& shape = output.get_partial_shape().get_max_shape();
     const ov::Layout& layout("NCHW");
     if (shape.size() != 4) {
         throw std::logic_error("SSD single output must have 4 dimensions, but had " + std::to_string(shape.size()));
@@ -271,8 +287,8 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
         detectionsNumId = ov::layout::height_idx(boxesLayout);
         objectSize = boxesShape[ov::layout::width_idx(boxesLayout)];
 
-        if (objectSize != 4) {
-            throw std::logic_error("Incorrect 'boxes' output shape, [b][n][4] shape is required");
+        if (objectSize != 4 && objectSize != 5) {
+            throw std::logic_error("Incorrect 'boxes' output shape, [b][n][{4 or 5}] shape is required");
         }
     } else {
         throw std::logic_error("Incorrect number of 'boxes' output dimensions, expected 2 or 3, but had " +

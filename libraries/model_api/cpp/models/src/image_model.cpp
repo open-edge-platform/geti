@@ -131,7 +131,7 @@ void ImageModel::updateModelInfo() {
     model->set_rt_info(formatResizeMode(resizeMode), "model_info", "resize_type");
 
     if (!labels.empty()) {
-        model->set_rt_info(labels, "model_info", "labels");  
+        model->set_rt_info(labels, "model_info", "labels");
     }
 
     model->set_rt_info(embedded_processing, "model_info", "embedded_processing");

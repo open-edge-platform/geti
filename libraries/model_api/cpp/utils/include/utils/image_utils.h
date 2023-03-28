@@ -28,7 +28,7 @@ inline std::string formatResizeMode(RESIZE_MODE mode) {
     switch (mode) {
         case RESIZE_FILL:   return "standard";
         case RESIZE_KEEP_ASPECT:   return "fit_to_window";
-        case RESIZE_KEEP_ASPECT_LETTERBOX: return "fit_to_window_letterbox";    
+        case RESIZE_KEEP_ASPECT_LETTERBOX: return "fit_to_window_letterbox";
         default:      return "unknown";
     }
 }

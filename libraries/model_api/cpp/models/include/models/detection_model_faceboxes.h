@@ -42,7 +42,7 @@ public:
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
     static std::string ModelType;
-    
+
 protected:
     size_t maxProposalsCount = 0;
     const std::vector<float> variance = {0.1f, 0.2f};

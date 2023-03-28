@@ -180,6 +180,9 @@ class Model:
             )
         if model_type is None:
             model_type = inference_adapter.get_rt_info(["model_info", "model_type"])
+            if type(model_type) != str:
+                # 2023.0 return OVAny which needs to be casted with astype()
+                model_type = model_type.astype(str)
         Model = cls._get_model_class(model_type)
         return Model(inference_adapter, configuration, preload)
 
@@ -243,16 +246,19 @@ class Model:
         for name, param in parameters.items():
             try:
                 str_val = self.inference_adapter.get_rt_info(["model_info", name])
+                if type(str_val) != str:
+                    str_val = str_val.astype(str)
                 value = param.from_str(str_val)
                 self.__setattr__(name, value)
-            except (
-                RuntimeError
-            ) as error:  # inference_adapter is not openvino adapter or IR doesn't contain requested rt_info
-                if (
-                    str(error)
-                    != "Cannot get runtime attribute. Path to runtime attribute is incorrect."
-                    and str(error) != "OVMSAdapter does not support RT info getting"
-                ):
+            except RuntimeError as error:
+                missing_rt_info = (
+                    "Cannot get runtime attribute. Path to runtime attribute is incorrect."
+                    in str(error)
+                )
+                is_OVMSAdapter = (
+                    str(error) == "OVMSAdapter does not support RT info getting"
+                )
+                if not missing_rt_info and not is_OVMSAdapter:
                     raise
 
         for name, value in config.items():

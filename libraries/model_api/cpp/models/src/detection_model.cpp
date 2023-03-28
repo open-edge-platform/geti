@@ -61,9 +61,9 @@ void DetectionModel::updateModelInfo() {
     model->set_rt_info(confidenceThreshold, "model_info", "confidence_threshold");
 }
 
-std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFile, 
-                                                             std::string model_type, 
-                                                             const ov::AnyMap& configuration, 
+std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFile,
+                                                             std::string model_type,
+                                                             const ov::AnyMap& configuration,
                                                              bool preload) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);

@@ -95,11 +95,10 @@ std::shared_ptr<ov::Model> ModelBase::prepare() {
 }
 
 ov::Layout ModelBase::getInputLayout(const ov::Output<ov::Node>& input) {
-    const ov::Shape& inputShape = input.get_shape();
     ov::Layout layout = ov::layout::get_layout(input);
     if (layout.empty()) {
         if (inputsLayouts.empty()) {
-            layout = getLayoutFromShape(inputShape);
+            layout = getLayoutFromShape(input.get_partial_shape());
             slog::warn << "Automatically detected layout '" << layout.to_string() << "' for input '"
                        << input.get_any_name() << "' will be used." << slog::endl;
         } else if (inputsLayouts.size() == 1) {

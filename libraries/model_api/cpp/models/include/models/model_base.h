@@ -57,7 +57,7 @@ public:
 
 protected:
     virtual void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) = 0;
-    virtual void updateModelInfo();     
+    virtual void updateModelInfo();
 
     InputTransform inputTransform = InputTransform();
 

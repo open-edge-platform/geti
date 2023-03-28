@@ -72,10 +72,7 @@ class SSD(DetectionModel):
 
     def _parse_outputs(self, outputs):
         detections = self.output_parser(outputs)
-
-        detections = [d for d in detections if d.score > self.confidence_threshold]
-
-        return detections
+        return [d for d in detections if d.score > self.confidence_threshold]
 
 
 def find_layer_by_name(name, layers):
@@ -148,7 +145,7 @@ class BoxesLabelsParser:
         filter_outputs = [
             name
             for name, data in layers.items()
-            if len(data.shape) == 2 and data.shape[-1] == 5
+            if (len(data.shape) == 2 or len(data.shape) == 3) and data.shape[-1] == 5
         ]
         if not filter_outputs:
             raise ValueError("Suitable output with bounding boxes is not found")
@@ -158,6 +155,7 @@ class BoxesLabelsParser:
 
     def __call__(self, outputs):
         bboxes = outputs[self.bboxes_layer]
+        bboxes = bboxes.squeeze(0)
         scores = bboxes[:, 4]
         bboxes = bboxes[:, :4]
         bboxes[:, 0::2] /= self.input_size[0]
@@ -166,6 +164,7 @@ class BoxesLabelsParser:
             labels = outputs[self.labels_layer]
         else:
             labels = np.full(len(bboxes), self.default_label, dtype=bboxes.dtype)
+        labels = labels.squeeze(0)
 
         detections = [
             Detection(*bbox, score, label)
