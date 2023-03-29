@@ -17,7 +17,7 @@
 import numpy as np
 
 from .image_model import ImageModel
-from .types import ListValue, NumericalValue, StringValue
+from .types import BooleanValue, ListValue, NumericalValue, StringValue
 from .utils import softmax
 
 
@@ -83,12 +83,33 @@ class ClassificationModel(ImageModel):
                 "path_to_labels": StringValue(
                     description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter"
                 ),
+                "multilabel": BooleanValue(
+                    default_value=False, description="Predict a set of labels per image"
+                ),
             }
         )
         return parameters
 
     def postprocess(self, outputs, meta):
-        outputs = outputs[self.out_layer_name].squeeze()
+        if self.multilabel:
+            return self.get_multilabel_predictions(
+                outputs[self.out_layer_name].squeeze()
+            )
+        return self.get_multiclass_predictions(outputs[self.out_layer_name].squeeze())
+
+    def get_multilabel_predictions(self, logits: np.ndarray):
+        logits = sigmoid_numpy(logits)
+        scores = []
+        indices = []
+        for i in range(logits.shape[0]):
+            if logits[i] > 0.5:
+                indices.append(i)
+                scores.append(logits[i])
+        labels = [self.labels[i] if self.labels else "" for i in indices]
+
+        return list(zip(indices, labels, scores))
+
+    def get_multiclass_predictions(self, outputs: np.ndarray):
         if not np.isclose(np.sum(outputs), 1.0, atol=0.01):
             outputs = softmax(outputs)
         indices = np.argpartition(outputs, -self.topk)[-self.topk :]
@@ -99,3 +120,8 @@ class ClassificationModel(ImageModel):
         indices = indices[desc_order]
         labels = [self.labels[i] if self.labels else "" for i in indices]
         return list(zip(indices, labels, scores))
+
+
+def sigmoid_numpy(x: np.ndarray):
+    """Sigmoid numpy."""
+    return 1.0 / (1.0 + np.exp(-1.0 * x))

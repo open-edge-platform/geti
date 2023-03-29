@@ -147,7 +147,7 @@ class BooleanValue(BaseValue):
         super().__init__(**kwargs)
 
     def from_str(self, value):
-        return "YES" == value
+        return "YES" == value or "True" == value
 
     def validate(self, value):
         errors = super().validate(value)

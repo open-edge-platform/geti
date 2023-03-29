@@ -36,6 +36,12 @@
 
 std::string ClassificationModel::ModelType = "Classification";
 
+namespace {
+float sigmoid(float x) {
+    return 1.0f / (1.0f + exp(-x));
+}
+}
+
 ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
     : ImageModel(model, configuration) {
     auto topk_iter = configuration.find("topk");
@@ -46,6 +52,14 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
     } else {
         topk = topk_iter->second.as<size_t>();
     }
+    auto multilabel_iter = configuration.find("multilabel");
+    if (multilabel_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "multilabel")) {
+            multilabel = model->get_rt_info<std::string>("model_info", "multilabel") == "True";
+        }
+    } else {
+        multilabel = multilabel_iter->second.as<std::string>() == "True";
+    }
 }
 
 ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter)
@@ -55,6 +69,10 @@ ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adap
     if (topk_iter != configuration.end()) {
         topk = topk_iter->second.as<size_t>();
     }
+    auto multilabel_iter = configuration.find("multilabel");
+    if (multilabel_iter != configuration.end()) {
+        multilabel = multilabel_iter->second.as<std::string>() == "True";
+    }
 }
 
 void ClassificationModel::updateModelInfo() {
@@ -62,6 +80,11 @@ void ClassificationModel::updateModelInfo() {
 
     model->set_rt_info(ClassificationModel::ModelType, "model_info", "model_type");
     model->set_rt_info(topk, "model_info", "topk");
+    if (multilabel) {
+        model->set_rt_info("True", "model_info", "multilabel");
+    } else {
+        model->set_rt_info("False", "model_info", "multilabel");
+    }
 }
 
 std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload) {
@@ -107,6 +130,31 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shar
 }
 
 std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& infResult) {
+    if (multilabel) {
+        return get_multilabel_predictions(infResult);
+    }
+    return get_multiclass_predictions(infResult);
+}
+
+std::unique_ptr<ResultBase> ClassificationModel::get_multilabel_predictions(InferenceResult& infResult) {
+    const ov::Tensor& logitsTensor = infResult.outputsData.find(outputNames[0])->second;
+    const float* logitsPtr = logitsTensor.data<float>();
+
+    ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
+    auto retVal = std::unique_ptr<ResultBase>(result);
+
+    result->topLabels.reserve(labels.size());
+    for (size_t i = 0; i < labels.size(); ++i) {
+        float score = sigmoid(logitsPtr[i]);
+        if (score > 0.5f) {
+            result->topLabels.emplace_back(i, labels[i], score);
+        }
+    }
+
+    return retVal;
+}
+
+std::unique_ptr<ResultBase> ClassificationModel::get_multiclass_predictions(InferenceResult& infResult) {
     const ov::Tensor& indicesTensor = infResult.outputsData.find(outputNames[0])->second;
     const int* indicesPtr = indicesTensor.data<int>();
     const ov::Tensor& scoresTensor = infResult.outputsData.find(outputNames[1])->second;
@@ -135,14 +183,6 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     }
     const auto& input = model->input();
     inputNames.push_back(input.get_any_name());
-
-    outputNames.push_back("indices");
-    outputNames.push_back("scores");
-
-    // Skip next steps if pre/postprocessing was embedded previously
-    if (embedded_processing) {
-        return;
-    }
 
     const ov::Shape& inputShape = input.get_partial_shape().get_max_shape();
     const ov::Layout& inputLayout = getInputLayout(input);
@@ -174,40 +214,50 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     ppp.input().model().set_layout(inputLayout);
 
     // --------------------------- Prepare output  -----------------------------------------------------
-    if (model->outputs().size() != 1) {
-        throw std::logic_error("Classification model wrapper supports topologies with only 1 output");
+    if (model->outputs().size() != 1 && model->outputs().size() != 2) {
+        throw std::logic_error("Classification model wrapper supports topologies with 1 or 2 outputs");
     }
 
-    const ov::Shape& outputShape = model->output().get_partial_shape().get_max_shape();
-    if (outputShape.size() != 2 && outputShape.size() != 4) {
-        throw std::logic_error("Classification model wrapper supports topologies only with"
-                               " 2-dimensional or 4-dimensional output");
-    }
+    if (model->outputs().size() == 1) {
+        const ov::Shape& outputShape = model->output().get_partial_shape().get_max_shape();
+        if (outputShape.size() != 2 && outputShape.size() != 4) {
+            throw std::logic_error("Classification model wrapper supports topologies only with"
+                                " 2-dimensional or 4-dimensional output");
+        }
 
-    const ov::Layout outputLayout("NCHW");
-    if (outputShape.size() == 4 && (outputShape[ov::layout::height_idx(outputLayout)] != 1 ||
-                                    outputShape[ov::layout::width_idx(outputLayout)] != 1)) {
-        throw std::logic_error("Classification model wrapper supports topologies only"
-                               " with 4-dimensional output which has last two dimensions of size 1");
-    }
+        const ov::Layout outputLayout("NCHW");
+        if (outputShape.size() == 4 && (outputShape[ov::layout::height_idx(outputLayout)] != 1 ||
+                                        outputShape[ov::layout::width_idx(outputLayout)] != 1)) {
+            throw std::logic_error("Classification model wrapper supports topologies only"
+                                " with 4-dimensional output which has last two dimensions of size 1");
+        }
 
-    size_t classesNum = outputShape[ov::layout::channels_idx(outputLayout)];
-    if (topk > classesNum) {
-        throw std::logic_error("The model provides " + std::to_string(classesNum) + " classes, but " +
-                               std::to_string(topk) + " labels are requested to be predicted");
-    }
-    if (classesNum == labels.size() + 1) {
-        labels.insert(labels.begin(), "other");
-        slog::warn << "Inserted 'other' label as first." << slog::endl;
-    } else if (classesNum != labels.size()) {
-        throw std::logic_error("Model's number of classes and parsed labels must match (" +
-                               std::to_string(outputShape[1]) + " and " + std::to_string(labels.size()) + ')');
-    }
+        size_t classesNum = outputShape[ov::layout::channels_idx(outputLayout)];
+        if (topk > classesNum) {
+            throw std::logic_error("The model provides " + std::to_string(classesNum) + " classes, but " +
+                                std::to_string(topk) + " labels are requested to be predicted");
+        }
+        if (classesNum == labels.size() + 1) {
+            labels.insert(labels.begin(), "other");
+            slog::warn << "Inserted 'other' label as first." << slog::endl;
+        } else if (classesNum != labels.size()) {
+            throw std::logic_error("Model's number of classes and parsed labels must match (" +
+                                std::to_string(outputShape[1]) + " and " + std::to_string(labels.size()) + ')');
+        }
 
-    ppp.output().tensor().set_element_type(ov::element::f32);
-    model = ppp.build();
+        ppp.output().tensor().set_element_type(ov::element::f32);
+        model = ppp.build();
+    }
+    if (multilabel) {
+        outputNames.push_back(model->output().get_any_name());
+        return;
+    }
+    addOrFindSoftmaxAndTopkOutputs();
+}
 
-    // --------------------------- Adding softmax and topK output  ---------------------------
+void ClassificationModel::addOrFindSoftmaxAndTopkOutputs() {
+    outputNames.push_back("indices");
+    outputNames.push_back("scores");
     auto nodes = model->get_ops();
     auto softmaxNodeIt = std::find_if(std::begin(nodes), std::end(nodes), [](const std::shared_ptr<ov::Node>& op) {
         return std::string(op->get_type_name()) == "Softmax";
@@ -237,7 +287,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     model->outputs()[1].set_names({"scores"});
 
     // set output precisions
-    ppp = ov::preprocess::PrePostProcessor(model);
+    ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
     ppp.output("indices").tensor().set_element_type(ov::element::i32);
     ppp.output("scores").tensor().set_element_type(ov::element::f32);
     model = ppp.build();

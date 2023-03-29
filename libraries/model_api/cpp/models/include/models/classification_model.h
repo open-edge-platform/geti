@@ -46,7 +46,11 @@ public:
 
 protected:
     size_t topk = 1;
+    bool multilabel = false;
 
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void updateModelInfo() override;
+    void addOrFindSoftmaxAndTopkOutputs();
+    std::unique_ptr<ResultBase> get_multilabel_predictions(InferenceResult& infResult);
+    std::unique_ptr<ResultBase> get_multiclass_predictions(InferenceResult& infResult);
 };
