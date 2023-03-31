@@ -187,31 +187,20 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     const ov::Shape& inputShape = input.get_partial_shape().get_max_shape();
     const ov::Layout& inputLayout = getInputLayout(input);
 
-    if (inputShape.size() != 4 || inputShape[ov::layout::channels_idx(inputLayout)] != 3) {
-        throw std::logic_error("3-channel 4-dimensional model's input is expected");
+    if (!embedded_processing) {
+        model = ImageModel::embedProcessing(model,
+                                        inputNames[0],
+                                        inputLayout,
+                                        resizeMode,
+                                        interpolationMode,
+                                        ov::Shape{inputShape[ov::layout::width_idx(inputLayout)], 
+                                                  inputShape[ov::layout::height_idx(inputLayout)]});
+
+        ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
+        ppp.output().tensor().set_element_type(ov::element::f32);
+        model = ppp.build();
+        useAutoResize = true; // temporal solution for classification
     }
-
-    const auto width = inputShape[ov::layout::width_idx(inputLayout)];
-    const auto height = inputShape[ov::layout::height_idx(inputLayout)];
-    if (height != width) {
-        throw std::logic_error("Model input has incorrect image shape. Must be NxN square."
-                               " Got " +
-                               std::to_string(height) + "x" + std::to_string(width) + ".");
-    }
-
-    ov::preprocess::PrePostProcessor ppp(model);
-    ppp.input().tensor().set_element_type(ov::element::u8).set_layout({"NHWC"});
-
-    if (useAutoResize) {
-        ppp.input().tensor().set_spatial_dynamic_shape();
-
-        ppp.input()
-            .preprocess()
-            .convert_element_type(ov::element::f32)
-            .resize(ov::preprocess::ResizeAlgorithm::RESIZE_LINEAR);
-    }
-
-    ppp.input().model().set_layout(inputLayout);
 
     // --------------------------- Prepare output  -----------------------------------------------------
     if (model->outputs().size() != 1 && model->outputs().size() != 2) {
@@ -244,23 +233,27 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
             throw std::logic_error("Model's number of classes and parsed labels must match (" +
                                 std::to_string(outputShape[1]) + " and " + std::to_string(labels.size()) + ')');
         }
-
-        ppp.output().tensor().set_element_type(ov::element::f32);
-        model = ppp.build();
     }
+
     if (multilabel) {
         outputNames.push_back(model->output().get_any_name());
+        embedded_processing = true;
         return;
     }
-    addOrFindSoftmaxAndTopkOutputs();
+
+    if (!embedded_processing) {
+        addOrFindSoftmaxAndTopkOutputs();
+        embedded_processing = true;
+    }
+
+    outputNames.push_back("indices");
+    outputNames.push_back("scores");
 }
 
 void ClassificationModel::addOrFindSoftmaxAndTopkOutputs() {
-    outputNames.push_back("indices");
-    outputNames.push_back("scores");
     auto nodes = model->get_ops();
     auto softmaxNodeIt = std::find_if(std::begin(nodes), std::end(nodes), [](const std::shared_ptr<ov::Node>& op) {
-        return std::string(op->get_type_name()) == "Softmax";
+        return std::string(op->get_type_name()) == "Softmax"; // TODO: it will not work for Vision Transformers, for example
     });
 
     std::shared_ptr<ov::Node> softmaxNode;
@@ -291,7 +284,6 @@ void ClassificationModel::addOrFindSoftmaxAndTopkOutputs() {
     ppp.output("indices").tensor().set_element_type(ov::element::i32);
     ppp.output("scores").tensor().set_element_type(ov::element::f32);
     model = ppp.build();
-    embedded_processing = true;
 }
 
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {

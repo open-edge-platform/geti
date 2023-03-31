@@ -50,9 +50,10 @@ DetectionModel::DetectionModel(std::shared_ptr<InferenceAdapter>& adapter)
    : ImageModel(adapter) {
     auto configuration = adapter->getModelConfig();
     auto confidence_threshold_iter = configuration.find("confidence_threshold");
-    if (confidence_threshold_iter == configuration.end()) {
+    if (confidence_threshold_iter != configuration.end()) {
         confidenceThreshold = confidence_threshold_iter->second.as<float>();
     }
+
 }
 
 void DetectionModel::updateModelInfo() {
@@ -62,8 +63,8 @@ void DetectionModel::updateModelInfo() {
 }
 
 std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& modelFile,
-                                                             std::string model_type,
                                                              const ov::AnyMap& configuration,
+                                                             std::string model_type,
                                                              bool preload) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);

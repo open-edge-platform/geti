@@ -32,8 +32,8 @@ public:
     DetectionModel(std::shared_ptr<InferenceAdapter>& adapter);
 
     static std::unique_ptr<DetectionModel> create_model(const std::string& modelFile,
-                                                        std::string model_type = "",
                                                         const ov::AnyMap& configuration = {},
+                                                        std::string model_type = "",
                                                         bool preload = true);
     static std::unique_ptr<DetectionModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 

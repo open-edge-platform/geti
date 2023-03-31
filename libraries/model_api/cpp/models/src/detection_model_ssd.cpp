@@ -35,6 +35,19 @@ struct InputData;
 
 std::string ModelSSD::ModelType = "ssd";
 
+ModelSSD::ModelSSD(std::shared_ptr<InferenceAdapter>& adapter)
+    : DetectionModel(adapter) {
+    auto configuration = adapter->getModelConfig();
+    auto object_size_iter = configuration.find("object_size");
+    if (object_size_iter != configuration.end()) {
+        objectSize = object_size_iter->second.as<size_t>();
+    }
+    auto detections_num_id_iter = configuration.find("detections_num_id");
+    if (detections_num_id_iter != configuration.end()) {
+        detectionsNumId = detections_num_id_iter->second.as<size_t>();
+    }
+}
+
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
         cv::Mat info(cv::Size(1, 3), CV_32SC1);
@@ -175,7 +188,6 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
 void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     // --------------------------- Configure input & output -------------------------------------------------
     // --------------------------- Prepare input ------------------------------------------------------
-    ov::preprocess::PrePostProcessor ppp(model);
     for (const auto& input : model->inputs()) {
         auto inputTensorName = input.get_any_name();
         const ov::Shape& shape = input.get_partial_shape().get_max_shape();
@@ -188,26 +200,28 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                 inputNames[0] = inputTensorName;
             }
 
-            inputTransform.setPrecision(ppp, inputTensorName);
-            ppp.input(inputTensorName).tensor().set_layout({"NHWC"});
+            if (!embedded_processing) {
+                model = ImageModel::embedProcessing(model,
+                                        inputNames[0],
+                                        inputLayout,
+                                        resizeMode,
+                                        interpolationMode,
+                                        ov::Shape{shape[ov::layout::width_idx(inputLayout)], 
+                                                  shape[ov::layout::height_idx(inputLayout)]});
 
-            if (useAutoResize) {
-                ppp.input(inputTensorName).tensor().set_spatial_dynamic_shape();
+                netInputWidth = shape[ov::layout::width_idx(inputLayout)];
+                netInputHeight = shape[ov::layout::height_idx(inputLayout)];
 
-                ppp.input(inputTensorName)
-                    .preprocess()
-                    .convert_element_type(ov::element::f32)
-                    .resize(ov::preprocess::ResizeAlgorithm::RESIZE_LINEAR);
+                useAutoResize = true; // temporal solution for SSD
             }
-
-            ppp.input(inputTensorName).model().set_layout(inputLayout);
-
-            netInputWidth = shape[ov::layout::width_idx(inputLayout)];
-            netInputHeight = shape[ov::layout::height_idx(inputLayout)];
         } else if (shape.size() == 2) {  // 2nd input contains image info
             inputNames.resize(2);
             inputNames[1] = inputTensorName;
-            ppp.input(inputTensorName).tensor().set_element_type(ov::element::f32);
+            if (!embedded_processing) {
+                ov::preprocess::PrePostProcessor ppp(model);
+                ppp.input(inputTensorName).tensor().set_element_type(ov::element::f32);
+                model = ppp.build();
+            }
         } else {
             throw std::logic_error("Unsupported " + std::to_string(input.get_partial_shape().size()) +
                                    "D "
@@ -217,7 +231,6 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                    "Only 2D and 4D input layers are supported");
         }
     }
-    model = ppp.build();
 
     // --------------------------- Prepare output  -----------------------------------------------------
     if (model->outputs().size() == 1) {
@@ -225,6 +238,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     } else {
         prepareMultipleOutputs(model);
     }
+    embedded_processing = true;
 }
 
 void ModelSSD::prepareSingleOutput(std::shared_ptr<ov::Model>& model) {
@@ -242,9 +256,12 @@ void ModelSSD::prepareSingleOutput(std::shared_ptr<ov::Model>& model) {
         throw std::logic_error("SSD single output must have 7 as a last dimension, but had " +
                                std::to_string(objectSize));
     }
-    ov::preprocess::PrePostProcessor ppp(model);
-    ppp.output().tensor().set_element_type(ov::element::f32).set_layout(layout);
-    model = ppp.build();
+
+    if (!embedded_processing) {
+        ov::preprocess::PrePostProcessor ppp(model);
+        ppp.output().tensor().set_element_type(ov::element::f32).set_layout(layout);
+        model = ppp.build();
+    }
 }
 
 void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
@@ -270,7 +287,6 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
     }
     std::sort(outputNames.begin(), outputNames.end());
 
-    ov::preprocess::PrePostProcessor ppp(model);
     const auto& boxesShape = model->output(outputNames[0]).get_partial_shape().get_max_shape();
 
     ov::Layout boxesLayout;
@@ -295,16 +311,21 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
                                std::to_string(boxesShape.size()));
     }
 
-    ppp.output(outputNames[0]).tensor().set_layout(boxesLayout);
+    if (!embedded_processing) {
+        ov::preprocess::PrePostProcessor ppp(model);
+        ppp.output(outputNames[0]).tensor().set_layout(boxesLayout);
 
-    for (const auto& outName : outputNames) {
-        ppp.output(outName).tensor().set_element_type(ov::element::f32);
+        for (const auto& outName : outputNames) {
+            ppp.output(outName).tensor().set_element_type(ov::element::f32);
+        }
+        model = ppp.build();
     }
-    model = ppp.build();
 }
 
 void ModelSSD::updateModelInfo() {
     DetectionModel::updateModelInfo();
 
     model->set_rt_info(ModelSSD::ModelType, "model_info", "model_type");
+    model->set_rt_info(objectSize, "model_info", "object_size");
+    model->set_rt_info(detectionsNumId, "model_info", "detections_num_id");
 }
