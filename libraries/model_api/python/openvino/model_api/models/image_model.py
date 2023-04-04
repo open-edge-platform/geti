@@ -17,8 +17,8 @@
 import numpy as np
 
 from .model import Model
-from .types import BooleanValue, ListValue, StringValue
-from .utils import RESIZE_TYPES, InputTransform, pad_image
+from .types import BooleanValue, ListValue, NumericalValue, StringValue
+from .utils import RESIZE_TYPES, InputTransform
 
 
 class ImageModel(Model):
@@ -71,8 +71,10 @@ class ImageModel(Model):
             self.reverse_input_channels, self.mean_values, self.scale_values
         )
 
-        if self.embed_preprocessing:
-            layout = self.inputs[self.image_blob_name].layout
+        layout = self.inputs[self.image_blob_name].layout
+        if self.embedded_processing:
+            self.h, self.w = self.orig_width, self.orig_height
+        else:
             inference_adapter.embed_preprocessing(
                 layout=layout,
                 resize_mode=self.resize_type,
@@ -82,6 +84,8 @@ class ImageModel(Model):
                 mean=self.mean_values,
                 scale=self.scale_values,
             )
+            self.embedded_processing = True
+            self.orig_height, self.orig_width = self.h, self.w
 
     @classmethod
     def parameters(cls):
@@ -104,9 +108,15 @@ class ImageModel(Model):
                     choices=tuple(RESIZE_TYPES.keys()),
                     description="Type of input image resizing",
                 ),
-                "embed_preprocessing": BooleanValue(
+                "embedded_processing": BooleanValue(
                     default_value=False,
-                    description="Whether to embed preprocessing into the model",
+                    description="Flag that pre/postprocessing embedded",
+                ),
+                "orig_width": NumericalValue(
+                    description="Model input width before embedding processing"
+                ),
+                "orig_height": NumericalValue(
+                    description="Model input height before embedding processing"
                 ),
             }
         )
@@ -163,25 +173,10 @@ class ImageModel(Model):
                 }
             - the input metadata, which might be used in `postprocess` method
         """
-        image = inputs
-        dict_inputs = {}
-        meta = {"original_shape": image.shape}
-
-        if self.embed_preprocessing:
-            meta.update({"resized_shape": (self.w, self.h, self.c)})
-
-            dict_inputs = {self.image_blob_name: np.expand_dims(image, axis=0)}
-        else:
-            resized_image = self.resize(image, (self.w, self.h))
-            meta.update({"resized_shape": resized_image.shape})
-            if self.resize_type == "fit_to_window":
-                resized_image = pad_image(resized_image, (self.w, self.h))
-                meta.update({"padded_shape": resized_image.shape})
-            resized_image = self.input_transform(resized_image)
-            resized_image = self._change_layout(resized_image)
-            dict_inputs = {self.image_blob_name: resized_image}
-
-        return dict_inputs, meta
+        return {self.image_blob_name: inputs[None]}, {
+            "original_shape": inputs.shape,
+            "resized_shape": (self.w, self.h, self.c),
+        }
 
     def _change_layout(self, image):
         """Changes the input image layout to fit the layout of the model input layer.

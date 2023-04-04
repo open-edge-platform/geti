@@ -115,7 +115,7 @@ std::unique_ptr<ResultBase> ModelBase::infer(const InputData& inputData) {
     InferenceInput inputs;
     InferenceResult result;
     auto internalModelData = this->preprocess(inputData, inputs);
-    
+
     result.outputsData = inferenceAdapter->infer(inputs);
     result.internalModelData = std::move(internalModelData);
 

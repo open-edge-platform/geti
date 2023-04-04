@@ -123,5 +123,4 @@ class ClassificationModel(ImageModel):
 
 
 def sigmoid_numpy(x: np.ndarray):
-    """Sigmoid numpy."""
-    return 1.0 / (1.0 + np.exp(-1.0 * x))
+    return 1.0 / (1.0 + np.exp(-x))

@@ -59,7 +59,7 @@ Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
     auto axes = opset10::Constant::create(element::i64, Shape{2}, {h_axis, w_axis});
 
     if (!keep_aspect_ratio) {
-        auto scales = opset10::Constant::create(element::f32, Shape{2}, {1.0f, 1.0f});
+        auto scales = opset10::Constant::create(element::f32, Shape{2}, {0.0f, 0.0f});
         opset10::Interpolate::InterpolateAttrs attrs;
         attrs.mode = mode;
         attrs.shape_calculation_mode = opset10::Interpolate::ShapeCalcMode::SIZES;
@@ -80,13 +80,28 @@ Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
     auto w_ratio = std::make_shared<opset10::Divide>(opset10::Constant::create(element::f32, Shape{1}, {float(w)}), iw);
     auto h_ratio = std::make_shared<opset10::Divide>(opset10::Constant::create(element::f32, Shape{1}, {float(h)}), ih);
     auto scale = std::make_shared<opset10::Minimum>(w_ratio, h_ratio);
+    auto nw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Multiply>(iw, scale), element::i32);
+    auto nh = std::make_shared<opset10::Convert>(std::make_shared<opset10::Multiply>(ih, scale), element::i32);
+    auto new_size = std::make_shared<opset10::Concat>(OutputVector{nh, nw}, 0);
 
-    auto scales = opset10::Constant::create(element::f32, Shape{2}, {1.0f, 1.0f});
+    auto scales = opset10::Constant::create(element::f32, Shape{2}, {0.0f, 0.0f});
     opset10::Interpolate::InterpolateAttrs attrs;
     attrs.mode = mode;
-    attrs.shape_calculation_mode = opset10::Interpolate::ShapeCalcMode::SCALES;
-
-    return std::make_shared<opset10::Interpolate>(input, sizes, scales, axes, attrs);
+    attrs.shape_calculation_mode = opset10::Interpolate::ShapeCalcMode::SIZES;
+    auto image = std::make_shared<opset10::Interpolate>(input, new_size, scales, axes, attrs);
+    auto dx_border = std::make_shared<opset10::Subtract>(opset10::Constant::create(element::i32, Shape{1}, {w}), nw);
+    auto dy_border = std::make_shared<opset10::Subtract>(opset10::Constant::create(element::i32, Shape{1}, {h}), nh);
+    auto pads_begin = opset10::Constant::create(element::i32, Shape{4}, {0, 0, 0, 0});
+    auto pads_end = std::make_shared<opset10::Concat>(
+        OutputVector{
+            opset10::Constant::create(element::i32, Shape{1}, {0}),
+            dy_border,
+            dx_border,
+            opset10::Constant::create(element::i32, Shape{1}, {0})
+        },
+        0
+    );
+    return std::make_shared<opset10::Pad>(image, pads_begin, pads_end, opset10::Constant::create(element::u8, Shape{}, {0}), ov::op::PadMode::CONSTANT);
 }
 
 Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
@@ -119,7 +134,7 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
     auto new_size = std::make_shared<opset10::Concat>(OutputVector{std::make_shared<opset10::Unsqueeze>(nh, opset10::Constant::create(element::i32, Shape{1}, {0})), 
                                                                    std::make_shared<opset10::Unsqueeze>(nw, opset10::Constant::create(element::i32, Shape{1}, {0}))}, -1);
 
-    auto scales = opset10::Constant::create(element::f32, Shape{2}, {1.0f, 1.0f});
+    auto scales = opset10::Constant::create(element::f32, Shape{2}, {0.0f, 0.0f});
     auto axes = opset10::Constant::create(element::i64, Shape{2}, {h_axis, w_axis});
     opset10::Interpolate::InterpolateAttrs attrs;
     attrs.mode = mode;

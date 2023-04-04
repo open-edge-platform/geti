@@ -340,7 +340,7 @@ class OpenvinoAdapter(InferenceAdapter):
     def embed_preprocessing(
         self,
         layout="NCHW",
-        resize_mode: str = None,
+        resize_mode: str = "",
         interpolation_mode="LINEAR",
         target_shape: Tuple[int] = None,
         dtype=type(int),

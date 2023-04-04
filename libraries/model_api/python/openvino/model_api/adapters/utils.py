@@ -110,7 +110,7 @@ def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
     image = opset.interpolate(
         input,
         new_size,
-        scales=np.array([1.0, 1.0], dtype=np.float32),
+        scales=np.array([0.0, 0.0], dtype=np.float32),
         axes=[h_axis, w_axis],
         mode=interpolation,
         shape_calculation_mode="sizes",
@@ -147,8 +147,7 @@ def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
         ],
         axis=0,
     )
-    resized_image = opset.pad(image, pads_begin, pads_end, "constant")
-    return resized_image
+    return opset.pad(image, pads_begin, pads_end, "constant")
 
 
 def crop_resize_graph(input: Output, size):
@@ -249,7 +248,7 @@ def crop_resize_graph(input: Output, size):
     resized_image = opset.interpolate(
         cropped_frame,
         target_size,
-        scales=np.array([1.0, 1.0], dtype=np.float32),
+        scales=np.array([0.0, 0.0], dtype=np.float32),
         axes=[h_axis, w_axis],
         mode="linear",
         shape_calculation_mode="sizes",
@@ -268,36 +267,34 @@ def resize_image_graph(
     target_size.reverse()
 
     if not keep_aspect_ratio:
-        resized_image = opset.interpolate(
+        return opset.interpolate(
             input,
             target_size,
-            scales=np.array([1.0, 1.0], dtype=np.float32),
+            scales=np.array([0.0, 0.0], dtype=np.float32),
             axes=[h_axis, w_axis],
-            mode="linear",
+            mode=interpolation,
             shape_calculation_mode="sizes",
         )
-    else:
-        image_shape = opset.shape_of(input, name="shape")
-        iw = opset.convert(
-            opset.gather(image_shape, opset.constant(w_axis), axis=0),
-            destination_type="f32",
-        )
-        ih = opset.convert(
-            opset.gather(image_shape, opset.constant(h_axis), axis=0),
-            destination_type="f32",
-        )
-        w_ratio = opset.divide(np.float32(w), iw)
-        h_ratio = opset.divide(np.float32(h), ih)
-        scale = opset.minimum(w_ratio, h_ratio)
-        resized_image = opset.interpolate(
-            input,
-            target_size,
-            scales=scale,
-            axes=[h_axis, w_axis],
-            mode="linear",
-            shape_calculation_mode="sizes",
-        )
-    return resized_image
+    image_shape = opset.shape_of(input, name="shape")
+    iw = opset.convert(
+        opset.gather(image_shape, opset.constant(w_axis), axis=0),
+        destination_type="f32",
+    )
+    ih = opset.convert(
+        opset.gather(image_shape, opset.constant(h_axis), axis=0),
+        destination_type="f32",
+    )
+    w_ratio = opset.divide(np.float32(w), iw)
+    h_ratio = opset.divide(np.float32(h), ih)
+    scale = opset.minimum(w_ratio, h_ratio)
+    return opset.interpolate(
+        input,
+        target_size,
+        scales=scale,
+        axes=[h_axis, w_axis],
+        mode=interpolation,
+        shape_calculation_mode="sizes",
+    )
 
 
 def resize_image(size, interpolation="linear"):
