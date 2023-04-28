@@ -32,10 +32,8 @@ struct ImageInputData;
 #pragma once
 class SegmentationModel : public ImageModel {
 public:
-    SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
-        : ImageModel(model, configuration) {}
-    SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter)
-        : ImageModel(adapter) {}
+    SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
+    SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter);
 
     static std::unique_ptr<SegmentationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true);
     static std::unique_ptr<SegmentationModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
@@ -52,4 +50,8 @@ protected:
     int outHeight = 0;
     int outWidth = 0;
     int outChannels = 0;
+
+    int blur_strength = -1;
+    float soft_threshold = std::numeric_limits<float>::infinity();
+    bool return_soft_prediction = true;
 };

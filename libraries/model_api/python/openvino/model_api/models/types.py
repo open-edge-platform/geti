@@ -60,7 +60,7 @@ class NumericalValue(BaseValue):
         self.value_type = value_type
 
     def from_str(self, value):
-        return float(value)
+        return self.value_type(value)
 
     def validate(self, value):
         errors = super().validate(value)

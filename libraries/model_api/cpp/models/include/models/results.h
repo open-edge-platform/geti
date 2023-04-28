@@ -128,6 +128,12 @@ struct ImageResult : public ResultBase {
     cv::Mat resultImage;
 };
 
+struct ImageResultWithSoftPrediction : public ImageResult {
+    ImageResultWithSoftPrediction(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
+        : ImageResult(frameId, metaData) {}
+    cv::Mat soft_prediction;
+};
+
 struct HumanPose {
     std::vector<cv::Point2f> keypoints;
     float score;
