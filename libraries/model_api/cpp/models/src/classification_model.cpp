@@ -40,6 +40,41 @@ namespace {
 float sigmoid(float x) {
     return 1.0f / (1.0f + exp(-x));
 }
+
+void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t topk) {
+    auto nodes = model->get_ops();
+    auto softmaxNodeIt = std::find_if(std::begin(nodes), std::end(nodes), [](const std::shared_ptr<ov::Node>& op) {
+        return std::string(op->get_type_name()) == "Softmax"; // TODO: it will not work for Vision Transformers, for example
+    });
+
+    std::shared_ptr<ov::Node> softmaxNode;
+    if (softmaxNodeIt == nodes.end()) {
+        auto logitsNode = model->get_output_op(0)->input(0).get_source_output().get_node();
+        softmaxNode = std::make_shared<ov::op::v1::Softmax>(logitsNode->output(0), 1);
+    } else {
+        softmaxNode = *softmaxNodeIt;
+    }
+    const auto k = std::make_shared<ov::op::v0::Constant>(ov::element::i32, ov::Shape{}, std::vector<size_t>{topk});
+    std::shared_ptr<ov::Node> topkNode = std::make_shared<ov::op::v3::TopK>(softmaxNode,
+                                                                            k,
+                                                                            1,
+                                                                            ov::op::v3::TopK::Mode::MAX,
+                                                                            ov::op::v3::TopK::SortType::SORT_VALUES);
+
+    auto indices = std::make_shared<ov::op::v0::Result>(topkNode->output(0));
+    auto scores = std::make_shared<ov::op::v0::Result>(topkNode->output(1));
+    model = std::make_shared<ov::Model>(ov::ResultVector{scores, indices}, model->get_parameters(), "classification");
+
+    // manually set output tensors name for created topK node
+    model->outputs()[0].set_names({"indices"});
+    model->outputs()[1].set_names({"scores"});
+
+    // set output precisions
+    ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
+    ppp.output("indices").tensor().set_element_type(ov::element::i32);
+    ppp.output("scores").tensor().set_element_type(ov::element::f32);
+    model = ppp.build();
+}
 }
 
 ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
@@ -55,10 +90,12 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
     auto multilabel_iter = configuration.find("multilabel");
     if (multilabel_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "multilabel")) {
-            multilabel = model->get_rt_info<std::string>("model_info", "multilabel") == "True";
+            std::string val = model->get_rt_info<std::string>("model_info", "multilabel");
+            multilabel = val == "True" || val == "YES";
         }
     } else {
-        multilabel = multilabel_iter->second.as<std::string>() == "True";
+        std::string val = multilabel_iter->second.as<std::string>();
+        multilabel = val == "True" || val == "YES";
     }
 }
 
@@ -71,7 +108,8 @@ ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adap
     }
     auto multilabel_iter = configuration.find("multilabel");
     if (multilabel_iter != configuration.end()) {
-        multilabel = multilabel_iter->second.as<std::string>() == "True";
+        std::string val = multilabel_iter->second.as<std::string>();
+        multilabel = val == "True" || val == "YES";
     }
 }
 
@@ -236,54 +274,15 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     }
 
     if (multilabel) {
-        outputNames.push_back(model->output().get_any_name());
+        outputNames = {model->output().get_any_name()};
         embedded_processing = true;
         return;
     }
 
-    if (!embedded_processing) {
-        addOrFindSoftmaxAndTopkOutputs();
-        embedded_processing = true;
-    }
+    addOrFindSoftmaxAndTopkOutputs(model, topk);
+    embedded_processing = true;
 
-    outputNames.push_back("indices");
-    outputNames.push_back("scores");
-}
-
-void ClassificationModel::addOrFindSoftmaxAndTopkOutputs() {
-    auto nodes = model->get_ops();
-    auto softmaxNodeIt = std::find_if(std::begin(nodes), std::end(nodes), [](const std::shared_ptr<ov::Node>& op) {
-        return std::string(op->get_type_name()) == "Softmax"; // TODO: it will not work for Vision Transformers, for example
-    });
-
-    std::shared_ptr<ov::Node> softmaxNode;
-    if (softmaxNodeIt == nodes.end()) {
-        auto logitsNode = model->get_output_op(0)->input(0).get_source_output().get_node();
-        softmaxNode = std::make_shared<ov::op::v1::Softmax>(logitsNode->output(0), 1);
-    } else {
-        softmaxNode = *softmaxNodeIt;
-    }
-    const auto k = std::make_shared<ov::op::v0::Constant>(ov::element::i32, ov::Shape{}, std::vector<size_t>{topk});
-    std::shared_ptr<ov::Node> topkNode = std::make_shared<ov::op::v3::TopK>(softmaxNode,
-                                                                            k,
-                                                                            1,
-                                                                            ov::op::v3::TopK::Mode::MAX,
-                                                                            ov::op::v3::TopK::SortType::SORT_VALUES);
-
-    auto indices = std::make_shared<ov::op::v0::Result>(topkNode->output(0));
-    auto scores = std::make_shared<ov::op::v0::Result>(topkNode->output(1));
-    ov::ResultVector res({scores, indices});
-    model = std::make_shared<ov::Model>(res, model->get_parameters(), "classification");
-
-    // manually set output tensors name for created topK node
-    model->outputs()[0].set_names({"indices"});
-    model->outputs()[1].set_names({"scores"});
-
-    // set output precisions
-    ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
-    ppp.output("indices").tensor().set_element_type(ov::element::i32);
-    ppp.output("scores").tensor().set_element_type(ov::element::f32);
-    model = ppp.build();
+    outputNames = {"indices", "scores"};
 }
 
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {

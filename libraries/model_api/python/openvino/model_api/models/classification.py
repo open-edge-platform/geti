@@ -15,21 +15,35 @@
 """
 
 import numpy as np
+from openvino.preprocess import PrePostProcessor
+from openvino.runtime import Model, Type
+from openvino.runtime import opset10 as opset
 
 from .image_model import ImageModel
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import softmax
 
 
 class ClassificationModel(ImageModel):
     __model__ = "Classification"
 
     def __init__(self, inference_adapter, configuration=None, preload=False):
-        super().__init__(inference_adapter, configuration, preload)
-        self._check_io_number(1, 1)
+        super().__init__(inference_adapter, configuration, preload=False)
+        self._check_io_number(1, (1, 2))
         if self.path_to_labels:
             self.labels = self._load_labels(self.path_to_labels)
-        self.out_layer_name = self._get_outputs()
+        self.out_layer_names = [self._get_output()]
+        if self.multilabel:
+            self.embedded_processing = True
+            if preload:
+                self.load()
+            return
+
+        addOrFindSoftmaxAndTopkOutputs(self.inference_adapter, self.topk)
+        self.embedded_processing = True
+
+        self.out_layer_names = ["indices", "scores"]
+        if preload:
+            self.load()
 
     def _load_labels(self, labels_file):
         with open(labels_file, "r") as f:
@@ -42,7 +56,7 @@ class ClassificationModel(ImageModel):
                 labels.append(s[(begin_idx + 1) : end_idx])
         return labels
 
-    def _get_outputs(self):
+    def _get_output(self):
         layer_name = next(iter(self.outputs))
         layer_shape = self.outputs[layer_name].shape
 
@@ -59,10 +73,10 @@ class ClassificationModel(ImageModel):
             if layer_shape[1] == len(self.labels) + 1:
                 self.labels.insert(0, "other")
                 self.logger.warning("\tInserted 'other' label as first.")
-            if layer_shape[1] != len(self.labels):
+            if layer_shape[1] > len(self.labels):
                 self.raise_error(
-                    "Model's number of classes and parsed "
-                    "labels must match ({} != {})".format(
+                    "Model's number of classes must be greater then "
+                    "number of parsed labels ({}, {})".format(
                         layer_shape[1], len(self.labels)
                     )
                 )
@@ -91,11 +105,12 @@ class ClassificationModel(ImageModel):
         return parameters
 
     def postprocess(self, outputs, meta):
+        print(self.multilabel)
         if self.multilabel:
             return self.get_multilabel_predictions(
-                outputs[self.out_layer_name].squeeze()
+                outputs[self.out_layer_names[0]].squeeze()
             )
-        return self.get_multiclass_predictions(outputs[self.out_layer_name].squeeze())
+        return self.get_multiclass_predictions(outputs)
 
     def get_multilabel_predictions(self, logits: np.ndarray):
         logits = sigmoid_numpy(logits)
@@ -109,17 +124,45 @@ class ClassificationModel(ImageModel):
 
         return list(zip(indices, labels, scores))
 
-    def get_multiclass_predictions(self, outputs: np.ndarray):
-        if not np.isclose(np.sum(outputs), 1.0, atol=0.01):
-            outputs = softmax(outputs)
-        indices = np.argpartition(outputs, -self.topk)[-self.topk :]
-        scores = outputs[indices]
+    def get_multiclass_predictions(self, outputs):
+        indicesTensor = outputs[self.out_layer_names[0]][0]
+        scoresTensor = outputs[self.out_layer_names[1]][0]
+        labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
+        return list(zip(indicesTensor, labels, scoresTensor))
 
-        desc_order = scores.argsort()[::-1]
-        scores = scores[desc_order]
-        indices = indices[desc_order]
-        labels = [self.labels[i] if self.labels else "" for i in indices]
-        return list(zip(indices, labels, scores))
+
+def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk):
+    nodes = inference_adapter.model.get_ops()
+    softmaxNode = None
+    for op in nodes:
+        if "Softmax" == op.get_type_name():
+            softmaxNode = op
+    if softmaxNode is None:
+        logitsNode = (
+            inference_adapter.model.get_output_op(0)
+            .input(0)
+            .get_source_output()
+            .get_node()
+        )
+        softmaxNode = opset.softmax(logitsNode.output(0), 1)
+    k = opset.constant(topk, np.int32)
+    topkNode = opset.topk(softmaxNode, k, 1, "max", "value")
+
+    indices = topkNode.output(0)
+    scores = topkNode.output(1)
+    inference_adapter.model = Model(
+        [indices, scores], inference_adapter.model.get_parameters(), "classification"
+    )
+
+    # manually set output tensors name for created topK node
+    inference_adapter.model.outputs[0].tensor.set_names({"scores"})
+    inference_adapter.model.outputs[1].tensor.set_names({"indices"})
+
+    # set output precisions
+    ppp = PrePostProcessor(inference_adapter.model)
+    ppp.output("indices").tensor().set_element_type(Type.i32)
+    ppp.output("scores").tensor().set_element_type(Type.f32)
+    inference_adapter.model = ppp.build()
 
 
 def sigmoid_numpy(x: np.ndarray):
