@@ -231,7 +231,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
                                         inputLayout,
                                         resizeMode,
                                         interpolationMode,
-                                        ov::Shape{inputShape[ov::layout::width_idx(inputLayout)], 
+                                        ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
                                                   inputShape[ov::layout::height_idx(inputLayout)]});
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);

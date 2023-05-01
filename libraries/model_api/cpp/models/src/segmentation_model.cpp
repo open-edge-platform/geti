@@ -172,20 +172,22 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
         throw std::logic_error("3-channel 4-dimensional model's input is expected");
     }
 
-    ov::preprocess::PrePostProcessor ppp(model);
-    ppp.input().tensor().set_element_type(ov::element::u8).set_layout({"NHWC"});
+    if (!embedded_processing) {
+        model = ImageModel::embedProcessing(model,
+                                        inputNames[0],
+                                        inputLayout,
+                                        resizeMode,
+                                        interpolationMode,
+                                        ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
+                                                  inputShape[ov::layout::height_idx(inputLayout)]});
 
-    if (useAutoResize) {
-        ppp.input().tensor().set_spatial_dynamic_shape();
-
-        ppp.input()
-            .preprocess()
-            .convert_element_type(ov::element::f32)
-            .resize(ov::preprocess::ResizeAlgorithm::RESIZE_LINEAR);
+        ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
+        ppp.output().tensor().set_element_type(ov::element::f32);
+        model = ppp.build();
+        useAutoResize = true; // temporal solution
+        embedded_processing = true;
     }
 
-    ppp.input().model().set_layout(inputLayout);
-    model = ppp.build();
     // --------------------------- Prepare output  -----------------------------------------------------
     if (model->outputs().size() != 1) {
         throw std::logic_error("Segmentation model wrapper supports topologies with only 1 output");
