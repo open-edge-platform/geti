@@ -43,6 +43,21 @@ class Detection:
         return self.__to_str()
 
 
+class SegmentedObject(Detection):
+    def __init__(self, xmin, ymin, xmax, ymax, score, id, str_label, mask):
+        super().__init__(xmin, ymin, xmax, ymax, score, id, str_label)
+        self.mask = mask
+
+    def __to_str(self):
+        return f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score:.3f}, {self.id}, {self.str_label}, {(self.mask > 0.5).sum()})"
+
+    def __str__(self):
+        return self.__to_str()
+
+    def __repr__(self):
+        return self.__to_str()
+
+
 def clip_detections(detections, size):
     for detection in detections:
         detection.xmin = min(max(round(detection.xmin), 0), size[1])

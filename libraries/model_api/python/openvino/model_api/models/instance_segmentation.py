@@ -18,8 +18,8 @@ import cv2
 import numpy as np
 
 from .image_model import ImageModel
-from .types import ListValue, NumericalValue, StringValue
-from .utils import load_labels, nms
+from .types import BooleanValue, ListValue, NumericalValue, StringValue
+from .utils import SegmentedObject, load_labels, nms
 
 
 class MaskRCNNModel(ImageModel):
@@ -46,6 +46,10 @@ class MaskRCNNModel(ImageModel):
                 "path_to_labels": StringValue(
                     description="Path to file with labels. Overrides the labels, if they sets via `labels` parameter"
                 ),
+                "postprocess_semantic_masks": BooleanValue(
+                    description="Resize and apply 0.5 threshold to instance segmentation masks",
+                    default_value=True,
+                ),
             }
         )
         return parameters
@@ -65,14 +69,23 @@ class MaskRCNNModel(ImageModel):
                 outputs["boxes"] = layer_name
             elif len(layer_shape) == 3:
                 outputs["masks"] = layer_name
-            else:
-                self.raise_error(
-                    "Unexpected output layer shape {} with name {}".format(
-                        layer_shape, layer_name
-                    )
-                )
+        if len(outputs) == 3:
+            return outputs
+        outputs = {}
+        for layer_name in self.outputs:
+            if layer_name.startswith("TopK"):
+                continue
+            layer_shape = self.outputs[layer_name].shape
 
-        return outputs
+            if len(layer_shape) == 2:
+                outputs["labels"] = layer_name
+            elif len(layer_shape) == 3:
+                outputs["boxes"] = layer_name
+            elif len(layer_shape) == 4:
+                outputs["masks"] = layer_name
+        if len(outputs) == 3:
+            return outputs
+        self.raise_error(f"Unexpected outputs: {self.outputs}")
 
     def _get_segmentoly_outputs(self):
         outputs = {}
@@ -106,6 +119,20 @@ class MaskRCNNModel(ImageModel):
         return dict_inputs, meta
 
     def postprocess(self, outputs, meta):
+        if (
+            outputs[self.output_blob_name["labels"]].ndim == 2
+            and outputs[self.output_blob_name["boxes"]].ndim == 3
+            and outputs[self.output_blob_name["masks"]].ndim == 4
+        ):
+            (
+                outputs[self.output_blob_name["labels"]],
+                outputs[self.output_blob_name["boxes"]],
+                outputs[self.output_blob_name["masks"]],
+            ) = (
+                outputs[self.output_blob_name["labels"]][0],
+                outputs[self.output_blob_name["boxes"]][0],
+                outputs[self.output_blob_name["masks"]][0],
+            )
         boxes = (
             outputs[self.output_blob_name["boxes"]]
             if self.is_segmentoly
@@ -116,66 +143,97 @@ class MaskRCNNModel(ImageModel):
             if self.is_segmentoly
             else outputs[self.output_blob_name["boxes"]][:, 4]
         )
-        scale_x = meta["resized_shape"][1] / meta["original_shape"][1]
-        scale_y = meta["resized_shape"][0] / meta["original_shape"][0]
-        boxes[:, 0::2] /= scale_x
-        boxes[:, 1::2] /= scale_y
-        if self.is_segmentoly:
-            classes = outputs[self.output_blob_name["labels"]].astype(np.uint32)
-        else:
-            classes = outputs[self.output_blob_name["labels"]].astype(np.uint32) + 1
-        masks = []
-        for box, cls, raw_mask in zip(
-            boxes, classes, outputs[self.output_blob_name["masks"]]
-        ):
-            raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
-            masks.append(
-                self._segm_postprocess(box, raw_cls_mask, *meta["original_shape"][:-1])
-            )
-        # Filter out detections with low confidence.
         detections_filter = scores > self.confidence_threshold
-        scores = scores[detections_filter]
-        classes = classes[detections_filter]
-        boxes = boxes[detections_filter]
-        masks = [segm for segm, is_valid in zip(masks, detections_filter) if is_valid]
-        return scores, classes, boxes, masks
-
-    @staticmethod
-    def _expand_box(box, scale):
-        w_half = (box[2] - box[0]) * 0.5
-        h_half = (box[3] - box[1]) * 0.5
-        x_c = (box[2] + box[0]) * 0.5
-        y_c = (box[3] + box[1]) * 0.5
-        w_half *= scale
-        h_half *= scale
-        box_exp = np.zeros(box.shape)
-        box_exp[0] = x_c - w_half
-        box_exp[2] = x_c + w_half
-        box_exp[1] = y_c - h_half
-        box_exp[3] = y_c + h_half
-        return box_exp
-
-    def _segm_postprocess(self, box, raw_cls_mask, im_h, im_w):
-        # Add zero border to prevent upsampling artifacts on segment borders.
-        raw_cls_mask = np.pad(
-            raw_cls_mask, ((1, 1), (1, 1)), "constant", constant_values=0
+        boxes, scores, labels, masks = (
+            boxes[detections_filter],
+            scores[detections_filter],
+            outputs[self.output_blob_name["labels"]][detections_filter],
+            outputs[self.output_blob_name["masks"]][detections_filter],
         )
-        extended_box = self._expand_box(
-            box, raw_cls_mask.shape[0] / (raw_cls_mask.shape[0] - 2.0)
-        ).astype(int)
-        w, h = np.maximum(extended_box[2:] - extended_box[:2] + 1, 1)
-        x0, y0 = np.clip(extended_box[:2], a_min=0, a_max=[im_w, im_h])
-        x1, y1 = np.clip(extended_box[2:] + 1, a_min=0, a_max=[im_w, im_h])
+        if not self.is_segmentoly:
+            labels += 1
+        if self.labels is None:
+            str_labels = (f"#{label}" for label in labels)
+        else:
+            str_labels = (self.labels[label] for label in labels)
 
-        raw_cls_mask = cv2.resize(raw_cls_mask.astype(np.float32), (w, h)) > 0.5
-        mask = raw_cls_mask.astype(np.uint8)
-        # Put an object mask in an image mask.
-        im_mask = np.zeros((im_h, im_w), dtype=np.uint8)
-        im_mask[y0:y1, x0:x1] = mask[
-            (y0 - extended_box[1]) : (y1 - extended_box[1]),
-            (x0 - extended_box[0]) : (x1 - extended_box[0]),
+        inputImgWidth, inputImgHeight = (
+            meta["original_shape"][1],
+            meta["original_shape"][0],
+        )
+        invertedScaleX, invertedScaleY = (
+            inputImgWidth / self.orig_width,
+            inputImgHeight / self.orig_height,
+        )
+        padLeft, padTop = 0, 0
+        if (
+            "fit_to_window" == self.resize_type
+            or "fit_to_window_letterbox" == self.resize_type
+        ):
+            invertedScaleX = invertedScaleY = max(invertedScaleX, invertedScaleY)
+            if "fit_to_window_letterbox" == resizeMode:
+                padLeft = (self.orig_width - int(inputImgWidth / invertedScaleX)) // 2
+                padTop = (self.orig_height - int(inputImgHeight / invertedScaleY)) // 2
+
+        boxes -= (padLeft, padTop, padLeft, padTop)
+        boxes *= (invertedScaleX, invertedScaleY, invertedScaleX, invertedScaleY)
+        np.around(boxes, out=boxes)
+        np.clip(
+            boxes,
+            0.0,
+            [inputImgWidth, inputImgHeight, inputImgWidth, inputImgHeight],
+            out=boxes,
+        )
+
+        resized_masks = []
+        for box, cls, raw_mask in zip(boxes, labels, masks):
+            raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
+            if self.postprocess_semantic_masks:
+                resized_masks.append(
+                    _segm_postprocess(box, raw_cls_mask, *meta["original_shape"][:-1])
+                )
+            else:
+                resized_masks.append(raw_cls_mask)
+        return [
+            SegmentedObject(*box, confidence, label, str_label, mask)
+            for box, confidence, label, str_label, mask in zip(
+                boxes.astype(int), scores, labels, str_labels, resized_masks
+            )
         ]
-        return im_mask
+
+
+def _expand_box(box, scale):
+    w_half = (box[2] - box[0]) * 0.5 * scale
+    h_half = (box[3] - box[1]) * 0.5 * scale
+    x_c = (box[2] + box[0]) * 0.5
+    y_c = (box[3] + box[1]) * 0.5
+    box_exp = np.zeros(box.shape)
+    box_exp[0] = x_c - w_half
+    box_exp[2] = x_c + w_half
+    box_exp[1] = y_c - h_half
+    box_exp[3] = y_c + h_half
+    return box_exp
+
+
+def _segm_postprocess(box, raw_cls_mask, im_h, im_w):
+    # Add zero border to prevent upsampling artifacts on segment borders.
+    raw_cls_mask = np.pad(raw_cls_mask, ((1, 1), (1, 1)), "constant", constant_values=0)
+    extended_box = _expand_box(
+        box, raw_cls_mask.shape[0] / (raw_cls_mask.shape[0] - 2.0)
+    ).astype(int)
+    w, h = np.maximum(extended_box[2:] - extended_box[:2] + 1, 1)
+    x0, y0 = np.clip(extended_box[:2], a_min=0, a_max=[im_w, im_h])
+    x1, y1 = np.clip(extended_box[2:] + 1, a_min=0, a_max=[im_w, im_h])
+
+    raw_cls_mask = cv2.resize(raw_cls_mask.astype(np.float32), (w, h)) > 0.5
+    mask = raw_cls_mask.astype(np.uint8)
+    # Put an object mask in an image mask.
+    im_mask = np.zeros((im_h, im_w), dtype=np.uint8)
+    im_mask[y0:y1, x0:x1] = mask[
+        (y0 - extended_box[1]) : (y1 - extended_box[1]),
+        (x0 - extended_box[0]) : (x1 - extended_box[0]),
+    ]
+    return im_mask
 
 
 class YolactModel(ImageModel):

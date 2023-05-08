@@ -101,7 +101,7 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
             DetectedObject desc;
 
             desc.confidence = confidence;
-            desc.labelID = static_cast<int>(detections[i * objectSize + 1]);
+            desc.labelID = static_cast<size_t>(detections[i * objectSize + 1]);
             desc.label = getLabelName(desc.labelID);
             desc.x = clamp(
                 round((detections[i * objectSize + 3] * netInputWidth - padLeft) * invertedScaleX),
@@ -213,6 +213,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                 netInputHeight = shape[ov::layout::height_idx(inputLayout)];
 
                 useAutoResize = true; // temporal solution for SSD
+                embedded_processing = true;
             }
         } else if (shape.size() == 2) {  // 2nd input contains image info
             inputNames.resize(2);

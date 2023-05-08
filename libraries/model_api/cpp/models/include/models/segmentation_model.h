@@ -29,7 +29,6 @@ struct ResultBase;
 struct ImageResult;
 struct ImageInputData;
 
-#pragma once
 class SegmentationModel : public ImageModel {
 public:
     SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);

@@ -101,7 +101,7 @@ struct DetectedObject : public cv::Rect2f {
 
     friend std::ostream& operator<< (std::ostream& stream, const DetectedObject& detection)
     {
-        stream << "(" << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width) 
+        stream << "(" << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width)
             << ", " << int(detection.y + detection.height) << ", ";
         stream << std::fixed;
         stream << std::setprecision(3) << detection.confidence << ", ";
@@ -120,6 +120,26 @@ struct RetinaFaceDetectionResult : public DetectionResult {
     RetinaFaceDetectionResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : DetectionResult(frameId, metaData) {}
     std::vector<cv::Point2f> landmarks;
+};
+
+struct SegmentedObject : DetectedObject {
+    cv::Mat mask;
+
+    friend std::ostream& operator<< (std::ostream& stream, const SegmentedObject& segmentation)
+    {
+        stream << "(" << int(segmentation.x) << ", " << int(segmentation.y) << ", " << int(segmentation.x + segmentation.width)
+            << ", " << int(segmentation.y + segmentation.height) << ", ";
+        stream << std::fixed;
+        stream << std::setprecision(3) << segmentation.confidence << ", ";
+        stream << std::setprecision(-1) << segmentation.labelID << ", " << segmentation.label << ", " << cv::countNonZero(segmentation.mask > 0.5) << ")";
+        return stream;
+    }
+};
+
+struct InstanceSegmentationResult : ResultBase {
+    InstanceSegmentationResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
+        : ResultBase(frameId, metaData) {}
+    std::vector<SegmentedObject> segmentedObjects;
 };
 
 struct ImageResult : public ResultBase {
