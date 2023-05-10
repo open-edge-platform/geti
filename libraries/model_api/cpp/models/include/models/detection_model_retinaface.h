@@ -34,7 +34,7 @@ class ModelRetinaFace : public DetectionModelExt {
 public:
     static const int LANDMARKS_NUM = 5;
     static const int INIT_VECTOR_SIZE = 200;
-    
+
     ModelRetinaFace(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelRetinaFace(std::shared_ptr<InferenceAdapter>& adapter);
     using DetectionModelExt::DetectionModelExt;

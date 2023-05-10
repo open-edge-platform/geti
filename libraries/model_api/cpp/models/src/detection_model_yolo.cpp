@@ -99,7 +99,7 @@ static inline float linear(float x) {
 }
 
 ModelYolo::ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
-    : DetectionModelExt(model, configuration) {    
+    : DetectionModelExt(model, configuration) {
     auto anchors_iter = configuration.find("anchors");
     if (anchors_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "anchors")) {

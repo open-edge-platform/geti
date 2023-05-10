@@ -37,7 +37,7 @@ public:
     ModelBase(const std::string& modelFile, const std::string& layout = "");
     ModelBase(std::shared_ptr<InferenceAdapter>& adapter);
     ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
-    
+
     virtual ~ModelBase() = default;
 
     std::shared_ptr<ov::Model> prepare();

@@ -41,7 +41,7 @@ opset10::Interpolate::InterpolateMode ov2ovInterpolationMode(cv::InterpolationFl
 }
 
 Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
-                const ov::Shape& size, 
+                const ov::Shape& size,
                 bool keep_aspect_ratio = false,
                 const cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR) {
     const auto h_axis = 1;
@@ -66,14 +66,14 @@ Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
 
         return std::make_shared<opset10::Interpolate>(input, sizes, scales, axes, attrs);
     }
-    
+
     auto image_shape = std::make_shared<opset10::ShapeOf>(input);
-    auto iw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape, 
-                                                                                   opset10::Constant::create(element::i64, Shape{1}, {w_axis}), 
+    auto iw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape,
+                                                                                   opset10::Constant::create(element::i64, Shape{1}, {w_axis}),
                                                                                    opset10::Constant::create(element::i64, Shape{1}, {0})),
                                                 element::f32);
-    auto ih = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape, 
-                                                                                   opset10::Constant::create(element::i64, Shape{1}, {h_axis}), 
+    auto ih = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape,
+                                                                                   opset10::Constant::create(element::i64, Shape{1}, {h_axis}),
                                                                                    opset10::Constant::create(element::i64, Shape{1}, {0})),
                                                 element::f32);
 
@@ -116,14 +116,14 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
         throw std::logic_error("Size parameter should be 2-dimensional");
     }
     auto w = size.at(0);
-    auto h = size.at(1);    
+    auto h = size.at(1);
     auto image_shape = std::make_shared<opset10::ShapeOf>(input);
-    auto iw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape, 
-                                                                                   opset10::Constant::create(element::i64, Shape{1}, {w_axis}), 
+    auto iw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape,
+                                                                                   opset10::Constant::create(element::i64, Shape{1}, {w_axis}),
                                                                                    opset10::Constant::create(element::i64, Shape{1}, {0})),
                                                 element::f32);
-    auto ih = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape, 
-                                                                                   opset10::Constant::create(element::i64, Shape{1}, {h_axis}), 
+    auto ih = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape,
+                                                                                   opset10::Constant::create(element::i64, Shape{1}, {h_axis}),
                                                                                    opset10::Constant::create(element::i64, Shape{1}, {0})),
                                                 element::f32);
     auto w_ratio = std::make_shared<opset10::Divide>(opset10::Constant::create(element::f32, Shape{1}, {float(w)}), iw);
@@ -131,7 +131,7 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
     auto scale = std::make_shared<opset10::Minimum>(w_ratio, h_ratio);
     auto nw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Multiply>(iw, scale), element::i32);
     auto nh = std::make_shared<opset10::Convert>(std::make_shared<opset10::Multiply>(ih, scale), element::i32);
-    auto new_size = std::make_shared<opset10::Concat>(OutputVector{std::make_shared<opset10::Unsqueeze>(nh, opset10::Constant::create(element::i32, Shape{1}, {0})), 
+    auto new_size = std::make_shared<opset10::Concat>(OutputVector{std::make_shared<opset10::Unsqueeze>(nh, opset10::Constant::create(element::i32, Shape{1}, {0})),
                                                                    std::make_shared<opset10::Unsqueeze>(nw, opset10::Constant::create(element::i32, Shape{1}, {0}))}, -1);
 
     auto scales = opset10::Constant::create(element::f32, Shape{2}, {0.0f, 0.0f});
@@ -140,7 +140,7 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
     attrs.mode = mode;
     attrs.shape_calculation_mode = opset10::Interpolate::ShapeCalcMode::SIZES;
     auto image = std::make_shared<opset10::Interpolate>(input, new_size, scales, axes, attrs);
-    
+
     // pad
     auto dx = std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(opset10::Constant::create(element::i32, Shape{1}, {w}), nw),
                                                 opset10::Constant::create(element::i32, Shape{1}, {2}));
@@ -148,11 +148,11 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
                                                 opset10::Constant::create(element::i32, Shape{1}, {2}));
     auto dx_border = std::make_shared<opset10::Subtract>(std::make_shared<opset10::Subtract>(opset10::Constant::create(element::i32, Shape{1}, {w}), nw), dx);
     auto dy_border = std::make_shared<opset10::Subtract>(std::make_shared<opset10::Subtract>(opset10::Constant::create(element::i32, Shape{1}, {h}), nh), dy);
-    auto pads_begin = std::make_shared<opset10::Concat>(OutputVector{opset10::Constant::create(element::i32, Shape{1}, {0}), 
+    auto pads_begin = std::make_shared<opset10::Concat>(OutputVector{opset10::Constant::create(element::i32, Shape{1}, {0}),
                                                                      dy,
                                                                      dx,
                                                                      opset10::Constant::create(element::i32, Shape{1}, {0})}, 0);
-    auto pads_end = std::make_shared<opset10::Concat>(OutputVector{opset10::Constant::create(element::i32, Shape{1}, {0}), 
+    auto pads_end = std::make_shared<opset10::Concat>(OutputVector{opset10::Constant::create(element::i32, Shape{1}, {0}),
                                                                    dy_border,
                                                                    dx_border,
                                                                    opset10::Constant::create(element::i32, Shape{1}, {0})}, 0);
@@ -168,12 +168,12 @@ Output<Node> cropResizeGraph(const ov::Output<ov::Node>& input,
     auto mode = ov2ovInterpolationMode(interpolationMode);
 
     auto image_shape = std::make_shared<opset10::ShapeOf>(input);
-    auto iw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape, 
-                                                                                   opset10::Constant::create(element::i64, Shape{1}, {w_axis}), 
+    auto iw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape,
+                                                                                   opset10::Constant::create(element::i64, Shape{1}, {w_axis}),
                                                                                    opset10::Constant::create(element::i64, Shape{1}, {0})),
                                                 element::i32);
-    auto ih = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape, 
-                                                                                   opset10::Constant::create(element::i64, Shape{1}, {h_axis}), 
+    auto ih = std::make_shared<opset10::Convert>(std::make_shared<opset10::Gather>(image_shape,
+                                                                                   opset10::Constant::create(element::i64, Shape{1}, {h_axis}),
                                                                                    opset10::Constant::create(element::i64, Shape{1}, {0})),
                                                 element::i32);
 
@@ -183,14 +183,14 @@ Output<Node> cropResizeGraph(const ov::Output<ov::Node>& input,
         auto image_t = std::make_shared<opset10::Parameter>(element::u8, PartialShape{-1, -1, -1, 3});
         auto iw_t = std::make_shared<opset10::Parameter>(element::i32, PartialShape{});
         auto ih_t = std::make_shared<opset10::Parameter>(element::i32, PartialShape{});
-        auto then_offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(ih_t, iw_t), 
+        auto then_offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(ih_t, iw_t),
                                                                                                   opset10::Constant::create(element::i32, Shape{1}, {2})),
                                                                opset10::Constant::create(element::i64, Shape{1}, {0}));
         auto then_stop = std::make_shared<opset10::Add>(then_offset, iw_t);
-        auto then_cropped_frame = std::make_shared<opset10::Slice>(image_t, 
-                                                                   then_offset, 
-                                                                   then_stop, 
-                                                                   opset10::Constant::create(element::i64, Shape{1}, {1}), 
+        auto then_cropped_frame = std::make_shared<opset10::Slice>(image_t,
+                                                                   then_offset,
+                                                                   then_stop,
+                                                                   opset10::Constant::create(element::i64, Shape{1}, {1}),
                                                                    opset10::Constant::create(element::i64, Shape{1}, {h_axis}));
         auto then_body_res_1 = std::make_shared<opset10::Result>(then_cropped_frame);
         auto then_body = std::make_shared<Model>(NodeVector{then_body_res_1}, ParameterVector{image_t, iw_t, ih_t});
@@ -199,14 +199,14 @@ Output<Node> cropResizeGraph(const ov::Output<ov::Node>& input,
         auto image_e = std::make_shared<opset10::Parameter>(element::u8, PartialShape{-1, -1, -1, 3});
         auto iw_e = std::make_shared<opset10::Parameter>(element::i32, PartialShape{});
         auto ih_e = std::make_shared<opset10::Parameter>(element::i32, PartialShape{});
-        auto else_offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(iw_e, ih_e), 
+        auto else_offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(iw_e, ih_e),
                                                                                                   opset10::Constant::create(element::i32, Shape{1}, {2})),
                                                                opset10::Constant::create(element::i64, Shape{1}, {0}));
         auto else_stop = std::make_shared<opset10::Add>(else_offset, ih_e);
-        auto else_cropped_frame = std::make_shared<opset10::Slice>(image_e, 
-                                                                   else_offset, 
-                                                                   else_stop, 
-                                                                   opset10::Constant::create(element::i64, Shape{1}, {1}), 
+        auto else_cropped_frame = std::make_shared<opset10::Slice>(image_e,
+                                                                   else_offset,
+                                                                   else_stop,
+                                                                   opset10::Constant::create(element::i64, Shape{1}, {1}),
                                                                    opset10::Constant::create(element::i64, Shape{1}, {w_axis}));
         auto else_body_res_1 = std::make_shared<opset10::Result>(else_cropped_frame);
         auto else_body = std::make_shared<Model>(NodeVector{else_body_res_1}, ParameterVector{image_e, iw_e, ih_e});
@@ -222,29 +222,29 @@ Output<Node> cropResizeGraph(const ov::Output<ov::Node>& input,
         cropped_frame = if_node->set_output(then_body_res_1, else_body_res_1);
     } else if (desired_aspect_ratio < 1) {
         auto new_width = std::make_shared<opset10::Floor>(
-                                    std::make_shared<opset10::Multiply>(std::make_shared<opset10::Convert>(ih, element::f32), 
+                                    std::make_shared<opset10::Multiply>(std::make_shared<opset10::Convert>(ih, element::f32),
                                                                         opset10::Constant::create(element::f32, Shape{1}, {desired_aspect_ratio})));
-        auto offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(iw, new_width), 
+        auto offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(iw, new_width),
                                                                                              opset10::Constant::create(element::i32, Shape{1}, {2})),
                                                           opset10::Constant::create(element::i64, Shape{1}, {0}));
         auto stop = std::make_shared<opset10::Add>(offset, new_width);
-        cropped_frame = std::make_shared<opset10::Slice>(input, 
-                                                        offset, 
-                                                        stop, 
-                                                        opset10::Constant::create(element::i64, Shape{1}, {1}), 
+        cropped_frame = std::make_shared<opset10::Slice>(input,
+                                                        offset,
+                                                        stop,
+                                                        opset10::Constant::create(element::i64, Shape{1}, {1}),
                                                         opset10::Constant::create(element::i64, Shape{1}, {w_axis}));
     } else {
         auto new_height = std::make_shared<opset10::Floor>(
-                                    std::make_shared<opset10::Multiply>(std::make_shared<opset10::Convert>(iw, element::f32), 
+                                    std::make_shared<opset10::Multiply>(std::make_shared<opset10::Convert>(iw, element::f32),
                                                                         opset10::Constant::create(element::f32, Shape{1}, {1.0 / desired_aspect_ratio})));
-        auto offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(ih, new_height), 
+        auto offset = std::make_shared<opset10::Unsqueeze>(std::make_shared<opset10::Divide>(std::make_shared<opset10::Subtract>(ih, new_height),
                                                                                              opset10::Constant::create(element::i32, Shape{1}, {2})),
                                                           opset10::Constant::create(element::i64, Shape{1}, {0}));
         auto stop = std::make_shared<opset10::Add>(offset, new_height);
-        cropped_frame = std::make_shared<opset10::Slice>(input, 
-                                                        offset, 
-                                                        stop, 
-                                                        opset10::Constant::create(element::i64, Shape{1}, {1}), 
+        cropped_frame = std::make_shared<opset10::Slice>(input,
+                                                        offset,
+                                                        stop,
+                                                        opset10::Constant::create(element::i64, Shape{1}, {1}),
                                                         opset10::Constant::create(element::i64, Shape{1}, {h_axis}));
     }
 
@@ -307,7 +307,7 @@ cv::Mat resizeImageExt(const cv::Mat& mat, int width, int height, RESIZE_MODE re
 }
 
 preprocess::PostProcessSteps::CustomPostprocessOp createResizeGraph(RESIZE_MODE resizeMode,
-                                                                    const Shape& size, 
+                                                                    const Shape& size,
                                                                     const cv::InterpolationFlags interpolationMode) {
     switch (resizeMode)
     {

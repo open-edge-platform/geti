@@ -94,7 +94,7 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
     } else {
         throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
-    
+
     detectionModel->prepare();
     if (preload) {
         detectionModel->load(core);
@@ -126,7 +126,7 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(std::shared_ptr<Inf
     } else {
         throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
     }
-    
+
     return detectionModel;
 }
 

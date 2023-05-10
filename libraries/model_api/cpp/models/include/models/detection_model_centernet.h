@@ -49,7 +49,7 @@ public:
 
     ModelCenterNet(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelCenterNet(std::shared_ptr<InferenceAdapter>& adapter);
-    
+
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 

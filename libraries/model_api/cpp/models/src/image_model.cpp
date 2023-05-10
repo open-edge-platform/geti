@@ -159,7 +159,7 @@ std::shared_ptr<ov::Model> ImageModel::embedProcessing(std::shared_ptr<ov::Model
                                             bool brg2rgb,
                                             const std::vector<float>& mean,
                                             const std::vector<float>& scale) {
-    
+
     ov::preprocess::PrePostProcessor ppp(model);
 
     inputTransform.setPrecision(ppp, inputName);

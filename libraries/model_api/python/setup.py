@@ -55,7 +55,7 @@ EXTRAS_REQUIRE = {
 setup(
     name="openvino_model_api",
     version="0.1.0",
-    author="Intel® Corporation",
+    author="Intel Corporation",
     license="OSI Approved :: Apache Software License",
     url="https://github.com/openvinotoolkit/model_api",
     description="Model API: model wrappers and pipelines for inference with OpenVINO",

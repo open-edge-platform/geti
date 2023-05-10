@@ -206,7 +206,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                         inputLayout,
                                         resizeMode,
                                         interpolationMode,
-                                        ov::Shape{shape[ov::layout::width_idx(inputLayout)], 
+                                        ov::Shape{shape[ov::layout::width_idx(inputLayout)],
                                                   shape[ov::layout::height_idx(inputLayout)]});
 
                 netInputWidth = shape[ov::layout::width_idx(inputLayout)];

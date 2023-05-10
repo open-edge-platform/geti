@@ -45,7 +45,7 @@ public:
     ModelRetinaFacePT(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelRetinaFacePT(std::shared_ptr<InferenceAdapter>& adapter);
     using DetectionModelExt::DetectionModelExt;
-    
+
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
     static std::string ModelType;
 

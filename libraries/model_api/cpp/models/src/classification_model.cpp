@@ -128,7 +128,7 @@ void ClassificationModel::updateModelInfo() {
 std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
-    
+
     // Check model_type in the rt_info, ignore configuration
     std::string model_type = ClassificationModel::ModelType;
     try {
@@ -138,7 +138,7 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std
     } catch (const std::exception& e) {
         slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
     }
-    
+
     if (model_type != ClassificationModel::ModelType) {
         throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
