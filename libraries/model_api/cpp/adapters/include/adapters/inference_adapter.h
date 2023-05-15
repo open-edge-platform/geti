@@ -38,7 +38,7 @@ public:
     virtual InferenceOutput infer(const InferenceInput& input) = 0;
     virtual void loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,
                            const std::string& device, const ov::AnyMap& compilationConfig) = 0;
-    virtual ov::Shape getInputShape(const std::string& inputName) const = 0;
+    virtual ov::PartialShape getInputShape(const std::string& inputName) const = 0;
     virtual std::vector<std::string> getInputNames() const = 0;
     virtual std::vector<std::string> getOutputNames() const = 0;
     virtual const ov::AnyMap& getModelConfig() const = 0;

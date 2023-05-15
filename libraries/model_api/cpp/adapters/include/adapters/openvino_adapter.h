@@ -33,7 +33,7 @@ public:
     virtual InferenceOutput infer(const InferenceInput& input) override;
     virtual void loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,
                                                     const std::string& device = "", const ov::AnyMap& compilationConfig = {}) override;
-    virtual ov::Shape getInputShape(const std::string& inputName) const override;
+    virtual ov::PartialShape getInputShape(const std::string& inputName) const override;
     virtual std::vector<std::string> getInputNames() const override;
     virtual std::vector<std::string> getOutputNames() const override;
     virtual const ov::AnyMap& getModelConfig() const override;

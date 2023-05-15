@@ -148,7 +148,7 @@ std::shared_ptr<InternalModelData> SuperResolutionModel::preprocess(const InputD
     auto imgData = inputData.asRef<ImageInputData>();
     auto& img = imgData.inputImage;
 
-    auto lrShape = inferenceAdapter->getInputShape(inputNames[0]);
+    auto lrShape = inferenceAdapter->getInputShape(inputNames[0]).get_max_shape();
     const ov::Layout layout("NHWC");
 
     if (img.channels() != static_cast<int>(lrShape[ov::layout::channels_idx(layout)])) {
@@ -164,7 +164,7 @@ std::shared_ptr<InternalModelData> SuperResolutionModel::preprocess(const InputD
     input.emplace(inputNames[0], wrapMat2Tensor(img));
 
     if (inputNames.size() == 2) {
-        auto bicShape = inferenceAdapter->getInputShape(inputNames[1]);
+        auto bicShape = inferenceAdapter->getInputShape(inputNames[1]).get_max_shape();
         const int h = static_cast<int>(bicShape[ov::layout::height_idx(layout)]);
         const int w = static_cast<int>(bicShape[ov::layout::width_idx(layout)]);
         cv::Mat resized;

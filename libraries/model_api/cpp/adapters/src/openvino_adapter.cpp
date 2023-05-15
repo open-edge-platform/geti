@@ -59,8 +59,8 @@ InferenceOutput OpenVINOInferenceAdapter::infer(const InferenceInput& input) {
     return output;
 }
 
-ov::Shape OpenVINOInferenceAdapter::getInputShape(const std::string& inputName) const {
-    return compiledModel.input(inputName).get_shape();
+ov::PartialShape OpenVINOInferenceAdapter::getInputShape(const std::string& inputName) const {
+    return compiledModel.input(inputName).get_partial_shape();
 }
 
 void OpenVINOInferenceAdapter::initInputsOutputs() {
