@@ -76,7 +76,7 @@ protected:
     static double intersectionOverUnion(const DetectedObject& o1, const DetectedObject& o2);
 
     std::map<std::string, Region> regions;
-    double boxIOUThreshold;
+    float boxIOUThreshold;
     bool useAdvancedPostprocessing = true;
     bool isObjConf = 1;
     YoloVersion yoloVersion = YOLO_V3;

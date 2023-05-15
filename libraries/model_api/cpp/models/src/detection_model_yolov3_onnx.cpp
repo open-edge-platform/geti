@@ -121,7 +121,7 @@ std::shared_ptr<InternalModelData> ModelYoloV3ONNX::preprocess(const InputData& 
     auto allocator = std::make_shared<SharedTensorAllocator>(info);
     ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 2}),  ov::Allocator(allocator));
 
-     input.emplace(inputNames[1], infoInput);
+    input.emplace(inputNames[1], infoInput);
 
     return ImageModel::preprocess(inputData, input);
 }
@@ -130,7 +130,7 @@ namespace {
 float getScore(const ov::Tensor& scoresTensor, size_t classInd, size_t boxInd) {
     const float* scoresPtr = scoresTensor.data<float>();
     const auto shape = scoresTensor.get_shape();
-    int N = shape[2];
+    size_t N = shape[2];
 
     return scoresPtr[classInd * N + boxInd];
 }

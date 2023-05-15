@@ -45,8 +45,8 @@ public:
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void updateModelInfo() override;
-    std::string getLabelName(int labelID) {
-        return (size_t)labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);
+    std::string getLabelName(size_t labelID) {
+        return labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);
     }
 
     float confidence_threshold = 0.5f;

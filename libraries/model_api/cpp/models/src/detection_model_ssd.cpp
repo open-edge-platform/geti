@@ -150,8 +150,8 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
 
     // In models with scores stored in separate output coordinates are normalized to [0,1]
     // In other multiple-outputs models coordinates are normalized to [0,netInputWidth] and [0,netInputHeight]
-    float widthScale = scores ? netInputWidth : 1;
-    float heightScale = scores ? netInputHeight : 1;
+    float widthScale = scores ? netInputWidth : 1.0f;
+    float heightScale = scores ? netInputHeight : 1.0f;
 
     for (size_t i = 0; i < detectionsNum; i++) {
         float confidence = scores ? scores[i] : boxes[i * objectSize + 4];

@@ -42,8 +42,8 @@ public:
 protected:
     float confidenceThreshold = 0.5f;
 
-    std::string getLabelName(int labelID) {
-        return (size_t)labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);
+    std::string getLabelName(size_t labelID) {
+        return labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);
     }
     void updateModelInfo() override;
 };

@@ -135,12 +135,12 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std
         if (model->has_rt_info("model_info", "model_type")) {
             model_type = model->get_rt_info<std::string>("model_info", "model_type");
         }
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
     }
 
     if (model_type != ClassificationModel::ModelType) {
-        throw ov::Exception("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
+        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
 
     std::unique_ptr<ClassificationModel> classifier{new ClassificationModel(model, configuration)};
@@ -160,7 +160,7 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shar
     }
 
     if (model_type != ClassificationModel::ModelType) {
-        throw ov::Exception("Incorrect or unsupported model_type is provided: " + model_type);
+        throw std::runtime_error("Incorrect or unsupported model_type is provided: " + model_type);
     }
 
     std::unique_ptr<ClassificationModel> classifier{new ClassificationModel(adapter)};

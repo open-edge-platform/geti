@@ -47,6 +47,8 @@ source_group("adapters/include" FILES ${ADAPTERS_HEADERS})
 add_library(model_api STATIC ${MODELS_SOURCES} ${UTILS_SOURCES} ${ADAPTERS_SOURCES})
 target_include_directories(model_api PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/models/include>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/utils/include>" "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/adapters/include>" "$<INSTALL_INTERFACE:include>")
 target_link_libraries(model_api PUBLIC openvino::runtime opencv_core opencv_imgproc)
+set_target_properties(model_api PROPERTIES CXX_STANDARD 17)
+set_target_properties(model_api PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(GenerateExportHeader)
 
