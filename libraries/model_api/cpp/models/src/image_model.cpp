@@ -155,7 +155,7 @@ std::shared_ptr<ov::Model> ImageModel::embedProcessing(std::shared_ptr<ov::Model
                                             const RESIZE_MODE resize_mode,
                                             const cv::InterpolationFlags interpolationMode,
                                             const ov::Shape& targetShape,
-                                            const std::type_info& dtype,
+                                            const std::type_info&,
                                             bool brg2rgb,
                                             const std::vector<float>& mean,
                                             const std::vector<float>& scale) {

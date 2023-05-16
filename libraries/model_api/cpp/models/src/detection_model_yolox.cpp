@@ -37,7 +37,7 @@
 
 std::string ModelYoloX::ModelType = "yolox";
 
-void ModelYoloX::initDefaultParameters(const ov::AnyMap& configuration) {
+void ModelYoloX::initDefaultParameters(const ov::AnyMap&) {
     resizeMode = RESIZE_KEEP_ASPECT; // Ignore configuration for now
     useAutoResize = false;
 }

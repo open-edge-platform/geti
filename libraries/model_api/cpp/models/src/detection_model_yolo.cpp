@@ -32,7 +32,8 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-std::vector<float> defaultAnchors[] = {
+namespace {
+const std::vector<float> defaultAnchors[]{
     // YOLOv1v2
     {0.57273f, 0.677385f, 1.87446f, 2.06253f, 3.33843f, 5.47434f, 7.88282f, 3.52778f, 9.77052f, 9.16828f},
     // YOLOv3
@@ -78,24 +79,13 @@ std::vector<float> defaultAnchors[] = {
     // YOLOF
     {16.0f, 16.0f, 32.0f, 32.0f, 64.0f, 64.0f, 128.0f, 128.0f, 256.0f, 256.0f, 512.0f, 512.0f}};
 
-const std::vector<int64_t> defaultMasks[] = {
-    // YOLOv1v2
-    {},
-    // YOLOv3
-    {},
-    // YOLOv4
-    {0, 1, 2, 3, 4, 5, 6, 7, 8},
-    // YOLOv4_Tiny
-    {1, 2, 3, 3, 4, 5},
-    // YOLOF
-    {0, 1, 2, 3, 4, 5}};
-
-static inline float sigmoid(float x) {
-    return 1.f / (1.f + exp(-x));
+float sigmoid(float x) noexcept {
+    return 1.0f / (1.0f + std::exp(-x));
 }
 
-static inline float linear(float x) {
+constexpr float identity(float x) noexcept {
     return x;
+}
 }
 
 ModelYolo::ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
@@ -191,7 +181,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     }
     model = ppp.build();
 
-    yoloVersion = YOLO_V3;
+    yoloVersion = YoloVersion::YOLO_V3;
     bool isRegionFound = false;
     for (const auto& op : model->get_ordered_ops()) {
         if (std::string("RegionYolo") == op->get_type_name()) {
@@ -199,7 +189,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
 
             if (regionYolo) {
                 if (!regionYolo->get_mask().size()) {
-                    yoloVersion = YOLO_V1V2;
+                    yoloVersion = YoloVersion::YOLO_V1V2;
                 }
 
                 const auto& opName = op->get_friendly_name();
@@ -217,21 +207,32 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     if (!isRegionFound) {
         switch (outputNames.size()) {
             case 1:
-                yoloVersion = YOLOF;
+                yoloVersion = YoloVersion::YOLOF;
                 break;
             case 2:
-                yoloVersion = YOLO_V4_TINY;
+                yoloVersion = YoloVersion::YOLO_V4_TINY;
                 break;
             case 3:
-                yoloVersion = YOLO_V4;
+                yoloVersion = YoloVersion::YOLO_V4;
                 break;
         }
 
-        int num = yoloVersion == YOLOF ? 6 : 3;
-        isObjConf = yoloVersion == YOLOF ? 0 : 1;
+        int num = yoloVersion == YoloVersion::YOLOF ? 6 : 3;
+        isObjConf = yoloVersion == YoloVersion::YOLOF ? 0 : 1;
         int i = 0;
 
-        auto chosenMasks = presetMasks.size() ? presetMasks : defaultMasks[yoloVersion];
+        const std::vector<int64_t> defaultMasks[]{
+            // YOLOv1v2
+            {},
+            // YOLOv3
+            {},
+            // YOLOv4
+            {0, 1, 2, 3, 4, 5, 6, 7, 8},
+            // YOLOv4_Tiny
+            {1, 2, 3, 3, 4, 5},
+            // YOLOF
+            {0, 1, 2, 3, 4, 5}};
+        auto chosenMasks = presetMasks.size() ? presetMasks : defaultMasks[size_t(yoloVersion)];
         if (chosenMasks.size() != num * outputs.size()) {
             throw std::runtime_error(std::string("Invalid size of masks array, got ") +
                                      std::to_string(presetMasks.size()) + ", should be " +
@@ -254,7 +255,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                 name,
                 Region(shape[ov::layout::channels_idx(yoloRegionLayout)] / num - 4 - (isObjConf ? 1 : 0),
                        4,
-                       presetAnchors.size() ? presetAnchors : defaultAnchors[yoloVersion],
+                       presetAnchors.size() ? presetAnchors : defaultAnchors[size_t(yoloVersion)],
                        std::vector<int64_t>(chosenMasks.begin() + i * num, chosenMasks.begin() + (i + 1) * num),
                        shape[ov::layout::width_idx(yoloRegionLayout)],
                        shape[ov::layout::height_idx(yoloRegionLayout)]));
@@ -343,28 +344,29 @@ void ModelYolo::parseYOLOOutput(const std::string& output_name,
     unsigned long scaleH;
     unsigned long scaleW;
     switch (yoloVersion) {
-        case YOLO_V1V2:
+        case YoloVersion::YOLO_V1V2:
             sideH = region.outputHeight;
             sideW = region.outputWidth;
             scaleW = region.outputWidth;
             scaleH = region.outputHeight;
             break;
-        case YOLO_V3:
-        case YOLO_V4:
-        case YOLO_V4_TINY:
-        case YOLOF:
+        case YoloVersion::YOLO_V3:
+        case YoloVersion::YOLO_V4:
+        case YoloVersion::YOLO_V4_TINY:
+        case YoloVersion::YOLOF:
             sideH = static_cast<int>(tensor.get_shape()[ov::layout::height_idx("NCHW")]);
             sideW = static_cast<int>(tensor.get_shape()[ov::layout::width_idx("NCHW")]);
             scaleW = resized_im_w;
             scaleH = resized_im_h;
             break;
+        default: throw std::runtime_error("Unknown YoloVersion");
     }
 
     auto entriesNum = sideW * sideH;
     const float* outData = tensor.data<float>();
 
     auto postprocessRawData =
-        (yoloVersion == YOLO_V4 || yoloVersion == YOLO_V4_TINY || yoloVersion == YOLOF) ? sigmoid : linear;
+        (yoloVersion == YoloVersion::YOLO_V4 || yoloVersion == YoloVersion::YOLO_V4_TINY || yoloVersion == YoloVersion::YOLOF) ? sigmoid : identity;
 
     // --------------------------- Parsing YOLO Region output -------------------------------------
     for (int i = 0; i < entriesNum; ++i) {
@@ -385,7 +387,7 @@ void ModelYolo::parseYOLOOutput(const std::string& output_name,
             if (scale >= confidenceThreshold) {
                 //--- Calculating scaled region's coordinates
                 float x, y;
-                if (yoloVersion == YOLOF) {
+                if (yoloVersion == YoloVersion::YOLOF) {
                     x = (static_cast<float>(col) / sideW +
                          outData[box_index + 0 * entriesNum] * region.anchors[2 * n] / scaleW) *
                         original_im_w;
@@ -468,7 +470,7 @@ ModelYolo::Region::Region(const std::shared_ptr<ov::op::v0::RegionYolo>& regionY
         num = regionYolo->get_num_regions();
         anchors = regionYolo->get_anchors();
         if (anchors.empty()) {
-            anchors = defaultAnchors[YOLO_V1V2];
+            anchors = defaultAnchors[size_t(YoloVersion::YOLO_V1V2)];
             num = 5;
         }
     }

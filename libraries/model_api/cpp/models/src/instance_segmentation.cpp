@@ -31,7 +31,7 @@
 #include "models/internal_model_data.h"
 #include "models/input_data.h"
 #include "models/results.h"
-
+#include "utils/common.hpp"
 
 namespace {
 cv::Rect expand_box(const cv::Rect2f& box, float scale) {

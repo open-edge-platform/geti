@@ -37,8 +37,8 @@
 std::string ClassificationModel::ModelType = "Classification";
 
 namespace {
-float sigmoid(float x) {
-    return 1.0f / (1.0f + exp(-x));
+float sigmoid(float x) noexcept {
+    return 1.0f / (1.0f + std::exp(-x));
 }
 
 void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t topk) {

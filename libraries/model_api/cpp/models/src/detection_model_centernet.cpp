@@ -38,7 +38,7 @@
 
 std::string ModelCenterNet::ModelType = "centernet";
 
-void ModelCenterNet::initDefaultParameters(const ov::AnyMap& configuration) {
+void ModelCenterNet::initDefaultParameters(const ov::AnyMap&) {
     resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX; // Ignore configuration for now
     useAutoResize = false;
 }
@@ -182,7 +182,7 @@ std::vector<std::pair<size_t, float>> nms(float* scoresPtr, const ov::Shape& sha
                 // ---------------------- maxpool2d -----------------------------------------------
                 for (int i = -kernel / 2; i < kernel / 2 + 1 && next; ++i) {
                     for (int j = -kernel / 2; j < kernel / 2 + 1; ++j) {
-                        if (w + i >= 0 && w + i < shape[2] && h + j >= 0 && h + j < shape[3]) {
+                        if (int(w) + i >= 0 && w + i < shape[2] && int(h) + j >= 0 && h + j < shape[3]) {
                             if (scoresPtr[chSize * ch + shape[2] * (w + i) + h + j] > max) {
                                 scores.pop_back();
                                 next = false;

@@ -35,7 +35,7 @@ public:
         return bytes <= img.rows * img.step[0] ? img.data : nullptr;
     }
 
-    void deallocate(void* handle, const size_t bytes, const size_t) override {}
+    void deallocate(void*, const size_t, const size_t) override {}
 
     bool is_equal(const AllocatorImpl& other) const override {
         auto other_tensor_allocator = dynamic_cast<const SharedTensorAllocator*>(&other);

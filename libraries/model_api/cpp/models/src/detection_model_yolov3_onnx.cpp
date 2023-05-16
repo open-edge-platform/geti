@@ -35,7 +35,7 @@
 #include "utils/image_utils.h"
 
 
-void ModelYoloV3ONNX::initDefaultParameters(const ov::AnyMap& configuration) {
+void ModelYoloV3ONNX::initDefaultParameters(const ov::AnyMap&) {
     resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX; // Ignore configuration for now
     useAutoResize = false;
 }

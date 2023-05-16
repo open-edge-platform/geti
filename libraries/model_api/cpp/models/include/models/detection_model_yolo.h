@@ -53,7 +53,7 @@ protected:
     };
 
 public:
-    enum YoloVersion { YOLO_V1V2, YOLO_V3, YOLO_V4, YOLO_V4_TINY, YOLOF };
+    enum class YoloVersion : size_t { YOLO_V1V2=0, YOLO_V3, YOLO_V4, YOLO_V4_TINY, YOLOF };
 
     ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelYolo(std::shared_ptr<InferenceAdapter>& adapter);
@@ -79,7 +79,7 @@ protected:
     float boxIOUThreshold;
     bool useAdvancedPostprocessing = true;
     bool isObjConf = 1;
-    YoloVersion yoloVersion = YOLO_V3;
+    YoloVersion yoloVersion = YoloVersion::YOLO_V3;
     std::vector<float> presetAnchors;
     std::vector<int64_t> presetMasks;
     ov::Layout yoloRegionLayout = "NCHW";

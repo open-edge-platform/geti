@@ -32,7 +32,7 @@
 #include "models/image_model.h"
 #include "models/input_data.h"
 #include "models/results.h"
-
+#include "utils/slog.hpp"
 
 DetectionModel::DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
     : ImageModel(model, configuration) {

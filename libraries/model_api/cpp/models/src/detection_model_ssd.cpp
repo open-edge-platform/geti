@@ -31,8 +31,6 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
-struct InputData;
-
 std::string ModelSSD::ModelType = "ssd";
 
 ModelSSD::ModelSSD(std::shared_ptr<InferenceAdapter>& adapter)

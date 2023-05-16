@@ -31,6 +31,7 @@
 #include "models/internal_model_data.h"
 #include "models/input_data.h"
 #include "models/results.h"
+#include "utils/slog.hpp"
 
 namespace {
 cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_prediction, float soft_threshold, int blur_strength) {
