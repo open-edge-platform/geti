@@ -172,6 +172,9 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
     if (inputShape.size() != 4 || inputShape[ov::layout::channels_idx(inputLayout)] != 3) {
         throw std::logic_error("3-channel 4-dimensional model's input is expected");
     }
+    if (model->outputs().size() != 1) {
+        throw std::logic_error("Segmentation model wrapper supports topologies with only 1 output");
+    }
 
     if (!embedded_processing) {
         model = ImageModel::embedProcessing(model,
@@ -183,38 +186,21 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
                                                   inputShape[ov::layout::height_idx(inputLayout)]});
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
-        ppp.output().tensor().set_element_type(ov::element::f32);
+        ppp.output().model().set_layout(getLayoutFromShape(model->output().get_partial_shape()));
+        ppp.output().tensor().set_element_type(ov::element::f32).set_layout("NCHW");
         model = ppp.build();
         useAutoResize = true; // temporal solution
         embedded_processing = true;
-    }
-
-    // --------------------------- Prepare output  -----------------------------------------------------
-    if (model->outputs().size() != 1) {
-        throw std::logic_error("Segmentation model wrapper supports topologies with only 1 output");
     }
 
     const auto& output = model->output();
     outputNames.push_back(output.get_any_name());
 
     const ov::Shape& outputShape = output.get_partial_shape().get_max_shape();
-    ov::Layout outputLayout("");
-    switch (outputShape.size()) {
-        case 3:
-            outputLayout = "CHW";
-            outChannels = 1;
-            outHeight = static_cast<int>(outputShape[ov::layout::height_idx(outputLayout)]);
-            outWidth = static_cast<int>(outputShape[ov::layout::width_idx(outputLayout)]);
-            break;
-        case 4:
-            outputLayout = "NCHW";
-            outChannels = static_cast<int>(outputShape[ov::layout::channels_idx(outputLayout)]);
-            outHeight = static_cast<int>(outputShape[ov::layout::height_idx(outputLayout)]);
-            outWidth = static_cast<int>(outputShape[ov::layout::width_idx(outputLayout)]);
-            break;
-        default:
-            throw std::logic_error("Unexpected output tensor shape. Only 4D and 3D outputs are supported.");
-    }
+    const ov::Layout& outputLayout = getLayoutFromShape(outputShape);
+    outChannels = static_cast<int>(outputShape[ov::layout::channels_idx(outputLayout)]);
+    outHeight = static_cast<int>(outputShape[ov::layout::height_idx(outputLayout)]);
+    outWidth = static_cast<int>(outputShape[ov::layout::width_idx(outputLayout)]);
 }
 
 std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infResult) {

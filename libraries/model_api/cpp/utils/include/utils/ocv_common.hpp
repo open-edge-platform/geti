@@ -48,8 +48,18 @@ static inline ov::Layout getLayoutFromShape(const ov::PartialShape& shape) {
                                                                       "HWC";
     }
     if (shape.size() == 4) {
-        return ov::Interval{1, 4}.contains(shape[1].get_interval()) ? "NCHW" :
-                                                                      "NHWC";
+        if (ov::Interval{1, 4}.contains(shape[1].get_interval())) {
+            return "NCHW";
+        }
+        if (ov::Interval{1, 4}.contains(shape[3].get_interval())) {
+            return "NHWC";
+        }
+        if (shape[1] == shape[2]) {
+            return "NHWC";
+        }
+        if (shape[2] == shape[3]) {
+            return "NCHW";
+        }
     }
     throw std::runtime_error("Usupported " + std::to_string(shape.size()) + "D shape");
 }
