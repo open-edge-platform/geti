@@ -193,17 +193,17 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
         embedded_processing = true;
     }
 
-    const auto& output = model->output();
-    outputNames.push_back(output.get_any_name());
-
-    const ov::Shape& outputShape = output.get_partial_shape().get_max_shape();
-    const ov::Layout& outputLayout = getLayoutFromShape(outputShape);
-    outChannels = static_cast<int>(outputShape[ov::layout::channels_idx(outputLayout)]);
-    outHeight = static_cast<int>(outputShape[ov::layout::height_idx(outputLayout)]);
-    outWidth = static_cast<int>(outputShape[ov::layout::width_idx(outputLayout)]);
+    outputNames.push_back(model->output().get_any_name());
 }
 
 std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infResult) {
+    const auto& inputImgSize = infResult.internalModelData->asRef<InternalImageModelData>();
+    const auto& outTensor = infResult.getFirstOutputTensor();
+    const ov::Shape& outputShape = outTensor.get_shape();
+    const ov::Layout& outputLayout = getLayoutFromShape(outputShape);
+    int outChannels = static_cast<int>(outputShape[ov::layout::channels_idx(outputLayout)]);
+    int outHeight = static_cast<int>(outputShape[ov::layout::height_idx(outputLayout)]);
+    int outWidth = static_cast<int>(outputShape[ov::layout::width_idx(outputLayout)]);
     if (blur_strength == -1 && soft_threshold == std::numeric_limits<float>::infinity()) {
         ImageResult* result = new ImageResult(infResult.frameId, infResult.metaData);
         const auto& inputImgSize = infResult.internalModelData->asRef<InternalImageModelData>();
@@ -249,8 +249,6 @@ std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infR
 
         return std::unique_ptr<ResultBase>(result);
     }
-    const auto& inputImgSize = infResult.internalModelData->asRef<InternalImageModelData>();
-    const auto& outTensor = infResult.getFirstOutputTensor();
     float* data = outTensor.data<float>();
     std::vector<cv::Mat> channels;
     for (size_t c = 0; c < outTensor.get_shape()[1]; ++c) {

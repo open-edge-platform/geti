@@ -46,10 +46,6 @@ protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void updateModelInfo() override;
 
-    int outHeight = 0;
-    int outWidth = 0;
-    int outChannels = 0;
-
     int blur_strength = -1;
     float soft_threshold = std::numeric_limits<float>::infinity();
     bool return_soft_prediction = true;
