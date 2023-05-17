@@ -58,6 +58,52 @@ class SegmentedObject(Detection):
         return self.__to_str()
 
 
+class SegmentedObjectWithRects(SegmentedObject):
+    def __init__(self, segmented_object):
+        super().__init__(
+            segmented_object.xmin,
+            segmented_object.ymin,
+            segmented_object.xmax,
+            segmented_object.ymax,
+            segmented_object.score,
+            segmented_object.id,
+            segmented_object.str_label,
+            segmented_object.mask,
+        )
+        self.rotated_rects = []
+
+    def __to_str(self):
+        res = f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score:.3f}, {self.id}, {self.str_label}, {(self.mask > 0.5).sum()}"
+        for rect in self.rotated_rects:
+            res += f", RotatedRect: {rect[0][0]:.3f} {rect[0][1]:.3f} {rect[1][0]:.3f} {rect[1][1]:.3f} {rect[2]:.3f}"
+        return res + ")"
+
+    def __str__(self):
+        return self.__to_str()
+
+    def __repr__(self):
+        return self.__to_str()
+
+
+def add_rotated_rects(segmented_objects):
+    objects_with_rects = []
+    for segmented_object in segmented_objects:
+        objects_with_rects.append(SegmentedObjectWithRects(segmented_object))
+        mask = segmented_object.mask.astype(np.uint8)
+        contours, hierarchies = cv2.findContours(
+            mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE
+        )
+        if hierarchies is None:
+            continue
+        for contour, hierarchy in zip(contours, hierarchies[0]):
+            if hierarchy[3] != -1:
+                continue
+            if len(contour) <= 2 or cv2.contourArea(contour) < 1.0:
+                continue
+            objects_with_rects[-1].rotated_rects.append(cv2.minAreaRect(contour))
+    return objects_with_rects
+
+
 def clip_detections(detections, size):
     for detection in detections:
         detection.xmin = min(max(round(detection.xmin), 0), size[1])

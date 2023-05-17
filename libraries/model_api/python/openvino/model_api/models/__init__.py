@@ -45,6 +45,9 @@ from .utils import (
     DetectionWithLandmarks,
     InputTransform,
     OutputTransform,
+    SegmentedObject,
+    SegmentedObjectWithRects,
+    add_rotated_rects,
 )
 from .yolo import YOLO, YOLOF, YOLOX, YoloV3ONNX, YoloV4
 
@@ -109,4 +112,7 @@ __all__ = [
     "DetectionWithLandmarks",
     "classification_models" "detection_models",
     "segmentation_models",
+    "SegmentedObject",
+    "SegmentedObjectWithRects",
+    "add_rotated_rects",
 ]

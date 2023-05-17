@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 #include <openvino/openvino.hpp>
 
 #include "internal_model_data.h"
@@ -135,6 +136,52 @@ struct SegmentedObject : DetectedObject {
         return stream;
     }
 };
+
+struct SegmentedObjectWithRects : SegmentedObject {
+    std::vector<cv::RotatedRect> rotated_rects;
+
+    SegmentedObjectWithRects(const SegmentedObject& segmented_object) : SegmentedObject(segmented_object) {}
+
+    friend std::ostream& operator<< (std::ostream& stream, const SegmentedObjectWithRects& segmentation)
+    {
+        stream << "(" << int(segmentation.x) << ", " << int(segmentation.y) << ", " << int(segmentation.x + segmentation.width)
+            << ", " << int(segmentation.y + segmentation.height) << ", ";
+        stream << std::fixed;
+        stream << std::setprecision(3) << segmentation.confidence << ", ";
+        stream << segmentation.labelID << ", " << segmentation.label << ", " << cv::countNonZero(segmentation.mask > 0.5);
+        for (const cv::RotatedRect& rect : segmentation.rotated_rects) {
+            stream << ", RotatedRect: " << rect.center.x << ' ' << rect.center.y << ' ' <<  rect.size.width << ' ' << rect.size.height << ' ' << rect.angle;
+        }
+        stream << ")";
+        return stream;
+    }
+};
+
+static inline std::vector<SegmentedObjectWithRects> add_rotated_rects(std::vector<SegmentedObject> segmented_objects) {
+    std::vector<SegmentedObjectWithRects> objects_with_rects;
+    objects_with_rects.reserve(segmented_objects.size());
+    for (const SegmentedObject& segmented_object : segmented_objects) {
+        objects_with_rects.push_back(SegmentedObjectWithRects{segmented_object});
+        cv::Mat mask;
+        segmented_object.mask.convertTo(mask, CV_8UC1);
+        std::vector<std::vector<cv::Point>> contours;
+        std::vector<cv::Vec4i> hierarchies;
+        cv::findContours(mask, contours, hierarchies, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
+        if (hierarchies.empty()) {
+            continue;
+        }
+        for (size_t i = 0; i < contours.size(); ++i) {
+            if (hierarchies[i][3] != -1) {
+                continue;
+            }
+            if (contours[i].size() <= 2 || cv::contourArea(contours[i]) < 1.0) {
+                continue;
+            }
+            objects_with_rects.back().rotated_rects.push_back(cv::minAreaRect(contours[i]));
+        }
+    }
+    return objects_with_rects;
+}
 
 struct InstanceSegmentationResult : ResultBase {
     InstanceSegmentationResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
