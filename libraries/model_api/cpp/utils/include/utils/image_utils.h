@@ -43,4 +43,5 @@ cv::Mat resizeImageExt(const cv::Mat& mat, int width, int height, RESIZE_MODE re
 
 ov::preprocess::PostProcessSteps::CustomPostprocessOp createResizeGraph(RESIZE_MODE resizeMode,
                                                                         const ov::Shape& size,
-                                                                        const cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR);
+                                                                        const cv::InterpolationFlags interpolationMode,
+                                                                        uint8_t pad_value);

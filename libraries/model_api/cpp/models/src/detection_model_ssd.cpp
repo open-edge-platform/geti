@@ -81,8 +81,8 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
         if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
-            padLeft = (netInputWidth - int(floatInputImgWidth / invertedScaleX)) / 2;
-            padTop = (netInputHeight - int(floatInputImgHeight / invertedScaleY)) / 2;
+            padLeft = (netInputWidth - int(std::round(floatInputImgWidth / invertedScaleX))) / 2;
+            padTop = (netInputHeight - int(std::round(floatInputImgHeight / invertedScaleY))) / 2;
         }
     }
 
@@ -141,8 +141,8 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
         if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
-            padLeft = (netInputWidth - int(floatInputImgWidth / invertedScaleX)) / 2;
-            padTop = (netInputHeight - int(floatInputImgHeight / invertedScaleY)) / 2;
+            padLeft = (netInputWidth - int(std::round(floatInputImgWidth / invertedScaleX))) / 2;
+            padTop = (netInputHeight - int(std::round(floatInputImgHeight / invertedScaleY))) / 2;
         }
     }
 
@@ -205,7 +205,8 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                         resizeMode,
                                         interpolationMode,
                                         ov::Shape{shape[ov::layout::width_idx(inputLayout)],
-                                                  shape[ov::layout::height_idx(inputLayout)]});
+                                                  shape[ov::layout::height_idx(inputLayout)]},
+                                        pad_value);
 
                 netInputWidth = shape[ov::layout::width_idx(inputLayout)];
                 netInputHeight = shape[ov::layout::height_idx(inputLayout)];

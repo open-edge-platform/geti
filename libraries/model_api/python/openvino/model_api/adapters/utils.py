@@ -88,7 +88,11 @@ class Layout:
         return user_layouts
 
 
-def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
+def resize_image_letterbox_graph(input: Output, size, interpolation, pad_value):
+    if not isinstance(pad_value, int):
+        raise RuntimeError("pad_value must be int")
+    if not 0 <= pad_value <= 255:
+        raise RuntimeError("pad_value must be in range [0, 255]")
     w, h = size
     h_axis = 1
     w_axis = 2
@@ -104,8 +108,12 @@ def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
     w_ratio = opset.divide(opset.constant(w, dtype=Type.f32), iw)
     h_ratio = opset.divide(opset.constant(h, dtype=Type.f32), ih)
     scale = opset.minimum(w_ratio, h_ratio)
-    nw = opset.convert(opset.multiply(iw, scale), destination_type="i32")
-    nh = opset.convert(opset.multiply(ih, scale), destination_type="i32")
+    nw = opset.convert(
+        opset.round(opset.multiply(iw, scale), "half_to_even"), destination_type="i32"
+    )
+    nh = opset.convert(
+        opset.round(opset.multiply(ih, scale), "half_to_even"), destination_type="i32"
+    )
     new_size = opset.concat([opset.unsqueeze(nh, 0), opset.unsqueeze(nw, 0)], axis=-1)
     image = opset.interpolate(
         input,
@@ -147,7 +155,13 @@ def resize_image_letterbox_graph(input: Output, size, interpolation="linear"):
         ],
         axis=0,
     )
-    return opset.pad(image, pads_begin, pads_end, "constant")
+    return opset.pad(
+        image,
+        pads_begin,
+        pads_end,
+        "constant",
+        opset.constant(pad_value, dtype=np.uint8),
+    )
 
 
 def crop_resize_graph(input: Output, size):
@@ -297,13 +311,13 @@ def resize_image_graph(
     )
 
 
-def resize_image(size, interpolation="linear"):
+def resize_image(size, interpolation, pad_value):
     return custom_preprocess_function(
         partial(resize_image_graph, size=size, interpolation=interpolation)
     )
 
 
-def resize_image_with_aspect(size, interpolation="linear"):
+def resize_image_with_aspect(size, interpolation, pad_value):
     return custom_preprocess_function(
         partial(
             resize_image_graph,
@@ -314,11 +328,16 @@ def resize_image_with_aspect(size, interpolation="linear"):
     )
 
 
-def crop_resize(size, interpolation="linear"):
+def crop_resize(size, interpolation, pad_value):
     return custom_preprocess_function(partial(crop_resize_graph, size=size))
 
 
-def resize_image_letterbox(size, interpolation="linear"):
+def resize_image_letterbox(size, interpolation, pad_value):
     return custom_preprocess_function(
-        partial(resize_image_letterbox_graph, size=size, interpolation=interpolation)
+        partial(
+            resize_image_letterbox_graph,
+            size=size,
+            interpolation=interpolation,
+            pad_value=pad_value,
+        )
     )

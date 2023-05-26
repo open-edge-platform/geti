@@ -183,7 +183,8 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
                                         resizeMode,
                                         interpolationMode,
                                         ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
-                                                  inputShape[ov::layout::height_idx(inputLayout)]});
+                                                  inputShape[ov::layout::height_idx(inputLayout)]},
+                                        pad_value);
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
         ppp.output().model().set_layout(getLayoutFromShape(model->output().get_partial_shape()));

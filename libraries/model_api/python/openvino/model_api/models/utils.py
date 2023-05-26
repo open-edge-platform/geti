@@ -196,12 +196,12 @@ def resize_image_with_aspect(image, size, interpolation=cv2.INTER_LINEAR):
     )
 
 
-def resize_image_letterbox(image, size, interpolation=cv2.INTER_LINEAR):
+def resize_image_letterbox(image, size, interpolation=cv2.INTER_LINEAR, pad_value=0):
     ih, iw = image.shape[0:2]
     w, h = size
     scale = min(w / iw, h / ih)
-    nw = int(iw * scale)
-    nh = int(ih * scale)
+    nw = round(iw * scale)
+    nh = round(ih * scale)
     image = cv2.resize(image, (nw, nh), interpolation=interpolation)
     dx = (w - nw) // 2
     dy = (h - nh) // 2
@@ -209,7 +209,7 @@ def resize_image_letterbox(image, size, interpolation=cv2.INTER_LINEAR):
         image,
         ((dy, h - nh - dy), (dx, w - nw - dx), (0, 0)),
         mode="constant",
-        constant_values=0,
+        constant_values=pad_value,
     )
 
 

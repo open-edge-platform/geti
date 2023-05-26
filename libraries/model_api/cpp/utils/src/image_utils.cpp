@@ -42,8 +42,9 @@ opset10::Interpolate::InterpolateMode ov2ovInterpolationMode(cv::InterpolationFl
 
 Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
                 const ov::Shape& size,
-                bool keep_aspect_ratio = false,
-                const cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR) {
+                bool keep_aspect_ratio,
+                const cv::InterpolationFlags interpolationMode,
+                uint8_t pad_value) {
     const auto h_axis = 1;
     const auto w_axis = 2;
 
@@ -101,12 +102,13 @@ Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
         },
         0
     );
-    return std::make_shared<opset10::Pad>(image, pads_begin, pads_end, opset10::Constant::create(element::u8, Shape{}, {0}), ov::op::PadMode::CONSTANT);
+    return std::make_shared<opset10::Pad>(image, pads_begin, pads_end, opset10::Constant::create(element::u8, Shape{}, {pad_value}), ov::op::PadMode::CONSTANT);
 }
 
 Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
                 const ov::Shape& size,
-                const cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR) {
+                const cv::InterpolationFlags interpolationMode,
+                uint8_t pad_value) {
     const auto h_axis = 1;
     const auto w_axis = 2;
 
@@ -129,8 +131,8 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
     auto w_ratio = std::make_shared<opset10::Divide>(opset10::Constant::create(element::f32, Shape{1}, {float(w)}), iw);
     auto h_ratio = std::make_shared<opset10::Divide>(opset10::Constant::create(element::f32, Shape{1}, {float(h)}), ih);
     auto scale = std::make_shared<opset10::Minimum>(w_ratio, h_ratio);
-    auto nw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Multiply>(iw, scale), element::i32);
-    auto nh = std::make_shared<opset10::Convert>(std::make_shared<opset10::Multiply>(ih, scale), element::i32);
+    auto nw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Round>(std::make_shared<opset10::Multiply>(iw, scale), opset10::Round::RoundMode::HALF_TO_EVEN), element::i32);
+    auto nh = std::make_shared<opset10::Convert>(std::make_shared<opset10::Round>(std::make_shared<opset10::Multiply>(ih, scale), opset10::Round::RoundMode::HALF_TO_EVEN), element::i32);
     auto new_size = std::make_shared<opset10::Concat>(OutputVector{std::make_shared<opset10::Unsqueeze>(nh, opset10::Constant::create(element::i32, Shape{1}, {0})),
                                                                    std::make_shared<opset10::Unsqueeze>(nw, opset10::Constant::create(element::i32, Shape{1}, {0}))}, -1);
 
@@ -156,12 +158,12 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
                                                                    dy_border,
                                                                    dx_border,
                                                                    opset10::Constant::create(element::i32, Shape{1}, {0})}, 0);
-    return std::make_shared<opset10::Pad>(image, pads_begin, pads_end, op::PadMode::CONSTANT);
+    return std::make_shared<opset10::Pad>(image, pads_begin, pads_end, opset10::Constant::create(element::u8, Shape{}, {pad_value}), op::PadMode::CONSTANT);
 }
 
 Output<Node> cropResizeGraph(const ov::Output<ov::Node>& input,
                 const ov::Shape& size,
-                const cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR) {
+                const cv::InterpolationFlags interpolationMode) {
     const auto h_axis = 1;
     const auto w_axis = 2;
     const auto desired_aspect_ratio = float(size[1]) / size[0];  // width / height
@@ -282,7 +284,7 @@ cv::Mat resizeImageExt(const cv::Mat& mat, int width, int height, RESIZE_MODE re
     {
         double scale = std::min(static_cast<double>(width) / mat.cols, static_cast<double>(height) / mat.rows);
         cv::Mat resizedImage;
-        cv::resize(mat, resizedImage, {int(mat.cols * scale), int(mat.rows * scale)}, 0, 0, interpolationMode);
+        cv::resize(mat, resizedImage, {int(std::round(mat.cols * scale)), int(std::round(mat.rows * scale))}, 0, 0, interpolationMode);
 
         int dx = resizeMode == RESIZE_KEEP_ASPECT ? 0 : (width - resizedImage.cols) / 2;
         int dy = resizeMode == RESIZE_KEEP_ASPECT ? 0 : (height - resizedImage.rows) / 2;
@@ -308,22 +310,23 @@ cv::Mat resizeImageExt(const cv::Mat& mat, int width, int height, RESIZE_MODE re
 
 preprocess::PostProcessSteps::CustomPostprocessOp createResizeGraph(RESIZE_MODE resizeMode,
                                                                     const Shape& size,
-                                                                    const cv::InterpolationFlags interpolationMode) {
+                                                                    const cv::InterpolationFlags interpolationMode,
+                                                                    uint8_t pad_value) {
     switch (resizeMode)
     {
         case RESIZE_FILL:
             return [=](const Output<Node>& node) {
-                return resizeImageGraph(node, size, false, interpolationMode);
+                return resizeImageGraph(node, size, false, interpolationMode, pad_value);
             };
             break;
         case RESIZE_KEEP_ASPECT:
             return [=](const Output<Node>& node) {
-                return resizeImageGraph(node, size, true, interpolationMode);
+                return resizeImageGraph(node, size, true, interpolationMode, pad_value);
             };
             break;
         case RESIZE_KEEP_ASPECT_LETTERBOX:
             return [=](const Output<Node>& node) {
-                return fitToWindowLetterBoxGraph(node, size, interpolationMode);
+                return fitToWindowLetterBoxGraph(node, size, interpolationMode, pad_value);
             };
             break;
         case RESIZE_CROP:

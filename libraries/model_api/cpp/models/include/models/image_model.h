@@ -48,10 +48,11 @@ public:
     static std::vector<std::string> loadLabels(const std::string& labelFilename);
     std::shared_ptr<ov::Model> embedProcessing(std::shared_ptr<ov::Model>& model,
                                                     const std::string& inputName,
-                                                    const ov::Layout& = ov::Layout("NCHW"),
-                                                    RESIZE_MODE resize_mode = NO_RESIZE,
-                                                    const cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR,
-                                                    const ov::Shape& targetShape = ov::Shape(),
+                                                    const ov::Layout&,
+                                                    RESIZE_MODE resize_mode,
+                                                    const cv::InterpolationFlags interpolationMode,
+                                                    const ov::Shape& targetShape,
+                                                    uint8_t pad_value,
                                                     const std::type_info& dtype = typeid(int),
                                                     bool brg2rgb = false,
                                                     const std::vector<float>& mean = {},
@@ -70,4 +71,5 @@ protected:
     size_t netInputWidth = 0;
     cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR;
     RESIZE_MODE resizeMode = RESIZE_FILL;
+    uint8_t pad_value = 0;
 };

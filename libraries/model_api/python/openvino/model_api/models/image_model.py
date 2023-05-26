@@ -80,6 +80,7 @@ class ImageModel(Model):
                 resize_mode=self.resize_type,
                 interpolation_mode="LINEAR",
                 target_shape=(self.w, self.h),
+                pad_value=self.pad_value,
                 brg2rgb=self.reverse_input_channels,
                 mean=self.mean_values,
                 scale=self.scale_values,
@@ -92,6 +93,13 @@ class ImageModel(Model):
         parameters = super().parameters()
         parameters.update(
             {
+                "pad_value": NumericalValue(
+                    int,
+                    min=0,
+                    max=255,
+                    description="Pad value for resize_image_letterbox embedded into a model",
+                    default_value=0,
+                ),
                 "mean_values": ListValue(
                     default_value=[],
                     description="Normalization values, which will be subtracted from image channels for image-input layer during preprocessing",

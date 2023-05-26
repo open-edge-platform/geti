@@ -339,10 +339,11 @@ class OpenvinoAdapter(InferenceAdapter):
 
     def embed_preprocessing(
         self,
-        layout="NCHW",
-        resize_mode: str = "",
-        interpolation_mode="LINEAR",
-        target_shape: Tuple[int] = None,
+        layout,
+        resize_mode: str,
+        interpolation_mode,
+        target_shape: Tuple[int],
+        pad_value,
         dtype=type(int),
         brg2rgb=False,
         mean=None,
@@ -373,7 +374,9 @@ class OpenvinoAdapter(InferenceAdapter):
                 ppp.input(input_idx).tensor().set_shape(input_shape)
                 ppp.input(input_idx).preprocess().custom(
                     RESIZE_MODE_MAP[resize_mode](
-                        target_shape, INTERPOLATION_MODE_MAP[interpolation_mode]
+                        target_shape,
+                        INTERPOLATION_MODE_MAP[interpolation_mode],
+                        pad_value,
                     )
                 )
 

@@ -171,7 +171,8 @@ void MaskRCNNModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                         resizeMode,
                                         interpolationMode,
                                         ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
-                                                  inputShape[ov::layout::height_idx(inputLayout)]});
+                                                  inputShape[ov::layout::height_idx(inputLayout)]},
+                                        pad_value);
 
         netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
         netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
@@ -211,8 +212,8 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
         if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
-            padLeft = (netInputWidth - int(floatInputImgWidth / invertedScaleX)) / 2;
-            padTop = (netInputHeight - int(floatInputImgHeight / invertedScaleY)) / 2;
+            padLeft = (netInputWidth - int(std::round(floatInputImgWidth / invertedScaleX))) / 2;
+            padTop = (netInputHeight - int(std::round(floatInputImgHeight / invertedScaleY))) / 2;
         }
     }
     const int64_t* const labels = infResult.outputsData[outputNames[0]].data<int64_t>();

@@ -97,6 +97,15 @@ ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
     if (model->has_rt_info("model_info", "orig_height")) {
         netInputHeight = model->get_rt_info<size_t>("model_info", "orig_height");
     }
+
+    auto pad_value_iter = configuration.find("pad_value");
+    if (pad_value_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "pad_value")) {
+            pad_value = model->get_rt_info<uint8_t>("model_info", "pad_value");
+        }
+    } else {
+        pad_value = pad_value_iter->second.as<uint8_t>();
+    }
 }
 
 ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
@@ -132,6 +141,11 @@ ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
     if (netInputHeight_iter != configuration.end()) {
         netInputHeight = netInputHeight_iter->second.as<size_t>();
     }
+
+    auto pad_value_iter = configuration.find("pad_value");
+    if (pad_value_iter != configuration.end()) {
+        pad_value = pad_value_iter->second.as<uint8_t>();
+    }
 }
 
 void ImageModel::updateModelInfo() {
@@ -155,6 +169,7 @@ std::shared_ptr<ov::Model> ImageModel::embedProcessing(std::shared_ptr<ov::Model
                                             const RESIZE_MODE resize_mode,
                                             const cv::InterpolationFlags interpolationMode,
                                             const ov::Shape& targetShape,
+                                            uint8_t pad_value,
                                             const std::type_info&,
                                             bool brg2rgb,
                                             const std::vector<float>& mean,
@@ -170,7 +185,7 @@ std::shared_ptr<ov::Model> ImageModel::embedProcessing(std::shared_ptr<ov::Model
         ppp.input(inputName).tensor().set_spatial_dynamic_shape();
         // Doing resize in u8 is more efficient than FP32 but can lead to slightly different results
         ppp.input(inputName).preprocess().custom(
-            createResizeGraph(resize_mode, targetShape, interpolationMode));
+            createResizeGraph(resize_mode, targetShape, interpolationMode, pad_value));
     }
 
     ppp.input(inputName).model().set_layout(ov::Layout(layout));

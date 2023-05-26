@@ -171,9 +171,11 @@ class MaskRCNNModel(ImageModel):
             or "fit_to_window_letterbox" == self.resize_type
         ):
             invertedScaleX = invertedScaleY = max(invertedScaleX, invertedScaleY)
-            if "fit_to_window_letterbox" == resizeMode:
-                padLeft = (self.orig_width - int(inputImgWidth / invertedScaleX)) // 2
-                padTop = (self.orig_height - int(inputImgHeight / invertedScaleY)) // 2
+            if "fit_to_window_letterbox" == self.resize_type:
+                padLeft = (self.orig_width - round(inputImgWidth / invertedScaleX)) // 2
+                padTop = (
+                    self.orig_height - round(inputImgHeight / invertedScaleY)
+                ) // 2
 
         boxes -= (padLeft, padTop, padLeft, padTop)
         boxes *= (invertedScaleX, invertedScaleY, invertedScaleX, invertedScaleY)

@@ -74,6 +74,13 @@ class DetectionModel(ImageModel):
 
         return parameters
 
+    def get_label_name(self, label_id):
+        if self.labels is None:
+            return f"#{label_id}"
+        if label_id >= len(self.labels):
+            return f"#{label_id}"
+        return self.labels[label_id]
+
     def _resize_detections(self, detections, meta):
         """Resizes detection bounding boxes according to initial image shape.
 
@@ -119,12 +126,8 @@ class DetectionModel(ImageModel):
         Returns:
             - list of detections with label strings
         """
-        if self.labels is None:
-            for detection in detections:
-                detection.str_label = f"#{detection.id}"
-        else:
-            for detection in detections:
-                detection.str_label = self.labels[detection.id]
+        for detection in detections:
+            detection.str_label = self.get_label_name(detection.id)
         return detections
 
 

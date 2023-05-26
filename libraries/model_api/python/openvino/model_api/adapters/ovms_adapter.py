@@ -205,14 +205,15 @@ class OVMSAdapter(InferenceAdapter):
 
     def embed_preprocessing(
         self,
-        layout="NCHW",
-        resize_mode: str = None,
-        interpolation_mode="LINEAR",
-        target_shape: Tuple[int] = None,
+        layout,
+        resize_mode: str,
+        interpolation_mode,
+        target_shape: Tuple[int],
+        pad_value,
         dtype=type(int),
         brg2rgb=False,
         mean=None,
         scale=None,
         input_idx=0,
     ):
-        pass
+        raise NotImplementedError("OVMSAdapter does not support embed_preprocessing()")
