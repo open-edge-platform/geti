@@ -42,13 +42,13 @@ public:
     /// @param modelFile name of model to load
     /// @param aspectRatio - the ratio of input width to its height.
     /// @param targetSize - the length of a short image side used for model reshaping.
-    /// @param confidenceThreshold - threshold to eliminate low-confidence poses.
+    /// @param confidence_threshold - threshold to eliminate low-confidence poses.
     /// Any pose with confidence lower than this threshold will be ignored.
     /// @param layout - model input layout
     HpeAssociativeEmbedding(const std::string& modelFile,
                             double aspectRatio,
                             int targetSize,
-                            float confidenceThreshold,
+                            float confidence_threshold,
                             const std::string& layout = "",
                             float delta = 0.0,
                             const std::string& resize_type = "fit_to_window");
@@ -63,7 +63,7 @@ protected:
     cv::Size inputLayerSize;
     double aspectRatio;
     int targetSize;
-    float confidenceThreshold;
+    float confidence_threshold;
     float delta;
 
     std::string embeddingsTensorName;

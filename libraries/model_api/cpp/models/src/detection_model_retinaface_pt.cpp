@@ -51,7 +51,7 @@ ModelRetinaFacePT::ModelRetinaFacePT(std::shared_ptr<ov::Model>& model, const ov
 
 ModelRetinaFacePT::ModelRetinaFacePT(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
 
@@ -139,7 +139,7 @@ void ModelRetinaFacePT::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
     priors = generatePriorData();
 }
 
-std::vector<size_t> ModelRetinaFacePT::filterByScore(const ov::Tensor& scoresTensor, const float confidenceThreshold) {
+std::vector<size_t> ModelRetinaFacePT::filterByScore(const ov::Tensor& scoresTensor, const float confidence_threshold) {
     std::vector<size_t> indicies;
     const auto& shape = scoresTensor.get_shape();
     const float* scoresPtr = scoresTensor.data<float>();
@@ -147,7 +147,7 @@ std::vector<size_t> ModelRetinaFacePT::filterByScore(const ov::Tensor& scoresTen
     for (size_t x = 0; x < shape[1]; ++x) {
         const auto idx = (x * shape[2] + 1);
         const auto score = scoresPtr[idx];
-        if (score >= confidenceThreshold) {
+        if (score >= confidence_threshold) {
             indicies.push_back(x);
         }
     }
@@ -251,7 +251,7 @@ std::unique_ptr<ResultBase> ModelRetinaFacePT::postprocess(InferenceResult& infR
     const auto boxesTensor = infResult.outputsData[outputNames[OUT_BOXES]];
     const auto scoresTensor = infResult.outputsData[outputNames[OUT_SCORES]];
 
-    const auto& validIndicies = filterByScore(scoresTensor, confidenceThreshold);
+    const auto& validIndicies = filterByScore(scoresTensor, confidence_threshold);
     const auto& scores = getFilteredScores(scoresTensor, validIndicies);
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
@@ -264,7 +264,7 @@ std::unique_ptr<ResultBase> ModelRetinaFacePT::postprocess(InferenceResult& infR
     const auto& proposals =
         getFilteredProposals(boxesTensor, validIndicies, internalData.inputImgWidth, internalData.inputImgHeight);
 
-    const auto& keptIndicies = nms(proposals, scores, boxIOUThreshold, !landmarksNum);
+    const auto& keptIndicies = nms(proposals, scores, iou_threshold, !landmarksNum);
 
     // --------------------------- Create detection result objects
     // --------------------------------------------------------

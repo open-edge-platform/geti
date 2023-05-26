@@ -51,7 +51,7 @@ void findPeaks(const std::vector<cv::Mat>& heatMaps,
                const float minPeaksDistance,
                std::vector<std::vector<Peak>>& allPeaks,
                int heatMapId,
-               float confidenceThreshold);
+               float confidence_threshold);
 
 std::vector<HumanPose> groupPeaksToPoses(const std::vector<std::vector<Peak>>& allPeaks,
                                          const std::vector<cv::Mat>& pafs,

@@ -113,7 +113,7 @@ ModelYolo::ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& config
 
 ModelYolo::ModelYolo(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     auto anchors_iter = configuration.find("anchors");
     if (anchors_iter != configuration.end()) {
         presetAnchors = anchors_iter->second.as<std::vector<float>>();
@@ -297,8 +297,8 @@ std::unique_ptr<ResultBase> ModelYolo::postprocess(InferenceResult& infResult) {
             bool isGoodResult = true;
             for (const auto& obj2 : objects) {
                 if (obj1.labelID == obj2.labelID && obj1.confidence < obj2.confidence &&
-                    intersectionOverUnion(obj1, obj2) >= boxIOUThreshold) {  // if obj1 is the same as obj2, condition
-                                                                             // expression will evaluate to false anyway
+                    intersectionOverUnion(obj1, obj2) >= iou_threshold) {  // if obj1 is the same as obj2, condition
+                                                                           // expression will evaluate to false anyway
                     isGoodResult = false;
                     break;
                 }
@@ -316,7 +316,7 @@ std::unique_ptr<ResultBase> ModelYolo::postprocess(InferenceResult& infResult) {
             if (objects[i].confidence == 0)
                 continue;
             for (size_t j = i + 1; j < objects.size(); ++j)
-                if (intersectionOverUnion(objects[i], objects[j]) >= boxIOUThreshold)
+                if (intersectionOverUnion(objects[i], objects[j]) >= iou_threshold)
                     objects[j].confidence = 0;
             result->objects.push_back(objects[i]);
         }
@@ -384,7 +384,7 @@ void ModelYolo::parseYOLOOutput(const std::string& output_name,
             float scale = isObjConf ? postprocessRawData(outData[obj_index]) : 1;
 
             //--- Preliminary check for confidence threshold conformance
-            if (scale >= confidenceThreshold) {
+            if (scale >= confidence_threshold) {
                 //--- Calculating scaled region's coordinates
                 float x, y;
                 if (yoloVersion == YoloVersion::YOLOF) {
@@ -420,7 +420,7 @@ void ModelYolo::parseYOLOOutput(const std::string& output_name,
                     float prob = scale * postprocessRawData(outData[class_index]);
 
                     //--- Checking confidence threshold conformance and adding region to the list
-                    if (prob >= confidenceThreshold) {
+                    if (prob >= confidence_threshold) {
                         obj.confidence = prob;
                         obj.labelID = j;
                         obj.label = getLabelName(obj.labelID);

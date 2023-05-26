@@ -57,7 +57,6 @@ public:
 
     ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelYolo(std::shared_ptr<InferenceAdapter>& adapter);
-    using DetectionModelExt::DetectionModelExt;
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
@@ -76,7 +75,7 @@ protected:
     static double intersectionOverUnion(const DetectedObject& o1, const DetectedObject& o2);
 
     std::map<std::string, Region> regions;
-    float boxIOUThreshold;
+    float iou_threshold;
     bool useAdvancedPostprocessing = true;
     bool isObjConf = 1;
     YoloVersion yoloVersion = YoloVersion::YOLO_V3;

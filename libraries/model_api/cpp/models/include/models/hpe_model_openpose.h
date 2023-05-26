@@ -41,12 +41,12 @@ public:
     /// @param modelFile name of model to load
     /// @param aspectRatio - the ratio of input width to its height.
     /// @param targetSize - the height used for model reshaping.
-    /// @param confidenceThreshold - threshold to eliminate low-confidence keypoints.
+    /// @param confidence_threshold - threshold to eliminate low-confidence keypoints.
     /// @param layout - model input layout
     HPEOpenPose(const std::string& modelFile,
                 double aspectRatio,
                 int targetSize,
-                float confidenceThreshold,
+                float confidence_threshold,
                 const std::string& layout = "");
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
@@ -69,7 +69,7 @@ protected:
     cv::Size inputLayerSize;
     double aspectRatio;
     int targetSize;
-    float confidenceThreshold;
+    float confidence_threshold;
 
     std::vector<HumanPose> extractPoses(const std::vector<cv::Mat>& heatMaps, const std::vector<cv::Mat>& pafs) const;
     void resizeFeatureMaps(std::vector<cv::Mat>& featureMaps) const;

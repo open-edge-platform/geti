@@ -45,12 +45,12 @@ const float HPEOpenPose::minSubsetScore = 0.2f;
 HPEOpenPose::HPEOpenPose(const std::string& modelFile,
                          double aspectRatio,
                          int targetSize,
-                         float confidenceThreshold,
+                         float confidence_threshold,
                          const std::string& layout)
     : ImageModel(modelFile, "fit_to_window", false, layout),
       aspectRatio(aspectRatio),
       targetSize(targetSize),
-      confidenceThreshold(confidenceThreshold) {
+      confidence_threshold(confidence_threshold) {
         interpolationMode = cv::INTER_CUBIC;
       }
 
@@ -214,15 +214,15 @@ public:
     FindPeaksBody(const std::vector<cv::Mat>& heatMaps,
                   float minPeaksDistance,
                   std::vector<std::vector<Peak>>& peaksFromHeatMap,
-                  float confidenceThreshold)
+                  float confidence_threshold)
         : heatMaps(heatMaps),
           minPeaksDistance(minPeaksDistance),
           peaksFromHeatMap(peaksFromHeatMap),
-          confidenceThreshold(confidenceThreshold) {}
+          confidence_threshold(confidence_threshold) {}
 
     void operator()(const cv::Range& range) const override {
         for (int i = range.start; i < range.end; i++) {
-            findPeaks(heatMaps, minPeaksDistance, peaksFromHeatMap, i, confidenceThreshold);
+            findPeaks(heatMaps, minPeaksDistance, peaksFromHeatMap, i, confidence_threshold);
         }
     }
 
@@ -230,13 +230,13 @@ private:
     const std::vector<cv::Mat>& heatMaps;
     float minPeaksDistance;
     std::vector<std::vector<Peak>>& peaksFromHeatMap;
-    float confidenceThreshold;
+    float confidence_threshold;
 };
 
 std::vector<HumanPose> HPEOpenPose::extractPoses(const std::vector<cv::Mat>& heatMaps,
                                                  const std::vector<cv::Mat>& pafs) const {
     std::vector<std::vector<Peak>> peaksFromHeatMap(heatMaps.size());
-    FindPeaksBody findPeaksBody(heatMaps, minPeaksDistance, peaksFromHeatMap, confidenceThreshold);
+    FindPeaksBody findPeaksBody(heatMaps, minPeaksDistance, peaksFromHeatMap, confidence_threshold);
     cv::parallel_for_(cv::Range(0, static_cast<int>(heatMaps.size())), findPeaksBody);
     int peaksBefore = 0;
     for (size_t heatmapId = 1; heatmapId < heatMaps.size(); heatmapId++) {

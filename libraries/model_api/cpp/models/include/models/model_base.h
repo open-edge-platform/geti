@@ -23,7 +23,6 @@
 #include <openvino/openvino.hpp>
 
 #include <utils/args_helper.hpp>
-#include <utils/config_factory.h>
 #include <utils/ocv_common.hpp>
 #include <adapters/inference_adapter.h>
 
@@ -41,7 +40,7 @@ public:
     virtual ~ModelBase() = default;
 
     std::shared_ptr<ov::Model> prepare();
-    void load(ov::Core& core);
+    void load(ov::Core& core, const std::string& device);
     std::shared_ptr<ov::Model> getModel();
 
     virtual std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) = 0;
@@ -66,7 +65,6 @@ protected:
     std::vector<std::string> outputNames;
     std::string modelFile;
     std::shared_ptr<InferenceAdapter> inferenceAdapter;
-    InferenceConfig config = {};
     std::map<std::string, ov::Layout> inputsLayouts;
     ov::Layout getInputLayout(const ov::Output<ov::Node>& input);
 };

@@ -35,7 +35,7 @@ std::string ModelSSD::ModelType = "ssd";
 
 ModelSSD::ModelSSD(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModel(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     auto object_size_iter = configuration.find("object_size");
     if (object_size_iter != configuration.end()) {
         objectSize = object_size_iter->second.as<size_t>();
@@ -95,7 +95,7 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
         float confidence = detections[i * objectSize + 2];
 
         /** Filtering out objects with confidence < confidence_threshold probability **/
-        if (confidence > confidenceThreshold) {
+        if (confidence > confidence_threshold) {
             DetectedObject desc;
 
             desc.confidence = confidence;
@@ -155,7 +155,7 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
         float confidence = scores ? scores[i] : boxes[i * objectSize + 4];
 
         /** Filtering out objects with confidence < confidence_threshold probability **/
-        if (confidence > confidenceThreshold) {
+        if (confidence > confidence_threshold) {
             DetectedObject desc;
 
             desc.confidence = confidence;
@@ -206,7 +206,10 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                         interpolationMode,
                                         ov::Shape{shape[ov::layout::width_idx(inputLayout)],
                                                   shape[ov::layout::height_idx(inputLayout)]},
-                                        pad_value);
+                                        pad_value,
+                                        reverse_input_channels,
+                                        {},
+                                        scale_values);
 
                 netInputWidth = shape[ov::layout::width_idx(inputLayout)];
                 netInputHeight = shape[ov::layout::height_idx(inputLayout)];

@@ -57,7 +57,7 @@ protected:
 
     std::vector<ModelRetinaFacePT::Box> priors;
 
-    std::vector<size_t> filterByScore(const ov::Tensor& scoresTensor, const float confidenceThreshold);
+    std::vector<size_t> filterByScore(const ov::Tensor& scoresTensor, const float confidence_threshold);
     std::vector<float> getFilteredScores(const ov::Tensor& scoresTensor, const std::vector<size_t>& indicies);
     std::vector<cv::Point2f> getFilteredLandmarks(const ov::Tensor& landmarksTensor,
                                                   const std::vector<size_t>& indicies,

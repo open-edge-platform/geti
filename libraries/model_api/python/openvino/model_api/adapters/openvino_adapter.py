@@ -352,6 +352,14 @@ class OpenvinoAdapter(InferenceAdapter):
     ):
         ppp = PrePostProcessor(self.model)
 
+        # Change the input type to the 8-bit image
+        if dtype == type(int):
+            ppp.input(input_idx).tensor().set_element_type(Type.u8)
+
+        ppp.input(input_idx).tensor().set_layout(ov.Layout("NHWC")).set_color_format(
+            ColorFormat.BGR
+        )
+
         INTERPOLATION_MODE_MAP = {
             "LINEAR": "linear",
             "CUBIC": "cubic",
@@ -384,14 +392,6 @@ class OpenvinoAdapter(InferenceAdapter):
                 raise ValueError(
                     f"Upsupported resize type in model preprocessing: {resize_mode}"
                 )
-
-        # Change the input type to the 8-bit image
-        if dtype == type(int):
-            ppp.input(input_idx).tensor().set_element_type(Type.u8)
-
-        ppp.input(input_idx).tensor().set_layout(ov.Layout("NHWC")).set_color_format(
-            ColorFormat.BGR
-        )
 
         # Handle layout
         ppp.input(input_idx).model().set_layout(ov.Layout(layout))

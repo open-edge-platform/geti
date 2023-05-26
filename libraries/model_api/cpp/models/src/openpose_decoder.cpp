@@ -42,7 +42,7 @@ void findPeaks(const std::vector<cv::Mat>& heatMaps,
                const float minPeaksDistance,
                std::vector<std::vector<Peak>>& allPeaks,
                int heatMapId,
-               float confidenceThreshold) {
+               float confidence_threshold) {
     std::vector<cv::Point> peaks;
     const cv::Mat& heatMap = heatMaps[heatMapId];
     const float* heatMapData = heatMap.ptr<float>();
@@ -52,31 +52,31 @@ void findPeaks(const std::vector<cv::Mat>& heatMaps,
             float val = 0;
             if (x >= 0 && y >= 0 && x < heatMap.cols && y < heatMap.rows) {
                 val = heatMapData[y * heatMapStep + x];
-                val = val >= confidenceThreshold ? val : 0;
+                val = val >= confidence_threshold ? val : 0;
             }
 
             float left_val = 0;
             if (y >= 0 && x < (heatMap.cols - 1) && y < heatMap.rows) {
                 left_val = heatMapData[y * heatMapStep + x + 1];
-                left_val = left_val >= confidenceThreshold ? left_val : 0;
+                left_val = left_val >= confidence_threshold ? left_val : 0;
             }
 
             float right_val = 0;
             if (x > 0 && y >= 0 && y < heatMap.rows) {
                 right_val = heatMapData[y * heatMapStep + x - 1];
-                right_val = right_val >= confidenceThreshold ? right_val : 0;
+                right_val = right_val >= confidence_threshold ? right_val : 0;
             }
 
             float top_val = 0;
             if (x >= 0 && x < heatMap.cols && y < (heatMap.rows - 1)) {
                 top_val = heatMapData[(y + 1) * heatMapStep + x];
-                top_val = top_val >= confidenceThreshold ? top_val : 0;
+                top_val = top_val >= confidence_threshold ? top_val : 0;
             }
 
             float bottom_val = 0;
             if (x >= 0 && y > 0 && x < heatMap.cols) {
                 bottom_val = heatMapData[(y - 1) * heatMapStep + x];
-                bottom_val = bottom_val >= confidenceThreshold ? bottom_val : 0;
+                bottom_val = bottom_val >= confidence_threshold ? bottom_val : 0;
             }
 
             if ((val > left_val) && (val > right_val) && (val > top_val) && (val > bottom_val)) {

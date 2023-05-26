@@ -40,7 +40,7 @@ protected:
     void initDefaultParameters(const ov::AnyMap& configuration);
     void updateModelInfo() override;
 
-    float boxIOUThreshold;
+    float iou_threshold;
     std::vector<std::pair<size_t, size_t>> grids;
     std::vector<size_t> expandedStrides;
     static const size_t numberOfClasses = 80;

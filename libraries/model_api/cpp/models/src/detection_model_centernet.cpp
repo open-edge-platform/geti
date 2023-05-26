@@ -50,7 +50,7 @@ ModelCenterNet::ModelCenterNet(std::shared_ptr<ov::Model>& model, const ov::AnyM
 
 ModelCenterNet::ModelCenterNet(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModel(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
 
@@ -281,7 +281,7 @@ std::unique_ptr<ResultBase> ModelCenterNet::postprocess(InferenceResult& infResu
     const auto& heatmapTensor = infResult.outputsData[outputNames[0]];
     const auto& heatmapTensorShape = heatmapTensor.get_shape();
     const auto chSize = heatmapTensorShape[2] * heatmapTensorShape[3];
-    const auto scores = filterScores(heatmapTensor, confidenceThreshold);
+    const auto scores = filterScores(heatmapTensor, confidence_threshold);
 
     const auto& regressionTensor = infResult.outputsData[outputNames[1]];
     const auto reg = filterReg(regressionTensor, scores, chSize);

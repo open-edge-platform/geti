@@ -45,14 +45,14 @@ const float HpeAssociativeEmbedding::tagThreshold = 1.0f;
 HpeAssociativeEmbedding::HpeAssociativeEmbedding(const std::string& modelFile,
                                                  double aspectRatio,
                                                  int targetSize,
-                                                 float confidenceThreshold,
+                                                 float confidence_threshold,
                                                  const std::string& layout,
                                                  float delta,
                                                  const std::string& resize_type)
     : ImageModel(modelFile, resize_type, false, layout),
       aspectRatio(aspectRatio),
       targetSize(targetSize),
-      confidenceThreshold(confidenceThreshold),
+      confidence_threshold(confidence_threshold),
       delta(delta) {
         interpolationMode = cv::INTER_CUBIC;
       }
@@ -245,7 +245,7 @@ std::vector<HumanPose> HpeAssociativeEmbedding::extractPoses(std::vector<cv::Mat
     for (size_t i = 0; i < allPoses.size(); i++) {
         Pose& pose = allPoses[i];
         // Filtering poses with low mean scores
-        if (pose.getMeanScore() <= confidenceThreshold) {
+        if (pose.getMeanScore() <= confidence_threshold) {
             continue;
         }
         for (size_t j = 0; j < heatMaps.size(); j++) {

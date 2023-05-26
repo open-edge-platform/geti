@@ -49,7 +49,7 @@ ModelYoloX::ModelYoloX(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
 
 ModelYoloX::ModelYoloX(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
 
@@ -164,7 +164,7 @@ std::unique_ptr<ResultBase> ModelYoloX::postprocess(InferenceResult& infResult) 
     for (size_t box_index = 0; box_index < expandedStrides.size(); ++box_index) {
         size_t startPos = outputShape[2] * box_index;
         float score = outputPtr[startPos + 4];
-        if (score < confidenceThreshold)
+        if (score < confidence_threshold)
             continue;
         float maxClassScore = -1;
         size_t mainClass = 0;
@@ -177,7 +177,7 @@ std::unique_ptr<ResultBase> ModelYoloX::postprocess(InferenceResult& infResult) 
 
         // Filter by score
         score *= maxClassScore;
-        if (score < confidenceThreshold)
+        if (score < confidence_threshold)
             continue;
 
         // Add successful boxes
@@ -190,7 +190,7 @@ std::unique_ptr<ResultBase> ModelYoloX::postprocess(InferenceResult& infResult) 
     }
 
     // NMS for valid boxes
-    std::vector<int> keep = nms(validBoxes, scores, boxIOUThreshold, true);
+    std::vector<int> keep = nms(validBoxes, scores, iou_threshold, true);
     for (auto& index: keep) {
         // Create new detected box
         DetectedObject obj;

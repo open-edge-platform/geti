@@ -33,5 +33,5 @@ public:
 
 protected:
     void updateModelInfo() override;
-    float boxIOUThreshold = 0.5f;
+    float iou_threshold = 0.5f;
 };

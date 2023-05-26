@@ -36,7 +36,7 @@ public:
     ClassificationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter);
 
-    static std::unique_ptr<ClassificationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true);
+    static std::unique_ptr<ClassificationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true, const std::string& device = "AUTO");
     static std::unique_ptr<ClassificationModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;

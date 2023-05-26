@@ -45,8 +45,8 @@ Output<Node> resizeImageGraph(const ov::Output<ov::Node>& input,
                 bool keep_aspect_ratio,
                 const cv::InterpolationFlags interpolationMode,
                 uint8_t pad_value) {
-    const auto h_axis = 1;
-    const auto w_axis = 2;
+    const size_t h_axis = 1;
+    const size_t w_axis = 2;
 
     auto mode = ov2ovInterpolationMode(interpolationMode);
 
@@ -109,8 +109,8 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
                 const ov::Shape& size,
                 const cv::InterpolationFlags interpolationMode,
                 uint8_t pad_value) {
-    const auto h_axis = 1;
-    const auto w_axis = 2;
+    const size_t h_axis = 1;
+    const size_t w_axis = 2;
 
     auto mode = ov2ovInterpolationMode(interpolationMode);
 
@@ -164,8 +164,8 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
 Output<Node> cropResizeGraph(const ov::Output<ov::Node>& input,
                 const ov::Shape& size,
                 const cv::InterpolationFlags interpolationMode) {
-    const auto h_axis = 1;
-    const auto w_axis = 2;
+    const size_t h_axis = 1;
+    const size_t w_axis = 2;
     const auto desired_aspect_ratio = float(size[1]) / size[0];  // width / height
     auto mode = ov2ovInterpolationMode(interpolationMode);
 

@@ -53,16 +53,15 @@ public:
                                                     const cv::InterpolationFlags interpolationMode,
                                                     const ov::Shape& targetShape,
                                                     uint8_t pad_value,
-                                                    const std::type_info& dtype = typeid(int),
-                                                    bool brg2rgb = false,
-                                                    const std::vector<float>& mean = {},
-                                                    const std::vector<float>& scale = {});
+                                                    bool brg2rgb,
+                                                    const std::vector<float>& mean,
+                                                    const std::vector<float>& scale,
+                                                    const std::type_info& dtype = typeid(int));
 
 protected:
     RESIZE_MODE selectResizeMode(const std::string& resize_type);
     void updateModelInfo() override;
 
-protected:
     std::vector<std::string> labels = {};
     bool useAutoResize = false;
     bool embedded_processing = false; // flag in model_info that pre/postprocessing embedded
@@ -72,4 +71,6 @@ protected:
     cv::InterpolationFlags interpolationMode = cv::INTER_LINEAR;
     RESIZE_MODE resizeMode = RESIZE_FILL;
     uint8_t pad_value = 0;
+    bool reverse_input_channels = false;
+    std::vector<float> scale_values;
 };

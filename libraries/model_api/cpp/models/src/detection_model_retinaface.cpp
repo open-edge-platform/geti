@@ -50,7 +50,7 @@ ModelRetinaFace::ModelRetinaFace(std::shared_ptr<ov::Model>& model, const ov::An
 
 ModelRetinaFace::ModelRetinaFace(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
 
@@ -223,7 +223,7 @@ void ModelRetinaFace::generateAnchorsFpn() {
     }
 }
 
-std::vector<size_t> thresholding(const ov::Tensor& scoresTensor, const int anchorNum, const float confidenceThreshold) {
+std::vector<size_t> thresholding(const ov::Tensor& scoresTensor, const int anchorNum, const float confidence_threshold) {
     std::vector<size_t> indices;
     indices.reserve(ModelRetinaFace::INIT_VECTOR_SIZE);
     auto shape = scoresTensor.get_shape();
@@ -235,7 +235,7 @@ std::vector<size_t> thresholding(const ov::Tensor& scoresTensor, const int ancho
             for (size_t z = 0; z < shape[3]; ++z) {
                 auto idx = (x * shape[2] + y) * shape[3] + z;
                 auto score = scoresPtr[idx];
-                if (score >= confidenceThreshold) {
+                if (score >= confidence_threshold) {
                     indices.push_back((y * shape[3] + z) * restAnchors + (x - anchorNum));
                 }
             }
@@ -348,7 +348,7 @@ std::unique_ptr<ResultBase> ModelRetinaFace::postprocess(InferenceResult& infRes
         auto s = anchorCfg[idx].stride;
         auto anchorNum = anchorsFpn[s].size();
 
-        auto validIndices = thresholding(scoresRaw, anchorNum, confidenceThreshold);
+        auto validIndices = thresholding(scoresRaw, anchorNum, confidence_threshold);
         filterScores(scores, validIndices, scoresRaw, anchorNum);
         filterBoxes(boxes, validIndices, boxRaw, anchorNum, anchors[idx]);
         if (shouldDetectLandmarks) {
@@ -363,7 +363,7 @@ std::unique_ptr<ResultBase> ModelRetinaFace::postprocess(InferenceResult& infRes
     // --------------------------- Apply Non-maximum Suppression
     // ---------------------------------------------------------- !shouldDetectLandmarks determines nms behavior, if
     // true - boundaries are included in areas calculation
-    const auto keep = nms(boxes, scores, boxIOUThreshold, !shouldDetectLandmarks);
+    const auto keep = nms(boxes, scores, iou_threshold, !shouldDetectLandmarks);
 
     // --------------------------- Create detection result objects
     // --------------------------------------------------------

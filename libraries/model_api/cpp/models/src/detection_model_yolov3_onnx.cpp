@@ -47,7 +47,7 @@ ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<ov::Model>& model, const ov::An
 
 ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModel(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
 
@@ -168,7 +168,7 @@ std::unique_ptr<ResultBase> ModelYoloV3ONNX::postprocess(InferenceResult& infRes
 
         float score = getScore(scores, classInd, boxInd);
 
-        if (score > confidenceThreshold) {
+        if (score > confidence_threshold) {
             DetectedObject obj;
             size_t startPos = boxShape[2] * boxInd;
 

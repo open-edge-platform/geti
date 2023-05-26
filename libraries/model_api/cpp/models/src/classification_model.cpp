@@ -101,7 +101,7 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
 
 ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter)
     : ImageModel(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     auto topk_iter = configuration.find("topk");
     if (topk_iter != configuration.end()) {
         topk = topk_iter->second.as<size_t>();
@@ -125,7 +125,7 @@ void ClassificationModel::updateModelInfo() {
     }
 }
 
-std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload) {
+std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
 
@@ -146,13 +146,13 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std
     std::unique_ptr<ClassificationModel> classifier{new ClassificationModel(model, configuration)};
     classifier->prepare();
     if (preload) {
-        classifier->load(core);
+        classifier->load(core, device);
     }
     return classifier;
 }
 
 std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shared_ptr<InferenceAdapter>& adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     auto model_type_iter = configuration.find("model_type");
     std::string model_type = ClassificationModel::ModelType;
     if (model_type_iter != configuration.end()) {
@@ -233,7 +233,10 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
                                         interpolationMode,
                                         ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
                                                   inputShape[ov::layout::height_idx(inputLayout)]},
-                                        pad_value);
+                                        pad_value,
+                                        reverse_input_channels,
+                                        {},
+                                        scale_values);
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
         ppp.output().tensor().set_element_type(ov::element::f32);

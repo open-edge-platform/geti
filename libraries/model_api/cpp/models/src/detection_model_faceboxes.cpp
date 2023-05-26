@@ -47,7 +47,7 @@ ModelFaceBoxes::ModelFaceBoxes(std::shared_ptr<ov::Model>& model, const ov::AnyM
 
 ModelFaceBoxes::ModelFaceBoxes(std::shared_ptr<InferenceAdapter>& adapter)
     : DetectionModelExt(adapter) {
-    auto configuration = adapter->getModelConfig();
+    const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
 
@@ -184,7 +184,7 @@ void ModelFaceBoxes::priorBoxes(const std::vector<std::pair<size_t, size_t>>& fe
 }
 
 std::pair<std::vector<size_t>, std::vector<float>> filterScores(const ov::Tensor& scoresTensor,
-                                                                const float confidenceThreshold) {
+                                                                const float confidence_threshold) {
     auto shape = scoresTensor.get_shape();
     const float* scoresPtr = scoresTensor.data<float>();
 
@@ -193,7 +193,7 @@ std::pair<std::vector<size_t>, std::vector<float>> filterScores(const ov::Tensor
     scores.reserve(ModelFaceBoxes::INIT_VECTOR_SIZE);
     indices.reserve(ModelFaceBoxes::INIT_VECTOR_SIZE);
     for (size_t i = 1; i < shape[1] * shape[2]; i = i + 2) {
-        if (scoresPtr[i] > confidenceThreshold) {
+        if (scoresPtr[i] > confidence_threshold) {
             indices.push_back(i / 2);
             scores.push_back(scoresPtr[i]);
         }
@@ -236,14 +236,14 @@ std::vector<Anchor> filterBoxes(const ov::Tensor& boxesTensor,
 std::unique_ptr<ResultBase> ModelFaceBoxes::postprocess(InferenceResult& infResult) {
     // Filter scores and get valid indices for bounding boxes
     const auto scoresTensor = infResult.outputsData[outputNames[1]];
-    const auto scores = filterScores(scoresTensor, confidenceThreshold);
+    const auto scores = filterScores(scoresTensor, confidence_threshold);
 
     // Filter bounding boxes on indices
     auto boxesTensor = infResult.outputsData[outputNames[0]];
     std::vector<Anchor> boxes = filterBoxes(boxesTensor, anchors, scores.first, variance);
 
     // Apply Non-maximum Suppression
-    const std::vector<int> keep = nms(boxes, scores.second, boxIOUThreshold);
+    const std::vector<int> keep = nms(boxes, scores.second, iou_threshold);
 
     // Create detection result objects
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
