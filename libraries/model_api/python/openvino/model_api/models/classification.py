@@ -14,6 +14,8 @@
  limitations under the License.
 """
 
+import json
+
 import numpy as np
 from openvino.preprocess import PrePostProcessor
 from openvino.runtime import Model, Type
@@ -32,6 +34,17 @@ class ClassificationModel(ImageModel):
         if self.path_to_labels:
             self.labels = self._load_labels(self.path_to_labels)
         self.out_layer_names = [self._get_output()]
+
+        if self.hierarchical:
+            self.embedded_processing = True
+            if not self.hierarchical_config:
+                self.raise_error("Hierarchical classification config is empty.")
+            self.hierarchical_info = json.loads(self.hierarchical_config)
+            self.labels_resolver = GreedyLabelsResolver(self.hierarchical_info)
+            if preload:
+                self.load()
+            return
+
         if self.multilabel:
             self.embedded_processing = True
             if preload:
@@ -100,24 +113,69 @@ class ClassificationModel(ImageModel):
                 "multilabel": BooleanValue(
                     default_value=False, description="Predict a set of labels per image"
                 ),
+                "hierarchical": BooleanValue(
+                    default_value=False,
+                    description="Predict a hierarchy if labels per image",
+                ),
+                "hierarchical_config": StringValue(
+                    default_value="",
+                    description="Extra config for decoding hierarchical predicitons",
+                ),
+                "confidence_threshold": NumericalValue(
+                    default_value=0.5, description="Predict a set of labels per image"
+                ),
             }
         )
         return parameters
 
     def postprocess(self, outputs, meta):
-        print(self.multilabel)
         if self.multilabel:
             return self.get_multilabel_predictions(
                 outputs[self.out_layer_names[0]].squeeze()
             )
+        elif self.hierarchical:
+            return self.get_hierarchical_predictions(
+                outputs[self.out_layer_names[0]].squeeze()
+            )
         return self.get_multiclass_predictions(outputs)
+
+    def get_hierarchical_predictions(self, logits: np.ndarray):
+        predicted_labels = []
+        predicted_scores = []
+        cls_heads_info = self.hierarchical_info["cls_heads_info"]
+        for i in range(cls_heads_info["num_multiclass_heads"]):
+            logits_begin, logits_end = cls_heads_info["head_idx_to_logits_range"][
+                str(i)
+            ]
+            head_logits = logits[logits_begin:logits_end]
+            head_logits = softmax_numpy(head_logits)
+            j = np.argmax(head_logits)
+            label_str = cls_heads_info["all_groups"][i][j]
+            predicted_labels.append(label_str)
+            predicted_scores.append(head_logits[j])
+
+        if cls_heads_info["num_multilabel_classes"]:
+            logits_begin = cls_heads_info["num_single_label_classes"]
+            head_logits = logits[logits_begin:]
+            head_logits = sigmoid_numpy(head_logits)
+
+            for i in range(head_logits.shape[0]):
+                if head_logits[i] > self.confidence_threshold:
+                    label_str = cls_heads_info["all_groups"][
+                        cls_heads_info["num_multiclass_heads"] + i
+                    ][0]
+                    predicted_labels.append(label_str)
+                    predicted_scores.append(head_logits[i])
+
+        predictions = zip(predicted_labels, predicted_scores)
+        return self.labels_resolver.resolve_labels(predictions)
 
     def get_multilabel_predictions(self, logits: np.ndarray):
         logits = sigmoid_numpy(logits)
         scores = []
         indices = []
         for i in range(logits.shape[0]):
-            if logits[i] > 0.5:
+            if logits[i] > self.confidence_threshold:
                 indices.append(i)
                 scores.append(logits[i])
         labels = [self.labels[i] if self.labels else "" for i in indices]
@@ -167,3 +225,78 @@ def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk):
 
 def sigmoid_numpy(x: np.ndarray):
     return 1.0 / (1.0 + np.exp(-x))
+
+
+def softmax_numpy(x: np.ndarray, eps: float = 1e-9):
+    x = np.exp(x - np.max(x))
+    return x / (np.sum(x) + eps)
+
+
+class GreedyLabelsResolver:
+    def __init__(self, hierarchical_config) -> None:
+        self.label_to_idx = hierarchical_config["cls_heads_info"]["label_to_idx"]
+        self.label_relations = hierarchical_config["label_tree_edges"]
+        self.label_groups = hierarchical_config["cls_heads_info"]["all_groups"]
+
+    def _get_parent(self, label):
+        for child, parent in self.label_relations:
+            if label == child:
+                return parent
+
+        return None
+
+    def resolve_labels(self, predictions):
+        """Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
+        The following two steps are taken:
+        - select the most likely label from each label group
+        - add it and it's predecessors if they are also most likely labels (greedy approach).
+        """
+
+        def get_predecessors(lbl, candidates):
+            """Returns all the predecessors of the input label or an empty list if one of the predecessors is not a candidate."""
+            predecessors = []
+            last_parent = self._get_parent(lbl)
+            if last_parent is None:
+                return [lbl]
+
+            while last_parent is not None:
+                if last_parent not in candidates:
+                    return []
+                predecessors.append(last_parent)
+                last_parent = self._get_parent(last_parent)
+
+            if predecessors:
+                predecessors.append(lbl)
+            return predecessors
+
+        label_to_prob = {lbl: 0.0 for lbl in self.label_to_idx.keys()}
+        for lbl, score in predictions:
+            label_to_prob[lbl] = score
+
+        candidates = []
+        for g in self.label_groups:
+            if len(g) == 1:
+                candidates.append(g[0])
+            else:
+                max_prob = 0.0
+                max_label = None
+                for lbl in g:
+                    if label_to_prob[lbl] > max_prob:
+                        max_prob = label_to_prob[lbl]
+                        max_label = lbl
+                if max_label is not None:
+                    candidates.append(max_label)
+
+        output_labels = []
+        for lbl in candidates:
+            if lbl in output_labels:
+                continue
+            labels_to_add = get_predecessors(lbl, candidates)
+            for new_lbl in labels_to_add:
+                if new_lbl not in output_labels:
+                    output_labels.append(new_lbl)
+
+        output_predictions = [
+            (self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in output_labels
+        ]
+        return output_predictions

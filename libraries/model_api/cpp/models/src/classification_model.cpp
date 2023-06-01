@@ -29,6 +29,8 @@
 #include <openvino/op/topk.hpp>
 #include <openvino/openvino.hpp>
 
+#include <nlohmann/json.hpp>
+
 #include <utils/slog.hpp>
 
 #include "models/results.h"
@@ -39,6 +41,50 @@ std::string ClassificationModel::ModelType = "Classification";
 namespace {
 float sigmoid(float x) noexcept {
     return 1.0f / (1.0f + std::exp(-x));
+}
+
+size_t fargmax(const float* x_start, const float* x_end) noexcept {
+    size_t argmax = 0;
+
+    for (const float* iter = x_start; iter < x_end; ++iter) {
+        if (x_start[argmax] < *iter) {
+            argmax = iter - x_start;
+        }
+    }
+
+    return argmax;
+}
+
+void softmax(float* x_start, float* x_end, float eps = 1e-9) {
+    if (x_start == x_end) {
+        return;
+    }
+
+    float x_max = *std::max_element(x_start, x_end);
+    float x_sum = 0.f;
+    for (auto it = x_start; it < x_end; ++it) {
+        *it = exp(*it - x_max);
+        x_sum += *it;
+    }
+
+    for (auto it = x_start; it < x_end; ++it) {
+        *it /= x_sum + eps;
+    }
+}
+
+bool get_bool_config_value(std::string field_name, std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration) {
+    auto value_iter = configuration.find(field_name);
+    if (value_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", field_name)) {
+            std::string val = model->get_rt_info<std::string>("model_info", field_name);
+            return val == "True" || val == "YES";
+        }
+    }
+    else {
+        std::string val = value_iter->second.as<std::string>();
+        return val == "True" || val == "YES";
+    }
+    return false;
 }
 
 void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t topk) {
@@ -87,15 +133,33 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
     } else {
         topk = topk_iter->second.as<size_t>();
     }
-    auto multilabel_iter = configuration.find("multilabel");
-    if (multilabel_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "multilabel")) {
-            std::string val = model->get_rt_info<std::string>("model_info", "multilabel");
-            multilabel = val == "True" || val == "YES";
+
+    auto thresh_iter = configuration.find("confidence_threshold");
+    if (thresh_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "confidence_threshold")) {
+            confidence_threshold = stof(model->get_rt_info<std::string>("model_info", "confidence_threshold"));
         }
     } else {
-        std::string val = multilabel_iter->second.as<std::string>();
-        multilabel = val == "True" || val == "YES";
+        confidence_threshold = thresh_iter->second.as<float>();
+    }
+
+    multilabel = get_bool_config_value("multilabel", model, configuration);
+    hierarchical = get_bool_config_value("hierarchical", model, configuration);
+
+    auto config_iter = configuration.find("hierarchical_config");
+    if (config_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "hierarchical_config")) {
+            hierarchical_json_config = model->get_rt_info<std::string>("model_info", "hierarchical_config");
+        }
+    } else {
+        hierarchical_json_config = thresh_iter->second.as<std::string>();
+    }
+    if (hierarchical)  {
+        if (hierarchical_json_config.empty()) {
+            throw std::runtime_error("Error: empty hierarchical classification config");
+        }
+        hierarchical_config = HierarchicalConfig(hierarchical_json_config);
+        resolver = GreedyLabelsResolver(hierarchical_config);
     }
 }
 
@@ -123,6 +187,12 @@ void ClassificationModel::updateModelInfo() {
     } else {
         model->set_rt_info("False", "model_info", "multilabel");
     }
+    if (hierarchical) {
+        model->set_rt_info("True", "model_info", "hierarchical");
+    } else {
+        model->set_rt_info("False", "model_info", "hierarchical");
+    }
+    model->set_rt_info(confidence_threshold, "model_info", "confidence_threshold");
 }
 
 std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {
@@ -171,6 +241,9 @@ std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& in
     if (multilabel) {
         return get_multilabel_predictions(infResult);
     }
+    else if (hierarchical) {
+        return get_hierarchical_predictions(infResult);
+    }
     return get_multiclass_predictions(infResult);
 }
 
@@ -184,9 +257,51 @@ std::unique_ptr<ResultBase> ClassificationModel::get_multilabel_predictions(Infe
     result->topLabels.reserve(labels.size());
     for (size_t i = 0; i < labels.size(); ++i) {
         float score = sigmoid(logitsPtr[i]);
-        if (score > 0.5f) {
+        if (score > confidence_threshold) {
             result->topLabels.emplace_back(i, labels[i], score);
         }
+    }
+
+    return retVal;
+}
+
+std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(InferenceResult& infResult) {
+    const ov::Tensor& logitsTensor = infResult.outputsData.find(outputNames[0])->second;
+    float* logitsPtr = logitsTensor.data<float>();
+
+    std::vector<std::reference_wrapper<std::string>> predicted_labels;
+    std::vector<float> predicted_scores;
+
+    predicted_labels.reserve(hierarchical_config.num_multiclass_heads + hierarchical_config.num_multilabel_heads);
+    predicted_scores.reserve(hierarchical_config.num_multiclass_heads + hierarchical_config.num_multilabel_heads);
+
+    for (size_t i = 0; i < hierarchical_config.num_multiclass_heads; ++i) {
+        const auto& logits_range = hierarchical_config.head_idx_to_logits_range[i];
+        softmax(logitsPtr + logits_range.first, logitsPtr + logits_range.second);
+        size_t j = fargmax(logitsPtr + logits_range.first, logitsPtr + logits_range.second);
+        predicted_labels.push_back(hierarchical_config.all_groups[i][j]);
+        predicted_scores.push_back(logitsPtr[logits_range.first + j]);
+    }
+
+    if (hierarchical_config.num_multilabel_heads) {
+        const float* mlc_logitsPtr = logitsPtr + hierarchical_config.num_single_label_classes;
+
+        for (size_t i = 0; i < hierarchical_config.num_multilabel_heads; ++i) {
+            float score = sigmoid(mlc_logitsPtr[i]);
+            if (score > confidence_threshold) {
+                predicted_scores.push_back(score);
+                predicted_labels.push_back(hierarchical_config.all_groups[hierarchical_config.num_multiclass_heads + i][0]);
+            }
+        }
+    }
+
+    auto resolved_labels = resolver.resolve_labels(predicted_labels, predicted_scores);
+
+    ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
+    auto retVal = std::unique_ptr<ResultBase>(result);
+    result->topLabels.reserve(resolved_labels.first.size());
+    for (size_t i = 0; i < resolved_labels.first.size(); ++i) {
+        result->topLabels.emplace_back(hierarchical_config.label_to_idx[resolved_labels.first[i]], resolved_labels.first[i], resolved_labels.second[i]);
     }
 
     return retVal;
@@ -277,7 +392,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
         }
     }
 
-    if (multilabel) {
+    if (multilabel || hierarchical) {
         outputNames = {model->output().get_any_name()};
         embedded_processing = true;
         return;
@@ -292,4 +407,110 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {
     auto result = ModelBase::infer(static_cast<const InputData&>(inputData));
     return std::unique_ptr<ClassificationResult>(static_cast<ClassificationResult*>(result.release()));
+}
+
+
+HierarchicalConfig::HierarchicalConfig(const std::string& json_repr)  {
+    nlohmann::json data = nlohmann::json::parse(json_repr);
+
+    num_multilabel_heads = data.at("cls_heads_info").at("num_multilabel_classes");
+    num_multiclass_heads = data.at("cls_heads_info").at("num_multiclass_heads");
+    num_single_label_classes = data.at("cls_heads_info").at("num_single_label_classes");
+
+    data.at("cls_heads_info").at("label_to_idx").get_to(label_to_idx);
+    data.at("cls_heads_info").at("all_groups").get_to(all_groups);
+    data.at("label_tree_edges").get_to(label_tree_edges);
+
+    std::map<std::string, std::pair<int,int>> tmp_head_idx_to_logits_range;
+    data.at("cls_heads_info").at("head_idx_to_logits_range").get_to(tmp_head_idx_to_logits_range);
+
+    for (const auto& range_descr : tmp_head_idx_to_logits_range) {
+        head_idx_to_logits_range[stoi(range_descr.first)] = range_descr.second;
+    }
+}
+
+GreedyLabelsResolver::GreedyLabelsResolver(const HierarchicalConfig& config) :
+    label_to_idx(config.label_to_idx),
+    label_relations(config.label_tree_edges),
+    label_groups(config.all_groups) {}
+
+std::pair<std::vector<std::string>, std::vector<float>> GreedyLabelsResolver::resolve_labels(const std::vector<std::reference_wrapper<std::string>>& labels,
+                                                                                             const std::vector<float>& scores) {
+    std::map<std::string, float> label_to_prob;
+    for (const auto& label_idx : label_to_idx) {
+        label_to_prob[label_idx.first] = 0.f;
+    }
+
+    for (size_t i = 0; i < labels.size(); ++i) {
+        label_to_prob[labels[i]] = scores[i];
+    }
+
+    std::vector<std::string> candidates;
+    for (const auto& g : label_groups) {
+        if (g.size() == 1) {
+            candidates.push_back(g[0]);
+        }
+        else {
+            float max_prob = 0.f;
+            std::string max_label;
+            for (const auto& lbl : g) {
+                if (label_to_prob[lbl] > max_prob) {
+                    max_prob = label_to_prob[lbl];
+                    max_label = lbl;
+                }
+                if (max_label.size() > 0) {
+                    candidates.push_back(max_label);
+                }
+            }
+        }
+    }
+    std::vector<std::string> output_labels;
+    std::vector<float> output_scores;
+
+    for (const auto& lbl : candidates) {
+        if (std::find(output_labels.begin(), output_labels.end(), lbl) != output_labels.end()) {
+            continue;
+        }
+        auto labels_to_add = get_predecessors(lbl, candidates);
+        for (const auto& new_lbl : labels_to_add) {
+            if (std::find(output_labels.begin(), output_labels.end(), new_lbl) == output_labels.end()) {
+                output_labels.push_back(new_lbl);
+                output_scores.push_back(label_to_prob[new_lbl]);
+            }
+        }
+    }
+
+    return {output_labels, output_scores};
+}
+
+std::string GreedyLabelsResolver::get_parent(const std::string& label) {
+    for (const auto& edge : label_relations) {
+        if (label == edge.first) {
+            return edge.second;
+        }
+    }
+    return "";
+}
+
+std::vector<std::string> GreedyLabelsResolver::get_predecessors(const std::string& label, const std::vector<std::string>& candidates) {
+    std::vector<std::string> predecessors;
+    auto last_parent = get_parent(label);
+
+    if (last_parent.size() == 0) {
+        return {label};
+    }
+    while (last_parent.size() > 0) {
+        if (std::find(candidates.begin(), candidates.end(), last_parent) == candidates.end()) {
+            return {};
+        }
+        predecessors.push_back(last_parent);
+        last_parent = get_parent(last_parent);
+
+    }
+
+    if (predecessors.size() > 0) {
+        predecessors.push_back(label);
+    }
+
+    return predecessors;
 }
