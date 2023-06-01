@@ -17,31 +17,17 @@
 #pragma once
 
 #include <opencv2/core.hpp>
-#include <openvino/runtime/allocator.hpp>
+#include <memory_resource>
 
-// To prevent false-positive clang compiler warning
-// (https://github.com/openvinotoolkit/openvino/pull/11092#issuecomment-1073846256):
-// warning: destructor called on non-final 'SharedTensorAllocator' that has virtual functions
-// but non-virtual destructor [-Wdelete-non-abstract-non-virtual-dtor]
-// SharedTensorAllocator class declared as final
+struct SharedMatAllocator : public std::pmr::memory_resource {
+    const cv::Mat mat;
 
-class SharedTensorAllocator final : public ov::AllocatorImpl {
-public:
-    SharedTensorAllocator(const cv::Mat& img) : img(img) {}
-
-    ~SharedTensorAllocator() = default;
-
-    void* allocate(const size_t bytes, const size_t) override {
-        return bytes <= img.rows * img.step[0] ? img.data : nullptr;
+    SharedMatAllocator(const cv::Mat& mat) : mat{mat} {}
+    void* do_allocate(size_t bytes, size_t) override {
+        return bytes <= mat.rows * mat.step[0] ? mat.data : nullptr;
     }
-
-    void deallocate(void*, const size_t, const size_t) override {}
-
-    bool is_equal(const AllocatorImpl& other) const override {
-        auto other_tensor_allocator = dynamic_cast<const SharedTensorAllocator*>(&other);
-        return other_tensor_allocator != nullptr && other_tensor_allocator == this;
+    void do_deallocate(void*, size_t, size_t) override {}
+    bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
+        return this == &other;
     }
-
-private:
-    const cv::Mat img;
 };
