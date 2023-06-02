@@ -163,7 +163,7 @@ class OpenvinoAdapter(InferenceAdapter):
         self.model_from_buffer = isinstance(self.model_path, bytes) and isinstance(
             weights_path, bytes
         )
-        model_from_file = Path(self.model_path).is_file()
+        model_from_file = not self.model_from_buffer and Path(self.model_path).is_file()
         if model_from_file or self.model_from_buffer:
             log.info(
                 "Reading model {}".format(
