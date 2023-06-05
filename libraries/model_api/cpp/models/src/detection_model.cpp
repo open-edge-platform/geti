@@ -39,7 +39,7 @@ DetectionModel::DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyM
     auto confidence_threshold_iter = configuration.find("confidence_threshold");
     if (confidence_threshold_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "confidence_threshold")) {
-            confidence_threshold = stof(model->get_rt_info<std::string>("model_info", "confidence_threshold"));
+            confidence_threshold = model->get_rt_info<float>("model_info", "confidence_threshold");
         }
     } else {
         confidence_threshold = confidence_threshold_iter->second.as<float>();

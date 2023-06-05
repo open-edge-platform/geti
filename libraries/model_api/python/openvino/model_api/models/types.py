@@ -218,7 +218,6 @@ class DictValue(BaseValue):
         super().__init__(**kwargs)
 
     def from_str(self, value):
-        # TODO
         raise NotImplementedError
 
     def validate(self, value):

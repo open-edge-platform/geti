@@ -128,7 +128,7 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
     auto topk_iter = configuration.find("topk");
     if (topk_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "topk")) {
-            topk = stoi(model->get_rt_info<std::string>("model_info", "topk"));
+            topk = model->get_rt_info<size_t>("model_info", "topk");
         }
     } else {
         topk = topk_iter->second.as<size_t>();
@@ -137,7 +137,7 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
     auto thresh_iter = configuration.find("confidence_threshold");
     if (thresh_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "confidence_threshold")) {
-            confidence_threshold = stof(model->get_rt_info<std::string>("model_info", "confidence_threshold"));
+            confidence_threshold = model->get_rt_info<float>("model_info", "confidence_threshold");
         }
     } else {
         confidence_threshold = thresh_iter->second.as<float>();

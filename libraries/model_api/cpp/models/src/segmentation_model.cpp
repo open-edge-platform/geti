@@ -64,7 +64,7 @@ SegmentationModel::SegmentationModel(std::shared_ptr<ov::Model>& model, const ov
     auto blur_strength_iter = configuration.find("blur_strength");
     if (blur_strength_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "blur_strength")) {
-            blur_strength = stoi(model->get_rt_info<std::string>("model_info", "blur_strength"));
+            blur_strength = model->get_rt_info<int>("model_info", "blur_strength");
         }
     } else {
         blur_strength = blur_strength_iter->second.as<int>();
@@ -72,7 +72,7 @@ SegmentationModel::SegmentationModel(std::shared_ptr<ov::Model>& model, const ov
     auto soft_threshold_iter = configuration.find("soft_threshold");
     if (soft_threshold_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "soft_threshold")) {
-            soft_threshold = stof(model->get_rt_info<std::string>("model_info", "soft_threshold"));
+            soft_threshold = model->get_rt_info<float>("model_info", "soft_threshold");
         }
     } else {
         soft_threshold = soft_threshold_iter->second.as<float>();

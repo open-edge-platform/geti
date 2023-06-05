@@ -178,8 +178,7 @@ class InputTransform:
 
 def load_labels(label_file):
     with open(label_file, "r") as f:
-        labels_map = [x.strip() for x in f]
-    return labels_map
+        return [x.strip() for x in f]
 
 
 def resize_image(image, size, keep_aspect_ratio=False, interpolation=cv2.INTER_LINEAR):

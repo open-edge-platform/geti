@@ -124,14 +124,7 @@ ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
     auto scale_values_iter = configuration.find("scale_values");
     if (scale_values_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "scale_values")) {
-            const std::string& str = model->get_rt_info<std::string>("model_info", "scale_values");
-            if (str.empty()) {
-                // Older OpenVINO can't decode empty string.
-                // TODO: remove after upgrade to 2023.0
-                scale_values = {};
-            } else {
-                scale_values = model->get_rt_info<std::vector<float>>("model_info", "scale_values");
-            }
+            scale_values = model->get_rt_info<std::vector<float>>("model_info", "scale_values");
         }
     } else {
         scale_values = labels_iter->second.as<std::vector<float>>();

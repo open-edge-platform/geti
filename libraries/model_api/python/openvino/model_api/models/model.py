@@ -179,10 +179,9 @@ class Model:
                 cache_dir=cache_dir,
             )
         if model_type is None:
-            model_type = inference_adapter.get_rt_info(["model_info", "model_type"])
-            if type(model_type) != str:
-                # 2023.0 return OVAny which needs to be casted with astype()
-                model_type = model_type.astype(str)
+            model_type = inference_adapter.get_rt_info(
+                ["model_info", "model_type"]
+            ).astype(str)
         Model = cls._get_model_class(model_type)
         return Model(inference_adapter, configuration, preload)
 
@@ -245,10 +244,9 @@ class Model:
         parameters = self.parameters()
         for name, param in parameters.items():
             try:
-                str_val = self.inference_adapter.get_rt_info(["model_info", name])
-                if type(str_val) != str:
-                    str_val = str_val.astype(str)
-                value = param.from_str(str_val)
+                value = param.from_str(
+                    self.inference_adapter.get_rt_info(["model_info", name]).astype(str)
+                )
                 self.__setattr__(name, value)
             except RuntimeError as error:
                 missing_rt_info = (
@@ -480,12 +478,7 @@ class Model:
         model = self.inference_adapter.get_model()
         model.set_rt_info(self.__model__, ["model_info", "model_type"])
         for name in self.parameters():
-            if [] == getattr(self, name):
-                # ov cant serialize empty list. Replace it with ""
-                # TODO: remove when Anastasia Kuporosova fixes that
-                model.set_rt_info("", ["model_info", name])
-            else:
-                model.set_rt_info(getattr(self, name), ["model_info", name])
+            model.set_rt_info(getattr(self, name), ["model_info", name])
         return model
 
     def save(self, xml_path, bin_path="", version="UNSPECIFIED"):
