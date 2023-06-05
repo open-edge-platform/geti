@@ -54,7 +54,7 @@ EXTRAS_REQUIRE = {
 
 setup(
     name="openvino_model_api",
-    version="0.1.0",
+    version="0.1.1",
     author="Intel Corporation",
     license="OSI Approved :: Apache Software License",
     url="https://github.com/openvinotoolkit/model_api",
@@ -69,4 +69,6 @@ setup(
     install_requires=INSTALL_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
     dependency_links=["https://download.pytorch.org/whl/cpu"],
+    long_description=(SETUP_DIR.parents[1] / "README.md").read_text(),
+    long_description_content_type="text/markdown",
 )
