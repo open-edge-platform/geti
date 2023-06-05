@@ -15,60 +15,31 @@
  limitations under the License.
 """
 
-"""
-Use this script to create a wheel for Open Model Zoo
-model API. The installation of wheel is described in
-`<omz_dir>/demos/README.md`
-"""
-
 from pathlib import Path
 
 from setuptools import find_packages, setup
 
 SETUP_DIR = Path(__file__).resolve().parent
 
-with open(SETUP_DIR / "requirements.txt") as f:
-    INSTALL_REQUIRES = f.read().splitlines()
-
-with open(SETUP_DIR / "requirements_ovms.txt") as f:
-    OVMS_REQUIRES = f.read().splitlines()
-
-packages = find_packages(str(SETUP_DIR))
-package_dir = {"openvino": str(SETUP_DIR / "openvino")}
-
-TESTS_REQUIRE = [
-    "pytest",
-    "parameterized",
-    "google-api-python-client",
-    "onnx",
-    "tensorflow",
-    "torch",
-    "torchvision",
-    "protobuf~=3.20",
-]
-
-EXTRAS_REQUIRE = {
-    "ovms": OVMS_REQUIRES,
-    "tests": TESTS_REQUIRE,
-}
-
 setup(
     name="openvino_model_api",
     version="0.1.1",
-    author="Intel Corporation",
-    license="OSI Approved :: Apache Software License",
-    url="https://github.com/openvinotoolkit/model_api",
     description="Model API: model wrappers and pipelines for inference with OpenVINO",
-    python_requires=">=3.7",
+    author="Intel(R) Corporation",
+    url="https://github.com/openvinotoolkit/model_api",
+    packages=find_packages(SETUP_DIR),
+    package_dir={"openvino": str(SETUP_DIR / "openvino")},
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
     ],
-    packages=packages,
-    package_dir=package_dir,
-    install_requires=INSTALL_REQUIRES,
-    extras_require=EXTRAS_REQUIRE,
-    dependency_links=["https://download.pytorch.org/whl/cpu"],
+    license="OSI Approved :: Apache Software License",
+    python_requires=">=3.7",
+    install_requires=(SETUP_DIR / "requirements.txt").read_text(),
+    extras_require={
+        "ovms": (SETUP_DIR / "requirements_ovms.txt").read_text(),
+        "tests": ["pytest", "openvino-dev[onnx,pytorch,tensorflow2]"],
+    },
     long_description=(SETUP_DIR.parents[1] / "README.md").read_text(),
     long_description_content_type="text/markdown",
 )
