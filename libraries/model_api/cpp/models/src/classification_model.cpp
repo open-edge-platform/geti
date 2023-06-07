@@ -87,7 +87,7 @@ bool get_bool_config_value(std::string field_name, std::shared_ptr<ov::Model>& m
     return false;
 }
 
-void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t topk) {
+void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t topk, bool add_raw_scores) {
     auto nodes = model->get_ops();
     auto softmaxNodeIt = std::find_if(std::begin(nodes), std::end(nodes), [](const std::shared_ptr<ov::Node>& op) {
         return std::string(op->get_type_name()) == "Softmax"; // TODO: it will not work for Vision Transformers, for example
@@ -109,16 +109,30 @@ void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t to
 
     auto indices = std::make_shared<ov::op::v0::Result>(topkNode->output(0));
     auto scores = std::make_shared<ov::op::v0::Result>(topkNode->output(1));
-    model = std::make_shared<ov::Model>(ov::ResultVector{scores, indices}, model->get_parameters(), "classification");
+    ov::ResultVector results_vector;
+    if (add_raw_scores) {
+        auto raw_scores = std::make_shared<ov::op::v0::Result>(softmaxNode->output(0));
+        results_vector = {scores, indices, raw_scores};
+    }
+    else {
+        results_vector = {scores, indices};
+    }
+    model = std::make_shared<ov::Model>(results_vector, model->get_parameters(), "classification");
 
     // manually set output tensors name for created topK node
     model->outputs()[0].set_names({"indices"});
     model->outputs()[1].set_names({"scores"});
+    if (add_raw_scores) {
+        model->outputs()[2].set_names({"raw_scores"});
+    }
 
     // set output precisions
     ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
     ppp.output("indices").tensor().set_element_type(ov::element::i32);
     ppp.output("scores").tensor().set_element_type(ov::element::f32);
+    if (add_raw_scores) {
+        ppp.output("raw_scores").tensor().set_element_type(ov::element::f32);
+    }
     model = ppp.build();
 }
 }
@@ -145,6 +159,7 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
 
     multilabel = get_bool_config_value("multilabel", model, configuration);
     hierarchical = get_bool_config_value("hierarchical", model, configuration);
+    output_raw_scores = get_bool_config_value("output_raw_scores", model, configuration);
 
     auto config_iter = configuration.find("hierarchical_config");
     if (config_iter == configuration.end()) {
@@ -182,16 +197,13 @@ void ClassificationModel::updateModelInfo() {
 
     model->set_rt_info(ClassificationModel::ModelType, "model_info", "model_type");
     model->set_rt_info(topk, "model_info", "topk");
-    if (multilabel) {
-        model->set_rt_info("True", "model_info", "multilabel");
-    } else {
-        model->set_rt_info("False", "model_info", "multilabel");
-    }
-    if (hierarchical) {
-        model->set_rt_info("True", "model_info", "hierarchical");
-    } else {
-        model->set_rt_info("False", "model_info", "hierarchical");
-    }
+
+    auto bool_to_string = [](bool b) -> std::string {
+        return b ? "True" : "False";
+    };
+    model->set_rt_info(bool_to_string(multilabel), "model_info", "multilabel");
+    model->set_rt_info(bool_to_string(hierarchical), "model_info", "hierarchical");
+    model->set_rt_info(bool_to_string(output_raw_scores), "model_info", "output_raw_scores");
     model->set_rt_info(confidence_threshold, "model_info", "confidence_threshold");
 }
 
@@ -398,10 +410,13 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
         return;
     }
 
-    addOrFindSoftmaxAndTopkOutputs(model, topk);
+    addOrFindSoftmaxAndTopkOutputs(model, topk, output_raw_scores);
     embedded_processing = true;
 
     outputNames = {"indices", "scores"};
+    if (output_raw_scores) {
+        outputNames.emplace_back("raw_scores");
+    }
 }
 
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {

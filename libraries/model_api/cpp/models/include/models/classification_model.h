@@ -78,6 +78,7 @@ protected:
     size_t topk = 1;
     bool multilabel = false;
     bool hierarchical = false;
+    bool output_raw_scores = false;
     float confidence_threshold = 0.5f;
     std::string hierarchical_json_config;
     HierarchicalConfig hierarchical_config;
