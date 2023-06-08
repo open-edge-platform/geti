@@ -14,16 +14,6 @@
  limitations under the License.
 """
 
-from typing import Tuple
-
-try:
-    import ovmsclient
-
-    ovmsclient_absent = False
-except ImportError:
-    ovmsclient_absent = True
-
-import logging as log
 import re
 
 import numpy as np
@@ -37,147 +27,55 @@ class OVMSAdapter(InferenceAdapter):
     Class that allows working with models served by the OpenVINO Model Server
     """
 
-    tf2ov_precision = {
-        "DT_INT64": "I64",
-        "DT_UINT64": "U64",
-        "DT_FLOAT": "FP32",
-        "DT_UINT32": "U32",
-        "DT_INT32": "I32",
-        "DT_HALF": "FP16",
-        "DT_INT16": "I16",
-        "DT_INT8": "I8",
-        "DT_UINT8": "U8",
-    }
+    def __init__(self, target_model: str):
+        """Expected format: <address>:<port>/models/<model_name>[:<model_version>]"""
+        import ovmsclient
 
-    tf2np_precision = {
-        "DT_INT64": np.int64,
-        "DT_UINT64": np.uint64,
-        "DT_FLOAT": np.float32,
-        "DT_UINT32": np.uint32,
-        "DT_INT32": np.int32,
-        "DT_HALF": np.float16,
-        "DT_INT16": np.int16,
-        "DT_INT8": np.int8,
-        "DT_UINT8": np.uint8,
-    }
-
-    @classmethod
-    def parse_model_arg(cls, target_model):
-        if not isinstance(target_model, str):
-            raise TypeError("--model option should be str")
-        # Expecting format: <address>:<port>/models/<model_name>[:<model_version>]
-        pattern = re.compile(r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9_-]+(\:\d+)*")
-        if not pattern.fullmatch(target_model):
-            raise ValueError("invalid --model option format")
-        service_url, _, model = target_model.split("/")
-        model_spec = model.split(":")
-        if len(model_spec) == 1:
-            # model version not specified - use latest
-            return service_url, model_spec[0], 0
-        elif len(model_spec) == 2:
-            return service_url, model_spec[0], int(model_spec[1])
-        else:
-            raise ValueError("invalid --model option format")
-
-    def _is_model_available(self):
-        try:
-            model_status = self.client.get_model_status(
-                self.model_name, self.model_version
-            )
-        except ovmsclient.ModelNotFoundError:
-            return False
-        target_version = max(model_status.keys())
-        version_status = model_status[target_version]
-        if version_status["state"] == "AVAILABLE" and version_status["error_code"] == 0:
-            return True
-        return False
-
-    def _prepare_inputs(self, dict_data):
-        inputs = {}
-        for input_name, input_data in dict_data.items():
-            if input_name not in self.metadata["inputs"].keys():
-                raise ValueError("Input data does not match model inputs")
-            input_info = self.metadata["inputs"][input_name]
-            model_precision = self.tf2np_precision[input_info["dtype"]]
-            if (
-                isinstance(input_data, np.ndarray)
-                and input_data.dtype != model_precision
-            ):
-                input_data = input_data.astype(model_precision)
-            elif isinstance(input_data, list):
-                input_data = np.array(input_data, dtype=model_precision)
-            inputs[input_name] = input_data
-        return inputs
-
-    def __init__(self, target_model):
-        if ovmsclient_absent:
-            raise ImportError("The ovmsclient package is not installed")
-
-        log.info("Connecting to remote model: {}".format(target_model))
-        service_url, model_name, model_version = OVMSAdapter.parse_model_arg(
+        service_url, self.model_name, self.model_version = _parse_model_arg(
             target_model
         )
-        self.model_name = model_name
-        self.model_version = model_version
         self.client = ovmsclient.make_grpc_client(url=service_url)
-        # Ensure the model is available
-        if not self._is_model_available():
-            model_version_str = (
-                "latest" if self.model_version == 0 else str(self.model_version)
-            )
-            raise RuntimeError(
-                "Requested model: {}, version: {}, has not been found or is not "
-                "in available state".format(self.model_name, model_version_str)
-            )
-
-        self.preprocessing_embedded = False
+        _verify_model_available(self.client, self.model_name, self.model_version)
 
         self.metadata = self.client.get_model_metadata(
             model_name=self.model_name, model_version=self.model_version
         )
 
-    def load_model(self):
-        pass
-
     def get_input_layers(self):
-        inputs = {}
-        for name, meta in self.metadata["inputs"].items():
-            input_layout = Layout.from_shape(meta["shape"])
-            inputs[name] = Metadata(
-                set(name),
+        return {
+            name: Metadata(
+                {name},
                 meta["shape"],
-                input_layout,
-                self.tf2ov_precision.get(meta["dtype"], meta["dtype"]),
+                Layout.from_shape(meta["shape"]),
+                _tf2ov_precision.get(meta["dtype"], meta["dtype"]),
             )
-        return inputs
+            for name, meta in self.metadata["inputs"].items()
+        }
 
     def get_output_layers(self):
-        outputs = {}
-        for name, meta in self.metadata["outputs"].items():
-            outputs[name] = Metadata(
-                names=set(name),
+        return {
+            name: Metadata(
+                {name},
                 shape=meta["shape"],
-                precision=self.tf2ov_precision.get(meta["dtype"], meta["dtype"]),
+                precision=_tf2ov_precision.get(meta["dtype"], meta["dtype"]),
             )
-        return outputs
-
-    def reshape_model(self, new_shape):
-        pass
+            for name, meta in self.metadata["outputs"].items()
+        }
 
     def infer_sync(self, dict_data):
-        inputs = self._prepare_inputs(dict_data)
+        inputs = _prepare_inputs(dict_data, self.metadata["inputs"])
         raw_result = self.client.predict(
             inputs, model_name=self.model_name, model_version=self.model_version
         )
         # For models with single output ovmsclient returns ndarray with results,
         # so the dict must be created to correctly implement interface.
         if isinstance(raw_result, np.ndarray):
-            output_name = list(self.metadata["outputs"].keys())[0]
+            output_name = next(iter((self.metadata["outputs"].keys())))
             return {output_name: raw_result}
         return raw_result
 
     def infer_async(self, dict_data, callback_data):
-        inputs = self._prepare_inputs(dict_data)
+        inputs = _prepare_inputs(dict_data, self.metadata["inputs"])
         raw_result = self.client.predict(
             inputs, model_name=self.model_name, model_version=self.model_version
         )
@@ -194,21 +92,21 @@ class OVMSAdapter(InferenceAdapter):
     def is_ready(self):
         return True
 
+    def load_model(self):
+        pass
+
     def await_all(self):
         pass
 
     def await_any(self):
         pass
 
-    def get_rt_info(self, path):
-        raise NotImplementedError("OVMSAdapter does not support RT info getting")
-
     def embed_preprocessing(
         self,
         layout,
         resize_mode: str,
         interpolation_mode,
-        target_shape: Tuple[int],
+        target_shape,
         pad_value,
         dtype=type(int),
         brg2rgb=False,
@@ -216,4 +114,87 @@ class OVMSAdapter(InferenceAdapter):
         scale=None,
         input_idx=0,
     ):
-        raise NotImplementedError("OVMSAdapter does not support embed_preprocessing()")
+        pass
+
+    def reshape_model(self, new_shape):
+        raise NotImplementedError
+
+    def get_rt_info(self, path):
+        raise NotImplementedError("OVMSAdapter does not support RT info getting")
+
+
+_tf2ov_precision = {
+    "DT_INT64": "I64",
+    "DT_UINT64": "U64",
+    "DT_FLOAT": "FP32",
+    "DT_UINT32": "U32",
+    "DT_INT32": "I32",
+    "DT_HALF": "FP16",
+    "DT_INT16": "I16",
+    "DT_INT8": "I8",
+    "DT_UINT8": "U8",
+}
+
+
+_tf2np_precision = {
+    "DT_INT64": np.int64,
+    "DT_UINT64": np.uint64,
+    "DT_FLOAT": np.float32,
+    "DT_UINT32": np.uint32,
+    "DT_INT32": np.int32,
+    "DT_HALF": np.float16,
+    "DT_INT16": np.int16,
+    "DT_INT8": np.int8,
+    "DT_UINT8": np.uint8,
+}
+
+
+def _parse_model_arg(target_model: str):
+    if not isinstance(target_model, str):
+        raise TypeError("target_model must be str")
+    # Expected format: <address>:<port>/models/<model_name>[:<model_version>]
+    if not re.fullmatch(
+        r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*", target_model
+    ):
+        raise ValueError("invalid --model option format")
+    service_url, _, model = target_model.split("/")
+    model_spec = model.split(":")
+    if len(model_spec) == 1:
+        # model version not specified - use latest
+        return service_url, model_spec[0], 0
+    if len(model_spec) == 2:
+        return service_url, model_spec[0], int(model_spec[1])
+    raise ValueError("invalid target_model format")
+
+
+def _verify_model_available(client, model_name, model_version):
+    import ovmsclient
+
+    version = "latest" if model_version == 0 else model_version
+    try:
+        model_status = client.get_model_status(model_name, model_version)
+    except ovmsclient.ModelNotFoundError as e:
+        raise RuntimeError(
+            f"Requested model: {model_name}, version: {version} has not been found"
+        ) from e
+    target_version = max(model_status.keys())
+    version_status = model_status[target_version]
+    if version_status["state"] != "AVAILABLE" or version_status["error_code"] != 0:
+        raise RuntimeError(
+            f"Requested model: {model_name}, version: {version} is not in available state"
+        )
+
+
+def _prepare_inputs(dict_data, inputs_meta):
+    inputs = {}
+    for input_name, input_data in dict_data.items():
+        if input_name not in inputs_meta.keys():
+            raise ValueError("Input data does not match model inputs")
+        input_info = inputs_meta[input_name]
+        model_precision = _tf2np_precision[input_info["dtype"]]
+        if isinstance(input_data, np.ndarray) and input_data.dtype != model_precision:
+            input_data = input_data.astype(model_precision)
+        elif isinstance(input_data, list):
+            input_data = np.array(input_data, dtype=model_precision)
+        inputs[input_name] = input_data
+    return inputs

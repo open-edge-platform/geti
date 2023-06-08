@@ -159,7 +159,7 @@ class Model:
         if isinstance(model, InferenceAdapter):
             inference_adapter = model
         elif isinstance(model, str) and re.compile(
-            r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9_-]+(\:\d+)*"
+            r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*"
         ).fullmatch(model):
             inference_adapter = OVMSAdapter(model)
         else:

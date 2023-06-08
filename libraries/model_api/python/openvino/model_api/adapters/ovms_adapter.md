@@ -6,23 +6,15 @@ The `OVMSAdapter` implements `InferenceAdapter` interface. The `OVMSAdapter` mak
 
 `OVMSAdapter` enables inference via gRPC calls to OpenVINO Model Server, so in order to use it you need two things:
 - OpenVINO Model Server that serves your model
-- [`ovmsclient`](https://pypi.org/project/ovmsclient/) package installed to enable communication with the model server
+- [`ovmsclient`](https://pypi.org/project/ovmsclient/) package installed to enable communication with the model server: `python3 -m pip install ovmsclient`
 
 ### Deploy OpenVINO Model Server
 
 Model Server is distributed as a docker image and it's available in DockerHub, so you can use it with `docker run` command. See [model server documentation](https://github.com/openvinotoolkit/model_server/blob/main/docs/starting_server.md) to learn how to deploy OpenVINO optimized models with OpenVINO Model Server.
 
-### Install ovmsclient
-
-`ovmsclient` package is distributed on PyPi, so the easiest way to install it is via:
-
-```
-pip3 install ovmsclient
-```
-
 ## Model configuration
 
-When using OpenVINO Model Server model cannot be directly accessed from the client application (like OMZ demos). Therefore any configuration must be done on model server side.
+When using OpenVINO Model Server model cannot be directly accessed from the client application (like OMZ demos). Therefore any configuration must be done on model server side or before starting the server: see [Prepare a model for `InferenceAdapter`](../../../../../README.md#prepare-a-model-for-inferenceadapter).
 
 ### Input reshaping
 
