@@ -197,13 +197,9 @@ void ClassificationModel::updateModelInfo() {
 
     model->set_rt_info(ClassificationModel::ModelType, "model_info", "model_type");
     model->set_rt_info(topk, "model_info", "topk");
-
-    auto bool_to_string = [](bool b) -> std::string {
-        return b ? "True" : "False";
-    };
-    model->set_rt_info(bool_to_string(multilabel), "model_info", "multilabel");
-    model->set_rt_info(bool_to_string(hierarchical), "model_info", "hierarchical");
-    model->set_rt_info(bool_to_string(output_raw_scores), "model_info", "output_raw_scores");
+    model->set_rt_info(multilabel, "model_info", "multilabel");
+    model->set_rt_info(hierarchical, "model_info", "hierarchical");
+    model->set_rt_info(output_raw_scores, "model_info", "output_raw_scores");
     model->set_rt_info(confidence_threshold, "model_info", "confidence_threshold");
 }
 
