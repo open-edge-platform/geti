@@ -130,6 +130,13 @@ class ImageModel(Model):
         )
         return parameters
 
+    def get_label_name(self, label_id):
+        if self.labels is None:
+            return f"#{label_id}"
+        if label_id >= len(self.labels):
+            return f"#{label_id}"
+        return self.labels[label_id]
+
     def _get_inputs(self):
         """Defines the model inputs for images and additional info.
 

@@ -201,6 +201,22 @@ struct ImageResultWithSoftPrediction : public ImageResult {
     cv::Mat soft_prediction;
 };
 
+struct Contour {
+    std::string label;
+    float probability;
+    std::vector<cv::Point> shape;
+
+    friend std::ostream& operator<< (std::ostream& stream, const Contour& contour)
+    {
+        stream << "(";
+        stream << std::fixed;
+        stream << std::setprecision(3) << contour.probability << ", ";
+        stream << std::setprecision(-1) << contour.label << ")";
+        return stream;
+    }
+};
+
+
 struct HumanPose {
     std::vector<cv::Point2f> keypoints;
     float score;
