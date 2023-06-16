@@ -76,6 +76,29 @@ struct ClassificationResult : public ResultBase {
     ClassificationResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ResultBase(frameId, metaData) {}
 
+    friend std::ostream& operator<< (std::ostream& os, const ClassificationResult& prediction) {
+        for (const ClassificationResult::Classification& classification : prediction.topLabels) {
+            os << classification << ", ";
+        }
+        try {
+            os << prediction.saliency_map.get_shape() << ", ";
+        } catch (ov::Exception&) {
+            os << "[0], ";
+        }
+        try {
+            os << prediction.feature_vector.get_shape();
+        } catch (ov::Exception&) {
+            os << "[0]";
+        }
+        return os;
+    }
+
+    explicit operator std::string() {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+
     struct Classification {
         unsigned int id;
         std::string label;
@@ -83,16 +106,13 @@ struct ClassificationResult : public ResultBase {
 
         Classification(unsigned int id, const std::string& label, float score) : id(id), label(label), score(score) {}
 
-        friend std::ostream& operator<< (std::ostream& stream, const Classification& prediction)
-        {
-            stream << "(" << prediction.id << ", " << prediction.label << ", ";
-            stream << std::fixed;
-            stream << std::setprecision(3) << prediction.score << ")";
-            return stream;
+        friend std::ostream& operator<< (std::ostream& os, const Classification& prediction) {
+            return os << prediction.id << " (" << prediction.label << "): " << std::fixed << std::setprecision(3) << prediction.score;
         }
     };
 
     std::vector<Classification> topLabels;
+    ov::Tensor saliency_map, feature_vector;  // Contan "saliency_map" and "feature_vector" model outputs if such exist
 };
 
 struct DetectedObject : public cv::Rect2f {

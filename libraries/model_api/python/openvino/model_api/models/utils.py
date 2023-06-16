@@ -15,9 +15,21 @@
 """
 
 import math
+from collections import namedtuple
 
 import cv2
 import numpy as np
+
+
+class ClassificationResult(
+    namedtuple("ClassificationResult", "top_labels saliency_map feature_vector")
+):
+    def __str__(self):
+        labels = ", ".join(
+            f"{idx} ({label}): {confidence:.3f}"
+            for idx, label, confidence in self.top_labels
+        )
+        return f"{labels}, [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 class Detection:

@@ -39,6 +39,9 @@
 std::string ClassificationModel::ModelType = "Classification";
 
 namespace {
+constexpr char saliency_map_name[]{"saliency_map"};
+constexpr char feature_vector_name[]{"feature_vector"};
+
 float sigmoid(float x) noexcept {
     return 1.0f / (1.0f + std::exp(-x));
 }
@@ -107,17 +110,22 @@ void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t to
                                                                             ov::op::v3::TopK::Mode::MAX,
                                                                             ov::op::v3::TopK::SortType::SORT_VALUES);
 
-    auto indices = std::make_shared<ov::op::v0::Result>(topkNode->output(0));
-    auto scores = std::make_shared<ov::op::v0::Result>(topkNode->output(1));
-    ov::ResultVector results_vector;
+    auto indices = topkNode->output(0);
+    auto scores = topkNode->output(1);
+    ov::OutputVector outputs_vector;
     if (add_raw_scores) {
-        auto raw_scores = std::make_shared<ov::op::v0::Result>(softmaxNode->output(0));
-        results_vector = {scores, indices, raw_scores};
+        auto raw_scores = softmaxNode->output(0);
+        outputs_vector = {scores, indices, raw_scores};
     }
     else {
-        results_vector = {scores, indices};
+        outputs_vector = {scores, indices};
     }
-    model = std::make_shared<ov::Model>(results_vector, model->get_parameters(), "classification");
+    for (const ov::Output<ov::Node>& output : model->outputs()) {
+        if (output.get_names().count(saliency_map_name) > 0 || output.get_names().count(feature_vector_name) > 0) {
+            outputs_vector.push_back(output);
+        }
+    }
+    model = std::make_shared<ov::Model>(outputs_vector, model->get_parameters(), "classification");
 
     // manually set output tensors name for created topK node
     model->outputs()[0].set_names({"indices"});
@@ -134,6 +142,30 @@ void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t to
         ppp.output("raw_scores").tensor().set_element_type(ov::element::f32);
     }
     model = ppp.build();
+}
+
+std::vector<std::string> get_non_xai_names(const std::vector<ov::Output<ov::Node>>& outputs) {
+    std::vector<std::string> outputNames;
+    outputNames.reserve(std::max(1, int(outputs.size()) - 2));
+    for (const ov::Output<ov::Node>& output : outputs) {
+        if (output.get_names().count(saliency_map_name) > 0) {
+            continue;
+        } if (output.get_names().count(feature_vector_name) > 0) {
+            continue;
+        }
+        outputNames.push_back(output.get_any_name());
+    }
+    return outputNames;
+}
+
+void append_xai_names(const std::vector<ov::Output<ov::Node>>& outputs, std::vector<std::string>& outputNames) {
+    for (const ov::Output<ov::Node>& output : outputs) {
+        if (output.get_names().count(saliency_map_name) > 0) {
+            outputNames.emplace_back(saliency_map_name);
+        } else if (output.get_names().count(feature_vector_name) > 0) {
+            outputNames.push_back(feature_vector_name);
+        }
+    }
 }
 }
 
@@ -246,13 +278,26 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shar
 }
 
 std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& infResult) {
+    std::unique_ptr<ResultBase> result;
     if (multilabel) {
-        return get_multilabel_predictions(infResult);
+        result = get_multilabel_predictions(infResult);
     }
     else if (hierarchical) {
-        return get_hierarchical_predictions(infResult);
+        result = get_hierarchical_predictions(infResult);
+    } else {
+        result = get_multiclass_predictions(infResult);
     }
-    return get_multiclass_predictions(infResult);
+
+    ClassificationResult* cls_res = static_cast<ClassificationResult*>(result.get());
+    auto saliency_map_iter = infResult.outputsData.find(saliency_map_name);
+    if (saliency_map_iter != infResult.outputsData.end()) {
+        cls_res->saliency_map = std::move(saliency_map_iter->second);
+    }
+    auto feature_vector_iter = infResult.outputsData.find(feature_vector_name);
+    if (feature_vector_iter != infResult.outputsData.end()) {
+        cls_res->feature_vector = std::move(feature_vector_iter->second);
+    }
+    return result;
 }
 
 std::unique_ptr<ResultBase> ClassificationModel::get_multilabel_predictions(InferenceResult& infResult) {
@@ -362,14 +407,13 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
                                         scale_values);
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
-        ppp.output().tensor().set_element_type(ov::element::f32);
         model = ppp.build();
         useAutoResize = true; // temporal solution for classification
     }
 
     // --------------------------- Prepare output  -----------------------------------------------------
-    if (model->outputs().size() != 1 && model->outputs().size() != 2) {
-        throw std::logic_error("Classification model wrapper supports topologies with 1 or 2 outputs");
+    if (model->outputs().size() > 5) {
+        throw std::logic_error("Classification model wrapper supports topologies with up to 4 outputs");
     }
 
     if (model->outputs().size() == 1) {
@@ -401,8 +445,9 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     }
 
     if (multilabel || hierarchical) {
-        outputNames = {model->output().get_any_name()};
         embedded_processing = true;
+        outputNames = get_non_xai_names(model->outputs());
+        append_xai_names(model->outputs(), outputNames);
         return;
     }
 
@@ -413,6 +458,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
     if (output_raw_scores) {
         outputNames.emplace_back("raw_scores");
     }
+    append_xai_names(model->outputs(), outputNames);
 }
 
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {

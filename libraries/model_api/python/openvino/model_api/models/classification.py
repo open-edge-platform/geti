@@ -23,6 +23,7 @@ from openvino.runtime import opset10 as opset
 
 from .image_model import ImageModel
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
+from .utils import ClassificationResult
 
 
 class ClassificationModel(ImageModel):
@@ -30,13 +31,16 @@ class ClassificationModel(ImageModel):
 
     def __init__(self, inference_adapter, configuration=None, preload=False):
         super().__init__(inference_adapter, configuration, preload=False)
-        self._check_io_number(1, (1, 2))
+        self._check_io_number(1, (1, 2, 3, 4, 5))
         if self.path_to_labels:
             self.labels = self._load_labels(self.path_to_labels)
-        self.out_layer_names = [self._get_output()]
+        if 1 == len(self.outputs):
+            self._verify_signle_output()
 
         if self.hierarchical:
             self.embedded_processing = True
+            self.out_layer_names = _get_non_xai_names(self.outputs.keys())
+            _append_xai_names(self.outputs.keys(), self.out_layer_names)
             if not self.hierarchical_config:
                 self.raise_error("Hierarchical classification config is empty.")
             self.hierarchical_info = json.loads(self.hierarchical_config)
@@ -47,6 +51,8 @@ class ClassificationModel(ImageModel):
 
         if self.multilabel:
             self.embedded_processing = True
+            self.out_layer_names = _get_non_xai_names(self.outputs.keys())
+            _append_xai_names(self.outputs.keys(), self.out_layer_names)
             if preload:
                 self.load()
             return
@@ -59,6 +65,7 @@ class ClassificationModel(ImageModel):
         self.out_layer_names = ["indices", "scores"]
         if self.output_raw_scores:
             self.out_layer_names.append("raw_scores")
+        _append_xai_names(self.outputs.keys(), self.out_layer_names)
         if preload:
             self.load()
 
@@ -73,7 +80,7 @@ class ClassificationModel(ImageModel):
                 labels.append(s[(begin_idx + 1) : end_idx])
         return labels
 
-    def _get_output(self):
+    def _verify_signle_output(self):
         layer_name = next(iter(self.outputs))
         layer_shape = self.outputs[layer_name].shape
 
@@ -97,7 +104,6 @@ class ClassificationModel(ImageModel):
                         layer_shape[1], len(self.labels)
                     )
                 )
-        return layer_name
 
     @classmethod
     def parameters(cls):
@@ -138,14 +144,21 @@ class ClassificationModel(ImageModel):
 
     def postprocess(self, outputs, meta):
         if self.multilabel:
-            return self.get_multilabel_predictions(
+            result = self.get_multilabel_predictions(
                 outputs[self.out_layer_names[0]].squeeze()
             )
         elif self.hierarchical:
-            return self.get_hierarchical_predictions(
+            result = self.get_hierarchical_predictions(
                 outputs[self.out_layer_names[0]].squeeze()
             )
-        return self.get_multiclass_predictions(outputs)
+        else:
+            result = self.get_multiclass_predictions(outputs)
+
+        return ClassificationResult(
+            result,
+            outputs.get(_saliency_map_name, np.ndarray(0)),
+            outputs.get(_feature_vector_name, np.ndarray(0)),
+        )
 
     def get_hierarchical_predictions(self, logits: np.ndarray):
         predicted_labels = []
@@ -220,6 +233,12 @@ def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk, output_raw_scores):
     if output_raw_scores:
         raw_scores = softmaxNode.output(0)
         results_descr.append(raw_scores)
+    for output in inference_adapter.model.outputs:
+        if (
+            _saliency_map_name in output.get_names()
+            or _feature_vector_name in output.get_names()
+        ):
+            results_descr.append(output)
     inference_adapter.model = Model(
         results_descr,
         inference_adapter.model.get_parameters(),
@@ -318,3 +337,22 @@ class GreedyLabelsResolver:
             (self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in output_labels
         ]
         return output_predictions
+
+
+_saliency_map_name = "saliency_map"
+_feature_vector_name = "feature_vector"
+
+
+def _get_non_xai_names(output_names):
+    return [
+        output_name
+        for output_name in output_names
+        if _saliency_map_name != output_name or _feature_vector_name == output_name
+    ]
+
+
+def _append_xai_names(outputs, output_names):
+    if _saliency_map_name in outputs:
+        output_names.append(_saliency_map_name)
+    if _feature_vector_name in outputs:
+        output_names.append(_feature_vector_name)
