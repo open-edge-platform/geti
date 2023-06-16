@@ -38,6 +38,46 @@ static inline ov::Tensor wrapMat2Tensor(const cv::Mat& mat) {
     return ov::Tensor(precision, ov::Shape{ 1, height, width, channels }, SharedMatAllocator{mat});
 }
 
+struct IntervalCondition {
+    using DimType = size_t;
+    using IndexType = size_t;
+    using ConditionChecker = std::function<bool(IndexType, const ov::PartialShape&)>;
+
+    template<class Cond>
+    constexpr IntervalCondition(IndexType i1, IndexType i2, Cond c) :
+        impl([=](IndexType i0, const ov::PartialShape& shape) {
+            return c(shape[i0].get_max_length(), shape[i1].get_max_length()) && c(shape[i0].get_max_length(), shape[i2].get_max_length());})
+    {}
+    bool operator() (IndexType i0, const ov::PartialShape& shape) const { return impl(i0, shape); }
+private:
+    ConditionChecker impl;
+};
+
+template <template<class> class Cond, class ...Args>
+IntervalCondition makeCond(Args&&...args) {
+    return IntervalCondition(std::forward<Args>(args)..., Cond<IntervalCondition::DimType>{});
+}
+using LayoutCondition = std::tuple<size_t/*dim index*/, IntervalCondition, std::string>;
+
+static inline std::tuple<bool, ov::Layout> makeGuesLayoutFrom4DShape(const ov::PartialShape& shape) {
+    // at the moment we make assumption about NCHW & NHCW only
+    // if hypothetical C value is less than hypothetical H and W - then
+    // out assumption is correct and we pick a corresponding layout
+    static const std::array<LayoutCondition, 2> hypothesisMatrix {{
+        {1, makeCond<std::less_equal>(2, 3), "NCHW"},
+        {3, makeCond<std::less_equal>(1, 2), "NHWC"}
+    }};
+    for (const auto &h : hypothesisMatrix) {
+
+        auto channel_index = std::get<0>(h);
+        const auto &cond = std::get<1>(h);
+        if (cond(channel_index, shape)) {
+            return std::make_tuple(true, ov::Layout{std::get<2>(h)});
+        }
+    }
+    return {false, ov::Layout{}};
+}
+
 static inline ov::Layout getLayoutFromShape(const ov::PartialShape& shape) {
     if (shape.size() == 2) {
         return "NC";
@@ -58,6 +98,12 @@ static inline ov::Layout getLayoutFromShape(const ov::PartialShape& shape) {
         }
         if (shape[2] == shape[3]) {
             return "NCHW";
+        }
+        bool guesResult = false;
+        ov::Layout guessedLayout;
+        std::tie(guesResult, guessedLayout) = makeGuesLayoutFrom4DShape(shape);
+        if (guesResult) {
+            return guessedLayout;
         }
     }
     throw std::runtime_error("Usupported " + std::to_string(shape.size()) + "D shape");
