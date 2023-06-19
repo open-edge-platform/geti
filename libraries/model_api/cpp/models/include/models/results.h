@@ -120,14 +120,11 @@ struct DetectedObject : public cv::Rect2f {
     std::string label;
     float confidence;
 
-    friend std::ostream& operator<< (std::ostream& stream, const DetectedObject& detection)
+    friend std::ostream& operator<< (std::ostream& os, const DetectedObject& detection)
     {
-        stream << "(" << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width)
-            << ", " << int(detection.y + detection.height) << ", ";
-        stream << std::fixed;
-        stream << std::setprecision(3) << detection.confidence << ", ";
-        stream << std::setprecision(-1) << detection.labelID << ", " << detection.label << ")";
-        return stream;
+        return os << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width)
+            << ", " << int(detection.y + detection.height) << ", "
+            << detection.labelID << " (" << detection.label << "): " << std::fixed << std::setprecision(3) << detection.confidence;
     }
 };
 
@@ -135,6 +132,30 @@ struct DetectionResult : public ResultBase {
     DetectionResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ResultBase(frameId, metaData) {}
     std::vector<DetectedObject> objects;
+    ov::Tensor saliency_map, feature_vector;  // Contan "saliency_map" and "feature_vector" model outputs if such exist
+
+    friend std::ostream& operator<< (std::ostream& os, const DetectionResult& prediction) {
+        for (const DetectedObject& obj : prediction.objects) {
+            os << obj << "; ";
+        }
+        try {
+            os << prediction.saliency_map.get_shape() << "; ";
+        } catch (ov::Exception&) {
+            os << "[0]; ";
+        }
+        try {
+            os << prediction.feature_vector.get_shape();
+        } catch (ov::Exception&) {
+            os << "[0]";
+        }
+        return os;
+    }
+
+    explicit operator std::string() {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
 };
 
 struct RetinaFaceDetectionResult : public DetectionResult {

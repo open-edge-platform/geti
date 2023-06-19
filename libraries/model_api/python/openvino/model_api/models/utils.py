@@ -42,17 +42,16 @@ class Detection:
         self.id = int(id)
         self.str_label = str_label
 
-    def get_coords(self):
-        return self.xmin, self.ymin, self.xmax, self.ymax
-
-    def __to_str(self):
-        return f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score:.3f}, {self.id}, {self.str_label})"
-
     def __str__(self):
-        return self.__to_str()
+        return f"{self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.id} ({self.str_label}): {self.score:.3f}"
 
-    def __repr__(self):
-        return self.__to_str()
+
+class DetectionResult(
+    namedtuple("DetectionResult", "objects saliency_map feature_vector")
+):
+    def __str__(self):
+        obj_str = "; ".join(str(obj) for obj in self.objects)
+        return f"{obj_str}; [{','.join(str(i) for i in self.saliency_map.shape)}]; [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 class SegmentedObject(Detection):

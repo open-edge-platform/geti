@@ -31,6 +31,11 @@
 #include "models/internal_model_data.h"
 #include "models/results.h"
 
+namespace {
+constexpr char saliency_map_name[]{"saliency_map"};
+constexpr char feature_vector_name[]{"feature_vector"};
+}
+
 std::string ModelSSD::ModelType = "ssd";
 
 ModelSSD::ModelSSD(std::shared_ptr<InferenceAdapter>& adapter)
@@ -60,7 +65,17 @@ std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputDa
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocess(InferenceResult& infResult) {
-    return outputNames.size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
+    std::unique_ptr<ResultBase> result = outputNames.size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
+    DetectionResult* cls_res = static_cast<DetectionResult*>(result.get());
+    auto saliency_map_iter = infResult.outputsData.find(saliency_map_name);
+    if (saliency_map_iter != infResult.outputsData.end()) {
+        cls_res->saliency_map = std::move(saliency_map_iter->second);
+    }
+    auto feature_vector_iter = infResult.outputsData.find(feature_vector_name);
+    if (feature_vector_iter != infResult.outputsData.end()) {
+        cls_res->feature_vector = std::move(feature_vector_iter->second);
+    }
+    return result;
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& infResult) {
