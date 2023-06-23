@@ -16,13 +16,16 @@
 
 import math
 from collections import namedtuple
+from typing import List, NamedTuple, Tuple
 
 import cv2
 import numpy as np
 
 
 class ClassificationResult(
-    namedtuple("ClassificationResult", "top_labels saliency_map feature_vector")
+    namedtuple(
+        "ClassificationResult", "top_labels saliency_map feature_vector"
+    )  # Contan "saliency_map" and "feature_vector" model outputs if such exist
 ):
     def __str__(self):
         labels = ", ".join(
@@ -47,7 +50,9 @@ class Detection:
 
 
 class DetectionResult(
-    namedtuple("DetectionResult", "objects saliency_map feature_vector")
+    namedtuple(
+        "DetectionResult", "objects saliency_map feature_vector"
+    )  # Contan "saliency_map" and "feature_vector" model outputs if such exist
 ):
     def __str__(self):
         obj_str = "; ".join(str(obj) for obj in self.objects)
@@ -122,6 +127,35 @@ def clip_detections(detections, size):
         detection.xmax = min(max(round(detection.xmax), 0), size[1])
         detection.ymax = min(max(round(detection.ymax), 0), size[0])
     return detections
+
+
+class Contour(NamedTuple):
+    label: str
+    probability: float
+    shape: List[Tuple[int, int]]
+
+    def __str__(self):
+        return f"{self.label}: {self.probability:.3f}, {len(self.shape)}"
+
+
+class ImageResultWithSoftPrediction(NamedTuple):
+    resultImage: np.ndarray
+    soft_prediction: np.ndarray
+    feature_vector: np.ndarray  # Contans "feature_vector" model output if such exists
+
+    def __str__(self):
+        outHist = cv2.calcHist(
+            [self.resultImage.astype(np.uint8)],
+            channels=None,
+            mask=None,
+            histSize=[256],
+            ranges=[0, 255],
+        )
+        hist = ""
+        for i, count in enumerate(outHist):
+            if count > 0:
+                hist += f"{i}: {count[0] / self.resultImage.size:.3f}, "
+        return f"{hist}[{','.join(str(i) for i in self.soft_prediction.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 class DetectionWithLandmarks(Detection):

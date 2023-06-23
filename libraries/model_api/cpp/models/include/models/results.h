@@ -234,12 +234,52 @@ struct ImageResult : public ResultBase {
     ImageResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ResultBase(frameId, metaData) {}
     cv::Mat resultImage;
+    friend std::ostream& operator<< (std::ostream& os, const ImageResult& prediction) {
+        cv::Mat predicted_mask[] = {prediction.resultImage};
+        int nimages = 1;
+        int *channels = nullptr;
+        cv::Mat mask;
+        cv::Mat outHist;
+        int dims = 1;
+        int histSize[] = {256};
+        float range[] = {0, 256};
+        const float *ranges[] = {range};
+        cv::calcHist(predicted_mask, nimages, channels, mask, outHist, dims, histSize, ranges);
+
+        os << std::fixed << std::setprecision(3);
+        for (int i = 0; i < range[1]; ++i) {
+            const float count = outHist.at<float>(i);
+            if (count > 0) {
+                os << i << ": " << count / prediction.resultImage.total() << ", ";
+            }
+        }
+        return os;
+    }
+    explicit operator std::string() {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
 };
 
 struct ImageResultWithSoftPrediction : public ImageResult {
     ImageResultWithSoftPrediction(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ImageResult(frameId, metaData) {}
     cv::Mat soft_prediction;
+    ov::Tensor feature_vector;  // Contans "feature_vector" model output if such exists
+    friend std::ostream& operator<< (std::ostream& os, const ImageResultWithSoftPrediction& prediction) {
+        os << static_cast<const ImageResult&>(prediction) << '[';
+        for (int i = 0; i < prediction.soft_prediction.dims; ++i) {
+            os << prediction.soft_prediction.size[i] << ',';
+        }
+        os << prediction.soft_prediction.channels() << "], ";
+        try {
+            os << prediction.feature_vector.get_shape();
+        } catch (ov::Exception&) {
+            os << "[0]";
+        }
+        return os;
+    }
 };
 
 struct Contour {
@@ -247,13 +287,8 @@ struct Contour {
     float probability;
     std::vector<cv::Point> shape;
 
-    friend std::ostream& operator<< (std::ostream& stream, const Contour& contour)
-    {
-        stream << "(";
-        stream << std::fixed;
-        stream << std::setprecision(3) << contour.probability << ", ";
-        stream << std::setprecision(-1) << contour.label << ")";
-        return stream;
+    friend std::ostream& operator<< (std::ostream& os, const Contour& contour) {
+        return os << contour.label << ": " << std::fixed << std::setprecision(3) << contour.probability << ", " << contour.shape.size();
     }
 };
 

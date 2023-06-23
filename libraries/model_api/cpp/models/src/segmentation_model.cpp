@@ -34,6 +34,8 @@
 #include "utils/slog.hpp"
 
 namespace {
+constexpr char feature_vector_name[]{"feature_vector"};
+
 cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_prediction, float soft_threshold, int blur_strength) {
     if (soft_prediction.channels() == 1) {
         return soft_prediction;
@@ -182,8 +184,23 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
     if (inputShape.size() != 4 || inputShape[ov::layout::channels_idx(inputLayout)] != 3) {
         throw std::logic_error("3-channel 4-dimensional model's input is expected");
     }
-    if (model->outputs().size() != 1) {
-        throw std::logic_error("Segmentation model wrapper supports topologies with only 1 output");
+    if (model->outputs().size() > 2) {
+        throw std::logic_error("Segmentation model wrapper supports topologies with 1 or 2 outputs");
+    }
+
+    std::string out_name;
+    for (ov::Output<ov::Node>& output : model->outputs()) {
+        const std::unordered_set<std::string>& out_names = output.get_names();
+        if (out_names.find(feature_vector_name) == out_names.end()) {
+            if (out_name.empty()) {
+                out_name = output.get_any_name();
+            } else {
+                throw std::runtime_error(std::string{"Only "} + feature_vector_name + " and 1 other output are allowed");
+            }
+        }
+    }
+    if (out_name.empty()) {
+        throw std::runtime_error("No output containing segmentatation found");
     }
 
     if (!embedded_processing) {
@@ -200,19 +217,26 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
                                         scale_values);
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
-        ppp.output().model().set_layout(getLayoutFromShape(model->output().get_partial_shape()));
-        ppp.output().tensor().set_element_type(ov::element::f32).set_layout("NCHW");
+        ppp.output(out_name).model().set_layout(getLayoutFromShape(model->output(out_name).get_partial_shape()));
+        ppp.output(out_name).tensor().set_element_type(ov::element::f32).set_layout("NCHW");
         model = ppp.build();
         useAutoResize = true; // temporal solution
         embedded_processing = true;
     }
 
-    outputNames.push_back(model->output().get_any_name());
+    outputNames.push_back(out_name);
+    for (ov::Output<ov::Node>& output : model->outputs()) {
+        const std::unordered_set<std::string>& out_names = output.get_names();
+        if (out_names.find(feature_vector_name) == out_names.end()) {
+            outputNames.emplace_back(feature_vector_name);
+            return;
+        }
+    }
 }
 
 std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infResult) {
     const auto& inputImgSize = infResult.internalModelData->asRef<InternalImageModelData>();
-    const auto& outTensor = infResult.getFirstOutputTensor();
+    const auto& outTensor = infResult.outputsData[outputNames[0]];
     const ov::Shape& outputShape = outTensor.get_shape();
     const ov::Layout& outputLayout = getLayoutFromShape(outputShape);
     int outChannels = static_cast<int>(outputShape[ov::layout::channels_idx(outputLayout)]);
@@ -247,6 +271,7 @@ std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infR
         result->resultImage = hard_prediction;
         cv::resize(soft_prediction, soft_prediction, {inputImgSize.inputImgWidth, inputImgSize.inputImgHeight}, 0.0, 0.0, cv::INTER_NEAREST);
         result->soft_prediction = soft_prediction;
+        result->feature_vector = infResult.outputsData[feature_vector_name];
         return std::unique_ptr<ResultBase>(result);
     }
 
