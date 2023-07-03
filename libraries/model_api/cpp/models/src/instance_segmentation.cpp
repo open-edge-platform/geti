@@ -34,6 +34,19 @@
 #include "utils/common.hpp"
 
 namespace {
+constexpr char saliency_map_name[]{"saliency_map"};
+constexpr char feature_vector_name[]{"feature_vector"};
+
+void append_xai_names(const std::vector<ov::Output<ov::Node>>& outputs, std::vector<std::string>& outputNames) {
+    for (const ov::Output<ov::Node>& output : outputs) {
+        if (output.get_names().count(saliency_map_name) > 0) {
+            outputNames.emplace_back(saliency_map_name);
+        } else if (output.get_names().count(feature_vector_name) > 0) {
+            outputNames.push_back(feature_vector_name);
+        }
+    }
+}
+
 cv::Rect expand_box(const cv::Rect2f& box, float scale) {
     float w_half = box.width * 0.5f * scale,
         h_half = box.height * 0.5f * scale;
@@ -59,6 +72,42 @@ cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, in
     cv::Mat im_mask(cv::Size{im_w, im_h}, CV_8UC1, cv::Scalar{0});
     im_mask(cv::Rect{x0, y0, x1-x0, y1-y0}).setTo(1, resized({cv::Point(x0-extended_box.x, y0-extended_box.y), cv::Point(x1-extended_box.x, y1-extended_box.y)}) > 0.5f);
     return im_mask;
+}
+
+std::vector<cv::Mat_<std::uint8_t>> average_and_normalize(const std::vector<std::vector<cv::Mat>>& saliency_maps) {
+    std::vector<cv::Mat_<std::uint8_t>> aggregated;
+    aggregated.reserve(saliency_maps.size());
+    for (const std::vector<cv::Mat>& per_class_maps : saliency_maps) {
+        if (per_class_maps.empty()) {
+            aggregated.emplace_back();
+        } else {
+            cv::Mat_<double> saliency_map{per_class_maps.front().size()};
+            for (const cv::Mat& per_class_map : per_class_maps) {
+                if (saliency_map.size != per_class_map.size) {
+                    throw std::runtime_error("saliency_maps must have same size");
+                } if (per_class_map.channels() != 1) {
+                    throw std::runtime_error("saliency_maps must have one channel");
+                } if (per_class_map.type() != CV_8U) {
+                    throw std::runtime_error("saliency_maps must have type CV_8U");
+                }
+            }
+            for (int row = 0; row < saliency_map.rows; ++row) {
+                for (int col = 0; col < saliency_map.cols; ++col) {
+                    double sum = 0.0;
+                    for (const cv::Mat& per_class_map : per_class_maps) {
+                        sum += per_class_map.at<std::uint8_t>(row, col);
+                    }
+                    saliency_map.at<double>(row, col) = sum / per_class_maps.size();
+                }
+            }
+            double min, max;
+            cv::minMaxLoc(saliency_map, &min, &max);
+            cv::Mat_<std::uint8_t> converted;
+            saliency_map.convertTo(converted, CV_8U, 255.0 / (max + 1e-12));
+            aggregated.push_back(std::move(converted));
+        }
+    }
+    return aggregated;
 }
 }
 std::string MaskRCNNModel::ModelType = "MaskRCNN";
@@ -184,25 +233,38 @@ void MaskRCNNModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     }
 
     // --------------------------- Prepare output  -----------------------------------------------------
-    if (model->outputs().size() != 3) {
-        throw std::logic_error("MaskRCNNModel model wrapper supports topologies with only 3 outputs");
-    }
-    outputNames.resize(3);
-    for (const auto& output : model->outputs()) {
-        switch (output.get_partial_shape().get_max_shape().size()) {
-            case 2:
-                outputNames[0] = output.get_any_name();
-                break;
-            case 3:
-                outputNames[1] = output.get_any_name();
-                break;
-            case 4:
-                outputNames[2] = output.get_any_name();
-                break;
-            default:
-                throw std::runtime_error("Unexpected output: " + output.get_any_name());
+    struct NameRank {
+        std::string name;
+        size_t rank;
+    };
+    std::vector<NameRank> filtered;
+    filtered.reserve(3);
+    for (ov::Output<ov::Node>& output : model->outputs()) {
+        const std::unordered_set<std::string>& out_names = output.get_names();
+        if (out_names.find(saliency_map_name) == out_names.end() && out_names.find(feature_vector_name) == out_names.end()) {
+            filtered.push_back({output.get_any_name(), output.get_partial_shape().get_max_shape().size()});
         }
     }
+    if (filtered.size() != 3) {
+        throw std::logic_error(std::string{"MaskRCNNModel model wrapper supports topologies with "} + saliency_map_name + ", " + feature_vector_name + " and 3 other outputs");
+    }
+    outputNames.resize(3);
+    for (const NameRank& name_rank : filtered) {
+        switch (name_rank.rank) {
+            case 2:
+                outputNames[0] = name_rank.name;
+                break;
+            case 3:
+                outputNames[1] = name_rank.name;
+                break;
+            case 4:
+                outputNames[2] = name_rank.name;
+                break;
+            default:
+                throw std::runtime_error("Unexpected output: " + name_rank.name);
+        }
+    }
+    append_xai_names(model->outputs(), outputNames);
 }
 
 std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResult) {
@@ -226,9 +288,17 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
     const cv::Size& masks_size{int(infResult.outputsData[outputNames[2]].get_shape()[3]), int(infResult.outputsData[outputNames[2]].get_shape()[2])};
     InstanceSegmentationResult* result = new InstanceSegmentationResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
+    std::vector<std::vector<cv::Mat>> saliency_maps;
+    bool has_feature_vector_name = std::find(outputNames.begin(), outputNames.end(), feature_vector_name) != outputNames.end();
+    if (has_feature_vector_name) {
+        if (this->labels.empty()) {
+            throw std::runtime_error("Can't get number of classes because labels are empty");
+        }
+        saliency_maps.resize(this->labels.size());
+    }
     for (size_t i = 0; i < infResult.outputsData[outputNames[0]].get_size(); ++i) {
         float confidence = boxes[i * objectSize + 4];
-        if (confidence <= confidence_threshold) {
+        if (confidence <= confidence_threshold && !has_feature_vector_name) {
             continue;
         }
         SegmentedObject obj;
@@ -258,8 +328,16 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
         } else {
             obj.mask = raw_cls_mask;
         }
-        result->segmentedObjects.push_back(obj);
-
+        if (confidence > confidence_threshold) {
+            result->segmentedObjects.push_back(obj);
+        }
+        if (has_feature_vector_name) {
+            saliency_maps[obj.labelID - 1].push_back(obj.mask);
+        }
+    }
+    result->saliency_map = average_and_normalize(saliency_maps);
+    if (has_feature_vector_name) {
+        result->feature_vector = std::move(infResult.outputsData[feature_vector_name]);
     }
     return retVal;
 }

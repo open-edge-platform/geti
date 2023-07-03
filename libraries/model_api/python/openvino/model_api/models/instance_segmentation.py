@@ -19,7 +19,7 @@ import numpy as np
 
 from .image_model import ImageModel
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import SegmentedObject, load_labels, nms
+from .utils import InstanceSegmentationResult, SegmentedObject, load_labels, nms
 
 
 class MaskRCNNModel(ImageModel):
@@ -57,8 +57,15 @@ class MaskRCNNModel(ImageModel):
     def _get_outputs(self):
         if self.is_segmentoly:
             return self._get_segmentoly_outputs()
+        filtered_names = []
+        for name, output in self.outputs.items():
+            if (
+                _saliency_map_name not in output.names
+                and _feature_vector_name not in output.names
+            ):
+                filtered_names.append(name)
         outputs = {}
-        for layer_name in self.outputs:
+        for layer_name in filtered_names:
             if layer_name.startswith("TopK"):
                 continue
             layer_shape = self.outputs[layer_name].shape
@@ -70,9 +77,10 @@ class MaskRCNNModel(ImageModel):
             elif len(layer_shape) == 3:
                 outputs["masks"] = layer_name
         if len(outputs) == 3:
+            _append_xai_names(self.outputs, outputs)
             return outputs
         outputs = {}
-        for layer_name in self.outputs:
+        for layer_name in filtered_names:
             if layer_name.startswith("TopK"):
                 continue
             layer_shape = self.outputs[layer_name].shape
@@ -84,6 +92,7 @@ class MaskRCNNModel(ImageModel):
             elif len(layer_shape) == 4:
                 outputs["masks"] = layer_name
         if len(outputs) == 3:
+            _append_xai_names(self.outputs, outputs)
             return outputs
         self.raise_error(f"Unexpected outputs: {self.outputs}")
 
@@ -143,13 +152,8 @@ class MaskRCNNModel(ImageModel):
             if self.is_segmentoly
             else outputs[self.output_blob_name["boxes"]][:, 4]
         )
-        detections_filter = scores > self.confidence_threshold
-        boxes, scores, labels, masks = (
-            boxes[detections_filter],
-            scores[detections_filter],
-            outputs[self.output_blob_name["labels"]][detections_filter],
-            outputs[self.output_blob_name["masks"]][detections_filter],
-        )
+        labels = outputs[self.output_blob_name["labels"]]
+        masks = outputs[self.output_blob_name["masks"]]
         if not self.is_segmentoly:
             labels += 1
         if self.labels is None:
@@ -187,21 +191,52 @@ class MaskRCNNModel(ImageModel):
             out=boxes,
         )
 
-        resized_masks = []
-        for box, cls, raw_mask in zip(boxes, labels, masks):
+        objects = []
+        has_feature_vector_name = _feature_vector_name in self.outputs
+        if has_feature_vector_name:
+            if not self.labels:
+                self.raise_error("Can't get number of classes because labels are empty")
+            saliency_maps = [[] for _ in range(len(self.labels))]
+        else:
+            saliency_maps = []
+        for box, confidence, cls, str_label, raw_mask in zip(
+            boxes, scores, labels, str_labels, masks
+        ):
+            if confidence <= self.confidence_threshold and not has_feature_vector_name:
+                continue
             raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
             if self.postprocess_semantic_masks:
-                resized_masks.append(
-                    _segm_postprocess(box, raw_cls_mask, *meta["original_shape"][:-1])
+                resized_mask = _segm_postprocess(
+                    box, raw_cls_mask, *meta["original_shape"][:-1]
                 )
             else:
-                resized_masks.append(raw_cls_mask)
-        return [
-            SegmentedObject(*box, confidence, label, str_label, mask)
-            for box, confidence, label, str_label, mask in zip(
-                boxes.astype(int), scores, labels, str_labels, resized_masks
-            )
-        ]
+                resized_mask = raw_cls_mask
+            if confidence > self.confidence_threshold:
+                objects.append(
+                    SegmentedObject(
+                        *box.astype(int), confidence, cls, str_label, resized_mask
+                    )
+                )
+            if has_feature_vector_name:
+                saliency_maps[cls - 1].append(resized_mask)
+        return InstanceSegmentationResult(
+            objects,
+            _average_and_normalize(saliency_maps),
+            outputs.get(_feature_vector_name, np.ndarray(0)),
+        )
+
+
+def _average_and_normalize(saliency_maps):
+    aggregated = []
+    for per_class_maps in saliency_maps:
+        if per_class_maps:
+            saliency_map = np.array(per_class_maps).mean(0)
+            max_values = np.max(saliency_map)
+            saliency_map = 255 * (saliency_map) / (max_values + 1e-12)
+            aggregated.append(saliency_map.astype(np.uint8))
+        else:
+            aggregated.append(np.ndarray(0))
+    return aggregated
 
 
 def _expand_box(box, scale):
@@ -423,3 +458,14 @@ class YolactModel(ImageModel):
         x1 = np.clip(_x1 - padding, 0, img_size)
         x2 = np.clip(_x2 + padding, 0, img_size)
         return x1, x2
+
+
+_saliency_map_name = "saliency_map"
+_feature_vector_name = "feature_vector"
+
+
+def _append_xai_names(outputs, output_names):
+    if _saliency_map_name in outputs:
+        output_names["saliency_map"] = _saliency_map_name
+    if _feature_vector_name in outputs:
+        output_names["feature_vector"] = _feature_vector_name

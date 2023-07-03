@@ -16,7 +16,7 @@
 
 import math
 from collections import namedtuple
-from typing import List, NamedTuple, Tuple
+from typing import List, NamedTuple, Tuple, Union
 
 import cv2
 import numpy as np
@@ -64,14 +64,8 @@ class SegmentedObject(Detection):
         super().__init__(xmin, ymin, xmax, ymax, score, id, str_label)
         self.mask = mask
 
-    def __to_str(self):
-        return f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score:.3f}, {self.id}, {self.str_label}, {(self.mask > 0.5).sum()})"
-
     def __str__(self):
-        return self.__to_str()
-
-    def __repr__(self):
-        return self.__to_str()
+        return f"{super().__str__()}, {(self.mask > 0.5).sum()}"
 
 
 class SegmentedObjectWithRects(SegmentedObject):
@@ -88,17 +82,26 @@ class SegmentedObjectWithRects(SegmentedObject):
         )
         self.rotated_rects = []
 
-    def __to_str(self):
-        res = f"({self.xmin}, {self.ymin}, {self.xmax}, {self.ymax}, {self.score:.3f}, {self.id}, {self.str_label}, {(self.mask > 0.5).sum()}"
+    def __str__(self):
+        res = super().__str__()
         for rect in self.rotated_rects:
             res += f", RotatedRect: {rect[0][0]:.3f} {rect[0][1]:.3f} {rect[1][0]:.3f} {rect[1][1]:.3f} {rect[2]:.3f}"
-        return res + ")"
+        return res
+
+
+class InstanceSegmentationResult(NamedTuple):
+    segmentedObjects: List[Union[SegmentedObject, SegmentedObjectWithRects]]
+    # Contan per class saliency_maps and "feature_vector" model output if feature_vector exists
+    saliency_map: List[np.ndarray]
+    feature_vector: np.ndarray
 
     def __str__(self):
-        return self.__to_str()
-
-    def __repr__(self):
-        return self.__to_str()
+        obj_str = "; ".join(str(obj) for obj in self.segmentedObjects)
+        filled = 0
+        for cls_map in self.saliency_map:
+            if cls_map.size:
+                filled += 1
+        return f"{obj_str}; {filled}; [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 def add_rotated_rects(segmented_objects):
