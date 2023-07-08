@@ -205,16 +205,19 @@ class MaskRCNNModel(ImageModel):
             if confidence <= self.confidence_threshold and not has_feature_vector_name:
                 continue
             raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
-            if self.postprocess_semantic_masks:
+            if self.postprocess_semantic_masks or has_feature_vector_name:
                 resized_mask = _segm_postprocess(
                     box, raw_cls_mask, *meta["original_shape"][:-1]
                 )
             else:
                 resized_mask = raw_cls_mask
             if confidence > self.confidence_threshold:
+                output_mask = (
+                    resized_mask if self.postprocess_semantic_masks else raw_cls_mask
+                )
                 objects.append(
                     SegmentedObject(
-                        *box.astype(int), confidence, cls, str_label, resized_mask
+                        *box.astype(int), confidence, cls, str_label, output_mask
                     )
                 )
             if has_feature_vector_name:

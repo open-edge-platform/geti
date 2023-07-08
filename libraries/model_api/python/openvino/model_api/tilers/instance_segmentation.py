@@ -16,7 +16,10 @@
 
 import cv2 as cv
 import numpy as np
-from openvino.model_api.models.instance_segmentation import _segm_postprocess
+from openvino.model_api.models.instance_segmentation import (
+    MaskRCNNModel,
+    _segm_postprocess,
+)
 from openvino.model_api.models.utils import InstanceSegmentationResult, SegmentedObject
 
 from .detection import DetectionTiler, _multiclass_nms
@@ -139,13 +142,10 @@ class InstanceSegmentationTiler(DetectionTiler):
             label = int(detections_array[i][0])
             score = float(detections_array[i][1])
             bbox = list(detections_array[i][2:])
+            masks[i] = _segm_postprocess(np.array(bbox), masks[i], *shape[:-1])
             detected_objects.append(
                 SegmentedObject(*bbox, score, label, self.model.labels[label], masks[i])
             )
-
-        for i, (det, mask) in enumerate(zip(detected_objects, masks)):
-            box = np.array([det.xmin, det.ymin, det.xmax, det.ymax])
-            masks[i] = _segm_postprocess(box, mask, *shape[:-1])
 
         return InstanceSegmentationResult(
             detected_objects,
@@ -213,3 +213,15 @@ class InstanceSegmentationTiler(DetectionTiler):
             merged_map[class_idx] = merged_map[class_idx].astype(np.uint8)
 
         return merged_map
+
+    def __call__(self, inputs):
+        if isinstance(self.model, MaskRCNNModel):
+            postprocess_state = self.model.postprocess_semantic_masks
+            self.model.postprocess_semantic_masks = False
+
+        predictions = super().__call__(inputs)
+
+        if isinstance(self.model, MaskRCNNModel):
+            self.model.postprocess_semantic_masks = postprocess_state
+
+        return predictions
