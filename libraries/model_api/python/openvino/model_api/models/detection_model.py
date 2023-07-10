@@ -15,7 +15,7 @@
 """
 from .image_model import ImageModel
 from .types import ListValue, NumericalValue, StringValue
-from .utils import clip_detections, load_labels
+from .utils import load_labels
 
 
 class DetectionModel(ImageModel):
@@ -85,30 +85,42 @@ class DetectionModel(ImageModel):
             meta (dict): the input metadata obtained from `preprocess` method
 
         Returns:
-            - list of detections with resized and clipped coordinates fit to initial image
-
-        Raises:
-            WrapperError: If the model uses custom resize or `resize_type` is not set
+            - list of detections with resized and clipped coordinates to fit the initial image
         """
-        resized_shape = meta["resized_shape"]
-        original_shape = meta["original_shape"]
+        input_img_height, input_img_widht = meta["original_shape"][:2]
+        inverted_scale_x = input_img_widht / self.w
+        inverted_scale_y = input_img_height / self.h
+        pad_left = 0
+        pad_top = 0
+        if (
+            "fit_to_window" == self.resize_type
+            or "fit_to_window_letterbox" == self.resize_type
+        ):
+            inverted_scale_x = inverted_scale_y = max(
+                inverted_scale_x, inverted_scale_y
+            )
+            if "fit_to_window_letterbox" == self.resize_type:
+                pad_left = (self.w - round(input_img_widht / inverted_scale_x)) // 2
+                pad_top = (self.h - round(input_img_height / inverted_scale_y)) // 2
 
-        if self.resize_type == "fit_to_window_letterbox":
-            detections = resize_detections_letterbox(
-                detections, original_shape[1::-1], resized_shape[1::-1]
+        for detection in detections:
+            detection.xmin = min(
+                max(round((detection.xmin * self.w - pad_left) * inverted_scale_x), 0),
+                input_img_widht,
             )
-        elif self.resize_type == "fit_to_window":
-            detections = resize_detections_with_aspect_ratio(
-                detections,
-                original_shape[1::-1],
-                resized_shape[1::-1],
-                (self.w, self.h),
+            detection.ymin = min(
+                max(round((detection.ymin * self.h - pad_top) * inverted_scale_y), 0),
+                input_img_height,
             )
-        elif self.resize_type == "standard":
-            detections = resize_detections(detections, original_shape[1::-1])
-        else:
-            self.raise_error("Unknown resize type {}".format(self.resize_type))
-        return clip_detections(detections, original_shape)
+            detection.xmax = min(
+                max(round((detection.xmax * self.w - pad_left) * inverted_scale_x), 0),
+                input_img_widht,
+            )
+            detection.ymax = min(
+                max(round((detection.ymax * self.h - pad_top) * inverted_scale_y), 0),
+                input_img_height,
+            )
+        return detections
 
     def _add_label_names(self, detections):
         """Adds labels names to detections if they are available
@@ -122,48 +134,3 @@ class DetectionModel(ImageModel):
         for detection in detections:
             detection.str_label = self.get_label_name(detection.id)
         return detections
-
-
-def resize_detections(detections, original_image_size):
-    for detection in detections:
-        detection.xmin *= original_image_size[0]
-        detection.xmax *= original_image_size[0]
-        detection.ymin *= original_image_size[1]
-        detection.ymax *= original_image_size[1]
-    return detections
-
-
-def resize_detections_with_aspect_ratio(
-    detections, original_image_size, resized_image_size, model_input_size
-):
-    scale_x = model_input_size[0] / resized_image_size[0] * original_image_size[0]
-    scale_y = model_input_size[1] / resized_image_size[1] * original_image_size[1]
-    for detection in detections:
-        detection.xmin *= scale_x
-        detection.xmax *= scale_x
-        detection.ymin *= scale_y
-        detection.ymax *= scale_y
-    return detections
-
-
-def resize_detections_letterbox(detections, original_image_size, resized_image_size):
-    inverted_scale = max(
-        original_image_size[0] / resized_image_size[0],
-        original_image_size[1] / resized_image_size[1],
-    )
-    pad_left = (resized_image_size[0] - original_image_size[0] / inverted_scale) // 2
-    pad_top = (resized_image_size[1] - original_image_size[1] / inverted_scale) // 2
-    for detection in detections:
-        detection.xmin = (
-            detection.xmin * resized_image_size[0] - pad_left
-        ) * inverted_scale
-        detection.ymin = (
-            detection.ymin * resized_image_size[1] - pad_top
-        ) * inverted_scale
-        detection.xmax = (
-            detection.xmax * resized_image_size[0] - pad_left
-        ) * inverted_scale
-        detection.ymax = (
-            detection.ymax * resized_image_size[1] - pad_top
-        ) * inverted_scale
-    return detections

@@ -114,7 +114,7 @@ def resize_image_letterbox_graph(input: Output, size, interpolation, pad_value):
     nh = opset.convert(
         opset.round(opset.multiply(ih, scale), "half_to_even"), destination_type="i32"
     )
-    new_size = opset.concat([opset.unsqueeze(nh, 0), opset.unsqueeze(nw, 0)], axis=-1)
+    new_size = opset.concat([opset.unsqueeze(nh, 0), opset.unsqueeze(nw, 0)], axis=0)
     image = opset.interpolate(
         input,
         new_size,
@@ -271,8 +271,12 @@ def crop_resize_graph(input: Output, size):
 
 
 def resize_image_graph(
-    input: Output, size, keep_aspect_ratio=False, interpolation="linear"
+    input: Output, size, keep_aspect_ratio, interpolation, pad_value
 ):
+    if not isinstance(pad_value, int):
+        raise RuntimeError("pad_value must be int")
+    if not 0 <= pad_value <= 255:
+        raise RuntimeError("pad_value must be in range [0, 255]")
     h_axis = 1
     w_axis = 2
     w, h = size
@@ -301,19 +305,51 @@ def resize_image_graph(
     w_ratio = opset.divide(np.float32(w), iw)
     h_ratio = opset.divide(np.float32(h), ih)
     scale = opset.minimum(w_ratio, h_ratio)
-    return opset.interpolate(
+    nw = opset.convert(
+        opset.round(opset.multiply(iw, scale), "half_to_even"), destination_type="i32"
+    )
+    nh = opset.convert(
+        opset.round(opset.multiply(ih, scale), "half_to_even"), destination_type="i32"
+    )
+    new_size = opset.concat([opset.unsqueeze(nh, 0), opset.unsqueeze(nw, 0)], axis=0)
+    image = opset.interpolate(
         input,
-        target_size,
-        scales=scale,
+        new_size,
+        scales=np.array([0.0, 0.0], dtype=np.float32),
         axes=[h_axis, w_axis],
         mode=interpolation,
         shape_calculation_mode="sizes",
+    )
+    dx_border = opset.subtract(opset.constant(w, dtype=np.int32), nw)
+    dy_border = opset.subtract(opset.constant(h, dtype=np.int32), nh)
+    pads_begin = np.array([0, 0, 0, 0], np.int32)
+    pads_end = opset.concat(
+        [
+            opset.constant([0], dtype=np.int32),
+            opset.unsqueeze(dy_border, 0),
+            opset.unsqueeze(dx_border, 0),
+            opset.constant([0], dtype=np.int32),
+        ],
+        axis=0,
+    )
+    return opset.pad(
+        image,
+        pads_begin,
+        pads_end,
+        "constant",
+        opset.constant(pad_value, dtype=np.uint8),
     )
 
 
 def resize_image(size, interpolation, pad_value):
     return custom_preprocess_function(
-        partial(resize_image_graph, size=size, interpolation=interpolation)
+        partial(
+            resize_image_graph,
+            size=size,
+            keep_aspect_ratio=False,
+            interpolation=interpolation,
+            pad_value=pad_value,
+        )
     )
 
 
@@ -324,6 +360,7 @@ def resize_image_with_aspect(size, interpolation, pad_value):
             size=size,
             keep_aspect_ratio=True,
             interpolation=interpolation,
+            pad_value=pad_value,
         )
     )
 

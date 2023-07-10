@@ -133,8 +133,7 @@ Output<Node> fitToWindowLetterBoxGraph(const ov::Output<ov::Node>& input,
     auto scale = std::make_shared<opset10::Minimum>(w_ratio, h_ratio);
     auto nw = std::make_shared<opset10::Convert>(std::make_shared<opset10::Round>(std::make_shared<opset10::Multiply>(iw, scale), opset10::Round::RoundMode::HALF_TO_EVEN), element::i32);
     auto nh = std::make_shared<opset10::Convert>(std::make_shared<opset10::Round>(std::make_shared<opset10::Multiply>(ih, scale), opset10::Round::RoundMode::HALF_TO_EVEN), element::i32);
-    auto new_size = std::make_shared<opset10::Concat>(OutputVector{std::make_shared<opset10::Unsqueeze>(nh, opset10::Constant::create(element::i32, Shape{1}, {0})),
-                                                                   std::make_shared<opset10::Unsqueeze>(nw, opset10::Constant::create(element::i32, Shape{1}, {0}))}, -1);
+    auto new_size = std::make_shared<opset10::Concat>(OutputVector{nh, nw}, 0);
 
     auto scales = opset10::Constant::create(element::f32, Shape{2}, {0.0f, 0.0f});
     auto axes = opset10::Constant::create(element::i64, Shape{2}, {h_axis, w_axis});
