@@ -177,7 +177,7 @@ ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
 
     auto scale_values_iter = configuration.find("scale_values");
     if (scale_values_iter != configuration.end()) {
-        scale_values = labels_iter->second.as<std::vector<float>>();
+        scale_values = scale_values_iter->second.as<std::vector<float>>();
     }
 }
 
