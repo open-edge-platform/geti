@@ -34,22 +34,52 @@
 namespace {
 constexpr char saliency_map_name[]{"saliency_map"};
 constexpr char feature_vector_name[]{"feature_vector"};
+
+struct NumAndStep {
+    size_t detectionsNum, objectSize;
+};
+
+NumAndStep fromSingleOutput(const ov::Shape& shape) {
+    const ov::Layout& layout("NCHW");
+    if (shape.size() != 4) {
+        throw std::logic_error("SSD single output must have 4 dimensions, but had " + std::to_string(shape.size()));
+    }
+    size_t detectionsNum = shape[ov::layout::height_idx(layout)];
+    size_t objectSize = shape[ov::layout::width_idx(layout)];
+    if (objectSize != 7) {
+        throw std::logic_error("SSD single output must have 7 as a last dimension, but had " +
+                               std::to_string(objectSize));
+    }
+    return {detectionsNum, objectSize};
+}
+
+NumAndStep fromMultipleOutputs(const ov::Shape& boxesShape) {
+    if (boxesShape.size() == 2) {
+        ov::Layout boxesLayout = "NC";
+        size_t detectionsNum = boxesShape[ov::layout::batch_idx(boxesLayout)];
+        size_t objectSize = boxesShape[ov::layout::channels_idx(boxesLayout)];
+
+        if (objectSize != 5) {
+            throw std::logic_error("Incorrect 'boxes' output shape, [n][5] shape is required");
+        }
+        return {detectionsNum, objectSize};
+    }
+    if (boxesShape.size() == 3) {
+        ov::Layout boxesLayout = "CHW";
+        size_t detectionsNum = boxesShape[ov::layout::height_idx(boxesLayout)];
+        size_t objectSize = boxesShape[ov::layout::width_idx(boxesLayout)];
+
+        if (objectSize != 4 && objectSize != 5) {
+            throw std::logic_error("Incorrect 'boxes' output shape, [b][n][{4 or 5}] shape is required");
+        }
+        return {detectionsNum, objectSize};
+    }
+    throw std::logic_error("Incorrect number of 'boxes' output dimensions, expected 2 or 3, but had " +
+                            std::to_string(boxesShape.size()));
+}
 }
 
 std::string ModelSSD::ModelType = "ssd";
-
-ModelSSD::ModelSSD(std::shared_ptr<InferenceAdapter>& adapter)
-    : DetectionModel(adapter) {
-    const ov::AnyMap& configuration = adapter->getModelConfig();
-    auto object_size_iter = configuration.find("object_size");
-    if (object_size_iter != configuration.end()) {
-        objectSize = object_size_iter->second.as<size_t>();
-    }
-    auto detections_num_id_iter = configuration.find("detections_num_id");
-    if (detections_num_id_iter != configuration.end()) {
-        detectionsNumId = detections_num_id_iter->second.as<size_t>();
-    }
-}
 
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
@@ -80,7 +110,7 @@ std::unique_ptr<ResultBase> ModelSSD::postprocess(InferenceResult& infResult) {
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& infResult) {
     const ov::Tensor& detectionsTensor = infResult.getFirstOutputTensor();
-    size_t detectionsNum = detectionsTensor.get_shape()[detectionsNumId];
+    NumAndStep numAndStep = fromSingleOutput(detectionsTensor.get_shape());
     const float* detections = detectionsTensor.data<float>();
 
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
@@ -100,35 +130,35 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
         }
     }
 
-    for (size_t i = 0; i < detectionsNum; i++) {
-        float image_id = detections[i * objectSize + 0];
+    for (size_t i = 0; i < numAndStep.detectionsNum; i++) {
+        float image_id = detections[i * numAndStep.objectSize + 0];
         if (image_id < 0) {
             break;
         }
 
-        float confidence = detections[i * objectSize + 2];
+        float confidence = detections[i * numAndStep.objectSize + 2];
 
         /** Filtering out objects with confidence < confidence_threshold probability **/
         if (confidence > confidence_threshold) {
             DetectedObject desc;
 
             desc.confidence = confidence;
-            desc.labelID = static_cast<size_t>(detections[i * objectSize + 1]);
+            desc.labelID = static_cast<size_t>(detections[i * numAndStep.objectSize + 1]);
             desc.label = getLabelName(desc.labelID);
             desc.x = clamp(
-                round((detections[i * objectSize + 3] * netInputWidth - padLeft) * invertedScaleX),
+                round((detections[i * numAndStep.objectSize + 3] * netInputWidth - padLeft) * invertedScaleX),
                 0.f,
                 floatInputImgWidth);
             desc.y = clamp(
-                round((detections[i * objectSize + 4] * netInputHeight - padTop) * invertedScaleY),
+                round((detections[i * numAndStep.objectSize + 4] * netInputHeight - padTop) * invertedScaleY),
                 0.f,
                 floatInputImgHeight);
             desc.width = clamp(
-                round((detections[i * objectSize + 5] * netInputWidth - padLeft) * invertedScaleX - desc.x),
+                round((detections[i * numAndStep.objectSize + 5] * netInputWidth - padLeft) * invertedScaleX - desc.x),
                 0.f,
                 floatInputImgWidth);
             desc.height = clamp(
-                round((detections[i * objectSize + 6] * netInputHeight - padTop) * invertedScaleY - desc.y),
+                round((detections[i * numAndStep.objectSize + 6] * netInputHeight - padTop) * invertedScaleY - desc.y),
                 0.f, floatInputImgHeight);
             result->objects.push_back(desc);
         }
@@ -139,7 +169,7 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult& infResult) {
     const float* boxes = infResult.outputsData[outputNames[0]].data<float>();
-    size_t detectionsNum = infResult.outputsData[outputNames[0]].get_shape()[detectionsNumId];
+    NumAndStep numAndStep = fromMultipleOutputs(infResult.outputsData[outputNames[0]].get_shape());
     const int64_t* labels = infResult.outputsData[outputNames[1]].data<int64_t>();
     const float* scores = outputNames.size() > 2 ? infResult.outputsData[outputNames[2]].data<float>() : nullptr;
 
@@ -165,8 +195,8 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
     float widthScale = scores ? netInputWidth : 1.0f;
     float heightScale = scores ? netInputHeight : 1.0f;
 
-    for (size_t i = 0; i < detectionsNum; i++) {
-        float confidence = scores ? scores[i] : boxes[i * objectSize + 4];
+    for (size_t i = 0; i < numAndStep.detectionsNum; i++) {
+        float confidence = scores ? scores[i] : boxes[i * numAndStep.objectSize + 4];
 
         /** Filtering out objects with confidence < confidence_threshold probability **/
         if (confidence > confidence_threshold) {
@@ -176,19 +206,19 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
             desc.labelID = labels[i];
             desc.label = getLabelName(desc.labelID);
             desc.x = clamp(
-                round((boxes[i * objectSize] * widthScale - padLeft) * invertedScaleX),
+                round((boxes[i * numAndStep.objectSize] * widthScale - padLeft) * invertedScaleX),
                 0.f,
                 floatInputImgWidth);
             desc.y = clamp(
-                round((boxes[i * objectSize + 1] * heightScale - padTop) * invertedScaleY),
+                round((boxes[i * numAndStep.objectSize + 1] * heightScale - padTop) * invertedScaleY),
                 0.f,
                 floatInputImgHeight);
             desc.width = clamp(
-                round((boxes[i * objectSize + 2] * widthScale - padLeft) * invertedScaleX - desc.x),
+                round((boxes[i * numAndStep.objectSize + 2] * widthScale - padLeft) * invertedScaleX - desc.x),
                 0.f,
                 floatInputImgWidth);
             desc.height = clamp(
-                round((boxes[i * objectSize + 3] * heightScale - padTop) * invertedScaleY - desc.y),
+                round((boxes[i * numAndStep.objectSize + 3] * heightScale - padTop) * invertedScaleY - desc.y),
                 0.f, floatInputImgHeight);
             result->objects.push_back(desc);
         }
@@ -262,21 +292,11 @@ void ModelSSD::prepareSingleOutput(std::shared_ptr<ov::Model>& model) {
     const auto& output = model->output();
     outputNames.push_back(output.get_any_name());
 
-    const ov::Shape& shape = output.get_partial_shape().get_max_shape();
-    const ov::Layout& layout("NCHW");
-    if (shape.size() != 4) {
-        throw std::logic_error("SSD single output must have 4 dimensions, but had " + std::to_string(shape.size()));
-    }
-    detectionsNumId = ov::layout::height_idx(layout);
-    objectSize = shape[ov::layout::width_idx(layout)];
-    if (objectSize != 7) {
-        throw std::logic_error("SSD single output must have 7 as a last dimension, but had " +
-                               std::to_string(objectSize));
-    }
+    fromSingleOutput(output.get_partial_shape().get_max_shape());
 
     if (!embedded_processing) {
         ov::preprocess::PrePostProcessor ppp(model);
-        ppp.output().tensor().set_element_type(ov::element::f32).set_layout(layout);
+        ppp.output().tensor().set_element_type(ov::element::f32);
         model = ppp.build();
     }
 }
@@ -304,33 +324,10 @@ void ModelSSD::prepareMultipleOutputs(std::shared_ptr<ov::Model>& model) {
     }
     std::sort(outputNames.begin(), outputNames.end());
 
-    const auto& boxesShape = model->output(outputNames[0]).get_partial_shape().get_max_shape();
-
-    ov::Layout boxesLayout;
-    if (boxesShape.size() == 2) {
-        boxesLayout = "NC";
-        detectionsNumId = ov::layout::batch_idx(boxesLayout);
-        objectSize = boxesShape[ov::layout::channels_idx(boxesLayout)];
-
-        if (objectSize != 5) {
-            throw std::logic_error("Incorrect 'boxes' output shape, [n][5] shape is required");
-        }
-    } else if (boxesShape.size() == 3) {
-        boxesLayout = "CHW";
-        detectionsNumId = ov::layout::height_idx(boxesLayout);
-        objectSize = boxesShape[ov::layout::width_idx(boxesLayout)];
-
-        if (objectSize != 4 && objectSize != 5) {
-            throw std::logic_error("Incorrect 'boxes' output shape, [b][n][{4 or 5}] shape is required");
-        }
-    } else {
-        throw std::logic_error("Incorrect number of 'boxes' output dimensions, expected 2 or 3, but had " +
-                               std::to_string(boxesShape.size()));
-    }
+    fromMultipleOutputs(model->output(outputNames[0]).get_partial_shape().get_max_shape());
 
     if (!embedded_processing) {
         ov::preprocess::PrePostProcessor ppp(model);
-        ppp.output(outputNames[0]).tensor().set_layout(boxesLayout);
 
         for (const auto& outName : outputNames) {
             ppp.output(outName).tensor().set_element_type(ov::element::f32);
@@ -343,6 +340,4 @@ void ModelSSD::updateModelInfo() {
     DetectionModel::updateModelInfo();
 
     model->set_rt_info(ModelSSD::ModelType, "model_info", "model_type");
-    model->set_rt_info(objectSize, "model_info", "object_size");
-    model->set_rt_info(detectionsNumId, "model_info", "detections_num_id");
 }
