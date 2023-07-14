@@ -65,7 +65,7 @@ ModelBase::ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& config
 
 void ModelBase::updateModelInfo() {
     if (!model) {
-        std::runtime_error("The ov::Model object is not accessible");
+        throw std::runtime_error("The ov::Model object is not accessible");
     }
 
     if (!inputsLayouts.empty()) {
@@ -125,7 +125,7 @@ std::unique_ptr<ResultBase> ModelBase::infer(const InputData& inputData) {
 
 std::shared_ptr<ov::Model> ModelBase::getModel() {
     if (!model) {
-        std::runtime_error(std::string("ov::Model is not accessible for the current model adapter: ") + typeid(inferenceAdapter).name());
+        throw std::runtime_error(std::string("ov::Model is not accessible for the current model adapter: ") + typeid(inferenceAdapter).name());
     }
 
     updateModelInfo();
