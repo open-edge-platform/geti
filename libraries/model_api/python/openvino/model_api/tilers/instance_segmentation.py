@@ -14,6 +14,8 @@
  limitations under the License.
 """
 
+from contextlib import contextmanager
+
 import cv2 as cv
 import numpy as np
 from openvino.model_api.models.instance_segmentation import (
@@ -141,7 +143,7 @@ class InstanceSegmentationTiler(DetectionTiler):
         for i in range(detections_array.shape[0]):
             label = int(detections_array[i][0])
             score = float(detections_array[i][1])
-            bbox = list(detections_array[i][2:])
+            bbox = list(detections_array[i][2:].astype(np.int32))
             masks[i] = _segm_postprocess(np.array(bbox), masks[i], *shape[:-1])
             detected_objects.append(
                 SegmentedObject(*bbox, score, label, self.model.labels[label], masks[i])
@@ -174,14 +176,9 @@ class InstanceSegmentationTiler(DetectionTiler):
             return image_saliency_map
 
         num_classes = len(image_saliency_map)
-        map_h, map_w = image_saliency_map[0].shape
         image_h, image_w, _ = shape
 
-        ratio = map_h / self.tile_size, map_w / self.tile_size
-        image_map_h = int(image_h * ratio[0])
-        image_map_w = int(image_w * ratio[1])
-
-        merged_map = [np.zeros((image_map_h, image_map_w)) for _ in range(num_classes)]
+        merged_map = [np.zeros((image_h, image_w)) for _ in range(num_classes)]
 
         for i, saliency_map in enumerate(saliency_maps[1:], 1):
             for class_idx in range(num_classes):
@@ -190,38 +187,36 @@ class InstanceSegmentationTiler(DetectionTiler):
                     continue
 
                 x_1, y_1, x_2, y_2 = tiles_coords[i]
-                y_1, x_1 = int(y_1 * ratio[0]), int(x_1 * ratio[1])
-                y_2, x_2 = int(y_2 * ratio[0]), int(x_2 * ratio[1])
-
-                map_h, map_w = cls_map.shape
-
                 cls_map = cv.resize(cls_map, (x_2 - x_1, y_2 - y_1))
 
-                map_h, map_w = y_2 - y_1, x_2 - x_1
-
-                tile_map = merged_map[class_idx][y_1 : y_1 + map_h, x_1 : x_1 + map_w]
-                merged_map[class_idx][
-                    y_1 : y_1 + map_h, x_1 : x_1 + map_w
-                ] = np.maximum(tile_map, cls_map)
+                tile_map = merged_map[class_idx][y_1:y_2, x_1:x_2]
+                merged_map[class_idx][y_1:y_2, x_1:x_2] = np.maximum(tile_map, cls_map)
 
         for class_idx in range(num_classes):
             image_map_cls = image_saliency_map[class_idx]
             if len(image_map_cls.shape) < 2:
-                continue
-            image_map_cls = cv.resize(image_map_cls, (image_map_w, image_map_h))
-            merged_map[class_idx] += 0.5 * image_map_cls
-            merged_map[class_idx] = merged_map[class_idx].astype(np.uint8)
+                merged_map[class_idx] = np.round(merged_map[class_idx]).astype(np.uint8)
+                if np.sum(merged_map[class_idx]) == 0:
+                    merged_map[class_idx] = np.ndarray(0)
+            else:
+                image_map_cls = cv.resize(image_map_cls, (image_h, image_w))
+                merged_map[class_idx] = np.maximum(merged_map[class_idx], image_map_cls)
+                merged_map[class_idx] = np.round(merged_map[class_idx]).astype(np.uint8)
 
         return merged_map
 
     def __call__(self, inputs):
-        if isinstance(self.model, MaskRCNNModel):
-            postprocess_state = self.model.postprocess_semantic_masks
-            self.model.postprocess_semantic_masks = False
+        @contextmanager
+        def setup_maskrcnn(*args, **kwds):
+            postprocess_state = None
+            if isinstance(self.model, MaskRCNNModel):
+                postprocess_state = self.model.postprocess_semantic_masks
+                self.model.postprocess_semantic_masks = False
+            try:
+                yield
+            finally:
+                if isinstance(self.model, MaskRCNNModel):
+                    self.model.postprocess_semantic_masks = postprocess_state
 
-        predictions = super().__call__(inputs)
-
-        if isinstance(self.model, MaskRCNNModel):
-            self.model.postprocess_semantic_masks = postprocess_state
-
-        return predictions
+        with setup_maskrcnn():
+            return super().__call__(inputs)

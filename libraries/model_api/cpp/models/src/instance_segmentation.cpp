@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <limits>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
@@ -52,26 +53,6 @@ cv::Rect expand_box(const cv::Rect2f& box, float scale) {
         h_half = box.height * 0.5f * scale;
     const cv::Point2f& center = (box.tl() + box.br()) * 0.5f;
     return {cv::Point(int(center.x - w_half), int(center.y - h_half)), cv::Point(int(center.x + w_half), int(center.y + h_half))};
-}
-
-cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, int im_h, int im_w) {
-    // Add zero border to prevent upsampling artifacts on segment borders.
-    cv::Mat raw_cls_mask;
-    cv::copyMakeBorder(unpadded, raw_cls_mask, 1, 1, 1, 1, cv::BORDER_CONSTANT, {0});
-    cv::Rect extended_box = expand_box(box, float(raw_cls_mask.cols) / (raw_cls_mask.cols - 2));
-
-    int w = std::max(extended_box.width + 1, 1);
-    int h = std::max(extended_box.height + 1, 1);
-    int x0 = clamp(extended_box.x, 0, im_w);
-    int y0 = clamp(extended_box.y, 0, im_h);
-    int x1 = clamp(extended_box.x + extended_box.width + 1, 0, im_w);
-    int y1 = clamp(extended_box.y + extended_box.height + 1, 0, im_h);
-
-    cv::Mat resized;
-    cv::resize(raw_cls_mask, resized, {w, h});
-    cv::Mat im_mask(cv::Size{im_w, im_h}, CV_8UC1, cv::Scalar{0});
-    im_mask(cv::Rect{x0, y0, x1-x0, y1-y0}).setTo(1, resized({cv::Point(x0-extended_box.x, y0-extended_box.y), cv::Point(x1-extended_box.x, y1-extended_box.y)}) > 0.5f);
-    return im_mask;
 }
 
 std::vector<cv::Mat_<std::uint8_t>> average_and_normalize(const std::vector<std::vector<cv::Mat>>& saliency_maps) {
@@ -110,6 +91,27 @@ std::vector<cv::Mat_<std::uint8_t>> average_and_normalize(const std::vector<std:
     return aggregated;
 }
 }
+
+cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, int im_h, int im_w) {
+    // Add zero border to prevent upsampling artifacts on segment borders.
+    cv::Mat raw_cls_mask;
+    cv::copyMakeBorder(unpadded, raw_cls_mask, 1, 1, 1, 1, cv::BORDER_CONSTANT, {0});
+    cv::Rect extended_box = expand_box(box, float(raw_cls_mask.cols) / (raw_cls_mask.cols - 2));
+
+    int w = std::max(extended_box.width + 1, 1);
+    int h = std::max(extended_box.height + 1, 1);
+    int x0 = clamp(extended_box.x, 0, im_w);
+    int y0 = clamp(extended_box.y, 0, im_h);
+    int x1 = clamp(extended_box.x + extended_box.width + 1, 0, im_w);
+    int y1 = clamp(extended_box.y + extended_box.height + 1, 0, im_h);
+
+    cv::Mat resized;
+    cv::resize(raw_cls_mask, resized, {w, h});
+    cv::Mat im_mask(cv::Size{im_w, im_h}, CV_8UC1, cv::Scalar{0});
+    im_mask(cv::Rect{x0, y0, x1-x0, y1-y0}).setTo(1, resized({cv::Point(x0-extended_box.x, y0-extended_box.y), cv::Point(x1-extended_box.x, y1-extended_box.y)}) > 0.5f);
+    return im_mask;
+}
+
 std::string MaskRCNNModel::ModelType = "MaskRCNN";
 
 MaskRCNNModel::MaskRCNNModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
@@ -325,16 +327,18 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
             round((boxes[i * objectSize + 3] - padTop) * invertedScaleY - obj.y),
             0.f, floatInputImgHeight);
         cv::Mat raw_cls_mask{masks_size, CV_32F, masks + masks_size.area() * i};
-        if (postprocess_semantic_masks) {
-            obj.mask = segm_postprocess(obj, raw_cls_mask, internalData.inputImgHeight, internalData.inputImgWidth);
+        cv::Mat resized_mask;
+        if (postprocess_semantic_masks || has_feature_vector_name) {
+            resized_mask = segm_postprocess(obj, raw_cls_mask, internalData.inputImgHeight, internalData.inputImgWidth);
         } else {
-            obj.mask = raw_cls_mask;
+            resized_mask = raw_cls_mask;
         }
+        obj.mask = postprocess_semantic_masks ? resized_mask : raw_cls_mask.clone();
         if (confidence > confidence_threshold) {
             result->segmentedObjects.push_back(obj);
         }
-        if (has_feature_vector_name) {
-            saliency_maps[obj.labelID - 1].push_back(obj.mask);
+        if (has_feature_vector_name && confidence > confidence_threshold) {
+            saliency_maps[obj.labelID - 1].push_back(resized_mask);
         }
     }
     result->saliency_map = average_and_normalize(saliency_maps);

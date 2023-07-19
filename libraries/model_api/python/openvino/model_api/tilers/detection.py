@@ -75,6 +75,10 @@ class DetectionTiler(Tiler):
         output_dict["saliency_map"] = predictions.saliency_map
         output_dict["features"] = predictions.feature_vector
 
+        if self.execution_mode == "sync":
+            output_dict["saliency_map"] = np.copy(output_dict["saliency_map"])
+            output_dict["features"] = np.copy(output_dict["features"])
+
         offset_x, offset_y = coord[:2]
         detections[:, 2:] += np.tile((offset_x, offset_y), 2)
         output_dict["bboxes"] = detections
@@ -123,7 +127,7 @@ class DetectionTiler(Tiler):
         for i in range(detections_array.shape[0]):
             label = int(detections_array[i][0])
             score = float(detections_array[i][1])
-            bbox = list(detections_array[i][2:])
+            bbox = list(detections_array[i][2:].astype(np.int32))
             detected_objects.append(
                 Detection(*bbox, score, label, self.model.labels[label])
             )

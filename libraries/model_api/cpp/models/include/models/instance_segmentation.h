@@ -28,6 +28,7 @@ struct InferenceResult;
 struct ResultBase;
 struct InstanceSegmentationResult;
 struct ImageInputData;
+struct SegmentedObject;
 
 class MaskRCNNModel : public ImageModel {
 public:
@@ -41,6 +42,7 @@ public:
 
     virtual std::unique_ptr<InstanceSegmentationResult> infer(const ImageInputData& inputData);
     static std::string ModelType;
+    bool postprocess_semantic_masks = true;
 
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
@@ -50,5 +52,6 @@ protected:
     }
 
     float confidence_threshold = 0.5f;
-    bool postprocess_semantic_masks = true;
 };
+
+cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, int im_h, int im_w);

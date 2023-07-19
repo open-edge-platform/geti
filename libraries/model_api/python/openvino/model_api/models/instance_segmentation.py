@@ -221,7 +221,8 @@ class MaskRCNNModel(ImageModel):
                     )
                 )
             if has_feature_vector_name:
-                saliency_maps[cls - 1].append(resized_mask)
+                if confidence > self.confidence_threshold:
+                    saliency_maps[cls - 1].append(resized_mask)
         return InstanceSegmentationResult(
             objects,
             _average_and_normalize(saliency_maps),
@@ -236,7 +237,7 @@ def _average_and_normalize(saliency_maps):
             saliency_map = np.max(np.array(per_object_maps), axis=0)
             max_values = np.max(saliency_map)
             saliency_map = 255 * (saliency_map) / (max_values + 1e-12)
-            aggregated.append(saliency_map.astype(np.uint8))
+            aggregated.append(np.round(saliency_map).astype(np.uint8))
         else:
             aggregated.append(np.ndarray(0))
     return aggregated
