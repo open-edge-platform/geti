@@ -67,14 +67,17 @@ std::unique_ptr<ResultBase> DetectionTiler::postprocess_tile(std::unique_ptr<Res
         det.y += coord.y;
     }
 
-    auto tmp_feature_vector = ov::Tensor(det_res->feature_vector.get_element_type(), det_res->feature_vector.get_shape());
-    auto tmp_saliency_map = ov::Tensor(det_res->saliency_map.get_element_type(), det_res->saliency_map.get_shape());
+    if (det_res->feature_vector) {
+        auto tmp_feature_vector = ov::Tensor(det_res->feature_vector.get_element_type(), det_res->feature_vector.get_shape());
+        det_res->feature_vector.copy_to(tmp_feature_vector);
+        det_res->feature_vector = tmp_feature_vector;
+    }
 
-    det_res->feature_vector.copy_to(tmp_feature_vector);
-    det_res->feature_vector = tmp_feature_vector;
-
-    det_res->saliency_map.copy_to(tmp_saliency_map);
-    det_res->saliency_map = tmp_saliency_map;
+    if (det_res->saliency_map) {
+        auto tmp_saliency_map = ov::Tensor(det_res->saliency_map.get_element_type(), det_res->saliency_map.get_shape());
+        det_res->saliency_map.copy_to(tmp_saliency_map);
+        det_res->saliency_map = tmp_saliency_map;
+    }
 
     return tile_result;
 }
@@ -105,28 +108,33 @@ std::unique_ptr<ResultBase> DetectionTiler::merge_results(const std::vector<std:
 
     if (tiles_results.size()) {
         DetectionResult* det_res = static_cast<DetectionResult*>(tiles_results.begin()->get());
-        result->feature_vector = ov::Tensor(det_res->feature_vector.get_element_type(), det_res->feature_vector.get_shape());
-    }
-
-    float* feature_ptr = result->feature_vector.data<float>();
-    size_t feature_size = result->feature_vector.get_size();
-
-    std::fill(feature_ptr, feature_ptr + feature_size, 0.f);
-
-    for (const auto& result : tiles_results) {
-        DetectionResult* det_res = static_cast<DetectionResult*>(result.get());
-        const float* current_feature_ptr = det_res->feature_vector.data<float>();
-
-        for (size_t i = 0; i < feature_size; ++i) {
-            feature_ptr[i] += current_feature_ptr[i];
+        if (det_res->feature_vector) {
+            result->feature_vector = ov::Tensor(det_res->feature_vector.get_element_type(), det_res->feature_vector.get_shape());
+        }
+        if (det_res->saliency_map) {
+            result->saliency_map = merge_saliency_maps(tiles_results, image_size, tile_coords);
         }
     }
 
-    for (size_t i = 0; i < feature_size; ++i) {
-        feature_ptr[i] /= tiles_results.size();
-    }
+    if (result->feature_vector) {
+        float* feature_ptr = result->feature_vector.data<float>();
+        size_t feature_size = result->feature_vector.get_size();
 
-    result->saliency_map = merge_saliency_maps(tiles_results, image_size, tile_coords);
+        std::fill(feature_ptr, feature_ptr + feature_size, 0.f);
+
+        for (const auto& result : tiles_results) {
+            DetectionResult* det_res = static_cast<DetectionResult*>(result.get());
+            const float* current_feature_ptr = det_res->feature_vector.data<float>();
+
+            for (size_t i = 0; i < feature_size; ++i) {
+                feature_ptr[i] += current_feature_ptr[i];
+            }
+        }
+
+        for (size_t i = 0; i < feature_size; ++i) {
+            feature_ptr[i] /= tiles_results.size();
+        }
+    }
 
     return retVal;
 }
