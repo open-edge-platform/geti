@@ -234,7 +234,7 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             {0, 1, 2, 3, 4, 5}};
         auto chosenMasks = presetMasks.size() ? presetMasks : defaultMasks[size_t(yoloVersion)];
         if (chosenMasks.size() != num * outputs.size()) {
-            throw std::runtime_error(std::string("Invalid size of masks array, got ") +
+            throw std::runtime_error("Invalid size of masks array, got " +
                                      std::to_string(presetMasks.size()) + ", should be " +
                                      std::to_string(num * outputs.size()));
         }

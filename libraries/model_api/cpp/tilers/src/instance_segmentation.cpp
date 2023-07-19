@@ -135,8 +135,7 @@ std::vector<cv::Mat_<std::uint8_t>> InstanceSegmentationTiler::merge_saliency_ma
     size_t num_classes = image_saliency_map.size();
     std::vector<cv::Mat_<std::uint8_t>> merged_map(num_classes);
     for (auto& map : merged_map) {
-        map = cv::Mat_<std::uint8_t>(image_size);
-        map = 0;
+        map = cv::Mat_<std::uint8_t>(image_size, 0);
     }
 
     for (size_t i = 1; i < all_saliecy_maps.size(); ++i) {

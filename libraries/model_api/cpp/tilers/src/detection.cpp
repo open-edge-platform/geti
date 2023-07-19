@@ -160,10 +160,10 @@ ov::Tensor DetectionTiler::merge_saliency_maps(const std::vector<std::unique_ptr
     size_t image_map_w = static_cast<size_t>(image_size.width * ratio_w);
 
     std::vector<cv::Mat_<float>> merged_map_mat(num_classes);
-    for (auto& class_map : merged_map_mat)  {
-        class_map = cv::Mat_<float>(cv::Size(image_map_w, image_map_h));
-        class_map = 0.f;
+    for (auto& class_map : merged_map_mat) {
+        class_map = cv::Mat_<float>(cv::Size{int(image_map_w), int(image_map_h)}, 0.f);
     }
+
     for (size_t i = 1; i < all_saliency_maps.size(); ++i) {
         for (size_t class_idx = 0; class_idx < num_classes; ++class_idx) {
             auto current_cls_map_mat = wrap_saliency_map_tensor_to_mat(all_saliency_maps[i], shape_shift, class_idx);
