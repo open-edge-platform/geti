@@ -25,6 +25,7 @@ try:
         AsyncInferQueue,
         Core,
         Dimension,
+        OVAny,
         PartialShape,
         Type,
         get_version,
@@ -152,6 +153,8 @@ class OpenvinoAdapter(InferenceAdapter):
         self.model_parameters["input_layouts"] = Layout.parse_layouts(
             self.model_parameters.get("input_layouts", None)
         )
+        self.is_onnx_file = False
+        self.onnx_metadata = {}
 
         if isinstance(self.model_path, (str, Path)):
             if Path(self.model_path).suffix == ".onnx" and weights_path:
@@ -159,6 +162,24 @@ class OpenvinoAdapter(InferenceAdapter):
                     'For model in ONNX format should set only "model_path" parameter.'
                     'The "weights_path" will be omitted'
                 )
+            if Path(self.model_path).suffix == ".onnx" and not weights_path:
+                import onnx
+
+                self.is_onnx_file = True
+                onnx_model = onnx.load(self.model_path)
+
+                def insert_hiararchical(keys, val, root_dict):
+                    if len(keys) == 1:
+                        root_dict[keys[0]] = val
+                        return
+                    if keys[0] not in root_dict:
+                        root_dict[keys[0]] = {}
+                    insert_hiararchical(keys[1:], val, root_dict[keys[0]])
+
+                for prop in onnx_model.metadata_props:
+                    keys = prop.key.split()
+                    if "model_info" in keys:
+                        insert_hiararchical(keys, prop.value, self.onnx_metadata)
 
         self.model_from_buffer = isinstance(self.model_path, bytes) and isinstance(
             weights_path, bytes
@@ -335,6 +356,16 @@ class OpenvinoAdapter(InferenceAdapter):
         return layers_info
 
     def get_rt_info(self, path):
+        if self.is_onnx_file:
+            try:
+                value = self.onnx_metadata
+                for item in path:
+                    value = value[item]
+                return OVAny(value)
+            except KeyError:
+                raise RuntimeError(
+                    "Cannot get runtime attribute. Path to runtime attribute is incorrect."
+                )
         return self.model.get_rt_info(path)
 
     def embed_preprocessing(

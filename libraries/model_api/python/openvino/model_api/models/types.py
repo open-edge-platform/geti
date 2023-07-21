@@ -172,7 +172,10 @@ class ListValue(BaseValue):
     def from_str(self, value):
         try:
             floats = [float(i) for i in value.split()]
-            ints = [int(i) for i in value.split()]
+            try:
+                ints = [int(i) for i in value.split()]
+            except ValueError:
+                ints = []
             if ints == floats:
                 return ints
             return floats

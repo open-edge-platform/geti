@@ -121,10 +121,10 @@ class ImageModel(Model):
                     description="Flag that pre/postprocessing embedded",
                 ),
                 "orig_width": NumericalValue(
-                    description="Model input width before embedding processing"
+                    int, description="Model input width before embedding processing"
                 ),
                 "orig_height": NumericalValue(
-                    description="Model input height before embedding processing"
+                    int, description="Model input height before embedding processing"
                 ),
             }
         )
