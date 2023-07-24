@@ -61,7 +61,7 @@ class Model:
 
     __model__ = None  # Abstract wrapper has no name
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         """Model constructor
 
         Args:
@@ -101,7 +101,7 @@ class Model:
         raise RuntimeError("get_model() is not supported for remote inference")
 
     @classmethod
-    def _get_model_class(cls, name):
+    def get_model_class(cls, name):
         subclasses = [
             subclass for subclass in cls.get_subclasses() if subclass.__model__
         ]
@@ -182,7 +182,7 @@ class Model:
             model_type = inference_adapter.get_rt_info(
                 ["model_info", "model_type"]
             ).astype(str)
-        Model = cls._get_model_class(model_type)
+        Model = cls.get_model_class(model_type)
         return Model(inference_adapter, configuration, preload)
 
     @classmethod

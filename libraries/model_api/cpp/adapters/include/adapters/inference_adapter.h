@@ -28,7 +28,7 @@ struct InferenceResult;
 using InferenceOutput = std::map<std::string, ov::Tensor>;
 using InferenceInput = std::map<std::string, ov::Tensor>;
 
-// Used as interface it should not contain any implementation details.
+// The interface doesn't have implementation
 class InferenceAdapter
 {
 

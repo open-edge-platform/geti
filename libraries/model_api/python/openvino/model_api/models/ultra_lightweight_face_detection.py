@@ -23,7 +23,7 @@ from .utils import Detection, nms
 class UltraLightweightFaceDetection(DetectionModel):
     __model__ = "Ultra_LightWeight_Face_Detection"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 2)
         self.labels = ["Face"]

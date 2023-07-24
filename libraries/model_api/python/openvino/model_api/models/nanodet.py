@@ -25,7 +25,7 @@ from .utils import Detection, clip_detections, nms, softmax
 class NanoDet(DetectionModel):
     __model__ = "NanoDet"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)
         self.output_blob_name = self._get_outputs()
@@ -170,7 +170,7 @@ class NanoDet(DetectionModel):
 class NanoDetPlus(NanoDet):
     __model__ = "NanoDet-Plus"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self.ad = 0
         self.strides = [8, 16, 32, 64]

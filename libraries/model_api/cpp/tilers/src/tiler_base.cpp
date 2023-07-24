@@ -22,7 +22,7 @@
 #include <models/input_data.h>
 
 
-TilerBase::TilerBase(std::shared_ptr<ModelBase> _model, const ov::AnyMap& configuration) :
+TilerBase::TilerBase(const std::shared_ptr<ModelBase>& _model, const ov::AnyMap& configuration) :
     model(_model) {
 
     ov::AnyMap extra_config;

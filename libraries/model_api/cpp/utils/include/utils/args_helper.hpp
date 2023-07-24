@@ -28,3 +28,31 @@ std::map<std::string, int32_t> parseValuePerDevice(const std::set<std::string>& 
 std::map<std::string, ov::Layout> parseLayoutString(const std::string& layout_string);
 
 std::string formatLayouts(const std::map<std::string, ov::Layout>& layouts);
+
+template<typename Type>
+Type get_from_any_maps(const std::string& key, const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority, Type low_priority) {
+    auto topk_iter = top_priority.find(key);
+    if (topk_iter != top_priority.end()) {
+        return topk_iter->second.as<Type>();
+    }
+    topk_iter = mid_priority.find(key);
+    if (topk_iter != mid_priority.end()) {
+        return topk_iter->second.as<Type>();
+    }
+    return low_priority;
+}
+
+template<>
+inline bool get_from_any_maps(const std::string& key, const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority, bool low_priority) {
+    auto topk_iter = top_priority.find(key);
+    if (topk_iter != top_priority.end()) {
+        const std::string& val = topk_iter->second.as<std::string>();
+        return val == "True" || val == "YES";
+    }
+    topk_iter = mid_priority.find(key);
+    if (topk_iter != mid_priority.end()) {
+        const std::string& val = topk_iter->second.as<std::string>();
+        return val == "True" || val == "YES";
+    }
+    return low_priority;
+}

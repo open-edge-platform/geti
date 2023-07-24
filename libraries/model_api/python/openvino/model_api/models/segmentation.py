@@ -55,7 +55,7 @@ def create_hard_prediction_from_soft_prediction(
 class SegmentationModel(ImageModel):
     __model__ = "Segmentation"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, (1, 2))
         if self.path_to_labels:

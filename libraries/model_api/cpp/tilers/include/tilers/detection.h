@@ -20,7 +20,7 @@
 
 class DetectionTiler : public TilerBase {
 public:
-    DetectionTiler(std::shared_ptr<ModelBase> model, const ov::AnyMap& configuration);
+    DetectionTiler(const std::shared_ptr<ModelBase>& model, const ov::AnyMap& configuration);
     virtual ~DetectionTiler() = default;
 
 protected:

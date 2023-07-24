@@ -42,7 +42,7 @@ class ImageModel(Model):
         input_transform (InputTransform): instance of the `InputTransform` for image normalization
     """
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         """Image model constructor
 
         It extends the `Model` constructor.

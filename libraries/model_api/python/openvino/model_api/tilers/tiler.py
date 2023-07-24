@@ -41,7 +41,7 @@ class Tiler(metaclass=abc.ABCMeta):
         execution_mode: Controls inference mode of the tiler (`async` or `sync`).
     """
 
-    def __init__(self, model, configuration=None, execution_mode="async"):
+    def __init__(self, model, configuration=dict(), execution_mode="async"):
         """
         Base constructor for creating a tiling pipeline
 

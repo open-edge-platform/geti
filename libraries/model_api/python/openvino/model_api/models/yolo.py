@@ -334,7 +334,7 @@ class YoloV4(YOLO):
             self.anchors = masked_anchors
             self.use_input_size = True
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
 
     def _get_output_info(self):
@@ -415,7 +415,7 @@ class YOLOF(YOLO):
             self.output_layout = "NCHW"
             self.use_input_size = True
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
 
     def _get_output_info(self):
@@ -457,7 +457,7 @@ class YOLOF(YOLO):
 class YOLOX(DetectionModel):
     __model__ = "YOLOX"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)
         self.output_blob_name = next(iter(self.outputs))
@@ -573,7 +573,7 @@ class YOLOX(DetectionModel):
 class YoloV3ONNX(DetectionModel):
     __model__ = "YOLOv3-ONNX"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self.image_info_blob_name = (
             self.image_info_blob_names[0]

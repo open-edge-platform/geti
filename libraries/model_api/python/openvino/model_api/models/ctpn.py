@@ -25,7 +25,7 @@ from .utils import Detection, clip_detections, nms
 class CTPN(DetectionModel):
     __model__ = "CTPN"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, False)
         self._check_io_number(1, 2)
         self.bboxes_blob_name, self.scores_blob_name = self._get_outputs()

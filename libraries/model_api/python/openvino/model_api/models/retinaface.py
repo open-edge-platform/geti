@@ -26,7 +26,7 @@ from .utils import Detection, DetectionWithLandmarks, clip_detections, nms
 class RetinaFace(DetectionModel):
     __model__ = "RetinaFace"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, (6, 9, 12))
 
@@ -60,7 +60,7 @@ class RetinaFace(DetectionModel):
 class RetinaFacePyTorch(DetectionModel):
     __model__ = "RetinaFace-PyTorch"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, (2, 3))
 

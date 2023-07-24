@@ -39,7 +39,7 @@ cv::Mat non_linear_normalization(cv::Mat& class_map) {
 
 }
 
-DetectionTiler::DetectionTiler(std::shared_ptr<ModelBase> _model, const ov::AnyMap& configuration) :
+DetectionTiler::DetectionTiler(const std::shared_ptr<ModelBase>& _model, const ov::AnyMap& configuration) :
     TilerBase(_model, configuration) {
 
     ov::AnyMap extra_config;

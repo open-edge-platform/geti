@@ -32,7 +32,7 @@ struct ResultBase;
 
 class TilerBase {
 public:
-    TilerBase(std::shared_ptr<ModelBase> model, const ov::AnyMap& configuration);
+    TilerBase(const std::shared_ptr<ModelBase>& model, const ov::AnyMap& configuration);
 
     virtual ~TilerBase() = default;
 

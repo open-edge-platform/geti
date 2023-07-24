@@ -31,7 +31,7 @@ from .types import NumericalValue
 class OpenPose(ImageModel):
     __model__ = "OpenPose"
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload=False)
         self.pooled_heatmaps_blob_name = "pooled_heatmaps"
         self.heatmaps_blob_name = "heatmaps"

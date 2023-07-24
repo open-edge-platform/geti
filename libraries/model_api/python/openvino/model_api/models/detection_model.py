@@ -28,7 +28,7 @@ class DetectionModel(ImageModel):
     The `postprocess` method must be implemented in a specific inherited wrapper.
     """
 
-    def __init__(self, inference_adapter, configuration=None, preload=False):
+    def __init__(self, inference_adapter, configuration=dict(), preload=False):
         """Detection Model constructor
 
         It extends the `ImageModel` construtor.
