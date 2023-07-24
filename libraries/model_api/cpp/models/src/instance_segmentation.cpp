@@ -90,6 +90,35 @@ std::vector<cv::Mat_<std::uint8_t>> average_and_normalize(const std::vector<std:
     }
     return aggregated;
 }
+
+struct Lbm {
+    ov::Tensor labels, boxes, masks;
+};
+
+Lbm filterTensors(const std::map<std::string, ov::Tensor>& infResult) {
+    Lbm lbm;
+    for (const auto& pair : infResult) {
+        if (pair.first == saliency_map_name || pair.first == feature_vector_name) {
+            continue;
+        }
+        switch(pair.second.get_shape().size()) {
+            case 2:
+                lbm.labels = pair.second;
+                break;
+            case 3:
+                lbm.boxes = pair.second;
+                break;
+            case 4:
+                lbm.masks = pair.second;
+                break;
+            case 0:
+                break;
+            default:
+                throw std::runtime_error("Unexpected result: " + pair.first);
+        }
+    }
+    return lbm;
+}
 }
 
 cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, int im_h, int im_w) {
@@ -285,11 +314,12 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
             padTop = (netInputHeight - int(std::round(floatInputImgHeight / invertedScaleY))) / 2;
         }
     }
-    const int64_t* const labels = infResult.outputsData[outputNames[0]].data<int64_t>();
-    const float* const boxes = infResult.outputsData[outputNames[1]].data<float>();
-    size_t objectSize = infResult.outputsData[outputNames[1]].get_shape().back();
-    float* const masks = infResult.outputsData[outputNames[2]].data<float>();
-    const cv::Size& masks_size{int(infResult.outputsData[outputNames[2]].get_shape()[3]), int(infResult.outputsData[outputNames[2]].get_shape()[2])};
+    const Lbm& lbm = filterTensors(infResult.outputsData);
+    const int64_t* const labels = lbm.labels.data<int64_t>();
+    const float* const boxes = lbm.boxes.data<float>();
+    size_t objectSize = lbm.boxes.get_shape().back();
+    float* const masks = lbm.masks.data<float>();
+    const cv::Size& masks_size{int(lbm.masks.get_shape()[3]), int(lbm.masks.get_shape()[2])};
     InstanceSegmentationResult* result = new InstanceSegmentationResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
     std::vector<std::vector<cv::Mat>> saliency_maps;
@@ -300,7 +330,7 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
         }
         saliency_maps.resize(this->labels.size());
     }
-    for (size_t i = 0; i < infResult.outputsData[outputNames[0]].get_size(); ++i) {
+    for (size_t i = 0; i < lbm.labels.get_size(); ++i) {
         float confidence = boxes[i * objectSize + 4];
         if (confidence <= confidence_threshold && !has_feature_vector_name) {
             continue;

@@ -77,6 +77,12 @@ NumAndStep fromMultipleOutputs(const ov::Shape& boxesShape) {
     throw std::logic_error("Incorrect number of 'boxes' output dimensions, expected 2 or 3, but had " +
                             std::to_string(boxesShape.size()));
 }
+
+std::vector<std::string> filterOutXai(const std::vector<std::string>& names) {
+    std::vector<std::string> filtered;
+    std::copy_if (names.begin(), names.end(), std::back_inserter(filtered), [](const std::string& name){return name != saliency_map_name && name != feature_vector_name;});
+    return filtered;
+}
 }
 
 std::string ModelSSD::ModelType = "ssd";
@@ -95,7 +101,7 @@ std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputDa
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocess(InferenceResult& infResult) {
-    std::unique_ptr<ResultBase> result = outputNames.size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
+    std::unique_ptr<ResultBase> result = filterOutXai(outputNames).size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
     DetectionResult* cls_res = static_cast<DetectionResult*>(result.get());
     auto saliency_map_iter = infResult.outputsData.find(saliency_map_name);
     if (saliency_map_iter != infResult.outputsData.end()) {
@@ -109,7 +115,9 @@ std::unique_ptr<ResultBase> ModelSSD::postprocess(InferenceResult& infResult) {
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& infResult) {
-    const ov::Tensor& detectionsTensor = infResult.getFirstOutputTensor();
+    const std::vector<std::string> namesWithoutXai = filterOutXai(outputNames);
+    assert(namesWithoutXai.size() == 1);
+    const ov::Tensor& detectionsTensor = infResult.outputsData[namesWithoutXai[0]];
     NumAndStep numAndStep = fromSingleOutput(detectionsTensor.get_shape());
     const float* detections = detectionsTensor.data<float>();
 
@@ -168,10 +176,11 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult& infResult) {
-    const float* boxes = infResult.outputsData[outputNames[0]].data<float>();
-    NumAndStep numAndStep = fromMultipleOutputs(infResult.outputsData[outputNames[0]].get_shape());
-    const int64_t* labels = infResult.outputsData[outputNames[1]].data<int64_t>();
-    const float* scores = outputNames.size() > 2 ? infResult.outputsData[outputNames[2]].data<float>() : nullptr;
+    const std::vector<std::string> namesWithoutXai = filterOutXai(outputNames);
+    const float* boxes = infResult.outputsData[namesWithoutXai[0]].data<float>();
+    NumAndStep numAndStep = fromMultipleOutputs(infResult.outputsData[namesWithoutXai[0]].get_shape());
+    const int64_t* labels = infResult.outputsData[namesWithoutXai[1]].data<int64_t>();
+    const float* scores = namesWithoutXai.size() > 2 ? infResult.outputsData[namesWithoutXai[2]].data<float>() : nullptr;
 
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
