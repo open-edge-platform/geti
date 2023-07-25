@@ -86,7 +86,12 @@ struct ClassificationResult : public ResultBase {
             os << "[0], ";
         }
         try {
-            os << prediction.feature_vector.get_shape();
+            os << prediction.feature_vector.get_shape() << ", ";
+        } catch (ov::Exception&) {
+            os << "[0], ";
+        }
+        try {
+            os << prediction.raw_scores.get_shape();
         } catch (ov::Exception&) {
             os << "[0]";
         }
@@ -112,7 +117,7 @@ struct ClassificationResult : public ResultBase {
     };
 
     std::vector<Classification> topLabels;
-    ov::Tensor saliency_map, feature_vector;  // Contan "saliency_map" and "feature_vector" model outputs if such exist
+    ov::Tensor saliency_map, feature_vector, raw_scores;  // Contains "raw_scores", "saliency_map" and "feature_vector" model outputs if such exist
 };
 
 struct DetectedObject : public cv::Rect2f {

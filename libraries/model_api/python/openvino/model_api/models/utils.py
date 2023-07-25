@@ -24,15 +24,18 @@ import numpy as np
 
 class ClassificationResult(
     namedtuple(
-        "ClassificationResult", "top_labels saliency_map feature_vector"
-    )  # Contan "saliency_map" and "feature_vector" model outputs if such exist
+        "ClassificationResult", "top_labels saliency_map feature_vector raw_scores"
+    )  # Contains "raw_scores", "saliency_map" and "feature_vector" model outputs if such exist
 ):
     def __str__(self):
         labels = ", ".join(
             f"{idx} ({label}): {confidence:.3f}"
             for idx, label, confidence in self.top_labels
         )
-        return f"{labels}, [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        return (
+            f"{labels}, [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}], "
+            f"[{','.join(str(i) for i in self.raw_scores.shape)}]"
+        )
 
 
 class Detection:

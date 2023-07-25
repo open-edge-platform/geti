@@ -43,6 +43,7 @@ constexpr char indices_name[]{"indices"};
 constexpr char scores_name[]{"scores"};
 constexpr char saliency_map_name[]{"saliency_map"};
 constexpr char feature_vector_name[]{"feature_vector"};
+constexpr char raw_scores_name[]{"raw_scores"};
 
 float sigmoid(float x) noexcept {
     return 1.0f / (1.0f + std::exp(-x));
@@ -118,7 +119,7 @@ void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t to
     model->outputs()[0].set_names({indices_name});
     model->outputs()[1].set_names({scores_name});
     if (add_raw_scores) {
-        model->outputs()[2].set_names({"raw_scores"});
+        model->outputs()[2].set_names({raw_scores_name});
     }
 
     // set output precisions
@@ -126,7 +127,7 @@ void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t to
     ppp.output(indices_name).tensor().set_element_type(ov::element::i32);
     ppp.output(scores_name).tensor().set_element_type(ov::element::f32);
     if (add_raw_scores) {
-        ppp.output("raw_scores").tensor().set_element_type(ov::element::f32);
+        ppp.output(raw_scores_name).tensor().set_element_type(ov::element::f32);
     }
     model = ppp.build();
 }
@@ -239,11 +240,11 @@ std::unique_ptr<ClassificationModel> ClassificationModel::create_model(std::shar
 std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& infResult) {
     std::unique_ptr<ResultBase> result;
     if (multilabel) {
-        result = get_multilabel_predictions(infResult);
+        result = get_multilabel_predictions(infResult, output_raw_scores);
     } else if (hierarchical) {
-        result = get_hierarchical_predictions(infResult);
+        result = get_hierarchical_predictions(infResult, output_raw_scores);
     } else {
-        result = get_multiclass_predictions(infResult);
+        result = get_multiclass_predictions(infResult, output_raw_scores);
     }
 
     ClassificationResult* cls_res = static_cast<ClassificationResult*>(result.get());
@@ -258,12 +259,20 @@ std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& in
     return result;
 }
 
-std::unique_ptr<ResultBase> ClassificationModel::get_multilabel_predictions(InferenceResult& infResult) {
+std::unique_ptr<ResultBase> ClassificationModel::get_multilabel_predictions(InferenceResult& infResult, bool add_raw_scores) {
     const ov::Tensor& logitsTensor = infResult.outputsData.find(outputNames[0])->second;
     const float* logitsPtr = logitsTensor.data<float>();
 
     ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
+
+    auto raw_scores = ov::Tensor();
+    float* raw_scoresPtr = nullptr;
+    if (add_raw_scores) {
+        raw_scores = ov::Tensor(logitsTensor.get_element_type(), logitsTensor.get_shape());
+        raw_scoresPtr = raw_scores.data<float>();
+        result->raw_scores = raw_scores;
+    }
 
     result->topLabels.reserve(labels.size());
     for (size_t i = 0; i < labels.size(); ++i) {
@@ -271,14 +280,27 @@ std::unique_ptr<ResultBase> ClassificationModel::get_multilabel_predictions(Infe
         if (score > confidence_threshold) {
             result->topLabels.emplace_back(i, labels[i], score);
         }
+        if (add_raw_scores) {
+            raw_scoresPtr[i] = score;
+        }
     }
 
     return retVal;
 }
 
-std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(InferenceResult& infResult) {
+std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(InferenceResult& infResult, bool add_raw_scores) {
+    ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
+
     const ov::Tensor& logitsTensor = infResult.outputsData.find(outputNames[0])->second;
     float* logitsPtr = logitsTensor.data<float>();
+
+    auto raw_scores = ov::Tensor();
+    float* raw_scoresPtr = nullptr;
+    if (add_raw_scores) {
+        raw_scores = ov::Tensor(logitsTensor.get_element_type(), logitsTensor.get_shape());
+        raw_scoresPtr = raw_scores.data<float>();
+        result->raw_scores = raw_scores;
+    }
 
     std::vector<std::reference_wrapper<std::string>> predicted_labels;
     std::vector<float> predicted_scores;
@@ -289,6 +311,9 @@ std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(In
     for (size_t i = 0; i < hierarchical_info.num_multiclass_heads; ++i) {
         const auto& logits_range = hierarchical_info.head_idx_to_logits_range[i];
         softmax(logitsPtr + logits_range.first, logitsPtr + logits_range.second);
+        if (add_raw_scores) {
+            softmax(raw_scoresPtr + logits_range.first, raw_scoresPtr + logits_range.second);
+        }
         size_t j = fargmax(logitsPtr + logits_range.first, logitsPtr + logits_range.second);
         predicted_labels.push_back(hierarchical_info.all_groups[i][j]);
         predicted_scores.push_back(logitsPtr[logits_range.first + j]);
@@ -303,12 +328,14 @@ std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(In
                 predicted_scores.push_back(score);
                 predicted_labels.push_back(hierarchical_info.all_groups[hierarchical_info.num_multiclass_heads + i][0]);
             }
+            if (add_raw_scores) {
+                raw_scoresPtr[hierarchical_info.num_single_label_classes + i] = score;
+            }
         }
     }
 
     auto resolved_labels = resolver.resolve_labels(predicted_labels, predicted_scores);
 
-    ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
     result->topLabels.reserve(resolved_labels.first.size());
     for (size_t i = 0; i < resolved_labels.first.size(); ++i) {
@@ -318,7 +345,7 @@ std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(In
     return retVal;
 }
 
-std::unique_ptr<ResultBase> ClassificationModel::get_multiclass_predictions(InferenceResult& infResult) {
+std::unique_ptr<ResultBase> ClassificationModel::get_multiclass_predictions(InferenceResult& infResult, bool add_raw_scores) {
     const ov::Tensor& indicesTensor = infResult.outputsData.find(indices_name)->second;
     const int* indicesPtr = indicesTensor.data<int>();
     const ov::Tensor& scoresTensor = infResult.outputsData.find(scores_name)->second;
@@ -326,6 +353,14 @@ std::unique_ptr<ResultBase> ClassificationModel::get_multiclass_predictions(Infe
 
     ClassificationResult* result = new ClassificationResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
+
+    if (add_raw_scores) {
+        const ov::Tensor& logitsTensor = infResult.outputsData.find(raw_scores_name)->second;
+        result->raw_scores = ov::Tensor(logitsTensor.get_element_type(), logitsTensor.get_shape());
+        logitsTensor.copy_to(result->raw_scores);
+        float* raw_scoresPtr = result->raw_scores.data<float>();
+        softmax(raw_scoresPtr, raw_scoresPtr + result->raw_scores.get_size());
+    }
 
     result->topLabels.reserve(scoresTensor.get_size());
     for (size_t i = 0; i < scoresTensor.get_size(); ++i) {

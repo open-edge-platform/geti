@@ -87,7 +87,7 @@ protected:
     void init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority);
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void updateModelInfo() override;
-    std::unique_ptr<ResultBase> get_multilabel_predictions(InferenceResult& infResult);
-    std::unique_ptr<ResultBase> get_multiclass_predictions(InferenceResult& infResult);
-    std::unique_ptr<ResultBase> get_hierarchical_predictions(InferenceResult& infResult);
+    std::unique_ptr<ResultBase> get_multilabel_predictions(InferenceResult& infResult, bool add_raw_scores);
+    std::unique_ptr<ResultBase> get_multiclass_predictions(InferenceResult& infResult, bool add_raw_scores);
+    std::unique_ptr<ResultBase> get_hierarchical_predictions(InferenceResult& infResult, bool add_raw_scores);
 };
