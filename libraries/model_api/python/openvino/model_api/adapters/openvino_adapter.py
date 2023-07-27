@@ -375,7 +375,7 @@ class OpenvinoAdapter(InferenceAdapter):
         interpolation_mode,
         target_shape: Tuple[int],
         pad_value,
-        dtype=type(int),
+        dtype: type = int,
         brg2rgb=False,
         mean=None,
         scale=None,
@@ -384,8 +384,10 @@ class OpenvinoAdapter(InferenceAdapter):
         ppp = PrePostProcessor(self.model)
 
         # Change the input type to the 8-bit image
-        if dtype == type(int):
+        if dtype == int:
             ppp.input(input_idx).tensor().set_element_type(Type.u8)
+        elif dtype == float:
+            ppp.input(input_idx).tensor().set_element_type(Type.f32)
 
         ppp.input(input_idx).tensor().set_layout(ov.Layout("NHWC")).set_color_format(
             ColorFormat.BGR

@@ -14,8 +14,6 @@
  limitations under the License.
 """
 
-import numpy as np
-
 from .model import Model
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
 from .utils import RESIZE_TYPES, InputTransform

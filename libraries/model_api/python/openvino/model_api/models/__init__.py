@@ -14,7 +14,7 @@
  limitations under the License.
 """
 
-
+from .anomaly import AnomalyDetection
 from .background_matting import (
     ImageMattingWithBackground,
     PortraitBackgroundMatting,
@@ -41,6 +41,7 @@ from .ssd import SSD
 from .ultra_lightweight_face_detection import UltraLightweightFaceDetection
 from .utils import (
     RESIZE_TYPES,
+    AnomalyResult,
     ClassificationResult,
     Contour,
     Detection,
@@ -76,6 +77,8 @@ segmentation_models = [
 
 
 __all__ = [
+    "AnomalyDetection",
+    "AnomalyResult",
     "BertEmbedding",
     "BertNamedEntityRecognition",
     "BertQuestionAnswering",
@@ -120,7 +123,8 @@ __all__ = [
     "Detection",
     "DetectionResult",
     "DetectionWithLandmarks",
-    "classification_models" "detection_models",
+    "classification_models",
+    "detection_models",
     "segmentation_models",
     "SegmentedObject",
     "SegmentedObjectWithRects",

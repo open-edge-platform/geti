@@ -173,7 +173,7 @@ class InferenceAdapter(metaclass=abc.ABCMeta):
         interpolation_mode,
         target_shape: Tuple[int],
         pad_value,
-        dtype=type(int),
+        dtype: type = int,
         brg2rgb=False,
         mean=None,
         scale=None,

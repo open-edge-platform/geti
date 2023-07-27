@@ -14,12 +14,24 @@
  limitations under the License.
 """
 
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
+
 import math
 from collections import namedtuple
 from typing import List, NamedTuple, Tuple, Union
 
 import cv2
 import numpy as np
+
+
+class AnomalyResult(NamedTuple):
+    """Results for anomaly models."""
+
+    anomaly_map: np.ndarray | None = None
+    pred_boxes: np.ndarray | None = None
+    pred_label: str | None = None
+    pred_mask: np.ndarray | None = None
+    pred_score: float | None = None
 
 
 class ClassificationResult(
