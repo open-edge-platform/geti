@@ -177,15 +177,14 @@ struct SegmentedObject : DetectedObject {
 };
 
 struct SegmentedObjectWithRects : SegmentedObject {
-    std::vector<cv::RotatedRect> rotated_rects;
+    cv::RotatedRect rotated_rect;
 
     SegmentedObjectWithRects(const SegmentedObject& segmented_object) : SegmentedObject(segmented_object) {}
 
     friend std::ostream& operator<< (std::ostream& os, const SegmentedObjectWithRects& prediction) {
         os << static_cast<const SegmentedObject&>(prediction) << std::fixed << std::setprecision(3);
-        for (const cv::RotatedRect& rect : prediction.rotated_rects) {
-            os << ", RotatedRect: " << rect.center.x << ' ' << rect.center.y << ' ' <<  rect.size.width << ' ' << rect.size.height << ' ' << rect.angle;
-        }
+        auto rect = prediction.rotated_rect;
+        os << ", RotatedRect: " << rect.center.x << ' ' << rect.center.y << ' ' <<  rect.size.width << ' ' << rect.size.height << ' ' << rect.angle;
         return os;
     }
 };
@@ -198,20 +197,15 @@ static inline std::vector<SegmentedObjectWithRects> add_rotated_rects(std::vecto
         cv::Mat mask;
         segmented_object.mask.convertTo(mask, CV_8UC1);
         std::vector<std::vector<cv::Point>> contours;
-        std::vector<cv::Vec4i> hierarchies;
-        cv::findContours(mask, contours, hierarchies, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
-        if (hierarchies.empty()) {
-            continue;
+        cv::findContours(mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+
+        std::vector<cv::Point> contour = {};
+        for (size_t i = 0; i < contours.size(); i++) {
+            contour.insert(contour.end(), contours[i].begin(), contours[i].end());
         }
-        for (size_t i = 0; i < contours.size(); ++i) {
-            if (hierarchies[i][3] != -1) {
-                continue;
-            }
-            if (contours[i].size() <= 2 || cv::contourArea(contours[i]) < 1.0) {
-                continue;
-            }
-            objects_with_rects.back().rotated_rects.push_back(cv::minAreaRect(contours[i]));
-        }
+        std::vector<cv::Point> hull;
+        cv::convexHull(contour, hull);
+        objects_with_rects.back().rotated_rect = cv::minAreaRect(hull);
     }
     return objects_with_rects;
 }

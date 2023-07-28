@@ -95,12 +95,11 @@ class SegmentedObjectWithRects(SegmentedObject):
             segmented_object.str_label,
             segmented_object.mask,
         )
-        self.rotated_rects = []
 
     def __str__(self):
         res = super().__str__()
-        for rect in self.rotated_rects:
-            res += f", RotatedRect: {rect[0][0]:.3f} {rect[0][1]:.3f} {rect[1][0]:.3f} {rect[1][1]:.3f} {rect[2]:.3f}"
+        rect = self.rotated_rect
+        res += f", RotatedRect: {rect[0][0]:.3f} {rect[0][1]:.3f} {rect[1][0]:.3f} {rect[1][1]:.3f} {rect[2]:.3f}"
         return res
 
 
@@ -125,16 +124,11 @@ def add_rotated_rects(segmented_objects):
         objects_with_rects.append(SegmentedObjectWithRects(segmented_object))
         mask = segmented_object.mask.astype(np.uint8)
         contours, hierarchies = cv2.findContours(
-            mask, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE
+            mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
-        if hierarchies is None:
-            continue
-        for contour, hierarchy in zip(contours, hierarchies[0]):
-            if hierarchy[3] != -1:
-                continue
-            if len(contour) <= 2 or cv2.contourArea(contour) < 1.0:
-                continue
-            objects_with_rects[-1].rotated_rects.append(cv2.minAreaRect(contour))
+
+        contour = np.vstack(contours)
+        objects_with_rects[-1].rotated_rect = cv2.minAreaRect(contour)
     return objects_with_rects
 
 
