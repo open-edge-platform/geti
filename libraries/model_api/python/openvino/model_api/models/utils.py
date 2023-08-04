@@ -132,6 +132,22 @@ def add_rotated_rects(segmented_objects):
     return objects_with_rects
 
 
+def get_contours(
+    segmentedObjects: List[Union[SegmentedObject, SegmentedObjectWithRects]]
+):
+    combined_contours = []
+    for obj in segmentedObjects:
+        contours, _ = cv2.findContours(
+            obj.mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+        )
+        # Assuming one contour output for findContours. Based on OTX this is a safe
+        # assumption
+        if len(contours) != 1:
+            raise RuntimeError("findContours() must have returned only one contour")
+        combined_contours.append(Contour(obj.str_label, obj.score, contours[0]))
+    return combined_contours
+
+
 def clip_detections(detections, size):
     for detection in detections:
         detection.xmin = min(max(round(detection.xmin), 0), size[1])

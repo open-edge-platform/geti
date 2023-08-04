@@ -291,6 +291,21 @@ struct Contour {
     }
 };
 
+static inline std::vector<Contour> getContours(const std::vector<SegmentedObject>& segmentedObjects) {
+    std::vector<Contour> combined_contours;
+    std::vector<std::vector<cv::Point>> contours;
+    for (const SegmentedObject& obj : segmentedObjects) {
+        cv::findContours(obj.mask, contours, cv::RETR_EXTERNAL,
+                        cv::CHAIN_APPROX_NONE);
+        // Assuming one contour output for findContours. Based on OTX this is a safe
+        // assumption
+        if (contours.size() != 1) {
+            throw std::runtime_error("findContours() must have returned only one contour");
+        }
+        combined_contours.push_back({obj.label, obj.confidence, contours[0]});
+    }
+    return combined_contours;
+}
 
 struct HumanPose {
     std::vector<cv::Point2f> keypoints;

@@ -54,6 +54,7 @@ from .utils import (
     SegmentedObject,
     SegmentedObjectWithRects,
     add_rotated_rects,
+    get_contours,
 )
 from .yolo import YOLO, YOLOF, YOLOX, YoloV3ONNX, YoloV4
 
@@ -129,4 +130,5 @@ __all__ = [
     "SegmentedObject",
     "SegmentedObjectWithRects",
     "add_rotated_rects",
+    "get_contours",
 ]
