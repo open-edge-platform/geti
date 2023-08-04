@@ -14,6 +14,8 @@
  limitations under the License.
 """
 
+from typing import Iterable, Union
+
 import cv2
 import numpy as np
 
@@ -153,6 +155,9 @@ class SegmentationModel(ImageModel):
             return ImageResultWithSoftPrediction(
                 hard_prediction,
                 soft_prediction,
+                _get_activation_map(soft_prediction)
+                if _feature_vector_name in outputs
+                else np.ndarray(0),
                 outputs.get(_feature_vector_name, np.ndarray(0)),
             )
         return hard_prediction
@@ -214,3 +219,13 @@ class SalientObjectDetectionModel(SegmentationModel):
 
 
 _feature_vector_name = "feature_vector"
+
+
+def _get_activation_map(features: Union[np.ndarray, Iterable, int, float]):
+    """Getter activation_map functions."""
+    min_soft_score = np.min(features)
+    max_soft_score = np.max(features)
+    factor = 255.0 / (max_soft_score - min_soft_score + 1e-12)
+
+    float_act_map = factor * (features - min_soft_score)
+    return np.round(float_act_map, out=float_act_map).astype(np.uint8)

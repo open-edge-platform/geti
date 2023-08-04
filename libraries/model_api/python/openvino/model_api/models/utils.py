@@ -105,7 +105,7 @@ class SegmentedObjectWithRects(SegmentedObject):
 
 class InstanceSegmentationResult(NamedTuple):
     segmentedObjects: List[Union[SegmentedObject, SegmentedObjectWithRects]]
-    # Contan per class saliency_maps and "feature_vector" model output if feature_vector exists
+    # Contain per class saliency_maps and "feature_vector" model output if feature_vector exists
     saliency_map: List[np.ndarray]
     feature_vector: np.ndarray
 
@@ -153,7 +153,9 @@ class Contour(NamedTuple):
 class ImageResultWithSoftPrediction(NamedTuple):
     resultImage: np.ndarray
     soft_prediction: np.ndarray
-    feature_vector: np.ndarray  # Contans "feature_vector" model output if such exists
+    # Contain per class saliency_maps and "feature_vector" model output if feature_vector exists
+    saliency_map: np.ndarray  # Requires return_soft_prediction==True
+    feature_vector: np.ndarray
 
     def __str__(self):
         outHist = cv2.calcHist(
@@ -167,7 +169,7 @@ class ImageResultWithSoftPrediction(NamedTuple):
         for i, count in enumerate(outHist):
             if count > 0:
                 hist += f"{i}: {count[0] / self.resultImage.size:.3f}, "
-        return f"{hist}[{','.join(str(i) for i in self.soft_prediction.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        return f"{hist}[{','.join(str(i) for i in self.soft_prediction.shape)}], [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 class DetectionWithLandmarks(Detection):

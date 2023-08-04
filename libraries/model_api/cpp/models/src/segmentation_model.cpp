@@ -69,6 +69,16 @@ cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_predicti
     }
     return hard_prediction;
 }
+
+cv::Mat get_activation_map(const cv::Mat& features) {
+    double min_soft_score, max_soft_score;
+    cv::minMaxLoc(features, &min_soft_score, &max_soft_score);
+    double factor = 255.0 / (max_soft_score - min_soft_score + 1e-12);
+
+    cv::Mat int_act_map;
+    features.convertTo(int_act_map, CV_8U, factor, -min_soft_score * factor);
+    return int_act_map;
+}
 }
 
 std::string SegmentationModel::ModelType = "Segmentation";
@@ -279,7 +289,11 @@ std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infR
         result->resultImage = hard_prediction;
         cv::resize(soft_prediction, soft_prediction, {inputImgSize.inputImgWidth, inputImgSize.inputImgHeight}, 0.0, 0.0, cv::INTER_NEAREST);
         result->soft_prediction = soft_prediction;
-        result->feature_vector = infResult.outputsData[feature_vector_name];
+        auto iter = infResult.outputsData.find(feature_vector_name);
+        if (infResult.outputsData.end() != iter) {
+            result->saliency_map = get_activation_map(soft_prediction);
+            result->feature_vector = iter->second;
+        }
         return std::unique_ptr<ResultBase>(result);
     }
 

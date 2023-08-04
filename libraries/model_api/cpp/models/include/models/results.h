@@ -255,13 +255,23 @@ struct ImageResultWithSoftPrediction : public ImageResult {
     ImageResultWithSoftPrediction(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ImageResult(frameId, metaData) {}
     cv::Mat soft_prediction;
-    ov::Tensor feature_vector;  // Contans "feature_vector" model output if such exists
+    // Contain per class saliency_maps and "feature_vector" model output if feature_vector exists
+    cv::Mat saliency_map;  // Requires return_soft_prediction==true
+    ov::Tensor feature_vector;
     friend std::ostream& operator<< (std::ostream& os, const ImageResultWithSoftPrediction& prediction) {
         os << static_cast<const ImageResult&>(prediction) << '[';
         for (int i = 0; i < prediction.soft_prediction.dims; ++i) {
             os << prediction.soft_prediction.size[i] << ',';
         }
-        os << prediction.soft_prediction.channels() << "], ";
+        os << prediction.soft_prediction.channels() << "], [";
+        if (prediction.saliency_map.data) {
+            for (int i = 0; i < prediction.saliency_map.dims; ++i) {
+                os << prediction.saliency_map.size[i] << ',';
+            }
+            os << prediction.saliency_map.channels() << "], ";
+        } else {
+            os << "0], ";
+        }
         try {
             os << prediction.feature_vector.get_shape();
         } catch (ov::Exception&) {
