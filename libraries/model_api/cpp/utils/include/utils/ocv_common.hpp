@@ -83,8 +83,13 @@ static inline ov::Layout getLayoutFromShape(const ov::PartialShape& shape) {
         return "NC";
     }
     if (shape.size() == 3) {
-        return ov::Interval{1, 4}.contains(shape[0].get_interval()) ? "CHW" :
-                                                                      "HWC";
+        if (shape[0] == 1) {
+            return "NHW";
+        }
+        if (shape[2] == 1) {
+            return "HWN";
+        }
+        throw std::runtime_error("Can't guess layout for " + shape.to_string());
     }
     if (shape.size() == 4) {
         if (ov::Interval{1, 4}.contains(shape[1].get_interval())) {
