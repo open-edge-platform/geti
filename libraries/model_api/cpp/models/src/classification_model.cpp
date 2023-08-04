@@ -298,6 +298,7 @@ std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(In
     float* raw_scoresPtr = nullptr;
     if (add_raw_scores) {
         raw_scores = ov::Tensor(logitsTensor.get_element_type(), logitsTensor.get_shape());
+        logitsTensor.copy_to(raw_scores);
         raw_scoresPtr = raw_scores.data<float>();
         result->raw_scores = raw_scores;
     }

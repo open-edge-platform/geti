@@ -73,7 +73,7 @@ class AnomalyDetection(ImageModel):
         pred_score = self._normalize(pred_score, self.image_threshold)
 
         # resize outputs
-        if anomaly_map is not None:
+        if anomaly_map is not None and pred_mask is not None:
             anomaly_map = cv2.resize(
                 anomaly_map, (meta["original_shape"][1], meta["original_shape"][0])
             )

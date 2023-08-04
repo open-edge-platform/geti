@@ -187,7 +187,7 @@ class ClassificationModel(ImageModel):
                 logits_begin = cls_heads_info["num_single_label_classes"]
                 probs[logits_begin:] = sigmoid_numpy(logits[logits_begin:])
         else:
-            probs = softmax_numpy(logits.reshape(-1))
+            probs = logits.reshape(-1)
         return probs
 
     def get_hierarchical_predictions(self, logits: np.ndarray):

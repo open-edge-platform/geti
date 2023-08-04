@@ -17,8 +17,10 @@
 
 from .detection import DetectionTiler
 from .instance_segmentation import InstanceSegmentationTiler
+from .tiler import Tiler
 
 __all__ = [
     "DetectionTiler",
     "InstanceSegmentationTiler",
+    "Tiler",
 ]
