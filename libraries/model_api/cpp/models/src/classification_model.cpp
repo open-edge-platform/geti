@@ -80,17 +80,22 @@ void softmax(float* x_start, float* x_end, float eps = 1e-9) {
 
 void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t topk, bool add_raw_scores) {
     auto nodes = model->get_ops();
-    auto softmaxNodeIt = std::find_if(std::begin(nodes), std::end(nodes), [](const std::shared_ptr<ov::Node>& op) {
-        return std::string(op->get_type_name()) == "Softmax"; // TODO: it will not work for Vision Transformers, for example
-    });
-
     std::shared_ptr<ov::Node> softmaxNode;
-    if (softmaxNodeIt == nodes.end()) {
+    for (size_t i = 0; i < model->outputs().size(); ++i) {
+        auto output_node = model->get_output_op(i)->input(0).get_source_output().get_node_shared_ptr();
+        if (std::string(output_node->get_type_name()) == "Softmax") {
+            softmaxNode = output_node;
+        }
+        else if (std::string(output_node->get_type_name()) == "TopK") {
+            return;
+        }
+    }
+
+    if (!softmaxNode) {
         auto logitsNode = model->get_output_op(0)->input(0).get_source_output().get_node();
         softmaxNode = std::make_shared<ov::op::v1::Softmax>(logitsNode->output(0), 1);
-    } else {
-        softmaxNode = *softmaxNodeIt;
     }
+
     const auto k = std::make_shared<ov::op::v0::Constant>(ov::element::i32, ov::Shape{}, std::vector<size_t>{topk});
     std::shared_ptr<ov::Node> topkNode = std::make_shared<ov::op::v3::TopK>(softmaxNode,
                                                                             k,
@@ -359,8 +364,7 @@ std::unique_ptr<ResultBase> ClassificationModel::get_multiclass_predictions(Infe
         const ov::Tensor& logitsTensor = infResult.outputsData.find(raw_scores_name)->second;
         result->raw_scores = ov::Tensor(logitsTensor.get_element_type(), logitsTensor.get_shape());
         logitsTensor.copy_to(result->raw_scores);
-        float* raw_scoresPtr = result->raw_scores.data<float>();
-        softmax(raw_scoresPtr, raw_scoresPtr + result->raw_scores.get_size());
+        result->raw_scores.set_shape(ov::Shape({result->raw_scores.get_size()}));
     }
 
     result->topLabels.reserve(scoresTensor.get_size());
@@ -445,7 +449,9 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
         return;
     }
 
-    addOrFindSoftmaxAndTopkOutputs(model, topk, output_raw_scores);
+    if (!embedded_processing) {
+        addOrFindSoftmaxAndTopkOutputs(model, topk, output_raw_scores);
+    }
     embedded_processing = true;
 
     outputNames = {indices_name, scores_name};
