@@ -77,4 +77,5 @@ protected:
     uint8_t pad_value = 0;
     bool reverse_input_channels = false;
     std::vector<float> scale_values;
+    std::vector<float> mean_values;
 };

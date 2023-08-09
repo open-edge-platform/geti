@@ -129,6 +129,14 @@ ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
     } else {
         scale_values = labels_iter->second.as<std::vector<float>>();
     }
+    auto mean_values_iter = configuration.find("mean_values");
+    if (mean_values_iter == configuration.end()) {
+        if (model->has_rt_info("model_info", "mean_values")) {
+            mean_values = model->get_rt_info<std::vector<float>>("model_info", "mean_values");
+        }
+    } else {
+        mean_values = labels_iter->second.as<std::vector<float>>();
+    }
 }
 
 ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
@@ -178,6 +186,10 @@ ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter)
     auto scale_values_iter = configuration.find("scale_values");
     if (scale_values_iter != configuration.end()) {
         scale_values = scale_values_iter->second.as<std::vector<float>>();
+    }
+    auto mean_values_iter = configuration.find("mean_values");
+    if (mean_values_iter != configuration.end()) {
+        mean_values = mean_values_iter->second.as<std::vector<float>>();
     }
 }
 
