@@ -66,7 +66,7 @@ void ModelRetinaFace::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     if (model->inputs().size() != 1) {
         throw std::logic_error("RetinaFace model wrapper expects models that have only 1 input");
     }
-    const ov::Shape& inputShape = model->input().get_shape();
+    const ov::Shape& inputShape = model->input().get_partial_shape().get_max_shape();
     const ov::Layout& inputLayout = getInputLayout(model->input());
 
     if (inputShape[ov::layout::channels_idx(inputLayout)] != 3) {
