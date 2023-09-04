@@ -17,17 +17,10 @@
 #pragma once
 
 #include <opencv2/core.hpp>
-#include <memory_resource>
 
-struct SharedMatAllocator : public std::pmr::memory_resource {
+struct SharedMatAllocator {
     const cv::Mat mat;
-
-    SharedMatAllocator(const cv::Mat& mat) : mat{mat} {}
-    void* do_allocate(size_t bytes, size_t) override {
-        return bytes <= mat.rows * mat.step[0] ? mat.data : nullptr;
-    }
-    void do_deallocate(void*, size_t, size_t) override {}
-    bool do_is_equal(const std::pmr::memory_resource& other) const noexcept override {
-        return this == &other;
-    }
+    void* allocate(size_t bytes, size_t) {return bytes <= mat.rows * mat.step[0] ? mat.data : nullptr;}
+    void deallocate(void*, size_t, size_t) {}
+    bool is_equal(const SharedMatAllocator& other) const noexcept {return this == &other;}
 };

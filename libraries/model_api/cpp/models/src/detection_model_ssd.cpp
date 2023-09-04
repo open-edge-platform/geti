@@ -93,7 +93,7 @@ std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputDa
         info.at<int>(0, 0) = netInputHeight;
         info.at<int>(0, 1) = netInputWidth;
         info.at<int>(0, 2) = 1;
-        ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 3}), SharedMatAllocator(info));
+        ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 3}), SharedMatAllocator{info});
 
         input.emplace(inputNames[1], infoInput);
     }
