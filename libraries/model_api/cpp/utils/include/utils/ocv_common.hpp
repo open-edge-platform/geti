@@ -13,8 +13,6 @@
 #include <opencv2/imgproc.hpp>
 #include <openvino/openvino.hpp>
 
-#include "utils/shared_tensor_allocator.hpp"
-
 static inline ov::Tensor wrapMat2Tensor(const cv::Mat& mat) {
     auto matType = mat.type() & CV_MAT_DEPTH_MASK;
     if (matType != CV_8U && matType != CV_32F) {
@@ -35,6 +33,12 @@ static inline ov::Tensor wrapMat2Tensor(const cv::Mat& mat) {
         throw std::runtime_error("Doesn't support conversion from not dense cv::Mat");
     }
     auto precision = isMatFloat ? ov::element::f32 : ov::element::u8;
+    struct SharedMatAllocator {
+        const cv::Mat mat;
+        void* allocate(size_t bytes, size_t) {return bytes <= mat.rows * mat.step[0] ? mat.data : nullptr;}
+        void deallocate(void*, size_t, size_t) {}
+        bool is_equal(const SharedMatAllocator& other) const noexcept {return this == &other;}
+    };
     return ov::Tensor(precision, ov::Shape{ 1, height, width, channels }, SharedMatAllocator{mat});
 }
 

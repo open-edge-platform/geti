@@ -89,13 +89,12 @@ std::string ModelSSD::ModelType = "ssd";
 
 std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputData, InferenceInput& input) {
     if (inputNames.size() > 1) {
-        cv::Mat info(cv::Size(1, 3), CV_32SC1);
-        info.at<int>(0, 0) = netInputHeight;
-        info.at<int>(0, 1) = netInputWidth;
-        info.at<int>(0, 2) = 1;
-        ov::Tensor infoInput = ov::Tensor(ov::element::i32, ov::Shape({1, 3}), SharedMatAllocator{info});
-
-        input.emplace(inputNames[1], infoInput);
+        ov::Tensor info{ov::element::i32, ov::Shape({1, 3})};
+        int32_t* data = info.data<int32_t>();
+        data[0] = netInputHeight;
+        data[1] = netInputWidth;
+        data[3] = 1;
+        input.emplace(inputNames[1], std::move(info));
     }
     return DetectionModel::preprocess(inputData, input);
 }
