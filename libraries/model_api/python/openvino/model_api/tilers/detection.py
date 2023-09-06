@@ -167,7 +167,9 @@ class DetectionTiler(Tiler):
         map_h, map_w = image_saliency_map.shape[1:]
 
         image_h, image_w, _ = shape
-        ratio = map_h / self.tile_size, map_w / self.tile_size
+        ratio = map_h / min(image_h, self.tile_size), map_w / min(
+            image_w, self.tile_size
+        )
 
         image_map_h = int(image_h * ratio[0])
         image_map_w = int(image_w * ratio[1])

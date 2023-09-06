@@ -161,8 +161,8 @@ ov::Tensor DetectionTiler::merge_saliency_maps(const std::vector<std::unique_ptr
     size_t map_h = image_saliency_map.get_shape()[shape_shift + 1];
     size_t map_w = image_saliency_map.get_shape()[shape_shift + 2];
 
-    float ratio_h = static_cast<float>(map_h) / tile_size;
-    float ratio_w = static_cast<float>(map_w) / tile_size;
+    float ratio_h = static_cast<float>(map_h) / std::min(tile_size, static_cast<size_t>(image_size.height));
+    float ratio_w = static_cast<float>(map_w) / std::min(tile_size, static_cast<size_t>(image_size.width));
 
     size_t image_map_h = static_cast<size_t>(image_size.height * ratio_h);
     size_t image_map_w = static_cast<size_t>(image_size.width * ratio_w);
