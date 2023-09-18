@@ -16,8 +16,15 @@ from collections import namedtuple
 import numpy as np
 
 from .detection_model import DetectionModel
-from .types import ListValue, NumericalValue
-from .utils import INTERPOLATION_TYPES, Detection, clip_detections, nms, resize_image
+from .types import BooleanValue, ListValue, NumericalValue
+from .utils import (
+    INTERPOLATION_TYPES,
+    Detection,
+    DetectionResult,
+    clip_detections,
+    nms,
+    resize_image,
+)
 
 DetectionBox = namedtuple("DetectionBox", ["x", "y", "w", "h"])
 
@@ -109,6 +116,19 @@ def permute_to_N_HWA_K(tensor, K, output_layout):
 
 def sigmoid(x):
     return 1.0 / (1.0 + np.exp(-x))
+
+
+def xywh2xyxy(xywh):
+    return np.stack(
+        (
+            xywh[:, 0] - xywh[:, 2] / 2.0,
+            xywh[:, 1] - xywh[:, 3] / 2.0,
+            xywh[:, 0] + xywh[:, 2] / 2.0,
+            xywh[:, 1] + xywh[:, 3] / 2.0,
+        ),
+        1,
+        xywh,
+    )
 
 
 class YOLO(DetectionModel):
@@ -513,7 +533,7 @@ class YOLOX(DetectionModel):
         valid_predictions = output[output[..., 4] > self.confidence_threshold]
         valid_predictions[:, 5:] *= valid_predictions[:, 4:5]
 
-        boxes = self.xywh2xyxy(valid_predictions[:, :4]) / meta["scale"]
+        boxes = xywh2xyxy(valid_predictions[:, :4]) / meta["scale"]
         i, j = (valid_predictions[:, 5:] > self.confidence_threshold).nonzero()
         x_mins, y_mins, x_maxs, y_maxs = boxes[i].T
         scores = valid_predictions[i, j + 5]
@@ -559,15 +579,6 @@ class YOLOX(DetectionModel):
 
         self.grids = np.concatenate(grids, 1)
         self.expanded_strides = np.concatenate(expanded_strides, 1)
-
-    @staticmethod
-    def xywh2xyxy(x):
-        y = np.copy(x)
-        y[:, 0] = x[:, 0] - x[:, 2] / 2
-        y[:, 1] = x[:, 1] - x[:, 3] / 2
-        y[:, 2] = x[:, 0] + x[:, 2] / 2
-        y[:, 3] = x[:, 1] + x[:, 3] / 2
-        return y
 
 
 class YoloV3ONNX(DetectionModel):
@@ -707,3 +718,130 @@ class YoloV3ONNX(DetectionModel):
         ]
 
         return detections
+
+
+class YOLOv5(DetectionModel):
+    """
+    Reimplementation of ultralytics.YOLO
+    """
+
+    __model__ = "YOLOv5"
+
+    def __init__(self, inference_adapter, configuration, preload=False):
+        super().__init__(inference_adapter, configuration, preload)
+        self._check_io_number(1, 1)
+        output = next(iter(self.outputs.values()))
+        if "f32" != output.precision:
+            self.raise_error("the output must be of precision f32")
+        out_shape = output.shape
+        if 3 != len(out_shape):
+            self.raise_error("the output must be of rank 3")
+        if self.labels and len(self.labels) + 4 != out_shape[1]:
+            self.raise_error("number of labels must be smaller than out_shape[1] by 4")
+
+    @classmethod
+    def parameters(cls):
+        parameters = super().parameters()
+        parameters["pad_value"].update_default_value(114)
+        parameters["resize_type"].update_default_value("fit_to_window_letterbox")
+        parameters["reverse_input_channels"].update_default_value(True)
+        parameters["scale_values"].update_default_value([255.0])
+        parameters["confidence_threshold"].update_default_value(0.25)
+        parameters.update(
+            {
+                "agnostic_nms": BooleanValue(
+                    description="If True, the model is agnostic to the number of classes, and all classes are considered as one",
+                    default_value=False,
+                ),
+                "iou_threshold": NumericalValue(
+                    float,
+                    min=0.0,
+                    max=1.0,
+                    default_value=0.7,
+                    description="Threshold for non-maximum suppression (NMS) intersection over union (IOU) filtering",
+                ),
+            }
+        )
+        return parameters
+
+    def postprocess(self, outputs, meta):
+        if 1 != len(outputs):
+            self.raise_error("expect 1 output")
+        prediction = next(iter(outputs.values()))
+        if np.float32 != prediction.dtype:
+            self.raise_error("the output must be of precision f32")
+        out_shape = prediction.shape
+        if 3 != len(out_shape):
+            raise RuntimeError("the output must be of rank 3")
+        if 1 != out_shape[0]:
+            raise RuntimeError("the first dim of the output must be 1")
+        LABELS_START = 4
+        xc = (
+            np.amax(prediction[:, LABELS_START:], 1) > self.confidence_threshold
+        )  # Candidates
+        x = prediction[0]
+        x = x.transpose(1, 0)[xc[0]]
+        box, cls = x[:, :LABELS_START], x[:, LABELS_START:]
+        box = xywh2xyxy(box)
+        j = cls.argmax(1, keepdims=True)
+        conf = np.take_along_axis(cls, j, 1)
+        x = np.concatenate((box, conf, j.astype(np.float32)), 1)
+        max_wh = 0 if self.agnostic_nms else 7680
+        c = x[:, 5:6] * max_wh
+        boxes = x[:, :LABELS_START] + c
+        boxes = x[
+            nms(
+                boxes[:, 0],
+                boxes[:, 1],
+                boxes[:, 2],
+                boxes[:, 3],
+                x[:, LABELS_START],
+                self.iou_threshold,
+                keep_top_k=30000,
+            )
+        ]
+        inputImgWidth = meta["original_shape"][1]
+        inputImgHeight = meta["original_shape"][0]
+        invertedScaleX, invertedScaleY = (
+            inputImgWidth / self.orig_width,
+            inputImgHeight / self.orig_height,
+        )
+        padLeft, padTop = 0, 0
+        if (
+            "fit_to_window" == self.resize_type
+            or "fit_to_window_letterbox" == self.resize_type
+        ):
+            invertedScaleX = invertedScaleY = max(invertedScaleX, invertedScaleY)
+            if "fit_to_window_letterbox" == self.resize_type:
+                padLeft = (self.orig_width - round(inputImgWidth / invertedScaleX)) // 2
+                padTop = (
+                    self.orig_height - round(inputImgHeight / invertedScaleY)
+                ) // 2
+        coords = boxes[:, :LABELS_START]
+        coords -= (padLeft, padTop, padLeft, padTop)
+        coords *= (invertedScaleX, invertedScaleY, invertedScaleX, invertedScaleY)
+
+        intboxes = np.round(coords, out=coords).astype(np.int32)
+        np.clip(
+            intboxes,
+            0,
+            [inputImgWidth, inputImgHeight, inputImgWidth, inputImgHeight],
+            intboxes,
+        )
+        intid = boxes[:, 5].astype(np.int32)
+        return DetectionResult(
+            [
+                Detection(
+                    *intboxes[i], boxes[i, 4], intid[i], self.get_label_name(intid[i])
+                )
+                for i in range(len(boxes))
+            ],
+            np.ndarray(0),
+            np.ndarray(0),
+        )
+
+
+class YOLOv8(YOLOv5):
+    """YOLOv5 and YOLOv8 are identical in terms of inference"""
+
+    __model__ = "YOLOv8"

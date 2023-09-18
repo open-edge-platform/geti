@@ -38,7 +38,12 @@ setup(
     install_requires=(SETUP_DIR / "requirements.txt").read_text(),
     extras_require={
         "ovms": (SETUP_DIR / "requirements_ovms.txt").read_text(),
-        "tests": ["httpx", "pytest", "openvino-dev[onnx,pytorch,tensorflow2]"],
+        "tests": [
+            "httpx",
+            "pytest",
+            "openvino-dev[onnx,pytorch,tensorflow2]",
+            "ultralytics>=8.0.114",
+        ],
     },
     long_description=(SETUP_DIR.parents[1] / "README.md").read_text(),
     long_description_content_type="text/markdown",

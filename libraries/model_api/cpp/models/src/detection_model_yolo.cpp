@@ -27,6 +27,7 @@
 #include <openvino/openvino.hpp>
 
 #include <utils/common.hpp>
+#include <utils/nms.hpp>
 #include <utils/slog.hpp>
 
 #include "models/internal_model_data.h"
@@ -504,3 +505,171 @@ ModelYolo::Region::Region(size_t classes,
         num = anchors.size() / 2;
     }
 }
+
+std::string YOLOv5::ModelType = "YOLOv5";
+
+void YOLOv5::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
+    const ov::Output<ov::Node>& input = model->input();
+    const ov::Shape& in_shape = input.get_partial_shape().get_max_shape();
+    if (in_shape.size() != 4) {
+        throw std::runtime_error("YOLO: the rank of the input must be 4");
+    }
+    inputNames.push_back(input.get_any_name());
+    const ov::Layout& inputLayout = getInputLayout(input);
+    if (!embedded_processing) {
+        model = ImageModel::embedProcessing(model,
+                                inputNames[0],
+                                inputLayout,
+                                resizeMode,
+                                interpolationMode,
+                                ov::Shape{
+                                    in_shape[ov::layout::width_idx(inputLayout)],
+                                    in_shape[ov::layout::height_idx(inputLayout)]
+                                },
+                                pad_value,
+                                reverse_input_channels,
+                                {},
+                                scale_values);
+
+        netInputWidth = in_shape[ov::layout::width_idx(inputLayout)];
+        netInputHeight = in_shape[ov::layout::height_idx(inputLayout)];
+
+        embedded_processing = true;
+    }
+
+    const ov::Output<const ov::Node>& output = model->output();
+    if (ov::element::Type_t::f32 != output.get_element_type()) {
+        throw std::runtime_error("YOLO: the output must be of precision f32");
+    }
+    const ov::Shape& out_shape = output.get_partial_shape().get_max_shape();
+    if (3 != out_shape.size()) {
+        throw std::runtime_error("YOLO: the output must be of rank 3");
+    }
+    if (!labels.empty() && labels.size() + 4 != out_shape[1]) {
+        throw std::runtime_error("YOLO: number of labels must be smaller than out_shape[1] by 4");
+    }
+}
+
+void YOLOv5::updateModelInfo() {
+    DetectionModelExt::updateModelInfo();
+    model->set_rt_info(YOLOv5::ModelType, "model_info", "model_type");
+    model->set_rt_info(agnostic_nms, "model_info", "agnostic_nms");
+    model->set_rt_info(iou_threshold, "model_info", "iou_threshold");
+}
+
+void YOLOv5::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority) {
+    pad_value = get_from_any_maps("pad_value", top_priority, mid_priority, 114);
+    if (top_priority.find("resize_type") == top_priority.end() && mid_priority.find("resize_type") == mid_priority.end()) {
+        interpolationMode = cv::INTER_LINEAR;
+        resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;
+    }
+    reverse_input_channels = get_from_any_maps("reverse_input_channels", top_priority, mid_priority, true);
+    scale_values = get_from_any_maps("scale_values", top_priority, mid_priority, std::vector<float>{255.0f});
+    confidence_threshold = get_from_any_maps("confidence_threshold", top_priority, mid_priority, 0.25f);
+    agnostic_nms = get_from_any_maps("agnostic_nms", top_priority, mid_priority, agnostic_nms);
+    iou_threshold = get_from_any_maps("iou_threshold", top_priority, mid_priority, 0.7f);
+}
+
+YOLOv5::YOLOv5(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+        : DetectionModelExt(model, configuration) {
+    init_from_config(configuration, model->get_rt_info<ov::AnyMap>("model_info"));
+}
+
+YOLOv5::YOLOv5(std::shared_ptr<InferenceAdapter>& adapter)
+        : DetectionModelExt(adapter) {
+    init_from_config(adapter->getModelConfig(), ov::AnyMap{});
+}
+
+std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
+    if (1 != infResult.outputsData.size()) {
+        throw std::runtime_error("YOLO: expect 1 output");
+    }
+    const ov::Tensor& detectionsTensor = infResult.getFirstOutputTensor();
+    const ov::Shape& out_shape = detectionsTensor.get_shape();
+    if (3 != out_shape.size()) {
+        throw std::runtime_error("YOLO: the output must be of rank 3");
+    }
+    if (1 != out_shape[0]) {
+        throw std::runtime_error("YOLO: the first dim of the output must be 1");
+    }
+    size_t num_proposals = out_shape[2];
+    std::vector<Anchor> boxes;
+    std::vector<float> confidences;
+    std::vector<size_t> labelIDs;
+    const float* const detections = detectionsTensor.data<float>();
+    for (size_t i = 0; i < num_proposals; ++i) {
+        float confidence = 0.0f;
+        size_t max_id = 0;
+        constexpr size_t LABELS_START = 4;
+        for (size_t j = LABELS_START; j < out_shape[1]; ++j) {
+            if (detections[j * num_proposals + i] > confidence) {
+                confidence = detections[j * num_proposals + i];
+                max_id = j;
+            }
+        }
+        if (confidence > confidence_threshold) {
+            boxes.push_back(Anchor{
+                detections[0 * num_proposals + i] - detections[2 * num_proposals + i] / 2.0f,
+                detections[1 * num_proposals + i] - detections[3 * num_proposals + i] / 2.0f,
+                detections[0 * num_proposals + i] + detections[2 * num_proposals + i] / 2.0f,
+                detections[1 * num_proposals + i] + detections[3 * num_proposals + i] / 2.0f,
+            });
+            confidences.push_back(confidence);
+            labelIDs.push_back(max_id - LABELS_START);
+        }
+    }
+    constexpr bool includeBoundaries = false;
+    constexpr size_t keep_top_k = 30000;
+    std::vector<size_t> keep;
+    if (agnostic_nms) {
+        keep = nms(boxes, confidences, iou_threshold, includeBoundaries, keep_top_k);
+    } else {
+        std::vector<AnchorLabeled> boxes_with_class;
+        boxes_with_class.reserve(boxes.size());
+        for (size_t i = 0; i < boxes.size(); ++i) {
+            boxes_with_class.emplace_back(boxes[i], int(labelIDs[i]));
+        }
+        keep = multiclass_nms(boxes_with_class, confidences, iou_threshold, includeBoundaries, keep_top_k);
+    }
+    DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
+    auto base = std::unique_ptr<ResultBase>(result);
+    const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
+    float floatInputImgWidth = float(internalData.inputImgWidth),
+         floatInputImgHeight = float(internalData.inputImgHeight);
+    float invertedScaleX = floatInputImgWidth / netInputWidth,
+          invertedScaleY = floatInputImgHeight / netInputHeight;
+    int padLeft = 0, padTop = 0;
+    if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
+        invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
+        if (RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
+            padLeft = (netInputWidth - int(std::round(floatInputImgWidth / invertedScaleX))) / 2;
+            padTop = (netInputHeight - int(std::round(floatInputImgHeight / invertedScaleY))) / 2;
+        }
+    }
+    for (size_t idx : keep) {
+        DetectedObject desc;
+        desc.x = clamp(
+            round((boxes[idx].left - padLeft) * invertedScaleX),
+            0.f,
+            floatInputImgWidth);
+        desc.y = clamp(
+            round((boxes[idx].top - padTop) * invertedScaleY),
+            0.f,
+            floatInputImgHeight);
+        desc.width = clamp(
+            round((boxes[idx].right - padLeft) * invertedScaleX),
+            0.f,
+            floatInputImgWidth) - desc.x;
+        desc.height = clamp(
+            round((boxes[idx].bottom - padTop) * invertedScaleY),
+            0.f,
+            floatInputImgHeight) - desc.y;
+        desc.confidence = confidences[idx];
+        desc.labelID = static_cast<size_t>(labelIDs[idx]);
+        desc.label = getLabelName(desc.labelID);
+        result->objects.push_back(desc);
+    }
+    return base;
+}
+
+std::string YOLOv8::ModelType = "YOLOv8";

@@ -243,7 +243,7 @@ std::unique_ptr<ResultBase> ModelFaceBoxes::postprocess(InferenceResult& infResu
     std::vector<Anchor> boxes = filterBoxes(boxesTensor, anchors, scores.first, variance);
 
     // Apply Non-maximum Suppression
-    const std::vector<int> keep = nms(boxes, scores.second, iou_threshold);
+    const std::vector<size_t>& keep = nms(boxes, scores.second, iou_threshold);
 
     // Create detection result objects
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);

@@ -87,7 +87,9 @@ class DetectionResult(
 ):
     def __str__(self):
         obj_str = "; ".join(str(obj) for obj in self.objects)
-        return f"{obj_str}; [{','.join(str(i) for i in self.saliency_map.shape)}]; [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        if obj_str:
+            obj_str += "; "
+        return f"{obj_str}[{','.join(str(i) for i in self.saliency_map.shape)}]; [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 class SegmentedObject(Detection):
@@ -340,7 +342,7 @@ INTERPOLATION_TYPES = {
 }
 
 
-def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=None):
+def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=0):
     b = 1 if include_boundaries else 0
     areas = (x2 - x1 + b) * (y2 - y1 + b)
     order = scores.argsort()[::-1]
@@ -362,12 +364,12 @@ def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=Non
         h = np.maximum(0.0, yy2 - yy1 + b)
         intersection = w * h
 
-        union = areas[i] + areas[order[1:]] - intersection
+        union_areas = areas[i] + areas[order[1:]] - intersection
         overlap = np.divide(
             intersection,
-            union,
+            union_areas,
             out=np.zeros_like(intersection, dtype=float),
-            where=union != 0,
+            where=union_areas != 0,
         )
 
         order = order[np.where(overlap <= thresh)[0] + 1]

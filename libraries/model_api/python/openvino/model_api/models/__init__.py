@@ -56,7 +56,7 @@ from .utils import (
     add_rotated_rects,
     get_contours,
 )
-from .yolo import YOLO, YOLOF, YOLOX, YoloV3ONNX, YoloV4
+from .yolo import YOLO, YOLOF, YOLOX, YoloV3ONNX, YoloV4, YOLOv5, YOLOv8
 
 classification_models = [
     "resnet-18-pytorch",
@@ -118,6 +118,8 @@ __all__ = [
     "YOLO",
     "YoloV3ONNX",
     "YoloV4",
+    "YOLOv5",
+    "YOLOv8",
     "YOLOF",
     "YOLOX",
     "ClassificationResult",

@@ -50,13 +50,13 @@ struct AnchorLabeled : public Anchor {
     AnchorLabeled() = default;
     AnchorLabeled(float _left, float _top, float _right, float _bottom, int _labelID) :
         Anchor(_left, _top, _right, _bottom), labelID(_labelID) {}
+    AnchorLabeled(const Anchor& coords, int labelID) : Anchor{coords}, labelID{labelID} {}
 };
 
 template <typename Anchor>
-std::vector<int> nms(const std::vector<Anchor>& boxes, const std::vector<float>& scores,
-                     const float thresh, bool includeBoundaries=false, size_t maxNum=0) {
-    if (maxNum == 0) {
-        maxNum = boxes.size();
+std::vector<size_t> nms(const std::vector<Anchor>& boxes, const std::vector<float>& scores, const float thresh, bool includeBoundaries=false, size_t keep_top_k=0) {
+    if (keep_top_k == 0) {
+        keep_top_k = boxes.size();
     }
     std::vector<float> areas(boxes.size());
     for (size_t i = 0; i < boxes.size(); ++i) {
@@ -67,25 +67,24 @@ std::vector<int> nms(const std::vector<Anchor>& boxes, const std::vector<float>&
     std::sort(order.begin(), order.end(), [&scores](int o1, int o2) { return scores[o1] > scores[o2]; });
 
     size_t ordersNum = 0;
-    for (; ordersNum < order.size() && scores[order[ordersNum]] >= 0  && ordersNum < maxNum; ordersNum++);
+    for (; ordersNum < order.size() && scores[order[ordersNum]] >= 0  && ordersNum < keep_top_k; ordersNum++);
 
-    std::vector<int> keep;
+    std::vector<size_t> keep;
     bool shouldContinue = true;
     for (size_t i = 0; shouldContinue && i < ordersNum; ++i) {
-        auto idx1 = order[i];
+        int idx1 = order[i];
         if (idx1 >= 0) {
             keep.push_back(idx1);
             shouldContinue = false;
             for (size_t j = i + 1; j < ordersNum; ++j) {
-                auto idx2 = order[j];
+                int idx2 = order[j];
                 if (idx2 >= 0) {
                     shouldContinue = true;
-                    auto overlappingWidth = std::fminf(boxes[idx1].right, boxes[idx2].right) - std::fmaxf(boxes[idx1].left, boxes[idx2].left);
-                    auto overlappingHeight = std::fminf(boxes[idx1].bottom, boxes[idx2].bottom) - std::fmaxf(boxes[idx1].top, boxes[idx2].top);
-                    auto intersection = overlappingWidth > 0 && overlappingHeight > 0 ? overlappingWidth * overlappingHeight : 0;
-                    auto overlap = intersection / (areas[idx1] + areas[idx2] - intersection);
-
-                    if (overlap >= thresh) {
+                    float overlappingWidth = std::fminf(boxes[idx1].right, boxes[idx2].right) - std::fmaxf(boxes[idx1].left, boxes[idx2].left);
+                    float overlappingHeight = std::fminf(boxes[idx1].bottom, boxes[idx2].bottom) - std::fmaxf(boxes[idx1].top, boxes[idx2].top);
+                    float intersection = overlappingWidth > 0 && overlappingHeight > 0 ? overlappingWidth * overlappingHeight : 0;
+                    float union_area = areas[idx1] + areas[idx2] - intersection;
+                    if (0.0f == union_area || intersection / union_area > thresh) {
                         order[j] = -1;
                     }
                 }
@@ -95,5 +94,5 @@ std::vector<int> nms(const std::vector<Anchor>& boxes, const std::vector<float>&
     return keep;
 }
 
-std::vector<int> multiclass_nms(const std::vector<AnchorLabeled>& boxes, const std::vector<float>& scores,
+std::vector<size_t> multiclass_nms(const std::vector<AnchorLabeled>& boxes, const std::vector<float>& scores,
                      const float iou_threshold=0.45f, bool includeBoundaries=false, size_t maxNum=200);

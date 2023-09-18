@@ -91,6 +91,20 @@ class ImageModel(Model):
         parameters = super().parameters()
         parameters.update(
             {
+                "embedded_processing": BooleanValue(
+                    description="Flag that pre/postprocessing embedded",
+                    default_value=False,
+                ),
+                "mean_values": ListValue(
+                    description="Normalization values, which will be subtracted from image channels for image-input layer during preprocessing",
+                    default_value=[],
+                ),
+                "orig_height": NumericalValue(
+                    int, description="Model input height before embedding processing"
+                ),
+                "orig_width": NumericalValue(
+                    int, description="Model input width before embedding processing"
+                ),
                 "pad_value": NumericalValue(
                     int,
                     min=0,
@@ -98,31 +112,17 @@ class ImageModel(Model):
                     description="Pad value for resize_image_letterbox embedded into a model",
                     default_value=0,
                 ),
-                "mean_values": ListValue(
-                    default_value=[],
-                    description="Normalization values, which will be subtracted from image channels for image-input layer during preprocessing",
-                ),
-                "scale_values": ListValue(
-                    default_value=[],
-                    description="Normalization values, which will divide the image channels for image-input layer",
-                ),
-                "reverse_input_channels": BooleanValue(
-                    default_value=False, description="Reverse the input channel order"
-                ),
                 "resize_type": StringValue(
                     default_value="standard",
                     choices=tuple(RESIZE_TYPES.keys()),
                     description="Type of input image resizing",
                 ),
-                "embedded_processing": BooleanValue(
-                    default_value=False,
-                    description="Flag that pre/postprocessing embedded",
+                "reverse_input_channels": BooleanValue(
+                    default_value=False, description="Reverse the input channel order"
                 ),
-                "orig_width": NumericalValue(
-                    int, description="Model input width before embedding processing"
-                ),
-                "orig_height": NumericalValue(
-                    int, description="Model input height before embedding processing"
+                "scale_values": ListValue(
+                    default_value=[],
+                    description="Normalization values, which will divide the image channels for image-input layer",
                 ),
             }
         )

@@ -190,8 +190,8 @@ std::unique_ptr<ResultBase> ModelYoloX::postprocess(InferenceResult& infResult) 
     }
 
     // NMS for valid boxes
-    std::vector<int> keep = nms(validBoxes, scores, iou_threshold, true);
-    for (auto& index: keep) {
+    const std::vector<size_t>& keep = nms(validBoxes, scores, iou_threshold, true);
+    for (size_t index: keep) {
         // Create new detected box
         DetectedObject obj;
         obj.x = clamp(validBoxes[index].left, 0.f, static_cast<float>(scale.inputImgWidth));

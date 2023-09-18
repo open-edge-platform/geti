@@ -91,6 +91,10 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
         detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloX(model, configuration));
     } else if (model_type == ModelCenterNet::ModelType) {
         detectionModel = std::unique_ptr<DetectionModel>(new ModelCenterNet(model, configuration));
+    } else if (model_type == YOLOv5::ModelType) {
+        detectionModel = std::unique_ptr<DetectionModel>(new YOLOv5(model, configuration));
+    } else if (model_type == YOLOv8::ModelType) {
+        detectionModel = std::unique_ptr<DetectionModel>(new YOLOv8(model, configuration));
     } else {
         throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
     }
