@@ -377,6 +377,43 @@ def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=0):
     return keep
 
 
+def multiclass_nms(
+    detections,
+    iou_threshold=0.45,
+    max_num=200,
+):
+    """Multi-class NMS.
+
+    strategy: in order to perform NMS independently per class,
+    we add an offset to all the boxes. The offset is dependent
+    only on the class idx, and is large enough so that boxes
+    from different classes do not overlap
+
+    Args:
+        detections (np.ndarray): labels, scores and boxes
+        iou_threshold (float, optional): IoU threshold. Defaults to 0.45.
+        max_num (int, optional): Max number of objects filter. Defaults to 200.
+
+    Returns:
+        tuple: (dets, indices), Dets are boxes with scores. Indices are indices of kept boxes.
+    """
+    if not detections.size:
+        return detections, []
+    labels = detections[:, 0]
+    scores = detections[:, 1]
+    boxes = detections[:, 2:]
+    max_coordinate = boxes.max()
+    offsets = labels.astype(boxes.dtype) * (max_coordinate + 1)
+    boxes_for_nms = boxes + offsets[:, None]
+
+    keep = nms(*boxes_for_nms.T, scores, iou_threshold)
+    if max_num > 0:
+        keep = keep[:max_num]
+    keep = np.array(keep)
+    det = detections[keep]
+    return det, keep
+
+
 def softmax(logits, axis=None, keepdims=False):
     exp = np.exp(logits - np.max(logits))
     return exp / np.sum(exp, axis=axis, keepdims=keepdims)

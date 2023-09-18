@@ -22,9 +22,13 @@ from openvino.model_api.models.instance_segmentation import (
     MaskRCNNModel,
     _segm_postprocess,
 )
-from openvino.model_api.models.utils import InstanceSegmentationResult, SegmentedObject
+from openvino.model_api.models.utils import (
+    InstanceSegmentationResult,
+    SegmentedObject,
+    multiclass_nms,
+)
 
-from .detection import DetectionTiler, _multiclass_nms
+from .detection import DetectionTiler
 
 
 class InstanceSegmentationTiler(DetectionTiler):
@@ -125,7 +129,7 @@ class InstanceSegmentationTiler(DetectionTiler):
 
         keep_idxs = []
         if np.prod(detections_array.shape):
-            detections_array, keep_idxs = _multiclass_nms(
+            detections_array, keep_idxs = multiclass_nms(
                 detections_array, max_num=self.max_pred_number
             )
         masks = [masks[keep_idx] for keep_idx in keep_idxs]

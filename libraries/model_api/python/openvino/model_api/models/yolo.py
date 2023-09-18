@@ -22,6 +22,7 @@ from .utils import (
     Detection,
     DetectionResult,
     clip_detections,
+    multiclass_nms,
     nms,
     resize_image,
 )
@@ -776,30 +777,32 @@ class YOLOv5(DetectionModel):
         if 1 != out_shape[0]:
             raise RuntimeError("the first dim of the output must be 1")
         LABELS_START = 4
-        xc = (
-            np.amax(prediction[:, LABELS_START:], 1) > self.confidence_threshold
-        )  # Candidates
-        x = prediction[0]
-        x = x.transpose(1, 0)[xc[0]]
-        box, cls = x[:, :LABELS_START], x[:, LABELS_START:]
-        box = xywh2xyxy(box)
-        j = cls.argmax(1, keepdims=True)
-        conf = np.take_along_axis(cls, j, 1)
-        x = np.concatenate((box, conf, j.astype(np.float32)), 1)
-        max_wh = 0 if self.agnostic_nms else 7680
-        c = x[:, 5:6] * max_wh
-        boxes = x[:, :LABELS_START] + c
-        boxes = x[
-            nms(
-                boxes[:, 0],
-                boxes[:, 1],
-                boxes[:, 2],
-                boxes[:, 3],
-                x[:, LABELS_START],
-                self.iou_threshold,
-                keep_top_k=30000,
-            )
+        filtered = prediction[0].T[
+            (prediction[:, LABELS_START:] > self.confidence_threshold).any(1)[0]
         ]
+        confidences = filtered[:, LABELS_START:]
+        labels = confidences.argmax(1, keepdims=True)
+        confidences = np.take_along_axis(confidences, labels, 1)
+        boxes = np.concatenate(
+            [labels, confidences, xywh2xyxy(filtered[:, :LABELS_START])],
+            1,
+            dtype=np.float32,
+        )
+        keep_top_k = 30000
+        if self.agnostic_nms:
+            boxes = boxes[
+                nms(
+                    boxes[:, 2],
+                    boxes[:, 3],
+                    boxes[:, 4],
+                    boxes[:, 5],
+                    boxes[:, 1],
+                    self.iou_threshold,
+                    keep_top_k=keep_top_k,
+                )
+            ]
+        else:
+            boxes, _ = multiclass_nms(boxes, self.iou_threshold, keep_top_k)
         inputImgWidth = meta["original_shape"][1]
         inputImgHeight = meta["original_shape"][0]
         invertedScaleX, invertedScaleY = (
@@ -817,7 +820,7 @@ class YOLOv5(DetectionModel):
                 padTop = (
                     self.orig_height - round(inputImgHeight / invertedScaleY)
                 ) // 2
-        coords = boxes[:, :LABELS_START]
+        coords = boxes[:, 2:]
         coords -= (padLeft, padTop, padLeft, padTop)
         coords *= (invertedScaleX, invertedScaleY, invertedScaleX, invertedScaleY)
 
@@ -828,11 +831,11 @@ class YOLOv5(DetectionModel):
             [inputImgWidth, inputImgHeight, inputImgWidth, inputImgHeight],
             intboxes,
         )
-        intid = boxes[:, 5].astype(np.int32)
+        intid = boxes[:, 0].astype(np.int32)
         return DetectionResult(
             [
                 Detection(
-                    *intboxes[i], boxes[i, 4], intid[i], self.get_label_name(intid[i])
+                    *intboxes[i], boxes[i, 1], intid[i], self.get_label_name(intid[i])
                 )
                 for i in range(len(boxes))
             ],

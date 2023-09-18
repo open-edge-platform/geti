@@ -50,7 +50,6 @@ struct AnchorLabeled : public Anchor {
     AnchorLabeled() = default;
     AnchorLabeled(float _left, float _top, float _right, float _bottom, int _labelID) :
         Anchor(_left, _top, _right, _bottom), labelID(_labelID) {}
-    AnchorLabeled(const Anchor& coords, int labelID) : Anchor{coords}, labelID{labelID} {}
 };
 
 template <typename Anchor>

@@ -593,9 +593,8 @@ std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
         throw std::runtime_error("YOLO: the first dim of the output must be 1");
     }
     size_t num_proposals = out_shape[2];
-    std::vector<Anchor> boxes;
+    std::vector<AnchorLabeled> boxes_with_class;
     std::vector<float> confidences;
-    std::vector<size_t> labelIDs;
     const float* const detections = detectionsTensor.data<float>();
     for (size_t i = 0; i < num_proposals; ++i) {
         float confidence = 0.0f;
@@ -608,27 +607,22 @@ std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
             }
         }
         if (confidence > confidence_threshold) {
-            boxes.push_back(Anchor{
+            boxes_with_class.emplace_back(
                 detections[0 * num_proposals + i] - detections[2 * num_proposals + i] / 2.0f,
                 detections[1 * num_proposals + i] - detections[3 * num_proposals + i] / 2.0f,
                 detections[0 * num_proposals + i] + detections[2 * num_proposals + i] / 2.0f,
                 detections[1 * num_proposals + i] + detections[3 * num_proposals + i] / 2.0f,
-            });
+                max_id - LABELS_START
+            );
             confidences.push_back(confidence);
-            labelIDs.push_back(max_id - LABELS_START);
         }
     }
     constexpr bool includeBoundaries = false;
     constexpr size_t keep_top_k = 30000;
     std::vector<size_t> keep;
     if (agnostic_nms) {
-        keep = nms(boxes, confidences, iou_threshold, includeBoundaries, keep_top_k);
+        keep = nms(boxes_with_class, confidences, iou_threshold, includeBoundaries, keep_top_k);
     } else {
-        std::vector<AnchorLabeled> boxes_with_class;
-        boxes_with_class.reserve(boxes.size());
-        for (size_t i = 0; i < boxes.size(); ++i) {
-            boxes_with_class.emplace_back(boxes[i], int(labelIDs[i]));
-        }
         keep = multiclass_nms(boxes_with_class, confidences, iou_threshold, includeBoundaries, keep_top_k);
     }
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
@@ -649,23 +643,23 @@ std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
     for (size_t idx : keep) {
         DetectedObject desc;
         desc.x = clamp(
-            round((boxes[idx].left - padLeft) * invertedScaleX),
+            round((boxes_with_class[idx].left - padLeft) * invertedScaleX),
             0.f,
             floatInputImgWidth);
         desc.y = clamp(
-            round((boxes[idx].top - padTop) * invertedScaleY),
+            round((boxes_with_class[idx].top - padTop) * invertedScaleY),
             0.f,
             floatInputImgHeight);
         desc.width = clamp(
-            round((boxes[idx].right - padLeft) * invertedScaleX),
+            round((boxes_with_class[idx].right - padLeft) * invertedScaleX),
             0.f,
             floatInputImgWidth) - desc.x;
         desc.height = clamp(
-            round((boxes[idx].bottom - padTop) * invertedScaleY),
+            round((boxes_with_class[idx].bottom - padTop) * invertedScaleY),
             0.f,
             floatInputImgHeight) - desc.y;
         desc.confidence = confidences[idx];
-        desc.labelID = static_cast<size_t>(labelIDs[idx]);
+        desc.labelID = static_cast<size_t>(boxes_with_class[idx].labelID);
         desc.label = getLabelName(desc.labelID);
         result->objects.push_back(desc);
     }
