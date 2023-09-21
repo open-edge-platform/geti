@@ -261,7 +261,7 @@ std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& input
     auto img = inputTransform(origImg);
 
     if (!useAutoResize && !embedded_processing) {
-        // /* Resize and copy data from the image to the input tensor */
+        // Resize and copy data from the image to the input tensor
         auto tensorShape = inferenceAdapter->getInputShape(inputNames[0]).get_max_shape(); // first input should be image
         const ov::Layout layout("NHWC");
         const size_t width = tensorShape[ov::layout::width_idx(layout)];

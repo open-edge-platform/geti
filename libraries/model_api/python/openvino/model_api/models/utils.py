@@ -102,7 +102,7 @@ class SegmentedObject(Detection):
 
 
 class SegmentedObjectWithRects(SegmentedObject):
-    def __init__(self, segmented_object):
+    def __init__(self, segmented_object, rotated_rect):
         super().__init__(
             segmented_object.xmin,
             segmented_object.ymin,
@@ -113,6 +113,7 @@ class SegmentedObjectWithRects(SegmentedObject):
             segmented_object.str_label,
             segmented_object.mask,
         )
+        self.rotated_rect = rotated_rect
 
     def __str__(self):
         res = super().__str__()
@@ -139,14 +140,15 @@ class InstanceSegmentationResult(NamedTuple):
 def add_rotated_rects(segmented_objects):
     objects_with_rects = []
     for segmented_object in segmented_objects:
-        objects_with_rects.append(SegmentedObjectWithRects(segmented_object))
         mask = segmented_object.mask.astype(np.uint8)
         contours, hierarchies = cv2.findContours(
             mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
 
         contour = np.vstack(contours)
-        objects_with_rects[-1].rotated_rect = cv2.minAreaRect(contour)
+        objects_with_rects.append(
+            SegmentedObjectWithRects(segmented_object, cv2.minAreaRect(contour))
+        )
     return objects_with_rects
 
 
