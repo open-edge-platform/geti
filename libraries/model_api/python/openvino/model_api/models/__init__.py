@@ -40,7 +40,6 @@ from .segmentation import SalientObjectDetectionModel, SegmentationModel
 from .ssd import SSD
 from .ultra_lightweight_face_detection import UltraLightweightFaceDetection
 from .utils import (
-    RESIZE_TYPES,
     AnomalyResult,
     ClassificationResult,
     Contour,
@@ -48,7 +47,6 @@ from .utils import (
     DetectionResult,
     DetectionWithLandmarks,
     ImageResultWithSoftPrediction,
-    InputTransform,
     InstanceSegmentationResult,
     OutputTransform,
     SegmentedObject,
@@ -96,7 +94,6 @@ __all__ = [
     "ImageMattingWithBackground",
     "ImageModel",
     "ImageResultWithSoftPrediction",
-    "InputTransform",
     "InstanceSegmentationResult",
     "MaskRCNNModel",
     "Model",
@@ -106,7 +103,6 @@ __all__ = [
     "OpenPose",
     "OutputTransform",
     "PortraitBackgroundMatting",
-    "RESIZE_TYPES",
     "RetinaFace",
     "RetinaFacePyTorch",
     "SalientObjectDetectionModel",

@@ -60,14 +60,21 @@ class ClassificationModel(ImageModel):
                 self.load()
             return
 
-        addOrFindSoftmaxAndTopkOutputs(
-            self.inference_adapter, self.topk, self.output_raw_scores
-        )
+        try:
+            addOrFindSoftmaxAndTopkOutputs(
+                self.inference_adapter, self.topk, self.output_raw_scores
+            )
+            self.embedded_topk = True
+            self.out_layer_names = ["indices", "scores"]
+            if self.output_raw_scores:
+                self.out_layer_names.append(self.raw_scores_name)
+        except (RuntimeError, AttributeError):
+            self.embedded_topk = False
+            self.out_layer_names = _get_non_xai_names(self.outputs.keys())
+            self.raw_scores_name = self.out_layer_names[0]
+
         self.embedded_processing = True
 
-        self.out_layer_names = ["indices", "scores"]
-        if self.output_raw_scores:
-            self.out_layer_names.append(self.raw_scores_name)
         _append_xai_names(self.outputs.keys(), self.out_layer_names)
         if preload:
             self.load()
@@ -187,7 +194,10 @@ class ClassificationModel(ImageModel):
                 logits_begin = cls_heads_info["num_single_label_classes"]
                 probs[logits_begin:] = sigmoid_numpy(logits[logits_begin:])
         else:
-            probs = logits.reshape(-1)
+            if self.embedded_topk:
+                probs = logits.reshape(-1)
+            else:
+                probs = softmax_numpy(logits.reshape(-1))
         return probs
 
     def get_hierarchical_predictions(self, logits: np.ndarray):
@@ -234,9 +244,14 @@ class ClassificationModel(ImageModel):
         return list(zip(indices, labels, scores))
 
     def get_multiclass_predictions(self, outputs):
-        indicesTensor = outputs[self.out_layer_names[0]][0]
-        scoresTensor = outputs[self.out_layer_names[1]][0]
-        labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
+        if self.embedded_topk:
+            indicesTensor = outputs[self.out_layer_names[0]][0]
+            scoresTensor = outputs[self.out_layer_names[1]][0]
+            labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
+        else:
+            scoresTensor = softmax_numpy(outputs[self.out_layer_names[0]][0])
+            indicesTensor = [np.argmax(scoresTensor)]
+            labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
         return list(zip(indicesTensor, labels, scoresTensor))
 
 

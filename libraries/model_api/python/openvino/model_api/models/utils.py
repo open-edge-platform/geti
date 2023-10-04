@@ -16,7 +16,6 @@
 
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
-import math
 from collections import namedtuple
 from typing import List, NamedTuple, Tuple, Union
 
@@ -246,102 +245,9 @@ class OutputTransform:
         return (np.array(inputs) * self.scale_factor).astype(np.int32)
 
 
-class InputTransform:
-    def __init__(
-        self, reverse_input_channels=False, mean_values=None, scale_values=None
-    ):
-        self.reverse_input_channels = reverse_input_channels
-        self.is_trivial = not (reverse_input_channels or mean_values or scale_values)
-        self.means = (
-            np.array(mean_values, dtype=np.float32)
-            if mean_values
-            else np.array([0.0, 0.0, 0.0])
-        )
-        self.std_scales = (
-            np.array(scale_values, dtype=np.float32)
-            if scale_values
-            else np.array([1.0, 1.0, 1.0])
-        )
-
-    def __call__(self, inputs):
-        if self.is_trivial:
-            return inputs
-        if self.reverse_input_channels:
-            inputs = cv2.cvtColor(inputs, cv2.COLOR_BGR2RGB)
-        return (inputs - self.means) / self.std_scales
-
-
 def load_labels(label_file):
     with open(label_file, "r") as f:
         return [x.strip() for x in f]
-
-
-def resize_image(image, size, keep_aspect_ratio=False, interpolation=cv2.INTER_LINEAR):
-    if keep_aspect_ratio:
-        h, w = image.shape[:2]
-        scale = min(size[1] / h, size[0] / w)
-        return cv2.resize(image, None, fx=scale, fy=scale, interpolation=interpolation)
-    return cv2.resize(image, size, interpolation=interpolation)
-
-
-def resize_image_with_aspect(image, size, interpolation=cv2.INTER_LINEAR):
-    return resize_image(
-        image, size, keep_aspect_ratio=True, interpolation=interpolation
-    )
-
-
-def resize_image_letterbox(image, size, interpolation=cv2.INTER_LINEAR, pad_value=0):
-    ih, iw = image.shape[0:2]
-    w, h = size
-    scale = min(w / iw, h / ih)
-    nw = round(iw * scale)
-    nh = round(ih * scale)
-    image = cv2.resize(image, (nw, nh), interpolation=interpolation)
-    dx = (w - nw) // 2
-    dy = (h - nh) // 2
-    return np.pad(
-        image,
-        ((dy, h - nh - dy), (dx, w - nw - dx), (0, 0)),
-        mode="constant",
-        constant_values=pad_value,
-    )
-
-
-def crop_resize(image, size):
-    desired_aspect_ratio = size[1] / size[0]  # width / height
-    if desired_aspect_ratio == 1:
-        if image.shape[0] > image.shape[1]:
-            offset = (image.shape[0] - image.shape[1]) // 2
-            cropped_frame = image[offset : image.shape[1] + offset]
-        else:
-            offset = (image.shape[1] - image.shape[0]) // 2
-            cropped_frame = image[:, offset : image.shape[0] + offset]
-    elif desired_aspect_ratio < 1:
-        new_width = math.floor(image.shape[0] * desired_aspect_ratio)
-        offset = (image.shape[1] - new_width) // 2
-        cropped_frame = image[:, offset : new_width + offset]
-    elif desired_aspect_ratio > 1:
-        new_height = math.floor(image.shape[1] / desired_aspect_ratio)
-        offset = (image.shape[0] - new_height) // 2
-        cropped_frame = image[offset : new_height + offset]
-
-    return cv2.resize(cropped_frame, size)
-
-
-RESIZE_TYPES = {
-    "crop": crop_resize,
-    "standard": resize_image,
-    "fit_to_window": resize_image_with_aspect,
-    "fit_to_window_letterbox": resize_image_letterbox,
-}
-
-
-INTERPOLATION_TYPES = {
-    "LINEAR": cv2.INTER_LINEAR,
-    "CUBIC": cv2.INTER_CUBIC,
-    "NEAREST": cv2.INTER_NEAREST,
-    "AREA": cv2.INTER_AREA,
-}
 
 
 def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=0):

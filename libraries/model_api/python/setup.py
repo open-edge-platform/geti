@@ -43,6 +43,8 @@ setup(
             "pytest",
             "openvino-dev[onnx,pytorch,tensorflow2]",
             "ultralytics>=8.0.114",
+            "onnx",
+            "onnxruntime",
         ],
     },
     long_description=(SETUP_DIR.parents[1] / "README.md").read_text(),

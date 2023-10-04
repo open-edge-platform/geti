@@ -18,6 +18,7 @@ import logging as log
 import re
 
 from openvino.model_api.adapters.inference_adapter import InferenceAdapter
+from openvino.model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
 from openvino.model_api.adapters.openvino_adapter import (
     OpenvinoAdapter,
     create_core,
@@ -76,6 +77,18 @@ class Model:
         """
         self.logger = log.getLogger()
         self.inference_adapter = inference_adapter
+        if isinstance(
+            self.inference_adapter, ONNXRuntimeAdapter
+        ) and self.__model__ not in {
+            "Classification",
+            "MaskRCNN",
+            "SSD",
+            "Segmentation",
+        }:
+            self.raise_error(
+                "this type of wrapper only supports OpenVINO and OVMS inference adapters"
+            )
+
         self.inputs = self.inference_adapter.get_input_layers()
         self.outputs = self.inference_adapter.get_output_layers()
         for name, parameter in self.parameters().items():

@@ -40,6 +40,8 @@ from .inference_adapter import InferenceAdapter, Metadata
 from .utils import (
     Layout,
     crop_resize,
+    get_rt_info_from_dict,
+    load_parameters_from_onnx,
     resize_image,
     resize_image_letterbox,
     resize_image_with_aspect,
@@ -166,20 +168,9 @@ class OpenvinoAdapter(InferenceAdapter):
                 import onnx
 
                 self.is_onnx_file = True
-                onnx_model = onnx.load(self.model_path)
-
-                def insert_hiararchical(keys, val, root_dict):
-                    if len(keys) == 1:
-                        root_dict[keys[0]] = val
-                        return
-                    if keys[0] not in root_dict:
-                        root_dict[keys[0]] = {}
-                    insert_hiararchical(keys[1:], val, root_dict[keys[0]])
-
-                for prop in onnx_model.metadata_props:
-                    keys = prop.key.split()
-                    if "model_info" in keys:
-                        insert_hiararchical(keys, prop.value, self.onnx_metadata)
+                self.onnx_metadata = load_parameters_from_onnx(
+                    onnx.load(self.model_path)
+                )
 
         self.model_from_buffer = isinstance(self.model_path, bytes) and isinstance(
             weights_path, bytes
@@ -357,15 +348,7 @@ class OpenvinoAdapter(InferenceAdapter):
 
     def get_rt_info(self, path):
         if self.is_onnx_file:
-            try:
-                value = self.onnx_metadata
-                for item in path:
-                    value = value[item]
-                return OVAny(value)
-            except KeyError:
-                raise RuntimeError(
-                    "Cannot get runtime attribute. Path to runtime attribute is incorrect."
-                )
+            return get_rt_info_from_dict(self.onnx_metadata, path)
         return self.model.get_rt_info(path)
 
     def embed_preprocessing(

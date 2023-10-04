@@ -14,18 +14,11 @@
 from collections import namedtuple
 
 import numpy as np
+from openvino.model_api.adapters.utils import INTERPOLATION_TYPES, resize_image_ocv
 
 from .detection_model import DetectionModel
 from .types import BooleanValue, ListValue, NumericalValue
-from .utils import (
-    INTERPOLATION_TYPES,
-    Detection,
-    DetectionResult,
-    clip_detections,
-    multiclass_nms,
-    nms,
-    resize_image,
-)
+from .utils import Detection, DetectionResult, clip_detections, multiclass_nms, nms
 
 DetectionBox = namedtuple("DetectionBox", ["x", "y", "w", "h"])
 
@@ -503,7 +496,9 @@ class YOLOX(DetectionModel):
 
     def preprocess(self, inputs):
         image = inputs
-        resized_image = resize_image(image, (self.w, self.h), keep_aspect_ratio=True)
+        resized_image = resize_image_ocv(
+            image, (self.w, self.h), keep_aspect_ratio=True
+        )
 
         padded_image = np.ones((self.h, self.w, 3), dtype=np.uint8) * 114
         padded_image[: resized_image.shape[0], : resized_image.shape[1]] = resized_image

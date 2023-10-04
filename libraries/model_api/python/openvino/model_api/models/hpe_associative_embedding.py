@@ -15,11 +15,11 @@
 """
 
 import numpy as np
+from openvino.model_api.adapters.utils import resize_image_ocv
 from scipy.optimize import linear_sum_assignment
 
 from .image_model import ImageModel
 from .types import NumericalValue, StringValue
-from .utils import resize_image
 
 
 class HpeAssociativeEmbedding(ImageModel):
@@ -116,7 +116,7 @@ class HpeAssociativeEmbedding(ImageModel):
         return parameters
 
     def preprocess(self, inputs):
-        img = resize_image(inputs, (self.w, self.h), keep_aspect_ratio=True)
+        img = resize_image_ocv(inputs, (self.w, self.h), keep_aspect_ratio=True)
         h, w = img.shape[:2]
         if not (
             self.h - self.size_divisor < h <= self.h
