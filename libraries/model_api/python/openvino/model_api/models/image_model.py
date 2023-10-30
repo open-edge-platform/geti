@@ -72,7 +72,7 @@ class ImageModel(Model):
 
         layout = self.inputs[self.image_blob_name].layout
         if self.embedded_processing:
-            self.h, self.w = self.orig_width, self.orig_height
+            self.h, self.w = self.orig_height, self.orig_width
         else:
             inference_adapter.embed_preprocessing(
                 layout=layout,
