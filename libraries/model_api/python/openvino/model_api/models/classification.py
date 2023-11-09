@@ -302,8 +302,8 @@ def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk, output_raw_scores):
 
     if "model_info" in source_rt_info:
         source_rt_info = source_rt_info["model_info"]
-    for k in source_rt_info:
-        inference_adapter.model.set_rt_info(source_rt_info[k], ["model_info", k])
+        for k in source_rt_info:
+            inference_adapter.model.set_rt_info(source_rt_info[k], ["model_info", k])
 
     # manually set output tensors name for created topK node
     inference_adapter.model.outputs[0].tensor.set_names({"scores"})

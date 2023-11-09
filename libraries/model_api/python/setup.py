@@ -23,7 +23,7 @@ SETUP_DIR = Path(__file__).resolve().parent
 
 setup(
     name="openvino_model_api",
-    version="0.1.7",
+    version="0.1.8",
     description="Model API: model wrappers and pipelines for inference with OpenVINO",
     author="Intel(R) Corporation",
     url="https://github.com/openvinotoolkit/model_api",
