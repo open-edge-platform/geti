@@ -292,11 +292,18 @@ def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk, output_raw_scores):
             or _feature_vector_name in output.get_names()
         ):
             results_descr.append(output)
+
+    source_rt_info = inference_adapter.get_model().get_rt_info()
     inference_adapter.model = Model(
         results_descr,
         inference_adapter.model.get_parameters(),
         "classification",
     )
+
+    if "model_info" in source_rt_info:
+        source_rt_info = source_rt_info["model_info"]
+    for k in source_rt_info:
+        inference_adapter.model.set_rt_info(source_rt_info[k], ["model_info", k])
 
     # manually set output tensors name for created topK node
     inference_adapter.model.outputs[0].tensor.set_names({"scores"})

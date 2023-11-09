@@ -118,7 +118,14 @@ void addOrFindSoftmaxAndTopkOutputs(std::shared_ptr<ov::Model>& model, size_t to
             outputs_vector.push_back(output);
         }
     }
+
+    auto source_rt_info = model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{};
     model = std::make_shared<ov::Model>(outputs_vector, model->get_parameters(), "classification");
+
+    // preserve extra model_info items
+    for (const auto& k : source_rt_info) {
+        model->set_rt_info(k.second, "model_info", k.first);
+    }
 
     // manually set output tensors name for created topK node
     model->outputs()[0].set_names({indices_name});
