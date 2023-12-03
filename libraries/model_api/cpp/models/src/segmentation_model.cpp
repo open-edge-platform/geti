@@ -253,7 +253,8 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
 
 std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infResult) {
     const auto& inputImgSize = infResult.internalModelData->asRef<InternalImageModelData>();
-    const auto& outTensor = infResult.outputsData[outputNames[0]];
+    const auto& outputName = outputNames[0] == feature_vector_name ? outputNames[1] : outputNames[0];
+    const auto& outTensor = infResult.outputsData[outputName];
     const ov::Shape& outputShape = outTensor.get_shape();
     const ov::Layout& outputLayout = getLayoutFromShape(outputShape);
     size_t outChannels = ov::layout::has_channels(outputLayout) ?
