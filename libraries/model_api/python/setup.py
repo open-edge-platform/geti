@@ -42,7 +42,7 @@ setup(
             "httpx",
             "pytest",
             "openvino-dev[onnx,pytorch,tensorflow2]",
-            "ultralytics>=8.0.114",
+            "ultralytics>=8.0.114,<=8.0.205",
             "onnx",
             "onnxruntime",
         ],
