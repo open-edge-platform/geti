@@ -42,7 +42,7 @@ class AnomalyResult(NamedTuple):
         anomaly_map_min, anomaly_map_max = self._compute_min_max(self.anomaly_map)
         pred_mask_min, pred_mask_max = self._compute_min_max(self.pred_mask)
         return (
-            f"anomaly_map min:{anomaly_map_min:.3f} max:{anomaly_map_max};"
+            f"anomaly_map min:{anomaly_map_min} max:{anomaly_map_max};"
             f"pred_score:{self.pred_score};"
             f"pred_label:{self.pred_label};"
             f"pred_mask min:{pred_mask_min} max:{pred_mask_max};"

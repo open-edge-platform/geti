@@ -70,6 +70,8 @@ class AnomalyDetection(ImageModel):
         assert anomaly_map is not None
         pred_mask = (anomaly_map >= self.pixel_threshold).astype(np.uint8)
         anomaly_map = self._normalize(anomaly_map, self.pixel_threshold)
+        anomaly_map *= 255
+        anomaly_map = np.round(anomaly_map).astype(np.uint8)
         pred_mask = cv2.resize(
             pred_mask, (meta["original_shape"][1], meta["original_shape"][0])
         )
