@@ -271,13 +271,15 @@ class OpenvinoAdapter(InferenceAdapter):
 
     def get_output_layers(self):
         outputs = {}
-        for output in self.model.outputs:
+        for i, output in enumerate(self.model.outputs):
             output_shape = (
                 output.partial_shape.get_min_shape()
                 if self.model.is_dynamic()
                 else output.shape
             )
-            outputs[output.get_any_name()] = Metadata(
+
+            output_name = output.get_any_name() if output.get_names() else i
+            outputs[output_name] = Metadata(
                 output.get_names(),
                 list(output_shape),
                 precision=output.get_element_type().get_type_name(),

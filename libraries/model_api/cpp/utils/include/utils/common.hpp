@@ -46,7 +46,7 @@ static inline void logBasicModelInfo(const std::shared_ptr<ov::Model>& model) {
 
     slog::info << "\tOutputs: " << slog::endl;
     for (const ov::Output<ov::Node>& output : outputs) {
-        const std::string name = output.get_any_name();
+        const std::string name = output.get_names().size() ? output.get_any_name() : "";
         const ov::element::Type type = output.get_element_type();
         const ov::PartialShape shape = output.get_partial_shape();
         const ov::Layout layout = ov::layout::get_layout(output);
