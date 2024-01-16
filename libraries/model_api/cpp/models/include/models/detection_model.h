@@ -15,11 +15,8 @@
 */
 
 #pragma once
-#include <stddef.h>
 
 #include <string>
-#include <vector>
-
 #include "models/image_model.h"
 
 struct DetectionResult;

@@ -29,6 +29,7 @@ class InferRequest;
 struct InputData;
 struct InternalModelData;
 
+// ImageModel implements preprocess(), ImageModel's direct or indirect children are expected to implement prostprocess()
 class ImageModel : public ModelBase {
 public:
     /// Constructor

@@ -41,6 +41,7 @@ public:
 
     std::shared_ptr<ov::Model> prepare();
     void load(ov::Core& core, const std::string& device);
+    // Modifying ov::Model doesn't affect the model wrapper
     std::shared_ptr<ov::Model> getModel();
     std::shared_ptr<InferenceAdapter> getInferenceAdapter();
 

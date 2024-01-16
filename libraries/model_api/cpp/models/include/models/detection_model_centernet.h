@@ -17,7 +17,6 @@
 #pragma once
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "models/detection_model.h"
 
@@ -32,21 +31,6 @@ struct ResultBase;
 
 class ModelCenterNet : public DetectionModel {
 public:
-    struct BBox {
-        float left;
-        float top;
-        float right;
-        float bottom;
-
-        float getWidth() const {
-            return (right - left) + 1.0f;
-        }
-        float getHeight() const {
-            return (bottom - top) + 1.0f;
-        }
-    };
-    static const int INIT_VECTOR_SIZE = 200;
-
     ModelCenterNet(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelCenterNet(std::shared_ptr<InferenceAdapter>& adapter);
 

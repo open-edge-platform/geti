@@ -16,14 +16,6 @@
 
 #include "models/detection_model_centernet.h"
 
-#include <stddef.h>
-
-#include <algorithm>
-#include <cmath>
-#include <map>
-#include <stdexcept>
-#include <utility>
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <openvino/openvino.hpp>
@@ -156,9 +148,11 @@ std::shared_ptr<InternalModelData> ModelCenterNet::preprocess(const InputData& i
     return std::make_shared<InternalImageModelData>(img.cols, img.rows);
 }
 
+namespace {
 std::vector<std::pair<size_t, float>> nms(float* scoresPtr, const ov::Shape& shape, float threshold, int kernel = 3) {
     std::vector<std::pair<size_t, float>> scores;
-    scores.reserve(ModelCenterNet::INIT_VECTOR_SIZE);
+    constexpr size_t INIT_VECTOR_SIZE = 200;
+    scores.reserve(INIT_VECTOR_SIZE);
     auto chSize = shape[2] * shape[3];
 
     for (size_t i = 0; i < shape[1] * shape[2] * shape[3]; ++i) {
@@ -237,11 +231,25 @@ std::vector<std::pair<float, float>> filterWH(const ov::Tensor& whTensor,
     return wh;
 }
 
-std::vector<ModelCenterNet::BBox> calcBoxes(const std::vector<std::pair<size_t, float>>& scores,
+struct BBox {
+    float left;
+    float top;
+    float right;
+    float bottom;
+
+    float getWidth() const {
+        return (right - left) + 1.0f;
+    }
+    float getHeight() const {
+        return (bottom - top) + 1.0f;
+    }
+};
+
+std::vector<BBox> calcBoxes(const std::vector<std::pair<size_t, float>>& scores,
                                             const std::vector<std::pair<float, float>>& reg,
                                             const std::vector<std::pair<float, float>>& wh,
                                             const ov::Shape& shape) {
-    std::vector<ModelCenterNet::BBox> boxes(scores.size());
+    std::vector<BBox> boxes(scores.size());
 
     for (size_t i = 0; i < boxes.size(); ++i) {
         size_t chIdx = scores[i].first % (shape[2] * shape[3]);
@@ -257,7 +265,7 @@ std::vector<ModelCenterNet::BBox> calcBoxes(const std::vector<std::pair<size_t, 
     return boxes;
 }
 
-void transform(std::vector<ModelCenterNet::BBox>& boxes,
+void transform(std::vector<BBox>& boxes,
                const ov::Shape& shape,
                int scale,
                float centerX,
@@ -265,7 +273,7 @@ void transform(std::vector<ModelCenterNet::BBox>& boxes,
     cv::Mat1f trans = getAffineTransform(centerX, centerY, scale, 0, shape[2], shape[3], true);
 
     for (auto& b : boxes) {
-        ModelCenterNet::BBox newbb;
+        BBox newbb;
 
         newbb.left = trans.at<float>(0, 0) * b.left + trans.at<float>(0, 1) * b.top + trans.at<float>(0, 2);
         newbb.top = trans.at<float>(1, 0) * b.left + trans.at<float>(1, 1) * b.top + trans.at<float>(1, 2);
@@ -274,6 +282,7 @@ void transform(std::vector<ModelCenterNet::BBox>& boxes,
 
         b = newbb;
     }
+}
 }
 
 std::unique_ptr<ResultBase> ModelCenterNet::postprocess(InferenceResult& infResult) {
