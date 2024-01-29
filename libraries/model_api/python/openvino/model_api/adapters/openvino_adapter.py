@@ -278,7 +278,7 @@ class OpenvinoAdapter(InferenceAdapter):
                 else output.shape
             )
 
-            output_name = output.get_any_name() if output.get_names() else i
+            output_name = output.get_any_name() if output.get_names() else output
             outputs[output_name] = Metadata(
                 output.get_names(),
                 list(output_shape),
