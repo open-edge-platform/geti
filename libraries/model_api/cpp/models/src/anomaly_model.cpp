@@ -84,6 +84,10 @@ std::unique_ptr<ResultBase> AnomalyModel::postprocess(InferenceResult& infResult
     anomaly_map.convertTo(anomaly_map, CV_8UC1, 255);
 
     pred_score = normalize(pred_score, imageThreshold);
+    if (pred_label == labels[0]) {    // normal label
+        pred_score = 1 - pred_score;  // Score of normal is 1 - score of anomaly
+    }
+
     if (!anomaly_map.empty()) {
         cv::resize(anomaly_map, anomaly_map, cv::Size{inputImgSize.inputImgWidth, inputImgSize.inputImgHeight});
     }
@@ -106,6 +110,10 @@ cv::Mat AnomalyModel::normalize(cv::Mat& tensor, float threshold) {
     return normalized;
 }
 
+/// @brief Normalize the value to be in the range [0, 1]. Centered around 0.5 and scaled by the normalization scale.
+/// @param value Unbounded value to be normalized.
+/// @param threshold This is the value that is subtracted from the input value before normalization.
+/// @return value between 0 and 1.
 double AnomalyModel::normalize(double& value, float threshold) {
     double normalized = ((value - threshold) / normalizationScale) + 0.5f;
     return std::min(std::max(normalized, 0.), 1.);
