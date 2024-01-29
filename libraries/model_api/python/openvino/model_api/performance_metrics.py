@@ -102,12 +102,18 @@ class PerformanceMetrics:
 
     def get_last(self):
         return (
-            self.last_moving_statistic.latency / self.last_moving_statistic.frame_count
-            if self.last_moving_statistic.frame_count != 0
-            else None,
-            self.last_moving_statistic.frame_count / self.last_moving_statistic.period
-            if self.last_moving_statistic.period != 0.0
-            else None,
+            (
+                self.last_moving_statistic.latency
+                / self.last_moving_statistic.frame_count
+                if self.last_moving_statistic.frame_count != 0
+                else None
+            ),
+            (
+                self.last_moving_statistic.frame_count
+                / self.last_moving_statistic.period
+                if self.last_moving_statistic.period != 0.0
+                else None
+            ),
         )
 
     def get_total(self):
@@ -116,17 +122,27 @@ class PerformanceMetrics:
         )
         return (
             (
-                (self.total_statistic.latency + self.current_moving_statistic.latency)
-                / frame_count
-            )
-            if frame_count != 0
-            else None,
+                (
+                    (
+                        self.total_statistic.latency
+                        + self.current_moving_statistic.latency
+                    )
+                    / frame_count
+                )
+                if frame_count != 0
+                else None
+            ),
             (
-                frame_count
-                / (self.total_statistic.period + self.current_moving_statistic.period)
-            )
-            if frame_count != 0
-            else None,
+                (
+                    frame_count
+                    / (
+                        self.total_statistic.period
+                        + self.current_moving_statistic.period
+                    )
+                )
+                if frame_count != 0
+                else None
+            ),
         )
 
     def get_latency(self):

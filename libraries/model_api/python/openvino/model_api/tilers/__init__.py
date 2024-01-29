@@ -14,7 +14,6 @@
  limitations under the License.
 """
 
-
 from .detection import DetectionTiler
 from .instance_segmentation import InstanceSegmentationTiler
 from .tiler import Tiler

@@ -291,9 +291,11 @@ class OpenvinoAdapter(InferenceAdapter):
         new_shape = {
             name: PartialShape(
                 [
-                    Dimension(dim)
-                    if not isinstance(dim, tuple)
-                    else Dimension(dim[0], dim[1])
+                    (
+                        Dimension(dim)
+                        if not isinstance(dim, tuple)
+                        else Dimension(dim[0], dim[1])
+                    )
                     for dim in shape
                 ]
             )

@@ -155,9 +155,11 @@ class SegmentationModel(ImageModel):
             return ImageResultWithSoftPrediction(
                 hard_prediction,
                 soft_prediction,
-                _get_activation_map(soft_prediction)
-                if _feature_vector_name in outputs
-                else np.ndarray(0),
+                (
+                    _get_activation_map(soft_prediction)
+                    if _feature_vector_name in outputs
+                    else np.ndarray(0)
+                ),
                 outputs.get(_feature_vector_name, np.ndarray(0)),
             )
         return hard_prediction
