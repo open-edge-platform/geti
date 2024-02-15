@@ -1,5 +1,5 @@
 """
- Copyright (c) 2021-2023 Intel Corporation
+ Copyright (c) 2021-2024 Intel Corporation
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 """
 
 import json
+from typing import Dict
 
 import numpy as np
 from openvino.preprocess import PrePostProcessor
@@ -170,10 +171,28 @@ class ClassificationModel(ImageModel):
 
         return ClassificationResult(
             result,
-            outputs.get(_saliency_map_name, np.ndarray(0)),
+            self.get_saliency_maps(outputs),
             outputs.get(_feature_vector_name, np.ndarray(0)),
             raw_scores,
         )
+
+    def get_saliency_maps(self, outputs: Dict) -> np.ndarray:
+        """
+        Returns saliency map model output. In hierarchical case reorders saliency maps
+        to match the order of labels in .XML meta.
+        """
+        saliency_maps = outputs.get(_saliency_map_name, np.ndarray(0))
+        if not self.hierarchical:
+            return saliency_maps
+
+        reordered_saliency_maps = [[] for _ in range(len(saliency_maps))]
+        model_classes = self.hierarchical_info["cls_heads_info"]["class_to_group_idx"]
+        label_to_model_out_idx = {lbl: i for i, lbl in enumerate(model_classes.keys())}
+        for batch in range(len(saliency_maps)):
+            for label in self.labels:
+                idx = label_to_model_out_idx[label]
+                reordered_saliency_maps[batch].append(saliency_maps[batch][idx])
+        return np.array(reordered_saliency_maps)
 
     def get_all_probs(self, logits: np.ndarray):
         if self.multilabel:
