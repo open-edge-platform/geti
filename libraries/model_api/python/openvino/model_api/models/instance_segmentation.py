@@ -202,7 +202,10 @@ class MaskRCNNModel(ImageModel):
         for box, confidence, cls, str_label, raw_mask in zip(
             boxes, scores, labels, str_labels, masks
         ):
-            if confidence <= self.confidence_threshold and not has_feature_vector_name:
+            x1, y1, x2, y2 = box
+            if (x2 - x1) * (y2 - y1) < 1 or (
+                confidence <= self.confidence_threshold and not has_feature_vector_name
+            ):
                 continue
             raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
             if self.postprocess_semantic_masks or has_feature_vector_name:
