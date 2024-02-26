@@ -427,7 +427,7 @@ def _get_non_xai_names(output_names):
     return [
         output_name
         for output_name in output_names
-        if _saliency_map_name != output_name or _feature_vector_name == output_name
+        if _saliency_map_name != output_name and _feature_vector_name != output_name
     ]
 
 
