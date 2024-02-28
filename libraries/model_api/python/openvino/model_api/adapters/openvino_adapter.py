@@ -185,7 +185,7 @@ class OpenvinoAdapter(InferenceAdapter):
             self.model = core.read_model(self.model_path, weights_path)
             return
         if isinstance(model, str):
-            from openvino.model_zoo.models import OMZModel, list_models
+            from omz_tools.models import OMZModel, list_models
 
             if model in list_models():
                 omz_model = OMZModel.download(
