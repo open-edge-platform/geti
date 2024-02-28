@@ -35,9 +35,9 @@ ONNX Runtime session parameters are forwarded to ORT instead of OpenVINO-specifi
 ```python
 import cv2
 # import model wrapper class
-from openvino.model_api.models import SSD
+from model_api.models import SSD
 # import inference adapter
-from openvino.model_api.adapters import ONNXRuntimeAdapter
+from model_api.adapters import ONNXRuntimeAdapter
 
 # read input image using opencv
 input_data = cv2.imread("sample.png")

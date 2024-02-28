@@ -16,8 +16,8 @@
 
 import cv2 as cv
 import numpy as np
-from openvino.model_api.models.types import NumericalValue
-from openvino.model_api.models.utils import Detection, DetectionResult, multiclass_nms
+from model_api.models.types import NumericalValue
+from model_api.models.utils import Detection, DetectionResult, multiclass_nms
 
 from .tiler import Tiler
 

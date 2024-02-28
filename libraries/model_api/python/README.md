@@ -122,9 +122,9 @@ Once the SSD model wrapper instance is created, we get the predictions by the mo
 ```python
 import cv2
 # import model wrapper class
-from openvino.model_api.models import SSD
+from model_api.models import SSD
 # import inference adapter and helper for runtime setup
-from openvino.model_api.adapters import OpenvinoAdapter, create_core
+from model_api.adapters import OpenvinoAdapter, create_core
 
 
 # read input image using opencv

@@ -14,7 +14,7 @@
 from collections import namedtuple
 
 import numpy as np
-from openvino.model_api.adapters.utils import INTERPOLATION_TYPES, resize_image_ocv
+from model_api.adapters.utils import INTERPOLATION_TYPES, resize_image_ocv
 
 from .detection_model import DetectionModel
 from .types import BooleanValue, ListValue, NumericalValue

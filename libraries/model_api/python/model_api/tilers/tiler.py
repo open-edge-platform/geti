@@ -18,8 +18,8 @@ import abc
 import logging as log
 from itertools import product
 
-from openvino.model_api.models.types import NumericalValue
-from openvino.model_api.pipelines import AsyncPipeline
+from model_api.models.types import NumericalValue
+from model_api.pipelines import AsyncPipeline
 
 
 class Tiler(metaclass=abc.ABCMeta):

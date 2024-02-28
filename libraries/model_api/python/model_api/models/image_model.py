@@ -14,7 +14,7 @@
  limitations under the License.
 """
 
-from openvino.model_api.adapters.utils import RESIZE_TYPES, InputTransform
+from model_api.adapters.utils import RESIZE_TYPES, InputTransform
 
 from .model import Model
 from .types import BooleanValue, ListValue, NumericalValue, StringValue

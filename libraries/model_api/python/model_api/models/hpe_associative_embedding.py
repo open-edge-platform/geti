@@ -15,7 +15,7 @@
 """
 
 import numpy as np
-from openvino.model_api.adapters.utils import resize_image_ocv
+from model_api.adapters.utils import resize_image_ocv
 from scipy.optimize import linear_sum_assignment
 
 from .image_model import ImageModel

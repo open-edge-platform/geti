@@ -17,14 +17,14 @@
 import logging as log
 import re
 
-from openvino.model_api.adapters.inference_adapter import InferenceAdapter
-from openvino.model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
-from openvino.model_api.adapters.openvino_adapter import (
+from model_api.adapters.inference_adapter import InferenceAdapter
+from model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
+from model_api.adapters.openvino_adapter import (
     OpenvinoAdapter,
     create_core,
     get_user_config,
 )
-from openvino.model_api.adapters.ovms_adapter import OVMSAdapter
+from model_api.adapters.ovms_adapter import OVMSAdapter
 
 
 class WrapperError(Exception):
