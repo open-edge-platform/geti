@@ -158,11 +158,35 @@ std::vector<std::string> get_non_xai_names(const std::vector<ov::Output<ov::Node
     return outputNames;
 }
 
+std::vector<std::string> get_non_xai_names(const std::vector<std::string>& outputs) {
+    std::vector<std::string> outputNames;
+    outputNames.reserve(std::max(1, int(outputs.size()) - 2));
+    for (const auto& output : outputs) {
+        if (output.find(saliency_map_name) != std::string::npos) {
+            continue;
+        } if (output.find(feature_vector_name) != std::string::npos) {
+            continue;
+        }
+        outputNames.push_back(output);
+    }
+    return outputNames;
+}
+
 void append_xai_names(const std::vector<ov::Output<ov::Node>>& outputs, std::vector<std::string>& outputNames) {
     for (const ov::Output<ov::Node>& output : outputs) {
         if (output.get_names().count(saliency_map_name) > 0) {
             outputNames.emplace_back(saliency_map_name);
         } else if (output.get_names().count(feature_vector_name) > 0) {
+            outputNames.push_back(feature_vector_name);
+        }
+    }
+}
+
+void append_xai_names(const std::vector<std::string>& outputs, std::vector<std::string>& outputNames) {
+    for (const auto& output : outputs) {
+        if (output.find(saliency_map_name) != std::string::npos) {
+            outputNames.emplace_back(saliency_map_name);
+        } else if (output.find(feature_vector_name) != std::string::npos) {
             outputNames.push_back(feature_vector_name);
         }
     }
@@ -192,6 +216,8 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
 
 ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter)
         : ImageModel(adapter) {
+    outputNames = get_non_xai_names(adapter->getOutputNames());
+    append_xai_names(adapter->getOutputNames(), outputNames);
     init_from_config(adapter->getModelConfig(), ov::AnyMap{});
 }
 
@@ -408,7 +434,7 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
                                                   inputShape[ov::layout::height_idx(inputLayout)]},
                                         pad_value,
                                         reverse_input_channels,
-                                        {},
+                                        mean_values,
                                         scale_values);
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
