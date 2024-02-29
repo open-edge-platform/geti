@@ -155,7 +155,7 @@ class Model:
             configuration (:obj:`dict`, optional): dictionary of model config with model properties, for example confidence_threshold, labels
             model_type (:obj:`str`, optional): name of model wrapper to create (e.g. "ssd")
             preload (:obj:`bool`, optional): whether to call load_model(). Can be set to false to reshape model before loading
-            core (optional): openvino.runtime.Core instance, passed to OpenvinoAdapter
+            core (optional): openvino.Core instance, passed to OpenvinoAdapter
             weights_path (:obj:`str`, optional): path to .bin file with model weights
             adaptor_parameters (:obj:`dict`, optional): parameters of ModelAdaptor
             device (:obj:`str`, optional): name of OpenVINO device (e.g. "CPU, GPU")
@@ -495,6 +495,6 @@ class Model:
         return model
 
     def save(self, xml_path, bin_path="", version="UNSPECIFIED"):
-        import openvino.runtime as ov
+        import openvino
 
-        ov.serialize(self.get_model(), xml_path, bin_path, version)
+        openvino.serialize(self.get_model(), xml_path, bin_path, version)

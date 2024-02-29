@@ -18,8 +18,8 @@ import json
 from typing import Dict
 
 import numpy as np
+from openvino import Model, Type
 from openvino.preprocess import PrePostProcessor
-from openvino.runtime import Model, Type
 from openvino.runtime import opset10 as opset
 
 from .image_model import ImageModel

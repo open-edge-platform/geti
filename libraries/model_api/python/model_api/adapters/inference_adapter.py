@@ -162,7 +162,7 @@ class InferenceAdapter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def get_rt_info(self, path):
         """
-        Forwards to openvino.runtime.Model.get_rt_info(path)
+        Forwards to openvino.Model.get_rt_info(path)
         """
 
     @abc.abstractmethod

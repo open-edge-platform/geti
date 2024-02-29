@@ -20,17 +20,16 @@ from typing import Dict, Set, Tuple
 
 try:
     import openvino.runtime as ov
-    from openvino.preprocess import ColorFormat, PrePostProcessor
-    from openvino.runtime import (
+    from openvino import (
         AsyncInferQueue,
         Core,
         Dimension,
-        OVAny,
         PartialShape,
         Type,
         get_version,
         layout_helpers,
     )
+    from openvino.preprocess import ColorFormat, PrePostProcessor
 
     openvino_absent = False
 except ImportError:
@@ -431,10 +430,10 @@ class OpenvinoAdapter(InferenceAdapter):
         self.load_model()
 
     def get_model(self):
-        """Returns the openvino.runtime.Model object
+        """Returns the openvino.Model object
 
         Returns:
-            openvino.runtime.Model object
+            openvino.Model object
         """
         return self.model
 

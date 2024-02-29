@@ -20,8 +20,8 @@ from typing import Optional
 
 import cv2
 import numpy as np
-import openvino.runtime as ov
-from openvino.runtime import Output, OVAny, Type, layout_helpers
+from openvino import Model, OVAny, Type, layout_helpers
+from openvino.runtime import Output
 from openvino.runtime import opset10 as opset
 from openvino.runtime.utils.decorators import custom_preprocess_function
 
@@ -195,7 +195,7 @@ def crop_resize_graph(input: Output, size):
             image_t, start=then_offset, stop=then_stop, step=[1], axes=[h_axis]
         )
         then_body_res_1 = opset.result(then_cropped_frame)
-        then_body = ov.Model(
+        then_body = Model(
             [then_body_res_1], [image_t, iw_t, ih_t], "then_body_function"
         )
 
@@ -212,7 +212,7 @@ def crop_resize_graph(input: Output, size):
             image_e, start=else_offset, stop=else_stop, step=[1], axes=[w_axis]
         )
         else_body_res_1 = opset.result(else_cropped_frame)
-        else_body = ov.Model(
+        else_body = Model(
             [else_body_res_1], [image_e, iw_e, ih_e], "else_body_function"
         )
 
