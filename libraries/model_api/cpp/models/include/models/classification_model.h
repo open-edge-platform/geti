@@ -37,6 +37,7 @@ struct HierarchicalConfig {
     std::vector<std::pair<std::string, std::string>> label_tree_edges;
     std::vector<std::vector<std::string>> all_groups;
     std::map<size_t, std::pair<size_t,size_t>> head_idx_to_logits_range;
+    std::map<size_t, std::string> logit_idx_to_label;
     size_t num_multiclass_heads;
     size_t num_multilabel_heads;
     size_t num_single_label_classes;
@@ -90,4 +91,6 @@ protected:
     std::unique_ptr<ResultBase> get_multilabel_predictions(InferenceResult& infResult, bool add_raw_scores);
     std::unique_ptr<ResultBase> get_multiclass_predictions(InferenceResult& infResult, bool add_raw_scores);
     std::unique_ptr<ResultBase> get_hierarchical_predictions(InferenceResult& infResult, bool add_raw_scores);
+    ov::Tensor reorder_saliency_maps(const ov::Tensor&);
+
 };

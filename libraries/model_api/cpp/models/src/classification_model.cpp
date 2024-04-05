@@ -289,6 +289,7 @@ std::unique_ptr<ResultBase> ClassificationModel::postprocess(InferenceResult& in
     auto saliency_map_iter = infResult.outputsData.find(saliency_map_name);
     if (saliency_map_iter != infResult.outputsData.end()) {
         cls_res->saliency_map = std::move(saliency_map_iter->second);
+        cls_res->saliency_map = reorder_saliency_maps(cls_res->saliency_map);
     }
     auto feature_vector_iter = infResult.outputsData.find(feature_vector_name);
     if (feature_vector_iter != infResult.outputsData.end()) {
@@ -382,6 +383,27 @@ std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(In
     }
 
     return retVal;
+}
+
+ov::Tensor ClassificationModel::reorder_saliency_maps(const ov::Tensor& source_maps) {
+    if (!hierarchical || source_maps.get_shape().size() == 1) {
+        return source_maps;
+    }
+
+    auto reordered_maps = ov::Tensor(source_maps.get_element_type(), source_maps.get_shape());
+    const std::uint8_t* source_maps_ptr = static_cast<std::uint8_t*>(source_maps.data());
+    std::uint8_t* reordered_maps_ptr = static_cast<std::uint8_t*>(reordered_maps.data());
+
+    size_t shape_offset = (source_maps.get_shape().size() == 4) ? 1 : 0;
+    size_t map_byte_size = source_maps.get_element_type().size() *
+        source_maps.get_shape()[shape_offset + 1] * source_maps.get_shape()[shape_offset + 2];
+
+    for (size_t i = 0; i < source_maps.get_shape()[shape_offset]; ++i) {
+        size_t new_index = hierarchical_info.label_to_idx[hierarchical_info.logit_idx_to_label[i]];
+        std::copy_n(source_maps_ptr + i*map_byte_size, map_byte_size, reordered_maps_ptr + new_index * map_byte_size);
+    }
+
+    return reordered_maps;
 }
 
 std::unique_ptr<ResultBase> ClassificationModel::get_multiclass_predictions(InferenceResult& infResult, bool add_raw_scores) {
@@ -515,6 +537,17 @@ HierarchicalConfig::HierarchicalConfig(const std::string& json_repr)  {
 
     for (const auto& range_descr : tmp_head_idx_to_logits_range) {
         head_idx_to_logits_range[stoi(range_descr.first)] = range_descr.second;
+    }
+
+    size_t logits_processed = 0;
+    for (size_t i = 0; i < num_multiclass_heads; ++i) {
+        const auto& logits_range = head_idx_to_logits_range[i];
+        for (size_t k = logits_range.first; k < logits_range.second; ++k) {
+            logit_idx_to_label[logits_processed++] = all_groups[i][k - logits_range.first];
+        }
+    }
+    for (size_t i = 0; i < num_multilabel_heads; ++i) {
+        logit_idx_to_label[logits_processed++] = all_groups[num_multiclass_heads + i][0];
     }
 }
 
