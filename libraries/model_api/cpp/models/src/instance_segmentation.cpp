@@ -356,6 +356,11 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
         obj.height = clamp(
             round((boxes[i * objectSize + 3] - padTop) * invertedScaleY - obj.y),
             0.f, floatInputImgHeight);
+
+        if (obj.height * obj.width <= 1) {
+            continue;
+        }
+
         cv::Mat raw_cls_mask{masks_size, CV_32F, masks + masks_size.area() * i};
         cv::Mat resized_mask;
         if (postprocess_semantic_masks || has_feature_vector_name) {
