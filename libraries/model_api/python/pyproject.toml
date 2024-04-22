@@ -1,0 +1,53 @@
+# Copyright (C) 2024 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+#
+
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openvino_model_api"
+version = "0.2.0"
+requires-python = ">=3.8"
+authors = [
+  {name = "Intel(R) Corporation"},
+]
+maintainers = [
+  {name = "Intel(R) Corporation"},
+]
+description = "Model API: model wrappers and pipelines for inference with OpenVINO"
+readme = "README.md"
+classifiers = [
+  "License :: OSI Approved :: MIT Apache Software License",
+  "Programming Language :: Python :: 3.8"
+]
+dependencies = [
+    "numpy>=1.16.6",
+    "opencv-python",
+    "scipy>=1.5.4",
+    "openvino>=2024.0",
+    "openvino-dev>=2024.0",
+    "omz_tools @ git+https://github.com/openvinotoolkit/open_model_zoo.git@master#egg=omz_tools&subdirectory=tools/model_tools",
+]
+
+[project.optional-dependencies]
+ovms = [
+  "ovmsclient",
+]
+tests = [
+    "httpx",
+    "pytest",
+    "openvino-dev[onnx,pytorch,tensorflow2]",
+    "ultralytics>=8.0.114,<=8.0.205",
+    "onnx",
+    "onnxruntime",
+]
+
+[project.urls]
+Homepage = "https://github.com/openvinotoolkit/model_api"
+Documentation = "https://github.com/openvinotoolkit/model_api/blob/master/README.md"
+Repository = "https://github.com/openvinotoolkit/model_api.git"
+
+[tool.setuptools.packages.find]
+include = ["model_api*"]
