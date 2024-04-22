@@ -42,7 +42,7 @@ public:
                const std::string& layout = "");
 
     ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
-    ImageModel(std::shared_ptr<InferenceAdapter>& adapter);
+    ImageModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration = {});
     using ModelBase::ModelBase;
 
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
@@ -62,6 +62,7 @@ public:
 protected:
     RESIZE_MODE selectResizeMode(const std::string& resize_type);
     void updateModelInfo() override;
+    void init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority);
 
     std::string getLabelName(size_t labelID) {
         return labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);

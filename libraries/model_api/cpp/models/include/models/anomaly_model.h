@@ -26,7 +26,7 @@ struct ImageInputData;
 class AnomalyModel : public ImageModel {
 public:
     AnomalyModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
-    AnomalyModel(std::shared_ptr<InferenceAdapter>& adapter);
+    AnomalyModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration = {});
 
     static std::unique_ptr<AnomalyModel> create_model(const std::string& modelFile,
                                                       const ov::AnyMap& configuration = {},

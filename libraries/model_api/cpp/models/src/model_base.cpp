@@ -34,14 +34,12 @@ ModelBase::ModelBase(const std::string& modelFile, const std::string& layout)
     model = core.read_model(modelFile);
 }
 
-ModelBase::ModelBase(std::shared_ptr<InferenceAdapter>& adapter)
+ModelBase::ModelBase(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
         : inferenceAdapter(adapter) {
-    const ov::AnyMap& configuration = adapter->getModelConfig();
-    auto layout_iter = configuration.find("layout");
+    const ov::AnyMap& adapter_configuration = adapter->getModelConfig();
+
     std::string layout = "";
-    if (layout_iter != configuration.end()) {
-        layout = layout_iter->second.as<std::string>();
-    }
+    layout = get_from_any_maps("layout", configuration, adapter_configuration, layout);
     inputsLayouts = parseLayoutString(layout);
 
     inputNames = adapter->getInputNames();

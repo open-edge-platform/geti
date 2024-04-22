@@ -34,7 +34,7 @@ struct Contour;
 class SegmentationModel : public ImageModel {
 public:
     SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
-    SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter);
+    SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration = {});
 
     static std::unique_ptr<SegmentationModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true, const std::string& device = "AUTO");
     static std::unique_ptr<SegmentationModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
@@ -49,6 +49,7 @@ protected:
 
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void updateModelInfo() override;
+    void init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority);
 
     int blur_strength = -1;
     float soft_threshold = -std::numeric_limits<float>::infinity();

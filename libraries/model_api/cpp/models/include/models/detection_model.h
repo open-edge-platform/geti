@@ -26,7 +26,7 @@ struct InferenceAdatper;
 class DetectionModel : public ImageModel {
 public:
     DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
-    DetectionModel(std::shared_ptr<InferenceAdapter>& adapter);
+    DetectionModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration = {});
 
     static std::unique_ptr<DetectionModel> create_model(const std::string& modelFile,
                                                         const ov::AnyMap& configuration = {},

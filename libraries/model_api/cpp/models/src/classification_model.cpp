@@ -214,11 +214,11 @@ ClassificationModel::ClassificationModel(std::shared_ptr<ov::Model>& model, cons
     init_from_config(configuration, model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
 }
 
-ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter)
-        : ImageModel(adapter) {
+ClassificationModel::ClassificationModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
+        : ImageModel(adapter, configuration) {
     outputNames = get_non_xai_names(adapter->getOutputNames());
     append_xai_names(adapter->getOutputNames(), outputNames);
-    init_from_config(adapter->getModelConfig(), ov::AnyMap{});
+    init_from_config(configuration, adapter->getModelConfig());
 }
 
 void ClassificationModel::updateModelInfo() {

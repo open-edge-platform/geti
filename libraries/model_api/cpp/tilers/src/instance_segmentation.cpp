@@ -43,7 +43,19 @@ class MaskRCNNModelParamsSetter {
 }
 
 InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ModelBase> _model, const ov::AnyMap& configuration) :
-    DetectionTiler(std::move(_model), configuration) {}
+    DetectionTiler(std::move(_model), configuration) {
+    ov::AnyMap extra_config;
+    try {
+        auto ov_model = model->getModel();
+        extra_config = ov_model->get_rt_info<ov::AnyMap>("model_info");
+    }
+    catch (const std::runtime_error&) {
+        extra_config = model->getInferenceAdapter()->getModelConfig();
+    }
+
+    postprocess_semantic_masks = get_from_any_maps("postprocess_semantic_masks",
+                                                   configuration, extra_config, postprocess_semantic_masks);
+}
 
 std::unique_ptr<ResultBase> InstanceSegmentationTiler::run(const ImageInputData& inputData) {
     auto setter = MaskRCNNModelParamsSetter(model);
@@ -88,8 +100,10 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(const std::
 
     result->segmentedObjects.reserve(keep_idx.size());
     for (auto idx : keep_idx) {
-        all_detections_ptrs[idx].get().mask = segm_postprocess(all_detections_ptrs[idx], all_detections_ptrs[idx].get().mask,
-                                    image_size.height, image_size.width);
+        if (postprocess_semantic_masks) {
+            all_detections_ptrs[idx].get().mask = segm_postprocess(all_detections_ptrs[idx], all_detections_ptrs[idx].get().mask,
+                                        image_size.height, image_size.width);
+        }
         result->segmentedObjects.push_back(all_detections_ptrs[idx]);
     }
 

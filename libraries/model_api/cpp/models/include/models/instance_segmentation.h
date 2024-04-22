@@ -33,7 +33,7 @@ struct SegmentedObject;
 class MaskRCNNModel : public ImageModel {
 public:
     MaskRCNNModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
-    MaskRCNNModel(std::shared_ptr<InferenceAdapter>& adapter);
+    MaskRCNNModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration = {});
 
     static std::unique_ptr<MaskRCNNModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true, const std::string& device = "AUTO");
     static std::unique_ptr<MaskRCNNModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
@@ -47,6 +47,7 @@ public:
 protected:
     void prepareInputsOutputs(std::shared_ptr<ov::Model>& model) override;
     void updateModelInfo() override;
+    void init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority);
     std::string getLabelName(size_t labelID) {
         return labelID < labels.size() ? labels[labelID] : std::string("Label #") + std::to_string(labelID);
     }

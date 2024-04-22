@@ -46,13 +46,9 @@ DetectionModel::DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyM
     }
 }
 
-DetectionModel::DetectionModel(std::shared_ptr<InferenceAdapter>& adapter)
-   : ImageModel(adapter) {
-    const ov::AnyMap& configuration = adapter->getModelConfig();
-    auto confidence_threshold_iter = configuration.find("confidence_threshold");
-    if (confidence_threshold_iter != configuration.end()) {
-        confidence_threshold = confidence_threshold_iter->second.as<float>();
-    }
+DetectionModel::DetectionModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
+   : ImageModel(adapter, configuration) {
+    confidence_threshold = get_from_any_maps("confidence_threshold", configuration, adapter->getModelConfig(), confidence_threshold);
 }
 
 void DetectionModel::updateModelInfo() {

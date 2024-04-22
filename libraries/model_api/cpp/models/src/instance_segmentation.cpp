@@ -143,40 +143,19 @@ cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, in
 
 std::string MaskRCNNModel::ModelType = "MaskRCNN";
 
-MaskRCNNModel::MaskRCNNModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
-        : ImageModel(model, configuration) {
-    auto confidence_threshold_iter = configuration.find("confidence_threshold");
-    if (confidence_threshold_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "confidence_threshold")) {
-            confidence_threshold = model->get_rt_info<float>("model_info", "confidence_threshold");
-        }
-    } else {
-        confidence_threshold = confidence_threshold_iter->second.as<float>();
-    }
-    auto postprocess_semantic_masks_iter = configuration.find("postprocess_semantic_masks");
-    if (postprocess_semantic_masks_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "postprocess_semantic_masks")) {
-            std::string val = model->get_rt_info<std::string>("model_info", "postprocess_semantic_masks");
-            postprocess_semantic_masks = val == "True" || val == "YES";
-        }
-    } else {
-        std::string val = postprocess_semantic_masks_iter->second.as<std::string>();
-        postprocess_semantic_masks = val == "True" || val == "YES";
-    }
+void MaskRCNNModel::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority) {
+    confidence_threshold = get_from_any_maps("confidence_threshold", top_priority, mid_priority, confidence_threshold);
+    postprocess_semantic_masks = get_from_any_maps("postprocess_semantic_masks", top_priority, mid_priority, postprocess_semantic_masks);
 }
 
-MaskRCNNModel::MaskRCNNModel(std::shared_ptr<InferenceAdapter>& adapter)
-        : ImageModel(adapter) {
-    const ov::AnyMap& configuration = adapter->getModelConfig();
-    auto confidence_threshold_iter = configuration.find("confidence_threshold");
-    if (confidence_threshold_iter != configuration.end()) {
-        confidence_threshold = confidence_threshold_iter->second.as<float>();
-    }
-    auto postprocess_semantic_masks_iter = configuration.find("postprocess_semantic_masks");
-    if (postprocess_semantic_masks_iter != configuration.end()) {
-        std::string val = postprocess_semantic_masks_iter->second.as<std::string>();
-        postprocess_semantic_masks = val == "True" || val == "YES";
-    }
+MaskRCNNModel::MaskRCNNModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+        : ImageModel(model, configuration) {
+    init_from_config(configuration, model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
+}
+
+MaskRCNNModel::MaskRCNNModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
+        : ImageModel(adapter, configuration) {
+    init_from_config(configuration, adapter->getModelConfig());
 }
 
 std::unique_ptr<MaskRCNNModel> MaskRCNNModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {

@@ -44,8 +44,9 @@ AnomalyModel::AnomalyModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& 
     init_from_config(configuration, model->get_rt_info<ov::AnyMap>("model_info"));
 }
 
-AnomalyModel::AnomalyModel(std::shared_ptr<InferenceAdapter>& adapter) : ImageModel(adapter) {
-    init_from_config(adapter->getModelConfig(), ov::AnyMap{});
+AnomalyModel::AnomalyModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
+        : ImageModel(adapter, configuration) {
+    init_from_config(configuration, adapter->getModelConfig());
 }
 
 std::unique_ptr<AnomalyResult> AnomalyModel::infer(const ImageInputData& inputData) {

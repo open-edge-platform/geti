@@ -83,50 +83,19 @@ cv::Mat get_activation_map(const cv::Mat& features) {
 
 std::string SegmentationModel::ModelType = "Segmentation";
 
-SegmentationModel::SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration) : ImageModel(model, configuration) {
-    auto blur_strength_iter = configuration.find("blur_strength");
-    if (blur_strength_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "blur_strength")) {
-            blur_strength = model->get_rt_info<int>("model_info", "blur_strength");
-        }
-    } else {
-        blur_strength = blur_strength_iter->second.as<int>();
-    }
-    auto soft_threshold_iter = configuration.find("soft_threshold");
-    if (soft_threshold_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "soft_threshold")) {
-            soft_threshold = model->get_rt_info<float>("model_info", "soft_threshold");
-        }
-    } else {
-        soft_threshold = soft_threshold_iter->second.as<float>();
-    }
-    auto return_soft_prediction_iter = configuration.find("return_soft_prediction");
-    if (return_soft_prediction_iter == configuration.end()) {
-        if (model->has_rt_info("model_info", "return_soft_prediction")) {
-            std::string val = model->get_rt_info<std::string>("model_info", "return_soft_prediction");
-            return_soft_prediction = val == "True" || val == "YES";
-        }
-    } else {
-        std::string val = return_soft_prediction_iter->second.as<std::string>();
-        return_soft_prediction = val == "True" || val == "YES";
-    }
+void SegmentationModel::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority) {
+    blur_strength = get_from_any_maps("blur_strength", top_priority, mid_priority, blur_strength);
+    soft_threshold = get_from_any_maps("soft_threshold", top_priority, mid_priority, soft_threshold);
+    return_soft_prediction = get_from_any_maps("return_soft_prediction", top_priority, mid_priority, return_soft_prediction);
 }
 
-SegmentationModel::SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter) : ImageModel(adapter) {
-    const ov::AnyMap& configuration = adapter->getModelConfig();
-    auto blur_strength_iter = configuration.find("blur_strength");
-    if (blur_strength_iter != configuration.end()) {
-        blur_strength = blur_strength_iter->second.as<int>();
-    }
-    auto soft_threshold_iter = configuration.find("soft_threshold");
-    if (soft_threshold_iter != configuration.end()) {
-        soft_threshold = soft_threshold_iter->second.as<float>();
-    }
-    auto return_soft_prediction_iter = configuration.find("return_soft_prediction");
-    if (return_soft_prediction_iter != configuration.end()) {
-        std::string val = return_soft_prediction_iter->second.as<std::string>();
-        return_soft_prediction = val == "True" || val == "YES";
-    }
+SegmentationModel::SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration) : ImageModel(model, configuration) {
+    init_from_config(configuration, model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
+}
+
+SegmentationModel::SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
+        : ImageModel(adapter, configuration) {
+    init_from_config(configuration, adapter->getModelConfig());
 }
 
 std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {
