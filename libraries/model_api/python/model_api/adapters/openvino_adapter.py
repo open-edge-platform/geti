@@ -101,21 +101,19 @@ def get_user_config(
         if device == "CPU":  # CPU supports a few special performance-oriented keys
             # limit threading for CPU portion of inference
             if flags_nthreads:
-                config["CPU_THREADS_NUM"] = str(flags_nthreads)
-
-            config["CPU_BIND_THREAD"] = "NO"
+                config["INFERENCE_NUM_THREADS"] = str(flags_nthreads)
 
             # for CPU execution, more throughput-oriented execution via streams
-            config["CPU_THROUGHPUT_STREAMS"] = (
+            config["NUM_STREAMS"] = (
                 str(device_nstreams[device])
                 if device in device_nstreams
-                else "CPU_THROUGHPUT_AUTO"
+                else "NUM_STREAMS_AUTO"
             )
         elif device == "GPU":
-            config["GPU_THROUGHPUT_STREAMS"] = (
+            config["NUM_STREAMS"] = (
                 str(device_nstreams[device])
                 if device in device_nstreams
-                else "GPU_THROUGHPUT_AUTO"
+                else "NUM_STREAMS_AUTO"
             )
             if "MULTI" in flags_d and "CPU" in devices:
                 # multi-device execution with the CPU + GPU performs best with GPU throttling hint,
