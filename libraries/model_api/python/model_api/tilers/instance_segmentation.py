@@ -81,7 +81,7 @@ class InstanceSegmentationTiler(DetectionTiler):
         return tile_coords
 
     def _postprocess_tile(self, predictions, coord):
-        """Converts predictions to a format convinient for further merging.
+        """Converts predictions to a format convenient for further merging.
 
         Args:
              predictions: predictions from an instance segmentation model: a list of `SegmentedObject` objects
@@ -107,7 +107,7 @@ class InstanceSegmentationTiler(DetectionTiler):
              results: list of per-tile results
              shape: original full-res image shape
         Returns:
-             merged prediciton
+             merged prediction
         """
 
         detections_array = np.empty((0, 6), dtype=np.float32)
@@ -127,7 +127,9 @@ class InstanceSegmentationTiler(DetectionTiler):
         keep_idxs = []
         if np.prod(detections_array.shape):
             detections_array, keep_idxs = multiclass_nms(
-                detections_array, max_num=self.max_pred_number
+                detections_array,
+                max_num=self.max_pred_number,
+                iou_threshold=self.iou_threshold,
             )
         masks = [masks[keep_idx] for keep_idx in keep_idxs]
 

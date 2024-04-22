@@ -99,7 +99,7 @@ std::unique_ptr<ResultBase> DetectionTiler::merge_results(const std::vector<std:
         }
     }
 
-    auto keep_idx = multiclass_nms(all_detections, all_scores, 0.45f, false, 200);
+    auto keep_idx = multiclass_nms(all_detections, all_scores, iou_threshold, false, 200);
 
     result->objects.reserve(keep_idx.size());
     for (auto idx : keep_idx) {

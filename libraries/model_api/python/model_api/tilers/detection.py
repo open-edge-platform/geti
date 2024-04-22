@@ -48,12 +48,19 @@ class DetectionTiler(Tiler):
                     min=1,
                     description="Maximum numbers of prediction per image",
                 ),
+                "iou_threshold": NumericalValue(
+                    value_type=float,
+                    default_value=0.45,
+                    min=0,
+                    max=1.0,
+                    description="IoU threshold which is used to apply NMS to bounding boxes",
+                ),
             }
         )
         return parameters
 
     def _postprocess_tile(self, predictions, coord):
-        """Converts predictions to a format convinient for further merging.
+        """Converts predictions to a format convenient for further merging.
 
         Args:
              predictions: predictions from a detection model: a list of `Detection` objects
@@ -70,7 +77,7 @@ class DetectionTiler(Tiler):
         elif hasattr(predictions, "segmentedObjects"):
             detections = _detection2array(predictions.segmentedObjects)
         else:
-            raise RuntimeError("Unsupported model predictions fromat")
+            raise RuntimeError("Unsupported model predictions format")
 
         output_dict["saliency_map"] = predictions.saliency_map
         output_dict["features"] = predictions.feature_vector
@@ -95,7 +102,7 @@ class DetectionTiler(Tiler):
              results: list of per-tile results
              shape: original full-res image shape
         Returns:
-             merged prediciton
+             merged prediction
         """
 
         detections_array = np.empty((0, 6), dtype=np.float32)
@@ -111,7 +118,9 @@ class DetectionTiler(Tiler):
 
         if np.prod(detections_array.shape):
             detections_array, _ = multiclass_nms(
-                detections_array, max_num=self.max_pred_number
+                detections_array,
+                max_num=self.max_pred_number,
+                iou_threshold=self.iou_threshold,
             )
 
         merged_vector = (

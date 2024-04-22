@@ -46,6 +46,11 @@ TilerBase::TilerBase(const std::shared_ptr<ModelBase>& _model, const ov::AnyMap&
     if (tiles_overlap_iter != merged_config.end()) {
         tiles_overlap = tiles_overlap_iter->second.as<float>();
     }
+
+    auto iou_threshold_iter = merged_config.find("iou_threshold");
+    if (iou_threshold_iter != merged_config.end()) {
+        iou_threshold = iou_threshold_iter->second.as<float>();
+    }
 }
 
 std::vector<cv::Rect> TilerBase::tile(const cv::Size& image_size) {
