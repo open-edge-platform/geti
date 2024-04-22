@@ -415,18 +415,38 @@ def get_rt_info_from_dict(rt_info_dict, path):
 
 
 def resize_image_ocv(
-    image, size, keep_aspect_ratio=False, interpolation=cv2.INTER_LINEAR
+    image,
+    size,
+    keep_aspect_ratio=False,
+    is_pad=False,
+    pad_value=0,
+    interpolation=cv2.INTER_LINEAR,
 ):
     if keep_aspect_ratio:
         h, w = image.shape[:2]
         scale = min(size[1] / h, size[0] / w)
-        return cv2.resize(image, None, fx=scale, fy=scale, interpolation=interpolation)
+        image = cv2.resize(image, None, fx=scale, fy=scale, interpolation=interpolation)
+        if is_pad:
+            nh, nw = image.shape[:2]
+            ph, pw = max(0, size[1] - nh), max(0, size[0] - nw)
+            image = np.pad(
+                image,
+                ((0, ph), (0, pw), (0, 0)),
+                mode="constant",
+                constant_values=pad_value,
+            )
+        return image
     return cv2.resize(image, size, interpolation=interpolation)
 
 
 def resize_image_with_aspect_ocv(image, size, interpolation=cv2.INTER_LINEAR):
     return resize_image_ocv(
-        image, size, keep_aspect_ratio=True, interpolation=interpolation
+        image,
+        size,
+        keep_aspect_ratio=True,
+        is_pad=True,
+        pad_value=0,
+        interpolation=interpolation,
     )
 
 
