@@ -18,7 +18,7 @@ import abc
 import logging as log
 from itertools import product
 
-from model_api.models.types import NumericalValue
+from model_api.models.types import BooleanValue, NumericalValue
 from model_api.pipelines import AsyncPipeline
 
 
@@ -92,6 +92,10 @@ class Tiler(metaclass=abc.ABCMeta):
                     min=0.0,
                     max=1.0,
                     description="Overlap of tiles",
+                ),
+                "tile_with_full_img": BooleanValue(
+                    default_value=True,
+                    description="Whether to include full image as a tile",
                 ),
             }
         )
@@ -186,7 +190,9 @@ class Tiler(metaclass=abc.ABCMeta):
         """
         height, width = image.shape[:2]
 
-        coords = [[0, 0, width, height]]
+        coords = []
+        if self.tile_with_full_img:
+            coords += [[0, 0, width, height]]
         for loc_j, loc_i in product(
             range(0, width, int(self.tile_size * (1 - self.tiles_overlap))),
             range(0, height, int(self.tile_size * (1 - self.tiles_overlap))),

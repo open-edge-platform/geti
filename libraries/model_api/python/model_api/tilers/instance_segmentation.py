@@ -183,7 +183,8 @@ class InstanceSegmentationTiler(DetectionTiler):
 
         merged_map = [np.zeros((image_h, image_w)) for _ in range(num_classes)]
 
-        for i, saliency_map in enumerate(saliency_maps[1:], 1):
+        start_idx = 1 if self.tile_with_full_img else 0
+        for i, saliency_map in enumerate(saliency_maps[start_idx:], start_idx):
             for class_idx in range(num_classes):
                 cls_map = saliency_map[class_idx]
                 if len(cls_map.shape) < 2:
