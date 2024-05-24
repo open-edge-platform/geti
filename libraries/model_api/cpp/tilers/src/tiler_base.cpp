@@ -34,23 +34,10 @@ TilerBase::TilerBase(const std::shared_ptr<ModelBase>& _model, const ov::AnyMap&
         extra_config = model->getInferenceAdapter()->getModelConfig();
     }
 
-    ov::AnyMap merged_config(configuration);
-    merged_config.merge(extra_config);
-
-    auto tile_size_iter = merged_config.find("tile_size");
-    if (tile_size_iter != merged_config.end()) {
-        tile_size = tile_size_iter->second.as<size_t>();
-    }
-
-    auto tiles_overlap_iter = merged_config.find("tiles_overlap");
-    if (tiles_overlap_iter != merged_config.end()) {
-        tiles_overlap = tiles_overlap_iter->second.as<float>();
-    }
-
-    auto iou_threshold_iter = merged_config.find("iou_threshold");
-    if (iou_threshold_iter != merged_config.end()) {
-        iou_threshold = iou_threshold_iter->second.as<float>();
-    }
+    tile_size = get_from_any_maps("tile_size", configuration, extra_config, tile_size);
+    tiles_overlap = get_from_any_maps("tiles_overlap", configuration, extra_config, tiles_overlap);
+    iou_threshold = get_from_any_maps("iou_threshold", configuration, extra_config, iou_threshold);
+    tile_with_full_img = get_from_any_maps("tile_with_full_img", configuration, extra_config, tile_with_full_img);
 }
 
 std::vector<cv::Rect> TilerBase::tile(const cv::Size& image_size) {
@@ -68,8 +55,13 @@ std::vector<cv::Rect> TilerBase::tile(const cv::Size& image_size) {
         num_w_tiles += 1;
     }
 
-    coords.reserve(num_h_tiles * num_w_tiles + 1);
-    coords.push_back(cv::Rect(0, 0, image_size.width, image_size.height));
+    if (tile_with_full_img) {
+        coords.reserve(num_h_tiles * num_w_tiles + 1);
+        coords.push_back(cv::Rect(0, 0, image_size.width, image_size.height));
+    }
+    else {
+        coords.reserve(num_h_tiles * num_w_tiles);
+    }
 
     for (size_t i = 0; i < num_w_tiles; ++i) {
         for (size_t j = 0; j < num_h_tiles; ++j) {

@@ -163,7 +163,8 @@ std::vector<cv::Mat_<std::uint8_t>> InstanceSegmentationTiler::merge_saliency_ma
         map = cv::Mat_<std::uint8_t>(image_size, 0);
     }
 
-    for (size_t i = 1; i < all_saliecy_maps.size(); ++i) {
+    size_t start_idx = tile_with_full_img ? 1 : 0;
+    for (size_t i = start_idx; i < all_saliecy_maps.size(); ++i) {
         for (size_t class_idx = 0; class_idx < num_classes; ++class_idx) {
             auto current_cls_map_mat = all_saliecy_maps[i][class_idx];
             if (current_cls_map_mat.empty()) {
@@ -178,7 +179,7 @@ std::vector<cv::Mat_<std::uint8_t>> InstanceSegmentationTiler::merge_saliency_ma
     }
 
     for (size_t class_idx = 0; class_idx < num_classes; ++class_idx) {
-        auto image_map_cls = image_saliency_map[class_idx];
+        auto image_map_cls = tile_with_full_img ? image_saliency_map[class_idx] : cv::Mat_<std::uint8_t>();
         if (image_map_cls.empty()) {
             if (cv::sum(merged_map[class_idx]) == cv::Scalar(0.)) {
                 merged_map[class_idx] = cv::Mat_<std::uint8_t>();

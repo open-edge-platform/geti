@@ -29,7 +29,7 @@ class Tiler(metaclass=abc.ABCMeta):
 
     The abstract tiler is free from any executor dependencies.
     It sets the `Model` instance with the provided model
-    and applys it to tiles of the input image, and then merges
+    and applies it to tiles of the input image, and then merges
     results from all tiles.
 
     The `_postprocess_tile` and `_merge_results` methods must be implemented in a specific inherited tiler.
@@ -259,10 +259,10 @@ class Tiler(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def _postprocess_tile(self, predictions, coord):
-        """Postprocesses predicitons made by a model from one tile.
+        """Postprocesses predictions made by a model from one tile.
 
         Args:
-            predictions: model-dependent set of predicitons or one prediciton
+            predictions: model-dependent set of predictions or one prediction
             coord: a list containing coordinates for the processed tile
 
         Returns:

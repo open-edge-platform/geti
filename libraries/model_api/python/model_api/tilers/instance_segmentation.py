@@ -197,7 +197,11 @@ class InstanceSegmentationTiler(DetectionTiler):
                 merged_map[class_idx][y_1:y_2, x_1:x_2] = np.maximum(tile_map, cls_map)
 
         for class_idx in range(num_classes):
-            image_map_cls = image_saliency_map[class_idx]
+            image_map_cls = (
+                image_saliency_map[class_idx]
+                if self.tile_with_full_img
+                else np.ndarray(0)
+            )
             if len(image_map_cls.shape) < 2:
                 merged_map[class_idx] = np.round(merged_map[class_idx]).astype(np.uint8)
                 if np.sum(merged_map[class_idx]) == 0:
