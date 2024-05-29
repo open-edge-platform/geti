@@ -27,6 +27,7 @@
 #include <utils/ocv_common.hpp>
 #include <adapters/inference_adapter.h>
 
+#include "models/results.h"
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
 
@@ -85,6 +86,23 @@ ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
 ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
     : ModelBase(adapter, configuration) {
     init_from_config(configuration, adapter->getModelConfig());
+}
+
+std::unique_ptr<ResultBase> ImageModel::inferImage(const ImageInputData& inputData) {
+    return ModelBase::infer(static_cast<const InputData&>(inputData));;
+}
+
+std::vector<std::unique_ptr<ResultBase>> ImageModel::inferBatchImage(const std::vector<ImageInputData>& inputImgs) {
+    std::vector<std::reference_wrapper<const InputData>> inputData;
+    inputData.reserve(inputImgs.size());
+    for (const auto& img : inputImgs) {
+        inputData.push_back(static_cast<const InputData&>(img));
+    }
+    return ModelBase::inferBatch(inputData);
+}
+
+void ImageModel::inferAsync(const ImageInputData& inputData, const ov::AnyMap& callback_args) {
+    ModelBase::inferAsync(static_cast<const InputData&>(inputData), callback_args);
 }
 
 void ImageModel::updateModelInfo() {

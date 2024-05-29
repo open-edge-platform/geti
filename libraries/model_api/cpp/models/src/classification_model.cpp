@@ -517,8 +517,18 @@ void ClassificationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model
 }
 
 std::unique_ptr<ClassificationResult> ClassificationModel::infer(const ImageInputData& inputData) {
-    auto result = ModelBase::infer(static_cast<const InputData&>(inputData));
+    auto result = ImageModel::inferImage(inputData);
     return std::unique_ptr<ClassificationResult>(static_cast<ClassificationResult*>(result.release()));
+}
+
+std::vector<std::unique_ptr<ClassificationResult>> ClassificationModel::inferBatch(const std::vector<ImageInputData>& inputImgs) {
+    auto results = ImageModel::inferBatchImage(inputImgs);
+    std::vector<std::unique_ptr<ClassificationResult>> clsResults;
+    clsResults.reserve(results.size());
+    for (auto& result : results) {
+        clsResults.emplace_back(static_cast<ClassificationResult*>(result.release()));
+    }
+    return clsResults;
 }
 
 HierarchicalConfig::HierarchicalConfig(const std::string& json_repr)  {

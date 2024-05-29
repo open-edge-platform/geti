@@ -50,9 +50,19 @@ AnomalyModel::AnomalyModel(std::shared_ptr<InferenceAdapter>& adapter, const ov:
 }
 
 std::unique_ptr<AnomalyResult> AnomalyModel::infer(const ImageInputData& inputData) {
-    auto result = ModelBase::infer(static_cast<const InputData&>(inputData));
+    auto result = ImageModel::inferImage(inputData);
 
     return std::unique_ptr<AnomalyResult>(static_cast<AnomalyResult*>(result.release()));
+}
+
+std::vector<std::unique_ptr<AnomalyResult>> AnomalyModel::inferBatch(const std::vector<ImageInputData>& inputImgs) {
+    auto results = ImageModel::inferBatchImage(inputImgs);
+    std::vector<std::unique_ptr<AnomalyResult>> anoResults;
+    anoResults.reserve(results.size());
+    for (auto& result : results) {
+        anoResults.emplace_back(static_cast<AnomalyResult*>(result.release()));
+    }
+    return anoResults;
 }
 
 std::unique_ptr<ResultBase> AnomalyModel::postprocess(InferenceResult& infResult) {

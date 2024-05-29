@@ -20,10 +20,11 @@
 #include <tilers/tiler_base.h>
 #include <models/results.h>
 #include <models/input_data.h>
+#include <models/image_model.h>
 
 
-TilerBase::TilerBase(const std::shared_ptr<ModelBase>& _model, const ov::AnyMap& configuration) :
-    model(_model) {
+TilerBase::TilerBase(const std::shared_ptr<ImageModel>& _model, const ov::AnyMap& configuration, ExecutionMode exec_mode) :
+    model(_model), run_mode(exec_mode) {
 
     ov::AnyMap extra_config;
     try {
@@ -93,6 +94,24 @@ std::unique_ptr<ResultBase> TilerBase::predict_sync(const cv::Mat& image, const 
     return merge_results(tile_results, image.size(), tile_coords);
 }
 
+std::unique_ptr<ResultBase> TilerBase::predict_async(const cv::Mat& image, const std::vector<cv::Rect>& tile_coords) {
+    std::vector<ImageInputData> input_data;
+
+    input_data.reserve(tile_coords.size());
+    for (const auto& coord : tile_coords) {
+        auto tile_img = crop_tile(image, coord);
+        input_data.push_back(ImageInputData(tile_img.clone()));
+    }
+
+    std::vector<std::unique_ptr<ResultBase>> tile_results;
+    auto tile_predictions = model->inferBatchImage(input_data);
+    for (size_t i = 0; i < tile_predictions.size(); ++i) {
+        auto tile_result = postprocess_tile(std::move(tile_predictions[i]), tile_coords[i]);
+        tile_results.push_back(std::move(tile_result));
+    }
+    return merge_results(tile_results, image.size(), tile_coords);
+}
+
 cv::Mat TilerBase::crop_tile(const cv::Mat& image, const cv::Rect& coord) {
     return cv::Mat(image, coord);
 }
@@ -101,5 +120,8 @@ std::unique_ptr<ResultBase> TilerBase::run(const ImageInputData& inputData) {
     auto& image = inputData.inputImage;
     auto tile_coords = tile(image.size());
     tile_coords = filter_tiles(image, tile_coords);
+    if (run_mode == ExecutionMode::async) {
+        return predict_async(image, tile_coords);
+    }
     return predict_sync(image, tile_coords);
 }

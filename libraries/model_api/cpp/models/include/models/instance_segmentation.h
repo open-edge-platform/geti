@@ -41,6 +41,7 @@ public:
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
     virtual std::unique_ptr<InstanceSegmentationResult> infer(const ImageInputData& inputData);
+    virtual std::vector<std::unique_ptr<InstanceSegmentationResult>> inferBatch(const std::vector<ImageInputData>& inputImgs);
     static std::string ModelType;
     bool postprocess_semantic_masks = true;
 

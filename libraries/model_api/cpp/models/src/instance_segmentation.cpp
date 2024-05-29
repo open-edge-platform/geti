@@ -363,6 +363,16 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
 }
 
 std::unique_ptr<InstanceSegmentationResult> MaskRCNNModel::infer(const ImageInputData& inputData) {
-    auto result = ModelBase::infer(static_cast<const InputData&>(inputData));
+    auto result = ImageModel::inferImage(inputData);
     return std::unique_ptr<InstanceSegmentationResult>(static_cast<InstanceSegmentationResult*>(result.release()));
+}
+
+std::vector<std::unique_ptr<InstanceSegmentationResult>> MaskRCNNModel::inferBatch(const std::vector<ImageInputData>& inputImgs) {
+    auto results = ImageModel::inferBatchImage(inputImgs);
+    std::vector<std::unique_ptr<InstanceSegmentationResult>> isegResults;
+    isegResults.reserve(results.size());
+    for (auto& result : results) {
+        isegResults.emplace_back(static_cast<InstanceSegmentationResult*>(result.release()));
+    }
+    return isegResults;
 }

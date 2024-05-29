@@ -42,7 +42,7 @@ class MaskRCNNModelParamsSetter {
 };
 }
 
-InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ModelBase> _model, const ov::AnyMap& configuration) :
+InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ImageModel> _model, const ov::AnyMap& configuration) :
     DetectionTiler(std::move(_model), configuration) {
     ov::AnyMap extra_config;
     try {

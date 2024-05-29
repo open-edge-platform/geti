@@ -16,11 +16,14 @@
 
 #pragma once
 #include <string>
+#include <functional>
 #include <vector>
 #include <map>
+#include <queue>
 #include <memory>
 
 #include "adapters/inference_adapter.h"
+#include "utils/async_infer_queue.hpp"
 
 class OpenVINOInferenceAdapter :public InferenceAdapter
 {
@@ -29,8 +32,15 @@ public:
     OpenVINOInferenceAdapter() = default;
 
     virtual InferenceOutput infer(const InferenceInput& input) override;
+    virtual void inferAsync(const InferenceInput& input, const CallbackData callback_args) override;
+    virtual void setCallback(std::function<void(ov::InferRequest, const CallbackData)> callback);
+    virtual bool isReady();
+    virtual void awaitAll();
+    virtual void awaitAny();
     virtual void loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,
-                                                    const std::string& device = "", const ov::AnyMap& compilationConfig = {}) override;
+                                                    const std::string& device = "", const ov::AnyMap& compilationConfig = {},
+                                                    size_t max_num_requests = 1) override;
+    virtual size_t getNumAsyncExecutors() const;
     virtual ov::PartialShape getInputShape(const std::string& inputName) const override;
     virtual std::vector<std::string> getInputNames() const override;
     virtual std::vector<std::string> getOutputNames() const override;
@@ -40,10 +50,10 @@ protected:
     void initInputsOutputs();
 
 protected:
-    //Depends on the implmentation details but we should share the model state in this class
+    //Depends on the implementation details but we should share the model state in this class
     std::vector<std::string> inputNames;
     std::vector<std::string> outputNames;
     ov::CompiledModel compiledModel;
-    ov::InferRequest inferRequest;
+    std::unique_ptr<AsyncInferQueue> asyncQueue;
     ov::AnyMap modelConfig; // the content of model_info section of rt_info
 };

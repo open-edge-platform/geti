@@ -42,6 +42,8 @@ public:
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
     virtual std::unique_ptr<ImageResult> infer(const ImageInputData& inputData);
+    virtual std::vector<std::unique_ptr<ImageResult>> inferBatch(const std::vector<ImageInputData>& inputImgs);
+
     static std::string ModelType;
     std::vector<Contour> getContours(const ImageResultWithSoftPrediction& imageResult);
 

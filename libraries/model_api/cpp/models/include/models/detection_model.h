@@ -36,6 +36,7 @@ public:
     static std::unique_ptr<DetectionModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     virtual std::unique_ptr<DetectionResult> infer(const ImageInputData& inputData);
+    virtual std::vector<std::unique_ptr<DetectionResult>> inferBatch(const std::vector<ImageInputData>& inputImgs);
 
 protected:
     float confidence_threshold = 0.5f;

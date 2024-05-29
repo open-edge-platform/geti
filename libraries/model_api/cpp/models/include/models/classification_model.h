@@ -73,6 +73,7 @@ public:
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
     virtual std::unique_ptr<ClassificationResult> infer(const ImageInputData& inputData);
+    virtual std::vector<std::unique_ptr<ClassificationResult>> inferBatch(const std::vector<ImageInputData>& inputImgs);
     static std::string ModelType;
 
 protected:

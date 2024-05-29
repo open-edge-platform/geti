@@ -302,6 +302,16 @@ std::vector<Contour> SegmentationModel::getContours(const ImageResultWithSoftPre
 
 std::unique_ptr<ImageResult>
 SegmentationModel::infer(const ImageInputData& inputData) {
-    auto result = ModelBase::infer(static_cast<const InputData&>(inputData));
+    auto result = ImageModel::inferImage(inputData);
     return std::unique_ptr<ImageResult>(static_cast<ImageResult*>(result.release()));
+}
+
+std::vector<std::unique_ptr<ImageResult>> SegmentationModel::inferBatch(const std::vector<ImageInputData>& inputImgs) {
+    auto results = ImageModel::inferBatchImage(inputImgs);
+    std::vector<std::unique_ptr<ImageResult>> segResults;
+    segResults.reserve(results.size());
+    for (auto& result : results) {
+        segResults.emplace_back(static_cast<ImageResult*>(result.release()));
+    }
+    return segResults;
 }
