@@ -15,14 +15,15 @@
 */
 
 #pragma once
-#include <tilers/detection.h>
+#include <tilers/tiler_base.h>
 
+struct InstanceSegmentationResult;
 
-class InstanceSegmentationTiler : public DetectionTiler {
+class InstanceSegmentationTiler : public TilerBase {
     /*InstanceSegmentationTiler tiler works with MaskRCNNModel model only*/
 public:
     InstanceSegmentationTiler(std::shared_ptr<ImageModel> model, const ov::AnyMap& configuration);
-    virtual std::unique_ptr<ResultBase> run(const ImageInputData& inputData);
+    virtual std::unique_ptr<InstanceSegmentationResult> run(const ImageInputData& inputData);
     virtual ~InstanceSegmentationTiler() = default;
     bool postprocess_semantic_masks = true;
 
@@ -31,4 +32,6 @@ protected:
     virtual std::unique_ptr<ResultBase> merge_results(const std::vector<std::unique_ptr<ResultBase>>&, const cv::Size&, const std::vector<cv::Rect>&);
 
     std::vector<cv::Mat_<std::uint8_t>> merge_saliency_maps(const std::vector<std::unique_ptr<ResultBase>>&, const cv::Size&, const std::vector<cv::Rect>&);
+
+    size_t max_pred_number = 200;
 };

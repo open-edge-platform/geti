@@ -41,7 +41,12 @@ class TmpCallbackSetter {
         model->setCallback(tmp_callback);
     }
     ~TmpCallbackSetter() {
-        model->setCallback(last_callback);
+        if (last_callback) {
+            model->setCallback(last_callback);
+        }
+        else {
+            model->setCallback([](std::unique_ptr<ResultBase>, const ov::AnyMap&){});
+        }
     }
 };
 }

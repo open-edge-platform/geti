@@ -37,10 +37,10 @@ public:
 
     virtual ~TilerBase() = default;
 
-    virtual std::unique_ptr<ResultBase> run(const ImageInputData& inputData);
 
 protected:
 
+    virtual std::unique_ptr<ResultBase> run_impl(const ImageInputData& inputData);
     std::vector<cv::Rect> tile(const cv::Size&);
     std::vector<cv::Rect> filter_tiles(const cv::Mat&, const std::vector<cv::Rect>&);
     std::unique_ptr<ResultBase> predict_sync(const cv::Mat&, const std::vector<cv::Rect>&);

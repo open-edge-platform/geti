@@ -43,7 +43,7 @@ class MaskRCNNModelParamsSetter {
 }
 
 InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ImageModel> _model, const ov::AnyMap& configuration) :
-    DetectionTiler(std::move(_model), configuration) {
+    TilerBase(_model, configuration) {
     ov::AnyMap extra_config;
     try {
         auto ov_model = model->getModel();
@@ -55,11 +55,13 @@ InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ImageModel>
 
     postprocess_semantic_masks = get_from_any_maps("postprocess_semantic_masks",
                                                    configuration, extra_config, postprocess_semantic_masks);
+    max_pred_number = get_from_any_maps("max_pred_number", configuration, extra_config, max_pred_number);
 }
 
-std::unique_ptr<ResultBase> InstanceSegmentationTiler::run(const ImageInputData& inputData) {
+std::unique_ptr<InstanceSegmentationResult> InstanceSegmentationTiler::run(const ImageInputData& inputData) {
     auto setter = MaskRCNNModelParamsSetter(model);
-    return TilerBase::run(inputData);
+    auto result = this->run_impl(inputData);
+    return std::unique_ptr<InstanceSegmentationResult>(static_cast<InstanceSegmentationResult*>(result.release()));
 }
 
 std::unique_ptr<ResultBase> InstanceSegmentationTiler::postprocess_tile(std::unique_ptr<ResultBase> tile_result, const cv::Rect& coord) {
@@ -96,7 +98,7 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(const std::
         }
     }
 
-    auto keep_idx = multiclass_nms(all_detections, all_scores, iou_threshold, false, 200);
+    auto keep_idx = multiclass_nms(all_detections, all_scores, iou_threshold, false, max_pred_number);
 
     result->segmentedObjects.reserve(keep_idx.size());
     for (auto idx : keep_idx) {

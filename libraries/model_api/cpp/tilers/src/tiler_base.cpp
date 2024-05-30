@@ -116,7 +116,7 @@ cv::Mat TilerBase::crop_tile(const cv::Mat& image, const cv::Rect& coord) {
     return cv::Mat(image, coord);
 }
 
-std::unique_ptr<ResultBase> TilerBase::run(const ImageInputData& inputData) {
+std::unique_ptr<ResultBase> TilerBase::run_impl(const ImageInputData& inputData) {
     auto& image = inputData.inputImage;
     auto tile_coords = tile(image.size());
     tile_coords = filter_tiles(image, tile_coords);
