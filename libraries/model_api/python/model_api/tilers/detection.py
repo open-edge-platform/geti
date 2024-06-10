@@ -164,7 +164,7 @@ class DetectionTiler(Tiler):
 
         image_saliency_map = saliency_maps[0]
 
-        if len(image_saliency_map.shape) == 1:
+        if len(image_saliency_map.shape) == 1 or len(saliency_maps) == 1:
             return image_saliency_map
 
         recover_shape = False

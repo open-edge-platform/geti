@@ -146,7 +146,7 @@ ov::Tensor DetectionTiler::merge_saliency_maps(const std::vector<std::unique_ptr
         image_saliency_map = all_saliency_maps[0];
     }
 
-    if (image_saliency_map.get_size() == 1) {
+    if ((image_saliency_map.get_size() == 1) || (all_saliency_maps.size() == 1)) {
         return image_saliency_map;
     }
 
