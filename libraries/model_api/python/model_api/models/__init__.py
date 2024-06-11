@@ -14,6 +14,7 @@
  limitations under the License.
 """
 
+from .action_classification import ActionClassificationModel
 from .anomaly import AnomalyDetection
 from .background_matting import (
     ImageMattingWithBackground,
@@ -76,6 +77,7 @@ segmentation_models = [
 
 
 __all__ = [
+    "ActionClassificationModel",
     "AnomalyDetection",
     "AnomalyResult",
     "BertEmbedding",

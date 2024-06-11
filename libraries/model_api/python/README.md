@@ -70,6 +70,7 @@ The following tasks can be solved with wrappers usage:
 | Question Answering         |  <ul><li>`BertQuestionAnswering`</li></ul> |
 | Salient Object Detection   |  <ul><li>`SalientObjectDetectionModel`</li></ul> |
 | Semantic Segmentation      |  <ul><li>`SegmentationModel`</li></ul> |
+| Action Classification      |  <ul><li>`ActionClassificationModel`</li></ul> |
 
 ## Model API Adapters
 
