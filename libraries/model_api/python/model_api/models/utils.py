@@ -136,6 +136,65 @@ class InstanceSegmentationResult(NamedTuple):
         return f"{obj_str}; {filled}; [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
+class VisualPromptingResult(NamedTuple):
+    upscaled_masks: List[np.ndarray] | None = None
+    low_res_masks: List[np.ndarray] | None = None
+    iou_predictions: List[np.ndarray] | None = None
+    scores: List[np.ndarray] | None = None
+    labels: List[np.ndarray] | None = None
+    hard_predictions: List[np.ndarray] | None = None
+    soft_predictions: List[np.ndarray] | None = None
+
+    def _compute_min_max(self, tensor: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+        return tensor.min(), tensor.max()
+
+    def __str__(self) -> str:
+        assert self.hard_predictions is not None
+        assert self.upscaled_masks is not None
+        upscaled_masks_min, upscaled_masks_max = self._compute_min_max(
+            self.upscaled_masks[0]
+        )
+
+        return (
+            f"upscaled_masks min:{upscaled_masks_min:.3f} max:{upscaled_masks_max:.3f};"
+            f"hard_predictions shape:{self.hard_predictions[0].shape};"
+        )
+
+
+class PredictedMask(NamedTuple):
+    mask: list[np.ndarray]
+    points: list[np.ndarray] | np.ndarray
+
+    def __str__(self) -> str:
+        obj_str = ""
+        obj_str += f"mask sum: {np.sum(sum(self.mask))}; "
+
+        if isinstance(self.points, list):
+            for point in self.points:
+                obj_str += "["
+                obj_str += ", ".join(str(round(c, 2)) for c in point)
+                obj_str += "] "
+        else:
+            for i in range(self.points.shape[0]):
+                point = self.points[i]
+                obj_str += "["
+                obj_str += ", ".join(str(round(c, 2)) for c in point)
+                obj_str += "] "
+
+        return obj_str.strip()
+
+
+class ZSLVisualPromptingResult(NamedTuple):
+    data: dict[int, PredictedMask]
+
+    def __str__(self) -> str:
+        return ", ".join(str(self.data[k]) for k in self.data)
+
+    def get_mask(self, label: int) -> PredictedMask:
+        """Returns a mask belonging to a given label"""
+        return self.data[label]
+
+
 def add_rotated_rects(segmented_objects):
     objects_with_rects = []
     for segmented_object in segmented_objects:
