@@ -192,6 +192,7 @@ class SAMDecoder(SegmentationModel):
         Returns:
             (dict[str, np.ndarray]): The postprocessed output of the model.
         """
+        outputs = deepcopy(outputs)
         probability = np.clip(outputs["scores"], 0.0, 1.0)
         hard_prediction = (
             outputs[self.output_blob_name].squeeze(0) > self.mask_threshold

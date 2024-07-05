@@ -99,16 +99,28 @@ class SAMVisualPrompter:
             prediction["scores"] = prediction["iou_predictions"]
             prediction["labels"] = label
             processed_prediction = self.decoder.postprocess(prediction, meta)
+
+            hard_masks, scores, logits = (
+                np.expand_dims(processed_prediction["hard_prediction"], 0),
+                processed_prediction["iou_predictions"],
+                processed_prediction["low_res_masks"],
+            )
+            _, mask, best_iou = _decide_masks(hard_masks, logits, scores)
+            processed_prediction["processed_mask"] = mask
+            processed_prediction["best_iou"] = best_iou
+
             outputs.append(processed_prediction)
 
         return VisualPromptingResult(
             upscaled_masks=[item["upscaled_masks"] for item in outputs],
+            processed_mask=[item["processed_mask"] for item in outputs],
             low_res_masks=[item["low_res_masks"] for item in outputs],
             iou_predictions=[item["iou_predictions"] for item in outputs],
             scores=[item["scores"] for item in outputs],
             labels=[item["labels"] for item in outputs],
             hard_predictions=[item["hard_prediction"] for item in outputs],
             soft_predictions=[item["soft_prediction"] for item in outputs],
+            best_iou=[item["best_iou"] for item in outputs],
         )
 
     def __call__(
@@ -133,7 +145,19 @@ class SAMLearnableVisualPrompter:
         encoder_model: SAMImageEncoder,
         decoder_model: SAMDecoder,
         reference_features: VisualPromptingFeatures | None = None,
+        threshold: float = 0.65,
     ):
+        """
+        Initializes ZSL pipeline.
+
+        Args:
+            encoder_model (SAMImageEncoder): initialized decoder wrapper
+            decoder_model (SAMDecoder): initialized encoder wrapper
+            reference_features (VisualPromptingFeatures | None, optional): Previously generated reference features.
+             Once the features are passed, one can skip learn() method, and start predicting masks right away. Defaults to None.
+            threshold (float, optional): Threshold to match vs reference features on infer(). Greater value means a
+            stricter matching. Defaults to 0.65.
+        """
         self.encoder = encoder_model
         self.decoder = decoder_model
 
@@ -148,9 +172,12 @@ class SAMLearnableVisualPrompter:
         self._has_mask_inputs = [np.array([[0.0]]), np.array([[1.0]])]
 
         self._is_cascade: bool = False
-        self._threshold: float = 0.0
+        if 0 <= threshold <= 1:
+            self._threshold: float = threshold
+        else:
+            raise ValueError("Confidence threshold should belong to [0;1] range.")
         self._num_bg_points: int = 1
-        self._default_threshold_target: float = 0.65
+        self._default_threshold_target: float = 0.0
         self._image_size: int = self.encoder.image_size
         self._downsizing: int = 64
         self._default_threshold_reference: float = 0.3
@@ -386,7 +413,12 @@ class SAMLearnableVisualPrompter:
 
         prediction = {}
         for k in used_points:
-            prediction[k] = PredictedMask(predicted_masks[k], used_points[k])
+            processed_points = []
+            scores = []
+            for pt in used_points[k]:
+                processed_points.append(pt[:2])
+                scores.append(float(pt[2]))
+            prediction[k] = PredictedMask(predicted_masks[k], processed_points, scores)
 
         return ZSLVisualPromptingResult(prediction)
 
@@ -446,7 +478,7 @@ class SAMLearnableVisualPrompter:
 
             elif i == 1:
                 # Cascaded Post-refinement-1
-                mask_input, masks = _decide_masks(
+                mask_input, masks, _ = _decide_masks(
                     masks, logits, scores, is_single=True
                 )  # noqa: F821
                 if masks.sum() == 0:
@@ -456,7 +488,9 @@ class SAMLearnableVisualPrompter:
 
             elif i == 2:
                 # Cascaded Post-refinement-2
-                mask_input, masks = _decide_masks(masks, logits, scores)  # noqa: F821
+                mask_input, masks, _ = _decide_masks(
+                    masks, logits, scores
+                )  # noqa: F821
                 if masks.sum() == 0:
                     return {"upscaled_masks": masks}
 
@@ -489,7 +523,7 @@ class SAMLearnableVisualPrompter:
             )
             masks = upscaled_masks > self.decoder.mask_threshold
 
-        _, masks = _decide_masks(masks, logits, scores)
+        _, masks, _ = _decide_masks(masks, logits, scores)
         return {"upscaled_masks": masks}
 
 
@@ -561,7 +595,7 @@ def _decide_masks(
     logits: np.ndarray,
     scores: np.ndarray,
     is_single: bool = False,
-) -> tuple[np.ndarray, ...] | tuple[None, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, float] | tuple[None, np.ndarray, float]:
     """Post-process logits for resized masks according to best index based on scores."""
     if is_single:
         best_idx = 0
@@ -581,10 +615,18 @@ def _decide_masks(
 
         if len(scores[0]) == 0:
             # all predicted masks were zero masks, ignore them.
-            return None, np.zeros(masks.shape[-2:])
+            return (
+                None,
+                np.zeros(masks.shape[-2:]),
+                float(np.clip(scores[0][best_idx], 0, 1)),
+            )
 
         best_idx = np.argmax(scores[0])
-    return logits[:, [best_idx]], masks[0, best_idx]
+    return (
+        logits[:, [best_idx]],
+        masks[0, best_idx],
+        float(np.clip(scores[0][best_idx], 0, 1)),
+    )
 
 
 def _get_prompt_candidates(
