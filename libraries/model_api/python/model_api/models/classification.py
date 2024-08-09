@@ -14,12 +14,15 @@
  limitations under the License.
 """
 
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
+
+import copy
 import json
-from typing import Dict
+from collections import defaultdict
 
 import numpy as np
-from openvino import Model, Type
 from openvino.preprocess import PrePostProcessor
+from openvino.runtime import Model, Type
 from openvino.runtime import opset10 as opset
 
 from .image_model import ImageModel
@@ -47,7 +50,14 @@ class ClassificationModel(ImageModel):
                 self.raise_error("Hierarchical classification config is empty.")
             self.raw_scores_name = self.out_layer_names[0]
             self.hierarchical_info = json.loads(self.hierarchical_config)
-            self.labels_resolver = GreedyLabelsResolver(self.hierarchical_info)
+
+            if self.hierarchical_postproc == "probabilistic":
+                self.labels_resolver = ProbabilisticLabelsResolver(
+                    self.hierarchical_info
+                )
+            else:
+                self.labels_resolver = GreedyLabelsResolver(self.hierarchical_info)
+
             if preload:
                 self.load()
             return
@@ -140,14 +150,19 @@ class ClassificationModel(ImageModel):
                 ),
                 "hierarchical_config": StringValue(
                     default_value="",
-                    description="Extra config for decoding hierarchical predicitons",
+                    description="Extra config for decoding hierarchical predictions",
                 ),
                 "confidence_threshold": NumericalValue(
                     default_value=0.5, description="Predict a set of labels per image"
                 ),
                 "output_raw_scores": BooleanValue(
                     default_value=False,
-                    description="Output all scores for multiclass classificaiton",
+                    description="Output all scores for multiclass classification",
+                ),
+                "hierarchical_postproc": StringValue(
+                    default_value="greedy",
+                    choices=("probabilistic", "greedy"),
+                    description="Type of hierarchical postprocessing",
                 ),
             }
         )
@@ -176,7 +191,7 @@ class ClassificationModel(ImageModel):
             raw_scores,
         )
 
-    def get_saliency_maps(self, outputs: Dict) -> np.ndarray:
+    def get_saliency_maps(self, outputs: dict) -> np.ndarray:
         """
         Returns saliency map model output. In hierarchical case reorders saliency maps
         to match the order of labels in .XML meta.
@@ -354,35 +369,32 @@ class GreedyLabelsResolver:
         self.label_relations = hierarchical_config["label_tree_edges"]
         self.label_groups = hierarchical_config["cls_heads_info"]["all_groups"]
 
-    def _get_parent(self, label):
+        self.label_tree = SimpleLabelsGraph(list(self.label_to_idx.keys()))
         for child, parent in self.label_relations:
-            if label == child:
-                return parent
-
-        return None
+            self.label_tree.add_edge(parent, child)
 
     def resolve_labels(self, predictions):
-        """Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
+        """
+        Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
         The following two steps are taken:
         - select the most likely label from each label group
         - add it and it's predecessors if they are also most likely labels (greedy approach).
+
+        Args:
+            predictions: a list of tuples (label name, score)
         """
 
         def get_predecessors(lbl, candidates):
             """Returns all the predecessors of the input label or an empty list if one of the predecessors is not a candidate."""
             predecessors = []
-            last_parent = self._get_parent(lbl)
-            if last_parent is None:
-                return [lbl]
 
+            last_parent = self.label_tree.get_parent(lbl)
             while last_parent is not None:
                 if last_parent not in candidates:
                     return []
                 predecessors.append(last_parent)
-                last_parent = self._get_parent(last_parent)
-
-            if predecessors:
-                predecessors.append(lbl)
+                last_parent = self.label_tree.get_parent(last_parent)
+            predecessors.append(lbl)
             return predecessors
 
         label_to_prob = {lbl: 0.0 for lbl in self.label_to_idx.keys()}
@@ -413,9 +425,207 @@ class GreedyLabelsResolver:
                     output_labels.append(new_lbl)
 
         output_predictions = [
-            (self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in output_labels
+            (self.label_to_idx[lbl], lbl, label_to_prob[lbl])
+            for lbl in sorted(output_labels)
         ]
         return output_predictions
+
+
+class ProbabilisticLabelsResolver(GreedyLabelsResolver):
+    def __init__(self, hierarchical_config, warmup_cache=True) -> None:
+        super().__init__(hierarchical_config)
+        if warmup_cache:
+            self.label_tree.get_labels_in_topological_order()
+
+    def resolve_labels(self, predictions):
+        """Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
+
+        The following two steps are taken:
+
+        - selects the most likely label from an exclusive (multiclass) group
+        - removes children of "not-most-likely" (non-max) parents in an exclusive group (top-down approach)
+
+        Args:
+            predictions: a list of tuples (label name, score)
+        """
+        label_to_prob = {}
+        for lbl, score in predictions:
+            label_to_prob[lbl] = score
+
+        return self.__resolve_labels_probabilistic(label_to_prob)
+
+    def __resolve_labels_probabilistic(
+        self,
+        label_to_probability,
+    ):
+        """Resolves hierarchical labels and exclusivity based on a probabilistic label output.
+
+        - selects the most likely (max) label from an exclusive group
+        - removes children of non-max parents in an exclusive group
+
+        See `resolve_labels_probabilistic` for parameter descriptions
+
+        Args:
+            label_to_probability : map from label to float.
+
+        Returns:
+            List of labels with probability
+        """
+        # add (potentially) missing ancestors labels for children with probability 0
+        # this is needed so that suppression of children of non-max exclusive labels works when the exclusive
+        # group has only one member
+        label_to_probability = self._add_missing_ancestors(label_to_probability)
+
+        hard_classification = self._resolve_exclusive_labels(label_to_probability)
+
+        # suppress the output of children of parent nodes that are not the most likely label within their group
+        resolved = self._suppress_descendant_output(hard_classification)
+
+        result = []
+        for lbl, probability in sorted(resolved.items()):
+            if probability > 0:  # only return labels with non-zero probability
+                result.append(
+                    (
+                        self.label_to_idx[lbl],
+                        lbl,
+                        # retain the original probability in the output
+                        probability * label_to_probability.get(lbl, 1.0),
+                    )
+                )
+        return result
+
+    def _suppress_descendant_output(
+        self, hard_classification: dict[str, float]
+    ) -> dict[str, float]:
+        """Suppresses outputs in `label_to_probability`.
+
+        Sets probability to 0.0 for descendants of parents that have 0 probability in `hard_classification`.
+        """
+
+        # Input: Conditional probability of each label given its parent label
+        # Output: Marginal probability of each label
+
+        # We recursively compute the marginal probability of each node by multiplying the conditional probability
+        # with the marginal probability of its parent. That is:
+        # P(B) = P(B|A) * P(A)
+        # The recursion is done a topologically sorted list of labels to ensure that the marginal probability
+        # of the parent label has been computed before trying to compute the child's probability.
+
+        all_labels = self.label_tree.get_labels_in_topological_order()
+
+        for child in all_labels:
+            if child in hard_classification:
+                # Get the immediate parents (should be at most one element; zero for root labels)
+                parent = self.label_tree.get_parent(child)
+                if parent is not None and parent in hard_classification:
+                    hard_classification[child] *= hard_classification[parent]
+
+        return hard_classification
+
+    def _resolve_exclusive_labels(
+        self, label_to_probability: dict[str, float]
+    ) -> dict[str, float]:
+        """Resolve exclusive labels.
+
+        For labels in `label_to_probability` sets labels that are most likely (maximum probability) in their exclusive
+        group to 1.0 and other (non-max) labels to probability 0.
+        """
+        # actual exclusive group selection should happen when extracting initial probs (apply argmax to exclusive groups)
+        hard_classification = {}
+        for label, probability in label_to_probability.items():
+            hard_classification[label] = float(probability > 0.0)
+        return hard_classification
+
+    def _add_missing_ancestors(
+        self,
+        label_to_probability: dict[str, float],
+    ) -> dict[str, float]:
+        """Adds missing ancestors to the `label_to_probability` map."""
+        updated_label_to_probability = copy.deepcopy(label_to_probability)
+        for label in label_to_probability:
+            for ancestor in self.label_tree.get_ancestors(label):
+                if ancestor not in updated_label_to_probability:
+                    updated_label_to_probability[ancestor] = (
+                        0.0  # by default missing ancestors get probability 0.0
+                    )
+        return updated_label_to_probability
+
+
+class SimpleLabelsGraph:
+    """
+    Class representing a tree. It implements basic operations
+    like adding edges, getting children and parents.
+    """
+
+    def __init__(self, vertices):
+        self._v = vertices
+        self._adj = defaultdict(list)
+        self._topological_order_cache = None
+        self._parents_map = {}
+
+    def add_edge(self, parent, child):
+        self._adj[parent].append(child)
+        self._parents_map[child] = parent
+        self.clear_topological_cache()
+
+    def get_children(self, label):
+        return self._adj[label]
+
+    def get_parent(self, label):
+        return self._parents_map.get(label, None)
+
+    def get_ancestors(self, label):
+        """Returns all the ancestors of the input label, including self."""
+
+        predecessors = [label]
+        last_parent = self.get_parent(label)
+        if last_parent is None:
+            return predecessors
+
+        while last_parent is not None:
+            predecessors.append(last_parent)
+            last_parent = self.get_parent(last_parent)
+
+        return predecessors
+
+    def get_labels_in_topological_order(self):
+        if self._topological_order_cache is None:
+            self._topological_order_cache = self.topological_sort()
+
+        return self._topological_order_cache
+
+    def topological_sort(self):
+        in_degree = defaultdict(int)
+
+        for node_adj in self._adj.values():
+            for j in node_adj:
+                in_degree[j] += 1
+
+        nodes_deque = []
+        for node in self._v:
+            if in_degree[node] == 0:
+                nodes_deque.append(node)
+
+        ordered = []
+        while nodes_deque:
+            u = nodes_deque.pop(0)
+            ordered.append(u)
+
+            for node in self._adj[u]:
+                in_degree[node] -= 1
+                if in_degree[node] == 0:
+                    nodes_deque.append(node)
+
+        if len(ordered) != len(self._v):
+            raise RuntimeError(
+                "Topological sort failed: input graph has been"
+                "changed during the sorting or contains a cycle"
+            )
+
+        return ordered
+
+    def clear_topological_cache(self):
+        self._topological_order_cache = None
 
 
 _saliency_map_name = "saliency_map"

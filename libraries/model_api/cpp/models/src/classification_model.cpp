@@ -17,6 +17,7 @@
 #include "models/classification_model.h"
 
 #include <algorithm>
+#include <deque>
 #include <fstream>
 #include <iterator>
 #include <map>
@@ -215,12 +216,21 @@ void ClassificationModel::init_from_config(const ov::AnyMap& top_priority, const
     output_raw_scores = get_from_any_maps("output_raw_scores", top_priority, mid_priority, output_raw_scores);
     hierarchical = get_from_any_maps("hierarchical", top_priority, mid_priority, hierarchical);
     hierarchical_config = get_from_any_maps("hierarchical_config", top_priority, mid_priority, hierarchical_config);
+    hierarchical_postproc = get_from_any_maps("hierarchical_postproc", top_priority, mid_priority, hierarchical_postproc);
     if (hierarchical) {
         if (hierarchical_config.empty()) {
             throw std::runtime_error("Error: empty hierarchical classification config");
         }
         hierarchical_info = HierarchicalConfig(hierarchical_config);
-        resolver = GreedyLabelsResolver(hierarchical_info);
+        if (hierarchical_postproc == "probabilistic") {
+            resolver = std::make_unique<ProbabilisticLabelsResolver>(hierarchical_info);
+        }
+        else if (hierarchical_postproc == "greedy") {
+            resolver = std::make_unique<GreedyLabelsResolver>(hierarchical_info);
+        }
+        else {
+            throw std::runtime_error("Wrong hierarchical labels postprocessing type");
+        }
     }
 }
 
@@ -246,6 +256,7 @@ void ClassificationModel::updateModelInfo() {
     model->set_rt_info(output_raw_scores, "model_info", "output_raw_scores");
     model->set_rt_info(confidence_threshold, "model_info", "confidence_threshold");
     model->set_rt_info(hierarchical_config, "model_info", "hierarchical_config");
+    model->set_rt_info(hierarchical_postproc, "model_info", "hierarchical_postproc");
 }
 
 std::unique_ptr<ClassificationModel> ClassificationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {
@@ -389,12 +400,12 @@ std::unique_ptr<ResultBase> ClassificationModel::get_hierarchical_predictions(In
         }
     }
 
-    auto resolved_labels = resolver.resolve_labels(predicted_labels, predicted_scores);
+    auto resolved_labels = resolver->resolve_labels(predicted_labels, predicted_scores);
 
     auto retVal = std::unique_ptr<ResultBase>(result);
-    result->topLabels.reserve(resolved_labels.first.size());
-    for (size_t i = 0; i < resolved_labels.first.size(); ++i) {
-        result->topLabels.emplace_back(hierarchical_info.label_to_idx[resolved_labels.first[i]], resolved_labels.first[i], resolved_labels.second[i]);
+    result->topLabels.reserve(resolved_labels.size());
+    for (const auto& label : resolved_labels) {
+        result->topLabels.emplace_back(hierarchical_info.label_to_idx[label.first], label.first, label.second);
     }
 
     return retVal;
@@ -579,8 +590,11 @@ GreedyLabelsResolver::GreedyLabelsResolver(const HierarchicalConfig& config) :
     label_relations(config.label_tree_edges),
     label_groups(config.all_groups) {}
 
-std::pair<std::vector<std::string>, std::vector<float>> GreedyLabelsResolver::resolve_labels(const std::vector<std::reference_wrapper<std::string>>& labels,
+std::map<std::string, float> GreedyLabelsResolver::resolve_labels(const std::vector<std::reference_wrapper<std::string>>& labels,
                                                                                              const std::vector<float>& scores) {
+    if (labels.size() != scores.size()) {
+        throw std::runtime_error("Inconsistent number of labels and scores");
+    }
     std::map<std::string, float> label_to_prob;
     for (const auto& label_idx : label_to_idx) {
         label_to_prob[label_idx.first] = 0.f;
@@ -609,23 +623,21 @@ std::pair<std::vector<std::string>, std::vector<float>> GreedyLabelsResolver::re
             }
         }
     }
-    std::vector<std::string> output_labels;
-    std::vector<float> output_scores;
 
+    std::map<std::string, float> resolved_label_to_prob;
     for (const auto& lbl : candidates) {
-        if (std::find(output_labels.begin(), output_labels.end(), lbl) != output_labels.end()) {
+        if (resolved_label_to_prob.find(lbl) != resolved_label_to_prob.end()) {
             continue;
         }
         auto labels_to_add = get_predecessors(lbl, candidates);
         for (const auto& new_lbl : labels_to_add) {
-            if (std::find(output_labels.begin(), output_labels.end(), new_lbl) == output_labels.end()) {
-                output_labels.push_back(new_lbl);
-                output_scores.push_back(label_to_prob[new_lbl]);
+            if (resolved_label_to_prob.find(new_lbl) == resolved_label_to_prob.end()) {
+                resolved_label_to_prob[new_lbl] = label_to_prob[new_lbl];
             }
         }
     }
 
-    return {output_labels, output_scores};
+    return resolved_label_to_prob;
 }
 
 std::string GreedyLabelsResolver::get_parent(const std::string& label) {
@@ -658,4 +670,173 @@ std::vector<std::string> GreedyLabelsResolver::get_predecessors(const std::strin
     }
 
     return predecessors;
+}
+
+
+SimpleLabelsGraph::SimpleLabelsGraph(const std::vector<std::string>& vertices_)
+    : vertices(vertices_), t_sort_cache_valid(false) {
+}
+
+void SimpleLabelsGraph::add_edge(const std::string& parent, const std::string& child) {
+    adj[parent].push_back(child);
+    parents_map[child] = parent;
+    t_sort_cache_valid = false;
+}
+
+std::vector<std::string> SimpleLabelsGraph::get_children(const std::string& label) const {
+    auto iter = adj.find(label);
+    if (iter == adj.end()) {
+        return std::vector<std::string>();
+    }
+    return iter->second;
+}
+
+std::string SimpleLabelsGraph::get_parent(const std::string& label) const {
+    auto iter = parents_map.find(label);
+    if (iter == parents_map.end()) {
+        return std::string();
+    }
+    return iter->second;
+}
+
+std::vector<std::string> SimpleLabelsGraph::get_ancestors(const std::string& label) const {
+    std::vector<std::string> predecessors = {label};
+    auto last_parent = get_parent(label);
+    if (!last_parent.size()) {
+        return predecessors;
+    }
+
+    while (last_parent.size()) {
+        predecessors.push_back(last_parent);
+        last_parent = get_parent(last_parent);
+    }
+
+    return predecessors;
+}
+
+std::vector<std::string> SimpleLabelsGraph::get_labels_in_topological_order() {
+    if (!t_sort_cache_valid) {
+        topological_order_cache = topological_sort();
+    }
+    return topological_order_cache;
+}
+
+std::vector<std::string> SimpleLabelsGraph::topological_sort() {
+    auto in_degree = std::unordered_map<std::string, size_t>();
+    for (const auto& node : vertices) {
+        in_degree[node] = 0;
+    }
+
+    for (const auto& item : adj) {
+        for (const auto& node : item.second) {
+            in_degree[node] += 1;
+        }
+    }
+
+    std::deque<std::string> nodes_deque;
+    for (const auto& node : vertices) {
+        if (in_degree[node] == 0) {
+            nodes_deque.push_back(node);
+        }
+    }
+
+    std::vector<std::string> ordered_nodes;
+    while (!nodes_deque.empty()) {
+        auto u = nodes_deque[0];
+        nodes_deque.pop_front();
+        ordered_nodes.push_back(u);
+
+        for (const auto& node : adj[u]) {
+            auto degree = --in_degree[node];
+            if (degree == 0) {
+                nodes_deque.push_back(node);
+            }
+        }
+    }
+
+    if (ordered_nodes.size() != vertices.size()) {
+        throw std::runtime_error("Topological sort failed: input graph has been"
+                                 "changed during the sorting or contains a cycle");
+    }
+
+    return ordered_nodes;
+}
+
+
+ProbabilisticLabelsResolver::ProbabilisticLabelsResolver(const HierarchicalConfig& conf) : GreedyLabelsResolver(conf) {
+    std::vector<std::string> all_labels;
+    for (const auto& item : label_to_idx) {
+        all_labels.push_back(item.first);
+    }
+    label_tree = SimpleLabelsGraph(all_labels);
+    for (const auto& item : label_relations) {
+        label_tree.add_edge(item.second, item.first);
+    }
+    label_tree.get_labels_in_topological_order();
+}
+
+std::map<std::string, float> ProbabilisticLabelsResolver::resolve_labels(const std::vector<std::reference_wrapper<std::string>>& labels,
+                                                                                                    const std::vector<float>& scores) {
+    if (labels.size() != scores.size()) {
+        throw std::runtime_error("Inconsistent number of labels and scores");
+    }
+
+    std::unordered_map<std::string, float> label_to_prob;
+    for (size_t i = 0; i < labels.size(); ++i) {
+        label_to_prob[labels[i]] = scores[i];
+    }
+
+    label_to_prob = add_missing_ancestors(label_to_prob);
+    auto hard_classification = resolve_exclusive_labels(label_to_prob);
+    suppress_descendant_output(hard_classification);
+
+    std::map<std::string, float> output_labels_map;
+
+    for (const auto& item : hard_classification) {
+        if (item.second > 0) {
+            if (label_to_prob.find(item.first) != label_to_prob.end()) {
+                output_labels_map[item.first] = item.second * label_to_prob[item.first];
+            }
+            else {
+                output_labels_map[item.first] = item.second;
+            }
+        }
+    }
+
+    return output_labels_map;
+}
+
+std::unordered_map<std::string, float> ProbabilisticLabelsResolver::add_missing_ancestors(const std::unordered_map<std::string, float>& label_to_prob) const {
+    std::unordered_map<std::string, float> updated_label_to_probability(label_to_prob);
+    for (const auto& item : label_to_prob) {
+        for (const auto& ancestor : label_tree.get_ancestors(item.first)) {
+            if (updated_label_to_probability.find(ancestor) == updated_label_to_probability.end()) {
+                updated_label_to_probability[ancestor] = 0.f;
+            }
+        }
+    }
+    return updated_label_to_probability;
+}
+
+std::map<std::string, float> ProbabilisticLabelsResolver::resolve_exclusive_labels(const std::unordered_map<std::string, float>& label_to_prob) const {
+    std::map<std::string, float> hard_classification;
+
+    for (const auto& item : label_to_prob) {
+        hard_classification[item.first] = static_cast<float>(item.second > 0);
+    }
+
+    return hard_classification;
+}
+
+void ProbabilisticLabelsResolver::suppress_descendant_output(std::map<std::string, float>& hard_classification) {
+    auto all_labels = label_tree.get_labels_in_topological_order();
+
+    for (const auto& child : all_labels) {
+        if (hard_classification.find(child) != hard_classification.end()) {
+            auto parent = label_tree.get_parent(child);
+            if (parent.size() && hard_classification.find(parent) != hard_classification.end()) {
+                hard_classification[child] *= hard_classification[parent];
+            }
+        }
+    }
 }

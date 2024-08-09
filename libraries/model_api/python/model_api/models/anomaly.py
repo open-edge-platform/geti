@@ -132,7 +132,7 @@ class AnomalyDetection(ImageModel):
         """Get bounding boxes from mask.
 
         Args:
-            mask (np.ndarray): Input mask of shapw (H, W)
+            mask (np.ndarray): Input mask of shape (H, W)
 
         Returns:
             np.ndarray: array of shape (N,4) containing the bounding box coordinates of the objects in the masks in
