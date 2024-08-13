@@ -156,7 +156,7 @@ class MaskRCNNModel(ImageModel):
         masks = outputs[self.output_blob_name["masks"]]
         if not self.is_segmentoly:
             labels += 1
-        if self.labels is None:
+        if not self.labels:
             str_labels = (f"#{label}" for label in labels)
         else:
             str_labels = (self.labels[label] for label in labels)

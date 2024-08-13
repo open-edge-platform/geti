@@ -618,7 +618,7 @@ def _decide_masks(
             return (
                 None,
                 np.zeros(masks.shape[-2:]),
-                float(np.clip(scores[0][best_idx], 0, 1)),
+                0.0,
             )
 
         best_idx = np.argmax(scores[0])
