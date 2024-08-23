@@ -294,7 +294,7 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
         }
     }
     const Lbm& lbm = filterTensors(infResult.outputsData);
-    const int64_t* const labels = lbm.labels.data<int64_t>();
+    const int64_t* const labels_tensor_ptr = lbm.labels.data<int64_t>();
     const float* const boxes = lbm.boxes.data<float>();
     size_t objectSize = lbm.boxes.get_shape().back();
     float* const masks = lbm.masks.data<float>();
@@ -304,10 +304,10 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
     std::vector<std::vector<cv::Mat>> saliency_maps;
     bool has_feature_vector_name = std::find(outputNames.begin(), outputNames.end(), feature_vector_name) != outputNames.end();
     if (has_feature_vector_name) {
-        if (this->labels.empty()) {
+        if (labels.empty()) {
             throw std::runtime_error("Can't get number of classes because labels are empty");
         }
-        saliency_maps.resize(this->labels.size());
+        saliency_maps.resize(labels.size());
     }
     for (size_t i = 0; i < lbm.labels.get_size(); ++i) {
         float confidence = boxes[i * objectSize + 4];
@@ -317,7 +317,10 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
         SegmentedObject obj;
 
         obj.confidence = confidence;
-        obj.labelID = labels[i] + 1;
+        obj.labelID = labels_tensor_ptr[i] + 1;
+        if (!labels.empty() && obj.labelID >= labels.size()) {
+            continue;
+        }
         obj.label = getLabelName(obj.labelID);
 
         obj.x = clamp(
