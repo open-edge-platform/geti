@@ -133,7 +133,11 @@ class InstanceSegmentationResult(NamedTuple):
         for cls_map in self.saliency_map:
             if cls_map.size:
                 filled += 1
-        return f"{obj_str}; {filled}; [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        prefix = f"{obj_str}; " if len(obj_str) else ""
+        return (
+            prefix
+            + f"{filled}; [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        )
 
 
 class VisualPromptingResult(NamedTuple):
@@ -198,6 +202,14 @@ class ZSLVisualPromptingResult(NamedTuple):
     def get_mask(self, label: int) -> PredictedMask:
         """Returns a mask belonging to a given label"""
         return self.data[label]
+
+
+class DetectedKeypoints(NamedTuple):
+    keypoints: np.ndarray
+    scores: np.ndarray
+
+    def __str__(self):
+        return f"keypoints: {self.keypoints.shape}, keypoints_x_sum: {np.sum(self.keypoints[:,:1]):.3f}, scores: {self.scores.shape}"
 
 
 def add_rotated_rects(segmented_objects):

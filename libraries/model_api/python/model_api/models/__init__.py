@@ -32,6 +32,7 @@ from .faceboxes import FaceBoxes
 from .hpe_associative_embedding import HpeAssociativeEmbedding
 from .image_model import ImageModel
 from .instance_segmentation import MaskRCNNModel, YolactModel
+from .keypoint_detection import KeypointDetectionModel, TopDownKeypointDetectionPipeline
 from .model import Model
 from .monodepth import MonoDepthModel
 from .nanodet import NanoDet, NanoDetPlus
@@ -45,6 +46,7 @@ from .utils import (
     AnomalyResult,
     ClassificationResult,
     Contour,
+    DetectedKeypoints,
     Detection,
     DetectionResult,
     DetectionWithLandmarks,
@@ -107,6 +109,8 @@ __all__ = [
     "PredictedMask",
     "SAMVisualPrompter",
     "SAMLearnableVisualPrompter",
+    "KeypointDetectionModel",
+    "TopDownKeypointDetectionPipeline",
     "MaskRCNNModel",
     "Model",
     "MonoDepthModel",
@@ -137,6 +141,7 @@ __all__ = [
     "Detection",
     "DetectionResult",
     "DetectionWithLandmarks",
+    "DetectedKeypoints",
     "classification_models",
     "detection_models",
     "segmentation_models",
