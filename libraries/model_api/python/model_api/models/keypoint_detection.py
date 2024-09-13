@@ -19,7 +19,6 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-from model_api.pipelines import AsyncPipeline
 
 from .image_model import ImageModel
 from .types import ListValue
@@ -87,7 +86,6 @@ class TopDownKeypointDetectionPipeline:
 
     def __init__(self, base_model: KeypointDetectionModel) -> None:
         self.base_model = base_model
-        self.async_pipeline = AsyncPipeline(self.base_model)
 
     def predict(
         self, image: np.ndarray, detections: list[Detection]
@@ -125,17 +123,7 @@ class TopDownKeypointDetectionPipeline:
         Returns:
             list[DetectedKeypoints]: per crop keypoints
         """
-        for i, crop in enumerate(crops):
-            self.async_pipeline.submit_data(crop, i)
-        self.async_pipeline.await_all()
-
-        num_crops = len(crops)
-        result = []
-        for j in range(num_crops):
-            crop_prediction, _ = self.async_pipeline.get_result(j)
-            result.append(crop_prediction)
-
-        return result
+        return self.base_model.infer_batch(crops)
 
 
 def _decode_simcc(

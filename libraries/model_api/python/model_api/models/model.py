@@ -16,6 +16,7 @@
 
 import logging as log
 import re
+from contextlib import contextmanager
 
 from model_api.adapters.inference_adapter import InferenceAdapter
 from model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
@@ -97,6 +98,7 @@ class Model:
         self.model_loaded = False
         if preload:
             self.load()
+        self.callback_fn = lambda _: None
 
     def get_model(self):
         """Returns the ov.Model object stored in the InferenceAdapter.
@@ -401,6 +403,40 @@ class Model:
         dict_data, input_meta = self.preprocess(inputs)
         raw_result = self.infer_sync(dict_data)
         return self.postprocess(raw_result, input_meta)
+
+    def infer_batch(self, inputs):
+        """
+        Applies preprocessing, asynchronous inference, postprocessing routines to a collection of inputs.
+
+        Args:
+            inputs (list): a list of inputs for inference
+
+        Returns:
+            list: a list of inference results
+        """
+        self.await_all()
+
+        completed_results = {}
+
+        @contextmanager
+        def tmp_callback():
+            old_callback = self.callback_fn
+
+            def batch_infer_callback(result, id):
+                completed_results[id] = result
+
+            try:
+                self.set_callback(batch_infer_callback)
+                yield
+            finally:
+                self.set_callback(old_callback)
+
+        with tmp_callback():
+            for i, input in enumerate(inputs):
+                self.infer_async(input, i)
+            self.await_all()
+
+        return [completed_results[i] for i in range(len(inputs))]
 
     def load(self, force=False):
         if not self.model_loaded or force:
