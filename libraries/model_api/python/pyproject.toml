@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvino_model_api"
-version = "0.2.3"
+version = "0.2.4"
 requires-python = ">=3.8"
 authors = [
   {name = "Intel(R) Corporation"},
