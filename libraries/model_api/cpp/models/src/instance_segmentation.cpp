@@ -233,7 +233,7 @@ void MaskRCNNModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                                   inputShape[ov::layout::height_idx(inputLayout)]},
                                         pad_value,
                                         reverse_input_channels,
-                                        {},
+                                        mean_values,
                                         scale_values);
 
         netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];

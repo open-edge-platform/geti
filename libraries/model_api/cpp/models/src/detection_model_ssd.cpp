@@ -262,7 +262,7 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                                   shape[ov::layout::height_idx(inputLayout)]},
                                         pad_value,
                                         reverse_input_channels,
-                                        {},
+                                        mean_values,
                                         scale_values);
 
                 netInputWidth = shape[ov::layout::width_idx(inputLayout)];

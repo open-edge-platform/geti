@@ -528,7 +528,7 @@ void YOLOv5::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
                                 },
                                 pad_value,
                                 reverse_input_channels,
-                                {},
+                                mean_values,
                                 scale_values);
 
         netInputWidth = in_shape[ov::layout::width_idx(inputLayout)];

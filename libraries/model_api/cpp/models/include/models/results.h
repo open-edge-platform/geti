@@ -357,3 +357,31 @@ struct HumanPoseResult : public ResultBase {
         : ResultBase(frameId, metaData) {}
     std::vector<HumanPose> poses;
 };
+
+struct DetectedKeypoints {
+    std::vector<cv::Point2f> keypoints;
+    std::vector<float> scores;
+
+    friend std::ostream& operator<< (std::ostream& os, const DetectedKeypoints& prediction) {
+        float kp_x_sum = 0.f;
+        for (const cv::Point2f& keypoint : prediction.keypoints) {
+            kp_x_sum += keypoint.x;
+        }
+        os << "keypoints: (" << prediction.keypoints.size() << ", 2), keypoints_x_sum: ";
+        os << std::fixed << std::setprecision(3) << kp_x_sum << ", scores: (" << prediction.scores.size() << ",)";
+        return os;
+    }
+
+    explicit operator std::string()
+    {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+};
+
+struct KeypointDetectionResult : public ResultBase {
+    KeypointDetectionResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
+        : ResultBase(frameId, metaData) {}
+    std::vector<DetectedKeypoints> poses;
+};

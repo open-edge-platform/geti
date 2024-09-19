@@ -197,8 +197,12 @@ def _get_simcc_maximum(
     x_locs = np.argmax(simcc_x, axis=1)
     y_locs = np.argmax(simcc_y, axis=1)
     locs = np.stack((x_locs, y_locs), axis=-1).astype(np.float32)
-    max_val_x = np.amax(simcc_x, axis=1)
-    max_val_y = np.amax(simcc_y, axis=1)
+    max_val_x = np.take_along_axis(
+        simcc_x, np.expand_dims(x_locs, axis=-1), axis=-1
+    ).squeeze(axis=-1)
+    max_val_y = np.take_along_axis(
+        simcc_y, np.expand_dims(y_locs, axis=-1), axis=-1
+    ).squeeze(axis=-1)
 
     mask = max_val_x > max_val_y
     max_val_x[mask] = max_val_y[mask]
