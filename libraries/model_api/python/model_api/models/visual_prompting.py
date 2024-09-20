@@ -286,8 +286,7 @@ class SAMLearnableVisualPrompter:
                     masks = _polygon_to_mask(inputs_decoder["polygon"], *original_shape)
                 else:
                     raise RuntimeError("Unsupported type of prompt")
-                ref_mask[masks] += 1
-            ref_mask = np.clip(ref_mask, 0, 1)
+                ref_mask = np.where(masks, 1, ref_mask)
 
             ref_feat: np.ndarray | None = None
             cur_default_threshold_reference = self._default_threshold_reference
