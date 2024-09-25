@@ -57,3 +57,5 @@ protected:
     float soft_threshold = -std::numeric_limits<float>::infinity();
     bool return_soft_prediction = true;
 };
+
+cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_prediction, float soft_threshold, int blur_strength);

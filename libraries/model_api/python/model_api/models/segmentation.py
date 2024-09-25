@@ -165,22 +165,24 @@ class SegmentationModel(ImageModel):
         return hard_prediction
 
     def get_contours(
-        self, hard_prediction: np.ndarray, soft_prediction: np.ndarray
+        self,
+        prediction: ImageResultWithSoftPrediction,
     ) -> list:
-        height, width = hard_prediction.shape[:2]
-        n_layers = soft_prediction.shape[2]
+        n_layers = prediction.soft_prediction.shape[2]
 
         if n_layers == 1:
             raise RuntimeError("Cannot get contours from soft prediction with 1 layer")
         combined_contours = []
         for layer_index in range(1, n_layers):  # ignoring background
             label = self.get_label_name(layer_index - 1)
-            if len(soft_prediction.shape) == 3:
-                current_label_soft_prediction = soft_prediction[:, :, layer_index]
+            if len(prediction.soft_prediction.shape) == 3:
+                current_label_soft_prediction = prediction.soft_prediction[
+                    :, :, layer_index
+                ]
             else:
-                current_label_soft_prediction = soft_prediction
+                current_label_soft_prediction = prediction.soft_prediction
 
-            obj_group = hard_prediction == layer_index
+            obj_group = prediction.resultImage == layer_index
             label_index_map = obj_group.astype(np.uint8) * 255
 
             contours, _hierarchy = cv2.findContours(
@@ -188,7 +190,7 @@ class SegmentationModel(ImageModel):
             )
 
             for contour in contours:
-                mask = np.zeros(hard_prediction.shape, dtype=np.uint8)
+                mask = np.zeros(prediction.resultImage.shape, dtype=np.uint8)
                 cv2.drawContours(
                     mask,
                     np.asarray([contour]),

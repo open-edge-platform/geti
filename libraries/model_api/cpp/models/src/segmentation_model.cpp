@@ -36,6 +36,17 @@
 namespace {
 constexpr char feature_vector_name[]{"feature_vector"};
 
+cv::Mat get_activation_map(const cv::Mat& features) {
+    double min_soft_score, max_soft_score;
+    cv::minMaxLoc(features, &min_soft_score, &max_soft_score);
+    double factor = 255.0 / (max_soft_score - min_soft_score + 1e-12);
+
+    cv::Mat int_act_map;
+    features.convertTo(int_act_map, CV_8U, factor, -min_soft_score * factor);
+    return int_act_map;
+}
+}
+
 cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_prediction, float soft_threshold, int blur_strength) {
     if (soft_prediction.channels() == 1) {
         return soft_prediction;
@@ -68,17 +79,6 @@ cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_predicti
         }
     }
     return hard_prediction;
-}
-
-cv::Mat get_activation_map(const cv::Mat& features) {
-    double min_soft_score, max_soft_score;
-    cv::minMaxLoc(features, &min_soft_score, &max_soft_score);
-    double factor = 255.0 / (max_soft_score - min_soft_score + 1e-12);
-
-    cv::Mat int_act_map;
-    features.convertTo(int_act_map, CV_8U, factor, -min_soft_score * factor);
-    return int_act_map;
-}
 }
 
 std::string SegmentationModel::ModelType = "Segmentation";

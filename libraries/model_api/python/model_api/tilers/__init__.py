@@ -16,10 +16,12 @@
 
 from .detection import DetectionTiler
 from .instance_segmentation import InstanceSegmentationTiler
+from .semantic_segmentation import SemanticSegmentationTiler
 from .tiler import Tiler
 
 __all__ = [
     "DetectionTiler",
     "InstanceSegmentationTiler",
     "Tiler",
+    "SemanticSegmentationTiler",
 ]

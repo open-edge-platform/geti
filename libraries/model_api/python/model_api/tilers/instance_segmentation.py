@@ -31,7 +31,7 @@ from .detection import DetectionTiler
 class InstanceSegmentationTiler(DetectionTiler):
     """
     Tiler for object instance segmentation models.
-    This tiler expects model to output a lsit of `SegmentedObject` objects.
+    This tiler expects model to output a list of `SegmentedObject` objects.
 
     In addition, this tiler allows to use a tile classifier model,
     which predicts objectness score for each tile. Later, tiles can
