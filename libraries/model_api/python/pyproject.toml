@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openvino_model_api"
-version = "0.2.4"
+version = "0.2.5"
 requires-python = ">=3.9"
 authors = [
   {name = "Intel(R) Corporation"},
@@ -20,7 +20,7 @@ description = "Model API: model wrappers and pipelines for inference with OpenVI
 readme = "README.md"
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
-  "Programming Language :: Python :: 3.8"
+  "Programming Language :: Python :: 3.9"
 ]
 dependencies = [
     "numpy>=1.16.6",
