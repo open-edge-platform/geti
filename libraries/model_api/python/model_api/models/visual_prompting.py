@@ -313,14 +313,16 @@ class SAMLearnableVisualPrompter:
         self,
         image: np.ndarray,
         reference_features: VisualPromptingFeatures | None = None,
+        apply_masks_refinement: bool = True,
     ) -> ZSLVisualPromptingResult:
         """A wrapper of the SAMLearnableVisualPrompter.infer() method"""
-        return self.infer(image, reference_features)
+        return self.infer(image, reference_features, apply_masks_refinement)
 
     def infer(
         self,
         image: np.ndarray,
         reference_features: VisualPromptingFeatures | None = None,
+        apply_masks_refinement: bool = True,
     ) -> ZSLVisualPromptingResult:
         """
         Obtains masks by already prepared reference features.
@@ -332,6 +334,8 @@ class SAMLearnableVisualPrompter:
             image (np.ndarray): HWC-shaped image
             reference_features (VisualPromptingFeatures | None, optional): Reference features object obtained during previous learn() calls.
             If not passed, object internal state is used, which reflects the last learn() call. Defaults to None.
+            apply_masks_refinement (bool, optional): Flag controlling additional refinement stage on inference. Once enabled, decoder will
+            be launched 2 extra times to refine the masks obtained with the first decoder call. Defaults to True.
 
         Returns:
             ZSLVisualPromptingResult: Mapping label -> predicted mask. Each mask object contains a list of binary masks, and a list of
@@ -401,7 +405,9 @@ class SAMLearnableVisualPrompter:
                 }
                 inputs_decoder["image_embeddings"] = image_embeddings
 
-                prediction = self._predict_masks(inputs_decoder, original_shape, True)
+                prediction = self._predict_masks(
+                    inputs_decoder, original_shape, apply_masks_refinement
+                )
                 prediction.update({"scores": points_score[-1]})
 
                 predicted_masks[label].append(prediction[self.decoder.output_blob_name])
