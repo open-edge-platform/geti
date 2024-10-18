@@ -606,7 +606,7 @@ std::map<std::string, float> GreedyLabelsResolver::resolve_labels(const std::vec
 
     std::vector<std::string> candidates;
     for (const auto& g : label_groups) {
-        if (g.size() == 1) {
+        if (g.size() == 1 && label_to_prob[g[0]] > 0.f) {
             candidates.push_back(g[0]);
         }
         else {

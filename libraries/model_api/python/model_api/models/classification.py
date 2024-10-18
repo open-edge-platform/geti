@@ -410,7 +410,7 @@ class GreedyLabelsResolver:
 
         candidates = []
         for g in self.label_groups:
-            if len(g) == 1:
+            if len(g) == 1 and label_to_prob[g[0]] > 0.0:
                 candidates.append(g[0])
             else:
                 max_prob = 0.0
