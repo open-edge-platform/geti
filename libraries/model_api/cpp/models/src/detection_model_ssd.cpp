@@ -34,6 +34,7 @@
 namespace {
 constexpr char saliency_map_name[]{"saliency_map"};
 constexpr char feature_vector_name[]{"feature_vector"};
+constexpr float box_area_threshold = 1.0f;
 
 struct NumAndStep {
     size_t detectionsNum, objectSize;
@@ -82,6 +83,11 @@ std::vector<std::string> filterOutXai(const std::vector<std::string>& names) {
     std::vector<std::string> filtered;
     std::copy_if (names.begin(), names.end(), std::back_inserter(filtered), [](const std::string& name){return name != saliency_map_name && name != feature_vector_name;});
     return filtered;
+}
+
+
+float clamp_and_round(float val, float min, float max) {
+    return std::round(std::max(min, std::min(max, val)));
 }
 }
 
@@ -214,23 +220,14 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
             desc.confidence = confidence;
             desc.labelID = labels[i];
             desc.label = getLabelName(desc.labelID);
-            desc.x = clamp(
-                round((boxes[i * numAndStep.objectSize] * widthScale - padLeft) * invertedScaleX),
-                0.f,
-                floatInputImgWidth);
-            desc.y = clamp(
-                round((boxes[i * numAndStep.objectSize + 1] * heightScale - padTop) * invertedScaleY),
-                0.f,
-                floatInputImgHeight);
-            desc.width = clamp(
-                round((boxes[i * numAndStep.objectSize + 2] * widthScale - padLeft) * invertedScaleX),
-                0.f,
-                floatInputImgWidth) - desc.x;
-            desc.height = clamp(
-                round((boxes[i * numAndStep.objectSize + 3] * heightScale - padTop) * invertedScaleY),
-                0.f,
-                floatInputImgHeight) - desc.y;
-            result->objects.push_back(desc);
+            desc.x = clamp_and_round((boxes[i * numAndStep.objectSize] * widthScale - padLeft) * invertedScaleX, 0.f, floatInputImgWidth);
+            desc.y = clamp_and_round((boxes[i * numAndStep.objectSize + 1] * heightScale - padTop) * invertedScaleY, 0.f, floatInputImgHeight);
+            desc.width = clamp_and_round((boxes[i * numAndStep.objectSize + 2] * widthScale - padLeft) * invertedScaleX, 0.f, floatInputImgWidth) - desc.x;
+            desc.height = clamp_and_round((boxes[i * numAndStep.objectSize + 3] * heightScale - padTop) * invertedScaleY, 0.f, floatInputImgHeight) - desc.y;
+
+            if (desc.width * desc.height >= box_area_threshold) {
+                result->objects.push_back(desc);
+            }
         }
     }
 

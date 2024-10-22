@@ -104,24 +104,54 @@ class DetectionModel(ImageModel):
                 pad_left = (self.w - round(input_img_widht / inverted_scale_x)) // 2
                 pad_top = (self.h - round(input_img_height / inverted_scale_y)) // 2
 
+        def _clamp_and_round(val, min_value, max_value):
+            return round(max(min_value, min(max_value, val)))
+
         for detection in detections:
-            detection.xmin = min(
-                max(round((detection.xmin * self.w - pad_left) * inverted_scale_x), 0),
+            detection.xmin = _clamp_and_round(
+                (detection.xmin * self.w - pad_left) * inverted_scale_x,
+                0,
                 input_img_widht,
             )
-            detection.ymin = min(
-                max(round((detection.ymin * self.h - pad_top) * inverted_scale_y), 0),
+            detection.ymin = _clamp_and_round(
+                (detection.ymin * self.h - pad_top) * inverted_scale_y,
+                0,
                 input_img_height,
             )
-            detection.xmax = min(
-                max(round((detection.xmax * self.w - pad_left) * inverted_scale_x), 0),
+            detection.xmax = _clamp_and_round(
+                (detection.xmax * self.w - pad_left) * inverted_scale_x,
+                0,
                 input_img_widht,
             )
-            detection.ymax = min(
-                max(round((detection.ymax * self.h - pad_top) * inverted_scale_y), 0),
+            detection.ymax = _clamp_and_round(
+                (detection.ymax * self.h - pad_top) * inverted_scale_y,
+                0,
                 input_img_height,
             )
+
         return detections
+
+    def _filter_detections(self, detections, box_area_threshold=0.0):
+        """Filters detections by confidence threshold and box size threshold
+
+        Args:
+            detections (List[Detection]): list of detections with coordinates in normalized form
+            box_area_threshold (float): minimal area of the bounding to be considered
+
+        Returns:
+            - list of detections with confidence above the threshold
+        """
+        filtered_detections = []
+        for detection in detections:
+            if (
+                detection.score < self.confidence_threshold
+                or (detection.xmax - detection.xmin) * (detection.ymax - detection.ymin)
+                < box_area_threshold
+            ):
+                continue
+            filtered_detections.append(detection)
+
+        return filtered_detections
 
     def _add_label_names(self, detections):
         """Adds labels names to detections if they are available

@@ -41,6 +41,7 @@ class SSD(DetectionModel):
     def postprocess(self, outputs, meta):
         detections = self._parse_outputs(outputs)
         detections = self._resize_detections(detections, meta)
+        detections = self._filter_detections(detections, _bbox_area_threshold)
         detections = self._add_label_names(detections)
         return DetectionResult(
             detections,
@@ -74,8 +75,7 @@ class SSD(DetectionModel):
         self.raise_error("Unsupported model outputs")
 
     def _parse_outputs(self, outputs):
-        detections = self.output_parser(outputs)
-        return [d for d in detections if d.score > self.confidence_threshold]
+        return self.output_parser(outputs)
 
 
 def find_layer_by_name(name, layers):
@@ -176,5 +176,6 @@ class BoxesLabelsParser:
         return detections
 
 
+_bbox_area_threshold = 1.0
 _saliency_map_name = "saliency_map"
 _feature_vector_name = "feature_vector"
