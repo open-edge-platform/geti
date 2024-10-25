@@ -15,10 +15,6 @@
 */
 
 #include "models/detection_model.h"
-#include "models/detection_model_centernet.h"
-#include "models/detection_model_faceboxes.h"
-#include "models/detection_model_retinaface.h"
-#include "models/detection_model_retinaface_pt.h"
 #include "models/detection_model_ssd.h"
 #include "models/detection_model_yolo.h"
 #include "models/detection_model_yolov3_onnx.h"
@@ -75,18 +71,10 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
     }
 
     std::unique_ptr<DetectionModel> detectionModel;
-    if (model_type == ModelFaceBoxes::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelFaceBoxes(model, configuration));
-    } else if (model_type == ModelRetinaFace::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFace(model, configuration));
-    } else if (model_type == ModelRetinaFacePT::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFacePT(model, configuration));
-    } else if (model_type == ModelSSD::ModelType || model_type == "SSD") {
+    if (model_type == ModelSSD::ModelType || model_type == "SSD") {
         detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(model, configuration));
     } else if (model_type == ModelYoloX::ModelType) {
         detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloX(model, configuration));
-    } else if (model_type == ModelCenterNet::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelCenterNet(model, configuration));
     } else if (model_type == YOLOv5::ModelType) {
         detectionModel = std::unique_ptr<DetectionModel>(new YOLOv5(model, configuration));
     } else if (model_type == YOLOv8::ModelType) {
@@ -111,18 +99,10 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(std::shared_ptr<Inf
     }
 
     std::unique_ptr<DetectionModel> detectionModel;
-    if (model_type == ModelFaceBoxes::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelFaceBoxes(adapter));
-    } else if (model_type == ModelRetinaFace::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFace(adapter));
-    } else if (model_type == ModelRetinaFacePT::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelRetinaFacePT(adapter));
-    } else if (model_type == ModelSSD::ModelType || model_type == "SSD") {
+    if (model_type == ModelSSD::ModelType || model_type == "SSD") {
         detectionModel = std::unique_ptr<DetectionModel>(new ModelSSD(adapter));
     } else if (model_type == ModelYoloX::ModelType) {
         detectionModel = std::unique_ptr<DetectionModel>(new ModelYoloX(adapter));
-    } else if (model_type == ModelCenterNet::ModelType) {
-        detectionModel = std::unique_ptr<DetectionModel>(new ModelCenterNet(adapter));
     } else {
         throw std::runtime_error("Incorrect or unsupported model_type is provided: " + model_type);
     }
