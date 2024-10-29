@@ -27,19 +27,24 @@ static inline ov::Tensor wrapMat2Tensor(const cv::Mat& mat) {
     const size_t strideH = mat.step.buf[0];
     const size_t strideW = mat.step.buf[1];
 
-    const bool isDense = !isMatFloat ? (strideW == channels && strideH == channels * width) :
-        (strideW == channels * sizeof(float) && strideH == channels * width * sizeof(float));
+    const bool isDense = !isMatFloat
+                             ? (strideW == channels && strideH == channels * width)
+                             : (strideW == channels * sizeof(float) && strideH == channels * width * sizeof(float));
     if (!isDense) {
         throw std::runtime_error("Doesn't support conversion from not dense cv::Mat");
     }
     auto precision = isMatFloat ? ov::element::f32 : ov::element::u8;
     struct SharedMatAllocator {
         const cv::Mat mat;
-        void* allocate(size_t bytes, size_t) {return bytes <= mat.rows * mat.step[0] ? mat.data : nullptr;}
+        void* allocate(size_t bytes, size_t) {
+            return bytes <= mat.rows * mat.step[0] ? mat.data : nullptr;
+        }
         void deallocate(void*, size_t, size_t) {}
-        bool is_equal(const SharedMatAllocator& other) const noexcept {return this == &other;}
+        bool is_equal(const SharedMatAllocator& other) const noexcept {
+            return this == &other;
+        }
     };
-    return ov::Tensor(precision, ov::Shape{ 1, height, width, channels }, SharedMatAllocator{mat});
+    return ov::Tensor(precision, ov::Shape{1, height, width, channels}, SharedMatAllocator{mat});
 }
 
 struct IntervalCondition {
@@ -47,34 +52,35 @@ struct IntervalCondition {
     using IndexType = size_t;
     using ConditionChecker = std::function<bool(IndexType, const ov::PartialShape&)>;
 
-    template<class Cond>
-    constexpr IntervalCondition(IndexType i1, IndexType i2, Cond c) :
-        impl([=](IndexType i0, const ov::PartialShape& shape) {
-            return c(shape[i0].get_max_length(), shape[i1].get_max_length()) && c(shape[i0].get_max_length(), shape[i2].get_max_length());})
-    {}
-    bool operator() (IndexType i0, const ov::PartialShape& shape) const { return impl(i0, shape); }
+    template <class Cond>
+    constexpr IntervalCondition(IndexType i1, IndexType i2, Cond c)
+        : impl([=](IndexType i0, const ov::PartialShape& shape) {
+              return c(shape[i0].get_max_length(), shape[i1].get_max_length()) &&
+                     c(shape[i0].get_max_length(), shape[i2].get_max_length());
+          }) {}
+    bool operator()(IndexType i0, const ov::PartialShape& shape) const {
+        return impl(i0, shape);
+    }
+
 private:
     ConditionChecker impl;
 };
 
-template <template<class> class Cond, class ...Args>
-IntervalCondition makeCond(Args&&...args) {
+template <template <class> class Cond, class... Args>
+IntervalCondition makeCond(Args&&... args) {
     return IntervalCondition(std::forward<Args>(args)..., Cond<IntervalCondition::DimType>{});
 }
-using LayoutCondition = std::tuple<size_t/*dim index*/, IntervalCondition, std::string>;
+using LayoutCondition = std::tuple<size_t /*dim index*/, IntervalCondition, std::string>;
 
 static inline std::tuple<bool, ov::Layout> makeGuesLayoutFrom4DShape(const ov::PartialShape& shape) {
     // at the moment we make assumption about NCHW & NHCW only
     // if hypothetical C value is less than hypothetical H and W - then
     // out assumption is correct and we pick a corresponding layout
-    static const std::array<LayoutCondition, 2> hypothesisMatrix {{
-        {1, makeCond<std::less_equal>(2, 3), "NCHW"},
-        {3, makeCond<std::less_equal>(1, 2), "NHWC"}
-    }};
-    for (const auto &h : hypothesisMatrix) {
-
+    static const std::array<LayoutCondition, 2> hypothesisMatrix{
+        {{1, makeCond<std::less_equal>(2, 3), "NCHW"}, {3, makeCond<std::less_equal>(1, 2), "NHWC"}}};
+    for (const auto& h : hypothesisMatrix) {
         auto channel_index = std::get<0>(h);
-        const auto &cond = std::get<1>(h);
+        const auto& cond = std::get<1>(h);
         if (cond(channel_index, shape)) {
             return std::make_tuple(true, ov::Layout{std::get<2>(h)});
         }
@@ -140,12 +146,11 @@ class InputTransform {
 public:
     InputTransform() : reverseInputChannels(false), isTrivial(true) {}
 
-    InputTransform(bool reverseInputChannels, const std::string& meanValues, const std::string& scaleValues) :
-        reverseInputChannels(reverseInputChannels),
-        isTrivial(!reverseInputChannels && meanValues.empty() && scaleValues.empty()),
-        means(meanValues.empty() ? cv::Scalar(0.0, 0.0, 0.0) : string2Scalar(meanValues)),
-        stdScales(scaleValues.empty() ? cv::Scalar(1.0, 1.0, 1.0) : string2Scalar(scaleValues)) {
-    }
+    InputTransform(bool reverseInputChannels, const std::string& meanValues, const std::string& scaleValues)
+        : reverseInputChannels(reverseInputChannels),
+          isTrivial(!reverseInputChannels && meanValues.empty() && scaleValues.empty()),
+          means(meanValues.empty() ? cv::Scalar(0.0, 0.0, 0.0) : string2Scalar(meanValues)),
+          stdScales(scaleValues.empty() ? cv::Scalar(1.0, 1.0, 1.0) : string2Scalar(scaleValues)) {}
 
     void setPrecision(ov::preprocess::PrePostProcessor& ppp, const std::string& tensorName) {
         const auto precision = isTrivial ? ov::element::u8 : ov::element::f32;
@@ -153,7 +158,9 @@ public:
     }
 
     cv::Mat operator()(const cv::Mat& inputs) {
-        if (isTrivial) { return inputs; }
+        if (isTrivial) {
+            return inputs;
+        }
         cv::Mat result;
         inputs.convertTo(result, CV_32F);
         if (reverseInputChannels) {
@@ -175,17 +182,19 @@ private:
 static inline cv::Mat wrap_saliency_map_tensor_to_mat(ov::Tensor& t, size_t shape_shift, size_t class_idx) {
     int ocv_dtype;
     switch (t.get_element_type()) {
-        case ov::element::u8:
-            ocv_dtype = CV_8U;
-            break;
-        case ov::element::f32:
-            ocv_dtype = CV_32F;
-            break;
-        default:
-            throw std::runtime_error("Unsupported saliency map data type in ov::Tensor to cv::Mat wrapper: " + t.get_element_type().get_type_name());
+    case ov::element::u8:
+        ocv_dtype = CV_8U;
+        break;
+    case ov::element::f32:
+        ocv_dtype = CV_32F;
+        break;
+    default:
+        throw std::runtime_error("Unsupported saliency map data type in ov::Tensor to cv::Mat wrapper: " +
+                                 t.get_element_type().get_type_name());
     }
     void* t_ptr = static_cast<char*>(t.data()) + class_idx * t.get_strides()[shape_shift];
-    auto mat_size = cv::Size(static_cast<int>(t.get_shape()[shape_shift + 2]), static_cast<int>(t.get_shape()[shape_shift + 1]));
+    auto mat_size =
+        cv::Size(static_cast<int>(t.get_shape()[shape_shift + 2]), static_cast<int>(t.get_shape()[shape_shift + 1]));
 
     return cv::Mat(mat_size, ocv_dtype, t_ptr, t.get_strides()[shape_shift + 1]);
 }

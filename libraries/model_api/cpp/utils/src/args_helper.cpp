@@ -42,11 +42,13 @@ std::map<std::string, int32_t> parseValuePerDevice(const std::set<std::string>& 
     std::transform(values_string_upper.begin(),
                    values_string_upper.end(),
                    values_string_upper.begin(),
-                   [](unsigned char c){ return std::toupper(c); });
+                   [](unsigned char c) {
+                       return std::toupper(c);
+                   });
     std::map<std::string, int32_t> result;
     auto device_value_strings = split(values_string_upper, ',');
     for (const auto& device_value_string : device_value_strings) {
-        auto device_value_vec =  split(device_value_string, ':');
+        auto device_value_vec = split(device_value_string, ':');
         if (device_value_vec.size() == 2) {
             auto it = std::find(devices.begin(), devices.end(), device_value_vec.at(0));
             if (it != devices.end()) {
@@ -68,8 +70,8 @@ std::map<std::string, ov::Layout> parseLayoutString(const std::string& layout_st
     // Parse parameter string like "input0:NCHW,input1:NC" or "NCHW" (applied to all
     // inputs)
     std::map<std::string, ov::Layout> layouts;
-    std::string searchStr = (layout_string.find_last_of(':') == std::string::npos && !layout_string.empty() ?
-        ":" : "") + layout_string;
+    std::string searchStr =
+        (layout_string.find_last_of(':') == std::string::npos && !layout_string.empty() ? ":" : "") + layout_string;
     auto colonPos = searchStr.find_last_of(':');
     while (colonPos != std::string::npos) {
         auto startPos = searchStr.find_last_of(',');
@@ -94,10 +96,10 @@ std::string formatLayouts(const std::map<std::string, ov::Layout>& layouts) {
     std::string result;
     for (const auto& layout : layouts) {
         auto layout_string = layout.second.to_string();
-        layout_string.erase(layout_string.begin()); // remove "["
-        layout_string.pop_back(); // remove "]"
+        layout_string.erase(layout_string.begin());  // remove "["
+        layout_string.pop_back();                    // remove "]"
         layout_string.erase(std::remove(layout_string.begin(), layout_string.end(), ','),
-                            layout_string.end()); // remove ","
+                            layout_string.end());  // remove ","
         result += layout.first + ":" + layout_string + ",";
     }
     if (!result.empty()) {

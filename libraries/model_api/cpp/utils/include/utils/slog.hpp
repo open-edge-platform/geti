@@ -18,19 +18,17 @@ namespace slog {
  * @class LogStreamEndLine
  * @brief The LogStreamEndLine class implements an end line marker for a log stream
  */
-class LogStreamEndLine { };
+class LogStreamEndLine {};
 
 static constexpr LogStreamEndLine endl;
-
 
 /**
  * @class LogStreamBoolAlpha
  * @brief The LogStreamBoolAlpha class implements bool printing for a log stream
  */
-class LogStreamBoolAlpha { };
+class LogStreamBoolAlpha {};
 
 static constexpr LogStreamBoolAlpha boolalpha;
-
 
 /**
  * @class LogStream
@@ -46,8 +44,7 @@ public:
      * @brief A constructor. Creates a LogStream object
      * @param prefix The prefix to print
      */
-    LogStream(const std::string &prefix, std::ostream& log_stream)
-            : _prefix(prefix), _new_line(true) {
+    LogStream(const std::string& prefix, std::ostream& log_stream) : _prefix(prefix), _new_line(true) {
         _log_stream = &log_stream;
     }
 
@@ -55,8 +52,8 @@ public:
      * @brief A stream output operator to be used within the logger
      * @param arg Object for serialization in the logger message
      */
-    template<class T>
-    LogStream &operator<<(const T &arg) {
+    template <class T>
+    LogStream& operator<<(const T& arg) {
         if (_new_line) {
             (*_log_stream) << "[ " << _prefix << " ] ";
             _new_line = false;
@@ -67,7 +64,7 @@ public:
     }
 
     // Specializing for LogStreamEndLine to support slog::endl
-    LogStream& operator<< (const LogStreamEndLine &/*arg*/) {
+    LogStream& operator<<(const LogStreamEndLine& /*arg*/) {
         _new_line = true;
 
         (*_log_stream) << std::endl;
@@ -75,21 +72,20 @@ public:
     }
 
     // Specializing for LogStreamBoolAlpha to support slog::boolalpha
-    LogStream& operator<< (const LogStreamBoolAlpha &/*arg*/) {
+    LogStream& operator<<(const LogStreamBoolAlpha& /*arg*/) {
         (*_log_stream) << std::boolalpha;
         return *this;
     }
 
     // Specializing for std::vector and std::list
-    template<template<class, class> class Container, class T>
-    LogStream& operator<< (const Container<T, std::allocator<T>>& container) {
+    template <template <class, class> class Container, class T>
+    LogStream& operator<<(const Container<T, std::allocator<T>>& container) {
         for (const auto& el : container) {
             *this << el << slog::endl;
         }
         return *this;
     }
 };
-
 
 static LogStream info("INFO", std::cout);
 static LogStream debug("DEBUG", std::cout);

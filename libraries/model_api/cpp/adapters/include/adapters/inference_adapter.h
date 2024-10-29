@@ -15,13 +15,12 @@
 */
 
 #pragma once
-#include <string>
 #include <functional>
-#include <vector>
 #include <map>
 #include <memory>
-
 #include <openvino/openvino.hpp>
+#include <string>
+#include <vector>
 
 struct InputData;
 struct InferenceResult;
@@ -31,9 +30,7 @@ using InferenceInput = std::map<std::string, ov::Tensor>;
 using CallbackData = std::shared_ptr<ov::AnyMap>;
 
 // The interface doesn't have implementation
-class InferenceAdapter
-{
-
+class InferenceAdapter {
 public:
     virtual ~InferenceAdapter() = default;
 
@@ -44,8 +41,10 @@ public:
     virtual void awaitAll() = 0;
     virtual void awaitAny() = 0;
     virtual size_t getNumAsyncExecutors() const = 0;
-    virtual void loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,
-                           const std::string& device = "", const ov::AnyMap& compilationConfig = {},
+    virtual void loadModel(const std::shared_ptr<const ov::Model>& model,
+                           ov::Core& core,
+                           const std::string& device = "",
+                           const ov::AnyMap& compilationConfig = {},
                            size_t max_num_requests = 0) = 0;
     virtual ov::PartialShape getInputShape(const std::string& inputName) const = 0;
     virtual std::vector<std::string> getInputNames() const = 0;

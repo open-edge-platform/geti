@@ -16,15 +16,13 @@
 
 #pragma once
 #include <memory>
+#include <openvino/openvino.hpp>
 #include <string>
 #include <vector>
 
-#include <openvino/openvino.hpp>
-
 #include "models/detection_model_ext.h"
 
-
-class ModelYoloX: public DetectionModelExt {
+class ModelYoloX : public DetectionModelExt {
 public:
     ModelYoloX(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     ModelYoloX(std::shared_ptr<InferenceAdapter>& adapter);

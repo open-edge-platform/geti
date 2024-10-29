@@ -20,17 +20,16 @@
 #include <stdint.h>
 
 #include <fstream>
-#include <stdexcept>
-#include <string>
-#include <vector>
 #include <limits>
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <openvino/openvino.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-#include "models/internal_model_data.h"
 #include "models/input_data.h"
+#include "models/internal_model_data.h"
 #include "models/results.h"
 #include "utils/common.hpp"
 
@@ -49,10 +48,10 @@ void append_xai_names(const std::vector<ov::Output<ov::Node>>& outputs, std::vec
 }
 
 cv::Rect expand_box(const cv::Rect2f& box, float scale) {
-    float w_half = box.width * 0.5f * scale,
-        h_half = box.height * 0.5f * scale;
+    float w_half = box.width * 0.5f * scale, h_half = box.height * 0.5f * scale;
     const cv::Point2f& center = (box.tl() + box.br()) * 0.5f;
-    return {cv::Point(int(center.x - w_half), int(center.y - h_half)), cv::Point(int(center.x + w_half), int(center.y + h_half))};
+    return {cv::Point(int(center.x - w_half), int(center.y - h_half)),
+            cv::Point(int(center.x + w_half), int(center.y + h_half))};
 }
 
 std::vector<cv::Mat_<std::uint8_t>> average_and_normalize(const std::vector<std::vector<cv::Mat>>& saliency_maps) {
@@ -66,9 +65,11 @@ std::vector<cv::Mat_<std::uint8_t>> average_and_normalize(const std::vector<std:
             for (const cv::Mat& per_object_map : per_object_maps) {
                 if (saliency_map.size != per_object_map.size) {
                     throw std::runtime_error("saliency_maps must have same size");
-                } if (per_object_map.channels() != 1) {
+                }
+                if (per_object_map.channels() != 1) {
                     throw std::runtime_error("saliency_maps must have one channel");
-                } if (per_object_map.type() != CV_8U) {
+                }
+                if (per_object_map.type() != CV_8U) {
                     throw std::runtime_error("saliency_maps must have type CV_8U");
                 }
             }
@@ -101,25 +102,25 @@ Lbm filterTensors(const std::map<std::string, ov::Tensor>& infResult) {
         if (pair.first == saliency_map_name || pair.first == feature_vector_name) {
             continue;
         }
-        switch(pair.second.get_shape().size()) {
-            case 2:
-                lbm.labels = pair.second;
-                break;
-            case 3:
-                lbm.boxes = pair.second;
-                break;
-            case 4:
-                lbm.masks = pair.second;
-                break;
-            case 0:
-                break;
-            default:
-                throw std::runtime_error("Unexpected result: " + pair.first);
+        switch (pair.second.get_shape().size()) {
+        case 2:
+            lbm.labels = pair.second;
+            break;
+        case 3:
+            lbm.boxes = pair.second;
+            break;
+        case 4:
+            lbm.masks = pair.second;
+            break;
+        case 0:
+            break;
+        default:
+            throw std::runtime_error("Unexpected result: " + pair.first);
         }
     }
     return lbm;
 }
-}
+}  // namespace
 
 cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, int im_h, int im_w) {
     // Add zero border to prevent upsampling artifacts on segment borders.
@@ -137,7 +138,10 @@ cv::Mat segm_postprocess(const SegmentedObject& box, const cv::Mat& unpadded, in
     cv::Mat resized;
     cv::resize(raw_cls_mask, resized, {w, h});
     cv::Mat im_mask(cv::Size{im_w, im_h}, CV_8UC1, cv::Scalar{0});
-    im_mask(cv::Rect{x0, y0, x1-x0, y1-y0}).setTo(1, resized({cv::Point(x0-extended_box.x, y0-extended_box.y), cv::Point(x1-extended_box.x, y1-extended_box.y)}) > 0.5f);
+    im_mask(cv::Rect{x0, y0, x1 - x0, y1 - y0})
+        .setTo(1,
+               resized({cv::Point(x0 - extended_box.x, y0 - extended_box.y),
+                        cv::Point(x1 - extended_box.x, y1 - extended_box.y)}) > 0.5f);
     return im_mask;
 }
 
@@ -145,35 +149,42 @@ std::string MaskRCNNModel::ModelType = "MaskRCNN";
 
 void MaskRCNNModel::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority) {
     confidence_threshold = get_from_any_maps("confidence_threshold", top_priority, mid_priority, confidence_threshold);
-    postprocess_semantic_masks = get_from_any_maps("postprocess_semantic_masks", top_priority, mid_priority, postprocess_semantic_masks);
+    postprocess_semantic_masks =
+        get_from_any_maps("postprocess_semantic_masks", top_priority, mid_priority, postprocess_semantic_masks);
 }
 
 MaskRCNNModel::MaskRCNNModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
-        : ImageModel(model, configuration) {
-    init_from_config(configuration, model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
+    : ImageModel(model, configuration) {
+    init_from_config(configuration,
+                     model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
 }
 
 MaskRCNNModel::MaskRCNNModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
-        : ImageModel(adapter, configuration) {
+    : ImageModel(adapter, configuration) {
     init_from_config(configuration, adapter->getModelConfig());
 }
 
-std::unique_ptr<MaskRCNNModel> MaskRCNNModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {
+std::unique_ptr<MaskRCNNModel> MaskRCNNModel::create_model(const std::string& modelFile,
+                                                           const ov::AnyMap& configuration,
+                                                           bool preload,
+                                                           const std::string& device) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
 
     // Check model_type in the rt_info, ignore configuration
     std::string model_type = MaskRCNNModel::ModelType;
     try {
-        if (model->has_rt_info("model_info", "model_type") ) {
+        if (model->has_rt_info("model_info", "model_type")) {
             model_type = model->get_rt_info<std::string>("model_info", "model_type");
         }
     } catch (const std::exception&) {
-        slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
+        slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type
+                   << slog::endl;
     }
 
     if (model_type != MaskRCNNModel::ModelType) {
-        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
+        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " +
+                                 model_type);
     }
 
     std::unique_ptr<MaskRCNNModel> segmentor{new MaskRCNNModel(model, configuration)};
@@ -224,21 +235,21 @@ void MaskRCNNModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     }
 
     if (!embedded_processing) {
-        model = ImageModel::embedProcessing(model,
-                                        inputNames[0],
-                                        inputLayout,
-                                        resizeMode,
-                                        interpolationMode,
-                                        ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
-                                                  inputShape[ov::layout::height_idx(inputLayout)]},
-                                        pad_value,
-                                        reverse_input_channels,
-                                        mean_values,
-                                        scale_values);
+        model = ImageModel::embedProcessing(
+            model,
+            inputNames[0],
+            inputLayout,
+            resizeMode,
+            interpolationMode,
+            ov::Shape{inputShape[ov::layout::width_idx(inputLayout)], inputShape[ov::layout::height_idx(inputLayout)]},
+            pad_value,
+            reverse_input_channels,
+            mean_values,
+            scale_values);
 
         netInputWidth = inputShape[ov::layout::width_idx(inputLayout)];
         netInputHeight = inputShape[ov::layout::height_idx(inputLayout)];
-        useAutoResize = true; // temporal solution
+        useAutoResize = true;  // temporal solution
         embedded_processing = true;
     }
 
@@ -251,29 +262,31 @@ void MaskRCNNModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     filtered.reserve(3);
     for (ov::Output<ov::Node>& output : model->outputs()) {
         const std::unordered_set<std::string>& out_names = output.get_names();
-        if (out_names.find(saliency_map_name) == out_names.end() && out_names.find(feature_vector_name) == out_names.end()) {
+        if (out_names.find(saliency_map_name) == out_names.end() &&
+            out_names.find(feature_vector_name) == out_names.end()) {
             filtered.push_back({output.get_any_name(), output.get_partial_shape().get_max_shape().size()});
         }
     }
     if (filtered.size() != 3 && filtered.size() != 4) {
-        throw std::logic_error(std::string{"MaskRCNNModel model wrapper supports topologies with "} + saliency_map_name + ", " + feature_vector_name + " and 3 or 4 other outputs");
+        throw std::logic_error(std::string{"MaskRCNNModel model wrapper supports topologies with "} +
+                               saliency_map_name + ", " + feature_vector_name + " and 3 or 4 other outputs");
     }
     outputNames.resize(3);
     for (const NameRank& name_rank : filtered) {
         switch (name_rank.rank) {
-            case 2:
-                outputNames[0] = name_rank.name;
-                break;
-            case 3:
-                outputNames[1] = name_rank.name;
-                break;
-            case 4:
-                outputNames[2] = name_rank.name;
-                break;
-            case 0:
-                break;
-            default:
-                throw std::runtime_error("Unexpected output: " + name_rank.name);
+        case 2:
+            outputNames[0] = name_rank.name;
+            break;
+        case 3:
+            outputNames[1] = name_rank.name;
+            break;
+        case 4:
+            outputNames[2] = name_rank.name;
+            break;
+        case 0:
+            break;
+        default:
+            throw std::runtime_error("Unexpected output: " + name_rank.name);
         }
     }
     append_xai_names(model->outputs(), outputNames);
@@ -282,9 +295,8 @@ void MaskRCNNModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
 std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResult) {
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
     float floatInputImgWidth = float(internalData.inputImgWidth),
-         floatInputImgHeight = float(internalData.inputImgHeight);
-    float invertedScaleX = floatInputImgWidth / netInputWidth,
-          invertedScaleY = floatInputImgHeight / netInputHeight;
+          floatInputImgHeight = float(internalData.inputImgHeight);
+    float invertedScaleX = floatInputImgWidth / netInputWidth, invertedScaleY = floatInputImgHeight / netInputHeight;
     int padLeft = 0, padTop = 0;
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
@@ -302,7 +314,8 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
     InstanceSegmentationResult* result = new InstanceSegmentationResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
     std::vector<std::vector<cv::Mat>> saliency_maps;
-    bool has_feature_vector_name = std::find(outputNames.begin(), outputNames.end(), feature_vector_name) != outputNames.end();
+    bool has_feature_vector_name =
+        std::find(outputNames.begin(), outputNames.end(), feature_vector_name) != outputNames.end();
     if (has_feature_vector_name) {
         if (labels.empty()) {
             throw std::runtime_error("Can't get number of classes because labels are empty");
@@ -323,21 +336,12 @@ std::unique_ptr<ResultBase> MaskRCNNModel::postprocess(InferenceResult& infResul
         }
         obj.label = getLabelName(obj.labelID);
 
-        obj.x = clamp(
-            round((boxes[i * objectSize + 0] - padLeft) * invertedScaleX),
-            0.f,
-            floatInputImgWidth);
-        obj.y = clamp(
-            round((boxes[i * objectSize + 1] - padTop) * invertedScaleY),
-            0.f,
-            floatInputImgHeight);
-        obj.width = clamp(
-            round((boxes[i * objectSize + 2] - padLeft) * invertedScaleX - obj.x),
-            0.f,
-            floatInputImgWidth);
-        obj.height = clamp(
-            round((boxes[i * objectSize + 3] - padTop) * invertedScaleY - obj.y),
-            0.f, floatInputImgHeight);
+        obj.x = clamp(round((boxes[i * objectSize + 0] - padLeft) * invertedScaleX), 0.f, floatInputImgWidth);
+        obj.y = clamp(round((boxes[i * objectSize + 1] - padTop) * invertedScaleY), 0.f, floatInputImgHeight);
+        obj.width =
+            clamp(round((boxes[i * objectSize + 2] - padLeft) * invertedScaleX - obj.x), 0.f, floatInputImgWidth);
+        obj.height =
+            clamp(round((boxes[i * objectSize + 3] - padTop) * invertedScaleY - obj.y), 0.f, floatInputImgHeight);
 
         if (obj.height * obj.width <= 1) {
             continue;
@@ -370,7 +374,8 @@ std::unique_ptr<InstanceSegmentationResult> MaskRCNNModel::infer(const ImageInpu
     return std::unique_ptr<InstanceSegmentationResult>(static_cast<InstanceSegmentationResult*>(result.release()));
 }
 
-std::vector<std::unique_ptr<InstanceSegmentationResult>> MaskRCNNModel::inferBatch(const std::vector<ImageInputData>& inputImgs) {
+std::vector<std::unique_ptr<InstanceSegmentationResult>> MaskRCNNModel::inferBatch(
+    const std::vector<ImageInputData>& inputImgs) {
     auto results = ImageModel::inferBatchImage(inputImgs);
     std::vector<std::unique_ptr<InstanceSegmentationResult>> isegResults;
     isegResults.reserve(results.size());

@@ -16,7 +16,6 @@
 
 #include "utils/async_infer_queue.hpp"
 
-
 AsyncInferQueue::AsyncInferQueue(ov::CompiledModel& model, size_t jobs) {
     if (jobs == 0) {
         jobs = static_cast<size_t>(model.get_property(ov::optimal_number_of_infer_requests));
@@ -94,7 +93,8 @@ void AsyncInferQueue::set_default_callbacks() {
     }
 }
 
-void AsyncInferQueue::set_custom_callbacks(std::function<void(ov::InferRequest, std::shared_ptr<ov::AnyMap>)> f_callback) {
+void AsyncInferQueue::set_custom_callbacks(
+    std::function<void(ov::InferRequest, std::shared_ptr<ov::AnyMap>)> f_callback) {
     for (size_t handle = 0; handle < m_requests.size(); handle++) {
         m_requests[handle].set_callback([this, f_callback, handle](std::exception_ptr exception_ptr) {
             if (exception_ptr == nullptr) {
@@ -105,8 +105,7 @@ void AsyncInferQueue::set_custom_callbacks(std::function<void(ov::InferRequest, 
                     std::lock_guard<std::mutex> lock(m_mutex);
                     m_errors.push(std::make_shared<std::exception>(ex));
                 }
-            }
-            else {
+            } else {
                 try {
                     std::rethrow_exception(exception_ptr);
                 } catch (const std::exception& ex) {
@@ -144,7 +143,8 @@ void AsyncInferQueue::start_async(const ov::Tensor& input, std::shared_ptr<ov::A
     m_requests[handle].start_async();
 }
 
-void AsyncInferQueue::start_async(const std::map<std::string, ov::Tensor>& input, std::shared_ptr<ov::AnyMap> userdata) {
+void AsyncInferQueue::start_async(const std::map<std::string, ov::Tensor>& input,
+                                  std::shared_ptr<ov::AnyMap> userdata) {
     // getIdleRequestId function has an intention to block InferQueue
     // until there is at least one idle (free to use) InferRequest
     auto handle = get_idle_request_id();

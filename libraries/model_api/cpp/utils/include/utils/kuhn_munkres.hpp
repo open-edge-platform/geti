@@ -4,11 +4,10 @@
 
 #pragma once
 
-#include "opencv2/core.hpp"
-
 #include <memory>
 #include <vector>
 
+#include "opencv2/core.hpp"
 
 ///
 /// \brief The KuhnMunkres class
@@ -31,7 +30,7 @@ public:
     /// \return Optimal column index for each row. -1 means that there is no
     /// column for row.
     ///
-    std::vector<size_t> Solve(const cv::Mat &dissimilarity_matrix);
+    std::vector<size_t> Solve(const cv::Mat& dissimilarity_matrix);
 
 private:
     static constexpr int kStar = 1;

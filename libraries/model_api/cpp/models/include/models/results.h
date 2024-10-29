@@ -17,12 +17,11 @@
 #pragma once
 #include <map>
 #include <memory>
-#include <string>
-#include <vector>
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <openvino/openvino.hpp>
+#include <string>
+#include <vector>
 
 #include "internal_model_data.h"
 
@@ -51,9 +50,8 @@ struct ResultBase {
     }
 };
 
-struct AnomalyResult : public ResultBase
-{
-    AnomalyResult(int64_t frameId = -1, const std::shared_ptr<MetaData> &metaData = nullptr)
+struct AnomalyResult : public ResultBase {
+    AnomalyResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ResultBase(frameId, metaData) {}
     cv::Mat anomaly_map;
     std::vector<cv::Rect> pred_boxes;
@@ -61,8 +59,7 @@ struct AnomalyResult : public ResultBase
     cv::Mat pred_mask;
     double pred_score;
 
-    friend std::ostream &operator<<(std::ostream &os, const AnomalyResult &prediction)
-    {
+    friend std::ostream& operator<<(std::ostream& os, const AnomalyResult& prediction) {
         double min_anomaly_map, max_anomaly_map;
         cv::minMaxLoc(prediction.anomaly_map, &min_anomaly_map, &max_anomaly_map);
         double min_pred_mask, max_pred_mask;
@@ -70,21 +67,19 @@ struct AnomalyResult : public ResultBase
         os << "anomaly_map min:" << min_anomaly_map << " max:" << max_anomaly_map << ";";
         os << "pred_score:" << std::fixed << std::setprecision(1) << prediction.pred_score << ";";
         os << "pred_label:" << prediction.pred_label << ";";
-        os << std::fixed << std::setprecision(0) << "pred_mask min:" << min_pred_mask << " max:" << max_pred_mask << ";";
+        os << std::fixed << std::setprecision(0) << "pred_mask min:" << min_pred_mask << " max:" << max_pred_mask
+           << ";";
 
-        if (!prediction.pred_boxes.empty())
-        {
+        if (!prediction.pred_boxes.empty()) {
             os << "pred_boxes:";
-            for (const cv::Rect &box : prediction.pred_boxes)
-            {
+            for (const cv::Rect& box : prediction.pred_boxes) {
                 os << box << ",";
             }
         }
 
         return os;
     }
-    explicit operator std::string()
-    {
+    explicit operator std::string() {
         std::stringstream ss;
         ss << *this;
         return ss.str();
@@ -116,7 +111,7 @@ struct ClassificationResult : public ResultBase {
     ClassificationResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ResultBase(frameId, metaData) {}
 
-    friend std::ostream& operator<< (std::ostream& os, const ClassificationResult& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const ClassificationResult& prediction) {
         for (const ClassificationResult::Classification& classification : prediction.topLabels) {
             os << classification << ", ";
         }
@@ -151,13 +146,15 @@ struct ClassificationResult : public ResultBase {
 
         Classification(unsigned int id, const std::string& label, float score) : id(id), label(label), score(score) {}
 
-        friend std::ostream& operator<< (std::ostream& os, const Classification& prediction) {
-            return os << prediction.id << " (" << prediction.label << "): " << std::fixed << std::setprecision(3) << prediction.score;
+        friend std::ostream& operator<<(std::ostream& os, const Classification& prediction) {
+            return os << prediction.id << " (" << prediction.label << "): " << std::fixed << std::setprecision(3)
+                      << prediction.score;
         }
     };
 
     std::vector<Classification> topLabels;
-    ov::Tensor saliency_map, feature_vector, raw_scores;  // Contains "raw_scores", "saliency_map" and "feature_vector" model outputs if such exist
+    ov::Tensor saliency_map, feature_vector,
+        raw_scores;  // Contains "raw_scores", "saliency_map" and "feature_vector" model outputs if such exist
 };
 
 struct DetectedObject : public cv::Rect2f {
@@ -165,10 +162,10 @@ struct DetectedObject : public cv::Rect2f {
     std::string label;
     float confidence;
 
-    friend std::ostream& operator<< (std::ostream& os, const DetectedObject& detection) {
-        return os << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width)
-            << ", " << int(detection.y + detection.height) << ", "
-            << detection.labelID << " (" << detection.label << "): " << std::fixed << std::setprecision(3) << detection.confidence;
+    friend std::ostream& operator<<(std::ostream& os, const DetectedObject& detection) {
+        return os << int(detection.x) << ", " << int(detection.y) << ", " << int(detection.x + detection.width) << ", "
+                  << int(detection.y + detection.height) << ", " << detection.labelID << " (" << detection.label
+                  << "): " << std::fixed << std::setprecision(3) << detection.confidence;
     }
 };
 
@@ -178,7 +175,7 @@ struct DetectionResult : public ResultBase {
     std::vector<DetectedObject> objects;
     ov::Tensor saliency_map, feature_vector;  // Contan "saliency_map" and "feature_vector" model outputs if such exist
 
-    friend std::ostream& operator<< (std::ostream& os, const DetectionResult& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const DetectionResult& prediction) {
         for (const DetectedObject& obj : prediction.objects) {
             os << obj << "; ";
         }
@@ -211,7 +208,7 @@ struct RetinaFaceDetectionResult : public DetectionResult {
 struct SegmentedObject : DetectedObject {
     cv::Mat mask;
 
-    friend std::ostream& operator<< (std::ostream& os, const SegmentedObject& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const SegmentedObject& prediction) {
         return os << static_cast<const DetectedObject&>(prediction) << ", " << cv::countNonZero(prediction.mask > 0.5);
     }
 };
@@ -221,10 +218,11 @@ struct SegmentedObjectWithRects : SegmentedObject {
 
     SegmentedObjectWithRects(const SegmentedObject& segmented_object) : SegmentedObject(segmented_object) {}
 
-    friend std::ostream& operator<< (std::ostream& os, const SegmentedObjectWithRects& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const SegmentedObjectWithRects& prediction) {
         os << static_cast<const SegmentedObject&>(prediction) << std::fixed << std::setprecision(3);
         auto rect = prediction.rotated_rect;
-        os << ", RotatedRect: " << rect.center.x << ' ' << rect.center.y << ' ' <<  rect.size.width << ' ' << rect.size.height << ' ' << rect.angle;
+        os << ", RotatedRect: " << rect.center.x << ' ' << rect.center.y << ' ' << rect.size.width << ' '
+           << rect.size.height << ' ' << rect.angle;
         return os;
     }
 };
@@ -263,16 +261,16 @@ struct ImageResult : public ResultBase {
     ImageResult(int64_t frameId = -1, const std::shared_ptr<MetaData>& metaData = nullptr)
         : ResultBase(frameId, metaData) {}
     cv::Mat resultImage;
-    friend std::ostream& operator<< (std::ostream& os, const ImageResult& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const ImageResult& prediction) {
         cv::Mat predicted_mask[] = {prediction.resultImage};
         int nimages = 1;
-        int *channels = nullptr;
+        int* channels = nullptr;
         cv::Mat mask;
         cv::Mat outHist;
         int dims = 1;
         int histSize[] = {256};
         float range[] = {0, 256};
-        const float *ranges[] = {range};
+        const float* ranges[] = {range};
         cv::calcHist(predicted_mask, nimages, channels, mask, outHist, dims, histSize, ranges);
 
         os << std::fixed << std::setprecision(3);
@@ -298,7 +296,7 @@ struct ImageResultWithSoftPrediction : public ImageResult {
     // Contain per class saliency_maps and "feature_vector" model output if feature_vector exists
     cv::Mat saliency_map;  // Requires return_soft_prediction==true
     ov::Tensor feature_vector;
-    friend std::ostream& operator<< (std::ostream& os, const ImageResultWithSoftPrediction& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const ImageResultWithSoftPrediction& prediction) {
         os << static_cast<const ImageResult&>(prediction) << '[';
         for (int i = 0; i < prediction.soft_prediction.dims; ++i) {
             os << prediction.soft_prediction.size[i] << ',';
@@ -326,8 +324,9 @@ struct Contour {
     float probability;
     std::vector<cv::Point> shape;
 
-    friend std::ostream& operator<< (std::ostream& os, const Contour& contour) {
-        return os << contour.label << ": " << std::fixed << std::setprecision(3) << contour.probability << ", " << contour.shape.size();
+    friend std::ostream& operator<<(std::ostream& os, const Contour& contour) {
+        return os << contour.label << ": " << std::fixed << std::setprecision(3) << contour.probability << ", "
+                  << contour.shape.size();
     }
 };
 
@@ -335,8 +334,7 @@ static inline std::vector<Contour> getContours(const std::vector<SegmentedObject
     std::vector<Contour> combined_contours;
     std::vector<std::vector<cv::Point>> contours;
     for (const SegmentedObject& obj : segmentedObjects) {
-        cv::findContours(obj.mask, contours, cv::RETR_EXTERNAL,
-                        cv::CHAIN_APPROX_NONE);
+        cv::findContours(obj.mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
         // Assuming one contour output for findContours. Based on OTX this is a safe
         // assumption
         if (contours.size() != 1) {
@@ -362,7 +360,7 @@ struct DetectedKeypoints {
     std::vector<cv::Point2f> keypoints;
     std::vector<float> scores;
 
-    friend std::ostream& operator<< (std::ostream& os, const DetectedKeypoints& prediction) {
+    friend std::ostream& operator<<(std::ostream& os, const DetectedKeypoints& prediction) {
         float kp_x_sum = 0.f;
         for (const cv::Point2f& keypoint : prediction.keypoints) {
             kp_x_sum += keypoint.x;
@@ -372,8 +370,7 @@ struct DetectedKeypoints {
         return os;
     }
 
-    explicit operator std::string()
-    {
+    explicit operator std::string() {
         std::stringstream ss;
         ss << *this;
         return ss.str();

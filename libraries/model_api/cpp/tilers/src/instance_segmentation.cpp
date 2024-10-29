@@ -14,23 +14,24 @@
 // limitations under the License.
 */
 
-#include <algorithm>
-#include <functional>
-#include <vector>
-#include <opencv2/core.hpp>
-
-#include <tilers/instance_segmentation.h>
 #include <models/instance_segmentation.h>
 #include <models/results.h>
+#include <tilers/instance_segmentation.h>
+
+#include <algorithm>
+#include <functional>
+#include <opencv2/core.hpp>
 #include <utils/nms.hpp>
+#include <vector>
+
 #include "utils/common.hpp"
 
 namespace {
 class MaskRCNNModelParamsSetter {
-    public:
-        std::shared_ptr<ModelBase> model;
-        bool state;
-        MaskRCNNModel* model_ptr;
+public:
+    std::shared_ptr<ModelBase> model;
+    bool state;
+    MaskRCNNModel* model_ptr;
     MaskRCNNModelParamsSetter(std::shared_ptr<ModelBase> model_) : model(model_) {
         model_ptr = static_cast<MaskRCNNModel*>(model.get());
         state = model_ptr->postprocess_semantic_masks;
@@ -40,21 +41,21 @@ class MaskRCNNModelParamsSetter {
         model_ptr->postprocess_semantic_masks = state;
     }
 };
-}
+}  // namespace
 
-InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ImageModel> _model, const ov::AnyMap& configuration) :
-    TilerBase(_model, configuration) {
+InstanceSegmentationTiler::InstanceSegmentationTiler(std::shared_ptr<ImageModel> _model,
+                                                     const ov::AnyMap& configuration)
+    : TilerBase(_model, configuration) {
     ov::AnyMap extra_config;
     try {
         auto ov_model = model->getModel();
         extra_config = ov_model->get_rt_info<ov::AnyMap>("model_info");
-    }
-    catch (const std::runtime_error&) {
+    } catch (const std::runtime_error&) {
         extra_config = model->getInferenceAdapter()->getModelConfig();
     }
 
-    postprocess_semantic_masks = get_from_any_maps("postprocess_semantic_masks",
-                                                   configuration, extra_config, postprocess_semantic_masks);
+    postprocess_semantic_masks =
+        get_from_any_maps("postprocess_semantic_masks", configuration, extra_config, postprocess_semantic_masks);
     max_pred_number = get_from_any_maps("max_pred_number", configuration, extra_config, max_pred_number);
 }
 
@@ -64,7 +65,8 @@ std::unique_ptr<InstanceSegmentationResult> InstanceSegmentationTiler::run(const
     return std::unique_ptr<InstanceSegmentationResult>(static_cast<InstanceSegmentationResult*>(result.release()));
 }
 
-std::unique_ptr<ResultBase> InstanceSegmentationTiler::postprocess_tile(std::unique_ptr<ResultBase> tile_result, const cv::Rect& coord) {
+std::unique_ptr<ResultBase> InstanceSegmentationTiler::postprocess_tile(std::unique_ptr<ResultBase> tile_result,
+                                                                        const cv::Rect& coord) {
     auto* iseg_res = static_cast<InstanceSegmentationResult*>(tile_result.get());
     for (auto& det : iseg_res->segmentedObjects) {
         det.x += coord.x;
@@ -72,7 +74,8 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::postprocess_tile(std::uni
     }
 
     if (iseg_res->feature_vector) {
-        auto tmp_feature_vector = ov::Tensor(iseg_res->feature_vector.get_element_type(), iseg_res->feature_vector.get_shape());
+        auto tmp_feature_vector =
+            ov::Tensor(iseg_res->feature_vector.get_element_type(), iseg_res->feature_vector.get_shape());
         iseg_res->feature_vector.copy_to(tmp_feature_vector);
         iseg_res->feature_vector = tmp_feature_vector;
     }
@@ -80,8 +83,10 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::postprocess_tile(std::uni
     return tile_result;
 }
 
-std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(const std::vector<std::unique_ptr<ResultBase>>& tiles_results,
-                                                                     const cv::Size& image_size, const std::vector<cv::Rect>& tile_coords) {
+std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(
+    const std::vector<std::unique_ptr<ResultBase>>& tiles_results,
+    const cv::Size& image_size,
+    const std::vector<cv::Rect>& tile_coords) {
     auto* result = new InstanceSegmentationResult();
     auto retVal = std::unique_ptr<ResultBase>(result);
 
@@ -103,8 +108,10 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(const std::
     result->segmentedObjects.reserve(keep_idx.size());
     for (auto idx : keep_idx) {
         if (postprocess_semantic_masks) {
-            all_detections_ptrs[idx].get().mask = segm_postprocess(all_detections_ptrs[idx], all_detections_ptrs[idx].get().mask,
-                                        image_size.height, image_size.width);
+            all_detections_ptrs[idx].get().mask = segm_postprocess(all_detections_ptrs[idx],
+                                                                   all_detections_ptrs[idx].get().mask,
+                                                                   image_size.height,
+                                                                   image_size.width);
         }
         result->segmentedObjects.push_back(all_detections_ptrs[idx]);
     }
@@ -112,7 +119,8 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(const std::
     if (tiles_results.size()) {
         auto* iseg_res = static_cast<InstanceSegmentationResult*>(tiles_results.begin()->get());
         if (iseg_res->feature_vector) {
-            result->feature_vector = ov::Tensor(iseg_res->feature_vector.get_element_type(), iseg_res->feature_vector.get_shape());
+            result->feature_vector =
+                ov::Tensor(iseg_res->feature_vector.get_element_type(), iseg_res->feature_vector.get_shape());
         }
     }
 
@@ -141,8 +149,10 @@ std::unique_ptr<ResultBase> InstanceSegmentationTiler::merge_results(const std::
     return retVal;
 }
 
-std::vector<cv::Mat_<std::uint8_t>> InstanceSegmentationTiler::merge_saliency_maps(const std::vector<std::unique_ptr<ResultBase>>& tiles_results,
-                                                                                   const cv::Size& image_size, const std::vector<cv::Rect>& tile_coords) {
+std::vector<cv::Mat_<std::uint8_t>> InstanceSegmentationTiler::merge_saliency_maps(
+    const std::vector<std::unique_ptr<ResultBase>>& tiles_results,
+    const cv::Size& image_size,
+    const std::vector<cv::Rect>& tile_coords) {
     std::vector<std::vector<cv::Mat_<std::uint8_t>>> all_saliecy_maps;
     all_saliecy_maps.reserve(tiles_results.size());
     for (const auto& result : tiles_results) {
@@ -186,8 +196,7 @@ std::vector<cv::Mat_<std::uint8_t>> InstanceSegmentationTiler::merge_saliency_ma
             if (cv::sum(merged_map[class_idx]) == cv::Scalar(0.)) {
                 merged_map[class_idx] = cv::Mat_<std::uint8_t>();
             }
-        }
-        else {
+        } else {
             cv::resize(image_map_cls, image_map_cls, image_size);
             cv::Mat(cv::max(merged_map[class_idx], image_map_cls)).copyTo(merged_map[class_idx]);
         }

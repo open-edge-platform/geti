@@ -10,15 +10,15 @@
 #pragma once
 
 #include <iostream>
+#include <openvino/openvino.hpp>
 #include <string>
 #include <utility>
 #include <vector>
 
-#include <openvino/openvino.hpp>
 #include "utils/slog.hpp"
 
 template <typename T, std::size_t N>
-constexpr std::size_t arraySize(const T(&)[N]) noexcept {
+constexpr std::size_t arraySize(const T (&)[N]) noexcept {
     return N;
 }
 

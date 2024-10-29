@@ -19,15 +19,13 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <openvino/openvino.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <vector>
-
-#include <openvino/openvino.hpp>
-
 #include <utils/common.hpp>
 #include <utils/slog.hpp>
+#include <vector>
 
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
@@ -38,7 +36,7 @@
 std::string ModelYoloX::ModelType = "yolox";
 
 void ModelYoloX::initDefaultParameters(const ov::AnyMap&) {
-    resizeMode = RESIZE_KEEP_ASPECT; // Ignore configuration for now
+    resizeMode = RESIZE_KEEP_ASPECT;  // Ignore configuration for now
     useAutoResize = false;
 }
 
@@ -47,8 +45,7 @@ ModelYoloX::ModelYoloX(std::shared_ptr<ov::Model>& model, const ov::AnyMap& conf
     initDefaultParameters(configuration);
 }
 
-ModelYoloX::ModelYoloX(std::shared_ptr<InferenceAdapter>& adapter)
-    : DetectionModelExt(adapter) {
+ModelYoloX::ModelYoloX(std::shared_ptr<InferenceAdapter>& adapter) : DetectionModelExt(adapter) {
     const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
@@ -123,14 +120,18 @@ void ModelYoloX::setStridesGrids() {
     }
 }
 
-std::shared_ptr<InternalModelData> ModelYoloX::preprocess(const InputData& inputData,
-                                                          InferenceInput& input) {
+std::shared_ptr<InternalModelData> ModelYoloX::preprocess(const InputData& inputData, InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;
-    float scale = std::min(static_cast<float>(netInputWidth) / origImg.cols,
-                           static_cast<float>(netInputHeight) / origImg.rows);
+    float scale =
+        std::min(static_cast<float>(netInputWidth) / origImg.cols, static_cast<float>(netInputHeight) / origImg.rows);
 
-    cv::Mat resizedImage = resizeImageExt(origImg, netInputWidth, netInputHeight, resizeMode,
-                                          interpolationMode, nullptr, cv::Scalar(114, 114, 114));
+    cv::Mat resizedImage = resizeImageExt(origImg,
+                                          netInputWidth,
+                                          netInputHeight,
+                                          resizeMode,
+                                          interpolationMode,
+                                          nullptr,
+                                          cv::Scalar(114, 114, 114));
 
     input.emplace(inputNames[0], wrapMat2Tensor(resizedImage));
     return std::make_shared<InternalScaleData>(origImg.cols, origImg.rows, scale, scale);
@@ -183,21 +184,27 @@ std::unique_ptr<ResultBase> ModelYoloX::postprocess(InferenceResult& infResult) 
         // Add successful boxes
         scores.push_back(score);
         classes.push_back(mainClass);
-        Anchor trueBox = {outputPtr[startPos + 0] - outputPtr[startPos + 2] / 2, outputPtr[startPos + 1] - outputPtr[startPos + 3] / 2,
-                          outputPtr[startPos + 0] + outputPtr[startPos + 2] / 2, outputPtr[startPos + 1] + outputPtr[startPos + 3] / 2};
-        validBoxes.push_back(Anchor({trueBox.left / scale.scaleX, trueBox.top / scale.scaleY,
-                                     trueBox.right / scale.scaleX, trueBox.bottom / scale.scaleY}));
+        Anchor trueBox = {outputPtr[startPos + 0] - outputPtr[startPos + 2] / 2,
+                          outputPtr[startPos + 1] - outputPtr[startPos + 3] / 2,
+                          outputPtr[startPos + 0] + outputPtr[startPos + 2] / 2,
+                          outputPtr[startPos + 1] + outputPtr[startPos + 3] / 2};
+        validBoxes.push_back(Anchor({trueBox.left / scale.scaleX,
+                                     trueBox.top / scale.scaleY,
+                                     trueBox.right / scale.scaleX,
+                                     trueBox.bottom / scale.scaleY}));
     }
 
     // NMS for valid boxes
     const std::vector<size_t>& keep = nms(validBoxes, scores, iou_threshold, true);
-    for (size_t index: keep) {
+    for (size_t index : keep) {
         // Create new detected box
         DetectedObject obj;
         obj.x = clamp(validBoxes[index].left, 0.f, static_cast<float>(scale.inputImgWidth));
         obj.y = clamp(validBoxes[index].top, 0.f, static_cast<float>(scale.inputImgHeight));
-        obj.height = clamp(validBoxes[index].bottom - validBoxes[index].top, 0.f, static_cast<float>(scale.inputImgHeight));
-        obj.width = clamp(validBoxes[index].right - validBoxes[index].left, 0.f, static_cast<float>(scale.inputImgWidth));
+        obj.height =
+            clamp(validBoxes[index].bottom - validBoxes[index].top, 0.f, static_cast<float>(scale.inputImgHeight));
+        obj.width =
+            clamp(validBoxes[index].right - validBoxes[index].left, 0.f, static_cast<float>(scale.inputImgWidth));
         obj.confidence = scores[index];
         obj.labelID = classes[index];
         obj.label = getLabelName(classes[index]);

@@ -20,8 +20,8 @@
 #include <memory>
 #include <string>
 
-#include "models/model_base.h"
 #include "models/input_data.h"
+#include "models/model_base.h"
 #include "utils/image_utils.h"
 
 namespace ov {
@@ -49,16 +49,16 @@ public:
     std::shared_ptr<InternalModelData> preprocess(const InputData& inputData, InferenceInput& input) override;
     static std::vector<std::string> loadLabels(const std::string& labelFilename);
     std::shared_ptr<ov::Model> embedProcessing(std::shared_ptr<ov::Model>& model,
-                                                    const std::string& inputName,
-                                                    const ov::Layout&,
-                                                    RESIZE_MODE resize_mode,
-                                                    const cv::InterpolationFlags interpolationMode,
-                                                    const ov::Shape& targetShape,
-                                                    uint8_t pad_value,
-                                                    bool brg2rgb,
-                                                    const std::vector<float>& mean,
-                                                    const std::vector<float>& scale,
-                                                    const std::type_info& dtype = typeid(int));
+                                               const std::string& inputName,
+                                               const ov::Layout&,
+                                               RESIZE_MODE resize_mode,
+                                               const cv::InterpolationFlags interpolationMode,
+                                               const ov::Shape& targetShape,
+                                               uint8_t pad_value,
+                                               bool brg2rgb,
+                                               const std::vector<float>& mean,
+                                               const std::vector<float>& scale,
+                                               const std::type_info& dtype = typeid(int));
     virtual void inferAsync(const ImageInputData& inputData, const ov::AnyMap& callback_args = {});
     std::unique_ptr<ResultBase> inferImage(const ImageInputData& inputData);
     std::vector<std::unique_ptr<ResultBase>> inferBatchImage(const std::vector<ImageInputData>& inputData);
@@ -74,7 +74,7 @@ protected:
 
     std::vector<std::string> labels = {};
     bool useAutoResize = false;
-    bool embedded_processing = false; // flag in model_info that pre/postprocessing embedded
+    bool embedded_processing = false;  // flag in model_info that pre/postprocessing embedded
 
     size_t netInputHeight = 0;
     size_t netInputWidth = 0;

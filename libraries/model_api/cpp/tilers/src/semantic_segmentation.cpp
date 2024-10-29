@@ -14,13 +14,13 @@
 // limitations under the License.
 */
 
-
-#include <vector>
-#include <opencv2/core.hpp>
-
-#include <tilers/semantic_segmentation.h>
-#include <models/segmentation_model.h>
 #include <models/results.h>
+#include <models/segmentation_model.h>
+#include <tilers/semantic_segmentation.h>
+
+#include <opencv2/core.hpp>
+#include <vector>
+
 #include "utils/common.hpp"
 
 namespace {
@@ -41,46 +41,54 @@ void normalize_soft_prediction(cv::Mat& soft_prediction, const cv::Mat& normaliz
         }
     }
 }
-}
+}  // namespace
 
-SemanticSegmentationTiler::SemanticSegmentationTiler(std::shared_ptr<ImageModel> _model, const ov::AnyMap& configuration) :
-    TilerBase(_model, configuration) {
+SemanticSegmentationTiler::SemanticSegmentationTiler(std::shared_ptr<ImageModel> _model,
+                                                     const ov::AnyMap& configuration)
+    : TilerBase(_model, configuration) {
     ov::AnyMap extra_config;
     try {
         auto ov_model = model->getModel();
         extra_config = ov_model->get_rt_info<ov::AnyMap>("model_info");
-    }
-    catch (const std::runtime_error&) {
+    } catch (const std::runtime_error&) {
         extra_config = model->getInferenceAdapter()->getModelConfig();
     }
 
     blur_strength = get_from_any_maps("blur_strength", configuration, extra_config, blur_strength);
     soft_threshold = get_from_any_maps("soft_threshold", configuration, extra_config, soft_threshold);
-    return_soft_prediction = get_from_any_maps("return_soft_prediction", configuration, extra_config, return_soft_prediction);
+    return_soft_prediction =
+        get_from_any_maps("return_soft_prediction", configuration, extra_config, return_soft_prediction);
 }
 
 std::unique_ptr<ImageResultWithSoftPrediction> SemanticSegmentationTiler::run(const ImageInputData& inputData) {
     auto result = this->run_impl(inputData);
-    return std::unique_ptr<ImageResultWithSoftPrediction>(static_cast<ImageResultWithSoftPrediction*>(result.release()));
+    return std::unique_ptr<ImageResultWithSoftPrediction>(
+        static_cast<ImageResultWithSoftPrediction*>(result.release()));
 }
 
-std::unique_ptr<ResultBase> SemanticSegmentationTiler::postprocess_tile(std::unique_ptr<ResultBase> tile_result, const cv::Rect&) {
+std::unique_ptr<ResultBase> SemanticSegmentationTiler::postprocess_tile(std::unique_ptr<ResultBase> tile_result,
+                                                                        const cv::Rect&) {
     ImageResultWithSoftPrediction* soft = dynamic_cast<ImageResultWithSoftPrediction*>(tile_result.get());
     if (!soft) {
-        throw std::runtime_error("SemanticSegmentationTiler requires the underlying model to return ImageResultWithSoftPrediction");
+        throw std::runtime_error(
+            "SemanticSegmentationTiler requires the underlying model to return ImageResultWithSoftPrediction");
     }
     return tile_result;
 }
 
-std::unique_ptr<ResultBase> SemanticSegmentationTiler::merge_results(const std::vector<std::unique_ptr<ResultBase>>& tiles_results,
-                                                                     const cv::Size& image_size, const std::vector<cv::Rect>& tile_coords) {
+std::unique_ptr<ResultBase> SemanticSegmentationTiler::merge_results(
+    const std::vector<std::unique_ptr<ResultBase>>& tiles_results,
+    const cv::Size& image_size,
+    const std::vector<cv::Rect>& tile_coords) {
     if (tiles_results.empty()) {
         return std::unique_ptr<ResultBase>(new ImageResultWithSoftPrediction());
     }
 
     cv::Mat voting_mask(cv::Size(image_size.width, image_size.height), CV_32SC1, cv::Scalar(0));
     auto* sseg_res = static_cast<ImageResultWithSoftPrediction*>(tiles_results[0].get());
-    cv::Mat merged_soft_prediction(cv::Size(image_size.width, image_size.height), CV_32FC(sseg_res->soft_prediction.channels()), cv::Scalar(0));
+    cv::Mat merged_soft_prediction(cv::Size(image_size.width, image_size.height),
+                                   CV_32FC(sseg_res->soft_prediction.channels()),
+                                   cv::Scalar(0));
 
     for (size_t i = 0; i < tiles_results.size(); ++i) {
         auto* sseg_res = static_cast<ImageResultWithSoftPrediction*>(tiles_results[i].get());
@@ -90,7 +98,8 @@ std::unique_ptr<ResultBase> SemanticSegmentationTiler::merge_results(const std::
 
     normalize_soft_prediction(merged_soft_prediction, voting_mask);
 
-    cv::Mat hard_prediction = create_hard_prediction_from_soft_prediction(merged_soft_prediction, soft_threshold, blur_strength);
+    cv::Mat hard_prediction =
+        create_hard_prediction_from_soft_prediction(merged_soft_prediction, soft_threshold, blur_strength);
 
     std::unique_ptr<ResultBase> retVal;
     if (return_soft_prediction) {
@@ -98,8 +107,7 @@ std::unique_ptr<ResultBase> SemanticSegmentationTiler::merge_results(const std::
         retVal = std::unique_ptr<ResultBase>(result);
         result->soft_prediction = merged_soft_prediction;
         result->resultImage = hard_prediction;
-    }
-    else {
+    } else {
         auto* result = new ImageResult();
         retVal = std::unique_ptr<ResultBase>(result);
         result->resultImage = hard_prediction;

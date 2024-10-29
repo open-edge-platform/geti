@@ -15,16 +15,16 @@
 */
 
 #include "models/detection_model.h"
-#include "models/detection_model_ssd.h"
-#include "models/detection_model_yolo.h"
-#include "models/detection_model_yolov3_onnx.h"
-#include "models/detection_model_yolox.h"
 
 #include <fstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 
+#include "models/detection_model_ssd.h"
+#include "models/detection_model_yolo.h"
+#include "models/detection_model_yolov3_onnx.h"
+#include "models/detection_model_yolox.h"
 #include "models/image_model.h"
 #include "models/input_data.h"
 #include "models/results.h"
@@ -43,8 +43,9 @@ DetectionModel::DetectionModel(std::shared_ptr<ov::Model>& model, const ov::AnyM
 }
 
 DetectionModel::DetectionModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
-   : ImageModel(adapter, configuration) {
-    confidence_threshold = get_from_any_maps("confidence_threshold", configuration, adapter->getModelConfig(), confidence_threshold);
+    : ImageModel(adapter, configuration) {
+    confidence_threshold =
+        get_from_any_maps("confidence_threshold", configuration, adapter->getModelConfig(), confidence_threshold);
 }
 
 void DetectionModel::updateModelInfo() {
@@ -62,11 +63,12 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
     if (model_type.empty()) {
         try {
-            if (model->has_rt_info("model_info", "model_type") ) {
+            if (model->has_rt_info("model_info", "model_type")) {
                 model_type = model->get_rt_info<std::string>("model_info", "model_type");
             }
         } catch (const std::exception&) {
-            slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
+            slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type
+                       << slog::endl;
         }
     }
 
@@ -80,7 +82,8 @@ std::unique_ptr<DetectionModel> DetectionModel::create_model(const std::string& 
     } else if (model_type == YOLOv8::ModelType) {
         detectionModel = std::unique_ptr<DetectionModel>(new YOLOv8(model, configuration));
     } else {
-        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
+        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " +
+                                 model_type);
     }
 
     detectionModel->prepare();

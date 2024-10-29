@@ -18,15 +18,13 @@
 
 #include <algorithm>
 #include <map>
+#include <openvino/openvino.hpp>
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
-#include <vector>
-
-#include <openvino/openvino.hpp>
-
 #include <utils/common.hpp>
 #include <utils/ocv_common.hpp>
+#include <vector>
 
 #include "models/internal_model_data.h"
 #include "models/results.h"
@@ -76,20 +74,21 @@ NumAndStep fromMultipleOutputs(const ov::Shape& boxesShape) {
         return {detectionsNum, objectSize};
     }
     throw std::logic_error("Incorrect number of 'boxes' output dimensions, expected 2 or 3, but had " +
-                            std::to_string(boxesShape.size()));
+                           std::to_string(boxesShape.size()));
 }
 
 std::vector<std::string> filterOutXai(const std::vector<std::string>& names) {
     std::vector<std::string> filtered;
-    std::copy_if (names.begin(), names.end(), std::back_inserter(filtered), [](const std::string& name){return name != saliency_map_name && name != feature_vector_name;});
+    std::copy_if(names.begin(), names.end(), std::back_inserter(filtered), [](const std::string& name) {
+        return name != saliency_map_name && name != feature_vector_name;
+    });
     return filtered;
 }
-
 
 float clamp_and_round(float val, float min, float max) {
     return std::round(std::max(min, std::min(max, val)));
 }
-}
+}  // namespace
 
 std::string ModelSSD::ModelType = "ssd";
 
@@ -106,7 +105,8 @@ std::shared_ptr<InternalModelData> ModelSSD::preprocess(const InputData& inputDa
 }
 
 std::unique_ptr<ResultBase> ModelSSD::postprocess(InferenceResult& infResult) {
-    std::unique_ptr<ResultBase> result = filterOutXai(outputNames).size() > 1 ? postprocessMultipleOutputs(infResult) : postprocessSingleOutput(infResult);
+    std::unique_ptr<ResultBase> result = filterOutXai(outputNames).size() > 1 ? postprocessMultipleOutputs(infResult)
+                                                                              : postprocessSingleOutput(infResult);
     DetectionResult* cls_res = static_cast<DetectionResult*>(result.get());
     auto saliency_map_iter = infResult.outputsData.find(saliency_map_name);
     if (saliency_map_iter != infResult.outputsData.end()) {
@@ -131,9 +131,8 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
     float floatInputImgWidth = float(internalData.inputImgWidth),
-         floatInputImgHeight = float(internalData.inputImgHeight);
-    float invertedScaleX = floatInputImgWidth / netInputWidth,
-          invertedScaleY = floatInputImgHeight / netInputHeight;
+          floatInputImgHeight = float(internalData.inputImgHeight);
+    float invertedScaleX = floatInputImgWidth / netInputWidth, invertedScaleY = floatInputImgHeight / netInputHeight;
     int padLeft = 0, padTop = 0;
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
@@ -158,22 +157,24 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessSingleOutput(InferenceResult& i
             desc.confidence = confidence;
             desc.labelID = static_cast<size_t>(detections[i * numAndStep.objectSize + 1]);
             desc.label = getLabelName(desc.labelID);
-            desc.x = clamp(
-                round((detections[i * numAndStep.objectSize + 3] * netInputWidth - padLeft) * invertedScaleX),
-                0.f,
-                floatInputImgWidth);
-            desc.y = clamp(
-                round((detections[i * numAndStep.objectSize + 4] * netInputHeight - padTop) * invertedScaleY),
-                0.f,
-                floatInputImgHeight);
-            desc.width = clamp(
-                round((detections[i * numAndStep.objectSize + 5] * netInputWidth - padLeft) * invertedScaleX),
-                0.f,
-                floatInputImgWidth) - desc.x;
-            desc.height = clamp(
-                round((detections[i * numAndStep.objectSize + 6] * netInputHeight - padTop) * invertedScaleY),
-                0.f,
-                floatInputImgHeight) - desc.y;
+            desc.x =
+                clamp(round((detections[i * numAndStep.objectSize + 3] * netInputWidth - padLeft) * invertedScaleX),
+                      0.f,
+                      floatInputImgWidth);
+            desc.y =
+                clamp(round((detections[i * numAndStep.objectSize + 4] * netInputHeight - padTop) * invertedScaleY),
+                      0.f,
+                      floatInputImgHeight);
+            desc.width =
+                clamp(round((detections[i * numAndStep.objectSize + 5] * netInputWidth - padLeft) * invertedScaleX),
+                      0.f,
+                      floatInputImgWidth) -
+                desc.x;
+            desc.height =
+                clamp(round((detections[i * numAndStep.objectSize + 6] * netInputHeight - padTop) * invertedScaleY),
+                      0.f,
+                      floatInputImgHeight) -
+                desc.y;
             result->objects.push_back(desc);
         }
     }
@@ -186,16 +187,16 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
     const float* boxes = infResult.outputsData[namesWithoutXai[0]].data<float>();
     NumAndStep numAndStep = fromMultipleOutputs(infResult.outputsData[namesWithoutXai[0]].get_shape());
     const int64_t* labels = infResult.outputsData[namesWithoutXai[1]].data<int64_t>();
-    const float* scores = namesWithoutXai.size() > 2 ? infResult.outputsData[namesWithoutXai[2]].data<float>() : nullptr;
+    const float* scores =
+        namesWithoutXai.size() > 2 ? infResult.outputsData[namesWithoutXai[2]].data<float>() : nullptr;
 
     DetectionResult* result = new DetectionResult(infResult.frameId, infResult.metaData);
     auto retVal = std::unique_ptr<ResultBase>(result);
 
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
     float floatInputImgWidth = float(internalData.inputImgWidth),
-         floatInputImgHeight = float(internalData.inputImgHeight);
-    float invertedScaleX = floatInputImgWidth / netInputWidth,
-          invertedScaleY = floatInputImgHeight / netInputHeight;
+          floatInputImgHeight = float(internalData.inputImgHeight);
+    float invertedScaleX = floatInputImgWidth / netInputWidth, invertedScaleY = floatInputImgHeight / netInputHeight;
     int padLeft = 0, padTop = 0;
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
@@ -220,10 +221,21 @@ std::unique_ptr<ResultBase> ModelSSD::postprocessMultipleOutputs(InferenceResult
             desc.confidence = confidence;
             desc.labelID = labels[i];
             desc.label = getLabelName(desc.labelID);
-            desc.x = clamp_and_round((boxes[i * numAndStep.objectSize] * widthScale - padLeft) * invertedScaleX, 0.f, floatInputImgWidth);
-            desc.y = clamp_and_round((boxes[i * numAndStep.objectSize + 1] * heightScale - padTop) * invertedScaleY, 0.f, floatInputImgHeight);
-            desc.width = clamp_and_round((boxes[i * numAndStep.objectSize + 2] * widthScale - padLeft) * invertedScaleX, 0.f, floatInputImgWidth) - desc.x;
-            desc.height = clamp_and_round((boxes[i * numAndStep.objectSize + 3] * heightScale - padTop) * invertedScaleY, 0.f, floatInputImgHeight) - desc.y;
+            desc.x = clamp_and_round((boxes[i * numAndStep.objectSize] * widthScale - padLeft) * invertedScaleX,
+                                     0.f,
+                                     floatInputImgWidth);
+            desc.y = clamp_and_round((boxes[i * numAndStep.objectSize + 1] * heightScale - padTop) * invertedScaleY,
+                                     0.f,
+                                     floatInputImgHeight);
+            desc.width = clamp_and_round((boxes[i * numAndStep.objectSize + 2] * widthScale - padLeft) * invertedScaleX,
+                                         0.f,
+                                         floatInputImgWidth) -
+                         desc.x;
+            desc.height =
+                clamp_and_round((boxes[i * numAndStep.objectSize + 3] * heightScale - padTop) * invertedScaleY,
+                                0.f,
+                                floatInputImgHeight) -
+                desc.y;
 
             if (desc.width * desc.height >= box_area_threshold) {
                 result->objects.push_back(desc);
@@ -250,22 +262,22 @@ void ModelSSD::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             }
 
             if (!embedded_processing) {
-                model = ImageModel::embedProcessing(model,
-                                        inputNames[0],
-                                        inputLayout,
-                                        resizeMode,
-                                        interpolationMode,
-                                        ov::Shape{shape[ov::layout::width_idx(inputLayout)],
-                                                  shape[ov::layout::height_idx(inputLayout)]},
-                                        pad_value,
-                                        reverse_input_channels,
-                                        mean_values,
-                                        scale_values);
+                model = ImageModel::embedProcessing(
+                    model,
+                    inputNames[0],
+                    inputLayout,
+                    resizeMode,
+                    interpolationMode,
+                    ov::Shape{shape[ov::layout::width_idx(inputLayout)], shape[ov::layout::height_idx(inputLayout)]},
+                    pad_value,
+                    reverse_input_channels,
+                    mean_values,
+                    scale_values);
 
                 netInputWidth = shape[ov::layout::width_idx(inputLayout)];
                 netInputHeight = shape[ov::layout::height_idx(inputLayout)];
 
-                useAutoResize = true; // temporal solution for SSD
+                useAutoResize = true;  // temporal solution for SSD
                 embedded_processing = true;
             }
         } else if (shape.size() == 2) {  // 2nd input contains image info

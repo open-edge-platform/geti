@@ -21,8 +21,7 @@ DetectionModelExt::DetectionModelExt(std::shared_ptr<ov::Model>& model, const ov
     }
 }
 
-DetectionModelExt::DetectionModelExt(std::shared_ptr<InferenceAdapter>& adapter)
-    : DetectionModel(adapter) {
+DetectionModelExt::DetectionModelExt(std::shared_ptr<InferenceAdapter>& adapter) : DetectionModel(adapter) {
     const ov::AnyMap& configuration = adapter->getModelConfig();
     auto iou_threshold_iter = configuration.find("iou_threshold");
     if (iou_threshold_iter != configuration.end()) {

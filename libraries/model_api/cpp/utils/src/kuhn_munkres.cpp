@@ -4,9 +4,8 @@
 
 #include <algorithm>
 #include <limits>
-#include <vector>
-
 #include <utils/kuhn_munkres.hpp>
+#include <vector>
 
 KuhnMunkres::KuhnMunkres(bool greedy) : n_(), greedy_(greedy) {}
 
@@ -20,8 +19,7 @@ std::vector<size_t> KuhnMunkres::Solve(const cv::Mat& dissimilarity_matrix) {
     marked_ = cv::Mat(n_, n_, CV_8S, cv::Scalar(0));
     points_ = std::vector<cv::Point>(n_ * 2);
 
-    dissimilarity_matrix.copyTo(dm_(
-            cv::Rect(0, 0, dissimilarity_matrix.cols, dissimilarity_matrix.rows)));
+    dissimilarity_matrix.copyTo(dm_(cv::Rect(0, 0, dissimilarity_matrix.cols, dissimilarity_matrix.rows)));
 
     is_row_visited_ = std::vector<int>(n_, 0);
     is_col_visited_ = std::vector<int>(n_, 0);
@@ -95,8 +93,10 @@ void KuhnMunkres::UpdateDissimilarityMatrix(float val) {
     for (int i = 0; i < n_; i++) {
         auto dm_ptr = dm_.ptr<float>(i);
         for (int j = 0; j < n_; j++) {
-            if (is_row_visited_[i]) dm_ptr[j] += val;
-            if (!is_col_visited_[j]) dm_ptr[j] -= val;
+            if (is_row_visited_[i])
+                dm_ptr[j] += val;
+            if (!is_col_visited_[j])
+                dm_ptr[j] -= val;
         }
     }
 }

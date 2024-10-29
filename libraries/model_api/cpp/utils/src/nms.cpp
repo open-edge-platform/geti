@@ -14,13 +14,15 @@
 // limitations under the License.
 */
 
-#include <vector>
-
 #include "utils/nms.hpp"
 
+#include <vector>
 
-std::vector<size_t> multiclass_nms(const std::vector<AnchorLabeled>& boxes, const std::vector<float>& scores,
-                     const float iou_threshold, bool includeBoundaries, size_t maxNum) {
+std::vector<size_t> multiclass_nms(const std::vector<AnchorLabeled>& boxes,
+                                   const std::vector<float>& scores,
+                                   const float iou_threshold,
+                                   bool includeBoundaries,
+                                   size_t maxNum) {
     std::vector<Anchor> boxes_copy;
     boxes_copy.reserve(boxes.size());
 

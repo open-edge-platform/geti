@@ -15,51 +15,50 @@
 */
 
 #include "models/model_base.h"
-#include <models/results.h>
-#include "utils/args_helper.hpp"
-#include "models/input_data.h"
-#include <adapters/openvino_adapter.h>
 
-#include <utility>
+#include <adapters/openvino_adapter.h>
+#include <models/results.h>
 
 #include <openvino/openvino.hpp>
-
+#include <utility>
 #include <utils/common.hpp>
 #include <utils/ocv_common.hpp>
 #include <utils/slog.hpp>
 
+#include "models/input_data.h"
+#include "utils/args_helper.hpp"
 
 namespace {
 class TmpCallbackSetter {
-    public:
-        ModelBase* model;
-        std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap&)> last_callback;
+public:
+    ModelBase* model;
+    std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap&)> last_callback;
     TmpCallbackSetter(ModelBase* model_,
                       std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap&)> tmp_callback,
                       std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap&)> last_callback_)
-        : model(model_), last_callback(last_callback_) {
+        : model(model_),
+          last_callback(last_callback_) {
         model->setCallback(tmp_callback);
     }
     ~TmpCallbackSetter() {
         if (last_callback) {
             model->setCallback(last_callback);
-        }
-        else {
-            model->setCallback([](std::unique_ptr<ResultBase>, const ov::AnyMap&){});
+        } else {
+            model->setCallback([](std::unique_ptr<ResultBase>, const ov::AnyMap&) {});
         }
     }
 };
-}
+}  // namespace
 
 ModelBase::ModelBase(const std::string& modelFile, const std::string& layout)
-        : modelFile(modelFile),
-          inputsLayouts(parseLayoutString(layout)) {
+    : modelFile(modelFile),
+      inputsLayouts(parseLayoutString(layout)) {
     auto core = ov::Core();
     model = core.read_model(modelFile);
 }
 
 ModelBase::ModelBase(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
-        : inferenceAdapter(adapter) {
+    : inferenceAdapter(adapter) {
     const ov::AnyMap& adapter_configuration = adapter->getModelConfig();
 
     std::string layout = "";
@@ -70,13 +69,12 @@ ModelBase::ModelBase(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMa
     outputNames = adapter->getOutputNames();
 }
 
-ModelBase::ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
-        : model(model) {
+ModelBase::ModelBase(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration) : model(model) {
     auto layout_iter = configuration.find("layout");
     std::string layout = "";
 
     if (layout_iter != configuration.end()) {
-       layout = layout_iter->second.as<std::string>();
+        layout = layout_iter->second.as<std::string>();
     } else {
         if (model->has_rt_info("model_info", "layout")) {
             layout = model->get_rt_info<std::string>("model_info", "layout");
@@ -145,10 +143,12 @@ std::unique_ptr<ResultBase> ModelBase::infer(const InputData& inputData) {
     return retVal;
 }
 
-std::vector<std::unique_ptr<ResultBase>> ModelBase::inferBatch(const std::vector<std::reference_wrapper<const InputData>>& inputData) {
+std::vector<std::unique_ptr<ResultBase>> ModelBase::inferBatch(
+    const std::vector<std::reference_wrapper<const InputData>>& inputData) {
     auto results = std::vector<std::unique_ptr<ResultBase>>(inputData.size());
-    auto setter = TmpCallbackSetter(this,
-        [&](std::unique_ptr<ResultBase> result, const ov::AnyMap& callback_args){
+    auto setter = TmpCallbackSetter(
+        this,
+        [&](std::unique_ptr<ResultBase> result, const ov::AnyMap& callback_args) {
             size_t id = callback_args.find("id")->second.as<size_t>();
             results[id] = std::move(result);
         },
@@ -170,7 +170,6 @@ std::vector<std::unique_ptr<ResultBase>> ModelBase::inferBatch(const std::vector
     return inferBatch(inputRefData);
 }
 
-
 void ModelBase::inferAsync(const InputData& inputData, const ov::AnyMap& callback_args) {
     InferenceInput inputs;
     auto internalModelData = this->preprocess(inputData, inputs);
@@ -188,7 +187,8 @@ void ModelBase::awaitAll() {
 void ModelBase::awaitAny() {
     inferenceAdapter->awaitAny();
 }
-void ModelBase::setCallback(std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap& callback_args)> callback) {
+void ModelBase::setCallback(
+    std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap& callback_args)> callback) {
     lastCallback = callback;
     inferenceAdapter->setCallback([this, callback](ov::InferRequest request, CallbackData args) {
         InferenceResult result;
@@ -215,7 +215,8 @@ size_t ModelBase::getNumAsyncExecutors() const {
 
 std::shared_ptr<ov::Model> ModelBase::getModel() {
     if (!model) {
-        throw std::runtime_error(std::string("ov::Model is not accessible for the current model adapter: ") + typeid(inferenceAdapter).name());
+        throw std::runtime_error(std::string("ov::Model is not accessible for the current model adapter: ") +
+                                 typeid(inferenceAdapter).name());
     }
 
     updateModelInfo();

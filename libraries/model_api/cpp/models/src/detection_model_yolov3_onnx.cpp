@@ -19,24 +19,21 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <openvino/openvino.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <vector>
-
-#include <openvino/openvino.hpp>
-
 #include <utils/common.hpp>
 #include <utils/slog.hpp>
+#include <vector>
 
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
 #include "models/results.h"
 #include "utils/image_utils.h"
 
-
 void ModelYoloV3ONNX::initDefaultParameters(const ov::AnyMap&) {
-    resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX; // Ignore configuration for now
+    resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;  // Ignore configuration for now
     useAutoResize = false;
 }
 
@@ -45,8 +42,7 @@ ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<ov::Model>& model, const ov::An
     initDefaultParameters(configuration);
 }
 
-ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<InferenceAdapter>& adapter)
-    : DetectionModel(adapter) {
+ModelYoloV3ONNX::ModelYoloV3ONNX(std::shared_ptr<InferenceAdapter>& adapter) : DetectionModel(adapter) {
     const ov::AnyMap& configuration = adapter->getModelConfig();
     initDefaultParameters(configuration);
 }
@@ -103,16 +99,15 @@ void ModelYoloV3ONNX::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
             scoresOutputName = currentName;
             ppp.output(currentName).tensor().set_element_type(ov::element::f32);
         } else {
-            throw std::logic_error("Expected shapes [:,:,4], [:,"
-                + std::to_string(numberOfClasses) + ",:] and [:,3] for outputs");
+            throw std::logic_error("Expected shapes [:,:,4], [:," + std::to_string(numberOfClasses) +
+                                   ",:] and [:,3] for outputs");
         }
         outputNames.push_back(currentName);
     }
     model = ppp.build();
 }
 
-std::shared_ptr<InternalModelData> ModelYoloV3ONNX::preprocess(const InputData& inputData,
-                                                               InferenceInput& input) {
+std::shared_ptr<InternalModelData> ModelYoloV3ONNX::preprocess(const InputData& inputData, InferenceInput& input) {
     const auto& origImg = inputData.asRef<ImageInputData>().inputImage;
     ov::Tensor info{ov::element::i32, ov::Shape({1, 2})};
     int32_t* data = info.data<int32_t>();
@@ -130,7 +125,7 @@ float getScore(const ov::Tensor& scoresTensor, size_t classInd, size_t boxInd) {
 
     return scoresPtr[classInd * N + boxInd];
 }
-}
+}  // namespace
 
 std::unique_ptr<ResultBase> ModelYoloV3ONNX::postprocess(InferenceResult& infResult) {
     // Get info about input image
@@ -183,7 +178,6 @@ std::unique_ptr<ResultBase> ModelYoloV3ONNX::postprocess(InferenceResult& infRes
             obj.label = getLabelName(classInd);
 
             result->objects.push_back(obj);
-
         }
     }
 

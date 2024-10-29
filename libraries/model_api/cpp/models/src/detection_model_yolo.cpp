@@ -19,16 +19,14 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <openvino/openvino.hpp>
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <vector>
-
-#include <openvino/openvino.hpp>
-
 #include <utils/common.hpp>
 #include <utils/nms.hpp>
 #include <utils/slog.hpp>
+#include <vector>
 
 #include "models/internal_model_data.h"
 #include "models/results.h"
@@ -87,14 +85,15 @@ float sigmoid(float x) noexcept {
 constexpr float identity(float x) noexcept {
     return x;
 }
-}
+}  // namespace
 
 ModelYolo::ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
     : DetectionModelExt(model, configuration) {
     auto anchors_iter = configuration.find("anchors");
     if (anchors_iter == configuration.end()) {
         if (model->has_rt_info("model_info", "anchors")) {
-            //presetAnchors = model->get_rt_info().at("model_info").as<ov::VariantWrapper<ov::AnyMap>>().get().at("anchors").as<std::vector<float>>();
+            // presetAnchors =
+            // model->get_rt_info().at("model_info").as<ov::VariantWrapper<ov::AnyMap>>().get().at("anchors").as<std::vector<float>>();
             presetAnchors = model->get_rt_info<std::vector<float>>("model_info", "anchors");
         }
     } else {
@@ -109,11 +108,10 @@ ModelYolo::ModelYolo(std::shared_ptr<ov::Model>& model, const ov::AnyMap& config
         presetMasks = masks_iter->second.as<std::vector<int64_t>>();
     }
 
-    resizeMode = RESIZE_FILL; // Ignore resize_type for now
+    resizeMode = RESIZE_FILL;  // Ignore resize_type for now
 }
 
-ModelYolo::ModelYolo(std::shared_ptr<InferenceAdapter>& adapter)
-    : DetectionModelExt(adapter) {
+ModelYolo::ModelYolo(std::shared_ptr<InferenceAdapter>& adapter) : DetectionModelExt(adapter) {
     const ov::AnyMap& configuration = adapter->getModelConfig();
     auto anchors_iter = configuration.find("anchors");
     if (anchors_iter != configuration.end()) {
@@ -124,7 +122,7 @@ ModelYolo::ModelYolo(std::shared_ptr<InferenceAdapter>& adapter)
         presetMasks = masks_iter->second.as<std::vector<int64_t>>();
     }
 
-    resizeMode = RESIZE_FILL; // Ignore resize_type for now
+    resizeMode = RESIZE_FILL;  // Ignore resize_type for now
 }
 
 void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
@@ -207,37 +205,35 @@ void ModelYolo::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
 
     if (!isRegionFound) {
         switch (outputNames.size()) {
-            case 1:
-                yoloVersion = YoloVersion::YOLOF;
-                break;
-            case 2:
-                yoloVersion = YoloVersion::YOLO_V4_TINY;
-                break;
-            case 3:
-                yoloVersion = YoloVersion::YOLO_V4;
-                break;
+        case 1:
+            yoloVersion = YoloVersion::YOLOF;
+            break;
+        case 2:
+            yoloVersion = YoloVersion::YOLO_V4_TINY;
+            break;
+        case 3:
+            yoloVersion = YoloVersion::YOLO_V4;
+            break;
         }
 
         int num = yoloVersion == YoloVersion::YOLOF ? 6 : 3;
         isObjConf = yoloVersion == YoloVersion::YOLOF ? 0 : 1;
         int i = 0;
 
-        const std::vector<int64_t> defaultMasks[]{
-            // YOLOv1v2
-            {},
-            // YOLOv3
-            {},
-            // YOLOv4
-            {0, 1, 2, 3, 4, 5, 6, 7, 8},
-            // YOLOv4_Tiny
-            {1, 2, 3, 3, 4, 5},
-            // YOLOF
-            {0, 1, 2, 3, 4, 5}};
+        const std::vector<int64_t> defaultMasks[]{// YOLOv1v2
+                                                  {},
+                                                  // YOLOv3
+                                                  {},
+                                                  // YOLOv4
+                                                  {0, 1, 2, 3, 4, 5, 6, 7, 8},
+                                                  // YOLOv4_Tiny
+                                                  {1, 2, 3, 3, 4, 5},
+                                                  // YOLOF
+                                                  {0, 1, 2, 3, 4, 5}};
         auto chosenMasks = presetMasks.size() ? presetMasks : defaultMasks[size_t(yoloVersion)];
         if (chosenMasks.size() != num * outputs.size()) {
-            throw std::runtime_error("Invalid size of masks array, got " +
-                                     std::to_string(presetMasks.size()) + ", should be " +
-                                     std::to_string(num * outputs.size()));
+            throw std::runtime_error("Invalid size of masks array, got " + std::to_string(presetMasks.size()) +
+                                     ", should be " + std::to_string(num * outputs.size()));
         }
 
         std::sort(outputNames.begin(),
@@ -345,29 +341,32 @@ void ModelYolo::parseYOLOOutput(const std::string& output_name,
     unsigned long scaleH;
     unsigned long scaleW;
     switch (yoloVersion) {
-        case YoloVersion::YOLO_V1V2:
-            sideH = region.outputHeight;
-            sideW = region.outputWidth;
-            scaleW = region.outputWidth;
-            scaleH = region.outputHeight;
-            break;
-        case YoloVersion::YOLO_V3:
-        case YoloVersion::YOLO_V4:
-        case YoloVersion::YOLO_V4_TINY:
-        case YoloVersion::YOLOF:
-            sideH = static_cast<int>(tensor.get_shape()[ov::layout::height_idx("NCHW")]);
-            sideW = static_cast<int>(tensor.get_shape()[ov::layout::width_idx("NCHW")]);
-            scaleW = resized_im_w;
-            scaleH = resized_im_h;
-            break;
-        default: throw std::runtime_error("Unknown YoloVersion");
+    case YoloVersion::YOLO_V1V2:
+        sideH = region.outputHeight;
+        sideW = region.outputWidth;
+        scaleW = region.outputWidth;
+        scaleH = region.outputHeight;
+        break;
+    case YoloVersion::YOLO_V3:
+    case YoloVersion::YOLO_V4:
+    case YoloVersion::YOLO_V4_TINY:
+    case YoloVersion::YOLOF:
+        sideH = static_cast<int>(tensor.get_shape()[ov::layout::height_idx("NCHW")]);
+        sideW = static_cast<int>(tensor.get_shape()[ov::layout::width_idx("NCHW")]);
+        scaleW = resized_im_w;
+        scaleH = resized_im_h;
+        break;
+    default:
+        throw std::runtime_error("Unknown YoloVersion");
     }
 
     auto entriesNum = sideW * sideH;
     const float* outData = tensor.data<float>();
 
-    auto postprocessRawData =
-        (yoloVersion == YoloVersion::YOLO_V4 || yoloVersion == YoloVersion::YOLO_V4_TINY || yoloVersion == YoloVersion::YOLOF) ? sigmoid : identity;
+    auto postprocessRawData = (yoloVersion == YoloVersion::YOLO_V4 || yoloVersion == YoloVersion::YOLO_V4_TINY ||
+                               yoloVersion == YoloVersion::YOLOF)
+                                  ? sigmoid
+                                  : identity;
 
     // --------------------------- Parsing YOLO Region output -------------------------------------
     for (int i = 0; i < entriesNum; ++i) {
@@ -517,19 +516,17 @@ void YOLOv5::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) {
     inputNames.push_back(input.get_any_name());
     const ov::Layout& inputLayout = getInputLayout(input);
     if (!embedded_processing) {
-        model = ImageModel::embedProcessing(model,
-                                inputNames[0],
-                                inputLayout,
-                                resizeMode,
-                                interpolationMode,
-                                ov::Shape{
-                                    in_shape[ov::layout::width_idx(inputLayout)],
-                                    in_shape[ov::layout::height_idx(inputLayout)]
-                                },
-                                pad_value,
-                                reverse_input_channels,
-                                mean_values,
-                                scale_values);
+        model = ImageModel::embedProcessing(
+            model,
+            inputNames[0],
+            inputLayout,
+            resizeMode,
+            interpolationMode,
+            ov::Shape{in_shape[ov::layout::width_idx(inputLayout)], in_shape[ov::layout::height_idx(inputLayout)]},
+            pad_value,
+            reverse_input_channels,
+            mean_values,
+            scale_values);
 
         netInputWidth = in_shape[ov::layout::width_idx(inputLayout)];
         netInputHeight = in_shape[ov::layout::height_idx(inputLayout)];
@@ -559,7 +556,8 @@ void YOLOv5::updateModelInfo() {
 
 void YOLOv5::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority) {
     pad_value = get_from_any_maps("pad_value", top_priority, mid_priority, 114);
-    if (top_priority.find("resize_type") == top_priority.end() && mid_priority.find("resize_type") == mid_priority.end()) {
+    if (top_priority.find("resize_type") == top_priority.end() &&
+        mid_priority.find("resize_type") == mid_priority.end()) {
         interpolationMode = cv::INTER_LINEAR;
         resizeMode = RESIZE_KEEP_ASPECT_LETTERBOX;
     }
@@ -571,12 +569,11 @@ void YOLOv5::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& 
 }
 
 YOLOv5::YOLOv5(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
-        : DetectionModelExt(model, configuration) {
+    : DetectionModelExt(model, configuration) {
     init_from_config(configuration, model->get_rt_info<ov::AnyMap>("model_info"));
 }
 
-YOLOv5::YOLOv5(std::shared_ptr<InferenceAdapter>& adapter)
-        : DetectionModelExt(adapter) {
+YOLOv5::YOLOv5(std::shared_ptr<InferenceAdapter>& adapter) : DetectionModelExt(adapter) {
     init_from_config(adapter->getModelConfig(), ov::AnyMap{});
 }
 
@@ -607,13 +604,11 @@ std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
             }
         }
         if (confidence > confidence_threshold) {
-            boxes_with_class.emplace_back(
-                detections[0 * num_proposals + i] - detections[2 * num_proposals + i] / 2.0f,
-                detections[1 * num_proposals + i] - detections[3 * num_proposals + i] / 2.0f,
-                detections[0 * num_proposals + i] + detections[2 * num_proposals + i] / 2.0f,
-                detections[1 * num_proposals + i] + detections[3 * num_proposals + i] / 2.0f,
-                max_id - LABELS_START
-            );
+            boxes_with_class.emplace_back(detections[0 * num_proposals + i] - detections[2 * num_proposals + i] / 2.0f,
+                                          detections[1 * num_proposals + i] - detections[3 * num_proposals + i] / 2.0f,
+                                          detections[0 * num_proposals + i] + detections[2 * num_proposals + i] / 2.0f,
+                                          detections[1 * num_proposals + i] + detections[3 * num_proposals + i] / 2.0f,
+                                          max_id - LABELS_START);
             confidences.push_back(confidence);
         }
     }
@@ -629,9 +624,8 @@ std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
     auto base = std::unique_ptr<ResultBase>(result);
     const auto& internalData = infResult.internalModelData->asRef<InternalImageModelData>();
     float floatInputImgWidth = float(internalData.inputImgWidth),
-         floatInputImgHeight = float(internalData.inputImgHeight);
-    float invertedScaleX = floatInputImgWidth / netInputWidth,
-          invertedScaleY = floatInputImgHeight / netInputHeight;
+          floatInputImgHeight = float(internalData.inputImgHeight);
+    float invertedScaleX = floatInputImgWidth / netInputWidth, invertedScaleY = floatInputImgHeight / netInputHeight;
     int padLeft = 0, padTop = 0;
     if (RESIZE_KEEP_ASPECT == resizeMode || RESIZE_KEEP_ASPECT_LETTERBOX == resizeMode) {
         invertedScaleX = invertedScaleY = std::max(invertedScaleX, invertedScaleY);
@@ -642,22 +636,12 @@ std::unique_ptr<ResultBase> YOLOv5::postprocess(InferenceResult& infResult) {
     }
     for (size_t idx : keep) {
         DetectedObject desc;
-        desc.x = clamp(
-            round((boxes_with_class[idx].left - padLeft) * invertedScaleX),
-            0.f,
-            floatInputImgWidth);
-        desc.y = clamp(
-            round((boxes_with_class[idx].top - padTop) * invertedScaleY),
-            0.f,
-            floatInputImgHeight);
-        desc.width = clamp(
-            round((boxes_with_class[idx].right - padLeft) * invertedScaleX),
-            0.f,
-            floatInputImgWidth) - desc.x;
-        desc.height = clamp(
-            round((boxes_with_class[idx].bottom - padTop) * invertedScaleY),
-            0.f,
-            floatInputImgHeight) - desc.y;
+        desc.x = clamp(round((boxes_with_class[idx].left - padLeft) * invertedScaleX), 0.f, floatInputImgWidth);
+        desc.y = clamp(round((boxes_with_class[idx].top - padTop) * invertedScaleY), 0.f, floatInputImgHeight);
+        desc.width =
+            clamp(round((boxes_with_class[idx].right - padLeft) * invertedScaleX), 0.f, floatInputImgWidth) - desc.x;
+        desc.height =
+            clamp(round((boxes_with_class[idx].bottom - padTop) * invertedScaleY), 0.f, floatInputImgHeight) - desc.y;
         desc.confidence = confidences[idx];
         desc.labelID = static_cast<size_t>(boxes_with_class[idx].labelID);
         desc.label = getLabelName(desc.labelID);

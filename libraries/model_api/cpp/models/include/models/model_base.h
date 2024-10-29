@@ -15,17 +15,16 @@
 */
 
 #pragma once
-#include <map>
+#include <adapters/inference_adapter.h>
+
 #include <functional>
+#include <map>
 #include <memory>
-#include <string>
-#include <vector>
-
 #include <openvino/openvino.hpp>
-
+#include <string>
 #include <utils/args_helper.hpp>
 #include <utils/ocv_common.hpp>
-#include <adapters/inference_adapter.h>
+#include <vector>
 
 struct InferenceResult;
 struct InputData;
@@ -50,13 +49,15 @@ public:
     virtual std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) = 0;
     virtual std::unique_ptr<ResultBase> infer(const InputData& inputData);
     virtual void inferAsync(const InputData& inputData, const ov::AnyMap& callback_args = {});
-    virtual std::vector<std::unique_ptr<ResultBase>> inferBatch(const std::vector<std::reference_wrapper<const InputData>>& inputData);
+    virtual std::vector<std::unique_ptr<ResultBase>> inferBatch(
+        const std::vector<std::reference_wrapper<const InputData>>& inputData);
     virtual std::vector<std::unique_ptr<ResultBase>> inferBatch(const std::vector<InputData>& inputData);
 
     virtual bool isReady();
     virtual void awaitAll();
     virtual void awaitAny();
-    virtual void setCallback(std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap& callback_args)> callback);
+    virtual void setCallback(
+        std::function<void(std::unique_ptr<ResultBase>, const ov::AnyMap& callback_args)> callback);
     virtual size_t getNumAsyncExecutors() const;
 
     const std::vector<std::string>& getoutputNames() const {

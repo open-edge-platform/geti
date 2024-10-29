@@ -28,7 +28,9 @@ public:
 
 protected:
     virtual std::unique_ptr<ResultBase> postprocess_tile(std::unique_ptr<ResultBase>, const cv::Rect&);
-    virtual std::unique_ptr<ResultBase> merge_results(const std::vector<std::unique_ptr<ResultBase>>&, const cv::Size&, const std::vector<cv::Rect>&);
+    virtual std::unique_ptr<ResultBase> merge_results(const std::vector<std::unique_ptr<ResultBase>>&,
+                                                      const cv::Size&,
+                                                      const std::vector<cv::Rect>&);
 
     int blur_strength = -1;
     float soft_threshold = -std::numeric_limits<float>::infinity();

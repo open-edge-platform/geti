@@ -14,24 +14,24 @@
 // limitations under the License.
 */
 
-#include <vector>
-#include <opencv2/core.hpp>
-
-#include <tilers/tiler_base.h>
-#include <models/results.h>
-#include <models/input_data.h>
 #include <models/image_model.h>
+#include <models/input_data.h>
+#include <models/results.h>
+#include <tilers/tiler_base.h>
 
+#include <opencv2/core.hpp>
+#include <vector>
 
-TilerBase::TilerBase(const std::shared_ptr<ImageModel>& _model, const ov::AnyMap& configuration, ExecutionMode exec_mode) :
-    model(_model), run_mode(exec_mode) {
-
+TilerBase::TilerBase(const std::shared_ptr<ImageModel>& _model,
+                     const ov::AnyMap& configuration,
+                     ExecutionMode exec_mode)
+    : model(_model),
+      run_mode(exec_mode) {
     ov::AnyMap extra_config;
     try {
         auto ov_model = model->getModel();
         extra_config = ov_model->get_rt_info<ov::AnyMap>("model_info");
-    }
-    catch (const std::runtime_error&) {
+    } catch (const std::runtime_error&) {
         extra_config = model->getInferenceAdapter()->getModelConfig();
     }
 
@@ -59,8 +59,7 @@ std::vector<cv::Rect> TilerBase::tile(const cv::Size& image_size) {
     if (tile_with_full_img) {
         coords.reserve(num_h_tiles * num_w_tiles + 1);
         coords.push_back(cv::Rect(0, 0, image_size.width, image_size.height));
-    }
-    else {
+    } else {
         coords.reserve(num_h_tiles * num_w_tiles);
     }
 
@@ -69,9 +68,10 @@ std::vector<cv::Rect> TilerBase::tile(const cv::Size& image_size) {
             int loc_h = static_cast<int>(j * tile_step);
             int loc_w = static_cast<int>(i * tile_step);
 
-            coords.push_back(cv::Rect(loc_w, loc_h,
-                std::min(static_cast<int>(tile_size), image_size.width - loc_w),
-                std::min(static_cast<int>(tile_size), image_size.height - loc_h)));
+            coords.push_back(cv::Rect(loc_w,
+                                      loc_h,
+                                      std::min(static_cast<int>(tile_size), image_size.width - loc_w),
+                                      std::min(static_cast<int>(tile_size), image_size.height - loc_h)));
         }
     }
     return coords;

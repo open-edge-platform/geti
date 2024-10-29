@@ -20,13 +20,12 @@
 #include <stdint.h>
 
 #include <fstream>
-#include <stdexcept>
-#include <string>
-#include <vector>
-
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 #include <openvino/openvino.hpp>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
@@ -45,9 +44,11 @@ cv::Mat get_activation_map(const cv::Mat& features) {
     features.convertTo(int_act_map, CV_8U, factor, -min_soft_score * factor);
     return int_act_map;
 }
-}
+}  // namespace
 
-cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_prediction, float soft_threshold, int blur_strength) {
+cv::Mat create_hard_prediction_from_soft_prediction(const cv::Mat& soft_prediction,
+                                                    float soft_threshold,
+                                                    int blur_strength) {
     if (soft_prediction.channels() == 1) {
         return soft_prediction;
     }
@@ -86,34 +87,42 @@ std::string SegmentationModel::ModelType = "Segmentation";
 void SegmentationModel::init_from_config(const ov::AnyMap& top_priority, const ov::AnyMap& mid_priority) {
     blur_strength = get_from_any_maps("blur_strength", top_priority, mid_priority, blur_strength);
     soft_threshold = get_from_any_maps("soft_threshold", top_priority, mid_priority, soft_threshold);
-    return_soft_prediction = get_from_any_maps("return_soft_prediction", top_priority, mid_priority, return_soft_prediction);
+    return_soft_prediction =
+        get_from_any_maps("return_soft_prediction", top_priority, mid_priority, return_soft_prediction);
 }
 
-SegmentationModel::SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration) : ImageModel(model, configuration) {
-    init_from_config(configuration, model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
+SegmentationModel::SegmentationModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
+    : ImageModel(model, configuration) {
+    init_from_config(configuration,
+                     model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
 }
 
 SegmentationModel::SegmentationModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
-        : ImageModel(adapter, configuration) {
+    : ImageModel(adapter, configuration) {
     init_from_config(configuration, adapter->getModelConfig());
 }
 
-std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::string& modelFile, const ov::AnyMap& configuration, bool preload, const std::string& device) {
+std::unique_ptr<SegmentationModel> SegmentationModel::create_model(const std::string& modelFile,
+                                                                   const ov::AnyMap& configuration,
+                                                                   bool preload,
+                                                                   const std::string& device) {
     auto core = ov::Core();
     std::shared_ptr<ov::Model> model = core.read_model(modelFile);
 
     // Check model_type in the rt_info, ignore configuration
     std::string model_type = SegmentationModel::ModelType;
     try {
-        if (model->has_rt_info("model_info", "model_type") ) {
+        if (model->has_rt_info("model_info", "model_type")) {
             model_type = model->get_rt_info<std::string>("model_info", "model_type");
         }
     } catch (const std::exception&) {
-        slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type << slog::endl;
+        slog::warn << "Model type is not specified in the rt_info, use default model type: " << model_type
+                   << slog::endl;
     }
 
     if (model_type != SegmentationModel::ModelType) {
-        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " + model_type);
+        throw std::runtime_error("Incorrect or unsupported model_type is provided in the model_info section: " +
+                                 model_type);
     }
 
     std::unique_ptr<SegmentationModel> segmentor{new SegmentationModel(model, configuration)};
@@ -174,7 +183,8 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
             if (out_name.empty()) {
                 out_name = output.get_any_name();
             } else {
-                throw std::runtime_error(std::string{"Only "} + feature_vector_name + " and 1 other output are allowed");
+                throw std::runtime_error(std::string{"Only "} + feature_vector_name +
+                                         " and 1 other output are allowed");
             }
         }
     }
@@ -183,17 +193,17 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
     }
 
     if (!embedded_processing) {
-        model = ImageModel::embedProcessing(model,
-                                        inputNames[0],
-                                        inputLayout,
-                                        resizeMode,
-                                        interpolationMode,
-                                        ov::Shape{inputShape[ov::layout::width_idx(inputLayout)],
-                                                  inputShape[ov::layout::height_idx(inputLayout)]},
-                                        pad_value,
-                                        reverse_input_channels,
-                                        mean_values,
-                                        scale_values);
+        model = ImageModel::embedProcessing(
+            model,
+            inputNames[0],
+            inputLayout,
+            resizeMode,
+            interpolationMode,
+            ov::Shape{inputShape[ov::layout::width_idx(inputLayout)], inputShape[ov::layout::height_idx(inputLayout)]},
+            pad_value,
+            reverse_input_channels,
+            mean_values,
+            scale_values);
 
         ov::preprocess::PrePostProcessor ppp = ov::preprocess::PrePostProcessor(model);
         ov::Layout out_layout = getLayoutFromShape(model->output(out_name).get_partial_shape());
@@ -206,7 +216,7 @@ void SegmentationModel::prepareInputsOutputs(std::shared_ptr<ov::Model>& model) 
             ppp.output(out_name).tensor().set_layout("NHW");
         }
         model = ppp.build();
-        useAutoResize = true; // temporal solution
+        useAutoResize = true;  // temporal solution
         embedded_processing = true;
     }
 
@@ -226,8 +236,8 @@ std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infR
     const auto& outTensor = infResult.outputsData[outputName];
     const ov::Shape& outputShape = outTensor.get_shape();
     const ov::Layout& outputLayout = getLayoutFromShape(outputShape);
-    size_t outChannels = ov::layout::has_channels(outputLayout) ?
-        outputShape[ov::layout::channels_idx(outputLayout)] : 1;
+    size_t outChannels =
+        ov::layout::has_channels(outputLayout) ? outputShape[ov::layout::channels_idx(outputLayout)] : 1;
     int outHeight = static_cast<int>(outputShape[ov::layout::height_idx(outputLayout)]);
     int outWidth = static_cast<int>(outputShape[ov::layout::width_idx(outputLayout)]);
     cv::Mat soft_prediction;
@@ -250,14 +260,26 @@ std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infR
         cv::merge(channels, soft_prediction);
     }
 
-    cv::Mat hard_prediction = create_hard_prediction_from_soft_prediction(soft_prediction, soft_threshold, blur_strength);
+    cv::Mat hard_prediction =
+        create_hard_prediction_from_soft_prediction(soft_prediction, soft_threshold, blur_strength);
 
-    cv::resize(hard_prediction, hard_prediction, {inputImgSize.inputImgWidth, inputImgSize.inputImgHeight}, 0.0, 0.0, cv::INTER_NEAREST);
+    cv::resize(hard_prediction,
+               hard_prediction,
+               {inputImgSize.inputImgWidth, inputImgSize.inputImgHeight},
+               0.0,
+               0.0,
+               cv::INTER_NEAREST);
 
     if (return_soft_prediction) {
-        ImageResultWithSoftPrediction* result = new ImageResultWithSoftPrediction(infResult.frameId, infResult.metaData);
+        ImageResultWithSoftPrediction* result =
+            new ImageResultWithSoftPrediction(infResult.frameId, infResult.metaData);
         result->resultImage = hard_prediction;
-        cv::resize(soft_prediction, soft_prediction, {inputImgSize.inputImgWidth, inputImgSize.inputImgHeight}, 0.0, 0.0, cv::INTER_NEAREST);
+        cv::resize(soft_prediction,
+                   soft_prediction,
+                   {inputImgSize.inputImgWidth, inputImgSize.inputImgHeight},
+                   0.0,
+                   0.0,
+                   cv::INTER_NEAREST);
         result->soft_prediction = soft_prediction;
         auto iter = infResult.outputsData.find(feature_vector_name);
         if (infResult.outputsData.end() != iter) {
@@ -272,7 +294,7 @@ std::unique_ptr<ResultBase> SegmentationModel::postprocess(InferenceResult& infR
     return std::unique_ptr<ResultBase>(result);
 }
 
-std::vector<Contour> SegmentationModel::getContours(const ImageResultWithSoftPrediction &imageResult) {
+std::vector<Contour> SegmentationModel::getContours(const ImageResultWithSoftPrediction& imageResult) {
     if (imageResult.soft_prediction.channels() == 1) {
         throw std::runtime_error{"Cannot get contours from soft prediction with 1 layer"};
     }
@@ -282,26 +304,29 @@ std::vector<Contour> SegmentationModel::getContours(const ImageResultWithSoftPre
     cv::Mat current_label_soft_prediction;
     for (int index = 1; index < imageResult.soft_prediction.channels(); index++) {
         cv::extractChannel(imageResult.soft_prediction, current_label_soft_prediction, index);
-        cv::inRange(imageResult.resultImage, cv::Scalar(index, index, index), cv::Scalar(index, index, index), label_index_map);
+        cv::inRange(imageResult.resultImage,
+                    cv::Scalar(index, index, index),
+                    cv::Scalar(index, index, index),
+                    label_index_map);
         std::vector<std::vector<cv::Point>> contours;
         cv::findContours(label_index_map, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
 
         std::string label = getLabelName(index - 1);
 
         for (unsigned int i = 0; i < contours.size(); i++) {
-            cv::Mat mask = cv::Mat::zeros(imageResult.resultImage.rows, imageResult.resultImage.cols, imageResult.resultImage.type());
+            cv::Mat mask = cv::Mat::zeros(imageResult.resultImage.rows,
+                                          imageResult.resultImage.cols,
+                                          imageResult.resultImage.type());
             cv::drawContours(mask, contours, i, 255, -1);
             float probability = (float)cv::mean(current_label_soft_prediction, mask)[0];
             combined_contours.push_back({label, probability, contours[i]});
         }
-
     }
 
     return combined_contours;
 }
 
-std::unique_ptr<ImageResult>
-SegmentationModel::infer(const ImageInputData& inputData) {
+std::unique_ptr<ImageResult> SegmentationModel::infer(const ImageInputData& inputData) {
     auto result = ImageModel::inferImage(inputData);
     return std::unique_ptr<ImageResult>(static_cast<ImageResult*>(result.release()));
 }

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <string>
+
 #include "models/image_model.h"
 
 struct DetectionResult;

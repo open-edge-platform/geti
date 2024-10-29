@@ -16,20 +16,19 @@
 
 #include "models/image_model.h"
 
-#include <stdexcept>
-#include <vector>
-#include <fstream>
+#include <adapters/inference_adapter.h>
+#include <utils/image_utils.h>
 
+#include <fstream>
 #include <opencv2/core.hpp>
 #include <openvino/openvino.hpp>
-
-#include <utils/image_utils.h>
+#include <stdexcept>
 #include <utils/ocv_common.hpp>
-#include <adapters/inference_adapter.h>
+#include <vector>
 
-#include "models/results.h"
 #include "models/input_data.h"
 #include "models/internal_model_data.h"
+#include "models/results.h"
 
 ImageModel::ImageModel(const std::string& modelFile,
                        const std::string& resize_type,
@@ -42,7 +41,7 @@ ImageModel::ImageModel(const std::string& modelFile,
 RESIZE_MODE ImageModel::selectResizeMode(const std::string& resize_type) {
     RESIZE_MODE resize = RESIZE_FILL;
     if ("crop" == resize_type) {
-         resize = RESIZE_CROP;
+        resize = RESIZE_CROP;
     } else if ("standard" == resize_type) {
         resize = RESIZE_FILL;
     } else if ("fit_to_window" == resize_type) {
@@ -73,14 +72,16 @@ void ImageModel::init_from_config(const ov::AnyMap& top_priority, const ov::AnyM
         throw std::runtime_error("pad_value must be in range [0, 255]");
     }
     pad_value = static_cast<uint8_t>(pad_value_int);
-    reverse_input_channels = get_from_any_maps("reverse_input_channels", top_priority, mid_priority, reverse_input_channels);
+    reverse_input_channels =
+        get_from_any_maps("reverse_input_channels", top_priority, mid_priority, reverse_input_channels);
     scale_values = get_from_any_maps("scale_values", top_priority, mid_priority, scale_values);
     mean_values = get_from_any_maps("mean_values", top_priority, mid_priority, mean_values);
 }
 
 ImageModel::ImageModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration)
     : ModelBase(model, configuration) {
-    init_from_config(configuration, model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
+    init_from_config(configuration,
+                     model->has_rt_info("model_info") ? model->get_rt_info<ov::AnyMap>("model_info") : ov::AnyMap{});
 }
 
 ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration)
@@ -89,7 +90,8 @@ ImageModel::ImageModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::Any
 }
 
 std::unique_ptr<ResultBase> ImageModel::inferImage(const ImageInputData& inputData) {
-    return ModelBase::infer(static_cast<const InputData&>(inputData));;
+    return ModelBase::infer(static_cast<const InputData&>(inputData));
+    ;
 }
 
 std::vector<std::unique_ptr<ResultBase>> ImageModel::inferBatchImage(const std::vector<ImageInputData>& inputImgs) {
@@ -121,16 +123,16 @@ void ImageModel::updateModelInfo() {
 }
 
 std::shared_ptr<ov::Model> ImageModel::embedProcessing(std::shared_ptr<ov::Model>& model,
-                                            const std::string& inputName,
-                                            const ov::Layout& layout,
-                                            const RESIZE_MODE resize_mode,
-                                            const cv::InterpolationFlags interpolationMode,
-                                            const ov::Shape& targetShape,
-                                            uint8_t pad_value,
-                                            bool brg2rgb,
-                                            const std::vector<float>& mean,
-                                            const std::vector<float>& scale,
-                                            const std::type_info& dtype) {
+                                                       const std::string& inputName,
+                                                       const ov::Layout& layout,
+                                                       const RESIZE_MODE resize_mode,
+                                                       const cv::InterpolationFlags interpolationMode,
+                                                       const ov::Shape& targetShape,
+                                                       uint8_t pad_value,
+                                                       bool brg2rgb,
+                                                       const std::vector<float>& mean,
+                                                       const std::vector<float>& scale,
+                                                       const std::type_info& dtype) {
     ov::preprocess::PrePostProcessor ppp(model);
 
     // Change the input type to the 8-bit image
@@ -138,9 +140,7 @@ std::shared_ptr<ov::Model> ImageModel::embedProcessing(std::shared_ptr<ov::Model
         ppp.input(inputName).tensor().set_element_type(ov::element::u8);
     }
 
-    ppp.input(inputName).tensor().set_layout(ov::Layout("NHWC")).set_color_format(
-        ov::preprocess::ColorFormat::BGR
-    );
+    ppp.input(inputName).tensor().set_layout(ov::Layout("NHWC")).set_color_format(ov::preprocess::ColorFormat::BGR);
 
     if (resize_mode != NO_RESIZE) {
         ppp.input(inputName).tensor().set_spatial_dynamic_shape();
@@ -174,15 +174,15 @@ std::shared_ptr<InternalModelData> ImageModel::preprocess(const InputData& input
 
     if (!useAutoResize && !embedded_processing) {
         // Resize and copy data from the image to the input tensor
-        auto tensorShape = inferenceAdapter->getInputShape(inputNames[0]).get_max_shape(); // first input should be image
+        auto tensorShape =
+            inferenceAdapter->getInputShape(inputNames[0]).get_max_shape();  // first input should be image
         const ov::Layout layout("NHWC");
         const size_t width = tensorShape[ov::layout::width_idx(layout)];
         const size_t height = tensorShape[ov::layout::height_idx(layout)];
         const size_t channels = tensorShape[ov::layout::channels_idx(layout)];
         if (static_cast<size_t>(img.channels()) != channels) {
-            throw std::runtime_error("The number of channels for model input: " +
-                                     std::to_string(channels) + " and image: " +
-                                     std::to_string(img.channels()) + " - must match");
+            throw std::runtime_error("The number of channels for model input: " + std::to_string(channels) +
+                                     " and image: " + std::to_string(img.channels()) + " - must match");
         }
         if (channels != 1 && channels != 3) {
             throw std::runtime_error("Unsupported number of channels");

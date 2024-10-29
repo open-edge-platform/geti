@@ -29,9 +29,13 @@ public:
 
 protected:
     virtual std::unique_ptr<ResultBase> postprocess_tile(std::unique_ptr<ResultBase>, const cv::Rect&);
-    virtual std::unique_ptr<ResultBase> merge_results(const std::vector<std::unique_ptr<ResultBase>>&, const cv::Size&, const std::vector<cv::Rect>&);
+    virtual std::unique_ptr<ResultBase> merge_results(const std::vector<std::unique_ptr<ResultBase>>&,
+                                                      const cv::Size&,
+                                                      const std::vector<cv::Rect>&);
 
-    std::vector<cv::Mat_<std::uint8_t>> merge_saliency_maps(const std::vector<std::unique_ptr<ResultBase>>&, const cv::Size&, const std::vector<cv::Rect>&);
+    std::vector<cv::Mat_<std::uint8_t>> merge_saliency_maps(const std::vector<std::unique_ptr<ResultBase>>&,
+                                                            const cv::Size&,
+                                                            const std::vector<cv::Rect>&);
 
     size_t max_pred_number = 200;
 };

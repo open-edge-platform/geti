@@ -15,13 +15,17 @@
 */
 
 #include "adapters/openvino_adapter.h"
+
 #include <openvino/openvino.hpp>
-#include <utils/slog.hpp>
 #include <stdexcept>
+#include <utils/slog.hpp>
 #include <vector>
 
-void OpenVINOInferenceAdapter::loadModel(const std::shared_ptr<const ov::Model>& model, ov::Core& core,
-                                                            const std::string& device, const ov::AnyMap& compilationConfig, size_t max_num_requests) {
+void OpenVINOInferenceAdapter::loadModel(const std::shared_ptr<const ov::Model>& model,
+                                         ov::Core& core,
+                                         const std::string& device,
+                                         const ov::AnyMap& compilationConfig,
+                                         size_t max_num_requests) {
     slog::info << "Loading model to the plugin" << slog::endl;
     ov::AnyMap customCompilationConfig(compilationConfig);
     if (max_num_requests != 1) {
@@ -33,8 +37,7 @@ void OpenVINOInferenceAdapter::loadModel(const std::shared_ptr<const ov::Model>&
                 customCompilationConfig["PERFORMANCE_HINT_NUM_REQUESTS"] = ov::hint::num_requests(max_num_requests);
             }
         }
-    }
-    else {
+    } else {
         if (customCompilationConfig.find("PERFORMANCE_HINT") == customCompilationConfig.end()) {
             customCompilationConfig["PERFORMANCE_HINT"] = ov::hint::PerformanceMode::LATENCY;
         }

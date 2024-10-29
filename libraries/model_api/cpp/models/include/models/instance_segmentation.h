@@ -35,13 +35,17 @@ public:
     MaskRCNNModel(std::shared_ptr<ov::Model>& model, const ov::AnyMap& configuration);
     MaskRCNNModel(std::shared_ptr<InferenceAdapter>& adapter, const ov::AnyMap& configuration = {});
 
-    static std::unique_ptr<MaskRCNNModel> create_model(const std::string& modelFile, const ov::AnyMap& configuration = {}, bool preload = true, const std::string& device = "AUTO");
+    static std::unique_ptr<MaskRCNNModel> create_model(const std::string& modelFile,
+                                                       const ov::AnyMap& configuration = {},
+                                                       bool preload = true,
+                                                       const std::string& device = "AUTO");
     static std::unique_ptr<MaskRCNNModel> create_model(std::shared_ptr<InferenceAdapter>& adapter);
 
     std::unique_ptr<ResultBase> postprocess(InferenceResult& infResult) override;
 
     virtual std::unique_ptr<InstanceSegmentationResult> infer(const ImageInputData& inputData);
-    virtual std::vector<std::unique_ptr<InstanceSegmentationResult>> inferBatch(const std::vector<ImageInputData>& inputImgs);
+    virtual std::vector<std::unique_ptr<InstanceSegmentationResult>> inferBatch(
+        const std::vector<ImageInputData>& inputImgs);
     static std::string ModelType;
     bool postprocess_semantic_masks = true;
 
