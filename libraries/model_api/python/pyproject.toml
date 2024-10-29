@@ -36,6 +36,7 @@ ovms = [
   "ovmsclient",
 ]
 tests = [
+    "pre-commit",
     "httpx",
     "pytest",
     "openvino-dev[onnx,pytorch,tensorflow2]",
@@ -43,6 +44,19 @@ tests = [
     "onnx",
     "onnxruntime",
 ]
+docs = [
+  "myst-parser",
+  "nbsphinx",
+  "pandoc",
+  "sphinx",
+  "sphinx_autodoc_typehints",
+  "pydata-sphinx-theme",
+  "sphinx-copybutton",
+  "sphinx_design",
+  "breathe",
+  "graphviz",
+]
+full = ["openvino_model_api[dependencies, ovms, tests, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/openvinotoolkit/model_api"

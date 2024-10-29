@@ -5,6 +5,7 @@ The `ONNXRuntimeAdapter` implements `InferenceAdapter` interface. The `ONNXRunti
 ## Prerequisites
 
 `ONNXRuntimeAdapter` enables inference via ONNX Runtime, and we need to install it first:
+
 ```sh
 pip install onnx onnxruntime
 ```
@@ -14,17 +15,19 @@ pip install onnx onnxruntime
 ModelAPI uses IR RTInfo to store metadata (wrapper-specific parameters, preprocessing parameters, labels list, etc.).
 For details see the implementation of `Model._load_config()` method.
 To embed that metadata into ONNX file, one can use ONNX properties: `metadata_props.add()` and use
-ModelAPI-specific parameters as metadata keys with exactly the same names as in RTInfo, but split by spaces: `"model_info model_type"` and so on.
+ModelAPI-specific parameters as metadata keys with exactly the same names as in RTInfo, but split by spaces:
+`"model_info model_type"` and so on.
 
 ## Limitations
 
 - `ONNXRuntimeAdapter` is available in Python version of ModelAPI only.
-- Although `ONNXRuntimeAdapter` doesn't use OpenVINO directly, OV should be installed, because Model API depends on it at the low level.
-- Model reshape is not supported, and input shape should be defined in the model (excluding batch dimension) to perform shape inference and
-parse model outputs successfully.
+- Although `ONNXRuntimeAdapter` doesn't use OpenVINO directly, OV should be installed, because Model API depends on it at
+  the low level.
+- Model reshape is not supported, and input shape should be defined in the model (excluding batch dimension) to perform
+  shape inference and parse model outputs successfully.
 - `model.load()` method does nothing, model is loaded in the constructor of `ONNXRuntimeAdapter`.
 - `ONNXRuntimeAdapter` supports only python-based preprocessing, and sometimes it gives slightly different results, than
-OpenVINO operations graph-based preprocessing. Therefore, inference results can also be different than when using `OpenvinoAdapter`.
+  OpenVINO operations graph-based preprocessing. Therefore, inference results can also be different than when using `OpenvinoAdapter`.
 - Models scope is limited to `SSD`, `MaskRCNNModel`, `SegmentationModel`, and `ClassificationModel` wrappers.
 
 ## Running a model with ONNXRuntimeAdapter

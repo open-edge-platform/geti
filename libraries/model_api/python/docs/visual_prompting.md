@@ -17,15 +17,17 @@ prepared inputs that includes prompts and outputs segmentation and some auxiliar
 ### Encoder parameters
 
 The following parameters can be provided via python API or RT Info embedded into OV model:
+
 - `image_size`(`int`) : encoder native input resolution. The input is supposed to have 1:1 aspect ratio
 
 ### Decoder parameters
 
 The following parameters can be provided via python API or RT Info embedded into OV model:
+
 - `image_size`(`int`) : encoder native input resolution. The input is supposed to have 1:1 aspect ratio
 - `mask_threshold`(`float`): threshold for generating hard predictions from output soft masks
 - `embed_dim`(`int`) : size of the output embedding. This parameter is provided for convenience and should match
-the real output size.
+  the real output size.
 
 ## OV model specifications
 
@@ -40,6 +42,7 @@ A single NDHW, where D is the embedding dimension. HW is the output feature spat
 ### Decoder inputs
 
 Decoder OV model should have the following named inputs:
+
 - `image_embeddings` (B, D, H, W) - embeddings obtained with encoder
 - `point_coords` (B, N, 2) - 2D input prompts in XY format
 - `point_labels` (B, N) - integer labels of input point prompts

@@ -11,6 +11,7 @@ Also, it doesn't use OV.PrePostProcessor() and therefore performs data preparati
 ## Model parameters
 
 The following parameters can be provided via python API or RT Info embedded into OV model:
+
 - `labels`(`list[str]`) : List of class labels
 - `path_to_labels` (`str`) : Path to file with labels. Labels are overridden if it's set.
 - `mean_values` (`list[int | float]`) Normalization values to be subtracted from the image channels during preprocessing.
@@ -54,7 +55,6 @@ At present, saliency maps, feature vectors, and raw scores are not provided.
 Utilizing the ActionClassificationModel is similar to other model wrappers, with the primary difference being the preparation of video clip inputs instead of single images.
 
 Below is an example demonstrating how to initialize the model with OpenVINO IR files and classify actions in a video clip.
-
 
 ```python
 import cv2

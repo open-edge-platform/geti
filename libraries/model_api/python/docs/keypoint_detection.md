@@ -15,6 +15,7 @@ and a keypoints regression model acting on crops.
 ### Keypoint model parameters
 
 The following parameters can be provided via python API or RT Info embedded into OV model:
+
 - `labels`(`list(str)`) : a list of keypoints names.
 
 ## OV model specifications
@@ -26,6 +27,7 @@ A single NCHW tensor representing a batch of images.
 ### Outputs
 
 Two vectors in Simple Coordinate Classification Perspective ([SimCC](https://arxiv.org/abs/2107.03332)) format:
+
 - `pred_x` (B, N, D1) - `x` coordinate representation, where `N` is the number of keypoints.
 - `pred_y` (B, N, D2) - `y` coordinate representation, where `N` is the number of keypoints.
 

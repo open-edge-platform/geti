@@ -5,6 +5,7 @@ The `OVMSAdapter` implements `InferenceAdapter` interface. The `OVMSAdapter` mak
 ## Prerequisites
 
 `OVMSAdapter` enables inference via gRPC calls to OpenVINO Model Server, so in order to use it you need two things:
+
 - OpenVINO Model Server that serves your model
 - [`ovmsclient`](https://pypi.org/project/ovmsclient/) package installed to enable communication with the model server: `python3 -m pip install ovmsclient`
 
@@ -23,6 +24,7 @@ For some use cases you may want your model to reshape to match input of certain 
 ### Inference options
 
 It's possible to configure inference related options for the model in OpenVINO Model Server with options:
+
 - `--target_device` - name of the device to load the model to
 - `--nireq` - number of InferRequests
 - `--plugin_config` - configuration of the device plugin
@@ -30,7 +32,8 @@ It's possible to configure inference related options for the model in OpenVINO M
 See [model server configuration parameters](https://github.com/openvinotoolkit/model_server/blob/main/docs/starting_server.md#serving-a-single-model) for more details.
 
 ### Example OVMS startup command
-```
+
+```bash
 docker run -d --rm -v /home/user/models:/models -p 9000:9000 openvino/model_server:latest --model_path /models/model1 --model_name model1 --port 9000 --shape auto --nireq 32 --target_device CPU --plugin_config "{\"CPU_THROUGHPUT_STREAMS\": \"CPU_THROUGHPUT_AUTO\"}"
 ```
 
@@ -40,17 +43,17 @@ docker run -d --rm -v /home/user/models:/models -p 9000:9000 openvino/model_serv
 
 To run the demo with model served in OpenVINO Model Server, you would have to provide `--adapter ovms` option and modify `-m` parameter to indicate model inference service instead of the model files. Model parameter for `OVMSAdapter` follows this schema:
 
-```<service_address>/models/<model_name>[:<model_version>]```
+`<service_address>/models/<model_name>[:<model_version>]`
 
 - `<service_address>` - OVMS gRPC service address in form `<address>:<port>`
 - `<model_name>` - name of the target model (the one specified by `model_name` parameter in the model server startup command)
-- `<model_version>` *(optional)* - version of the target model (default: latest)
+- `<model_version>` _(optional)_ - version of the target model (default: latest)
 
- Assuming that model server runs on the same machine as the demo, exposes gRPC service on port 9000 and serves model called `model1`, the value of `-m` parameter would be:
+Assuming that model server runs on the same machine as the demo, exposes gRPC service on port 9000 and serves model called `model1`, the value of `-m` parameter would be:
 
 - `localhost:9000/models/model1` - requesting latest model version
 - `localhost:9000/models/model1:2` - requesting model version number 2
 
 ## See Also
 
-* [OpenVINO Model Server](https://github.com/openvinotoolkit/model_server)
+- [OpenVINO Model Server](https://github.com/openvinotoolkit/model_server)
