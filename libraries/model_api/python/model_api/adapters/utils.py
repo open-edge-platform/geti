@@ -1,22 +1,22 @@
+"""Copyright (C) 2022-2024 Intel Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
- Copyright (C) 2022-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-"""
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
 import math
 from functools import partial
-from typing import Optional
 
 import cv2
 import numpy as np
@@ -32,9 +32,7 @@ class Layout:
 
     @staticmethod
     def from_shape(shape):
-        """
-        Create Layout from given shape
-        """
+        """Create Layout from given shape"""
         if len(shape) == 2:
             return "NC"
         if len(shape) == 3:
@@ -45,36 +43,28 @@ class Layout:
             return "NSTHWC" if shape[5] in range(1, 5) else "NSCTHW"
 
         raise RuntimeError(
-            "Get layout from shape method doesn't support {}D shape".format(len(shape))
+            f"Get layout from shape method doesn't support {len(shape)}D shape",
         )
 
     @staticmethod
     def from_openvino(input):
-        """
-        Create Layout from openvino input
-        """
+        """Create Layout from openvino input"""
         return layout_helpers.get_layout(input).to_string().strip("[]").replace(",", "")
 
     @staticmethod
     def from_user_layouts(input_names: set, user_layouts: dict):
-        """
-        Create Layout for input based on user info
-        """
+        """Create Layout for input based on user info"""
         for input_name in input_names:
             if input_name in user_layouts:
                 return user_layouts[input_name]
         return user_layouts.get("", "")
 
     @staticmethod
-    def parse_layouts(layout_string: str) -> Optional[dict]:
-        """
-        Parse layout parameter in format "input0:NCHW,input1:NC" or "NCHW" (applied to all inputs)
-        """
+    def parse_layouts(layout_string: str) -> dict | None:
+        """Parse layout parameter in format "input0:NCHW,input1:NC" or "NCHW" (applied to all inputs)"""
         if not layout_string:
             return None
-        search_string = (
-            layout_string if layout_string.rfind(":") != -1 else ":" + layout_string
-        )
+        search_string = layout_string if layout_string.rfind(":") != -1 else ":" + layout_string
         colon_pos = search_string.rfind(":")
         user_layouts = {}
         while colon_pos != -1:
@@ -113,10 +103,12 @@ def resize_image_letterbox_graph(input: Output, size, interpolation, pad_value):
     h_ratio = opset.divide(opset.constant(h, dtype=Type.f32), ih)
     scale = opset.minimum(w_ratio, h_ratio)
     nw = opset.convert(
-        opset.round(opset.multiply(iw, scale), "half_to_even"), destination_type="i32"
+        opset.round(opset.multiply(iw, scale), "half_to_even"),
+        destination_type="i32",
     )
     nh = opset.convert(
-        opset.round(opset.multiply(ih, scale), "half_to_even"), destination_type="i32"
+        opset.round(opset.multiply(ih, scale), "half_to_even"),
+        destination_type="i32",
     )
     new_size = opset.concat([opset.unsqueeze(nh, 0), opset.unsqueeze(nw, 0)], axis=0)
     image = opset.interpolate(
@@ -136,10 +128,12 @@ def resize_image_letterbox_graph(input: Output, size, interpolation, pad_value):
         opset.constant(2, dtype=np.int32),
     )
     dx_border = opset.subtract(
-        opset.subtract(opset.constant(w, dtype=np.int32), nw), dx
+        opset.subtract(opset.constant(w, dtype=np.int32), nw),
+        dx,
     )
     dy_border = opset.subtract(
-        opset.subtract(opset.constant(h, dtype=np.int32), nh), dy
+        opset.subtract(opset.constant(h, dtype=np.int32), nh),
+        dy,
     )
     pads_begin = opset.concat(
         [
@@ -194,11 +188,17 @@ def crop_resize_graph(input: Output, size):
         )
         then_stop = opset.add(then_offset, iw_t)
         then_cropped_frame = opset.slice(
-            image_t, start=then_offset, stop=then_stop, step=[1], axes=[h_axis]
+            image_t,
+            start=then_offset,
+            stop=then_stop,
+            step=[1],
+            axes=[h_axis],
         )
         then_body_res_1 = opset.result(then_cropped_frame)
         then_body = Model(
-            [then_body_res_1], [image_t, iw_t, ih_t], "then_body_function"
+            [then_body_res_1],
+            [image_t, iw_t, ih_t],
+            "then_body_function",
         )
 
         # else_body
@@ -211,11 +211,17 @@ def crop_resize_graph(input: Output, size):
         )
         else_stop = opset.add(else_offset, ih_e)
         else_cropped_frame = opset.slice(
-            image_e, start=else_offset, stop=else_stop, step=[1], axes=[w_axis]
+            image_e,
+            start=else_offset,
+            stop=else_stop,
+            step=[1],
+            axes=[w_axis],
         )
         else_body_res_1 = opset.result(else_cropped_frame)
         else_body = Model(
-            [else_body_res_1], [image_e, iw_e, ih_e], "else_body_function"
+            [else_body_res_1],
+            [image_e, iw_e, ih_e],
+            "else_body_function",
         )
 
         # if
@@ -231,34 +237,46 @@ def crop_resize_graph(input: Output, size):
     elif desired_aspect_ratio < 1:
         new_width = opset.floor(
             opset.multiply(
-                opset.convert(ih, destination_type="f32"), desired_aspect_ratio
-            )
+                opset.convert(ih, destination_type="f32"),
+                desired_aspect_ratio,
+            ),
         )
         offset = opset.unsqueeze(
             opset.divide(
-                opset.subtract(iw, new_width), opset.constant(2, dtype=np.int32)
+                opset.subtract(iw, new_width),
+                opset.constant(2, dtype=np.int32),
             ),
             0,
         )
         stop = opset.add(offset, new_width)
         cropped_frame = opset.slice(
-            input, start=offset, stop=stop, step=[1], axes=[w_axis]
+            input,
+            start=offset,
+            stop=stop,
+            step=[1],
+            axes=[w_axis],
         )
     elif desired_aspect_ratio > 1:
         new_hight = opset.floor(
             opset.multiply(
-                opset.convert(iw, destination_type="f32"), desired_aspect_ratio
-            )
+                opset.convert(iw, destination_type="f32"),
+                desired_aspect_ratio,
+            ),
         )
         offset = opset.unsqueeze(
             opset.divide(
-                opset.subtract(ih, new_hight), opset.constant(2, dtype=np.int32)
+                opset.subtract(ih, new_hight),
+                opset.constant(2, dtype=np.int32),
             ),
             0,
         )
         stop = opset.add(offset, new_hight)
         cropped_frame = opset.slice(
-            input, start=offset, stop=stop, step=[1], axes=[h_axis]
+            input,
+            start=offset,
+            stop=stop,
+            step=[1],
+            axes=[h_axis],
         )
 
     target_size = list(size)
@@ -275,7 +293,11 @@ def crop_resize_graph(input: Output, size):
 
 
 def resize_image_graph(
-    input: Output, size, keep_aspect_ratio, interpolation, pad_value
+    input: Output,
+    size,
+    keep_aspect_ratio,
+    interpolation,
+    pad_value,
 ):
     if not isinstance(pad_value, int):
         raise RuntimeError("pad_value must be int")
@@ -310,10 +332,12 @@ def resize_image_graph(
     h_ratio = opset.divide(np.float32(h), ih)
     scale = opset.minimum(w_ratio, h_ratio)
     nw = opset.convert(
-        opset.round(opset.multiply(iw, scale), "half_to_even"), destination_type="i32"
+        opset.round(opset.multiply(iw, scale), "half_to_even"),
+        destination_type="i32",
     )
     nh = opset.convert(
-        opset.round(opset.multiply(ih, scale), "half_to_even"), destination_type="i32"
+        opset.round(opset.multiply(ih, scale), "half_to_even"),
+        destination_type="i32",
     )
     new_size = opset.concat([opset.unsqueeze(nh, 0), opset.unsqueeze(nw, 0)], axis=0)
     image = opset.interpolate(
@@ -353,7 +377,7 @@ def resize_image(size, interpolation, pad_value):
             keep_aspect_ratio=False,
             interpolation=interpolation,
             pad_value=pad_value,
-        )
+        ),
     )
 
 
@@ -365,7 +389,7 @@ def resize_image_with_aspect(size, interpolation, pad_value):
             keep_aspect_ratio=True,
             interpolation=interpolation,
             pad_value=pad_value,
-        )
+        ),
     )
 
 
@@ -380,7 +404,7 @@ def resize_image_letterbox(size, interpolation, pad_value):
             size=size,
             interpolation=interpolation,
             pad_value=pad_value,
-        )
+        ),
     )
 
 
@@ -412,7 +436,7 @@ def get_rt_info_from_dict(rt_info_dict, path):
         return OVAny(value)
     except KeyError:
         raise RuntimeError(
-            "Cannot get runtime attribute. Path to runtime attribute is incorrect."
+            "Cannot get runtime attribute. Path to runtime attribute is incorrect.",
         )
 
 
@@ -453,7 +477,10 @@ def resize_image_with_aspect_ocv(image, size, interpolation=cv2.INTER_LINEAR):
 
 
 def resize_image_letterbox_ocv(
-    image, size, interpolation=cv2.INTER_LINEAR, pad_value=0
+    image,
+    size,
+    interpolation=cv2.INTER_LINEAR,
+    pad_value=0,
 ):
     ih, iw = image.shape[0:2]
     w, h = size
@@ -510,20 +537,15 @@ INTERPOLATION_TYPES = {
 
 class InputTransform:
     def __init__(
-        self, reverse_input_channels=False, mean_values=None, scale_values=None
+        self,
+        reverse_input_channels=False,
+        mean_values=None,
+        scale_values=None,
     ):
         self.reverse_input_channels = reverse_input_channels
         self.is_trivial = not (reverse_input_channels or mean_values or scale_values)
-        self.means = (
-            np.array(mean_values, dtype=np.float32)
-            if mean_values
-            else np.array([0.0, 0.0, 0.0])
-        )
-        self.std_scales = (
-            np.array(scale_values, dtype=np.float32)
-            if scale_values
-            else np.array([1.0, 1.0, 1.0])
-        )
+        self.means = np.array(mean_values, dtype=np.float32) if mean_values else np.array([0.0, 0.0, 0.0])
+        self.std_scales = np.array(scale_values, dtype=np.float32) if scale_values else np.array([1.0, 1.0, 1.0])
 
     def __call__(self, inputs):
         if self.is_trivial:

@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2024 Intel Corporation
+"""Copyright (c) 2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from __future__ import annotations
@@ -26,15 +25,12 @@ from .utils import DetectedKeypoints, Detection
 
 
 class KeypointDetectionModel(ImageModel):
-    """
-    A wrapper that implements a basic keypoint regression model.
-    """
+    """A wrapper that implements a basic keypoint regression model."""
 
     __model__ = "keypoint_detection"
 
     def __init__(self, inference_adapter, configuration=dict(), preload=False):
-        """
-        Initializes the keypoint detection model.
+        """Initializes the keypoint detection model.
 
         Args:
             inference_adapter (InferenceAdapter): inference adapter containing the underlying model.
@@ -46,10 +42,11 @@ class KeypointDetectionModel(ImageModel):
         self._check_io_number(1, 2)
 
     def postprocess(
-        self, outputs: dict[str, np.ndarray], meta: dict[str, Any]
+        self,
+        outputs: dict[str, np.ndarray],
+        meta: dict[str, Any],
     ) -> DetectedKeypoints:
-        """
-        Applies SCC decoded to the model outputs.
+        """Applies SCC decoded to the model outputs.
 
         Args:
             outputs (dict[str, np.ndarray]): raw outputs of the model
@@ -72,26 +69,27 @@ class KeypointDetectionModel(ImageModel):
         parameters.update(
             {
                 "labels": ListValue(
-                    description="List of class labels", value_type=str, default_value=[]
+                    description="List of class labels",
+                    value_type=str,
+                    default_value=[],
                 ),
-            }
+            },
         )
         return parameters
 
 
 class TopDownKeypointDetectionPipeline:
-    """
-    Pipeline implementing top down keypoint detection approach.
-    """
+    """Pipeline implementing top down keypoint detection approach."""
 
     def __init__(self, base_model: KeypointDetectionModel) -> None:
         self.base_model = base_model
 
     def predict(
-        self, image: np.ndarray, detections: list[Detection]
+        self,
+        image: np.ndarray,
+        detections: list[Detection],
     ) -> list[DetectedKeypoints]:
-        """
-        Predicts keypoints for the given image and detections.
+        """Predicts keypoints for the given image and detections.
 
         Args:
             image (np.ndarray): input full-size image
@@ -114,8 +112,7 @@ class TopDownKeypointDetectionPipeline:
         return crops_results
 
     def predict_crops(self, crops: list[np.ndarray]) -> list[DetectedKeypoints]:
-        """
-        Predicts keypoints for the given crops.
+        """Predicts keypoints for the given crops.
 
         Args:
             crops (list[np.ndarray]): list of cropped object images
@@ -127,7 +124,9 @@ class TopDownKeypointDetectionPipeline:
 
 
 def _decode_simcc(
-    simcc_x: np.ndarray, simcc_y: np.ndarray, simcc_split_ratio: float = 2.0
+    simcc_x: np.ndarray,
+    simcc_y: np.ndarray,
+    simcc_split_ratio: float = 2.0,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Decodes keypoint coordinates from SimCC representations. The decoded coordinates are in the input image space.
 
@@ -198,10 +197,14 @@ def _get_simcc_maximum(
     y_locs = np.argmax(simcc_y, axis=1)
     locs = np.stack((x_locs, y_locs), axis=-1).astype(np.float32)
     max_val_x = np.take_along_axis(
-        simcc_x, np.expand_dims(x_locs, axis=-1), axis=-1
+        simcc_x,
+        np.expand_dims(x_locs, axis=-1),
+        axis=-1,
     ).squeeze(axis=-1)
     max_val_y = np.take_along_axis(
-        simcc_y, np.expand_dims(y_locs, axis=-1), axis=-1
+        simcc_y,
+        np.expand_dims(y_locs, axis=-1),
+        axis=-1,
     ).squeeze(axis=-1)
 
     mask = max_val_x > max_val_y

@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2021-2024 Intel Corporation
+"""Copyright (c) 2021-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 import re
@@ -23,22 +22,21 @@ from .utils import Layout
 
 
 class OVMSAdapter(InferenceAdapter):
-    """
-    Class that allows working with models served by the OpenVINO Model Server
-    """
+    """Class that allows working with models served by the OpenVINO Model Server"""
 
     def __init__(self, target_model: str):
         """Expected format: <address>:<port>/models/<model_name>[:<model_version>]"""
         import ovmsclient
 
         service_url, self.model_name, self.model_version = _parse_model_arg(
-            target_model
+            target_model,
         )
         self.client = ovmsclient.make_grpc_client(url=service_url)
         _verify_model_available(self.client, self.model_name, self.model_version)
 
         self.metadata = self.client.get_model_metadata(
-            model_name=self.model_name, model_version=self.model_version
+            model_name=self.model_name,
+            model_version=self.model_version,
         )
 
     def get_input_layers(self):
@@ -65,19 +63,23 @@ class OVMSAdapter(InferenceAdapter):
     def infer_sync(self, dict_data):
         inputs = _prepare_inputs(dict_data, self.metadata["inputs"])
         raw_result = self.client.predict(
-            inputs, model_name=self.model_name, model_version=self.model_version
+            inputs,
+            model_name=self.model_name,
+            model_version=self.model_version,
         )
         # For models with single output ovmsclient returns ndarray with results,
         # so the dict must be created to correctly implement interface.
         if isinstance(raw_result, np.ndarray):
-            output_name = next(iter((self.metadata["outputs"].keys())))
+            output_name = next(iter(self.metadata["outputs"].keys()))
             return {output_name: raw_result}
         return raw_result
 
     def infer_async(self, dict_data, callback_data):
         inputs = _prepare_inputs(dict_data, self.metadata["inputs"])
         raw_result = self.client.predict(
-            inputs, model_name=self.model_name, model_version=self.model_version
+            inputs,
+            model_name=self.model_name,
+            model_version=self.model_version,
         )
         # For models with single output ovmsclient returns ndarray with results,
         # so the dict must be created to correctly implement interface.
@@ -154,7 +156,8 @@ def _parse_model_arg(target_model: str):
         raise TypeError("target_model must be str")
     # Expected format: <address>:<port>/models/<model_name>[:<model_version>]
     if not re.fullmatch(
-        r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*", target_model
+        r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*",
+        target_model,
     ):
         raise ValueError("invalid --model option format")
     service_url, _, model = target_model.split("/")
@@ -175,13 +178,13 @@ def _verify_model_available(client, model_name, model_version):
         model_status = client.get_model_status(model_name, model_version)
     except ovmsclient.ModelNotFoundError as e:
         raise RuntimeError(
-            f"Requested model: {model_name}, version: {version} has not been found"
+            f"Requested model: {model_name}, version: {version} has not been found",
         ) from e
     target_version = max(model_status.keys())
     version_status = model_status[target_version]
     if version_status["state"] != "AVAILABLE" or version_status["error_code"] != 0:
         raise RuntimeError(
-            f"Requested model: {model_name}, version: {version} is not in available state"
+            f"Requested model: {model_name}, version: {version} is not in available state",
         )
 
 

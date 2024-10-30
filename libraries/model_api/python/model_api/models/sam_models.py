@@ -1,25 +1,25 @@
-"""
- Copyright (C) 2024 Intel Corporation
+"""Copyright (C) 2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
+
 from model_api.adapters.inference_adapter import InferenceAdapter
 from model_api.models.types import BooleanValue, NumericalValue
 
@@ -35,7 +35,7 @@ class SAMImageEncoder(ImageModel):
     def __init__(
         self,
         inference_adapter: InferenceAdapter,
-        configuration: Dict[str, Any] = dict(),
+        configuration: dict[str, Any] = dict(),
         preload: bool = False,
     ):
         super().__init__(inference_adapter, configuration, preload)
@@ -47,14 +47,18 @@ class SAMImageEncoder(ImageModel):
         parameters.update(
             {
                 "image_size": NumericalValue(
-                    value_type=int, default_value=1024, min=0, max=2048
+                    value_type=int,
+                    default_value=1024,
+                    min=0,
+                    max=2048,
                 ),
             },
         )
         return parameters
 
     def preprocess(
-        self, inputs: np.ndarray
+        self,
+        inputs: np.ndarray,
     ) -> tuple[dict[str, np.ndarray], dict[str, Any]]:
         """Update meta for image encoder."""
         dict_inputs, meta = super().preprocess(inputs)
@@ -62,7 +66,9 @@ class SAMImageEncoder(ImageModel):
         return dict_inputs, meta
 
     def postprocess(
-        self, outputs: dict[str, np.ndarray], meta: dict[str, Any]
+        self,
+        outputs: dict[str, np.ndarray],
+        meta: dict[str, Any],
     ) -> np.ndarray:
         return outputs[self.output_name]
 
@@ -75,7 +81,7 @@ class SAMDecoder(SegmentationModel):
     def __init__(
         self,
         model_adapter: InferenceAdapter,
-        configuration: Dict[str, Any] = dict(),
+        configuration: dict[str, Any] = dict(),
         preload: bool = False,
     ):
         super().__init__(model_adapter, configuration, preload)
@@ -89,23 +95,32 @@ class SAMDecoder(SegmentationModel):
         parameters.update(
             {
                 "image_size": NumericalValue(
-                    value_type=int, default_value=1024, min=0, max=2048
-                )
-            }
+                    value_type=int,
+                    default_value=1024,
+                    min=0,
+                    max=2048,
+                ),
+            },
         )
         parameters.update(
             {
                 "mask_threshold": NumericalValue(
-                    value_type=float, default_value=0.0, min=0, max=1
-                )
-            }
+                    value_type=float,
+                    default_value=0.0,
+                    min=0,
+                    max=1,
+                ),
+            },
         )
         parameters.update(
             {
                 "embed_dim": NumericalValue(
-                    value_type=int, default_value=256, min=0, max=512
-                )
-            }
+                    value_type=int,
+                    default_value=256,
+                    min=0,
+                    max=512,
+                ),
+            },
         )
         parameters.update({"embedded_processing": BooleanValue(default_value=True)})
         return parameters
@@ -117,7 +132,7 @@ class SAMDecoder(SegmentationModel):
         """Preprocess prompts."""
         processed_prompts: list[dict[str, Any]] = []
         for prompt_name in ["bboxes", "points"]:
-            if (prompts := inputs.get(prompt_name, None)) is None or (
+            if (prompts := inputs.get(prompt_name)) is None or (
                 labels := inputs["labels"].get(prompt_name, None)
             ) is None:
                 continue
@@ -125,12 +140,14 @@ class SAMDecoder(SegmentationModel):
             for prompt, label in zip(prompts, labels):
                 if prompt_name == "bboxes":
                     point_coords = self.apply_coords(
-                        prompt.reshape(-1, 2, 2), inputs["orig_size"]
+                        prompt.reshape(-1, 2, 2),
+                        inputs["orig_size"],
                     )
                     point_labels = np.array([2, 3], dtype=np.float32).reshape(-1, 2)
                 else:
                     point_coords = self.apply_coords(
-                        prompt.reshape(-1, 1, 2), inputs["orig_size"]
+                        prompt.reshape(-1, 1, 2),
+                        inputs["orig_size"],
                     )
                     point_labels = np.array([1], dtype=np.float32).reshape(-1, 1)
 
@@ -141,7 +158,8 @@ class SAMDecoder(SegmentationModel):
                         "mask_input": self.mask_input,
                         "has_mask_input": self.has_mask_input,
                         "orig_size": np.array(
-                            inputs["orig_size"], dtype=np.int64
+                            inputs["orig_size"],
+                            dtype=np.int64,
                         ).reshape(-1, 2),
                         "label": label,
                     },
@@ -149,7 +167,9 @@ class SAMDecoder(SegmentationModel):
         return processed_prompts
 
     def apply_coords(
-        self, coords: np.ndarray, orig_size: np.ndarray | list[int] | tuple[int, int]
+        self,
+        coords: np.ndarray,
+        orig_size: np.ndarray | list[int] | tuple[int, int],
     ) -> np.ndarray:
         """Process coords according to preprocessed image size using image meta."""
         old_h, old_w = orig_size
@@ -160,7 +180,10 @@ class SAMDecoder(SegmentationModel):
         return coords
 
     def _get_preprocess_shape(
-        self, old_h: int, old_w: int, image_size: int
+        self,
+        old_h: int,
+        old_w: int,
+        image_size: int,
     ) -> tuple[int, int]:
         """Compute the output size given input size and target image size."""
         scale = image_size / max(old_h, old_w)
@@ -170,7 +193,9 @@ class SAMDecoder(SegmentationModel):
         return (new_h, new_w)
 
     def _check_io_number(
-        self, number_of_inputs: int | tuple[int], number_of_outputs: int | tuple[int]
+        self,
+        number_of_inputs: int | tuple[int],
+        number_of_outputs: int | tuple[int],
     ) -> None:
         pass
 
@@ -181,7 +206,9 @@ class SAMDecoder(SegmentationModel):
         return image_blob_names, image_info_blob_names
 
     def postprocess(
-        self, outputs: dict[str, np.ndarray], meta: dict[str, Any]
+        self,
+        outputs: dict[str, np.ndarray],
+        meta: dict[str, Any],
     ) -> dict[str, np.ndarray]:
         """Postprocess to convert soft prediction to hard prediction.
 
@@ -194,9 +221,7 @@ class SAMDecoder(SegmentationModel):
         """
         outputs = deepcopy(outputs)
         probability = np.clip(outputs["scores"], 0.0, 1.0)
-        hard_prediction = (
-            outputs[self.output_blob_name].squeeze(0) > self.mask_threshold
-        )
+        hard_prediction = outputs[self.output_blob_name].squeeze(0) > self.mask_threshold
         soft_prediction = hard_prediction * probability.reshape(-1, 1, 1)
 
         outputs["hard_prediction"] = hard_prediction

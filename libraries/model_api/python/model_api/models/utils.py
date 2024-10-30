@@ -1,23 +1,22 @@
-"""
- Copyright (C) 2020-2024 Intel Corporation
+"""Copyright (C) 2020-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
 from collections import namedtuple
-from typing import List, NamedTuple, Tuple, Union
+from typing import NamedTuple
 
 import cv2
 import numpy as np
@@ -51,14 +50,12 @@ class AnomalyResult(NamedTuple):
 
 class ClassificationResult(
     namedtuple(
-        "ClassificationResult", "top_labels saliency_map feature_vector raw_scores"
-    )  # Contains "raw_scores", "saliency_map" and "feature_vector" model outputs if such exist
+        "ClassificationResult",
+        "top_labels saliency_map feature_vector raw_scores",
+    ),  # Contains "raw_scores", "saliency_map" and "feature_vector" model outputs if such exist
 ):
     def __str__(self):
-        labels = ", ".join(
-            f"{idx} ({label}): {confidence:.3f}"
-            for idx, label, confidence in self.top_labels
-        )
+        labels = ", ".join(f"{idx} ({label}): {confidence:.3f}" for idx, label, confidence in self.top_labels)
         return (
             f"{labels}, [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}], "
             f"[{','.join(str(i) for i in self.raw_scores.shape)}]"
@@ -81,8 +78,9 @@ class Detection:
 
 class DetectionResult(
     namedtuple(
-        "DetectionResult", "objects saliency_map feature_vector"
-    )  # Contan "saliency_map" and "feature_vector" model outputs if such exist
+        "DetectionResult",
+        "objects saliency_map feature_vector",
+    ),  # Contan "saliency_map" and "feature_vector" model outputs if such exist
 ):
     def __str__(self):
         obj_str = "; ".join(str(obj) for obj in self.objects)
@@ -122,9 +120,9 @@ class SegmentedObjectWithRects(SegmentedObject):
 
 
 class InstanceSegmentationResult(NamedTuple):
-    segmentedObjects: List[Union[SegmentedObject, SegmentedObjectWithRects]]
+    segmentedObjects: list[SegmentedObject | SegmentedObjectWithRects]
     # Contain per class saliency_maps and "feature_vector" model output if feature_vector exists
-    saliency_map: List[np.ndarray]
+    saliency_map: list[np.ndarray]
     feature_vector: np.ndarray
 
     def __str__(self):
@@ -134,22 +132,19 @@ class InstanceSegmentationResult(NamedTuple):
             if cls_map.size:
                 filled += 1
         prefix = f"{obj_str}; " if len(obj_str) else ""
-        return (
-            prefix
-            + f"{filled}; [{','.join(str(i) for i in self.feature_vector.shape)}]"
-        )
+        return prefix + f"{filled}; [{','.join(str(i) for i in self.feature_vector.shape)}]"
 
 
 class VisualPromptingResult(NamedTuple):
-    upscaled_masks: List[np.ndarray] | None = None
-    processed_mask: List[np.ndarray] | None = None
-    low_res_masks: List[np.ndarray] | None = None
-    iou_predictions: List[np.ndarray] | None = None
-    scores: List[np.ndarray] | None = None
-    labels: List[np.ndarray] | None = None
-    hard_predictions: List[np.ndarray] | None = None
-    soft_predictions: List[np.ndarray] | None = None
-    best_iou: List[float] | None = None
+    upscaled_masks: list[np.ndarray] | None = None
+    processed_mask: list[np.ndarray] | None = None
+    low_res_masks: list[np.ndarray] | None = None
+    iou_predictions: list[np.ndarray] | None = None
+    scores: list[np.ndarray] | None = None
+    labels: list[np.ndarray] | None = None
+    hard_predictions: list[np.ndarray] | None = None
+    soft_predictions: list[np.ndarray] | None = None
+    best_iou: list[float] | None = None
 
     def _compute_min_max(self, tensor: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         return tensor.min(), tensor.max()
@@ -158,7 +153,7 @@ class VisualPromptingResult(NamedTuple):
         assert self.hard_predictions is not None
         assert self.upscaled_masks is not None
         upscaled_masks_min, upscaled_masks_max = self._compute_min_max(
-            self.upscaled_masks[0]
+            self.upscaled_masks[0],
         )
 
         return (
@@ -209,7 +204,7 @@ class DetectedKeypoints(NamedTuple):
     scores: np.ndarray
 
     def __str__(self):
-        return f"keypoints: {self.keypoints.shape}, keypoints_x_sum: {np.sum(self.keypoints[:,:1]):.3f}, scores: {self.scores.shape}"
+        return f"keypoints: {self.keypoints.shape}, keypoints_x_sum: {np.sum(self.keypoints[:, :1]):.3f}, scores: {self.scores.shape}"
 
 
 def add_rotated_rects(segmented_objects):
@@ -217,23 +212,27 @@ def add_rotated_rects(segmented_objects):
     for segmented_object in segmented_objects:
         mask = segmented_object.mask.astype(np.uint8)
         contours, hierarchies = cv2.findContours(
-            mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+            mask,
+            cv2.RETR_EXTERNAL,
+            cv2.CHAIN_APPROX_SIMPLE,
         )
 
         contour = np.vstack(contours)
         objects_with_rects.append(
-            SegmentedObjectWithRects(segmented_object, cv2.minAreaRect(contour))
+            SegmentedObjectWithRects(segmented_object, cv2.minAreaRect(contour)),
         )
     return objects_with_rects
 
 
 def get_contours(
-    segmentedObjects: List[Union[SegmentedObject, SegmentedObjectWithRects]]
+    segmentedObjects: list[SegmentedObject | SegmentedObjectWithRects],
 ):
     combined_contours = []
     for obj in segmentedObjects:
         contours, _ = cv2.findContours(
-            obj.mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+            obj.mask,
+            cv2.RETR_EXTERNAL,
+            cv2.CHAIN_APPROX_NONE,
         )
         # Assuming one contour output for findContours. Based on OTX this is a safe
         # assumption
@@ -255,7 +254,7 @@ def clip_detections(detections, size):
 class Contour(NamedTuple):
     label: str
     probability: float
-    shape: List[Tuple[int, int]]
+    shape: list[tuple[int, int]]
 
     def __str__(self):
         return f"{self.label}: {self.probability:.3f}, {len(self.shape)}"
@@ -301,7 +300,8 @@ class OutputTransform:
         self.input_size = input_size
         size = self.input_size[::-1]
         self.scale_factor = min(
-            self.output_resolution[0] / size[0], self.output_resolution[1] / size[1]
+            self.output_resolution[0] / size[0],
+            self.output_resolution[1] / size[1],
         )
         return self.scale(size)
 
@@ -322,7 +322,7 @@ class OutputTransform:
 
 
 def load_labels(label_file):
-    with open(label_file, "r") as f:
+    with open(label_file) as f:
         return [x.strip() for x in f]
 
 

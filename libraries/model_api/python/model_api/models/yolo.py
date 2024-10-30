@@ -1,19 +1,20 @@
-"""
- Copyright (C) 2020-2024 Intel Corporation
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
-      http://www.apache.org/licenses/LICENSE-2.0
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+"""Copyright (C) 2020-2024 Intel Corporation
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from collections import namedtuple
+from itertools import starmap
 
 import numpy as np
+
 from model_api.adapters.utils import INTERPOLATION_TYPES, resize_image_ocv
 
 from .detection_model import DetectionModel
@@ -95,9 +96,7 @@ ANCHORS = {
 
 
 def permute_to_N_HWA_K(tensor, K, output_layout):
-    """
-    Transpose/reshape a tensor from (N, (A x K), H, W) to (N, (HxWxA), K)
-    """
+    """Transpose/reshape a tensor from (N, (A x K), H, W) to (N, (HxWxA), K)"""
     assert tensor.ndim == 4, tensor.shape
     if output_layout == "NHWC":
         tensor = tensor.transpose(0, 3, 1, 2)
@@ -154,9 +153,7 @@ class YOLO(DetectionModel):
 
     def __init__(self, inference_adapter, configuration, preload=False):
         super().__init__(inference_adapter, configuration, preload)
-        self.is_tiny = (
-            len(self.outputs) == 2
-        )  # Weak way to distinguish between YOLOv4 and YOLOv4-tiny
+        self.is_tiny = len(self.outputs) == 2  # Weak way to distinguish between YOLOv4 and YOLOv4-tiny
 
         self._check_io_number(1, -1)
 
@@ -194,7 +191,7 @@ class YOLO(DetectionModel):
                     default_value=0.5,
                     description="Threshold for non-maximum suppression (NMS) intersection over union (IOU) filtering",
                 ),
-            }
+            },
         )
         parameters["resize_type"].update_default_value("fit_to_window_letterbox")
         parameters["confidence_threshold"].update_default_value(0.5)
@@ -211,7 +208,9 @@ class YOLO(DetectionModel):
         objects = []
         size_normalizer = input_size if params.use_input_size else params.sides
         predictions = permute_to_N_HWA_K(
-            predictions, params.bbox_size, params.output_layout
+            predictions,
+            params.bbox_size,
+            params.output_layout,
         )
         # ------------------------------------------- Parsing YOLO Region output ---------------------------------------
         for prediction in predictions:
@@ -249,7 +248,7 @@ class YOLO(DetectionModel):
                         predicted_box.y + predicted_box.h / 2,
                         confidence.item(),
                         label.item(),
-                    )
+                    ),
                 )
 
         return objects
@@ -274,7 +273,12 @@ class YOLO(DetectionModel):
 
     @staticmethod
     def _get_absolute_det_box(
-        box, row, col, anchors, coord_normalizer, size_normalizer
+        box,
+        row,
+        col,
+        anchors,
+        coord_normalizer,
+        size_normalizer,
     ):
         x = (col + box.x) / coord_normalizer[1]
         y = (row + box.y) / coord_normalizer[0]
@@ -287,10 +291,12 @@ class YOLO(DetectionModel):
     def _filter(detections, iou_threshold):
         def iou(box_1, box_2):
             width_of_overlap_area = min(box_1.xmax, box_2.xmax) - max(
-                box_1.xmin, box_2.xmin
+                box_1.xmin,
+                box_2.xmin,
             )
             height_of_overlap_area = min(box_1.ymax, box_2.ymax) - max(
-                box_1.ymin, box_2.ymin
+                box_1.ymin,
+                box_2.ymin,
             )
             if width_of_overlap_area < 0 or height_of_overlap_area < 0:
                 area_of_overlap = 0
@@ -324,7 +330,9 @@ class YOLO(DetectionModel):
             layer_params = self.yolo_layer_params[layer_name]
             out_blob.shape = layer_params[0]
             detections += self._parse_yolo_region(
-                out_blob, meta["resized_shape"], layer_params[1]
+                out_blob,
+                meta["resized_shape"],
+                layer_params[1],
             )
 
         detections = self._filter(detections, self.iou_threshold)
@@ -355,12 +363,12 @@ class YoloV4(YOLO):
         if not self.anchors:
             self.anchors = ANCHORS["YOLOV4-TINY"] if self.is_tiny else ANCHORS["YOLOV4"]
         if not self.masks:
-            self.masks = (
-                [1, 2, 3, 3, 4, 5] if self.is_tiny else [0, 1, 2, 3, 4, 5, 6, 7, 8]
-            )
+            self.masks = [1, 2, 3, 3, 4, 5] if self.is_tiny else [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
         outputs = sorted(
-            self.outputs.items(), key=lambda x: x[1].shape[2], reverse=True
+            self.outputs.items(),
+            key=lambda x: x[1].shape[2],
+            reverse=True,
         )
 
         output_info = {}
@@ -374,7 +382,7 @@ class YoloV4(YOLO):
             classes = channels // num - 5
             if channels % num != 0:
                 self.raise_error(
-                    "The output blob {} has wrong 2nd dimension".format(name)
+                    f"The output blob {name} has wrong 2nd dimension",
                 )
             yolo_params = self.Params(
                 classes,
@@ -394,9 +402,9 @@ class YoloV4(YOLO):
             {
                 "anchors": ListValue(description="List of custom anchor values"),
                 "masks": ListValue(
-                    description="List of mask, applied to anchors for each output layer"
+                    description="List of mask, applied to anchors for each output layer",
                 ),
-            }
+            },
         )
         return parameters
 
@@ -456,7 +464,12 @@ class YOLOF(YOLO):
 
     @staticmethod
     def _get_absolute_det_box(
-        box, row, col, anchors, coord_normalizer, size_normalizer
+        box,
+        row,
+        col,
+        anchors,
+        coord_normalizer,
+        size_normalizer,
     ):
         anchor_x = anchors[0] / size_normalizer[0]
         anchor_y = anchors[1] / size_normalizer[1]
@@ -489,7 +502,7 @@ class YOLOX(DetectionModel):
                     default_value=0.65,
                     description="Threshold for non-maximum suppression (NMS) intersection over union (IOU) filtering",
                 ),
-            }
+            },
         )
         parameters["confidence_threshold"].update_default_value(0.5)
         return parameters
@@ -497,7 +510,9 @@ class YOLOX(DetectionModel):
     def preprocess(self, inputs):
         image = inputs
         resized_image = resize_image_ocv(
-            image, (self.w, self.h), keep_aspect_ratio=True
+            image,
+            (self.w, self.h),
+            keep_aspect_ratio=True,
         )
 
         padded_image = np.ones((self.h, self.w, 3), dtype=np.uint8) * 114
@@ -510,10 +525,10 @@ class YOLOX(DetectionModel):
 
         preprocessed_image = self.input_transform(padded_image)
         preprocessed_image = preprocessed_image.transpose(
-            (2, 0, 1)
+            (2, 0, 1),
         )  # Change data layout from HWC to CHW
         preprocessed_image = preprocessed_image.reshape(
-            (self.n, self.c, self.h, self.w)
+            (self.n, self.c, self.h, self.w),
         )
 
         dict_inputs = {self.image_blob_name: preprocessed_image}
@@ -544,17 +559,19 @@ class YOLOX(DetectionModel):
             include_boundaries=True,
         )
 
-        detections = [
-            Detection(*det)
-            for det in zip(
-                x_mins[keep_nms],
-                y_mins[keep_nms],
-                x_maxs[keep_nms],
-                y_maxs[keep_nms],
-                scores[keep_nms],
-                j[keep_nms],
+        detections = list(
+            starmap(
+                Detection,
+                zip(
+                    x_mins[keep_nms],
+                    y_mins[keep_nms],
+                    x_maxs[keep_nms],
+                    y_maxs[keep_nms],
+                    scores[keep_nms],
+                    j[keep_nms],
+                ),
             )
-        ]
+        )
         return clip_detections(detections, meta["original_shape"])
 
     def set_strides_grids(self):
@@ -582,11 +599,7 @@ class YoloV3ONNX(DetectionModel):
 
     def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
-        self.image_info_blob_name = (
-            self.image_info_blob_names[0]
-            if len(self.image_info_blob_names) == 1
-            else None
-        )
+        self.image_info_blob_name = self.image_info_blob_names[0] if len(self.image_info_blob_names) == 1 else None
         self._check_io_number(2, 3)
         self.classes = 80
         (
@@ -619,18 +632,12 @@ class YoloV3ONNX(DetectionModel):
                 self.raise_error(
                     "Expected shapes [:,:,4], [:,{},:] and [:,3] for outputs, but got {}, {} and {}".format(
                         self.classes,
-                        *[output.shape for output in self.outputs.values()]
-                    )
+                        *[output.shape for output in self.outputs.values()],
+                    ),
                 )
-        if (
-            self.outputs[bboxes_blob_name].shape[1]
-            != self.outputs[scores_blob_name].shape[2]
-        ):
+        if self.outputs[bboxes_blob_name].shape[1] != self.outputs[scores_blob_name].shape[2]:
             self.raise_error(
-                "Expected the same dimension for boxes and scores, but got {} and {}".format(
-                    self.outputs[bboxes_blob_name].shape[1],
-                    self.outputs[scores_blob_name].shape[2],
-                )
+                f"Expected the same dimension for boxes and scores, but got {self.outputs[bboxes_blob_name].shape[1]} and {self.outputs[scores_blob_name].shape[2]}",
             )
         return bboxes_blob_name, scores_blob_name, indices_blob_name
 
@@ -652,19 +659,23 @@ class YoloV3ONNX(DetectionModel):
             dict_inputs = {
                 self.image_blob_name: np.expand_dims(image, axis=0),
                 self.image_info_blob_name: np.array(
-                    [[image.shape[0], image.shape[1]]], dtype=np.float32
+                    [[image.shape[0], image.shape[1]]],
+                    dtype=np.float32,
                 ),
             }
         else:
             resized_image = self.resize(
-                image, (self.w, self.h), interpolation=INTERPOLATION_TYPES["CUBIC"]
+                image,
+                (self.w, self.h),
+                interpolation=INTERPOLATION_TYPES["CUBIC"],
             )
             meta.update({"resized_shape": resized_image.shape})
             resized_image = self._change_layout(resized_image)
             dict_inputs = {
                 self.image_blob_name: resized_image,
                 self.image_info_blob_name: np.array(
-                    [[image.shape[0], image.shape[1]]], dtype=np.float32
+                    [[image.shape[0], image.shape[1]]],
+                    dtype=np.float32,
                 ),
             }
 
@@ -708,18 +719,13 @@ class YoloV3ONNX(DetectionModel):
         x_maxs = transposed_boxes[3]
         y_maxs = transposed_boxes[2]
 
-        detections = [
-            Detection(*det)
-            for det in zip(x_mins, y_mins, x_maxs, y_maxs, out_scores, out_classes)
-        ]
+        detections = list(starmap(Detection, zip(x_mins, y_mins, x_maxs, y_maxs, out_scores, out_classes)))
 
         return detections
 
 
 class YOLOv5(DetectionModel):
-    """
-    Reimplementation of ultralytics.YOLO
-    """
+    """Reimplementation of ultralytics.YOLO"""
 
     __model__ = "YOLOv5"
 
@@ -727,10 +733,10 @@ class YOLOv5(DetectionModel):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)
         output = next(iter(self.outputs.values()))
-        if "f32" != output.precision:
+        if output.precision != "f32":
             self.raise_error("the output must be of precision f32")
         out_shape = output.shape
-        if 3 != len(out_shape):
+        if len(out_shape) != 3:
             self.raise_error("the output must be of rank 3")
         if self.labels and len(self.labels) + 4 != out_shape[1]:
             self.raise_error("number of labels must be smaller than out_shape[1] by 4")
@@ -756,25 +762,23 @@ class YOLOv5(DetectionModel):
                     default_value=0.7,
                     description="Threshold for non-maximum suppression (NMS) intersection over union (IOU) filtering",
                 ),
-            }
+            },
         )
         return parameters
 
     def postprocess(self, outputs, meta):
-        if 1 != len(outputs):
+        if len(outputs) != 1:
             self.raise_error("expect 1 output")
         prediction = next(iter(outputs.values()))
         if np.float32 != prediction.dtype:
             self.raise_error("the output must be of precision f32")
         out_shape = prediction.shape
-        if 3 != len(out_shape):
+        if len(out_shape) != 3:
             raise RuntimeError("the output must be of rank 3")
-        if 1 != out_shape[0]:
+        if out_shape[0] != 1:
             raise RuntimeError("the first dim of the output must be 1")
         LABELS_START = 4
-        filtered = prediction[0].T[
-            (prediction[:, LABELS_START:] > self.confidence_threshold).any(1)[0]
-        ]
+        filtered = prediction[0].T[(prediction[:, LABELS_START:] > self.confidence_threshold).any(1)[0]]
         confidences = filtered[:, LABELS_START:]
         labels = confidences.argmax(1, keepdims=True)
         confidences = np.take_along_axis(confidences, labels, 1)
@@ -805,16 +809,11 @@ class YOLOv5(DetectionModel):
             inputImgHeight / self.orig_height,
         )
         padLeft, padTop = 0, 0
-        if (
-            "fit_to_window" == self.resize_type
-            or "fit_to_window_letterbox" == self.resize_type
-        ):
+        if self.resize_type == "fit_to_window" or self.resize_type == "fit_to_window_letterbox":
             invertedScaleX = invertedScaleY = max(invertedScaleX, invertedScaleY)
-            if "fit_to_window_letterbox" == self.resize_type:
+            if self.resize_type == "fit_to_window_letterbox":
                 padLeft = (self.orig_width - round(inputImgWidth / invertedScaleX)) // 2
-                padTop = (
-                    self.orig_height - round(inputImgHeight / invertedScaleY)
-                ) // 2
+                padTop = (self.orig_height - round(inputImgHeight / invertedScaleY)) // 2
         coords = boxes[:, 2:]
         coords -= (padLeft, padTop, padLeft, padTop)
         coords *= (invertedScaleX, invertedScaleY, invertedScaleX, invertedScaleY)
@@ -830,7 +829,10 @@ class YOLOv5(DetectionModel):
         return DetectionResult(
             [
                 Detection(
-                    *intboxes[i], boxes[i, 1], intid[i], self.get_label_name(intid[i])
+                    *intboxes[i],
+                    boxes[i, 1],
+                    intid[i],
+                    self.get_label_name(intid[i]),
                 )
                 for i in range(len(boxes))
             ],

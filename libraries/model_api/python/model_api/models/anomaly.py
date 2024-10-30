@@ -63,9 +63,7 @@ class AnomalyDetection(ImageModel):
             anomaly_map = predictions.squeeze()
             pred_score = anomaly_map.reshape(-1).max()
 
-        pred_label = (
-            self.labels[1] if pred_score > self.image_threshold else self.labels[0]
-        )
+        pred_label = self.labels[1] if pred_score > self.image_threshold else self.labels[0]
 
         assert anomaly_map is not None
         pred_mask = (anomaly_map >= self.pixel_threshold).astype(np.uint8)
@@ -73,7 +71,8 @@ class AnomalyDetection(ImageModel):
         anomaly_map *= 255
         anomaly_map = np.round(anomaly_map).astype(np.uint8)
         pred_mask = cv2.resize(
-            pred_mask, (meta["original_shape"][1], meta["original_shape"][0])
+            pred_mask,
+            (meta["original_shape"][1], meta["original_shape"][0]),
         )
 
         # normalize
@@ -85,7 +84,8 @@ class AnomalyDetection(ImageModel):
         # resize outputs
         if anomaly_map is not None:
             anomaly_map = cv2.resize(
-                anomaly_map, (meta["original_shape"][1], meta["original_shape"][0])
+                anomaly_map,
+                (meta["original_shape"][1], meta["original_shape"][0]),
             )
 
         if self.task == "detection":
@@ -105,19 +105,24 @@ class AnomalyDetection(ImageModel):
         parameters.update(
             {
                 "image_threshold": NumericalValue(
-                    description="Image threshold", min=0.0, default_value=0.5
+                    description="Image threshold",
+                    min=0.0,
+                    default_value=0.5,
                 ),
                 "pixel_threshold": NumericalValue(
-                    description="Pixel threshold", min=0.0, default_value=0.5
+                    description="Pixel threshold",
+                    min=0.0,
+                    default_value=0.5,
                 ),
                 "normalization_scale": NumericalValue(
                     description="Value used for normalization",
                 ),
                 "task": StringValue(
-                    description="Task type", default_value="segmentation"
+                    description="Task type",
+                    default_value="segmentation",
                 ),
                 "labels": ListValue(description="List of class labels"),
-            }
+            },
         )
         return parameters
 

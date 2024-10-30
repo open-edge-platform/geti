@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2021-2024 Intel Corporation
+"""Copyright (c) 2021-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
@@ -38,7 +37,7 @@ class ClassificationModel(ImageModel):
         self._check_io_number(1, (1, 2, 3, 4, 5))
         if self.path_to_labels:
             self.labels = self._load_labels(self.path_to_labels)
-        if 1 == len(self.outputs):
+        if len(self.outputs) == 1:
             self._verify_signle_output()
 
         self.raw_scores_name = _raw_scores_name
@@ -53,7 +52,7 @@ class ClassificationModel(ImageModel):
 
             if self.hierarchical_postproc == "probabilistic":
                 self.labels_resolver = ProbabilisticLabelsResolver(
-                    self.hierarchical_info
+                    self.hierarchical_info,
                 )
             else:
                 self.labels_resolver = GreedyLabelsResolver(self.hierarchical_info)
@@ -73,7 +72,9 @@ class ClassificationModel(ImageModel):
 
         try:
             addOrFindSoftmaxAndTopkOutputs(
-                self.inference_adapter, self.topk, self.output_raw_scores
+                self.inference_adapter,
+                self.topk,
+                self.output_raw_scores,
             )
             self.embedded_topk = True
             self.out_layer_names = ["indices", "scores"]
@@ -98,7 +99,7 @@ class ClassificationModel(ImageModel):
             self.load()
 
     def _load_labels(self, labels_file):
-        with open(labels_file, "r") as f:
+        with open(labels_file) as f:
             labels = []
             for s in f:
                 begin_idx = s.find(" ")
@@ -114,12 +115,12 @@ class ClassificationModel(ImageModel):
 
         if len(layer_shape) != 2 and len(layer_shape) != 4:
             self.raise_error(
-                "The Classification model wrapper supports topologies only with 2D or 4D output"
+                "The Classification model wrapper supports topologies only with 2D or 4D output",
             )
         if len(layer_shape) == 4 and (layer_shape[2] != 1 or layer_shape[3] != 1):
             self.raise_error(
                 "The Classification model wrapper supports topologies only with 4D "
-                "output which has last two dimensions of size 1"
+                "output which has last two dimensions of size 1",
             )
         if self.labels:
             if layer_shape[1] == len(self.labels) + 1:
@@ -128,9 +129,7 @@ class ClassificationModel(ImageModel):
             if layer_shape[1] > len(self.labels):
                 self.raise_error(
                     "Model's number of classes must be greater then "
-                    "number of parsed labels ({}, {})".format(
-                        layer_shape[1], len(self.labels)
-                    )
+                    f"number of parsed labels ({layer_shape[1]}, {len(self.labels)})",
                 )
 
     @classmethod
@@ -146,10 +145,11 @@ class ClassificationModel(ImageModel):
                 ),
                 "labels": ListValue(description="List of class labels"),
                 "path_to_labels": StringValue(
-                    description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter"
+                    description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter",
                 ),
                 "multilabel": BooleanValue(
-                    default_value=False, description="Predict a set of labels per image"
+                    default_value=False,
+                    description="Predict a set of labels per image",
                 ),
                 "hierarchical": BooleanValue(
                     default_value=False,
@@ -160,7 +160,8 @@ class ClassificationModel(ImageModel):
                     description="Extra config for decoding hierarchical predictions",
                 ),
                 "confidence_threshold": NumericalValue(
-                    default_value=0.5, description="Predict a set of labels per image"
+                    default_value=0.5,
+                    description="Predict a set of labels per image",
                 ),
                 "output_raw_scores": BooleanValue(
                     default_value=False,
@@ -171,18 +172,18 @@ class ClassificationModel(ImageModel):
                     choices=("probabilistic", "greedy"),
                     description="Type of hierarchical postprocessing",
                 ),
-            }
+            },
         )
         return parameters
 
     def postprocess(self, outputs, meta):
         if self.multilabel:
             result = self.get_multilabel_predictions(
-                outputs[self.out_layer_names[0]].squeeze()
+                outputs[self.out_layer_names[0]].squeeze(),
             )
         elif self.hierarchical:
             result = self.get_hierarchical_predictions(
-                outputs[self.out_layer_names[0]].squeeze()
+                outputs[self.out_layer_names[0]].squeeze(),
             )
         else:
             result = self.get_multiclass_predictions(outputs)
@@ -199,8 +200,7 @@ class ClassificationModel(ImageModel):
         )
 
     def get_saliency_maps(self, outputs: dict) -> np.ndarray:
-        """
-        Returns saliency map model output. In hierarchical case reorders saliency maps
+        """Returns saliency map model output. In hierarchical case reorders saliency maps
         to match the order of labels in .XML meta.
         """
         saliency_maps = outputs.get(_saliency_map_name, np.ndarray(0))
@@ -224,21 +224,18 @@ class ClassificationModel(ImageModel):
             probs = np.copy(logits)
             cls_heads_info = self.hierarchical_info["cls_heads_info"]
             for i in range(cls_heads_info["num_multiclass_heads"]):
-                logits_begin, logits_end = cls_heads_info["head_idx_to_logits_range"][
-                    str(i)
-                ]
+                logits_begin, logits_end = cls_heads_info["head_idx_to_logits_range"][str(i)]
                 probs[logits_begin:logits_end] = softmax_numpy(
-                    logits[logits_begin:logits_end]
+                    logits[logits_begin:logits_end],
                 )
 
             if cls_heads_info["num_multilabel_classes"]:
                 logits_begin = cls_heads_info["num_single_label_classes"]
                 probs[logits_begin:] = sigmoid_numpy(logits[logits_begin:])
+        elif self.embedded_topk:
+            probs = logits.reshape(-1)
         else:
-            if self.embedded_topk:
-                probs = logits.reshape(-1)
-            else:
-                probs = softmax_numpy(logits.reshape(-1))
+            probs = softmax_numpy(logits.reshape(-1))
         return probs
 
     def get_hierarchical_predictions(self, logits: np.ndarray):
@@ -246,9 +243,7 @@ class ClassificationModel(ImageModel):
         predicted_scores = []
         cls_heads_info = self.hierarchical_info["cls_heads_info"]
         for i in range(cls_heads_info["num_multiclass_heads"]):
-            logits_begin, logits_end = cls_heads_info["head_idx_to_logits_range"][
-                str(i)
-            ]
+            logits_begin, logits_end = cls_heads_info["head_idx_to_logits_range"][str(i)]
             head_logits = logits[logits_begin:logits_end]
             head_logits = softmax_numpy(head_logits)
             j = np.argmax(head_logits)
@@ -263,9 +258,7 @@ class ClassificationModel(ImageModel):
 
             for i in range(head_logits.shape[0]):
                 if head_logits[i] > self.confidence_threshold:
-                    label_str = cls_heads_info["all_groups"][
-                        cls_heads_info["num_multiclass_heads"] + i
-                    ][0]
+                    label_str = cls_heads_info["all_groups"][cls_heads_info["num_multiclass_heads"] + i][0]
                     predicted_labels.append(label_str)
                     predicted_scores.append(head_logits[i])
 
@@ -299,24 +292,14 @@ class ClassificationModel(ImageModel):
 def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk, output_raw_scores):
     softmaxNode = None
     for i in range(len(inference_adapter.model.outputs)):
-        output_node = (
-            inference_adapter.model.get_output_op(i)
-            .input(0)
-            .get_source_output()
-            .get_node()
-        )
-        if "Softmax" == output_node.get_type_name():
+        output_node = inference_adapter.model.get_output_op(i).input(0).get_source_output().get_node()
+        if output_node.get_type_name() == "Softmax":
             softmaxNode = output_node
-        elif "TopK" == output_node.get_type_name():
+        elif output_node.get_type_name() == "TopK":
             return
 
     if softmaxNode is None:
-        logitsNode = (
-            inference_adapter.model.get_output_op(0)
-            .input(0)
-            .get_source_output()
-            .get_node()
-        )
+        logitsNode = inference_adapter.model.get_output_op(0).input(0).get_source_output().get_node()
         softmaxNode = opset.softmax(logitsNode.output(0), 1)
     k = opset.constant(topk, np.int32)
     topkNode = opset.topk(softmaxNode, k, 1, "max", "value")
@@ -328,10 +311,7 @@ def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk, output_raw_scores):
         raw_scores = softmaxNode.output(0)
         results_descr.append(raw_scores)
     for output in inference_adapter.model.outputs:
-        if (
-            _saliency_map_name in output.get_names()
-            or _feature_vector_name in output.get_names()
-        ):
+        if _saliency_map_name in output.get_names() or _feature_vector_name in output.get_names():
             results_descr.append(output)
 
     source_rt_info = inference_adapter.get_model().get_rt_info()
@@ -381,8 +361,7 @@ class GreedyLabelsResolver:
             self.label_tree.add_edge(parent, child)
 
     def resolve_labels(self, predictions):
-        """
-        Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
+        """Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
         The following two steps are taken:
         - select the most likely label from each label group
         - add it and it's predecessors if they are also most likely labels (greedy approach).
@@ -404,7 +383,7 @@ class GreedyLabelsResolver:
             predecessors.append(lbl)
             return predecessors
 
-        label_to_prob = {lbl: 0.0 for lbl in self.label_to_idx.keys()}
+        label_to_prob = dict.fromkeys(self.label_to_idx.keys(), 0.0)
         for lbl, score in predictions:
             label_to_prob[lbl] = score
 
@@ -431,10 +410,7 @@ class GreedyLabelsResolver:
                 if new_lbl not in output_labels:
                     output_labels.append(new_lbl)
 
-        output_predictions = [
-            (self.label_to_idx[lbl], lbl, label_to_prob[lbl])
-            for lbl in sorted(output_labels)
-        ]
+        output_predictions = [(self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in sorted(output_labels)]
         return output_predictions
 
 
@@ -497,18 +473,18 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
                         lbl,
                         # retain the original probability in the output
                         probability * label_to_probability.get(lbl, 1.0),
-                    )
+                    ),
                 )
         return result
 
     def _suppress_descendant_output(
-        self, hard_classification: dict[str, float]
+        self,
+        hard_classification: dict[str, float],
     ) -> dict[str, float]:
         """Suppresses outputs in `label_to_probability`.
 
         Sets probability to 0.0 for descendants of parents that have 0 probability in `hard_classification`.
         """
-
         # Input: Conditional probability of each label given its parent label
         # Output: Marginal probability of each label
 
@@ -530,7 +506,8 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
         return hard_classification
 
     def _resolve_exclusive_labels(
-        self, label_to_probability: dict[str, float]
+        self,
+        label_to_probability: dict[str, float],
     ) -> dict[str, float]:
         """Resolve exclusive labels.
 
@@ -552,15 +529,12 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
         for label in label_to_probability:
             for ancestor in self.label_tree.get_ancestors(label):
                 if ancestor not in updated_label_to_probability:
-                    updated_label_to_probability[ancestor] = (
-                        0.0  # by default missing ancestors get probability 0.0
-                    )
+                    updated_label_to_probability[ancestor] = 0.0  # by default missing ancestors get probability 0.0
         return updated_label_to_probability
 
 
 class SimpleLabelsGraph:
-    """
-    Class representing a tree. It implements basic operations
+    """Class representing a tree. It implements basic operations
     like adding edges, getting children and parents.
     """
 
@@ -583,7 +557,6 @@ class SimpleLabelsGraph:
 
     def get_ancestors(self, label):
         """Returns all the ancestors of the input label, including self."""
-
         predecessors = [label]
         last_parent = self.get_parent(label)
         if last_parent is None:
@@ -625,8 +598,7 @@ class SimpleLabelsGraph:
 
         if len(ordered) != len(self._v):
             raise RuntimeError(
-                "Topological sort failed: input graph has been"
-                "changed during the sorting or contains a cycle"
+                "Topological sort failed: input graph has been" "changed during the sorting or contains a cycle",
             )
 
         return ordered

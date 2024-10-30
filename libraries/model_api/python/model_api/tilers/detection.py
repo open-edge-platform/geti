@@ -1,21 +1,21 @@
-"""
- Copyright (c) 2023-2024 Intel Corporation
+"""Copyright (c) 2023-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 import cv2 as cv
 import numpy as np
+
 from model_api.models.types import NumericalValue
 from model_api.models.utils import Detection, DetectionResult, multiclass_nms
 
@@ -23,8 +23,7 @@ from .tiler import Tiler
 
 
 class DetectionTiler(Tiler):
-    """
-    Tiler for object detection models.
+    """Tiler for object detection models.
     This tiler expects model to output a lsit of `Detection` objects
     or one `DetectionResult` object.
     """
@@ -55,7 +54,7 @@ class DetectionTiler(Tiler):
                     max=1.0,
                     description="IoU threshold which is used to apply NMS to bounding boxes",
                 ),
-            }
+            },
         )
         return parameters
 
@@ -70,7 +69,6 @@ class DetectionTiler(Tiler):
         Returns:
              a dict with postprocessed predictions in 6-items format: (label id, score, bbox)
         """
-
         output_dict = {}
         if hasattr(predictions, "objects"):
             detections = _detection2array(predictions.objects)
@@ -104,7 +102,6 @@ class DetectionTiler(Tiler):
         Returns:
              merged prediction
         """
-
         detections_array = np.empty((0, 6), dtype=np.float32)
         feature_vectors = []
         saliency_maps = []
@@ -123,14 +120,8 @@ class DetectionTiler(Tiler):
                 iou_threshold=self.iou_threshold,
             )
 
-        merged_vector = (
-            np.mean(feature_vectors, axis=0) if feature_vectors else np.ndarray(0)
-        )
-        saliency_map = (
-            self._merge_saliency_maps(saliency_maps, shape, tiles_coords)
-            if saliency_maps
-            else np.ndarray(0)
-        )
+        merged_vector = np.mean(feature_vectors, axis=0) if feature_vectors else np.ndarray(0)
+        saliency_map = self._merge_saliency_maps(saliency_maps, shape, tiles_coords) if saliency_maps else np.ndarray(0)
 
         detected_objects = []
         for i in range(detections_array.shape[0]):
@@ -138,7 +129,7 @@ class DetectionTiler(Tiler):
             score = float(detections_array[i][1])
             bbox = list(detections_array[i][2:].astype(np.int32))
             detected_objects.append(
-                Detection(*bbox, score, label, self.model.labels[label])
+                Detection(*bbox, score, label, self.model.labels[label]),
             )
 
         return DetectionResult(
@@ -158,7 +149,6 @@ class DetectionTiler(Tiler):
         Returns:
             Merged saliency map with shape (Nc, H, W)
         """
-
         if not saliency_maps:
             return None
 
@@ -176,8 +166,13 @@ class DetectionTiler(Tiler):
         map_h, map_w = image_saliency_map.shape[1:]
 
         image_h, image_w, _ = shape
-        ratio = map_h / min(image_h, self.tile_size), map_w / min(
-            image_w, self.tile_size
+        ratio = (
+            map_h / min(image_h, self.tile_size),
+            map_w
+            / min(
+                image_w,
+                self.tile_size,
+            ),
         )
 
         image_map_h = int(image_h * ratio[0])
@@ -207,9 +202,7 @@ class DetectionTiler(Tiler):
                     map_pixel = cls_map[hi, wi]
                     merged_pixel = merged_map[class_idx][y_1 + hi, x_1 + wi]
                     if merged_pixel != 0:
-                        merged_map[class_idx][y_1 + hi, x_1 + wi] = 0.5 * (
-                            map_pixel + merged_pixel
-                        )
+                        merged_map[class_idx][y_1 + hi, x_1 + wi] = 0.5 * (map_pixel + merged_pixel)
                     else:
                         merged_map[class_idx][y_1 + hi, x_1 + wi] = map_pixel
 
@@ -229,7 +222,6 @@ class DetectionTiler(Tiler):
 
 def _non_linear_normalization(saliency_map):
     """Use non-linear normalization y=x**1.5 for 2D saliency maps."""
-
     min_soft_score = np.min(saliency_map)
     # make merged_map distribution positive to perform non-linear normalization y=x**1.5
     saliency_map = (saliency_map - min_soft_score) ** 1.5

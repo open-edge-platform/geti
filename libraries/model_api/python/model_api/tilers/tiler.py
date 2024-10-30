@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2023-2024 Intel Corporation
+"""Copyright (c) 2023-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 import abc
@@ -22,7 +21,7 @@ from model_api.models.types import BooleanValue, NumericalValue
 from model_api.pipelines import AsyncPipeline
 
 
-class Tiler(metaclass=abc.ABCMeta):
+class Tiler(abc.ABC):
     EXECUTION_MODES = ["async", "sync"]
     """
     An abstract tiler
@@ -42,8 +41,7 @@ class Tiler(metaclass=abc.ABCMeta):
     """
 
     def __init__(self, model, configuration=dict(), execution_mode="async"):
-        """
-        Base constructor for creating a tiling pipeline
+        """Base constructor for creating a tiling pipeline
 
         Args:
             model: underlying model
@@ -51,7 +49,6 @@ class Tiler(metaclass=abc.ABCMeta):
               tiler (`tile_size`, `tiles_overlap` etc.) which are set as data attributes.
             execution_mode: Controls inference mode of the tiler (`async` or `sync`).
         """
-
         self.logger = log.getLogger()
         self.model = model
         for name, parameter in self.parameters().items():
@@ -60,7 +57,7 @@ class Tiler(metaclass=abc.ABCMeta):
         self.async_pipeline = AsyncPipeline(self.model)
         if execution_mode not in Tiler.EXECUTION_MODES:
             raise ValueError(
-                f"Wrong execution mode. The following modes are supported {Tiler.EXECUTION_MODES}"
+                f"Wrong execution mode. The following modes are supported {Tiler.EXECUTION_MODES}",
             )
         self.execution_mode = execution_mode
 
@@ -97,7 +94,7 @@ class Tiler(metaclass=abc.ABCMeta):
                     default_value=True,
                     description="Whether to include full image as a tile",
                 ),
-            }
+            },
         )
         return parameters
 
@@ -118,7 +115,7 @@ class Tiler(metaclass=abc.ABCMeta):
             then the default value of the parameter will be updated. If some key presented
             in the config is not introduced in `parameters`, it will be omitted.
 
-         Raises:
+        Raises:
             RuntimeError: if the configuration is incorrect
         """
         parameters = self.parameters()
@@ -127,18 +124,13 @@ class Tiler(metaclass=abc.ABCMeta):
             try:
                 value = param.from_str(
                     self.model.inference_adapter.get_rt_info(
-                        ["model_info", name]
-                    ).astype(str)
+                        ["model_info", name],
+                    ).astype(str),
                 )
                 self.__setattr__(name, value)
             except RuntimeError as error:
-                missing_rt_info = (
-                    "Cannot get runtime attribute. Path to runtime attribute is incorrect."
-                    in str(error)
-                )
-                is_OVMSAdapter = (
-                    str(error) == "OVMSAdapter does not support RT info getting"
-                )
+                missing_rt_info = "Cannot get runtime attribute. Path to runtime attribute is incorrect." in str(error)
+                is_OVMSAdapter = str(error) == "OVMSAdapter does not support RT info getting"
                 if not missing_rt_info and not is_OVMSAdapter:
                     raise
 
@@ -156,12 +148,11 @@ class Tiler(metaclass=abc.ABCMeta):
                 self.__setattr__(name, value)
             else:
                 self.logger.warning(
-                    f'The parameter "{name}" not found in tiler, will be omitted'
+                    f'The parameter "{name}" not found in tiler, will be omitted',
                 )
 
     def __call__(self, inputs):
-        """
-        Applies full pipeline of tiling inference in one call.
+        """Applies full pipeline of tiling inference in one call.
 
         Args:
             inputs: raw input data, the data type is defined by underlying model wrapper
@@ -169,7 +160,6 @@ class Tiler(metaclass=abc.ABCMeta):
         Returns:
             - postprocessed data in the format defined by underlying model wrapper
         """
-
         tile_coords = self._tile(inputs)
         tile_coords = self._filter_tiles(inputs, tile_coords)
 

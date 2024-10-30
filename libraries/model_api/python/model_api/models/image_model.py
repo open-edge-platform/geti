@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2021-2024 Intel Corporation
+"""Copyright (c) 2021-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from model_api.adapters.utils import RESIZE_TYPES, InputTransform
@@ -67,7 +66,9 @@ class ImageModel(Model):
             self.n, self.h, self.w, self.c = self.inputs[self.image_blob_name].shape
         self.resize = RESIZE_TYPES[self.resize_type]
         self.input_transform = InputTransform(
-            self.reverse_input_channels, self.mean_values, self.scale_values
+            self.reverse_input_channels,
+            self.mean_values,
+            self.scale_values,
         )
 
         layout = self.inputs[self.image_blob_name].layout
@@ -101,10 +102,12 @@ class ImageModel(Model):
                     default_value=[],
                 ),
                 "orig_height": NumericalValue(
-                    int, description="Model input height before embedding processing"
+                    int,
+                    description="Model input height before embedding processing",
                 ),
                 "orig_width": NumericalValue(
-                    int, description="Model input width before embedding processing"
+                    int,
+                    description="Model input width before embedding processing",
                 ),
                 "pad_value": NumericalValue(
                     int,
@@ -119,13 +122,14 @@ class ImageModel(Model):
                     description="Type of input image resizing",
                 ),
                 "reverse_input_channels": BooleanValue(
-                    default_value=False, description="Reverse the input channel order"
+                    default_value=False,
+                    description="Reverse the input channel order",
                 ),
                 "scale_values": ListValue(
                     default_value=[],
                     description="Normalization values, which will divide the image channels for image-input layer",
                 ),
-            }
+            },
         )
         return parameters
 
@@ -154,11 +158,11 @@ class ImageModel(Model):
                 image_info_blob_names.append(name)
             else:
                 self.raise_error(
-                    "Failed to identify the input for ImageModel: only 2D and 4D input layer supported"
+                    "Failed to identify the input for ImageModel: only 2D and 4D input layer supported",
                 )
         if not image_blob_names:
             self.raise_error(
-                "Failed to identify the input for the image: no 4D input layer found"
+                "Failed to identify the input for the image: no 4D input layer found",
             )
         return image_blob_names, image_info_blob_names
 

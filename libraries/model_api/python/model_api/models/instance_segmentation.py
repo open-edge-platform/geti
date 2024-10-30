@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2020-2024 Intel Corporation
+"""Copyright (c) 2020-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 import cv2
@@ -19,7 +18,7 @@ import numpy as np
 
 from .image_model import ImageModel
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import InstanceSegmentationResult, SegmentedObject, load_labels, nms
+from .utils import InstanceSegmentationResult, SegmentedObject, load_labels
 
 
 class MaskRCNNModel(ImageModel):
@@ -44,13 +43,13 @@ class MaskRCNNModel(ImageModel):
                 ),
                 "labels": ListValue(description="List of class labels"),
                 "path_to_labels": StringValue(
-                    description="Path to file with labels. Overrides the labels, if they sets via `labels` parameter"
+                    description="Path to file with labels. Overrides the labels, if they sets via `labels` parameter",
                 ),
                 "postprocess_semantic_masks": BooleanValue(
                     description="Resize and apply 0.5 threshold to instance segmentation masks",
                     default_value=True,
                 ),
-            }
+            },
         )
         return parameters
 
@@ -59,10 +58,7 @@ class MaskRCNNModel(ImageModel):
             return self._get_segmentoly_outputs()
         filtered_names = []
         for name, output in self.outputs.items():
-            if (
-                _saliency_map_name not in output.names
-                and _feature_vector_name not in output.names
-            ):
+            if _saliency_map_name not in output.names and _feature_vector_name not in output.names:
                 filtered_names.append(name)
         outputs = {}
         for layer_name in filtered_names:
@@ -110,9 +106,7 @@ class MaskRCNNModel(ImageModel):
                 outputs["masks"] = layer_name
             else:
                 self.raise_error(
-                    "Unexpected output layer shape {} with name {}".format(
-                        layer_shape, layer_name
-                    )
+                    f"Unexpected output layer shape {layer_shape} with name {layer_name}",
                 )
         return outputs
 
@@ -122,7 +116,8 @@ class MaskRCNNModel(ImageModel):
         if self.is_segmentoly:
             assert len(self.image_info_blob_names) == 1
             input_image_info = np.asarray(
-                [[input_image_size[0], input_image_size[1], 1]], dtype=np.float32
+                [[input_image_size[0], input_image_size[1], 1]],
+                dtype=np.float32,
             )
             dict_inputs[self.image_info_blob_names[0]] = input_image_info
         return dict_inputs, meta
@@ -166,16 +161,11 @@ class MaskRCNNModel(ImageModel):
             inputImgHeight / self.orig_height,
         )
         padLeft, padTop = 0, 0
-        if (
-            "fit_to_window" == self.resize_type
-            or "fit_to_window_letterbox" == self.resize_type
-        ):
+        if self.resize_type == "fit_to_window" or self.resize_type == "fit_to_window_letterbox":
             invertedScaleX = invertedScaleY = max(invertedScaleX, invertedScaleY)
-            if "fit_to_window_letterbox" == self.resize_type:
+            if self.resize_type == "fit_to_window_letterbox":
                 padLeft = (self.orig_width - round(inputImgWidth / invertedScaleX)) // 2
-                padTop = (
-                    self.orig_height - round(inputImgHeight / invertedScaleY)
-                ) // 2
+                padTop = (self.orig_height - round(inputImgHeight / invertedScaleY)) // 2
 
         boxes -= (padLeft, padTop, padLeft, padTop)
         boxes *= (invertedScaleX, invertedScaleY, invertedScaleX, invertedScaleY)
@@ -197,9 +187,7 @@ class MaskRCNNModel(ImageModel):
             saliency_maps = []
         for box, confidence, cls, raw_mask in zip(boxes, scores, labels, masks):
             x1, y1, x2, y2 = box
-            if (x2 - x1) * (y2 - y1) < 1 or (
-                confidence <= self.confidence_threshold and not has_feature_vector_name
-            ):
+            if (x2 - x1) * (y2 - y1) < 1 or (confidence <= self.confidence_threshold and not has_feature_vector_name):
                 continue
 
             # Skip if label index is out of bounds
@@ -212,18 +200,22 @@ class MaskRCNNModel(ImageModel):
             raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
             if self.postprocess_semantic_masks or has_feature_vector_name:
                 resized_mask = _segm_postprocess(
-                    box, raw_cls_mask, *meta["original_shape"][:-1]
+                    box,
+                    raw_cls_mask,
+                    *meta["original_shape"][:-1],
                 )
             else:
                 resized_mask = raw_cls_mask
             if confidence > self.confidence_threshold:
-                output_mask = (
-                    resized_mask if self.postprocess_semantic_masks else raw_cls_mask
-                )
+                output_mask = resized_mask if self.postprocess_semantic_masks else raw_cls_mask
                 objects.append(
                     SegmentedObject(
-                        *box.astype(int), confidence, cls, str_label, output_mask
-                    )
+                        *box.astype(int),
+                        confidence,
+                        cls,
+                        str_label,
+                        output_mask,
+                    ),
                 )
             if has_feature_vector_name:
                 if confidence > self.confidence_threshold:
@@ -265,7 +257,8 @@ def _segm_postprocess(box, raw_cls_mask, im_h, im_w):
     # Add zero border to prevent upsampling artifacts on segment borders.
     raw_cls_mask = np.pad(raw_cls_mask, ((1, 1), (1, 1)), "constant", constant_values=0)
     extended_box = _expand_box(
-        box, raw_cls_mask.shape[0] / (raw_cls_mask.shape[0] - 2.0)
+        box,
+        raw_cls_mask.shape[0] / (raw_cls_mask.shape[0] - 2.0),
     ).astype(int)
     w, h = np.maximum(extended_box[2:] - extended_box[:2] + 1, 1)
     x0, y0 = np.clip(extended_box[:2], a_min=0, a_max=[im_w, im_h])

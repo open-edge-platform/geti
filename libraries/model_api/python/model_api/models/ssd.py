@@ -1,17 +1,16 @@
-"""
- Copyright (C) 2020-2024 Intel Corporation
+"""Copyright (C) 2020-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 import numpy as np
@@ -25,11 +24,7 @@ class SSD(DetectionModel):
 
     def __init__(self, inference_adapter, configuration=dict(), preload=False):
         super().__init__(inference_adapter, configuration, preload)
-        self.image_info_blob_name = (
-            self.image_info_blob_names[0]
-            if len(self.image_info_blob_names) == 1
-            else None
-        )
+        self.image_info_blob_name = self.image_info_blob_names[0] if len(self.image_info_blob_names) == 1 else None
         self.output_parser = self._get_output_parser(self.image_blob_name)
 
     def preprocess(self, inputs):
@@ -50,7 +45,11 @@ class SSD(DetectionModel):
         )
 
     def _get_output_parser(
-        self, image_blob_name, bboxes="bboxes", labels="labels", scores="scores"
+        self,
+        image_blob_name,
+        bboxes="bboxes",
+        labels="labels",
+        scores="scores",
     ):
         try:
             parser = SingleOutputParser(self.outputs)
@@ -81,10 +80,10 @@ class SSD(DetectionModel):
 def find_layer_by_name(name, layers):
     suitable_layers = [layer_name for layer_name in layers if name in layer_name]
     if not suitable_layers:
-        raise ValueError('Suitable layer for "{}" output is not found'.format(name))
+        raise ValueError(f'Suitable layer for "{name}" output is not found')
 
     if len(suitable_layers) > 1:
-        raise ValueError('More than 1 layer matched to "{}" output'.format(name))
+        raise ValueError(f'More than 1 layer matched to "{name}" output')
 
     return suitable_layers[0]
 
@@ -97,16 +96,13 @@ class SingleOutputParser:
         last_dim = output_data.shape[-1]
         if last_dim != 7:
             raise ValueError(
-                "The last dimension of the output blob must be equal to 7, "
-                "got {} instead.".format(last_dim)
+                "The last dimension of the output blob must be equal to 7, " f"got {last_dim} instead.",
             )
 
     def __call__(self, outputs):
         return [
             Detection(xmin, ymin, xmax, ymax, score, label)
-            for _, label, score, xmin, ymin, xmax, ymax in outputs[self.output_name][0][
-                0
-            ]
+            for _, label, score, xmin, ymin, xmax, ymax in outputs[self.output_name][0][0]
         ]
 
 
@@ -126,10 +122,7 @@ class MultipleOutputParser:
         bboxes = outputs[self.bboxes_layer][0]
         scores = outputs[self.scores_layer][0]
         labels = outputs[self.labels_layer][0]
-        return [
-            Detection(*bbox, score, label)
-            for label, score, bbox in zip(labels, scores, bboxes)
-        ]
+        return [Detection(*bbox, score, label) for label, score, bbox in zip(labels, scores, bboxes)]
 
 
 class BoxesLabelsParser:
@@ -169,10 +162,7 @@ class BoxesLabelsParser:
             labels = np.full(len(bboxes), self.default_label, dtype=bboxes.dtype)
         labels = labels.squeeze(0)
 
-        detections = [
-            Detection(*bbox, score, label)
-            for label, score, bbox in zip(labels, scores, bboxes)
-        ]
+        detections = [Detection(*bbox, score, label) for label, score, bbox in zip(labels, scores, bboxes)]
         return detections
 
 

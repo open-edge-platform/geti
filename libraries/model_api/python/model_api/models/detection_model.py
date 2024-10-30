@@ -1,17 +1,16 @@
-"""
- Copyright (c) 2021-2024 Intel Corporation
+"""Copyright (c) 2021-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 from .image_model import ImageModel
@@ -44,14 +43,11 @@ class DetectionModel(ImageModel):
         Raises:
             WrapperError: if the model has more than 1 image inputs
         """
-
         super().__init__(inference_adapter, configuration, preload)
 
         if not self.image_blob_name:
             self.raise_error(
-                "The Wrapper supports only one image input, but {} found".format(
-                    len(self.image_blob_names)
-                )
+                f"The Wrapper supports only one image input, but {len(self.image_blob_names)} found",
             )
 
         if self.path_to_labels:
@@ -68,9 +64,9 @@ class DetectionModel(ImageModel):
                 ),
                 "labels": ListValue(description="List of class labels"),
                 "path_to_labels": StringValue(
-                    description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter"
+                    description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter",
                 ),
-            }
+            },
         )
 
         return parameters
@@ -93,14 +89,12 @@ class DetectionModel(ImageModel):
         inverted_scale_y = input_img_height / self.h
         pad_left = 0
         pad_top = 0
-        if (
-            "fit_to_window" == self.resize_type
-            or "fit_to_window_letterbox" == self.resize_type
-        ):
+        if self.resize_type == "fit_to_window" or self.resize_type == "fit_to_window_letterbox":
             inverted_scale_x = inverted_scale_y = max(
-                inverted_scale_x, inverted_scale_y
+                inverted_scale_x,
+                inverted_scale_y,
             )
-            if "fit_to_window_letterbox" == self.resize_type:
+            if self.resize_type == "fit_to_window_letterbox":
                 pad_left = (self.w - round(input_img_widht / inverted_scale_x)) // 2
                 pad_top = (self.h - round(input_img_height / inverted_scale_y)) // 2
 
@@ -145,8 +139,7 @@ class DetectionModel(ImageModel):
         for detection in detections:
             if (
                 detection.score < self.confidence_threshold
-                or (detection.xmax - detection.xmin) * (detection.ymax - detection.ymin)
-                < box_area_threshold
+                or (detection.xmax - detection.xmin) * (detection.ymax - detection.ymin) < box_area_threshold
             ):
                 continue
             filtered_detections.append(detection)

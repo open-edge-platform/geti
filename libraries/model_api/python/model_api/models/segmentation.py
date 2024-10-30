@@ -1,20 +1,21 @@
+"""Copyright (c) 2020-2024 Intel Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
- Copyright (c) 2020-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
-"""
-
-from typing import Iterable, Union
+from collections.abc import Iterable
 
 import cv2
 import numpy as np
@@ -25,7 +26,9 @@ from .utils import Contour, ImageResultWithSoftPrediction, load_labels
 
 
 def create_hard_prediction_from_soft_prediction(
-    soft_prediction: np.ndarray, soft_threshold: float, blur_strength: int
+    soft_prediction: np.ndarray,
+    soft_threshold: float,
+    blur_strength: int,
 ) -> np.ndarray:
     """Creates a hard prediction containing the final label index per pixel.
 
@@ -45,13 +48,13 @@ def create_hard_prediction_from_soft_prediction(
     """
     if blur_strength == -1 or soft_threshold == float("inf"):
         return np.argmax(soft_prediction, axis=2)
-    else:
-        soft_prediction_blurred = cv2.blur(
-            soft_prediction, (blur_strength, blur_strength)
-        )
-        assert len(soft_prediction.shape) == 3
-        soft_prediction_blurred[soft_prediction_blurred < soft_threshold] = 0
-        return np.argmax(soft_prediction_blurred, axis=2)
+    soft_prediction_blurred = cv2.blur(
+        soft_prediction,
+        (blur_strength, blur_strength),
+    )
+    assert len(soft_prediction.shape) == 3
+    soft_prediction_blurred[soft_prediction_blurred < soft_threshold] = 0
+    return np.argmax(soft_prediction_blurred, axis=2)
 
 
 class SegmentationModel(ImageModel):
@@ -71,7 +74,7 @@ class SegmentationModel(ImageModel):
             if _feature_vector_name not in output.names:
                 if out_name:
                     self.raise_error(
-                        f"only {_feature_vector_name} and 1 other output are allowed"
+                        f"only {_feature_vector_name} and 1 other output are allowed",
                     )
                 else:
                     out_name = name
@@ -85,9 +88,7 @@ class SegmentationModel(ImageModel):
             self.out_channels = layer_shape[1]
         else:
             self.raise_error(
-                "Unexpected output layer shape {}. Only 4D and 3D output layers are supported".format(
-                    layer_shape
-                )
+                f"Unexpected output layer shape {layer_shape}. Only 4D and 3D output layers are supported",
             )
 
         return out_name
@@ -99,7 +100,7 @@ class SegmentationModel(ImageModel):
             {
                 "labels": ListValue(description="List of class labels"),
                 "path_to_labels": StringValue(
-                    description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter"
+                    description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter",
                 ),
                 "blur_strength": NumericalValue(
                     value_type=int,
@@ -115,7 +116,7 @@ class SegmentationModel(ImageModel):
                     description="Return raw resized model prediction in addition to processed one",
                     default_value=True,
                 ),
-            }
+            },
         )
         return parameters
 
@@ -155,11 +156,7 @@ class SegmentationModel(ImageModel):
             return ImageResultWithSoftPrediction(
                 hard_prediction,
                 soft_prediction,
-                (
-                    _get_activation_map(soft_prediction)
-                    if _feature_vector_name in outputs
-                    else np.ndarray(0)
-                ),
+                (_get_activation_map(soft_prediction) if _feature_vector_name in outputs else np.ndarray(0)),
                 outputs.get(_feature_vector_name, np.ndarray(0)),
             )
         return hard_prediction
@@ -177,7 +174,9 @@ class SegmentationModel(ImageModel):
             label = self.get_label_name(layer_index - 1)
             if len(prediction.soft_prediction.shape) == 3:
                 current_label_soft_prediction = prediction.soft_prediction[
-                    :, :, layer_index
+                    :,
+                    :,
+                    layer_index,
                 ]
             else:
                 current_label_soft_prediction = prediction.soft_prediction
@@ -186,7 +185,9 @@ class SegmentationModel(ImageModel):
             label_index_map = obj_group.astype(np.uint8) * 255
 
             contours, _hierarchy = cv2.findContours(
-                label_index_map, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+                label_index_map,
+                cv2.RETR_EXTERNAL,
+                cv2.CHAIN_APPROX_NONE,
             )
 
             for contour in contours:
@@ -225,7 +226,7 @@ class SalientObjectDetectionModel(SegmentationModel):
 _feature_vector_name = "feature_vector"
 
 
-def _get_activation_map(features: Union[np.ndarray, Iterable, int, float]):
+def _get_activation_map(features: np.ndarray | Iterable | int | float):
     """Getter activation_map functions."""
     min_soft_score = np.min(features)
     max_soft_score = np.max(features)

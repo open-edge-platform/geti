@@ -1,22 +1,20 @@
-"""
- Copyright (c) 2021-2024 Intel Corporation
+"""Copyright (c) 2021-2024 Intel Corporation
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 """
 
 import logging as log
 from pathlib import Path
-from typing import Dict, Set, Tuple
 
 try:
     import openvino.runtime as ov
@@ -52,7 +50,7 @@ def create_core():
         raise ImportError("The OpenVINO package is not installed")
 
     log.info("OpenVINO Runtime")
-    log.info("\tbuild: {}".format(get_version()))
+    log.info(f"\tbuild: {get_version()}")
     return Core()
 
 
@@ -71,7 +69,7 @@ def parse_devices(device_string):
     return (device_string,)
 
 
-def parse_value_per_device(devices: Set[str], values_string: str) -> Dict[str, int]:
+def parse_value_per_device(devices: set[str], values_string: str) -> dict[str, int]:
     """Format: <device1>:<value1>,<device2>:<value2> or just <value>"""
     values_string_upper = values_string.upper()
     result = {}
@@ -90,8 +88,10 @@ def parse_value_per_device(devices: Set[str], values_string: str) -> Dict[str, i
 
 
 def get_user_config(
-    flags_d: str, flags_nstreams: str, flags_nthreads: int
-) -> Dict[str, str]:
+    flags_d: str,
+    flags_nstreams: str,
+    flags_nthreads: int,
+) -> dict[str, str]:
     config = {}
 
     devices = set(parse_devices(flags_d))
@@ -104,17 +104,9 @@ def get_user_config(
                 config["INFERENCE_NUM_THREADS"] = str(flags_nthreads)
 
             # for CPU execution, more throughput-oriented execution via streams
-            config["NUM_STREAMS"] = (
-                str(device_nstreams[device])
-                if device in device_nstreams
-                else "NUM_STREAMS_AUTO"
-            )
+            config["NUM_STREAMS"] = str(device_nstreams[device]) if device in device_nstreams else "NUM_STREAMS_AUTO"
         elif device == "GPU":
-            config["NUM_STREAMS"] = (
-                str(device_nstreams[device])
-                if device in device_nstreams
-                else "NUM_STREAMS_AUTO"
-            )
+            config["NUM_STREAMS"] = str(device_nstreams[device]) if device in device_nstreams else "NUM_STREAMS_AUTO"
             if "MULTI" in flags_d and "CPU" in devices:
                 # multi-device execution with the CPU + GPU performs best with GPU throttling hint,
                 # which releases another CPU thread (that is otherwise used by the GPU driver for active polling)
@@ -123,9 +115,7 @@ def get_user_config(
 
 
 class OpenvinoAdapter(InferenceAdapter):
-    """
-    Works with OpenVINO model
-    """
+    """Works with OpenVINO model"""
 
     def __init__(
         self,
@@ -140,9 +130,7 @@ class OpenvinoAdapter(InferenceAdapter):
         download_dir=None,
         cache_dir=None,
     ):
-        """
-        precision, download_dir and cache_dir are ignored if model is a path to a file
-        """
+        """precision, download_dir and cache_dir are ignored if model is a path to a file"""
         self.core = core
         self.model_path = model
         self.device = device
@@ -150,7 +138,7 @@ class OpenvinoAdapter(InferenceAdapter):
         self.max_num_requests = max_num_requests
         self.model_parameters = model_parameters
         self.model_parameters["input_layouts"] = Layout.parse_layouts(
-            self.model_parameters.get("input_layouts", None)
+            self.model_parameters.get("input_layouts", None),
         )
         self.is_onnx_file = False
         self.onnx_metadata = {}
@@ -159,25 +147,26 @@ class OpenvinoAdapter(InferenceAdapter):
             if Path(self.model_path).suffix == ".onnx" and weights_path:
                 log.warning(
                     'For model in ONNX format should set only "model_path" parameter.'
-                    'The "weights_path" will be omitted'
+                    'The "weights_path" will be omitted',
                 )
             if Path(self.model_path).suffix == ".onnx" and not weights_path:
                 import onnx
 
                 self.is_onnx_file = True
                 self.onnx_metadata = load_parameters_from_onnx(
-                    onnx.load(self.model_path)
+                    onnx.load(self.model_path),
                 )
 
         self.model_from_buffer = isinstance(self.model_path, bytes) and isinstance(
-            weights_path, bytes
+            weights_path,
+            bytes,
         )
         model_from_file = not self.model_from_buffer and Path(self.model_path).is_file()
         if model_from_file or self.model_from_buffer:
             log.info(
                 "Reading model {}".format(
-                    "from buffer" if self.model_from_buffer else self.model_path
-                )
+                    "from buffer" if self.model_from_buffer else self.model_path,
+                ),
             )
             self.model = core.read_model(self.model_path, weights_path)
             return
@@ -199,20 +188,23 @@ class OpenvinoAdapter(InferenceAdapter):
 
     def load_model(self):
         self.compiled_model = self.core.compile_model(
-            self.model, self.device, self.plugin_config
+            self.model,
+            self.device,
+            self.plugin_config,
         )
         self.async_queue = AsyncInferQueue(self.compiled_model, self.max_num_requests)
         if self.max_num_requests == 0:
             # +1 to use it as a buffer of the pipeline
             self.async_queue = AsyncInferQueue(
-                self.compiled_model, len(self.async_queue) + 1
+                self.compiled_model,
+                len(self.async_queue) + 1,
             )
 
         log.info(
             "The model {} is loaded to {}".format(
                 "from buffer" if self.model_from_buffer else self.model_path,
                 self.device,
-            )
+            ),
         )
         self.log_runtime_settings()
 
@@ -222,20 +214,20 @@ class OpenvinoAdapter(InferenceAdapter):
             for device in devices:
                 try:
                     nstreams = self.compiled_model.get_property(
-                        device + "_THROUGHPUT_STREAMS"
+                        device + "_THROUGHPUT_STREAMS",
                     )
-                    log.info("\tDevice: {}".format(device))
-                    log.info("\t\tNumber of streams: {}".format(nstreams))
+                    log.info(f"\tDevice: {device}")
+                    log.info(f"\t\tNumber of streams: {nstreams}")
                     if device == "CPU":
                         nthreads = self.compiled_model.get_property("CPU_THREADS_NUM")
                         log.info(
                             "\t\tNumber of threads: {}".format(
-                                nthreads if int(nthreads) else "AUTO"
-                            )
+                                nthreads if int(nthreads) else "AUTO",
+                            ),
                         )
                 except RuntimeError:
                     pass
-        log.info("\tNumber of model infer requests: {}".format(len(self.async_queue)))
+        log.info(f"\tNumber of model infer requests: {len(self.async_queue)}")
 
     def get_input_layers(self):
         inputs = {}
@@ -255,25 +247,22 @@ class OpenvinoAdapter(InferenceAdapter):
         input_layout = ""
         if self.model_parameters["input_layouts"]:
             input_layout = Layout.from_user_layouts(
-                input.get_names(), self.model_parameters["input_layouts"]
+                input.get_names(),
+                self.model_parameters["input_layouts"],
             )
         if not input_layout:
             if not layout_helpers.get_layout(input).empty:
                 input_layout = Layout.from_openvino(input)
             else:
                 input_layout = Layout.from_shape(
-                    shape if shape is not None else input.shape
+                    shape if shape is not None else input.shape,
                 )
         return input_layout
 
     def get_output_layers(self):
         outputs = {}
         for i, output in enumerate(self.model.outputs):
-            output_shape = (
-                output.partial_shape.get_min_shape()
-                if self.model.is_dynamic()
-                else output.shape
-            )
+            output_shape = output.partial_shape.get_min_shape() if self.model.is_dynamic() else output.shape
 
             output_name = output.get_any_name() if output.get_names() else output
             outputs[output_name] = Metadata(
@@ -287,14 +276,7 @@ class OpenvinoAdapter(InferenceAdapter):
     def reshape_model(self, new_shape):
         new_shape = {
             name: PartialShape(
-                [
-                    (
-                        Dimension(dim)
-                        if not isinstance(dim, tuple)
-                        else Dimension(dim[0], dim[1])
-                    )
-                    for dim in shape
-                ]
+                [(Dimension(dim) if not isinstance(dim, tuple) else Dimension(dim[0], dim[1])) for dim in shape],
             )
             for name, shape in new_shape.items()
         }
@@ -304,9 +286,7 @@ class OpenvinoAdapter(InferenceAdapter):
         return {key: request.get_tensor(key).data for key in self.get_output_layers()}
 
     def copy_raw_result(self, request):
-        return {
-            key: request.get_tensor(key).data.copy() for key in self.get_output_layers()
-        }
+        return {key: request.get_tensor(key).data.copy() for key in self.get_output_layers()}
 
     def infer_sync(self, dict_data):
         self.infer_request = self.async_queue[self.async_queue.get_idle_request_id()]
@@ -343,7 +323,8 @@ class OpenvinoAdapter(InferenceAdapter):
             if node.get_type_name() == operation_type:
                 layer_name = node.get_friendly_name()
                 layers_info[layer_name] = Metadata(
-                    type=node.get_type_name(), meta=node.get_attributes()
+                    type=node.get_type_name(),
+                    meta=node.get_attributes(),
                 )
         return layers_info
 
@@ -357,7 +338,7 @@ class OpenvinoAdapter(InferenceAdapter):
         layout,
         resize_mode: str,
         interpolation_mode,
-        target_shape: Tuple[int],
+        target_shape: tuple[int],
         pad_value,
         dtype: type = int,
         brg2rgb=False,
@@ -374,7 +355,7 @@ class OpenvinoAdapter(InferenceAdapter):
             ppp.input(input_idx).tensor().set_element_type(Type.f32)
 
         ppp.input(input_idx).tensor().set_layout(ov.Layout("NHWC")).set_color_format(
-            ColorFormat.BGR
+            ColorFormat.BGR,
         )
 
         INTERPOLATION_MODE_MAP = {
@@ -402,12 +383,12 @@ class OpenvinoAdapter(InferenceAdapter):
                         target_shape,
                         INTERPOLATION_MODE_MAP[interpolation_mode],
                         pad_value,
-                    )
+                    ),
                 )
 
             else:
                 raise ValueError(
-                    f"Upsupported resize type in model preprocessing: {resize_mode}"
+                    f"Upsupported resize type in model preprocessing: {resize_mode}",
                 )
 
         # Handle layout
