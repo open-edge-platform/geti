@@ -99,7 +99,10 @@ class ActionClassificationModel(Model):
                     description="Path to file with labels. Overrides the labels, if they sets via 'labels' parameter",
                 ),
                 "mean_values": ListValue(
-                    description="Normalization values, which will be subtracted from image channels for image-input layer during preprocessing",
+                    description=(
+                        "Normalization values, which will be subtracted from image channels "
+                        "for image-input layer during preprocessing"
+                    ),
                     default_value=[],
                 ),
                 "pad_value": NumericalValue(

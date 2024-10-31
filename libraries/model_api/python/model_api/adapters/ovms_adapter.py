@@ -185,7 +185,7 @@ def _verify_model_available(client, model_name, model_version):
 def _prepare_inputs(dict_data, inputs_meta):
     inputs = {}
     for input_name, input_data in dict_data.items():
-        if input_name not in inputs_meta.keys():
+        if input_name not in inputs_meta:
             raise ValueError("Input data does not match model inputs")
         input_info = inputs_meta[input_name]
         model_precision = _tf2np_precision[input_info["dtype"]]

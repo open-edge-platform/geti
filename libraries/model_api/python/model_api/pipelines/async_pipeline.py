@@ -5,7 +5,7 @@
 
 from time import perf_counter
 
-from ..performance_metrics import PerformanceMetrics
+from model_api.performance_metrics import PerformanceMetrics
 
 
 class AsyncPipeline:

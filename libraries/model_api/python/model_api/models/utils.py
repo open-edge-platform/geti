@@ -47,7 +47,9 @@ class ClassificationResult(
     def __str__(self):
         labels = ", ".join(f"{idx} ({label}): {confidence:.3f}" for idx, label, confidence in self.top_labels)
         return (
-            f"{labels}, [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}], "
+            f"{labels}, "
+            f"[{','.join(str(i) for i in self.saliency_map.shape)}], "
+            f"[{','.join(str(i) for i in self.feature_vector.shape)}], "
             f"[{','.join(str(i) for i in self.raw_scores.shape)}]"
         )
 
@@ -76,7 +78,9 @@ class DetectionResult(
         obj_str = "; ".join(str(obj) for obj in self.objects)
         if obj_str:
             obj_str += "; "
-        return f"{obj_str}[{','.join(str(i) for i in self.saliency_map.shape)}]; [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        saliency_map_shape = ",".join(str(i) for i in self.saliency_map.shape)
+        feature_vector_shape = ",".join(str(i) for i in self.feature_vector.shape)
+        return f"{obj_str}[{saliency_map_shape}]; [{feature_vector_shape}]"
 
 
 class SegmentedObject(Detection):
@@ -194,14 +198,18 @@ class DetectedKeypoints(NamedTuple):
     scores: np.ndarray
 
     def __str__(self):
-        return f"keypoints: {self.keypoints.shape}, keypoints_x_sum: {np.sum(self.keypoints[:, :1]):.3f}, scores: {self.scores.shape}"
+        return (
+            f"keypoints: {self.keypoints.shape}, "
+            f"keypoints_x_sum: {np.sum(self.keypoints[:, :1]):.3f}, "
+            f"scores: {self.scores.shape}"
+        )
 
 
 def add_rotated_rects(segmented_objects):
     objects_with_rects = []
     for segmented_object in segmented_objects:
         mask = segmented_object.mask.astype(np.uint8)
-        contours, hierarchies = cv2.findContours(
+        contours, _ = cv2.findContours(
             mask,
             cv2.RETR_EXTERNAL,
             cv2.CHAIN_APPROX_SIMPLE,
@@ -269,7 +277,10 @@ class ImageResultWithSoftPrediction(NamedTuple):
         for i, count in enumerate(outHist):
             if count > 0:
                 hist += f"{i}: {count[0] / self.resultImage.size:.3f}, "
-        return f"{hist}[{','.join(str(i) for i in self.soft_prediction.shape)}], [{','.join(str(i) for i in self.saliency_map.shape)}], [{','.join(str(i) for i in self.feature_vector.shape)}]"
+        soft_pred_shape = ",".join(str(i) for i in self.soft_prediction.shape)
+        saliency_map_shape = ",".join(str(i) for i in self.saliency_map.shape)
+        feature_vector_shape = ",".join(str(i) for i in self.feature_vector.shape)
+        return f"{hist}[{soft_pred_shape}], " f"[{saliency_map_shape}], " f"[{feature_vector_shape}]"
 
 
 class DetectionWithLandmarks(Detection):

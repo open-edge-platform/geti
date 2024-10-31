@@ -301,7 +301,7 @@ class OpenvinoAdapter(InferenceAdapter):
     def _get_meta_from_ngraph(self, layers_info):
         for node in self.model.get_ordered_ops():
             layer_name = node.get_friendly_name()
-            if layer_name not in layers_info.keys():
+            if layer_name not in layers_info:
                 continue
             layers_info[layer_name].meta = node.get_attributes()
             layers_info[layer_name].type = node.get_type_name()
@@ -339,9 +339,9 @@ class OpenvinoAdapter(InferenceAdapter):
         ppp = PrePostProcessor(self.model)
 
         # Change the input type to the 8-bit image
-        if dtype == int:
+        if dtype is int:
             ppp.input(input_idx).tensor().set_element_type(Type.u8)
-        elif dtype == float:
+        elif dtype is float:
             ppp.input(input_idx).tensor().set_element_type(Type.f32)
 
         ppp.input(input_idx).tensor().set_layout(ov.Layout("NHWC")).set_color_format(

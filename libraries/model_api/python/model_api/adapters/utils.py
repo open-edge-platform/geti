@@ -6,8 +6,8 @@
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
 import math
+from collections.abc import Callable
 from functools import partial
-from typing import Callable, Optional
 
 import cv2
 import numpy as np

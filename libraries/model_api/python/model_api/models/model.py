@@ -5,7 +5,6 @@
 
 import logging as log
 import re
-from abc import ABC
 from contextlib import contextmanager
 
 from model_api.adapters.inference_adapter import InferenceAdapter
@@ -135,9 +134,11 @@ class Model:
 
         Args:
             model (str): model name from OpenVINO Model Zoo, path to model, OVMS URL
-            configuration (:obj:`dict`, optional): dictionary of model config with model properties, for example confidence_threshold, labels
+            configuration (:obj:`dict`, optional): dictionary of model config with model properties, for example
+                confidence_threshold, labels
             model_type (:obj:`str`, optional): name of model wrapper to create (e.g. "ssd")
-            preload (:obj:`bool`, optional): whether to call load_model(). Can be set to false to reshape model before loading
+            preload (:obj:`bool`, optional): whether to call load_model(). Can be set to false to reshape model before
+                loading.
             core (optional): openvino.Core instance, passed to OpenvinoAdapter
             weights_path (:obj:`str`, optional): path to .bin file with model weights
             adaptor_parameters (:obj:`dict`, optional): parameters of ModelAdaptor
@@ -147,7 +148,8 @@ class Model:
             max_num_requests (:obj:`int`, optional): number of infer requests for asynchronous inference
             precision (:obj:`str`, optional): inference precision (e.g. "FP16")
             download_dir (:obj:`str`, optional): directory where to store downloaded models
-            cache_dir (:obj:`str`, optional): directory where to store compiled models to reduce the load time before the inference
+            cache_dir (:obj:`str`, optional): directory where to store compiled models to reduce the load time before
+                the inference.
 
         Returns:
             Model object
@@ -482,11 +484,13 @@ class Model:
         """Prints the shape, precision and layout for all model inputs/outputs."""
         for name, metadata in self.inputs.items():
             self.logger.info(
-                f"\tInput layer: {name}, shape: {metadata.shape}, precision: {metadata.precision}, layout: {metadata.layout}",
+                f"\tInput layer: {name}, shape: {metadata.shape}, "
+                f"precision: {metadata.precision}, layout: {metadata.layout}",
             )
         for name, metadata in self.outputs.items():
             self.logger.info(
-                f"\tOutput layer: {name}, shape: {metadata.shape}, precision: {metadata.precision}, layout: {metadata.layout}",
+                f"\tOutput layer: {name}, shape: {metadata.shape}, "
+                f"precision: {metadata.precision}, layout: {metadata.layout}",
             )
 
     def save(self, xml_path, bin_path="", version="UNSPECIFIED"):

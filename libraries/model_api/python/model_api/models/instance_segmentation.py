@@ -207,9 +207,8 @@ class MaskRCNNModel(ImageModel):
                         output_mask,
                     ),
                 )
-            if has_feature_vector_name:
-                if confidence > self.confidence_threshold:
-                    saliency_maps[cls - 1].append(resized_mask)
+            if has_feature_vector_name and confidence > self.confidence_threshold:
+                saliency_maps[cls - 1].append(resized_mask)
         return InstanceSegmentationResult(
             objects,
             _average_and_normalize(saliency_maps),

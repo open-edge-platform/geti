@@ -99,7 +99,10 @@ class SegmentationModel(ImageModel):
                 ),
                 "soft_threshold": NumericalValue(
                     value_type=float,
-                    description="Probability threshold value for bounding box filtering. inf value means no blurring and no soft_threshold",
+                    description=(
+                        "Probability threshold value for bounding box filtering. "
+                        "inf value means no blurring and no soft_threshold"
+                    ),
                     default_value=float("-inf"),
                 ),
                 "return_soft_prediction": BooleanValue(

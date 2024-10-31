@@ -374,7 +374,11 @@ class GreedyLabelsResolver:
         """
 
         def get_predecessors(lbl, candidates):
-            """Returns all the predecessors of the input label or an empty list if one of the predecessors is not a candidate."""
+            """Return all predecessors.
+
+            Returns all the predecessors of the input label or an empty list if one of the predecessors is not a
+            candidate.
+            """
             predecessors = []
 
             last_parent = self.label_tree.get_parent(lbl)
@@ -517,7 +521,8 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
         For labels in `label_to_probability` sets labels that are most likely (maximum probability) in their exclusive
         group to 1.0 and other (non-max) labels to probability 0.
         """
-        # actual exclusive group selection should happen when extracting initial probs (apply argmax to exclusive groups)
+        # actual exclusive group selection should happen when extracting initial probs
+        # (apply argmax to exclusive groups)
         hard_classification = {}
         for label, probability in label_to_probability.items():
             hard_classification[label] = float(probability > 0.0)

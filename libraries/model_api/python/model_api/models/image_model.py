@@ -90,7 +90,10 @@ class ImageModel(Model):
                     default_value=False,
                 ),
                 "mean_values": ListValue(
-                    description="Normalization values, which will be subtracted from image channels for image-input layer during preprocessing",
+                    description=(
+                        "Normalization values, which will be subtracted from image "
+                        "channels for image-input layer during preprocessing"
+                    ),
                     default_value=[],
                 ),
                 "orig_height": NumericalValue(
