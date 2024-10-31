@@ -19,6 +19,7 @@ public:
     OpenVINOInferenceAdapter() = default;
 
     virtual InferenceOutput infer(const InferenceInput& input) override;
+    virtual void infer(const InferenceInput& input, InferenceOutput& output) override;
     virtual void inferAsync(const InferenceInput& input, const CallbackData callback_args) override;
     virtual void setCallback(std::function<void(ov::InferRequest, const CallbackData)> callback);
     virtual bool isReady();
@@ -31,6 +32,9 @@ public:
                            size_t max_num_requests = 1) override;
     virtual size_t getNumAsyncExecutors() const;
     virtual ov::PartialShape getInputShape(const std::string& inputName) const override;
+    virtual ov::PartialShape getOutputShape(const std::string& outputName) const override;
+    virtual ov::element::Type_t getInputDatatype(const std::string& inputName) const override;
+    virtual ov::element::Type_t getOutputDatatype(const std::string& outputName) const override;
     virtual std::vector<std::string> getInputNames() const override;
     virtual std::vector<std::string> getOutputNames() const override;
     virtual const ov::AnyMap& getModelConfig() const override;
