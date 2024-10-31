@@ -30,7 +30,7 @@ class BaseValue:
         if len(errors) == 0:
             return value if value is not None else self.default_value
 
-    def build_error():
+    def build_error(self) -> None:
         pass
 
     def __str__(self) -> str:

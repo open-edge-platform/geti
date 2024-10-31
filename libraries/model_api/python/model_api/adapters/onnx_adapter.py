@@ -162,6 +162,10 @@ class ONNXRuntimeAdapter(InferenceAdapter):
             reversed(preproc_funcs),
         )
 
+    def get_model(self):
+        """Return the reference to the ONNXRuntime session."""
+        return self.session
+
     def reshape_model(self, new_shape):
         raise NotImplementedError
 

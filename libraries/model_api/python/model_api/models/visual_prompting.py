@@ -149,13 +149,12 @@ class SAMLearnableVisualPrompter:
         """
         self.encoder = encoder_model
         self.decoder = decoder_model
+        self._used_indices: np.ndarray | None = None
+        self._reference_features: np.ndarray | None = None
 
         if reference_features is not None:
             self._reference_features = reference_features.feature_vectors
             self._used_indices = reference_features.used_indices
-        else:
-            self._reference_features = None
-            self._used_indices = None
 
         self._point_labels_box = np.array([[2, 3]], dtype=np.float32)
         self._has_mask_inputs = [np.array([[0.0]]), np.array([[1.0]])]
@@ -287,10 +286,9 @@ class SAMLearnableVisualPrompter:
                 )
                 cur_default_threshold_reference -= 0.05
 
-            self._reference_features[label] = ref_feat
-            self._used_indices: np.ndarray = np.concatenate(
-                (self._used_indices, [label]),
-            )
+            if self._reference_features is not None:
+                self._reference_features[label] = ref_feat
+            self._used_indices = np.concatenate((self._used_indices, [label]))
             ref_masks[label] = ref_mask
 
         self._used_indices = np.unique(self._used_indices)
@@ -359,7 +357,7 @@ class SAMLearnableVisualPrompter:
             downsizing=self._downsizing,
         )
 
-        predicted_masks: defaultdict[int, list] = defaultdict(list)
+        predicted_masks: dict[int, list] = defaultdict(list)
         used_points: defaultdict[int, list] = defaultdict(list)
         for label in total_points_scores:
             points_scores = total_points_scores[label]
@@ -392,20 +390,18 @@ class SAMLearnableVisualPrompter:
                 }
                 inputs_decoder["image_embeddings"] = image_embeddings
 
-                prediction = self._predict_masks(
-                    inputs_decoder,
-                    original_shape,
-                    apply_masks_refinement,
+                _prediction: dict[str, np.ndarray] = self._predict_masks(
+                    inputs_decoder, original_shape, apply_masks_refinement
                 )
-                prediction.update({"scores": points_score[-1]})
+                _prediction.update({"scores": points_score[-1]})
 
-                predicted_masks[label].append(prediction[self.decoder.output_blob_name])
+                predicted_masks[label].append(_prediction[self.decoder.output_blob_name])
                 used_points[label].append(points_score)
 
         # check overlapping area between different label masks
         _inspect_overlapping_areas(predicted_masks, used_points)
 
-        prediction = {}
+        prediction: dict[int, PredictedMask] = {}
         for k in used_points:
             processed_points = []
             scores = []

@@ -5,6 +5,7 @@
 
 import logging as log
 import re
+from abc import ABC
 from contextlib import contextmanager
 
 from model_api.adapters.inference_adapter import InferenceAdapter
@@ -50,7 +51,7 @@ class Model:
         model_loaded (bool): a flag whether the model is loaded to device
     """
 
-    __model__ = None  # Abstract wrapper has no name
+    __model__: str = "Model"
 
     def __init__(self, inference_adapter, configuration=dict(), preload=False):
         """Model constructor
@@ -91,19 +92,11 @@ class Model:
         self.callback_fn = lambda _: None
 
     def get_model(self):
-        """Returns the ov.Model object stored in the InferenceAdapter.
-
-        Note: valid only for local inference
-
-        Returns:
-            ov.Model object
-        Raises:
-            RuntimeError: in case of remote inference (serving)
-        """
-        if isinstance(self.inference_adapter, OpenvinoAdapter):
-            return self.inference_adapter.get_model()
-
-        raise RuntimeError("get_model() is not supported for remote inference")
+        model = self.inference_adapter.get_model()
+        model.set_rt_info(self.__model__, ["model_info", "model_type"])
+        for name in self.parameters():
+            model.set_rt_info(getattr(self, name), ["model_info", name])
+        return model
 
     @classmethod
     def get_model_class(cls, name):
@@ -157,7 +150,7 @@ class Model:
             cache_dir (:obj:`str`, optional): directory where to store compiled models to reduce the load time before the inference
 
         Returns:
-            Model objcet
+            Model object
         """
         if isinstance(model, InferenceAdapter):
             inference_adapter = model
@@ -262,8 +255,8 @@ class Model:
                 errors = parameters[name].validate(value)
                 if errors:
                     self.logger.error(f'Error with "{name}" parameter:')
-                    for error in errors:
-                        self.logger.error(f"\t{error}")
+                    for _error in errors:
+                        self.logger.error(f"\t{_error}")
                     self.raise_error("Incorrect user configuration")
                 value = parameters[name].get_value(value)
                 self.__setattr__(name, value)
@@ -495,13 +488,6 @@ class Model:
             self.logger.info(
                 f"\tOutput layer: {name}, shape: {metadata.shape}, precision: {metadata.precision}, layout: {metadata.layout}",
             )
-
-    def get_model(self):
-        model = self.inference_adapter.get_model()
-        model.set_rt_info(self.__model__, ["model_info", "model_type"])
-        for name in self.parameters():
-            model.set_rt_info(getattr(self, name), ["model_info", name])
-        return model
 
     def save(self, xml_path, bin_path="", version="UNSPECIFIED"):
         import openvino

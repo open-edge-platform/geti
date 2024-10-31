@@ -14,6 +14,8 @@ from openvino.preprocess import PrePostProcessor
 from openvino.runtime import Model, Type
 from openvino.runtime import opset10 as opset
 
+from model_api.adapters.inference_adapter import InferenceAdapter
+
 from .image_model import ImageModel
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
 from .utils import ClassificationResult
@@ -22,13 +24,24 @@ from .utils import ClassificationResult
 class ClassificationModel(ImageModel):
     __model__ = "Classification"
 
-    def __init__(self, inference_adapter, configuration=dict(), preload=False):
+    def __init__(self, inference_adapter: InferenceAdapter, configuration: dict = dict(), preload: bool = False):
         super().__init__(inference_adapter, configuration, preload=False)
+        self.topk: int
+        self.labels: list[str]
+        self.path_to_labels: str
+        self.multilabel: bool
+        self.hierarchical: bool
+        self.hierarchical_config: str
+        self.confidence_threshold: float
+        self.output_raw_scores: bool
+        self.hierarchical_postproc: str
+        self.labels_resolver: GreedyLabelsResolver | ProbabilisticLabelsResolver
+
         self._check_io_number(1, (1, 2, 3, 4, 5))
         if self.path_to_labels:
             self.labels = self._load_labels(self.path_to_labels)
         if len(self.outputs) == 1:
-            self._verify_signle_output()
+            self._verify_single_output()
 
         self.raw_scores_name = _raw_scores_name
         if self.hierarchical:
@@ -99,7 +112,7 @@ class ClassificationModel(ImageModel):
                 labels.append(s[(begin_idx + 1) : end_idx])
         return labels
 
-    def _verify_signle_output(self):
+    def _verify_single_output(self):
         layer_name = next(iter(self.outputs))
         layer_shape = self.outputs[layer_name].shape
 
@@ -197,7 +210,7 @@ class ClassificationModel(ImageModel):
         if not self.hierarchical:
             return saliency_maps
 
-        reordered_saliency_maps = [[] for _ in range(len(saliency_maps))]
+        reordered_saliency_maps: list[list[np.ndarray]] = [[] for _ in range(len(saliency_maps))]
         model_classes = self.hierarchical_info["cls_heads_info"]["class_to_group_idx"]
         label_to_model_out_idx = {lbl: i for i, lbl in enumerate(model_classes.keys())}
         for batch in range(len(saliency_maps)):
@@ -279,7 +292,7 @@ class ClassificationModel(ImageModel):
         return list(zip(indicesTensor, labels, scoresTensor))
 
 
-def addOrFindSoftmaxAndTopkOutputs(inference_adapter, topk, output_raw_scores):
+def addOrFindSoftmaxAndTopkOutputs(inference_adapter: InferenceAdapter, topk: int, output_raw_scores: bool):
     softmaxNode = None
     for i in range(len(inference_adapter.model.outputs)):
         output_node = inference_adapter.model.get_output_op(i).input(0).get_source_output().get_node()

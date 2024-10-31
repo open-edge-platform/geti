@@ -69,6 +69,17 @@ include = ["model_api*"]
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# MYPY CONFIGURATION.                                                         #
+[tool.mypy]
+ignore_missing_imports = true
+show_error_codes = true
+
+
+[[tool.mypy.overrides]]
+follow_imports = "skip"
+follow_imports_for_stubs = true
+
+
 # RUFF CONFIGURATION                                                          #
 [tool.ruff]
 # Enable preview features

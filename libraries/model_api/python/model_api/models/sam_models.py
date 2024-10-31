@@ -30,6 +30,8 @@ class SAMImageEncoder(ImageModel):
     ):
         super().__init__(inference_adapter, configuration, preload)
         self.output_name: str = list(self.outputs.keys())[0]
+        self.resize_type: str
+        self.image_size: int
 
     @classmethod
     def parameters(cls) -> dict[str, Any]:
@@ -78,6 +80,9 @@ class SAMDecoder(SegmentationModel):
 
         self.mask_input = np.zeros((1, 1, 256, 256), dtype=np.float32)
         self.has_mask_input = np.zeros((1, 1), dtype=np.float32)
+        self.image_size: int
+        self.mask_threshold: float
+        self.embed_dim: int
 
     @classmethod
     def parameters(cls) -> dict[str, Any]:

@@ -87,6 +87,10 @@ class OVMSAdapter(InferenceAdapter):
     def load_model(self):
         pass
 
+    def get_model(self):
+        """Return the reference to the GrpcClient."""
+        return self.client
+
     def await_all(self):
         pass
 

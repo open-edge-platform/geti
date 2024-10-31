@@ -30,6 +30,8 @@ class ImageModel(Model):
         input_transform (InputTransform): instance of the `InputTransform` for image normalization
     """
 
+    __model__ = "ImageModel"
+
     def __init__(self, inference_adapter, configuration=dict(), preload=False):
         """Image model constructor
 
