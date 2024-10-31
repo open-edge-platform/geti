@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2020-2024 Intel Corporation
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "models/detection_model_ext.h"
 
 #include <fstream>
