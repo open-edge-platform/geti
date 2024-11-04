@@ -116,7 +116,8 @@ class OVMSAdapter(InferenceAdapter):
         raise NotImplementedError
 
     def get_rt_info(self, path):
-        raise NotImplementedError("OVMSAdapter does not support RT info getting")
+        msg = "OVMSAdapter does not support RT info getting"
+        raise NotImplementedError(msg)
 
 
 _tf2ov_precision = {
@@ -147,13 +148,15 @@ _tf2np_precision = {
 
 def _parse_model_arg(target_model: str):
     if not isinstance(target_model, str):
-        raise TypeError("target_model must be str")
+        msg = "target_model must be str"
+        raise TypeError(msg)
     # Expected format: <address>:<port>/models/<model_name>[:<model_version>]
     if not re.fullmatch(
         r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*",
         target_model,
     ):
-        raise ValueError("invalid --model option format")
+        msg = "invalid --model option format"
+        raise ValueError(msg)
     service_url, _, model = target_model.split("/")
     model_spec = model.split(":")
     if len(model_spec) == 1:
@@ -161,7 +164,8 @@ def _parse_model_arg(target_model: str):
         return service_url, model_spec[0], 0
     if len(model_spec) == 2:
         return service_url, model_spec[0], int(model_spec[1])
-    raise ValueError("invalid target_model format")
+    msg = "invalid target_model format"
+    raise ValueError(msg)
 
 
 def _verify_model_available(client, model_name, model_version):
@@ -171,22 +175,21 @@ def _verify_model_available(client, model_name, model_version):
     try:
         model_status = client.get_model_status(model_name, model_version)
     except ovmsclient.ModelNotFoundError as e:
-        raise RuntimeError(
-            f"Requested model: {model_name}, version: {version} has not been found",
-        ) from e
+        msg = f"Requested model: {model_name}, version: {version} has not been found"
+        raise RuntimeError(msg) from e
     target_version = max(model_status.keys())
     version_status = model_status[target_version]
     if version_status["state"] != "AVAILABLE" or version_status["error_code"] != 0:
-        raise RuntimeError(
-            f"Requested model: {model_name}, version: {version} is not in available state",
-        )
+        msg = f"Requested model: {model_name}, version: {version} is not in available state"
+        raise RuntimeError(msg)
 
 
 def _prepare_inputs(dict_data, inputs_meta):
     inputs = {}
     for input_name, input_data in dict_data.items():
         if input_name not in inputs_meta:
-            raise ValueError("Input data does not match model inputs")
+            msg = "Input data does not match model inputs"
+            raise ValueError(msg)
         input_info = inputs_meta[input_name]
         model_precision = _tf2np_precision[input_info["dtype"]]
         if isinstance(input_data, np.ndarray) and input_data.dtype != model_precision:

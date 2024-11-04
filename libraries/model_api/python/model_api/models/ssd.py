@@ -12,7 +12,7 @@ from .result_types import Detection, DetectionResult
 class SSD(DetectionModel):
     __model__ = "SSD"
 
-    def __init__(self, inference_adapter, configuration=dict(), preload=False):
+    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self.image_info_blob_name = self.image_info_blob_names[0] if len(self.image_info_blob_names) == 1 else None
         self.output_parser = self._get_output_parser(self.image_blob_name)
@@ -70,10 +70,12 @@ class SSD(DetectionModel):
 def find_layer_by_name(name, layers):
     suitable_layers = [layer_name for layer_name in layers if name in layer_name]
     if not suitable_layers:
-        raise ValueError(f'Suitable layer for "{name}" output is not found')
+        msg = f'Suitable layer for "{name}" output is not found'
+        raise ValueError(msg)
 
     if len(suitable_layers) > 1:
-        raise ValueError(f'More than 1 layer matched to "{name}" output')
+        msg = f'More than 1 layer matched to "{name}" output'
+        raise ValueError(msg)
 
     return suitable_layers[0]
 
@@ -81,13 +83,13 @@ def find_layer_by_name(name, layers):
 class SingleOutputParser:
     def __init__(self, all_outputs):
         if len(all_outputs) != 1:
-            raise ValueError("Network must have only one output.")
+            msg = "Network must have only one output."
+            raise ValueError(msg)
         self.output_name, output_data = next(iter(all_outputs.items()))
         last_dim = output_data.shape[-1]
         if last_dim != 7:
-            raise ValueError(
-                "The last dimension of the output blob must be equal to 7, " f"got {last_dim} instead.",
-            )
+            msg = f"The last dimension of the output blob must be equal to 7, got {last_dim} instead."
+            raise ValueError(msg)
 
     def __call__(self, outputs):
         return [
@@ -134,9 +136,11 @@ class BoxesLabelsParser:
             if (len(data.shape) == 2 or len(data.shape) == 3) and data.shape[-1] == 5
         ]
         if not filter_outputs:
-            raise ValueError("Suitable output with bounding boxes is not found")
+            msg = "Suitable output with bounding boxes is not found"
+            raise ValueError(msg)
         if len(filter_outputs) > 1:
-            raise ValueError("More than 1 candidate for output with bounding boxes.")
+            msg = "More than 1 candidate for output with bounding boxes."
+            raise ValueError(msg)
         return filter_outputs[0]
 
     def __call__(self, outputs):

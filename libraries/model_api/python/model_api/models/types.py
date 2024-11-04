@@ -108,7 +108,8 @@ class StringValue(BaseValue):
         self.choices = choices
         for choice in self.choices:
             if not isinstance(choice, str):
-                raise ValueError(f"Incorrect option in choice list - {choice}.")
+                msg = f"Incorrect option in choice list - {choice}."
+                raise ValueError(msg)
 
     def from_str(self, value):
         return value

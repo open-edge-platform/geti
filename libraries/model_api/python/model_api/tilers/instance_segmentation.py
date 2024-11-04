@@ -30,7 +30,7 @@ class InstanceSegmentationTiler(DetectionTiler):
     def __init__(
         self,
         model,
-        configuration=dict(),
+        configuration: dict = {},
         execution_mode="async",
         tile_classifier_model=None,
     ):

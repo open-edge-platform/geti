@@ -19,7 +19,7 @@ class DetectionTiler(Tiler):
     or one `DetectionResult` object.
     """
 
-    def __init__(self, model, configuration=dict(), execution_mode="async"):
+    def __init__(self, model, configuration: dict = {}, execution_mode="async"):
         super().__init__(model, configuration, execution_mode)
 
     @classmethod
@@ -66,7 +66,8 @@ class DetectionTiler(Tiler):
         elif hasattr(predictions, "segmentedObjects"):
             detections = _detection2array(predictions.segmentedObjects)
         else:
-            raise RuntimeError("Unsupported model predictions format")
+            msg = "Unsupported model predictions format"
+            raise RuntimeError(msg)
 
         output_dict["saliency_map"] = predictions.saliency_map
         output_dict["features"] = predictions.feature_vector

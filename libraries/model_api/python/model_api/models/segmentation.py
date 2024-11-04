@@ -51,9 +51,10 @@ def create_hard_prediction_from_soft_prediction(
 class SegmentationModel(ImageModel):
     __model__ = "Segmentation"
 
-    def __init__(self, inference_adapter, configuration=dict(), preload=False):
+    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, (1, 2))
+        self.path_to_labels: str
         if self.path_to_labels:
             self.labels = load_labels(self.path_to_labels)
 
@@ -162,7 +163,8 @@ class SegmentationModel(ImageModel):
         n_layers = prediction.soft_prediction.shape[2]
 
         if n_layers == 1:
-            raise RuntimeError("Cannot get contours from soft prediction with 1 layer")
+            msg = "Cannot get contours from soft prediction with 1 layer"
+            raise RuntimeError(msg)
         combined_contours = []
         for layer_index in range(1, n_layers):  # ignoring background
             label = self.get_label_name(layer_index - 1)

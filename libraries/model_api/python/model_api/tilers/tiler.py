@@ -30,7 +30,7 @@ class Tiler(abc.ABC):
         execution_mode: Controls inference mode of the tiler (`async` or `sync`).
     """
 
-    def __init__(self, model, configuration=dict(), execution_mode="async"):
+    def __init__(self, model, configuration: dict = {}, execution_mode: str = "async"):
         """Base constructor for creating a tiling pipeline
 
         Args:
@@ -46,9 +46,8 @@ class Tiler(abc.ABC):
         self._load_config(configuration)
         self.async_pipeline = AsyncPipeline(self.model)
         if execution_mode not in Tiler.EXECUTION_MODES:
-            raise ValueError(
-                f"Wrong execution mode. The following modes are supported {Tiler.EXECUTION_MODES}",
-            )
+            msg = f"Wrong execution mode. The following modes are supported {Tiler.EXECUTION_MODES}"
+            raise ValueError(msg)
         self.execution_mode = execution_mode
 
     def get_model(self):
@@ -133,7 +132,8 @@ class Tiler(abc.ABC):
                     self.logger.error(f'Error with "{name}" parameter:')
                     for _error in errors:
                         self.logger.error(f"\t{_error}")
-                    raise RuntimeError("Incorrect user configuration")
+                    msg = "Incorrect user configuration"
+                    raise RuntimeError(msg)
                 value = parameters[name].get_value(value)
                 self.__setattr__(name, value)
             else:

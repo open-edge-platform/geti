@@ -55,7 +55,7 @@ class ClassificationResult(NamedTuple):
 
 
 class Detection:
-    def __init__(self, xmin, ymin, xmax, ymax, score, id, str_label=None):
+    def __init__(self, xmin, ymin, xmax, ymax, score, id, str_label=None) -> None:
         self.xmin: int = xmin
         self.ymin: int = ymin
         self.xmax: int = xmax

@@ -46,7 +46,7 @@ class ActionClassificationModel(Model):
     def __init__(
         self,
         inference_adapter: InferenceAdapter,
-        configuration: dict[str, Any] = dict(),
+        configuration: dict[str, Any] = {},
         preload: bool = False,
     ) -> None:
         """Action classaification model constructor

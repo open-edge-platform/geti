@@ -25,7 +25,10 @@ class AnomalyDetection(ImageModel):
     __model__ = "AnomalyDetection"
 
     def __init__(
-        self, inference_adapter: InferenceAdapter, configuration: dict = dict(), preload: bool = False
+        self,
+        inference_adapter: InferenceAdapter,
+        configuration: dict = {},
+        preload: bool = False,
     ) -> None:
         super().__init__(inference_adapter, configuration, preload)
         self._check_io_number(1, 1)

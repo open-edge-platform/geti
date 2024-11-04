@@ -37,7 +37,8 @@ from .utils import (
 
 def create_core():
     if openvino_absent:
-        raise ImportError("The OpenVINO package is not installed")
+        msg = "The OpenVINO package is not installed"
+        raise ImportError(msg)
 
     log.info("OpenVINO Runtime")
     log.info(f"\tbuild: {get_version()}")
@@ -73,7 +74,8 @@ def parse_value_per_device(devices: set[str], values_string: str) -> dict[str, i
             for device in devices:
                 result[device] = int(device_value_list[0])
         elif device_value_list[0] != "":
-            raise RuntimeError(f"Unknown string format: {values_string}")
+            msg = f"Unknown string format: {values_string}"
+            raise RuntimeError(msg)
     return result
 
 
@@ -174,7 +176,8 @@ class OpenvinoAdapter(InferenceAdapter):
                 log.info(f"Reading model {self.model_path}")
                 self.model = core.read_model(self.model_path)
                 return
-        raise RuntimeError("Model must be bytes, a file or existing OMZ model name")
+        msg = "Model must be bytes, a file or existing OMZ model name"
+        raise RuntimeError(msg)
 
     def load_model(self):
         self.compiled_model = self.core.compile_model(
@@ -377,9 +380,8 @@ class OpenvinoAdapter(InferenceAdapter):
                 )
 
             else:
-                raise ValueError(
-                    f"Upsupported resize type in model preprocessing: {resize_mode}",
-                )
+                msg = f"Upsupported resize type in model preprocessing: {resize_mode}"
+                raise ValueError(msg)
 
         # Handle layout
         ppp.input(input_idx).model().set_layout(ov.Layout(layout))

@@ -20,7 +20,7 @@ class DetectionModel(ImageModel):
 
     __model__ = "DetectionModel"
 
-    def __init__(self, inference_adapter, configuration=dict(), preload=False):
+    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
         """Detection Model constructor
 
         It extends the `ImageModel` construtor.
@@ -36,7 +36,7 @@ class DetectionModel(ImageModel):
             WrapperError: if the model has more than 1 image inputs
         """
         super().__init__(inference_adapter, configuration, preload)
-
+        self.path_to_labels: str
         if not self.image_blob_name:
             self.raise_error(
                 f"The Wrapper supports only one image input, but {len(self.image_blob_names)} found",

@@ -32,7 +32,7 @@ class ImageModel(Model):
 
     __model__ = "ImageModel"
 
-    def __init__(self, inference_adapter, configuration=dict(), preload=False):
+    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
         """Image model constructor
 
         It extends the `Model` constructor.
@@ -50,6 +50,14 @@ class ImageModel(Model):
         super().__init__(inference_adapter, configuration, preload)
         self.image_blob_names, self.image_info_blob_names = self._get_inputs()
         self.image_blob_name = self.image_blob_names[0]
+        self.orig_height: int
+        self.orig_width: int
+        self.pad_value: int
+        self.resize_type: str
+        self.mean_values: list
+        self.scale_values: list
+        self.reverse_input_channels: bool
+        self.embedded_processing: bool
 
         self.nchw_layout = self.inputs[self.image_blob_name].layout == "NCHW"
         if self.nchw_layout:

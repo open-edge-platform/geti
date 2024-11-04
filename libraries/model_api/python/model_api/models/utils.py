@@ -41,7 +41,8 @@ def get_contours(
         # Assuming one contour output for findContours. Based on OTX this is a safe
         # assumption
         if len(contours) != 1:
-            raise RuntimeError("findContours() must have returned only one contour")
+            msg = "findContours() must have returned only one contour"
+            raise RuntimeError(msg)
         combined_contours.append(Contour(str(obj.str_label), obj.score, contours[0]))
     return combined_contours
 

@@ -65,7 +65,8 @@ class SAMVisualPrompter:
             VisualPromptingResult: result object containing predicted masks and aux information.
         """
         if boxes is None and points is None:
-            raise RuntimeError("boxes or points prompts are required for inference")
+            msg = "boxes or points prompts are required for inference"
+            raise RuntimeError(msg)
 
         outputs: list[dict[str, Any]] = []
 
@@ -165,7 +166,8 @@ class SAMLearnableVisualPrompter:
         if 0 <= threshold <= 1:
             self._threshold: float = threshold
         else:
-            raise ValueError("Confidence threshold should belong to [0;1] range.")
+            msg = "Confidence threshold should belong to [0;1] range."
+            raise ValueError(msg)
         self._num_bg_points: int = 1
         self._default_threshold_target: float = 0.0
         self._image_size: int = self.encoder.image_size
@@ -187,7 +189,8 @@ class SAMLearnableVisualPrompter:
                 np.copy(self._used_indices),
             )
 
-        raise RuntimeError("Reference features are not generated")
+        msg = "Reference features are not generated"
+        raise RuntimeError(msg)
 
     def learn(
         self,
@@ -220,9 +223,8 @@ class SAMLearnableVisualPrompter:
             The shape of the reference mask is N_labels x H x W, where H and W are the same as in the input image.
         """
         if boxes is None and points is None and polygons is None:
-            raise RuntimeError(
-                "boxes, polygons or points prompts are required for learning",
-            )
+            msg = "boxes, polygons or points prompts are required for learning"
+            raise RuntimeError(msg)
 
         if reset_features or not self.has_reference_features():
             self.reset_reference_info()
@@ -275,7 +277,8 @@ class SAMLearnableVisualPrompter:
                 elif "polygon" in inputs_decoder:
                     masks = _polygon_to_mask(inputs_decoder["polygon"], *original_shape)
                 else:
-                    raise RuntimeError("Unsupported type of prompt")
+                    msg = "Unsupported type of prompt"
+                    raise RuntimeError(msg)
                 ref_mask = np.where(masks, 1, ref_mask)
 
             ref_feat: np.ndarray | None = None
@@ -334,19 +337,19 @@ class SAMLearnableVisualPrompter:
         """
         if reference_features is None:
             if self._reference_features is None:
-                raise RuntimeError(
-                    (
-                        "Reference features are not defined. This parameter can be passed via "
-                        "SAMLearnableVisualPrompter constructor, or as an argument of infer() method"
-                    ),
+                msg = (
+                    "Reference features are not defined. This parameter can be passed via "
+                    "SAMLearnableVisualPrompter constructor, or as an argument of infer() method"
                 )
+                raise RuntimeError(msg)
             reference_feats = self._reference_features
 
             if self._used_indices is None:
-                raise RuntimeError(
+                msg = (
                     "Used indices are not defined. This parameter can be passed via "
                     "SAMLearnableVisualPrompter constructor, or as an argument of infer() method"
                 )
+                raise RuntimeError(msg)
             used_idx = self._used_indices
         else:
             reference_feats, used_idx = reference_features
@@ -400,7 +403,9 @@ class SAMLearnableVisualPrompter:
                 inputs_decoder["image_embeddings"] = image_embeddings
 
                 _prediction: dict[str, np.ndarray] = self._predict_masks(
-                    inputs_decoder, original_shape, apply_masks_refinement
+                    inputs_decoder,
+                    original_shape,
+                    apply_masks_refinement,
                 )
                 _prediction.update({"scores": points_score[-1]})
 
@@ -445,7 +450,8 @@ class SAMLearnableVisualPrompter:
     def _expand_reference_info(self, new_largest_label: int) -> None:
         """Expand reference info dimensions if newly given processed prompts have more labels."""
         if self._reference_features is None:
-            raise RuntimeError("Can not expand non existing reference info")
+            msg = "Can not expand non existing reference info"
+            raise RuntimeError(msg)
 
         if new_largest_label > (cur_largest_label := len(self._reference_features) - 1):
             diff = new_largest_label - cur_largest_label

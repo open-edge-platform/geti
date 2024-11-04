@@ -52,7 +52,7 @@ class Model:
 
     __model__: str = "Model"
 
-    def __init__(self, inference_adapter, configuration=dict(), preload=False):
+    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
         """Model constructor
 
         Args:

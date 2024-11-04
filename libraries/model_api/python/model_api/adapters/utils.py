@@ -33,9 +33,8 @@ class Layout:
         if len(shape) == 6:
             return "NSTHWC" if shape[5] in range(1, 5) else "NSCTHW"
 
-        raise RuntimeError(
-            f"Get layout from shape method doesn't support {len(shape)}D shape",
-        )
+        msg = f"Get layout from shape method doesn't support {len(shape)}D shape"
+        raise RuntimeError(msg)
 
     @staticmethod
     def from_openvino(input):
@@ -75,9 +74,11 @@ class Layout:
 
 def resize_image_letterbox_graph(input: Output, size, interpolation, pad_value):
     if not isinstance(pad_value, int):
-        raise RuntimeError("pad_value must be int")
+        msg = "pad_value must be int"
+        raise RuntimeError(msg)
     if not 0 <= pad_value <= 255:
-        raise RuntimeError("pad_value must be in range [0, 255]")
+        msg = "pad_value must be in range [0, 255]"
+        raise RuntimeError(msg)
     w, h = size
     h_axis = 1
     w_axis = 2
@@ -291,9 +292,11 @@ def resize_image_graph(
     pad_value,
 ):
     if not isinstance(pad_value, int):
-        raise RuntimeError("pad_value must be int")
+        msg = "pad_value must be int"
+        raise RuntimeError(msg)
     if not 0 <= pad_value <= 255:
-        raise RuntimeError("pad_value must be in range [0, 255]")
+        msg = "pad_value must be in range [0, 255]"
+        raise RuntimeError(msg)
     h_axis = 1
     w_axis = 2
     w, h = size
@@ -426,9 +429,8 @@ def get_rt_info_from_dict(rt_info_dict, path):
             value = value[item]
         return OVAny(value)
     except KeyError:
-        raise RuntimeError(
-            "Cannot get runtime attribute. Path to runtime attribute is incorrect.",
-        )
+        msg = "Cannot get runtime attribute. Path to runtime attribute is incorrect."
+        raise RuntimeError(msg)
 
 
 def resize_image_ocv(
