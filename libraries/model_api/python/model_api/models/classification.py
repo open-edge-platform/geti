@@ -17,8 +17,8 @@ from openvino.runtime import opset10 as opset
 from model_api.adapters.inference_adapter import InferenceAdapter
 
 from .image_model import ImageModel
+from .result_types import ClassificationResult
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import ClassificationResult
 
 
 class ClassificationModel(ImageModel):

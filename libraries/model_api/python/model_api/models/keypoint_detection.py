@@ -10,8 +10,8 @@ from typing import Any
 import numpy as np
 
 from .image_model import ImageModel
+from .result_types import DetectedKeypoints, Detection
 from .types import ListValue
-from .utils import DetectedKeypoints, Detection
 
 
 class KeypointDetectionModel(ImageModel):

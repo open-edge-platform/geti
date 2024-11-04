@@ -7,8 +7,9 @@ import cv2
 import numpy as np
 
 from .image_model import ImageModel
+from .result_types import InstanceSegmentationResult, SegmentedObject
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import InstanceSegmentationResult, SegmentedObject, load_labels
+from .utils import load_labels
 
 
 class MaskRCNNModel(ImageModel):

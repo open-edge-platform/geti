@@ -12,8 +12,9 @@ import numpy as np
 from model_api.adapters.utils import RESIZE_TYPES, InputTransform
 
 from .model import Model
+from .result_types import ClassificationResult
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import ClassificationResult, load_labels
+from .utils import load_labels
 
 if TYPE_CHECKING:
     from model_api.adapters.inference_adapter import InferenceAdapter

@@ -8,12 +8,12 @@ from contextlib import contextmanager
 import cv2 as cv
 import numpy as np
 
-from model_api.models.instance_segmentation import MaskRCNNModel, _segm_postprocess
-from model_api.models.utils import (
+from model_api.models import (
     InstanceSegmentationResult,
     SegmentedObject,
-    multiclass_nms,
 )
+from model_api.models.instance_segmentation import MaskRCNNModel, _segm_postprocess
+from model_api.models.utils import multiclass_nms
 
 from .detection import DetectionTiler
 

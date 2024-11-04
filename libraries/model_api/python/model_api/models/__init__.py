@@ -11,25 +11,26 @@ from .image_model import ImageModel
 from .instance_segmentation import MaskRCNNModel
 from .keypoint_detection import KeypointDetectionModel, TopDownKeypointDetectionPipeline
 from .model import Model
-from .sam_models import SAMDecoder, SAMImageEncoder
-from .segmentation import SalientObjectDetectionModel, SegmentationModel
-from .ssd import SSD
-from .utils import (
+from .result_types import (
     AnomalyResult,
     ClassificationResult,
     Contour,
     DetectedKeypoints,
     Detection,
     DetectionResult,
-    DetectionWithLandmarks,
     ImageResultWithSoftPrediction,
     InstanceSegmentationResult,
-    OutputTransform,
     PredictedMask,
     SegmentedObject,
     SegmentedObjectWithRects,
     VisualPromptingResult,
     ZSLVisualPromptingResult,
+)
+from .sam_models import SAMDecoder, SAMImageEncoder
+from .segmentation import SalientObjectDetectionModel, SegmentationModel
+from .ssd import SSD
+from .utils import (
+    OutputTransform,
     add_rotated_rects,
     get_contours,
 )
@@ -62,8 +63,6 @@ __all__ = [
     "ClassificationModel",
     "Contour",
     "DetectionModel",
-    "DetectionWithLandmarks",
-    "ImageMattingWithBackground",
     "ImageModel",
     "ImageResultWithSoftPrediction",
     "InstanceSegmentationResult",
@@ -77,11 +76,9 @@ __all__ = [
     "MaskRCNNModel",
     "Model",
     "OutputTransform",
-    "PortraitBackgroundMatting",
     "SalientObjectDetectionModel",
     "SegmentationModel",
     "SSD",
-    "VideoBackgroundMatting",
     "YOLO",
     "YoloV3ONNX",
     "YoloV4",
@@ -95,7 +92,6 @@ __all__ = [
     "Prompt",
     "Detection",
     "DetectionResult",
-    "DetectionWithLandmarks",
     "DetectedKeypoints",
     "classification_models",
     "detection_models",

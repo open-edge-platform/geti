@@ -17,8 +17,8 @@ import numpy as np
 from model_api.adapters.inference_adapter import InferenceAdapter
 
 from .image_model import ImageModel
+from .result_types import AnomalyResult
 from .types import ListValue, NumericalValue, StringValue
-from .utils import AnomalyResult
 
 
 class AnomalyDetection(ImageModel):

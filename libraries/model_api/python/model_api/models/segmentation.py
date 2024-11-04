@@ -11,8 +11,9 @@ import cv2
 import numpy as np
 
 from .image_model import ImageModel
+from .result_types import Contour, ImageResultWithSoftPrediction
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
-from .utils import Contour, ImageResultWithSoftPrediction, load_labels
+from .utils import load_labels
 
 
 def create_hard_prediction_from_soft_prediction(

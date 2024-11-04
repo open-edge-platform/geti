@@ -6,8 +6,9 @@
 import cv2 as cv
 import numpy as np
 
+from model_api.models import Detection, DetectionResult
 from model_api.models.types import NumericalValue
-from model_api.models.utils import Detection, DetectionResult, multiclass_nms
+from model_api.models.utils import multiclass_nms
 
 from .tiler import Tiler
 

@@ -9,8 +9,7 @@ from contextlib import contextmanager
 
 import numpy as np
 
-from model_api.models import SegmentationModel
-from model_api.models.utils import ImageResultWithSoftPrediction
+from model_api.models import ImageResultWithSoftPrediction, SegmentationModel
 
 from .tiler import Tiler
 
