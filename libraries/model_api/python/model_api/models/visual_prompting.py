@@ -551,8 +551,7 @@ def _polygon_to_mask(
     else:
         contour = [[int(point[0]), int(point[1])] for point in polygon]
     gt_mask = np.zeros((height, width), dtype=np.uint8)
-    gt_mask = cv2.drawContours(gt_mask, np.asarray([contour]), 0, 1, cv2.FILLED)
-    return gt_mask
+    return cv2.drawContours(gt_mask, np.asarray([contour]), 0, 1, cv2.FILLED)
 
 
 def _generate_masked_features(

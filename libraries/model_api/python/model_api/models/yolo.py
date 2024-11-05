@@ -97,8 +97,7 @@ def permute_to_N_HWA_K(tensor, K, output_layout):
     N, _, H, W = tensor.shape
     tensor = tensor.reshape(N, -1, K, H, W)
     tensor = tensor.transpose(0, 3, 4, 1, 2)
-    tensor = tensor.reshape(N, -1, K)
-    return tensor
+    return tensor.reshape(N, -1, K)
 
 
 def sigmoid(x):
@@ -194,8 +193,7 @@ class YOLO(DetectionModel):
     def postprocess(self, outputs, meta):
         detections = self._parse_outputs(outputs, meta)
         detections = self._resize_detections(detections, meta)
-        detections = self._add_label_names(detections)
-        return detections
+        return self._add_label_names(detections)
 
     def _parse_yolo_region(self, predictions, input_size, params):
         # ------------------------------------------ Extracting layer parameters ---------------------------------------
@@ -329,8 +327,7 @@ class YOLO(DetectionModel):
                 layer_params[1],
             )
 
-        detections = self._filter(detections, self.iou_threshold)
-        return detections
+        return self._filter(detections, self.iou_threshold)
 
 
 class YoloV4(YOLO):
@@ -680,8 +677,7 @@ class YoloV3ONNX(DetectionModel):
 
     def postprocess(self, outputs, meta):
         detections = self._parse_outputs(outputs)
-        detections = clip_detections(detections, meta["original_shape"])
-        return detections
+        return clip_detections(detections, meta["original_shape"])
 
     def _parse_outputs(self, outputs):
         boxes = outputs[self.bboxes_blob_name][0]
@@ -716,9 +712,7 @@ class YoloV3ONNX(DetectionModel):
         x_maxs = transposed_boxes[3]
         y_maxs = transposed_boxes[2]
 
-        detections = list(starmap(Detection, zip(x_mins, y_mins, x_maxs, y_maxs, out_scores, out_classes)))
-
-        return detections
+        return list(starmap(Detection, zip(x_mins, y_mins, x_maxs, y_maxs, out_scores, out_classes)))
 
 
 class YOLOv5(DetectionModel):
@@ -743,7 +737,7 @@ class YOLOv5(DetectionModel):
         parameters = super().parameters()
         parameters["pad_value"].update_default_value(114)
         parameters["resize_type"].update_default_value("fit_to_window_letterbox")
-        parameters["reverse_input_channels"].update_default_value(True)
+        parameters["reverse_input_channels"].update_default_value(True)  # noqa: FBT003 TODO: refactor this piece of code
         parameters["scale_values"].update_default_value([255.0])
         parameters["confidence_threshold"].update_default_value(0.25)
         parameters.update(

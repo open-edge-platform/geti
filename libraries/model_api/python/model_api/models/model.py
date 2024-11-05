@@ -105,11 +105,9 @@ class Model:
         for subclass in subclasses:
             if name.lower() == subclass.__model__.lower():
                 return subclass
-        cls.raise_error(
-            'There is no model with name "{}" in list: {}'.format(
-                name,
-                ", ".join([subclass.__model__ for subclass in subclasses]),
-            ),
+        return cls.raise_error(
+            f"There is no model with name {name} in list: "
+            f"{', '.join([subclass.__model__ for subclass in subclasses])}",
         )
 
     @classmethod
@@ -214,8 +212,7 @@ class Model:
         Returns:
             - the dictionary with defined wrapper data parameters
         """
-        parameters = {}
-        return parameters
+        return {}
 
     def _load_config(self, config):
         """Reads the configuration and creates data attributes

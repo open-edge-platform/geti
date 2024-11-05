@@ -243,5 +243,4 @@ class ImageResultWithSoftPrediction(NamedTuple):
 def _array_shape_to_str(array: np.ndarray | None) -> str:
     if array is not None:
         return f"[{','.join(str(i) for i in array.shape)}]"
-    else:
-        return "[]"
+    return "[]"

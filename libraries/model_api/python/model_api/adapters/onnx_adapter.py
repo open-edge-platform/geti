@@ -42,11 +42,11 @@ class ONNXRuntimeAdapter(InferenceAdapter):
         loaded_model = onnx.load(model)
 
         inferred_model = SymbolicShapeInference.infer_shapes(
-            loaded_model,
-            int(sys.maxsize / 2),
-            False,
-            False,
-            False,
+            in_mp=loaded_model,
+            int_max=int(sys.maxsize / 2),
+            auto_merge=False,
+            guess_output_rank=False,
+            verbose=False,
         )
 
         self.session = ort.InferenceSession(

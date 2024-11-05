@@ -209,14 +209,13 @@ class SalientObjectDetectionModel(SegmentationModel):
         input_image_width = meta["original_shape"][1]
         result = outputs[self.output_blob_name].squeeze()
         result = 1 / (1 + np.exp(-result))
-        result = cv2.resize(
+        return cv2.resize(
             result,
             (input_image_width, input_image_height),
             0,
             0,
             interpolation=cv2.INTER_NEAREST,
         )
-        return result
 
 
 _feature_vector_name = "feature_vector"

@@ -246,5 +246,4 @@ def _detection2array(detections):
             [[float(det.xmin), float(det.ymin), float(det.xmax), float(det.ymax)]],
             axis=0,
         )
-    detections = np.concatenate((labels, scores, boxes), -1)
-    return detections
+    return np.concatenate((labels, scores, boxes), -1)

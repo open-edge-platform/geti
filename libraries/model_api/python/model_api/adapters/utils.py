@@ -273,7 +273,7 @@ def crop_resize_graph(input: Output, size):
 
     target_size = list(size)
     target_size.reverse()
-    resized_image = opset.interpolate(
+    return opset.interpolate(
         cropped_frame,
         target_size,
         scales=np.array([0.0, 0.0], dtype=np.float32),
@@ -281,7 +281,6 @@ def crop_resize_graph(input: Output, size):
         mode="linear",
         shape_calculation_mode="sizes",
     )
-    return resized_image
 
 
 def resize_image_graph(

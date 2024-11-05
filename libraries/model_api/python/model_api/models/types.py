@@ -29,6 +29,8 @@ class BaseValue:
         errors = self.validate(value)
         if len(errors) == 0:
             return value if value is not None else self.default_value
+        msg = "Encountered errors during validation."
+        raise ValueError(msg)
 
     def build_error(self) -> None:
         pass

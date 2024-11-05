@@ -233,8 +233,7 @@ class OpenvinoAdapter(InferenceAdapter):
                 input_layout,
                 input.get_element_type().get_type_name(),
             )
-        inputs = self._get_meta_from_ngraph(inputs)
-        return inputs
+        return self._get_meta_from_ngraph(inputs)
 
     def get_layout_for_input(self, input, shape=None) -> str:
         input_layout = ""
@@ -263,8 +262,7 @@ class OpenvinoAdapter(InferenceAdapter):
                 list(output_shape),
                 precision=output.get_element_type().get_type_name(),
             )
-        outputs = self._get_meta_from_ngraph(outputs)
-        return outputs
+        return self._get_meta_from_ngraph(outputs)
 
     def reshape_model(self, new_shape):
         new_shape = {

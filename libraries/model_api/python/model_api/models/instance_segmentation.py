@@ -45,7 +45,7 @@ class MaskRCNNModel(ImageModel):
         )
         return parameters
 
-    def _get_outputs(self):
+    def _get_outputs(self):  # noqa: C901 TODO: Fix this method to reduce complexity
         if self.is_segmentoly:
             return self._get_segmentoly_outputs()
         filtered_names = []
@@ -82,7 +82,7 @@ class MaskRCNNModel(ImageModel):
         if len(outputs) == 3:
             _append_xai_names(self.outputs, outputs)
             return outputs
-        self.raise_error(f"Unexpected outputs: {self.outputs}")
+        return self.raise_error(f"Unexpected outputs: {self.outputs}")
 
     def _get_segmentoly_outputs(self):
         outputs = {}

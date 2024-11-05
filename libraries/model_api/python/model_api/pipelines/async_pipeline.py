@@ -30,7 +30,7 @@ class AsyncPipeline:
                 preprocessing_meta,
                 start_time,
             )
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 TODO: Figure out the exact exception that might be raised
             self.callback_exceptions.append(e)
 
     def submit_data(self, inputs, id, meta={}):

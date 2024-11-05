@@ -61,7 +61,8 @@ class SSD(DetectionModel):
             return parser
         except ValueError:
             pass
-        self.raise_error("Unsupported model outputs")
+        msg = "Unsupported model outputs"
+        raise ValueError(msg)
 
     def _parse_outputs(self, outputs):
         return self.output_parser(outputs)
@@ -156,8 +157,7 @@ class BoxesLabelsParser:
             labels = np.full(len(bboxes), self.default_label, dtype=bboxes.dtype)
         labels = labels.squeeze(0)
 
-        detections = [Detection(*bbox, score, label) for label, score, bbox in zip(labels, scores, bboxes)]
-        return detections
+        return [Detection(*bbox, score, label) for label, score, bbox in zip(labels, scores, bboxes)]
 
 
 _bbox_area_threshold = 1.0

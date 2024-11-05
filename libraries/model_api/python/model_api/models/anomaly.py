@@ -126,8 +126,7 @@ class AnomalyDetection(ImageModel):
     def _normalize(self, tensor: np.ndarray, threshold: float) -> np.ndarray:
         """Currently supports only min-max normalization."""
         normalized = ((tensor - threshold) / self.normalization_scale) + 0.5
-        normalized = np.clip(normalized, 0, 1)
-        return normalized
+        return np.clip(normalized, 0, 1)
 
     @staticmethod
     def _get_boxes(mask: np.ndarray) -> np.ndarray:

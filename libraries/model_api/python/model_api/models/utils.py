@@ -5,6 +5,8 @@
 
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
+from pathlib import Path
+
 import cv2
 import numpy as np
 
@@ -88,7 +90,7 @@ class OutputTransform:
 
 
 def load_labels(label_file):
-    with open(label_file) as f:
+    with Path(label_file).open() as f:
         return [x.strip() for x in f]
 
 

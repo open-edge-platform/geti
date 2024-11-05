@@ -8,6 +8,7 @@ from __future__ import annotations  # TODO: remove when Python3.9 support is dro
 import copy
 import json
 from collections import defaultdict
+from pathlib import Path
 
 import numpy as np
 from openvino.preprocess import PrePostProcessor
@@ -102,7 +103,7 @@ class ClassificationModel(ImageModel):
             self.load()
 
     def _load_labels(self, labels_file):
-        with open(labels_file) as f:
+        with Path(labels_file).open() as f:
             labels = []
             for s in f:
                 begin_idx = s.find(" ")
@@ -417,8 +418,7 @@ class GreedyLabelsResolver:
                 if new_lbl not in output_labels:
                     output_labels.append(new_lbl)
 
-        output_predictions = [(self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in sorted(output_labels)]
-        return output_predictions
+        return [(self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in sorted(output_labels)]
 
 
 class ProbabilisticLabelsResolver(GreedyLabelsResolver):
