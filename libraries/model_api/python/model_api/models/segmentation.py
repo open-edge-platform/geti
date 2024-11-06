@@ -49,6 +49,24 @@ def create_hard_prediction_from_soft_prediction(
 
 
 class SegmentationModel(ImageModel):
+    """Segmentation Model.
+
+    Args:
+        inference_adapter (InferenceAdapter): Inference adapter
+        configuration (dict, optional): Configuration parameters. Defaults to {}.
+        preload (bool, optional): Whether to preload the model. Defaults to False.
+
+    Example:
+        >>> from model_api.models import SegmentationModel
+        >>> import cv2
+        >>> model = SegmentationModel.create_model("./path_to_model.xml")
+        >>> image = cv2.imread("path_to_image.jpg")
+        >>> result = model.predict(image)
+        ImageResultWithSoftPrediction(
+            ...
+        )
+    """
+
     __model__ = "Segmentation"
 
     def __init__(self, inference_adapter, configuration: dict = {}, preload=False):

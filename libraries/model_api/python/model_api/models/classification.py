@@ -23,6 +23,27 @@ from .types import BooleanValue, ListValue, NumericalValue, StringValue
 
 
 class ClassificationModel(ImageModel):
+    """Classification Model.
+
+    Args:
+        inference_adapter (InferenceAdapter): Inference adapter
+        configuration (dict, optional): Configuration parameters. Defaults to {}.
+        preload (bool, optional): Whether to preload the model. Defaults to False.
+
+    Example:
+        >>> from model_api.models import ClassificationModel
+        >>> import cv2
+        >>> model = ClassificationModel.create_model("./path_to_model.xml")
+        >>> image = cv2.imread("path_to_image.jpg")
+        >>> result = model.predict(image)
+        ClassificationResult(
+            top_labels=[(1, 'bicycle', 0.90176445), (6, 'car', 0.85433626), (7, 'cat', 0.60699755)],
+            saliency_map=array([], dtype=float64),
+            feature_vector=array([], dtype=float64),
+            raw_scores=array([], dtype=float64)
+        )
+    """
+
     __model__ = "Classification"
 
     def __init__(self, inference_adapter: InferenceAdapter, configuration: dict = {}, preload: bool = False):

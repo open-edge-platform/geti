@@ -22,6 +22,40 @@ from .types import ListValue, NumericalValue, StringValue
 
 
 class AnomalyDetection(ImageModel):
+    """Anomaly Detection model.
+
+    Generic anomaly detection model that acts as an inference wrapper for all the exported models from
+    Anomalib.
+
+    Args:
+        inference_adapter (InferenceAdapter): Inference adapter
+        configuration (dict, optional): Configuration parameters. Defaults to {}.
+        preload (bool, optional): Whether to preload the model. Defaults to False.
+
+    Example:
+        >>> from model_api.models import AnomalyDetection
+        >>> import cv2
+        >>> model = AnomalyDetection.create_model("./path_to_model.xml")
+        >>> image = cv2.imread("path_to_image.jpg")
+        >>> result = model.predict(image)
+            AnomalyResult(anomaly_map=array([[150, 150, 150, ..., 138, 138, 138],
+                [150, 150, 150, ..., 138, 138, 138],
+                [150, 150, 150, ..., 138, 138, 138],
+                ...,
+                [134, 134, 134, ..., 138, 138, 138],
+                [134, 134, 134, ..., 138, 138, 138],
+                [134, 134, 134, ..., 138, 138, 138]], dtype=uint8),
+                pred_boxes=None, pred_label='Anomaly',
+                pred_mask=array([[1, 1, 1, ..., 1, 1, 1],
+                    [1, 1, 1, ..., 1, 1, 1],
+                    [1, 1, 1, ..., 1, 1, 1],
+                    ...,
+                    [1, 1, 1, ..., 1, 1, 1],
+                    [1, 1, 1, ..., 1, 1, 1],
+                    [1, 1, 1, ..., 1, 1, 1]], dtype=uint8),
+                    pred_score=0.8536462108391619)
+    """
+
     __model__ = "AnomalyDetection"
 
     def __init__(
