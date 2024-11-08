@@ -230,9 +230,11 @@ static inline std::vector<SegmentedObjectWithRects> add_rotated_rects(std::vecto
         for (size_t i = 0; i < contours.size(); i++) {
             contour.insert(contour.end(), contours[i].begin(), contours[i].end());
         }
-        std::vector<cv::Point> hull;
-        cv::convexHull(contour, hull);
-        objects_with_rects.back().rotated_rect = cv::minAreaRect(hull);
+        if (contour.size() > 0) {
+            std::vector<cv::Point> hull;
+            cv::convexHull(contour, hull);
+            objects_with_rects.back().rotated_rect = cv::minAreaRect(hull);
+        }
     }
     return objects_with_rects;
 }
