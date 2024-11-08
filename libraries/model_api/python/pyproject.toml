@@ -121,7 +121,7 @@ lint.select = [
     "SLF",  # flake8-self (`SLF`)
     "SIM",  # flake8-simplify (`SIM`)
     "TID",  # flake8-tidy-imports (`TID`)
-    # "TCH",  # flake8-type-checking (`TCH`)
+    "TCH",  # flake8-type-checking (`TCH`)
     "INT",  # flake8-gettext (`INT`)
     # "ARG",  # flake8-unsused-arguments (`ARG`)
     "PTH",  # flake8-use-pathlib (`PTH`)

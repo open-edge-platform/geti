@@ -3,10 +3,18 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-from model_api.adapters.utils import RESIZE_TYPES, InputTransform
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
-from .model import Model
-from .types import BooleanValue, ListValue, NumericalValue, StringValue
+from typing import TYPE_CHECKING, Any
+
+from model_api.adapters.utils import RESIZE_TYPES, InputTransform
+from model_api.models.model import Model
+from model_api.models.types import BooleanValue, ListValue, NumericalValue, StringValue
+
+if TYPE_CHECKING:
+    import numpy as np
+
+    from model_api.adapters.inference_adapter import InferenceAdapter
 
 
 class ImageModel(Model):
@@ -32,7 +40,7 @@ class ImageModel(Model):
 
     __model__ = "ImageModel"
 
-    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
+    def __init__(self, inference_adapter: InferenceAdapter, configuration: dict = {}, preload: bool = False) -> None:
         """Image model constructor
 
         It extends the `Model` constructor.
@@ -58,6 +66,7 @@ class ImageModel(Model):
         self.scale_values: list
         self.reverse_input_channels: bool
         self.embedded_processing: bool
+        self.labels: list[str]
 
         self.nchw_layout = self.inputs[self.image_blob_name].layout == "NCHW"
         if self.nchw_layout:
@@ -89,7 +98,7 @@ class ImageModel(Model):
             self.orig_height, self.orig_width = self.h, self.w
 
     @classmethod
-    def parameters(cls):
+    def parameters(cls) -> dict[str, Any]:
         parameters = super().parameters()
         parameters.update(
             {
@@ -136,14 +145,14 @@ class ImageModel(Model):
         )
         return parameters
 
-    def get_label_name(self, label_id):
+    def get_label_name(self, label_id: int) -> str:
         if self.labels is None:
             return f"#{label_id}"
         if label_id >= len(self.labels):
             return f"#{label_id}"
         return self.labels[label_id]
 
-    def _get_inputs(self):
+    def _get_inputs(self) -> tuple[list[str], ...]:
         """Defines the model inputs for images and additional info.
 
         Raises:
@@ -169,7 +178,7 @@ class ImageModel(Model):
             )
         return image_blob_names, image_info_blob_names
 
-    def preprocess(self, inputs):
+    def preprocess(self, inputs: np.ndarray) -> list[dict]:
         """Data preprocess method
 
         It performs basic preprocessing of a single image:
@@ -194,12 +203,15 @@ class ImageModel(Model):
                 }
             - the input metadata, which might be used in `postprocess` method
         """
-        return {self.image_blob_name: inputs[None]}, {
-            "original_shape": inputs.shape,
-            "resized_shape": (self.w, self.h, self.c),
-        }
+        return [
+            {self.image_blob_name: inputs[None]},
+            {
+                "original_shape": inputs.shape,
+                "resized_shape": (self.w, self.h, self.c),
+            },
+        ]
 
-    def _change_layout(self, image):
+    def _change_layout(self, image: np.ndarray) -> np.ndarray:
         """Changes the input image layout to fit the layout of the model input layer.
 
         Args:

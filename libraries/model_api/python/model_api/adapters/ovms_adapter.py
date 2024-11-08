@@ -97,6 +97,9 @@ class OVMSAdapter(InferenceAdapter):
     def await_any(self):
         pass
 
+    def get_raw_result(self, infer_result):
+        pass
+
     def embed_preprocessing(
         self,
         layout,

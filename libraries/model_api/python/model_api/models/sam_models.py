@@ -6,7 +6,7 @@
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
 from copy import deepcopy
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -15,6 +15,9 @@ from model_api.models.types import BooleanValue, NumericalValue
 
 from .image_model import ImageModel
 from .segmentation import SegmentationModel
+
+if TYPE_CHECKING:
+    from model_api.adapters.inference_adapter import InferenceAdapter
 
 
 class SAMImageEncoder(ImageModel):
@@ -51,11 +54,11 @@ class SAMImageEncoder(ImageModel):
     def preprocess(
         self,
         inputs: np.ndarray,
-    ) -> tuple[dict[str, np.ndarray], dict[str, Any]]:
+    ) -> list[dict]:
         """Update meta for image encoder."""
         dict_inputs, meta = super().preprocess(inputs)
         meta["resize_type"] = self.resize_type
-        return dict_inputs, meta
+        return [dict_inputs, meta]
 
     def postprocess(
         self,
@@ -123,7 +126,7 @@ class SAMDecoder(SegmentationModel):
     def _get_outputs(self) -> str:
         return "upscaled_masks"
 
-    def preprocess(self, inputs: dict[str, Any]) -> list[dict[str, Any]]:
+    def preprocess(self, inputs: dict[str, Any]) -> list[dict]:
         """Preprocess prompts."""
         processed_prompts: list[dict[str, Any]] = []
         for prompt_name in ["bboxes", "points"]:
@@ -189,8 +192,8 @@ class SAMDecoder(SegmentationModel):
 
     def _check_io_number(
         self,
-        number_of_inputs: int | tuple[int],
-        number_of_outputs: int | tuple[int],
+        number_of_inputs: int | tuple[int, ...],
+        number_of_outputs: int | tuple[int, ...],
     ) -> None:
         pass
 

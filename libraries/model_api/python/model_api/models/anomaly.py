@@ -9,16 +9,17 @@ Note: This file will change when anomalib is upgraded in OTX. CVS-114640
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import cv2
 import numpy as np
 
-from model_api.adapters.inference_adapter import InferenceAdapter
+from model_api.models.image_model import ImageModel
+from model_api.models.result_types import AnomalyResult
+from model_api.models.types import ListValue, NumericalValue, StringValue
 
-from .image_model import ImageModel
-from .result_types import AnomalyResult
-from .types import ListValue, NumericalValue, StringValue
+if TYPE_CHECKING:
+    from model_api.adapters.inference_adapter import InferenceAdapter
 
 
 class AnomalyDetection(ImageModel):

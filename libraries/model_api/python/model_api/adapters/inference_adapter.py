@@ -83,7 +83,7 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def infer_sync(self, dict_data):
+    def infer_sync(self, dict_data) -> dict:
         """Performs the synchronous model inference. The infer is a blocking method.
 
         Args:
@@ -122,6 +122,22 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
+    def get_raw_result(self, infer_result) -> dict:
+        """Gets raw results from the internal inference framework representation as a dict.
+
+        Args:
+            - infer_result: framework-specific result of inference from the model
+
+        Returns:
+            - raw result (dict) - model raw output in the following format:
+                {
+                    'output_layer_name_1': raw_result_1,
+                    'output_layer_name_2': raw_result_2,
+                    ...
+                }
+        """
+
+    @abstractmethod
     def is_ready(self):
         """In case of asynchronous execution checks if one can submit input data
         to the model for inference, or all infer requests are busy.
@@ -153,7 +169,7 @@ class InferenceAdapter(ABC):
         layout,
         resize_mode: str,
         interpolation_mode,
-        target_shape: tuple[int],
+        target_shape: tuple[int, ...],
         pad_value,
         dtype: type = int,
         brg2rgb=False,

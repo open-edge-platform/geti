@@ -3,11 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
+
 import logging as log
 import re
 from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any, NoReturn, Type
 
-from model_api.adapters.inference_adapter import InferenceAdapter
 from model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
 from model_api.adapters.openvino_adapter import (
     OpenvinoAdapter,
@@ -16,11 +18,18 @@ from model_api.adapters.openvino_adapter import (
 )
 from model_api.adapters.ovms_adapter import OVMSAdapter
 
+if TYPE_CHECKING:
+    from os import PathLike
+
+    from numpy import ndarray
+
+    from model_api.adapters.inference_adapter import InferenceAdapter
+
 
 class WrapperError(Exception):
     """The class for errors occurred in Model API wrappers"""
 
-    def __init__(self, wrapper_name, message):
+    def __init__(self, wrapper_name, message) -> None:
         super().__init__(f"{wrapper_name}: {message}")
 
 
@@ -52,7 +61,7 @@ class Model:
 
     __model__: str = "Model"
 
-    def __init__(self, inference_adapter, configuration: dict = {}, preload=False):
+    def __init__(self, inference_adapter: InferenceAdapter, configuration: dict = {}, preload: bool = False) -> None:
         """Model constructor
 
         Args:
@@ -98,7 +107,7 @@ class Model:
         return model
 
     @classmethod
-    def get_model_class(cls, name):
+    def get_model_class(cls, name: str) -> Type:
         subclasses = [subclass for subclass in cls.get_subclasses() if subclass.__model__]
         if cls.__model__:
             subclasses.append(cls)
@@ -113,21 +122,21 @@ class Model:
     @classmethod
     def create_model(
         cls,
-        model,
-        model_type=None,
-        configuration={},
-        preload=True,
-        core=None,
-        weights_path="",
-        adaptor_parameters={},
-        device="AUTO",
-        nstreams="1",
-        nthreads=None,
-        max_num_requests=0,
-        precision="FP16",
-        download_dir=None,
-        cache_dir=None,
-    ):
+        model: str,
+        model_type: Any | None = None,
+        configuration: dict[str, Any] = {},
+        preload: bool = True,
+        core: Any | None = None,
+        weights_path: PathLike | None = None,
+        adaptor_parameters: dict[str, Any] = {},
+        device: str = "AUTO",
+        nstreams: str = "1",
+        nthreads: int | None = None,
+        max_num_requests: int = 0,
+        precision: str = "FP16",
+        download_dir: PathLike | None = None,
+        cache_dir: PathLike | None = None,
+    ) -> Any:
         """Create an instance of the Model API model
 
         Args:
@@ -152,9 +161,8 @@ class Model:
         Returns:
             Model object
         """
-        if isinstance(model, InferenceAdapter):
-            inference_adapter = model
-        elif isinstance(model, str) and re.compile(
+        inference_adapter: InferenceAdapter
+        if isinstance(model, str) and re.compile(
             r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*",
         ).fullmatch(model):
             inference_adapter = OVMSAdapter(model)
@@ -182,7 +190,7 @@ class Model:
         return Model(inference_adapter, configuration, preload)
 
     @classmethod
-    def get_subclasses(cls):
+    def get_subclasses(cls) -> list[Any]:
         all_subclasses = []
         for subclass in cls.__subclasses__():
             all_subclasses.append(subclass)
@@ -196,7 +204,7 @@ class Model:
         return [subclass.__model__ for subclass in available_classes if subclass.__model__]
 
     @classmethod
-    def parameters(cls):
+    def parameters(cls) -> dict[str, Any]:
         """Defines the description and type of configurable data parameters for the wrapper.
 
         See `types.py` to find available types of the data parameter. For each parameter
@@ -214,7 +222,7 @@ class Model:
         """
         return {}
 
-    def _load_config(self, config):
+    def _load_config(self, config: dict[str, Any]) -> None:
         """Reads the configuration and creates data attributes
            by setting the wrapper parameters with values from configuration.
 
@@ -265,7 +273,7 @@ class Model:
                 )
 
     @classmethod
-    def raise_error(cls, message):
+    def raise_error(cls, message) -> NoReturn:
         """Raises the WrapperError.
 
         Args:
@@ -292,7 +300,7 @@ class Model:
         """
         raise NotImplementedError
 
-    def postprocess(self, outputs, meta):
+    def postprocess(self, outputs: dict[str, Any], meta: dict[str, Any]):
         """Interface for postprocess method.
 
         Args:
@@ -309,7 +317,11 @@ class Model:
         """
         raise NotImplementedError
 
-    def _check_io_number(self, number_of_inputs, number_of_outputs):
+    def _check_io_number(
+        self,
+        number_of_inputs: int | tuple[int, ...],
+        number_of_outputs: int | tuple[int, ...],
+    ) -> None:
         """Checks whether the number of model inputs/outputs is supported.
 
         Args:
@@ -321,47 +333,32 @@ class Model:
         Raises:
             WrapperError: if the model has unsupported number of inputs/outputs
         """
-        if not isinstance(number_of_inputs, tuple):
+        if isinstance(number_of_inputs, int):
             if len(self.inputs) != number_of_inputs and number_of_inputs != -1:
                 self.raise_error(
-                    "Expected {} input blob{}, but {} found: {}".format(
-                        number_of_inputs,
-                        "s" if number_of_inputs != 1 else "",
-                        len(self.inputs),
-                        ", ".join(self.inputs),
-                    ),
+                    f"Expected {number_of_inputs} input blob {'s' if number_of_inputs != 1 else ''}, "
+                    f"but {len(self.inputs)} found: {', '.join(self.inputs)}",
                 )
         elif len(self.inputs) not in number_of_inputs:
             self.raise_error(
-                "Expected {} or {} input blobs, but {} found: {}".format(
-                    ", ".join(str(n) for n in number_of_inputs[:-1]),
-                    int(number_of_inputs[-1]),
-                    len(self.inputs),
-                    ", ".join(self.inputs),
-                ),
+                f"Expected {', '.join(str(n) for n in number_of_inputs[:-1])} or "
+                f"{int(number_of_inputs[-1])} input blobs, but {len(self.inputs)} found: {', '.join(self.inputs)}",
             )
 
-        if not isinstance(number_of_outputs, tuple):
+        if isinstance(number_of_outputs, int):
             if len(self.outputs) != number_of_outputs and number_of_outputs != -1:
                 self.raise_error(
-                    "Expected {} output blob{}, but {} found: {}".format(
-                        number_of_outputs,
-                        "s" if number_of_outputs != 1 else "",
-                        len(self.outputs),
-                        ", ".join(self.outputs),
-                    ),
+                    f"Expected {number_of_outputs} output blob {'s' if number_of_outputs != 1 else ''}, "
+                    f"but {len(self.outputs)} found: {', '.join(self.outputs)}",
                 )
         elif len(self.outputs) not in number_of_outputs:
             self.raise_error(
-                "Expected {} or {} output blobs, but {} found: {}".format(
-                    ", ".join(str(n) for n in number_of_outputs[:-1]),
-                    int(number_of_outputs[-1]),
-                    len(self.outputs),
-                    ", ".join(self.outputs),
-                ),
+                f"Expected {', '.join(str(n) for n in number_of_outputs[:-1])} or "
+                f"{int(number_of_outputs[-1])} output blobs, "
+                f"but {len(self.outputs)} found: {', '.join(self.outputs)}",
             )
 
-    def __call__(self, inputs):
+    def __call__(self, inputs: ndarray):
         """Applies preprocessing, synchronous inference, postprocessing routines while one call.
 
         Args:
@@ -407,7 +404,7 @@ class Model:
 
         return [completed_results[i] for i in range(len(inputs))]
 
-    def load(self, force=False):
+    def load(self, force: bool = False) -> None:
         if not self.model_loaded or force:
             self.model_loaded = True
             self.inference_adapter.load_model()
@@ -423,7 +420,7 @@ class Model:
         self.inputs = self.inference_adapter.get_input_layers()
         self.outputs = self.inference_adapter.get_output_layers()
 
-    def infer_sync(self, dict_data):
+    def infer_sync(self, dict_data: dict[str, ndarray]) -> dict[str, ndarray]:
         if not self.model_loaded:
             self.raise_error(
                 "The model is not loaded to the device. Please, create the wrapper "

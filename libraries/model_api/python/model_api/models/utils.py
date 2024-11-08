@@ -10,10 +10,10 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from .result_types import Contour, SegmentedObject, SegmentedObjectWithRects
+from model_api.models.result_types import Contour, Detection, SegmentedObject, SegmentedObjectWithRects
 
 
-def add_rotated_rects(segmented_objects):
+def add_rotated_rects(segmented_objects: list[SegmentedObject]) -> list[SegmentedObjectWithRects]:
     objects_with_rects = []
     for segmented_object in segmented_objects:
         mask = segmented_object.mask.astype(np.uint8)
@@ -32,7 +32,7 @@ def add_rotated_rects(segmented_objects):
 
 def get_contours(
     segmentedObjects: list[SegmentedObject | SegmentedObjectWithRects],
-):
+) -> list[Contour]:
     combined_contours = []
     for obj in segmentedObjects:
         contours, _ = cv2.findContours(
@@ -49,7 +49,7 @@ def get_contours(
     return combined_contours
 
 
-def clip_detections(detections, size):
+def clip_detections(detections: list[Detection], size: tuple[int, int]) -> list[Detection]:
     for detection in detections:
         detection.xmin = min(max(round(detection.xmin), 0), size[1])
         detection.ymin = min(max(round(detection.ymin), 0), size[0])
@@ -94,7 +94,16 @@ def load_labels(label_file):
         return [x.strip() for x in f]
 
 
-def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=0):
+def nms(
+    x1: np.ndarray,
+    y1: np.ndarray,
+    x2: np.ndarray,
+    y2: np.ndarray,
+    scores: np.ndarray,
+    thresh: float,
+    include_boundaries: bool = False,
+    keep_top_k: int = 0,
+) -> list[int]:
     b = 1 if include_boundaries else 0
     areas = (x2 - x1 + b) * (y2 - y1 + b)
     order = scores.argsort()[::-1]
@@ -130,9 +139,9 @@ def nms(x1, y1, x2, y2, scores, thresh, include_boundaries=False, keep_top_k=0):
 
 
 def multiclass_nms(
-    detections,
-    iou_threshold=0.45,
-    max_num=200,
+    detections: np.ndarray,
+    iou_threshold: float = 0.45,
+    max_num: int = 200,
 ):
     """Multi-class NMS.
 
@@ -158,7 +167,7 @@ def multiclass_nms(
     offsets = labels.astype(boxes.dtype) * (max_coordinate + 1)
     boxes_for_nms = boxes + offsets[:, None]
 
-    keep = nms(*boxes_for_nms.T, scores, iou_threshold)
+    keep = nms(*boxes_for_nms.T, scores=scores, thresh=iou_threshold)  # type: ignore[misc]
     if max_num > 0:
         keep = keep[:max_num]
     keep = np.array(keep)
@@ -166,6 +175,6 @@ def multiclass_nms(
     return det, keep
 
 
-def softmax(logits, axis=None, keepdims=False):
+def softmax(logits: np.ndarray, eps: float = 1e-9, axis=None, keepdims: bool = False) -> np.ndarray:
     exp = np.exp(logits - np.max(logits))
-    return exp / np.sum(exp, axis=axis, keepdims=keepdims)
+    return exp / (np.sum(exp, axis=axis, keepdims=keepdims) + eps)
