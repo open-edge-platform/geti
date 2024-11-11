@@ -10,6 +10,7 @@ import re
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, NoReturn, Type
 
+from model_api.adapters.inference_adapter import InferenceAdapter
 from model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
 from model_api.adapters.openvino_adapter import (
     OpenvinoAdapter,
@@ -22,8 +23,6 @@ if TYPE_CHECKING:
     from os import PathLike
 
     from numpy import ndarray
-
-    from model_api.adapters.inference_adapter import InferenceAdapter
 
 
 class WrapperError(Exception):
@@ -100,11 +99,7 @@ class Model:
         self.callback_fn = lambda _: None
 
     def get_model(self):
-        model = self.inference_adapter.get_model()
-        model.set_rt_info(self.__model__, ["model_info", "model_type"])
-        for name in self.parameters():
-            model.set_rt_info(getattr(self, name), ["model_info", name])
-        return model
+        return self.inference_adapter.get_model()
 
     @classmethod
     def get_model_class(cls, name: str) -> Type:
@@ -122,7 +117,7 @@ class Model:
     @classmethod
     def create_model(
         cls,
-        model: str,
+        model: str | InferenceAdapter,
         model_type: Any | None = None,
         configuration: dict[str, Any] = {},
         preload: bool = True,
@@ -140,7 +135,7 @@ class Model:
         """Create an instance of the Model API model
 
         Args:
-            model (str): model name from OpenVINO Model Zoo, path to model, OVMS URL
+            model (str| InferenceAdapter): model name from OpenVINO Model Zoo, path to model, OVMS URL, or an adapter
             configuration (:obj:`dict`, optional): dictionary of model config with model properties, for example
                 confidence_threshold, labels
             model_type (:obj:`str`, optional): name of model wrapper to create (e.g. "ssd")
@@ -162,7 +157,9 @@ class Model:
             Model object
         """
         inference_adapter: InferenceAdapter
-        if isinstance(model, str) and re.compile(
+        if isinstance(model, InferenceAdapter):
+            inference_adapter = model
+        elif isinstance(model, str) and re.compile(
             r"(\w+\.*\-*)*\w+:\d+\/models\/[a-zA-Z0-9._-]+(\:\d+)*",
         ).fullmatch(model):
             inference_adapter = OVMSAdapter(model)
@@ -487,7 +484,12 @@ class Model:
                 f"precision: {metadata.precision}, layout: {metadata.layout}",
             )
 
-    def save(self, xml_path, bin_path="", version="UNSPECIFIED"):
-        import openvino
+    def save(self, path: str, weights_path: str = "", version: str = "UNSPECIFIED"):
+        model_info = {
+            "model_type": self.__model__,
+        }
+        for name in self.parameters():
+            model_info[name] = getattr(self, name)
 
-        openvino.serialize(self.get_model(), xml_path, bin_path, version)
+        self.inference_adapter.update_model_info(model_info)
+        self.inference_adapter.save_model(path, weights_path, version)

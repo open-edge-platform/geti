@@ -419,6 +419,19 @@ class OpenvinoAdapter(InferenceAdapter):
         """
         return self.model
 
+    def update_model_info(self, model_info: dict[str, Any]):
+        """
+        Populates OV IR RT info with the given model info.
+
+        Args:
+            model_info (dict[str, Any]): a dict representing the serialized parameters.
+        """
+        for name in model_info:
+            self.model.set_rt_info(model_info[name], ["model_info", name])
+
+    def save_model(self, path: str, weights_path: str = "", version: str = "UNSPECIFIED"):
+        ov.serialize(self.get_model(), path, weights_path, version)
+
 
 def get_input_shape(input_tensor: ov.Output) -> list[int]:
     def string_to_tuple(string, casting_type=int):
