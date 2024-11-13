@@ -22,7 +22,7 @@ class TilerBase {
 public:
     TilerBase(const std::shared_ptr<ImageModel>& model,
               const ov::AnyMap& configuration,
-              ExecutionMode exec_mode = ExecutionMode::async);
+              ExecutionMode exec_mode = ExecutionMode::sync);
 
     virtual ~TilerBase() = default;
 
@@ -43,5 +43,5 @@ protected:
     float tiles_overlap = 0.5f;
     float iou_threshold = 0.45f;
     bool tile_with_full_img = true;
-    ExecutionMode run_mode = ExecutionMode::async;
+    ExecutionMode run_mode = ExecutionMode::sync;
 };
