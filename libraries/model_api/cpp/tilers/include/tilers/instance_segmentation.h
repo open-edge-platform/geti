@@ -11,7 +11,9 @@ struct InstanceSegmentationResult;
 class InstanceSegmentationTiler : public TilerBase {
     /*InstanceSegmentationTiler tiler works with MaskRCNNModel model only*/
 public:
-    InstanceSegmentationTiler(std::shared_ptr<ImageModel> model, const ov::AnyMap& configuration);
+    InstanceSegmentationTiler(std::shared_ptr<ImageModel> model,
+                              const ov::AnyMap& configuration,
+                              ExecutionMode exec_mode = ExecutionMode::sync);
     virtual std::unique_ptr<InstanceSegmentationResult> run(const ImageInputData& inputData);
     virtual ~InstanceSegmentationTiler() = default;
     bool postprocess_semantic_masks = true;

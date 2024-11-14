@@ -10,7 +10,9 @@ struct DetectionResult;
 
 class DetectionTiler : public TilerBase {
 public:
-    DetectionTiler(const std::shared_ptr<ImageModel>& model, const ov::AnyMap& configuration);
+    DetectionTiler(const std::shared_ptr<ImageModel>& model,
+                   const ov::AnyMap& configuration,
+                   ExecutionMode exec_mode = ExecutionMode::sync);
     virtual ~DetectionTiler() = default;
 
     virtual std::unique_ptr<DetectionResult> run(const ImageInputData& inputData);

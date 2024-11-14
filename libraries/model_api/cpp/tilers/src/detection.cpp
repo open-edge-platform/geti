@@ -27,8 +27,10 @@ cv::Mat non_linear_normalization(cv::Mat& class_map) {
 
 }  // namespace
 
-DetectionTiler::DetectionTiler(const std::shared_ptr<ImageModel>& _model, const ov::AnyMap& configuration)
-    : TilerBase(_model, configuration) {
+DetectionTiler::DetectionTiler(const std::shared_ptr<ImageModel>& _model,
+                               const ov::AnyMap& configuration,
+                               ExecutionMode exec_mode)
+    : TilerBase(_model, configuration, exec_mode) {
     ov::AnyMap extra_config;
     try {
         auto ov_model = model->getModel();
