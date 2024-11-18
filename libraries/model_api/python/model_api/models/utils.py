@@ -45,7 +45,7 @@ def get_contours(
         if len(contours) != 1:
             msg = "findContours() must have returned only one contour"
             raise RuntimeError(msg)
-        combined_contours.append(Contour(str(obj.str_label), obj.score, contours[0]))
+        combined_contours.append(Contour(label=str(obj.str_label), probability=obj.score, shape=contours[0]))
     return combined_contours
 
 

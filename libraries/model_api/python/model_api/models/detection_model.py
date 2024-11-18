@@ -4,6 +4,7 @@
 #
 
 from .image_model import ImageModel
+from .result_types import Detection
 from .types import ListValue, NumericalValue, StringValue
 from .utils import load_labels
 
@@ -37,6 +38,7 @@ class DetectionModel(ImageModel):
         """
         super().__init__(inference_adapter, configuration, preload)
         self.path_to_labels: str
+        self.confidence_threshold: float
         if not self.image_blob_name:
             self.raise_error(
                 f"The Wrapper supports only one image input, but {len(self.image_blob_names)} found",
@@ -63,7 +65,7 @@ class DetectionModel(ImageModel):
 
         return parameters
 
-    def _resize_detections(self, detections, meta):
+    def _resize_detections(self, detections: list[Detection], meta):
         """Resizes detection bounding boxes according to initial image shape.
 
         It implements image resizing depending on the set `resize_type`(see `ImageModel` for details).
@@ -117,7 +119,7 @@ class DetectionModel(ImageModel):
 
         return detections
 
-    def _filter_detections(self, detections, box_area_threshold=0.0):
+    def _filter_detections(self, detections: list[Detection], box_area_threshold=0.0):
         """Filters detections by confidence threshold and box size threshold
 
         Args:
@@ -138,7 +140,7 @@ class DetectionModel(ImageModel):
 
         return filtered_detections
 
-    def _add_label_names(self, detections):
+    def _add_label_names(self, detections: list[Detection]):
         """Adds labels names to detections if they are available
 
         Args:
