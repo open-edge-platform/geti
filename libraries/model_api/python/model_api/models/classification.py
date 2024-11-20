@@ -8,16 +8,15 @@ from __future__ import annotations  # TODO: remove when Python3.9 support is dro
 import copy
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, List, Tuple
+from typing import TYPE_CHECKING
 
 import numpy as np
-from numpy import float32
 from openvino.preprocess import PrePostProcessor
 from openvino.runtime import Model, Type
 from openvino.runtime import opset10 as opset
 
 from model_api.models.image_model import ImageModel
-from model_api.models.result_types import ClassificationResult
+from model_api.models.result_types import ClassificationResult, Label
 from model_api.models.types import BooleanValue, ListValue, NumericalValue, StringValue
 from model_api.models.utils import softmax
 
@@ -267,7 +266,7 @@ class ClassificationModel(ImageModel):
             probs = softmax(logits.reshape(-1))
         return probs
 
-    def get_hierarchical_predictions(self, logits: np.ndarray):
+    def get_hierarchical_predictions(self, logits: np.ndarray) -> list[Label]:
         predicted_labels = []
         predicted_scores = []
         cls_heads_info = self.hierarchical_info["cls_heads_info"]
@@ -294,7 +293,7 @@ class ClassificationModel(ImageModel):
         predictions = list(zip(predicted_labels, predicted_scores))
         return self.labels_resolver.resolve_labels(predictions)
 
-    def get_multilabel_predictions(self, logits: np.ndarray) -> List[Tuple[int, str, float32]]:
+    def get_multilabel_predictions(self, logits: np.ndarray) -> list[Label]:
         logits = sigmoid_numpy(logits)
         scores = []
         indices = []
@@ -304,18 +303,18 @@ class ClassificationModel(ImageModel):
                 scores.append(logits[i])
         labels = [self.labels[i] if self.labels else "" for i in indices]
 
-        return list(zip(indices, labels, scores))
+        return [Label(*data) for data in zip(indices, labels, scores)]
 
-    def get_multiclass_predictions(self, outputs: dict) -> list[tuple[int, str, float]]:
+    def get_multiclass_predictions(self, outputs: dict) -> list[Label]:
         if self.embedded_topk:
             indicesTensor = outputs[self.out_layer_names[0]][0]
             scoresTensor = outputs[self.out_layer_names[1]][0]
             labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
         else:
             scoresTensor = softmax(outputs[self.out_layer_names[0]][0])
-            indicesTensor = [np.argmax(scoresTensor)]
+            indicesTensor = [int(np.argmax(scoresTensor))]
             labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
-        return list(zip(indicesTensor, labels, scoresTensor))
+        return [Label(*data) for data in zip(indicesTensor, labels, scoresTensor)]
 
 
 def addOrFindSoftmaxAndTopkOutputs(inference_adapter: InferenceAdapter, topk: int, output_raw_scores: bool) -> None:
@@ -384,7 +383,7 @@ class GreedyLabelsResolver:
         for child, parent in self.label_relations:
             self.label_tree.add_edge(parent, child)
 
-    def resolve_labels(self, predictions: list[tuple]) -> list:
+    def resolve_labels(self, predictions: list[tuple]) -> list[Label]:
         """Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
         The following two steps are taken:
         - select the most likely label from each label group
@@ -438,7 +437,7 @@ class GreedyLabelsResolver:
                 if new_lbl not in output_labels:
                     output_labels.append(new_lbl)
 
-        return [(self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in sorted(output_labels)]
+        return [Label(self.label_to_idx[lbl], lbl, label_to_prob[lbl]) for lbl in sorted(output_labels)]
 
 
 class ProbabilisticLabelsResolver(GreedyLabelsResolver):
@@ -447,7 +446,7 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
         if warmup_cache:
             self.label_tree.get_labels_in_topological_order()
 
-    def resolve_labels(self, predictions: list[tuple[str, float]]) -> list[tuple[int, str, float]]:
+    def resolve_labels(self, predictions: list[tuple[str, float]]) -> list[Label]:
         """Resolves hierarchical labels and exclusivity based on a list of ScoredLabels (labels with probability).
 
         The following two steps are taken:
@@ -467,7 +466,7 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
     def __resolve_labels_probabilistic(
         self,
         label_to_probability: dict[str, float],
-    ) -> list[tuple[int, str, float]]:
+    ) -> list[Label]:
         """Resolves hierarchical labels and exclusivity based on a probabilistic label output.
 
         - selects the most likely (max) label from an exclusive group
@@ -495,7 +494,7 @@ class ProbabilisticLabelsResolver(GreedyLabelsResolver):
         for lbl, probability in sorted(resolved.items()):
             if probability > 0:  # only return labels with non-zero probability
                 result.append(
-                    (
+                    Label(
                         self.label_to_idx[lbl],
                         lbl,
                         # retain the original probability in the output

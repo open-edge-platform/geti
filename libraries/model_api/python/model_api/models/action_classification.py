@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from model_api.adapters.utils import RESIZE_TYPES, InputTransform
+from model_api.models.result_types import Label
 
 from .model import Model
 from .result_types import ClassificationResult
@@ -223,7 +224,7 @@ class ActionClassificationModel(Model):
         logits = next(iter(outputs.values())).squeeze()
         index = np.argmax(logits)
         return ClassificationResult(
-            [(index, self.labels[index], logits[index])],
+            [Label(int(index), self.labels[index], logits[index])],
             np.ndarray(0),
             np.ndarray(0),
             np.ndarray(0),
