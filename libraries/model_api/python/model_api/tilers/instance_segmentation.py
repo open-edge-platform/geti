@@ -8,10 +8,7 @@ from contextlib import contextmanager
 import cv2 as cv
 import numpy as np
 
-from model_api.models import (
-    InstanceSegmentationResult,
-    SegmentedObject,
-)
+from model_api.models import InstanceSegmentationResult
 from model_api.models.instance_segmentation import MaskRCNNModel, _segm_postprocess
 from model_api.models.utils import multiclass_nms
 
@@ -68,7 +65,7 @@ class InstanceSegmentationTiler(DetectionTiler):
 
         return tile_coords
 
-    def _postprocess_tile(self, predictions, coord):
+    def _postprocess_tile(self, predictions: InstanceSegmentationResult, coord) -> dict:  # type: ignore[override]
         """Converts predictions to a format convenient for further merging.
 
         Args:
@@ -80,21 +77,21 @@ class InstanceSegmentationTiler(DetectionTiler):
         """
         output_dict = super()._postprocess_tile(predictions, coord)
         output_dict["masks"] = []
-        for segm_res in predictions.segmentedObjects:
-            output_dict["masks"].append(segm_res.mask)
+        for mask in predictions.masks:
+            output_dict["masks"].append(mask)
 
         return output_dict
 
-    def _merge_results(self, results, shape):
+    def _merge_results(self, results, shape) -> InstanceSegmentationResult:
         """Merge results from all tiles.
 
         To merge detections, per-class NMS is applied.
 
         Args:
-             results: list of per-tile results
-             shape: original full-res image shape
+            results: list of per-tile results
+            shape: original full-res image shape
         Returns:
-             merged prediction
+            merged prediction
         """
         detections_array = np.empty((0, 6), dtype=np.float32)
         feature_vectors = []
@@ -114,28 +111,30 @@ class InstanceSegmentationTiler(DetectionTiler):
         if np.prod(detections_array.shape):
             detections_array, keep_idxs = multiclass_nms(
                 detections_array,
-                max_num=self.max_pred_number,
-                iou_threshold=self.iou_threshold,
+                max_num=self.max_pred_number,  # type: ignore[attr-defined]
+                iou_threshold=self.iou_threshold,  # type: ignore[attr-defined]
             )
         masks = [masks[keep_idx] for keep_idx in keep_idxs]
 
         merged_vector = np.mean(feature_vectors, axis=0) if feature_vectors else np.ndarray(0)
         saliency_map = self._merge_saliency_maps(saliency_maps, shape, tiles_coords) if saliency_maps else []
 
-        detected_objects = []
-        for i in range(detections_array.shape[0]):
-            label = int(detections_array[i][0])
-            score = float(detections_array[i][1])
-            bbox = list(detections_array[i][2:].astype(np.int32))
-            masks[i] = _segm_postprocess(np.array(bbox), masks[i], *shape[:-1])
-            detected_objects.append(
-                SegmentedObject(*bbox, score, label, self.model.labels[label], masks[i]),
-            )
+        labels, scores, bboxes = np.hsplit(detections_array, [1, 2])
+        labels = labels.astype(np.int32)
+        resized_masks, label_names = [], []
+        for mask, box, label_idx in zip(masks, bboxes, labels):
+            label_names.append(self.model.labels[int(label_idx)])
+            resized_masks.append(_segm_postprocess(box, mask, *shape[:-1]))
 
+        resized_masks = np.stack(resized_masks) if resized_masks else masks
         return InstanceSegmentationResult(
-            detected_objects,
-            saliency_map,
-            merged_vector,
+            bboxes=np.round(bboxes).astype(np.int32),
+            labels=labels.squeeze(),
+            scores=scores.squeeze(),
+            masks=resized_masks,
+            label_names=label_names if label_names else None,
+            saliency_map=saliency_map,
+            feature_vector=merged_vector,
         )
 
     def _merge_saliency_maps(self, saliency_maps, shape, tiles_coords):

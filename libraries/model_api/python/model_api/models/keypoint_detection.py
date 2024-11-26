@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 from .image_model import ImageModel
-from .result_types import DetectedKeypoints, Detection
+from .result_types import DetectedKeypoints, DetectionResult
 from .types import ListValue
 
 
@@ -77,25 +77,27 @@ class TopDownKeypointDetectionPipeline:
     def predict(
         self,
         image: np.ndarray,
-        detections: list[Detection],
+        detection_result: DetectionResult,
     ) -> list[DetectedKeypoints]:
         """Predicts keypoints for the given image and detections.
 
         Args:
             image (np.ndarray): input full-size image
-            detections (list[Detection]): detections located within the given image
+            detection_result (detection_result): detections located within the given image
 
         Returns:
             list[DetectedKeypoints]: per detection keypoints in detection coordinates
         """
         crops = []
-        for det in detections:
-            crops.append(image[det.ymin : det.ymax, det.xmin : det.xmax])
+        for box in detection_result.bboxes:
+            x1, y1, x2, y2 = box
+            crops.append(image[y1:y2, x1:x2])
 
         crops_results = self.predict_crops(crops)
-        for i, det in enumerate(detections):
+        for i, box in enumerate(detection_result.bboxes):
+            x1, y1, x2, y2 = box
             crops_results[i] = DetectedKeypoints(
-                crops_results[i].keypoints + np.array([det.xmin, det.ymin]),
+                crops_results[i].keypoints + np.array([x1, y1]),
                 crops_results[i].scores,
             )
 

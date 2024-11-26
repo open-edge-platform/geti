@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+import numpy as np
+
 from .image_model import ImageModel
-from .result_types import Detection
+from .result_types import DetectionResult
 from .types import ListValue, NumericalValue, StringValue
 from .utils import load_labels
 
@@ -65,18 +67,15 @@ class DetectionModel(ImageModel):
 
         return parameters
 
-    def _resize_detections(self, detections: list[Detection], meta):
+    def _resize_detections(self, detection_result: DetectionResult, meta: dict):
         """Resizes detection bounding boxes according to initial image shape.
 
         It implements image resizing depending on the set `resize_type`(see `ImageModel` for details).
         Next, it applies bounding boxes clipping.
 
         Args:
-            detections (List[Detection]): list of detections with coordinates in normalized form
+            detection_result (DetectionList): detection result with coordinates in normalized form
             meta (dict): the input metadata obtained from `preprocess` method
-
-        Returns:
-            - list of detections with resized and clipped coordinates to fit the initial image
         """
         input_img_height, input_img_widht = meta["original_shape"][:2]
         inverted_scale_x = input_img_widht / self.w
@@ -92,63 +91,35 @@ class DetectionModel(ImageModel):
                 pad_left = (self.w - round(input_img_widht / inverted_scale_x)) // 2
                 pad_top = (self.h - round(input_img_height / inverted_scale_y)) // 2
 
-        def _clamp_and_round(val, min_value, max_value):
-            return round(max(min_value, min(max_value, val)))
+        boxes = detection_result.bboxes
+        boxes[:, 0::2] = (boxes[:, 0::2] * self.w - pad_left) * inverted_scale_x
+        boxes[:, 1::2] = (boxes[:, 1::2] * self.h - pad_top) * inverted_scale_y
+        np.round(boxes, out=boxes)
+        boxes[:, 0::2] = np.clip(boxes[:, 0::2], 0, input_img_widht)
+        boxes[:, 1::2] = np.clip(boxes[:, 1::2], 0, input_img_height)
+        detection_result.bboxes = boxes.astype(np.int32)
 
-        for detection in detections:
-            detection.xmin = _clamp_and_round(
-                (detection.xmin * self.w - pad_left) * inverted_scale_x,
-                0,
-                input_img_widht,
-            )
-            detection.ymin = _clamp_and_round(
-                (detection.ymin * self.h - pad_top) * inverted_scale_y,
-                0,
-                input_img_height,
-            )
-            detection.xmax = _clamp_and_round(
-                (detection.xmax * self.w - pad_left) * inverted_scale_x,
-                0,
-                input_img_widht,
-            )
-            detection.ymax = _clamp_and_round(
-                (detection.ymax * self.h - pad_top) * inverted_scale_y,
-                0,
-                input_img_height,
-            )
-
-        return detections
-
-    def _filter_detections(self, detections: list[Detection], box_area_threshold=0.0):
+    def _filter_detections(self, detection_result: DetectionResult, box_area_threshold=0.0):
         """Filters detections by confidence threshold and box size threshold
 
         Args:
-            detections (List[Detection]): list of detections with coordinates in normalized form
+            detection_result (DetectionResult): DetectionResult object with coordinates in normalized form
             box_area_threshold (float): minimal area of the bounding to be considered
 
         Returns:
             - list of detections with confidence above the threshold
         """
-        filtered_detections = []
-        for detection in detections:
-            if (
-                detection.score < self.confidence_threshold
-                or (detection.xmax - detection.xmin) * (detection.ymax - detection.ymin) < box_area_threshold
-            ):
-                continue
-            filtered_detections.append(detection)
+        keep = (detection_result.get_obj_sizes() > box_area_threshold) & (
+            detection_result.scores > self.confidence_threshold
+        )
+        detection_result.bboxes = detection_result.bboxes[keep]
+        detection_result.labels = detection_result.labels[keep]
+        detection_result.scores = detection_result.scores[keep]
 
-        return filtered_detections
-
-    def _add_label_names(self, detections: list[Detection]):
+    def _add_label_names(self, detection_result: DetectionResult) -> None:
         """Adds labels names to detections if they are available
 
         Args:
-            detections (List[Detection]): list of detections with coordinates in normalized form
-
-        Returns:
-            - list of detections with label strings
+            detection_result (List[Detection]): list of detections with coordinates in normalized form
         """
-        for detection in detections:
-            detection.str_label = self.get_label_name(detection.id)
-        return detections
+        detection_result.label_names = [self.get_label_name(label_idx) for label_idx in detection_result.labels]

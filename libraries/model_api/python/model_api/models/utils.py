@@ -6,37 +6,49 @@
 from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import cv2
 import numpy as np
 
-from model_api.models.result_types import Contour, Detection, SegmentedObject, SegmentedObjectWithRects
+from model_api.models.result_types import Contour, InstanceSegmentationResult, RotatedSegmentationResult
+
+if TYPE_CHECKING:
+    from model_api.models.result_types.detection import DetectionResult
 
 
-def add_rotated_rects(segmented_objects: list[SegmentedObject]) -> list[SegmentedObjectWithRects]:
+def add_rotated_rects(inst_seg_result: InstanceSegmentationResult) -> RotatedSegmentationResult:
     objects_with_rects = []
-    for segmented_object in segmented_objects:
-        mask = segmented_object.mask.astype(np.uint8)
+    for mask in inst_seg_result.masks:
+        mask = mask.astype(np.uint8)
         contours, _ = cv2.findContours(
             mask,
             cv2.RETR_EXTERNAL,
             cv2.CHAIN_APPROX_SIMPLE,
         )
-
         contour = np.vstack(contours)
-        objects_with_rects.append(
-            SegmentedObjectWithRects(segmented_object, cv2.minAreaRect(contour)),
-        )
-    return objects_with_rects
+        objects_with_rects.append(cv2.minAreaRect(contour))
+    return RotatedSegmentationResult(
+        bboxes=inst_seg_result.bboxes,
+        masks=inst_seg_result.masks,
+        scores=inst_seg_result.scores,
+        labels=inst_seg_result.labels,
+        label_names=inst_seg_result.label_names,
+        rotated_rects=objects_with_rects,
+        feature_vector=inst_seg_result.feature_vector,
+        saliency_map=inst_seg_result.saliency_map,
+    )
 
 
-def get_contours(
-    segmentedObjects: list[SegmentedObject | SegmentedObjectWithRects],
-) -> list[Contour]:
+def get_contours(seg_result: RotatedSegmentationResult | InstanceSegmentationResult) -> list[Contour]:
     combined_contours = []
-    for obj in segmentedObjects:
+    for mask, score, label_name in zip(
+        seg_result.masks,
+        seg_result.scores,
+        seg_result.label_names,
+    ):
         contours, _ = cv2.findContours(
-            obj.mask,
+            mask,
             cv2.RETR_EXTERNAL,
             cv2.CHAIN_APPROX_NONE,
         )
@@ -45,17 +57,19 @@ def get_contours(
         if len(contours) != 1:
             msg = "findContours() must have returned only one contour"
             raise RuntimeError(msg)
-        combined_contours.append(Contour(label=str(obj.str_label), probability=obj.score, shape=contours[0]))
+        combined_contours.append(Contour(label=label_name, probability=score, shape=contours[0]))
     return combined_contours
 
 
-def clip_detections(detections: list[Detection], size: tuple[int, int]) -> list[Detection]:
-    for detection in detections:
-        detection.xmin = min(max(round(detection.xmin), 0), size[1])
-        detection.ymin = min(max(round(detection.ymin), 0), size[0])
-        detection.xmax = min(max(round(detection.xmax), 0), size[1])
-        detection.ymax = min(max(round(detection.ymax), 0), size[0])
-    return detections
+def clip_detections(detections: DetectionResult, size: tuple[int, int]):
+    """Clip bounding boxes to image size.
+
+    Args:
+        detections (DetectionResult): detection results including boxes, labels and scores.
+        size (tuple[int, int]): image size of format (height, width).
+    """
+    detections.bboxes[:, 0::2] = np.clip(detections.bboxes[:, 0::2], 0, size[1])
+    detections.bboxes[:, 1::2] = np.clip(detections.bboxes[:, 1::2], 0, size[0])
 
 
 class OutputTransform:

@@ -5,14 +5,13 @@
 
 from .anomaly import AnomalyResult
 from .classification import ClassificationResult, Label
-from .detection import Detection, DetectionResult
+from .detection import DetectionResult
 from .keypoint import DetectedKeypoints
 from .segmentation import (
     Contour,
     ImageResultWithSoftPrediction,
     InstanceSegmentationResult,
-    SegmentedObject,
-    SegmentedObjectWithRects,
+    RotatedSegmentationResult,
 )
 from .visual_prompting import PredictedMask, VisualPromptingResult, ZSLVisualPromptingResult
 
@@ -20,15 +19,13 @@ __all__ = [
     "AnomalyResult",
     "ClassificationResult",
     "Contour",
-    "Detection",
     "DetectionResult",
     "DetectedKeypoints",
     "Label",
-    "SegmentedObject",
-    "SegmentedObjectWithRects",
     "ImageResultWithSoftPrediction",
     "InstanceSegmentationResult",
     "PredictedMask",
     "VisualPromptingResult",
     "ZSLVisualPromptingResult",
+    "RotatedSegmentationResult",
 ]

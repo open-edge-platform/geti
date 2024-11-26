@@ -4,14 +4,13 @@
 #
 
 from collections import namedtuple
-from itertools import starmap
 
 import numpy as np
 
 from model_api.adapters.utils import INTERPOLATION_TYPES, resize_image_ocv
 
 from .detection_model import DetectionModel
-from .result_types import Detection, DetectionResult
+from .result_types import DetectionResult
 from .types import BooleanValue, ListValue, NumericalValue
 from .utils import clip_detections, multiclass_nms, nms
 
@@ -190,14 +189,14 @@ class YOLO(DetectionModel):
         parameters["confidence_threshold"].update_default_value(0.5)
         return parameters
 
-    def postprocess(self, outputs, meta):
+    def postprocess(self, outputs, meta) -> DetectionResult:
         detections = self._parse_outputs(outputs, meta)
-        detections = self._resize_detections(detections, meta)
-        return self._add_label_names(detections)
+        self._resize_detections(detections, meta)
+        self._add_label_names(detections)
+        return detections
 
-    def _parse_yolo_region(self, predictions, input_size, params):
+    def _parse_yolo_region(self, predictions, input_size, params) -> DetectionResult:
         # ------------------------------------------ Extracting layer parameters ---------------------------------------
-        objects = []
         size_normalizer = input_size if params.use_input_size else params.sides
         predictions = permute_to_N_HWA_K(
             predictions,
@@ -205,6 +204,7 @@ class YOLO(DetectionModel):
             params.output_layout,
         )
         # ------------------------------------------- Parsing YOLO Region output ---------------------------------------
+        bboxes, labels, scores = [], [], []
         for prediction in predictions:
             # Getting probabilities from raw outputs
             class_probabilities = self._get_probabilities(prediction, params.classes)
@@ -232,18 +232,32 @@ class YOLO(DetectionModel):
                 # Define class_label and cofidence
                 label = class_idx[ind]
                 confidence = class_probabilities[ind]
-                objects.append(
-                    Detection(
+
+                bboxes.append(
+                    [
                         predicted_box.x - predicted_box.w / 2,
                         predicted_box.y - predicted_box.h / 2,
                         predicted_box.x + predicted_box.w / 2,
                         predicted_box.y + predicted_box.h / 2,
-                        confidence.item(),
-                        label.item(),
-                    ),
+                    ],
                 )
+                scores.append(confidence.item())
+                labels.append(label.item())
 
-        return objects
+        if len(bboxes):
+            bboxes = np.stack(bboxes)
+            labels = np.array(labels)
+            scores = np.array(scores)
+        else:
+            bboxes = np.empty((0, 4), dtype=np.float32)
+            labels = np.empty((0,), dtype=np.int32)
+            scores = np.empty((0,), dtype=np.float32)
+
+        return DetectionResult(
+            bboxes=bboxes,
+            labels=labels,
+            scores=scores,
+        )
 
     @staticmethod
     def _get_probabilities(prediction, classes):
@@ -280,7 +294,7 @@ class YOLO(DetectionModel):
         return DetectionBox(x, y, width, height)
 
     @staticmethod
-    def _filter(detections, iou_threshold):
+    def _filter(detections: DetectionResult, iou_threshold: float) -> DetectionResult:
         def iou(box_1, box_2):
             width_of_overlap_area = min(box_1.xmax, box_2.xmax) - max(
                 box_1.xmin,
@@ -301,33 +315,59 @@ class YOLO(DetectionModel):
                 return 0
             return area_of_overlap / area_of_union
 
-        detections = sorted(detections, key=lambda obj: obj.score, reverse=True)
+        indices = np.argsort(detections.scores)[::-1]
+        detections.bboxes = detections.bboxes[indices]
+        detections.scores = detections.scores[indices]
+        detections.labels = detections.labels[indices]
+
         for i in range(len(detections)):
-            if detections[i].score == 0:
+            if detections.scores[i] == 0:
                 continue
             for j in range(i + 1, len(detections)):
                 # We perform IOU only on objects of same class
-                if detections[i].id != detections[j].id:
+                if detections.labels[i] != detections.labels[j]:
                     continue
 
-                if iou(detections[i], detections[j]) > iou_threshold:
-                    detections[j].score = 0
+                if iou(detections.bboxes[i], detections.bboxes[j]) > iou_threshold:
+                    detections.scores[j] = 0.0
 
-        return [det for det in detections if det.score > 0]
+        keep = detections.scores > 0.0
+        detections.bboxes = detections.bboxes[keep]
+        detections.scores = detections.scores[keep]
+        detections.labels = detections.labels[keep]
+        return detections
 
-    def _parse_outputs(self, outputs, meta):
-        detections = []
+    def _parse_outputs(self, outputs, meta) -> DetectionResult:
+        bboxes, scores, labels = [], [], []
         for layer_name in self.yolo_layer_params:
             out_blob = outputs[layer_name]
             layer_params = self.yolo_layer_params[layer_name]
             out_blob.shape = layer_params[0]
-            detections += self._parse_yolo_region(
+            detection_result = self._parse_yolo_region(
                 out_blob,
                 meta["resized_shape"],
                 layer_params[1],
             )
+            bboxes.extend(detection_result.bboxes)
+            scores.extend(detection_result.scores)
+            labels.extend(detection_result.labels)
 
-        return self._filter(detections, self.iou_threshold)
+        if len(bboxes):
+            bboxes = np.stack(bboxes)
+            labels = np.array(labels)
+            scores = np.array(scores)
+        else:
+            bboxes = np.empty((0, 4), dtype=np.float32)
+            labels = np.empty((0,), dtype=np.int32)
+            scores = np.empty((0,), dtype=np.float32)
+
+        detection_result = DetectionResult(
+            bboxes=bboxes,
+            labels=labels,
+            scores=scores,
+        )
+
+        return self._filter(detection_result, self.iou_threshold)  # type: ignore[attr-defined]
 
 
 class YoloV4(YOLO):
@@ -525,7 +565,7 @@ class YOLOX(DetectionModel):
         dict_inputs = {self.image_blob_name: preprocessed_image}
         return dict_inputs, meta
 
-    def postprocess(self, outputs, meta):
+    def postprocess(self, outputs, meta) -> DetectionResult:
         output = outputs[self.output_blob_name][0]
 
         if np.size(self.expanded_strides) != 0 and np.size(self.grids) != 0:
@@ -546,24 +586,18 @@ class YOLOX(DetectionModel):
             x_maxs,
             y_maxs,
             scores,
-            self.iou_threshold,
+            self.iou_threshold,  # type: ignore[attr-defined]
             include_boundaries=True,
         )
 
-        detections = list(
-            starmap(
-                Detection,
-                zip(
-                    x_mins[keep_nms],
-                    y_mins[keep_nms],
-                    x_maxs[keep_nms],
-                    y_maxs[keep_nms],
-                    scores[keep_nms],
-                    j[keep_nms],
-                ),
-            ),
+        detections = DetectionResult(
+            bboxes=boxes[i][keep_nms],
+            scores=scores[keep_nms],
+            labels=j[keep_nms],
         )
-        return clip_detections(detections, meta["original_shape"])
+
+        clip_detections(detections, meta["original_shape"])
+        return detections
 
     def set_strides_grids(self):
         grids = []
@@ -675,11 +709,12 @@ class YoloV3ONNX(DetectionModel):
 
         return dict_inputs, meta
 
-    def postprocess(self, outputs, meta):
+    def postprocess(self, outputs, meta) -> DetectionResult:
         detections = self._parse_outputs(outputs)
-        return clip_detections(detections, meta["original_shape"])
+        clip_detections(detections, meta["original_shape"])
+        return detections
 
-    def _parse_outputs(self, outputs):
+    def _parse_outputs(self, outputs) -> DetectionResult:
         boxes = outputs[self.bboxes_blob_name][0]
         scores = outputs[self.scores_blob_name][0]
         indices = (
@@ -695,24 +730,33 @@ class YoloV3ONNX(DetectionModel):
             out_classes.append(idx_[1])
             out_scores.append(scores[tuple(idx_[1:])])
             out_boxes.append(boxes[idx_[2]])
-        transposed_boxes = np.array(out_boxes).T if out_boxes else ([], [], [], [])
+
+        _boxes = np.stack(out_boxes) if out_boxes else np.empty((0, 4), dtype=np.float32)
+        x_mins = _boxes[:, 1]
+        y_mins = _boxes[:, 0]
+        x_maxs = _boxes[:, 3]
+        y_maxs = _boxes[:, 2]
+        _boxes = np.stack((x_mins, y_mins, x_maxs, y_maxs)).T
         mask = np.array(out_scores) > self.confidence_threshold
 
         if mask.size == 0:
-            return []
+            return DetectionResult(
+                bboxes=np.empty((0, 4), dtype=np.float32),
+                labels=np.empty((0,), dtype=np.int32),
+                scores=np.empty((0,), dtype=np.float32),
+            )
 
-        out_classes, out_scores, transposed_boxes = (
+        _classes, _scores, _boxes = (
             np.array(out_classes)[mask],
             np.array(out_scores)[mask],
-            transposed_boxes[:, mask],
+            _boxes[mask],
         )
 
-        x_mins = transposed_boxes[1]
-        y_mins = transposed_boxes[0]
-        x_maxs = transposed_boxes[3]
-        y_maxs = transposed_boxes[2]
-
-        return list(starmap(Detection, zip(x_mins, y_mins, x_maxs, y_maxs, out_scores, out_classes)))
+        return DetectionResult(
+            bboxes=_boxes,
+            labels=_classes,
+            scores=_scores,
+        )
 
 
 class YOLOv5(DetectionModel):
@@ -760,7 +804,7 @@ class YOLOv5(DetectionModel):
         )
         return parameters
 
-    def postprocess(self, outputs, meta):
+    def postprocess(self, outputs, meta) -> DetectionResult:
         if len(outputs) != 1:
             self.raise_error("expect 1 output")
         prediction = next(iter(outputs.values()))
@@ -784,7 +828,7 @@ class YOLOv5(DetectionModel):
             dtype=np.float32,
         )
         keep_top_k = 30000
-        if self.agnostic_nms:
+        if self.agnostic_nms:  # type: ignore[attr-defined]
             boxes = boxes[
                 nms(
                     boxes[:, 2],
@@ -792,12 +836,12 @@ class YOLOv5(DetectionModel):
                     boxes[:, 4],
                     boxes[:, 5],
                     boxes[:, 1],
-                    self.iou_threshold,
+                    self.iou_threshold,  # type: ignore[attr-defined]
                     keep_top_k=keep_top_k,
                 )
             ]
         else:
-            boxes, _ = multiclass_nms(boxes, self.iou_threshold, keep_top_k)
+            boxes, _ = multiclass_nms(boxes, self.iou_threshold, keep_top_k)  # type: ignore[attr-defined]
         inputImgWidth = meta["original_shape"][1]
         inputImgHeight = meta["original_shape"][0]
         invertedScaleX, invertedScaleY = (
@@ -823,17 +867,12 @@ class YOLOv5(DetectionModel):
         )
         intid = boxes[:, 0].astype(np.int32)
         return DetectionResult(
-            [
-                Detection(
-                    *intboxes[i],
-                    boxes[i, 1],
-                    intid[i],
-                    self.get_label_name(intid[i]),
-                )
-                for i in range(len(boxes))
-            ],
-            np.ndarray(0),
-            np.ndarray(0),
+            bboxes=intboxes,
+            scores=boxes[:, 1],
+            labels=intid,
+            label_names=[self.get_label_name(i) for i in intid],
+            saliency_map=np.ndarray(0),
+            feature_vector=np.ndarray(0),
         )
 
 

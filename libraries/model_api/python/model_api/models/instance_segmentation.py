@@ -9,7 +9,7 @@ import numpy as np
 from model_api.adapters.inference_adapter import InferenceAdapter
 
 from .image_model import ImageModel
-from .result_types import InstanceSegmentationResult, SegmentedObject
+from .result_types import InstanceSegmentationResult
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
 from .utils import load_labels
 
@@ -176,7 +176,6 @@ class MaskRCNNModel(ImageModel):
             out=boxes,
         )
 
-        objects = []
         has_feature_vector_name = _feature_vector_name in self.outputs
         if has_feature_vector_name:
             if not self.labels:
@@ -184,19 +183,24 @@ class MaskRCNNModel(ImageModel):
             saliency_maps: list = [[] for _ in range(len(self.labels))]
         else:
             saliency_maps = []
-        for box, confidence, cls, raw_mask in zip(boxes, scores, labels, masks):
-            x1, y1, x2, y2 = box
-            if (x2 - x1) * (y2 - y1) < 1 or (confidence <= self.confidence_threshold and not has_feature_vector_name):
-                continue
 
-            # Skip if label index is out of bounds
-            if self.labels and cls >= len(self.labels):
-                continue
+        # Apply confidence threshold, bounding box area filter and label index filter.
+        keep = (scores > self.confidence_threshold) & ((boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1]) > 1)
 
-            # Get label string
-            str_label = self.labels[cls] if self.labels else f"#{cls}"
+        if self.labels:
+            keep &= labels < len(self.labels)
 
-            raw_cls_mask = raw_mask[cls, ...] if self.is_segmentoly else raw_mask
+        boxes = boxes[keep].astype(np.int32)
+        scores = scores[keep]
+        labels = labels[keep]
+        masks = masks[keep]
+
+        resized_masks, label_names = [], []
+        for box, label_idx, raw_mask in zip(boxes, labels, masks):
+            if self.labels:
+                label_names.append(self.labels[label_idx])
+
+            raw_cls_mask = raw_mask[label_idx, ...] if self.is_segmentoly else raw_mask
             if self.postprocess_semantic_masks or has_feature_vector_name:
                 resized_mask = _segm_postprocess(
                     box,
@@ -205,27 +209,21 @@ class MaskRCNNModel(ImageModel):
                 )
             else:
                 resized_mask = raw_cls_mask
-            if confidence > self.confidence_threshold:
-                output_mask = resized_mask if self.postprocess_semantic_masks else raw_cls_mask
-                xmin, ymin, xmax, ymax = box.astype(int)
-                objects.append(
-                    SegmentedObject(
-                        xmin,
-                        ymin,
-                        xmax,
-                        ymax,
-                        score=confidence,
-                        id=cls,
-                        str_label=str_label,
-                        mask=output_mask,
-                    ),
-                )
-            if has_feature_vector_name and confidence > self.confidence_threshold:
-                saliency_maps[cls - 1].append(resized_mask)
+
+            output_mask = resized_mask if self.postprocess_semantic_masks else raw_cls_mask
+            resized_masks.append(output_mask)
+            if has_feature_vector_name:
+                saliency_maps[label_idx - 1].append(resized_mask)
+
+        _masks = np.stack(resized_masks) if len(resized_masks) > 0 else np.empty((0, 16, 16), dtype=np.uint8)
         return InstanceSegmentationResult(
-            objects,
-            _average_and_normalize(saliency_maps),
-            outputs.get(_feature_vector_name, np.ndarray(0)),
+            bboxes=boxes,
+            labels=labels,
+            scores=scores,
+            masks=_masks,
+            label_names=label_names if label_names else None,
+            saliency_map=_average_and_normalize(saliency_maps),
+            feature_vector=outputs.get(_feature_vector_name, np.ndarray(0)),
         )
 
 
