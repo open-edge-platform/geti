@@ -3,8 +3,10 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
+
 import re
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -79,7 +81,7 @@ class OVMSAdapter(InferenceAdapter):
             raw_result = {output_name: raw_result}
         self.callback_fn(raw_result, (lambda x: x, callback_data))
 
-    def set_callback(self, callback_fn):
+    def set_callback(self, callback_fn: Callable):
         self.callback_fn = callback_fn
 
     def is_ready(self):
@@ -98,7 +100,7 @@ class OVMSAdapter(InferenceAdapter):
     def await_any(self):
         pass
 
-    def get_raw_result(self, infer_result):
+    def get_raw_result(self, infer_result: dict):
         pass
 
     def embed_preprocessing(
@@ -127,7 +129,7 @@ class OVMSAdapter(InferenceAdapter):
         msg = "OVMSAdapter does not support updating model info"
         raise NotImplementedError(msg)
 
-    def save_model(self, path: str, weights_path: str = "", version: str = "UNSPECIFIED"):
+    def save_model(self, path: str, weights_path: str | None = None, version: str | None = None):
         msg = "OVMSAdapter does not support saving a model"
         raise NotImplementedError(msg)
 

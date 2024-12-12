@@ -8,7 +8,7 @@ from __future__ import annotations  # TODO: remove when Python3.9 support is dro
 import logging as log
 import re
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, NoReturn, Type
+from typing import TYPE_CHECKING, Any, Callable, NoReturn, Type
 
 from model_api.adapters.inference_adapter import InferenceAdapter
 from model_api.adapters.onnx_adapter import ONNXRuntimeAdapter
@@ -98,11 +98,26 @@ class Model:
             self.load()
         self.callback_fn = lambda _: None
 
-    def get_model(self):
+    def get_model(self) -> Any:
+        """
+        Returns underlying adapter-specific model.
+
+        Returns:
+            Any: Model object.
+        """
         return self.inference_adapter.get_model()
 
     @classmethod
     def get_model_class(cls, name: str) -> Type:
+        """
+        Retrieves a wrapper class by a given wrapper name.
+
+        Args:
+            name (str): Wrapper name.
+
+        Returns:
+            Type: Model class.
+        """
         subclasses = [subclass for subclass in cls.get_subclasses() if subclass.__model__]
         if cls.__model__:
             subclasses.append(cls)
@@ -188,6 +203,7 @@ class Model:
 
     @classmethod
     def get_subclasses(cls) -> list[Any]:
+        """Retrieves all the subclasses of the model class given."""
         all_subclasses = []
         for subclass in cls.__subclasses__():
             all_subclasses.append(subclass)
@@ -195,7 +211,11 @@ class Model:
         return all_subclasses
 
     @classmethod
-    def available_wrappers(cls):
+    def available_wrappers(cls) -> list[str]:
+        """
+        Prepares a list of all discoverable wrapper names
+        (including custom ones inherited from the core wrappers).
+        """
         available_classes = [cls] if cls.__model__ else []
         available_classes.extend(cls.get_subclasses())
         return [subclass.__model__ for subclass in available_classes if subclass.__model__]
@@ -368,7 +388,7 @@ class Model:
         raw_result = self.infer_sync(dict_data)
         return self.postprocess(raw_result, input_meta)
 
-    def infer_batch(self, inputs):
+    def infer_batch(self, inputs: list) -> list[Any]:
         """Applies preprocessing, asynchronous inference, postprocessing routines to a collection of inputs.
 
         Args:
@@ -402,11 +422,24 @@ class Model:
         return [completed_results[i] for i in range(len(inputs))]
 
     def load(self, force: bool = False) -> None:
+        """
+        Prepares the model to be executed by the inference adapter.
+
+        Args:
+            force (bool, optional): Forces the process even if the model is ready. Defaults to False.
+        """
         if not self.model_loaded or force:
             self.model_loaded = True
             self.inference_adapter.load_model()
 
-    def reshape(self, new_shape):
+    def reshape(self, new_shape: dict):
+        """
+        Reshapes the model inputs to fit the new input shape.
+
+        Args:
+            new_shape (dict): a dictionary with inputs names as keys and
+            list of new shape as values in the following format.
+        """
         if self.model_loaded:
             self.logger.warning(
                 f"{self.__model__}: the model already loaded to device, ",
@@ -418,6 +451,10 @@ class Model:
         self.outputs = self.inference_adapter.get_output_layers()
 
     def infer_sync(self, dict_data: dict[str, ndarray]) -> dict[str, ndarray]:
+        """
+        Performs the synchronous model inference. The infer is a blocking method.
+        See InferenceAdapter documentation for details.
+        """
         if not self.model_loaded:
             self.raise_error(
                 "The model is not loaded to the device. Please, create the wrapper "
@@ -425,7 +462,14 @@ class Model:
             )
         return self.inference_adapter.infer_sync(dict_data)
 
-    def infer_async_raw(self, dict_data, callback_data):
+    def infer_async_raw(self, dict_data: dict, callback_data: Any):
+        """
+        Runs asynchronous inference on raw data skipping preprocess() call.
+
+        Args:
+            dict_data (dict): data to be passed to the model
+            callback_data (Any): data to be passed to the callback alongside with inference results.
+        """
         if not self.model_loaded:
             self.raise_error(
                 "The model is not loaded to the device. Please, create the wrapper "
@@ -433,7 +477,15 @@ class Model:
             )
         self.inference_adapter.infer_async(dict_data, callback_data)
 
-    def infer_async(self, input_data, user_data):
+    def infer_async(self, input_data: dict, user_data: Any):
+        """
+        Runs asynchronous model inference.
+
+        Args:
+            input_data (dict): Input dict containing model input name as keys and data object as values.
+            user_data (Any): data to be passed to the callback alongside with inference results.
+        """
+
         if not self.model_loaded:
             self.raise_error(
                 "The model is not loaded to the device. Please, create the wrapper "
@@ -452,23 +504,35 @@ class Model:
         )
 
     @staticmethod
-    def process_callback(request, callback_data):
+    def _process_callback(request, callback_data: Any):
+        """
+        A wrapper for async inference callback.
+        """
         meta, get_result_fn, postprocess_fn, callback_fn, user_data = callback_data
         raw_result = get_result_fn(request)
         result = postprocess_fn(raw_result, meta)
         callback_fn(result, user_data)
 
-    def set_callback(self, callback_fn):
+    def set_callback(self, callback_fn: Callable):
+        """
+        Sets callback that grabs results of async inference.
+
+        Args:
+            callback_fn (Callable): _description_
+        """
         self.callback_fn = callback_fn
-        self.inference_adapter.set_callback(Model.process_callback)
+        self.inference_adapter.set_callback(Model._process_callback)
 
     def is_ready(self):
+        """Checks if model is ready for async inference."""
         return self.inference_adapter.is_ready()
 
     def await_all(self):
+        """Waits for all async inference requests to be completed."""
         self.inference_adapter.await_all()
 
     def await_any(self):
+        """Waits for model to be available for an async infer request."""
         self.inference_adapter.await_any()
 
     def log_layers_info(self):
@@ -484,7 +548,15 @@ class Model:
                 f"precision: {metadata.precision}, layout: {metadata.layout}",
             )
 
-    def save(self, path: str, weights_path: str = "", version: str = "UNSPECIFIED"):
+    def save(self, path: str, weights_path: str | None = None, version: str | None = None):
+        """
+        Serializes model to the filesystem. Model format depends in the InferenceAdapter being used.
+
+        Args:
+            path (str): Path to write the resulting model.
+            weights_path (str | None): Optional path to save weights if they are stored separately.
+            version (str | None): Optional model version.
+        """
         model_info = {
             "model_type": self.__model__,
         }

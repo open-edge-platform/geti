@@ -3,9 +3,11 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from __future__ import annotations  # TODO: remove when Python3.9 support is dropped
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Callable
 
 
 @dataclass
@@ -69,7 +71,7 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def reshape_model(self, new_shape):
+    def reshape_model(self, new_shape: dict):
         """Reshapes the model inputs to fit the new input shape.
 
         Args:
@@ -83,7 +85,7 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def infer_sync(self, dict_data) -> dict:
+    def infer_sync(self, dict_data: dict) -> dict:
         """Performs the synchronous model inference. The infer is a blocking method.
 
         Args:
@@ -104,7 +106,7 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def infer_async(self, dict_data, callback_data):
+    def infer_async(self, dict_data: dict, callback_data: Any):
         """
         Performs the asynchronous model inference and sets
         the callback for inference completion. Also, it should
@@ -122,11 +124,11 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def get_raw_result(self, infer_result) -> dict:
+    def get_raw_result(self, infer_result: dict) -> dict:
         """Gets raw results from the internal inference framework representation as a dict.
 
         Args:
-            - infer_result: framework-specific result of inference from the model
+            - infer_result (dict): framework-specific result of inference from the model
 
         Returns:
             - raw result (dict) - model raw output in the following format:
@@ -138,7 +140,16 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def is_ready(self):
+    def set_callback(self, callback_fn: Callable):
+        """
+        Sets callback that grabs results of async inference.
+
+        Args:
+            callback_fn (Callable): Callback function.
+        """
+
+    @abstractmethod
+    def is_ready(self) -> bool:
         """In case of asynchronous execution checks if one can submit input data
         to the model for inference, or all infer requests are busy.
 
@@ -160,29 +171,67 @@ class InferenceAdapter(ABC):
         """
 
     @abstractmethod
-    def get_rt_info(self, path):
-        """Forwards to openvino.Model.get_rt_info(path)"""
+    def get_rt_info(self, path: list[str]) -> Any:
+        """
+        Returns an attribute stored in model info.
+
+        Args:
+            path (list[str]): a sequence of tag names leading to the attribute.
+
+        Returns:
+            Any: a value stored under corresponding tag sequence.
+        """
 
     @abstractmethod
     def update_model_info(self, model_info: dict[str, Any]):
-        """Updates model with the provided model info."""
+        """
+        Updates model with the provided model info.  Model info dict can
+        also contain nested dicts.
+
+        Args:
+            model_info (dict[str, Any]): model info dict to write to the model.
+        """
 
     @abstractmethod
-    def save_model(self, path: str, weights_path: str, version: str):
-        """Serializes model to the filesystem."""
+    def save_model(self, path: str, weights_path: str | None, version: str | None):
+        """
+        Serializes model to the filesystem.
+
+        Args:
+            path (str): Path to write the resulting model.
+            weights_path (str | None): Optional path to save weights if they are stored separately.
+            version (str | None): Optional model version.
+        """
 
     @abstractmethod
     def embed_preprocessing(
         self,
-        layout,
+        layout: str,
         resize_mode: str,
-        interpolation_mode,
+        interpolation_mode: str,
         target_shape: tuple[int, ...],
-        pad_value,
+        pad_value: int,
         dtype: type = int,
-        brg2rgb=False,
-        mean=None,
-        scale=None,
-        input_idx=0,
+        brg2rgb: bool = False,
+        mean: list[Any] | None = None,
+        scale: list[Any] | None = None,
+        input_idx: int = 0,
     ):
-        """Embeds preprocessing into the model using OpenVINO preprocessing API"""
+        """
+        Embeds preprocessing into the model if possible with the adapter being used.
+        In some cases, this method would just add extra python preprocessing steps
+        instaed actuall of embedding it into the model representation.
+
+        Args:
+            layout (str): Layout, for instance NCHW.
+            resize_mode (str): Resize type to use for preprocessing.
+            interpolation_mode (str): Resize interpolation mode.
+            target_shape (tuple[int, ...]): Target resize shape.
+            pad_value (int): Value to pad with if resize implies padding.
+            dtype (type, optional): Input data type for the preprocessing module. Defaults to int.
+            bgr2rgb (bool, optional): Defines if we need to swap R and B channels in case of image input.
+            Defaults to False.
+            mean (list[Any] | None, optional): Mean values to perform input normalization. Defaults to None.
+            scale (list[Any] | None, optional): Scale values to perform input normalization. Defaults to None.
+            input_idx (int, optional): Index of the model input to apply preprocessing to. Defaults to 0.
+        """

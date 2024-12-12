@@ -146,6 +146,16 @@ class ImageModel(Model):
         return parameters
 
     def get_label_name(self, label_id: int) -> str:
+        """
+        Returns a label name by it's index.
+        If index is out of range, and auto-generated name is returned.
+
+        Args:
+            label_id (int): label index.
+
+        Returns:
+            str: label name.
+        """
         if self.labels is None:
             return f"#{label_id}"
         if label_id >= len(self.labels):

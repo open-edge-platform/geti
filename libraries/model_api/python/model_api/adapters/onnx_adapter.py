@@ -7,7 +7,7 @@ from __future__ import annotations  # TODO: remove when Python3.9 support is dro
 
 import sys
 from functools import partial, reduce
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -111,7 +111,7 @@ class ONNXRuntimeAdapter(InferenceAdapter):
     def infer_async(self, dict_data, callback_data):
         raise NotImplementedError
 
-    def set_callback(self, callback_fn):
+    def set_callback(self, callback_fn: Callable):
         self.callback_fn = callback_fn
 
     def is_ready(self):
@@ -126,22 +126,25 @@ class ONNXRuntimeAdapter(InferenceAdapter):
     def await_any(self):
         pass
 
-    def get_raw_result(self, infer_result):
+    def get_raw_result(self, infer_result: dict):
         pass
 
     def embed_preprocessing(
         self,
-        layout,
+        layout: str,
         resize_mode: str,
-        interpolation_mode,
-        target_shape,
-        pad_value,
+        interpolation_mode: str,
+        target_shape: tuple[int, ...],
+        pad_value: int,
         dtype: type = int,
-        brg2rgb=False,
-        mean=None,
-        scale=None,
-        input_idx=0,
+        brg2rgb: bool = False,
+        mean: list[Any] | None = None,
+        scale: list[Any] | None = None,
+        input_idx: int = 0,
     ):
+        """
+        Adds external preprocessing steps done before ONNX model execution.
+        """
         preproc_funcs = [np.squeeze]
         if resize_mode != "crop":
             if resize_mode == "fit_to_window_letterbox":
@@ -170,13 +173,23 @@ class ONNXRuntimeAdapter(InferenceAdapter):
         )
 
     def get_model(self):
-        """Return the reference to the ONNXRuntime session."""
+        """Return a reference to the ONNXRuntime session."""
         return self.model
 
     def reshape_model(self, new_shape):
+        """ "Not supported by ONNX adapter."""
         raise NotImplementedError
 
     def get_rt_info(self, path):
+        """
+        Returns an attribute stored in model info.
+
+        Args:
+            path (list[str]): a sequence of tag names leading to the attribute.
+
+        Returns:
+            Any: a value stored under corresponding tag sequence.
+        """
         return get_rt_info_from_dict(self.onnx_metadata, path)
 
     def update_model_info(self, model_info: dict[str, Any]):
@@ -189,7 +202,15 @@ class ONNXRuntimeAdapter(InferenceAdapter):
             else:
                 meta.value = str(model_info[item])
 
-    def save_model(self, path: str, weights_path: str = "", version: str = "UNSPECIFIED"):
+    def save_model(self, path: str, weights_path: str | None = None, version: str | None = None):
+        """
+        Serializes model to the filesystem.
+
+        Args:
+            path (str): paths to save .onnx file.
+            weights_path (str | None): not used by ONNX adapter.
+            version (str | None): not used by ONNX adapter.
+        """
         onnx.save(self.model, path)
 
 
