@@ -7,6 +7,7 @@ from __future__ import annotations  # TODO: remove when Python3.9 support is dro
 
 import copy
 import json
+from itertools import starmap
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -303,7 +304,7 @@ class ClassificationModel(ImageModel):
                 scores.append(logits[i])
         labels = [self.labels[i] if self.labels else "" for i in indices]
 
-        return [Label(*data) for data in zip(indices, labels, scores)]
+        return list(starmap(Label, zip(indices, labels, scores)))
 
     def get_multiclass_predictions(self, outputs: dict) -> list[Label]:
         if self.embedded_topk:
@@ -314,7 +315,7 @@ class ClassificationModel(ImageModel):
             scoresTensor = softmax(outputs[self.out_layer_names[0]][0])
             indicesTensor = [int(np.argmax(scoresTensor))]
             labels = [self.labels[i] if self.labels else "" for i in indicesTensor]
-        return [Label(*data) for data in zip(indicesTensor, labels, scoresTensor)]
+        return list(starmap(Label, zip(indicesTensor, labels, scoresTensor)))
 
 
 def addOrFindSoftmaxAndTopkOutputs(inference_adapter: InferenceAdapter, topk: int, output_raw_scores: bool) -> None:

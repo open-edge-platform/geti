@@ -221,7 +221,7 @@ class MaskRCNNModel(ImageModel):
             labels=labels,
             scores=scores,
             masks=_masks,
-            label_names=label_names if label_names else None,
+            label_names=label_names or None,
             saliency_map=_average_and_normalize(saliency_maps),
             feature_vector=outputs.get(_feature_vector_name, np.ndarray(0)),
         )

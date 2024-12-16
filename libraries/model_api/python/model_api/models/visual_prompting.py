@@ -484,9 +484,9 @@ class SAMLearnableVisualPrompter:
             elif i == 1:
                 # Cascaded Post-refinement-1
                 mask_input, masks, _ = _decide_masks(
-                    masks,
-                    logits,
-                    scores,
+                    masks,  # noqa: F821 masks are set in the first iteration
+                    logits,  # noqa: F821 masks are set in the first iteration
+                    scores,  # noqa: F821 masks are set in the first iteration
                     is_single=True,
                 )
                 if masks.sum() == 0:
@@ -498,8 +498,8 @@ class SAMLearnableVisualPrompter:
                 # Cascaded Post-refinement-2
                 mask_input, masks, _ = _decide_masks(
                     masks,
-                    logits,
-                    scores,
+                    logits,  # noqa: F821 masks are set in the first iteration
+                    scores,  # noqa: F821 masks are set in the first iteration
                 )
                 if masks.sum() == 0:
                     return {"upscaled_masks": masks}

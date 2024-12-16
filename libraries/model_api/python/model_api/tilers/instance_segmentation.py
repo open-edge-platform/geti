@@ -132,7 +132,7 @@ class InstanceSegmentationTiler(DetectionTiler):
             labels=labels.squeeze(),
             scores=scores.squeeze(),
             masks=resized_masks,
-            label_names=label_names if label_names else None,
+            label_names=label_names or None,
             saliency_map=saliency_map,
             feature_vector=merged_vector,
         )

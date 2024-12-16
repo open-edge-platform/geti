@@ -164,8 +164,7 @@ class ONNXRuntimeAdapter(InferenceAdapter):
             resize_fn = partial(RESIZE_TYPES[resize_mode], size=target_shape)
         preproc_funcs.append(resize_fn)
         input_transform = InputTransform(brg2rgb, mean, scale)
-        preproc_funcs.append(input_transform.__call__)
-        preproc_funcs.append(partial(change_layout, layout=layout))
+        preproc_funcs.extend((input_transform.__call__, partial(change_layout, layout=layout)))
 
         self.preprocessor = reduce(
             lambda f, g: lambda x: f(g(x)),

@@ -12,7 +12,7 @@ from model_api.pipelines import AsyncPipeline
 
 
 class Tiler(abc.ABC):
-    EXECUTION_MODES = ["async", "sync"]
+    EXECUTION_MODES = ("async", "sync")
     """
     An abstract tiler
 

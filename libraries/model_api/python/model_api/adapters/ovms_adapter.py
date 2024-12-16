@@ -77,7 +77,7 @@ class OVMSAdapter(InferenceAdapter):
         # For models with single output ovmsclient returns ndarray with results,
         # so the dict must be created to correctly implement interface.
         if isinstance(raw_result, np.ndarray):
-            output_name = list(self.metadata["outputs"].keys())[0]
+            output_name = next(iter(self.metadata["outputs"].keys()))
             raw_result = {output_name: raw_result}
         self.callback_fn(raw_result, (lambda x: x, callback_data))
 

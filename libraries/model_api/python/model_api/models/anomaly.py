@@ -87,7 +87,7 @@ class AnomalyDetection(ImageModel):
         pred_label: str | None = None
         pred_mask: np.ndarray | None = None
         pred_boxes: np.ndarray | None = None
-        predictions = outputs[list(self.outputs)[0]]
+        predictions = outputs[next(iter(self.outputs))]
 
         if len(predictions.shape) == 1:
             pred_score = predictions

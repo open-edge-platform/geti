@@ -32,7 +32,7 @@ class SAMImageEncoder(ImageModel):
         preload: bool = False,
     ):
         super().__init__(inference_adapter, configuration, preload)
-        self.output_name: str = list(self.outputs.keys())[0]
+        self.output_name: str = next(iter(self.outputs.keys()))
         self.resize_type: str
         self.image_size: int
 

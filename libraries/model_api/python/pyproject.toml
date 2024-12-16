@@ -91,7 +91,7 @@ preview = true
 
 # Enable rules
 lint.select = [
-    # "F",    # Pyflakes (`F`)
+    "F",    # Pyflakes (`F`)
     "E",    # pycodestyle error (`E`)
     "W",    # pycodestyle warning (`W`)
     "C90",  # mccabe (`C90`)
@@ -127,18 +127,18 @@ lint.select = [
     # "ARG",  # flake8-unsused-arguments (`ARG`)
     "PTH",  # flake8-use-pathlib (`PTH`)
     # "TD",   # flake8-todos (`TD`)
-    # "FIX",  # flake8-fixme (`FIX`)
+    "FIX",  # flake8-fixme (`FIX`)
     "ERA",  # eradicate (`ERA`)
     "PD",   # pandas-vet (`PD`)
     "PGH",  # pygrep-hooks (`PGH`)
     # "PL",   # pylint (`PL`)
     # "TRY",  # tryceratos (`TRY`)
-    # "FLY",  # flynt (`FLY`)
+    "FLY",  # flynt (`FLY`)
     "NPY",  # NumPy-specific rules (`NPY`)
     # "PERF", # Perflint (`PERF`)
-    # "RUF",  # Ruff-specific rules (`RUF`)
-    # "FURB", # refurb (`FURB`) - ERROR: Unknown rule selector: `FURB`
-    # "LOG",  # flake8-logging (`LOG`) - ERROR: Unknown rule selector: `LOG`
+    "RUF",  # Ruff-specific rules (`RUF`)
+    "FURB", # refurb (`FURB`) - ERROR: Unknown rule selector: `FURB`
+    "LOG",  # flake8-logging (`LOG`) - ERROR: Unknown rule selector: `LOG`
 ]
 
 lint.ignore = [
