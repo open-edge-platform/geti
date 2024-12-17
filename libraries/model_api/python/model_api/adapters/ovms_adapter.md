@@ -7,7 +7,7 @@ The `OVMSAdapter` implements `InferenceAdapter` interface. The `OVMSAdapter` mak
 `OVMSAdapter` enables inference via gRPC calls to OpenVINO Model Server, so in order to use it you need two things:
 
 - OpenVINO Model Server that serves your model
-- [`ovmsclient`](https://pypi.org/project/ovmsclient/) package installed to enable communication with the model server: `python3 -m pip install ovmsclient`
+- [`tritonclient[http]`](https://pypi.org/project/tritonclient/) package installed to enable communication with the model server: `python3 -m pip install tritonclient[http]`
 
 ### Deploy OpenVINO Model Server
 
@@ -15,7 +15,7 @@ Model Server is distributed as a docker image and it's available in DockerHub, s
 
 ## Model configuration
 
-When using OpenVINO Model Server model cannot be directly accessed from the client application (like OMZ demos). Therefore any configuration must be done on model server side or before starting the server: see [Prepare a model for `InferenceAdapter`](../../../../../README.md#prepare-a-model-for-inferenceadapter).
+When using OpenVINO Model Server model cannot be directly accessed from the client application. Therefore any configuration must be done on model server side or before starting the server: see [Prepare a model for `InferenceAdapter`](../../../../../README.md#prepare-a-model-for-inferenceadapter).
 
 ### Input reshaping
 
@@ -51,8 +51,8 @@ To run the demo with model served in OpenVINO Model Server, you would have to pr
 
 Assuming that model server runs on the same machine as the demo, exposes gRPC service on port 9000 and serves model called `model1`, the value of `-m` parameter would be:
 
-- `localhost:9000/models/model1` - requesting latest model version
-- `localhost:9000/models/model1:2` - requesting model version number 2
+- `localhost:9000/v2/models/model1` - requesting latest model version
+- `localhost:9000/v2/models/model1:2` - requesting model version number 2
 
 ## See Also
 
