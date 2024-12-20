@@ -5,8 +5,10 @@
 
 import numpy as np
 
+from .base import Result
 
-class DetectedKeypoints:
+
+class DetectedKeypoints(Result):
     def __init__(self, keypoints: np.ndarray, scores: np.ndarray) -> None:
         self.keypoints = keypoints
         self.scores = scores

@@ -11,7 +11,7 @@ from .image_model import ImageModel
 from .instance_segmentation import MaskRCNNModel
 from .keypoint_detection import KeypointDetectionModel, TopDownKeypointDetectionPipeline
 from .model import Model
-from .result_types import (
+from .result import (
     AnomalyResult,
     ClassificationResult,
     Contour,

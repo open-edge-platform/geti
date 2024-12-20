@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Generator
 
+from .base import Result
 from .utils import array_shape_to_str
 
 if TYPE_CHECKING:
@@ -35,7 +36,7 @@ class Label:
         return f"{self.id} ({self.name}): {self.confidence:.3f}"
 
 
-class ClassificationResult:
+class ClassificationResult(Result):
     """Results for classification models."""
 
     def __init__(

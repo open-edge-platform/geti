@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from model_api.adapters.utils import RESIZE_TYPES, InputTransform
-from model_api.models.result_types import Label
+from model_api.models.result import Label
 
 from .model import Model
-from .result_types import ClassificationResult
+from .result import ClassificationResult
 from .types import BooleanValue, ListValue, NumericalValue, StringValue
 from .utils import load_labels
 

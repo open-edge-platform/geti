@@ -10,7 +10,7 @@ import numpy as np
 from model_api.adapters.utils import INTERPOLATION_TYPES, resize_image_ocv
 
 from .detection_model import DetectionModel
-from .result_types import DetectionResult
+from .result import DetectionResult
 from .types import BooleanValue, ListValue, NumericalValue
 from .utils import clip_detections, multiclass_nms, nms
 

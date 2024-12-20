@@ -17,7 +17,7 @@ from openvino.runtime import Model, Type
 from openvino.runtime import opset10 as opset
 
 from model_api.models.image_model import ImageModel
-from model_api.models.result_types import ClassificationResult, Label
+from model_api.models.result import ClassificationResult, Label
 from model_api.models.types import BooleanValue, ListValue, NumericalValue, StringValue
 from model_api.models.utils import softmax
 

@@ -30,6 +30,7 @@ dependencies = [
     "openvino>=2024.0",
     "openvino-dev>=2024.0",
     "omz_tools @ git+https://github.com/openvinotoolkit/open_model_zoo.git@master#egg=omz_tools&subdirectory=tools/model_tools",
+    "pillow",
 ]
 
 [project.optional-dependencies]

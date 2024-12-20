@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 from .image_model import ImageModel
-from .result_types import DetectedKeypoints, DetectionResult
+from .result import DetectedKeypoints, DetectionResult
 from .types import ListValue
 
 

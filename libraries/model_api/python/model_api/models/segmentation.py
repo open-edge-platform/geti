@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 
 from model_api.models.image_model import ImageModel
-from model_api.models.result_types import Contour, ImageResultWithSoftPrediction
+from model_api.models.result import Contour, ImageResultWithSoftPrediction
 from model_api.models.types import BooleanValue, ListValue, NumericalValue, StringValue
 from model_api.models.utils import load_labels
 

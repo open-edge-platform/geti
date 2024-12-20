@@ -7,8 +7,10 @@ from __future__ import annotations
 
 import numpy as np
 
+from .base import Result
 
-class AnomalyResult:
+
+class AnomalyResult(Result):
     """Results for anomaly models."""
 
     def __init__(

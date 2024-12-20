@@ -6,7 +6,7 @@
 import numpy as np
 
 from .image_model import ImageModel
-from .result_types import DetectionResult
+from .result import DetectionResult
 from .types import ListValue, NumericalValue, StringValue
 from .utils import load_labels
 

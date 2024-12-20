@@ -7,8 +7,10 @@ from __future__ import annotations
 
 import numpy as np
 
+from .base import Result
 
-class VisualPromptingResult:
+
+class VisualPromptingResult(Result):
     def __init__(
         self,
         upscaled_masks: list[np.ndarray] | None = None,
@@ -79,7 +81,7 @@ class PredictedMask:
         return obj_str.strip()
 
 
-class ZSLVisualPromptingResult:
+class ZSLVisualPromptingResult(Result):
     def __init__(self, data: dict[int, PredictedMask]) -> None:
         self.data = data
 

@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from .anomaly import AnomalyResult
+from .base import Result
 from .classification import ClassificationResult, Label
 from .detection import DetectionResult
 from .keypoint import DetectedKeypoints
@@ -25,6 +26,7 @@ __all__ = [
     "ImageResultWithSoftPrediction",
     "InstanceSegmentationResult",
     "PredictedMask",
+    "Result",
     "VisualPromptingResult",
     "ZSLVisualPromptingResult",
     "RotatedSegmentationResult",

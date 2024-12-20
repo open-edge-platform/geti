@@ -11,10 +11,10 @@ from typing import TYPE_CHECKING
 import cv2
 import numpy as np
 
-from model_api.models.result_types import Contour, InstanceSegmentationResult, RotatedSegmentationResult
+from model_api.models.result import Contour, InstanceSegmentationResult, RotatedSegmentationResult
 
 if TYPE_CHECKING:
-    from model_api.models.result_types.detection import DetectionResult
+    from model_api.models.result.detection import DetectionResult
 
 
 def add_rotated_rects(inst_seg_result: InstanceSegmentationResult) -> RotatedSegmentationResult:

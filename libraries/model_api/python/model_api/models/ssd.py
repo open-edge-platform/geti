@@ -6,7 +6,7 @@
 import numpy as np
 
 from .detection_model import DetectionModel
-from .result_types import DetectionResult
+from .result import DetectionResult
 
 BBOX_AREA_THRESHOLD = 1.0
 SALIENCY_MAP_NAME = "saliency_map"

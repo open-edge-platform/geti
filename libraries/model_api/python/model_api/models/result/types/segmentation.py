@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 import cv2
 import numpy as np
 
+from .base import Result
 from .detection import DetectionResult
 from .utils import array_shape_to_str
 
@@ -157,7 +158,7 @@ class Contour:
         return f"{self.label}: {self.probability:.3f}, {len(self.shape)}"
 
 
-class ImageResultWithSoftPrediction:
+class ImageResultWithSoftPrediction(Result):
     def __init__(
         self,
         resultImage: np.ndarray,

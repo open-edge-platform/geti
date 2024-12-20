@@ -7,10 +7,11 @@ from __future__ import annotations
 
 import numpy as np
 
+from .base import Result
 from .utils import array_shape_to_str
 
 
-class DetectionResult:
+class DetectionResult(Result):
     """Result for detection model.
 
     Args:

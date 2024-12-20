@@ -15,7 +15,7 @@ import cv2
 import numpy as np
 
 from model_api.models.image_model import ImageModel
-from model_api.models.result_types import AnomalyResult
+from model_api.models.result import AnomalyResult
 from model_api.models.types import ListValue, NumericalValue, StringValue
 
 if TYPE_CHECKING:
