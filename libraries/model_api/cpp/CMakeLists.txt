@@ -13,7 +13,13 @@ if(NOT GENERATOR_IS_MULTI_CONFIG_VAR AND NOT DEFINED CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ...")
 endif()
 
-project(model_api)
+set(model_api_VERSION 0.0.0)
+
+project(model_api
+        VERSION ${model_api_VERSION}
+        DESCRIPTION "OpenVINO Vision API"
+        HOMEPAGE_URL "https://github.com/openvinotoolkit/model_api/"
+        LANGUAGES CXX C)
 
 if(WIN32)
     if(NOT "${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
@@ -23,13 +29,24 @@ if(WIN32)
     add_definitions(-DNOMINMAX)
 endif()
 
-set(model_api_VERSION 0.0.0)
-
 find_package(OpenCV REQUIRED COMPONENTS core imgproc)
-find_package(OpenVINO REQUIRED COMPONENTS Runtime)
+
+# Looking for OpenVINO in the python distribution. It doesn't work for cross-compiling build
+if(NOT CMAKE_CROSSCOMPILING)
+    find_package(Python3 REQUIRED)
+    execute_process(
+        COMMAND ${Python3_EXECUTABLE} -c "from openvino.utils import get_cmake_path; print(get_cmake_path(), end='')"
+        OUTPUT_VARIABLE OpenVINO_DIR_PY
+        ERROR_QUIET
+    )
+endif()
+
+find_package(OpenVINO REQUIRED
+             COMPONENTS Runtime Threading
+             HINTS "${OpenVINO_DIR_PY}")
 
 include(FetchContent)
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.2/json.tar.xz)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
 file(GLOB MODELS_SOURCES ./models/src/*.cpp)
