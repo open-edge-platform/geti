@@ -59,7 +59,10 @@ docs = [
   "breathe",
   "graphviz",
 ]
-full = ["openvino_model_api[dependencies, ovms, tests, docs]"]
+build = [
+  "nanobind==2.4.0",
+]
+full = ["openvino_model_api[dependencies, ovms, tests, docs, build]"]
 
 [project.urls]
 Homepage = "https://github.com/openvinotoolkit/model_api"

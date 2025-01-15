@@ -1,8 +1,10 @@
-# Copyright (C) 2018-2024 Intel Corporation
+# Copyright (C) 2018-2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
 
 cmake_minimum_required(VERSION 3.26)
+
+option(ENABLE_PY_BINDINGS "Enables building python bindings package" ON)
 
 # Multi config generators such as Visual Studio ignore CMAKE_BUILD_TYPE. Multi config generators are configured with
 # CMAKE_CONFIGURATION_TYPES, but limiting options in it completely removes such build options
@@ -81,6 +83,11 @@ if(MSVC)
         /EHsc)  # Enable standard C++ stack unwinding, assume functions with extern "C" never throw
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "^GNU|(Apple)?Clang$")
     target_compile_options(model_api PRIVATE -Wall -Wextra -Wpedantic)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
+
+if (ENABLE_PY_BINDINGS)
+    add_subdirectory(py_bindings)
 endif()
 
 include(GenerateExportHeader)
