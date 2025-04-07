@@ -65,6 +65,11 @@ endif
 ###
 build-image-default:
 	@echo "Building docker image for component: ${COMPONENT_NAME}"
+	@echo docker build \
+		${DOCKER_EXTRA_ARGS} \
+		${DOCKER_BUILD_CONTEXT} \
+		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
+		-f ./Dockerfile .
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \

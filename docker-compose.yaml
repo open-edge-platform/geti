@@ -1,0 +1,344 @@
+x-proxies: &proxies
+  args:
+    - HTTP_PROXY=${HTTP_PROXY}
+    - HTTPS_PROXY=${HTTPS_PROXY}
+    - NO_PROXY=${NO_PROXY}
+    - http_proxy=${http_proxy}
+    - https_proxy=${https_proxy}
+    - no_proxy=${no_proxy}
+
+services:
+  # Build services
+  #
+  debian:
+    image: ${REGISTRY-ghcr.io/geti}/debian:${TAG-main}
+    build:
+      dockerfile_inline: |
+        FROM debian AS debian
+        LABEL release=1
+
+        RUN apt update \
+            && apt -y install \
+                ca-certificates \
+                curl=7.88.* \
+                wget=1.21.* \
+                netcat-traditional=1.10-* \
+                gpg \
+            && apt clean all \
+            && rm -rf /var/cache/apt/*
+      <<: *proxies
+      additional_contexts:
+        #- debian=docker-image://public.ecr.aws/debian/debian:12.8-slim
+        - debian=docker-image://gcr.io/distroless/static-debian12:nonroot
+
+
+  otx:
+    image: ${REGISTRY-ghcr.io/geti}/otx2:${TAG-main}
+    build:
+      dockerfile_inline: |
+        FROM debian AS otx
+
+        ARG OTX_RELEASE_TAG
+
+        WORKDIR /app
+
+        RUN apt-get update && \
+            apt-get install -y git \
+            && apt clean all \
+            && rm -rf /var/cache/apt/*
+
+        RUN git clone --branch ${OTX_RELEASE_TAG} --single-branch https://github.com/open-edge-platform/training_extensions.git
+
+        RUN cp -r /app/training_extensions/src/otx/tools/templates /model_templates
+      args:
+        - HTTP_PROXY=${HTTP_PROXY}
+        - HTTPS_PROXY=${HTTPS_PROXY}
+        - NO_PROXY=${NO_PROXY}
+        - http_proxy=${http_proxy}
+        - https_proxy=${https_proxy}
+        - no_proxy=${no_proxy}
+        - OTX_RELEASE_TAG=${OTX_RELEASE_TAG}
+      additional_contexts:
+        - debian=docker-image://public.ecr.aws/debian/debian:12.8-slim
+        
+
+  # Platform services
+  # 
+  platform_account:
+    image: ${REGISTRY-ghcr.io/geti}/platform_account:${TAG-main}
+    build:
+      context: ./platform/services/account
+      <<: *proxies
+      additional_contexts:
+        - dev-go=docker-image://${GO_IMAGE}
+        - debian_image=service:debian
+        - credit_system=./grpc_interfaces/grpc_interfaces/credit_system/go
+        - account_service_grpc=./grpc_interfaces/grpc_interfaces/account_service/go
+
+  platform_auth_proxy:
+    image: ${REGISTRY-ghcr.io/geti}/platform_auth_proxy:${TAG-main}
+    build:
+      context: ./platform/services/auth_proxy
+      <<: *proxies
+      additional_contexts:
+        - dev-go=docker-image://${GO_IMAGE}
+        - debian_image=service:debian
+        - account_service_client=./grpc_interfaces/grpc_interfaces/account_service/go
+
+  platform_credit:
+    image: ${REGISTRY-ghcr.io/geti}/platform_credit:${TAG-main}
+    build:
+      context: ./platform/services/credit
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs 
+        - grpc_interfaces=./grpc_interfaces
+
+  platform_notifier:
+    image: ${REGISTRY-ghcr.io/geti}/platform_notifier:${TAG-main}
+    build:
+      context: ./platform/services/notifier
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+
+  platform_observability:
+    image: ${REGISTRY-ghcr.io/geti}/platform_observability:${TAG-main}
+    build:
+      context: ./platform/services/observability
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+
+  platform_onboarding:
+    image: ${REGISTRY-ghcr.io/geti}/platform_onboarding:${TAG-main}
+    build:
+      context: ./platform/services/onboarding
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+
+  platform_initial_user:
+    image: ${REGISTRY-ghcr.io/geti}/platform_initial_user:${TAG-main}
+    build:
+      context: ./platform/services/initial_user
+      <<: *proxies
+      additional_contexts:
+        - common_libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+        - platform_libs=./platform/libs
+
+  platform_user_directory:
+    image: ${REGISTRY-ghcr.io/geti}/platform_user_directory:${TAG-main}
+    build:
+      context: ./platform/services/user_directory
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+        - platform_libs=./platform/libs
+
+  # IAI Services
+  # 
+  interactive_ai_auto_train:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/auto_train:${TAG-main}
+    build:
+      context: ./interactive_ai/services/auto_train
+      <<: *proxies
+      additional_contexts:
+        - training_extensions_v2=service:otx
+        - libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+        - sc_sdk=./interactive_ai/libs/sc_sdk/
+
+  interactive_ai_dataset_import_export:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/dataset_import_export:${TAG-main}
+    build:
+      context: ./interactive_ai/services/dataset_ie
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+        - sc_sdk=./interactive_ai/libs/sc_sdk/
+
+  interactive_ai_director:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/director:${TAG-main}
+    build:
+      context: ./interactive_ai/services/director
+      <<: *proxies
+      additional_contexts:
+        - training_extensions_v2=service:otx
+        - schemas=./interactive_ai/services/api
+        - libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+        - sc_sdk=./interactive_ai/libs/sc_sdk/
+
+  interactive_ai_inference_gateway:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/inference_gateway:${TAG-main}
+    build:
+      context: ./interactive_ai/services/inference_gateway
+      <<: *proxies
+      additional_contexts:
+        - dev-go=docker-image://${GO_IMAGE}
+        - debian_image=service:debian
+        - go_sdk=./interactive_ai/libs/go_sdk/
+        - modelmesh=./grpc_interfaces/grpc_interfaces/model_mesh/go/pb
+        - modelregistration=./grpc_interfaces/grpc_interfaces/model_registration/go/pb
+        - predict=./grpc_interfaces/grpc_interfaces/predict/go/pb
+
+  interactive_ai_jobs:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/jobs:${TAG-main}
+    build:
+      context: ./interactive_ai/services/jobs
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+        - grpc_interfaces=./grpc_interfaces
+        - sc_sdk=./interactive_ai/libs/sc_sdk/
+
+  interactive_ai_media:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/media:${TAG-main}
+    build:
+      context: ./interactive_ai/services/media
+      <<: *proxies
+      additional_contexts:
+        - dev-go=docker-image://${GO_IMAGE}
+        - debian_image=service:debian
+        - go_sdk=./interactive_ai/libs/go_sdk/
+
+  interactive_ai_mlflow_geti_store:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/mlflow_geti_store:${TAG-main}
+    build:
+      <<: *proxies
+      context: ./interactive_ai/services/mlflow_geti_store
+
+  interactive_ai_model_registration:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/model_registration:${TAG-main}
+    build:
+      context: ./interactive_ai/services/model_registration
+      <<: *proxies
+      additional_contexts:
+        - grpc_interfaces=./grpc_interfaces
+
+  interactive_ai_project_import_export:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/project_import_export:${TAG-main}
+    build:
+      context: ./interactive_ai/services/project_ie
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs 
+        - grpc_interfaces=./grpc_interfaces
+        - sc_sdk=./interactive_ai/libs/sc_sdk/
+
+  interactive_ai_resource:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/resource:${TAG-main}
+    build:
+      context: ./interactive_ai/services/resource
+      <<: *proxies
+      additional_contexts:
+        - training_extensions_v2=service:otx
+        - schemas=./interactive_ai/services/api
+        - libs=./libs 
+        - grpc_interfaces=./grpc_interfaces
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+
+  interactive_ai_visual_prompt:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/visual_prompt:${TAG-main}
+    build:
+      context: ./interactive_ai/services/visual_prompt
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs 
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+
+  # IAI Workflows
+  # 
+  interactive_ai_workflows_dataset_import_export:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/workflows_dataset_import_export:${TAG-main}
+    build:
+      context: ./interactive_ai/workflows/geti_domain/dataset_ie
+      <<: *proxies
+      additional_contexts:
+        - training_extensions_v2=service:otx
+        - common=./interactive_ai/workflows/geti_domain/common
+        - libs=./libs
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+        - grpc_interfaces=./grpc_interfaces
+
+  interactive_ai_workflows_model_test:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/workflows_model_test:${TAG-main}
+    build:
+      context: ./interactive_ai/workflows/geti_domain/model_test
+      <<: *proxies
+      additional_contexts:
+        - common=./interactive_ai/workflows/geti_domain/common
+        - libs=./libs
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+        - grpc_interfaces=./grpc_interfaces
+
+
+  interactive_ai_workflows_project_import_export:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/workflows_project_import_export:${TAG-main}
+    build:
+      context: ./interactive_ai/workflows/geti_domain/project_ie
+      <<: *proxies
+      additional_contexts:
+        - common=./interactive_ai/workflows/geti_domain/common
+        - libs=./libs
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+        - grpc_interfaces=./grpc_interfaces
+        - data_migration=./interactive_ai/data_migration
+
+  interactive_ai_workflows_optimize:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/workflows_optimize:${TAG-main}
+    build:
+      context: ./interactive_ai/workflows/geti_domain/optimize
+      <<: *proxies
+      additional_contexts:
+        - training_extensions_v2=service:otx
+        - common=./interactive_ai/workflows/geti_domain/common
+        - libs=./libs
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+        - grpc_interfaces=./grpc_interfaces
+
+  interactive_ai_workflows_train:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/workflows_train:${TAG-main}
+    build:
+      context: ./interactive_ai/workflows/geti_domain/train
+      <<: *proxies
+      additional_contexts:
+        - training_extensions_v2=service:otx
+        - common=./interactive_ai/workflows/geti_domain/common
+        - libs=./libs
+        - sc_sdk=./interactive_ai/libs/sc_sdk
+        - media_utils=./interactive_ai/libs/media_utils
+        - grpc_interfaces=./grpc_interfaces
+
+
+  interactive_ai_workflows_otx_v2:
+    image: ${REGISTRY-ghcr.io/geti}/interactive_ai/otx_v2:${TAG-main}
+    build:
+      context: ./interactive_ai/workflows/otx_domain/trainer/otx_v2/
+      <<: *proxies
+      additional_contexts:
+        - libs=./libs
+
+  # Web UI
+  # 
+  web:
+    image: ${REGISTRY-ghcr.io/geti}/web_ui:${TAG-main}
+    build:
+      context: ./web_ui
+      <<: *proxies
+      additional_contexts:
+        - nginx_image=docker-image://${NGINX_IMAGE}
+        - node_image=docker-image://${NODE_IMAGE}
+        - docs_context=./docs 
+        - api_context=./interactive_ai/services/api
