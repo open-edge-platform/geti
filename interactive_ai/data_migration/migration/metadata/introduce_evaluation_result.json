@@ -1,0 +1,9 @@
+{
+  "description": "Introduces new evaluation_result collection, unifying data from result_set and model_test_result collections but do not replace them. Migration is backward compatible.",
+  "supports_downgrade": true,
+  "skip_on_project_import": false,
+  "new_collections": ["evaluation_result"],
+  "updated_collections": [],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

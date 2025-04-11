@@ -1,0 +1,15 @@
+{
+    "condition": "and",
+    "rules": [
+        {
+            "field": "label_id",
+            "operator": "equal",
+            "value": null
+        },
+        {
+            "field": "score",
+            "operator": "greater",
+            "value": 0.5
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+.accessDeniedCode {
+    font-size: var(--spectrum-global-dimension-font-size-1300);
+    color: var(--spectrum-global-color-gray-500);
+}
+
+.accessDeniedText {
+    font-size: var(--spectrum-global-dimension-font-size-900);
+}
+
+.accessDeniedButtonGroup {
+    justify-content: center !important;
+    padding-left: 0 !important;
+}

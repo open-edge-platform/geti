@@ -1,0 +1,36 @@
+ARG REGISTRY=ghcr.io
+FROM ${REGISTRY}/astral-sh/uv:python3.10-bookworm-slim AS builder
+
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+
+# Disable Python downloads, because we want to use the system interpreter across both images.
+ENV UV_PYTHON_DOWNLOADS=0
+
+# Copy the service dependencies
+WORKDIR /builder
+COPY --link --from=libs . libs
+COPY --link --from=data_migration . interactive_ai/data_migration
+
+WORKDIR /builder/interactive_ai/migration_job
+
+ADD migration_job/ .
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv venv --relocatable && \
+    uv sync --frozen --no-dev --no-editable
+
+FROM ${REGISTRY}/astral-sh/uv:python3.10-bookworm-slim AS migration-job
+
+# Install ffmpeg
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN useradd -l -u 10001 non-root
+COPY --link --from=builder --chown=10001 /builder/interactive_ai/migration_job/.venv /.venv
+COPY --link --chown=10001 entrypoint.sh .
+USER non-root
+ENTRYPOINT [ "./entrypoint.sh"]

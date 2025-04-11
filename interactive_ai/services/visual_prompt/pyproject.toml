@@ -1,0 +1,72 @@
+[project]
+name = "visual-prompt"
+version = "1.0.0"
+description = "Visual prompt service for Geti"
+requires-python = ">=3.10, <3.13"
+
+dependencies = [
+    "fastapi==0.115.2",
+    "uvicorn~=0.27.1",
+    "openvino-model-api==0.2.5.2",
+    "python-multipart~=0.0.18",
+    "geti-feature-tools",
+    "geti-fastapi-tools",
+    "geti-kafka-tools",
+    "geti-telemetry-tools[telemetry,fastapi,logger,kafka]",
+    "geti-types",
+    "sc_sdk",
+    "media_utils",
+]
+
+[tool.uv.sources]
+geti-feature-tools = { path = "../../../libs/feature_tools", editable = true }
+geti-fastapi-tools = { path = "../../../libs/fastapi_tools", editable = true }
+geti-kafka-tools = { path = "../../../libs/kafka_tools", editable = true }
+geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
+geti-types = { path = "../../../libs/types", editable = true }
+sc_sdk = { path = "../../libs/sc_sdk", editable = true }
+media_utils = { path = "../../libs/media_utils", editable = true }
+
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "mypy~=1.15",
+    "pytest-freezegun~=0.4",
+    "httpx~=0.23",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+src = ["app"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "D", "ARG", "PLR"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+known-local-folder = ["geti_types", "geti_kafka_tools",  "geti_feature_tools", "geti_telemetry_tools", "geti_fastapi_tools", "sc_sdk", "media_utils"]
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

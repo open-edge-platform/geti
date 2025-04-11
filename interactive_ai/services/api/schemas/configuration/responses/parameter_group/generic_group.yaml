@@ -1,0 +1,20 @@
+type: object
+properties:
+  header:
+    type: string
+    example: Learning Parameters
+    description: Defines the parameter group
+  description:
+    type: string
+    description: Description of the parameter group
+    example: Configuration to control training behaviour
+  type:
+    type: string
+    enum: [PARAMETER_GROUP]
+  name:
+    type: string
+    description: Name of the parameter group
+  parameters:
+    type: array
+    items:
+      $ref: "../configurable_parameters/generic_parameter.yaml"

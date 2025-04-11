@@ -1,0 +1,9 @@
+type: object
+properties:
+  workspaces:
+    type: array
+    description: Array of workspaces
+    items:
+      $ref: "workspace.yaml"
+required:
+- workspaces

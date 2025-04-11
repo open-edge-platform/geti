@@ -1,0 +1,6 @@
+type: string
+enum: [active, deprecated, obsolete]
+description: |-
+  The current support status of the model architecture. 'Active' algorithms are fully supported and maintained. 
+  'Deprecated' ones are still supported, but not recommended for training; in a later version, they may be
+  discontinued and become 'obsolete', which means that new models cannot be trained with such algorithms. 

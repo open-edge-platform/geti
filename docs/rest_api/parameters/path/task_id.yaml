@@ -1,0 +1,7 @@
+in: path
+name: task_id
+style: simple
+description: The ID of the task of interest.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

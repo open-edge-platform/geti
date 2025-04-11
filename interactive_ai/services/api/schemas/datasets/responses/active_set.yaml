@@ -1,0 +1,9 @@
+type: object
+properties:
+  active_set:
+    type: array
+    description: List of media items
+    items:
+      oneOf:
+        - $ref: 'image_in_active_dataset.yaml'
+        - $ref: 'video_in_active_dataset.yaml'

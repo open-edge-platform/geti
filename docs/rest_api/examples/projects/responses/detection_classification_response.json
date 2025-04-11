@@ -1,0 +1,206 @@
+{
+    "creation_time": "2022-05-30T07:04:01.917000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "62946c61003ddb3967f14751",
+            "name": "Card detection"
+        }
+    ],
+    "id": "62946c61003ddb3967f14750",
+    "storage_info": {},
+    "name": "Card detection",
+    "performance": {
+        "score": null,
+        "task_performances": [
+            {
+                "task_id": "62946c61003ddb3967f1474d",
+                "score": null
+            },
+            {
+                "task_id": "62946c61003ddb3967f1474f",
+                "score": null
+            }
+        ]
+    },
+    "pipeline": {
+        "connections": [
+            {
+                "from": "62946c61003ddb3967f1474c",
+                "to": "62946c61003ddb3967f1474d"
+            },
+            {
+                "from": "62946c61003ddb3967f1474d",
+                "to": "62946c61003ddb3967f1474e"
+            },
+            {
+                "from": "62946c61003ddb3967f1474e",
+                "to": "62946c61003ddb3967f1474f"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "62946c61003ddb3967f1474c",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "62946c61003ddb3967f1474d",
+                "label_schema_id": "62946c62003ddb3967f1475f",
+                "labels": [
+                    {
+                        "color": "#26518eff",
+                        "group": "Default group root task",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1475b",
+                        "is_empty": false,
+                        "name": "Card",
+                        "parent_id": null
+                    },
+                    {
+                        "color": "#a4fc32ff",
+                        "group": "No object",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1475d",
+                        "is_empty": true,
+                        "name": "No object",
+                        "parent_id": null
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Detection task"
+            },
+            {
+                "id": "62946c61003ddb3967f1474e",
+                "task_type": "crop",
+                "title": "Crop task"
+            },
+            {
+                "id": "62946c61003ddb3967f1474f",
+                "label_schema_id": "62946c62003ddb3967f14770",
+                "labels": [
+                    {
+                        "color": "#ff5662ff",
+                        "group": "Default group root task___Suit",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14760",
+                        "is_empty": false,
+                        "name": "Hearts",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#81407bff",
+                        "group": "Default group root task___Suit",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14762",
+                        "is_empty": false,
+                        "name": "Diamonds",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#f7dab3ff",
+                        "group": "Default group root task___Suit",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14763",
+                        "is_empty": false,
+                        "name": "Spades",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#80e9afff",
+                        "group": "Default group root task___Suit",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14764",
+                        "is_empty": false,
+                        "name": "Clubs",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#ff7d00ff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14765",
+                        "is_empty": false,
+                        "name": "Seven",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#c9e649ff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14767",
+                        "is_empty": false,
+                        "name": "Eight",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#25a18eff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14768",
+                        "is_empty": false,
+                        "name": "Nine",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#00a5cfff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f14769",
+                        "is_empty": false,
+                        "name": "Ten",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#708541ff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1476a",
+                        "is_empty": false,
+                        "name": "Jack",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#26518eff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1476b",
+                        "is_empty": false,
+                        "name": "Queen",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#5b69ffff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1476c",
+                        "is_empty": false,
+                        "name": "King",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#f15b85ff",
+                        "group": "Default group root task___Value",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1476d",
+                        "is_empty": false,
+                        "name": "Ace",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    },
+                    {
+                        "color": "#29d5ecff",
+                        "group": "No class",
+                        "hotkey": "",
+                        "id": "62946c62003ddb3967f1476e",
+                        "is_empty": true,
+                        "name": "No class",
+                        "parent_id": "62946c62003ddb3967f1475b"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Classification task"
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/workspaces/62909fdf003ddb3967f14382/projects/62946c61003ddb3967f14750/thumbnail"
+}

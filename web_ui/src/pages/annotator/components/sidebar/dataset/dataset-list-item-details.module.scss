@@ -1,0 +1,29 @@
+.itemDetails {
+    box-sizing: border-box;
+    width: 100%;
+    cursor: pointer;
+    border: var(--spectrum-alias-border-size-thick) solid transparent;
+    padding: var(--spectrum-global-dimension-size-100) var(--spectrum-global-dimension-size-100);
+    padding-right: 0px;
+
+    &:hover {
+        background-color: var(--detailsBackground);
+    }
+}
+
+.itemDetailsSelected {
+    border: var(--spectrum-alias-border-size-thick) solid var(--spectrum-global-color-informative);
+}
+
+.itemMediaName {
+    font-size: var(--spectrum-global-dimension-font-size-50);
+}
+
+.itemDetailsText {
+    color: var(--spectrum-global-color-gray-600);
+    font-size: var(--spectrum-global-dimension-font-size-25);
+}
+
+.itemDetailsDivider {
+    background-color: var(--detailsDividerBackground);
+}

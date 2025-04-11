@@ -1,0 +1,4 @@
+description: Configuration for visual prompt model
+header: Configuration for visual prompt model
+type: CONFIGURABLE_PARAMETERS
+visible_in_ui: false

@@ -1,0 +1,56 @@
+.termsAndConditionsBg {
+    height: 100vh;
+}
+
+.dialog {
+    --spectrum-dialog-padding-x: 0 !important;
+    --spectrum-dialog-padding-y: 0 !important;
+    min-width: 50vh;
+}
+
+.dialogHeader {
+    background: linear-gradient(90deg, #1db0e2 0%, #4ca286 52.6%, #89ad4e 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spectrum-global-dimension-static-size-600) 0 var(--spectrum-global-dimension-static-size-300) 0;
+
+    span {
+        font-size: var(--spectrum-global-dimension-static-font-size-200);
+        font-weight: 400;
+        line-height: var(--spectrum-global-dimension-static-size-300);
+    }
+}
+
+.dialogHeader :first-child {
+    font-size: var(--spectrum-global-dimension-static-font-size-900);
+    font-weight: 500;
+    line-height: var(--spectrum-global-dimension-static-size-600);
+}
+
+.content {
+    padding: var(--spectrum-global-dimension-static-size-800) !important;
+
+    h6 {
+        font-size: var(--spectrum-global-dimension-static-font-size-200);
+        font-weight: 500;
+        margin: 0;
+    }
+}
+
+.consentWrapper {
+    margin-bottom: var(--spectrum-global-dimension-static-size-300);
+    padding: 0 var(--spectrum-global-dimension-static-size-150);
+
+    .description {
+        margin-left: var(--spectrum-global-dimension-size-300);
+        margin-top: var(--spectrum-global-dimension-size-75);
+        color: var(--energy-blue) !important;
+    }
+}
+
+.termsOfUseFooter a {
+    text-decoration: none !important;
+    color: var(--energy-blue) !important;
+}

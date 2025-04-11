@@ -1,0 +1,15 @@
+.confidenceTextBucket {
+    color: var(--spectrum-global-color-gray-600) !important;
+}
+
+.sortIcon {
+    color: var(--spectrum-global-color-gray-600);
+    height: var(--spectrum-global-dimension-size-250);
+    width: var(--spectrum-global-dimension-size-200);
+    cursor: pointer;
+
+    & svg {
+        height: var(--spectrum-global-dimension-size-250);
+        width: var(--spectrum-global-dimension-size-200);
+    }
+}

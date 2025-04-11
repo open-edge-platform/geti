@@ -1,0 +1,96 @@
+# INTEL CONFIDENTIAL
+#
+# Copyright (C) 2025 Intel Corporation
+#
+# This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+# the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+# you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+# without Intel's prior written permission.
+#
+# This software and the related documents are provided as is, with no express or implied warranties,
+# other than those that are expressly stated in the License.
+
+CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
+
+.PHONY: build-image-default push-image publish-chart lint-chart-default
+
+###
+# version
+###
+PRODUCT_VERSION                    ?= 2.9.0
+TAG                                ?= $(PRODUCT_VERSION)-local-$(shell git rev-parse --short HEAD)
+
+###
+# registries
+###
+REGISTRY                          ?= local
+IMAGES_REGISTRY                   ?= ${REGISTRY}/impp
+CHARTS_REGISTRY                   ?= ${REGISTRY}/geti-helm
+BASE_IMAGES_REGISTRY              ?= ${REGISTRY}/base-images
+
+###
+# base images versions
+###
+BASE_DEBIAN_IMAGE_TAG             ?= 12.8.1
+BASE_PYTHON_IMAGE_TAG             ?= 12.8.1.2
+BASE_DEV_PYTHON_IMAGE_TAG         ?= 12.8.1.2
+BASE_DEV_GO_IMAGE_TAG             ?= 12.8.1.4
+BASE_FFMPEG_TAG                   ?= 12.8.1.1
+BASE_OTE_V2_IMAGE_TAG             ?= 12.7.3.1.20
+
+###
+# component
+###
+CHART_DIR                         := ./chart
+CHART_YAML                        := ${CHART_DIR}/Chart.yaml
+COMPONENT_NAME                    := $(shell grep '^name:' ${CHART_YAML} | sed 's/^name: //')
+###
+# docker configuration
+###
+
+PROXY                             := --build-arg HTTP_PROXY=$(http_proxy) \
+									 --build-arg HTTPS_PROXY=$(https_proxy) \
+									 --build-arg NO_PROXY=$(no_proxy) \
+									 --build-arg http_proxy=$(http_proxy) \
+									 --build-arg https_proxy=$(https_proxy) \
+									 --build-arg no_proxy=$(no_proxy)
+
+DOCKER_REGISTRY					  := $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY),)
+
+DOCKER_BUILD_CONTEXT              ?=
+
+DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
+
+
+###
+# docker images
+###
+build-image-default:
+	@echo "Building docker image for component: ${COMPONENT_NAME}"
+	@docker build \
+		${DOCKER_EXTRA_ARGS} \
+		${DOCKER_BUILD_CONTEXT} \
+		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
+		-f ./Dockerfile .
+
+
+push-image:
+	@echo "Pushing docker image for component: ${COMPONENT_NAME}"
+	@docker push ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG}
+
+###
+# helm charts
+###
+lint-chart-default:
+	@echo "Running chart linter for component: ${COMPONENT_NAME}"
+	helm lint --with-subcharts $(dir ${CHART_YAML})
+
+publish-chart:
+	@echo "Publishing chart for component: ${COMPONENT_NAME}"
+	helm package $(dir ${CHART_YAML}) --version ${TAG}
+	helm push ${COMPONENT_NAME}-${TAG}.tgz oci://${CHARTS_REGISTRY}
+
+# To suppress warnings when overriding Makefile targets, declare the abstract targets as <name>-default
+%:  %-default
+	@  true
+

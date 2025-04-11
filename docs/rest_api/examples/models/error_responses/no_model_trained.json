@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "One or more tasks in the task chain has not been trained",
+  "error_code": "model_not_found"
+}

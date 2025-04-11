@@ -1,0 +1,65 @@
+get:
+  tags:
+    - Training dataset versions
+  summary: Retrieve all media in a training revision
+  description: Allows the user to get all the media items in a training revision. A training revision is a dataset 
+   which contains the Training, Testing, and Validation subsets. A training revision ID can be obtained after starting 
+   at least one training inference.
+  operationId: GetMediaForDataset
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/dataset_revision_id.yaml'
+    - $ref: '../../parameters/query/limit.yaml'
+    - $ref: '../../parameters/query/skip.yaml'
+    - $ref: '../../parameters/query/sort_direction.yaml'
+    - $ref: '../../parameters/query/filter_sort_by.yaml'
+  responses:
+    '200':
+      description: Media items in the training revision
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../interactive_ai/services/api/schemas/datasets/responses/filtered_dataset.yaml'
+          examples:
+            Combined media list response:
+              value:
+                $ref: '../../examples/datasets/responses/filtered_dataset_response.json'
+    '400':
+      description: Bad request. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid filter exception:
+              value:
+                $ref: "../../examples/datasets/error_responses/invalid_filter_exception.json"
+            Dataset is not a training dataset:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_is_not_a_training_dataset.yaml"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Training revision not found response:
+              description: Note, a training revision is a type of dataset.
+              value:
+                $ref: "../../examples/datasets/error_responses/training_revision_not_found.json"

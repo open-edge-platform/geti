@@ -1,0 +1,13 @@
+in: path
+name: annotation_id
+style: simple
+description: |-
+  Set to `latest` to fetch the latest annotations. 
+  This parameter can also be set to the ID of a specific annotation. For example, the specific ID could be obtained 
+  from the [training revision](#Training%20dataset%20versions/GetMediaForDataset) response, 
+  where the response includes the specific user annotation for a media that is used for training.
+schema:
+  oneOf:
+    - $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+    - $ref: "../../../../interactive_ai/services/api/schemas/parameters/latest.yaml"
+required: true

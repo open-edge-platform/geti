@@ -1,0 +1,6 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  shape:
+    $ref: "../../annotations/rectangle.yaml"

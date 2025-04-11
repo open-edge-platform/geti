@@ -1,0 +1,23 @@
+.productTitle {
+    font-size: var(--spectrum-global-dimension-size-325);
+}
+
+.productDescription {
+    display: block;
+}
+
+.legalInformation {
+    margin-top: var(--spectrum-global-dimension-size-125);
+
+    h3 {
+        margin: 0;
+    }
+
+    a + h3 {
+        margin-top: var(--spectrum-global-dimension-size-300);
+    }
+}
+
+.link {
+    color: var(--energy-blue) !important;
+}

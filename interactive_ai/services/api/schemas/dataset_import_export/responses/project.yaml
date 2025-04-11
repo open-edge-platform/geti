@@ -1,0 +1,12 @@
+type: object
+properties:
+  id:
+    type: string
+    description: ID of the project
+  name:
+    type: string
+    description: Name of the project
+  type:
+    type: string
+    description: Type name of the project
+    $ref: "../project_types.yaml"

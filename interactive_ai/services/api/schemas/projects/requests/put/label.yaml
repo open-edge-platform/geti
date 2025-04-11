@@ -1,0 +1,35 @@
+required:
+  - name
+  - color
+type: object
+properties:
+  name:
+    type: string
+    description: 'Label name, must be unique'
+  id:
+    $ref: '../../../mongo_id.yaml'
+  color:
+    type: string
+    pattern: ^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$
+    description: 'Label color, picked at random if not specified'
+  hotkey:
+    type: string
+    description: 'Key or combination of key to select this label. Can be empty (no key).'
+    minLength: 0
+  group:
+    type: string
+    description: 'Name of label group'
+  is_empty:
+    type: boolean
+    readOnly: true
+    description: Indicates whether the label is an empty label
+  is_deleted:
+    type: boolean
+    description: Indicates whether the label is going to be deleted
+  parent_id:
+    description: 'Name of parent label'
+  revisit_affected_annotations:
+    type: boolean
+    writeOnly: true
+    description: 'On label schema change, whether to mark the annotations linked to this
+       label as "to be revisited" by the user'

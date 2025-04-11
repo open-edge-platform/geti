@@ -1,0 +1,50 @@
+{
+  "range_labels": [
+    {
+      "start_frame": 0,
+      "end_frame": 7,
+      "label_ids": [
+        "a"
+      ]
+    },
+    {
+      "start_frame": 8,
+      "end_frame": 10,
+      "label_ids": [
+        "a",
+        "b"
+      ]
+    },
+    {
+      "start_frame": 11,
+      "end_frame": 12,
+      "label_ids": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    {
+      "start_frame": 13,
+      "end_frame": 76,
+      "label_ids": [
+        "b",
+        "c"
+      ]
+    },
+    {
+      "start_frame": 77,
+      "end_frame": 77,
+      "label_ids": [
+        "b"
+      ]
+    },
+    {
+      "start_frame": 95,
+      "end_frame": 100,
+      "label_ids": [
+        "b"
+      ]
+    }
+  ]
+}

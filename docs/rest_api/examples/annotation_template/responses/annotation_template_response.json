@@ -1,0 +1,14 @@
+{
+  "annotation_templates": [
+    {
+      "id": "62387685df33ae8280c63b33",
+      "name": "running",
+      "value": "FORMAT IS TBD"
+    },
+    {
+      "id": "62387685df33ae8280c63b36",
+      "name": "standing",
+      "value": "FORMAT IS TBD"
+    }
+  ]
+}

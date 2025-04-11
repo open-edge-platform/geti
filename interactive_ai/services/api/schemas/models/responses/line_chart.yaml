@@ -1,0 +1,34 @@
+type: object
+description: Line chart, containing description of the chart and the lines coordinates. 
+properties:
+  x_axis_label:
+    type: string
+    description: Label of the x-axis for the line chart
+  y_axis_label:
+    type: string
+    description: Label of the y-axis for the line chart
+  color:
+    type: [string, 'null']
+    description: Color of the bar in hex format
+  line_data:
+    type: array
+    description: Array of line data, each containing the information for one line.
+    items:
+      type: object
+      properties:
+        points:
+          type: array
+          description: List of coordinates of the points in the line chart
+          items:
+            type: object
+            properties:
+              x:
+                type: number
+                description: X coordinate of the point
+              y:
+                type: number
+                description: Y coordinate of the point
+required:
+  - x_axis_label
+  - y_axis_label
+  - line_data

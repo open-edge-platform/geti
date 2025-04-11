@@ -1,0 +1,20 @@
+{
+  "video_id": "60d31793d5f1fb7e6e3c1a5f",
+  "range_labels": [
+    {
+      "start_frame": 0,
+      "end_frame": 1,
+      "label_ids": ["60d31793d5f1fb7e6e3c1a5e"]
+    },
+    {
+      "start_frame": 2,
+      "end_frame": 22,
+      "label_ids": ["60d31793d5f1fb7e6e3c1a5a","60d31793d5f1fb7e6e3c1a5b"]
+    },
+    {
+      "start_frame": 23,
+      "end_frame": 29,
+      "label_ids": ["60d31793d5f1fb7e6e3c1a5c"]
+    }
+  ]
+}

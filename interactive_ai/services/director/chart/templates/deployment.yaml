@@ -1,0 +1,270 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "director.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "director.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+        proxy.istio.io/config: |
+          terminationDrainDuration: 60s
+      labels:
+        {{- include "director.selectorLabels" . | nindent 8 }}
+        authorization: public_api
+        opa_envoy_filter: enabled
+    spec:
+      terminationGracePeriodSeconds: 90
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+      initContainers:
+        - name: init-kafka
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: ['sh', '-c', 'until nc -w 5 -z {{ .Release.Namespace }}-kafka 9092; do echo wait...; sleep 2; done;']
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              mkdir -p "{{ .Values.mountPath }}"/storage
+              find {{ .Values.mountPath }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+              find {{ .Values.audit_logs_mount_path }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+          volumeMounts:
+            - name: data-storage
+              mountPath: {{ .Values.mountPath }}
+              readOnly: false
+              subPath: binary_data
+            - name: data-storage
+              mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: false
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.volumeSecurityContext | nindent 12 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s 
+              --for=condition=complete 
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+      containers:
+        - name: &containerName director
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.ports.director.port }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.ports.director.port }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          env:
+            - name: MIN_FREE_SPACE_GIB
+              value: "{{ .Values.global.min_free_disk_space_gib }}"
+            - name: LOGS_DIR
+              value: {{ .Values.global.logs_dir }}
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            {{- if .Values.global.enable_mongodb_credentials }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-mongodb-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-mongodb-password
+            {{- end }}
+            - name: KAFKA_ADDRESS
+              value: {{ .Release.Namespace }}-kafka
+            - name: JOB_SERVICE_ADDRESS
+              value: {{ .Release.Namespace }}-jobs-ms:50051
+            - name: WORKDIR
+              value: {{ .Values.mountPath }}
+            - name: SERVICE_MANAGEMENT_ENABLED
+              value: "1"
+            - name: ORCHESTRATOR
+              value: kubernetes
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: user
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: password
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: SPICEDB_SSL_CERTIFICATES_DIR
+              value: "/etc/tls-secrets"
+            - name: MODEL_TEMPLATES_DIR
+              value: /model_templates
+            - name: WORKLOAD_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: director-microservice
+            - name: DATASET_ITEM_TO_ANNOTATION_RATIO
+              value: "0.9"
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.instance.id=$(K8S_POD_NAME),k8s.pod.uid=$(K8S_POD_UID),k8s.container.name=$(K8S_CONTAINER_NAME)
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: MONGODB_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: mongodb_credentials_provider
+            - name: NUM_MODELS_TO_KEEP_IN_STORAGE
+              valueFrom:
+                configMapKeyRef:
+                  key: num_models_to_keep_in_storage
+                  name: {{ .Release.Namespace }}-configuration
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: S3_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: "s3_endpoint"
+                  name: "{{ .Release.Namespace }}-configuration"
+                  optional: true
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "director_secret_key"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "director_access_key"
+            - name: S3_PRESIGNED_URL_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "director_s3_presigned_url_access_key"
+            - name: S3_PRESIGNED_URL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "director_s3_presigned_url_secret_key"
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+            - configMapRef:
+                name: {{ .Release.Namespace }}-s3-bucket-names
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: {{ .Values.global.logs_dir }}
+              readOnly: false
+              subPath: logs
+              name: data-storage
+            - mountPath: {{ .Values.mountPath }}
+              readOnly: false
+              name: data-storage
+              subPath: binary_data
+            - name: data-storage
+              mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: false
+            - name: tls-secrets
+              mountPath: "/etc/tls-secrets"
+              readOnly: true
+          ports:
+            - name: director
+              containerPort: {{ .Values.service.ports.director.port }}
+              protocol: TCP
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "60s"]
+      volumes:
+        {{- if .Values.global.storage_volume_claim_name_director }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_director }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - name: tls-secrets
+          secret:
+            secretName: {{ include "spice-db.tlsSecretName" . }}
+            items:
+              - key: ca.crt
+                path: ca.crt

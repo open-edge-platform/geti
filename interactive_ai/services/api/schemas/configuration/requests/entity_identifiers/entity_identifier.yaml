@@ -1,0 +1,4 @@
+oneOf:
+  - $ref: component_entity_identifier.yaml
+  - $ref: model_entity_identifier.yaml
+  - $ref: hyper_parameter_group_entity_identifier.yaml

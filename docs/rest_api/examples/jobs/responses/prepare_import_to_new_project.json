@@ -1,0 +1,211 @@
+{
+    "id": "65de8164bbd1fcc07d6f1802",
+    "type": "prepare_import_to_new_project",
+    "creation_time": "2024-02-28T00:42:12.845000+00:00",
+    "start_time": "2024-02-28T00:42:20.152000+00:00",
+    "end_time": "2024-02-28T00:42:34.776000+00:00",
+    "name": "Prepare Import to New Project",
+    "author": "1fc46c32-ccb0-4fa6-94c3-3987a70c0ddc",
+    "state": "finished",
+    "steps": [
+        {
+            "message": "Dataset is parsed successfully",
+            "index": 1,
+            "progress": 100,
+            "state": "finished",
+            "step_name": "Prepare dataset import to new project",
+            "duration": 8.016
+        }
+    ],
+    "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+    },
+    "metadata": {
+        "file_id": "65e6bcf4c6ada55c64630357",
+        "warnings": [
+            {
+                "type": "warning",
+                "name": "Missing expected annotation type for detection domain",
+                "description": "Image contains no bounding boxes",
+                "affected_images": 1
+            },
+            {
+                "type": "warning",
+                "name": "Missing expected annotation type for segmentation domain",
+                "description": "Image contains no polygons",
+                "affected_images": 1
+            }
+        ],
+        "supported_project_types": [
+            {
+                "project_type": "segmentation",
+                "pipeline": {
+                    "connections": [
+                        {
+                            "from": "Dataset",
+                            "to": "Segmentation"
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "title": "Dataset",
+                            "task_type": "dataset",
+                            "labels": []
+                        },
+                        {
+                            "title": "Segmentation",
+                            "task_type": "segmentation",
+                            "labels": [
+                                {
+                                    "name": "car",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "truck",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "bus",
+                                    "group": "default - Segmentation"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "project_type": "detection",
+                "pipeline": {
+                    "connections": [
+                        {
+                            "from": "Dataset",
+                            "to": "Detection"
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "title": "Dataset",
+                            "task_type": "dataset",
+                            "labels": []
+                        },
+                        {
+                            "title": "Detection",
+                            "task_type": "detection",
+                            "labels": [
+                                {
+                                    "name": "car",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "truck",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "bus",
+                                    "group": "default - Segmentation"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "project_type": "instance_segmentation",
+                "pipeline": {
+                    "connections": [
+                        {
+                            "from": "Dataset",
+                            "to": "Instance Segmentation"
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "title": "Dataset",
+                            "task_type": "dataset",
+                            "labels": []
+                        },
+                        {
+                            "title": "Instance Segmentation",
+                            "task_type": "instance_segmentation",
+                            "labels": [
+                                {
+                                    "name": "car",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "truck",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "bus",
+                                    "group": "default - Segmentation"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "project_type": "detection_segmentation",
+                "pipeline": {
+                    "connections": [
+                        {
+                            "from": "Dataset",
+                            "to": "Detection"
+                        },
+                        {
+                            "from": "Detection",
+                            "to": "Crop"
+                        },
+                        {
+                            "from": "Crop",
+                            "to": "Segmentation"
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "title": "Dataset",
+                            "task_type": "dataset",
+                            "labels": []
+                        },
+                        {
+                            "title": "Detection",
+                            "task_type": "detection",
+                            "labels": [
+                                {
+                                    "name": "default_detection_label",
+                                    "group": "default - Detection"
+                                }
+                            ]
+                        },
+                        {
+                            "title": "Crop",
+                            "task_type": "crop",
+                            "labels": []
+                        },
+                        {
+                            "title": "Segmentation",
+                            "task_type": "segmentation",
+                            "labels": [
+                                {
+                                    "name": "car",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "truck",
+                                    "group": "default - Segmentation"
+                                },
+                                {
+                                    "name": "bus",
+                                    "group": "default - Segmentation"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

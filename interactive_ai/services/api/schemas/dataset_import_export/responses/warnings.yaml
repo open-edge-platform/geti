@@ -1,0 +1,27 @@
+type: array
+description: Warnings to import dataset to specific domain
+items:
+  type: object
+  properties:
+    type:
+      type: string
+      description: Type of the warning
+      enum: [error, warning]
+    name:
+      type: string
+      description: Name of the warning
+      example: Missing expected annotation type for classification domain
+    description:
+      type: string
+      description: Detailed description of the warning
+    resolve_strategy:
+      type: string
+      description: How to handle the warning
+    affected_images:
+      type: number
+      format: int32
+      description: Number of affected images
+  required:
+    - type
+    - name
+    - description

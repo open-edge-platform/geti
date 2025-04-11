@@ -1,0 +1,40 @@
+.gridWrapper {
+    width: 100%;
+    height: 100%;
+    padding: var(--spectrum-global-dimension-size-50);
+    overflow: hidden auto;
+    min-height: var(--spectrum-global-dimension-size-1700);
+    background-color: var(--spectrum-global-color-gray-50);
+    margin-bottom: var(--spectrum-global-dimension-size-50);
+}
+
+.emptyAnnotationsNotification {
+    box-sizing: border-box;
+    padding-left: var(--spectrum-global-dimension-size-250);
+    padding-right: var(--spectrum-global-dimension-size-250);
+    background-color: var(--energy-blue);
+    width: 728px;
+    height: 56px;
+    color: var(--spectrum-global-color-gray-50);
+    animation: 0.3s animateNotification;
+
+    & button {
+        color: var(--spectrum-global-color-gray-50) !important;
+    }
+
+    & [role='link'] {
+        text-decoration: none !important;
+    }
+}
+
+@keyframes animateNotification {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}

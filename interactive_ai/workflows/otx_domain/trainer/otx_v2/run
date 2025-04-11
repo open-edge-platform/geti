@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# INTEL CONFIDENTIAL
+#
+# Copyright (C) 2024 Intel Corporation
+#
+# This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+# the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+# you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+# without Intel's prior written permission.
+#
+# This software and the related documents are provided as is, with no express or implied warranties,
+# other than those that are expressly stated in the License.
+
+# TODO: This can be enhanced by introducing K8S native sidecar container feature
+# CVS-149031
+SIDECAR_PID_FPATH=/shard_files/sidecar.pid
+
+# Step 1. Running script
+set -o pipefail;
+python -X faulthandler /opt/scripts/run.py;
+retVal=$?;
+echo "Finished running script. Returned exit code status: $retVal"
+
+# Step 2. Clean up container
+until curl -XPOST 127.0.0.1:15020/quitquitquit;  # TODO?
+  echo "Returned exit code status: $?"
+  do sleep 3;
+done;
+
+if [ -e $SIDECAR_PID_FPATH ]; then kill -SIGINT $(cat $SIDECAR_PID_FPATH); fi;
+if [ -f /tmp/training_completed ]; then exit 0; else exit $retVal; fi;

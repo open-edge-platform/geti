@@ -1,0 +1,83 @@
+image: user-directory
+imagePullPolicy: IfNotPresent
+
+replicaCount: 1
+
+port: 9000
+grpc_port: "50051"
+
+tmp_dir: "/tmp"
+logs_mount_path: "/logs"
+spicedb_log_file_path: "/audit_logs/spicedb.log"
+audit_logs_mount_path: "audit_logs"
+configuration_cm_name: "impt-configuration"
+
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 200Mi
+  limits:
+    memory: 200Mi
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+initialDelaySeconds: 5
+periodSeconds: 45
+
+global:
+  ldap_service_user_secret_name: "impt-ldap-service-user"
+  security_headers: ""
+  stripped_headers: ""
+  logging_config_dir: "/mnt/logging_config"
+  storage_volume_claim_name_gtw: 'data-storage-volume-claim'
+  enable_master_node_selector: true
+  docker_namespace: impp
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+
+kafka:
+  topic: project_notifications
+  port: 9092
+
+endpoints:
+- matches:
+    - /api/v(.*)/organizations/.*/users/.*/statuses
+  methods:
+    - PUT

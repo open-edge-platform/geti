@@ -1,0 +1,12 @@
+type: object
+properties:
+  score:
+    type: 
+      - "number"
+      - "null"
+    format: float
+    description: Average score of task scores of a project, null if no model is trained.
+  task_performances:
+    type: array
+    items:
+      $ref: "task_performance.yaml"

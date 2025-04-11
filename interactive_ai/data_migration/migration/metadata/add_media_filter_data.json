@@ -1,0 +1,9 @@
+{
+    "description": "Add size and video info to filter data",
+    "supports_downgrade": true,
+    "skip_on_project_import": false,
+    "new_collections": [],
+    "updated_collections": ["dataset_storage_filter_data"],
+    "deprecated_collections": [],
+    "affects_binary_data": false
+}

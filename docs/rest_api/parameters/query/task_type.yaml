@@ -1,0 +1,12 @@
+in: query
+name: task_type
+style: form
+description: Task type to get a list of supported algorithms for
+schema:
+  type: string
+  enum: [
+    "detection",
+    "segmentation",
+    "classification",
+    "anomaly",
+  ]

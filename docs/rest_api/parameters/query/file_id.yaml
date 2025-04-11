@@ -1,0 +1,7 @@
+in: query
+name: file_id
+style: form
+description: The ID of the uploaded file
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

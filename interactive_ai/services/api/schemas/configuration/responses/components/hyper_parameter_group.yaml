@@ -1,0 +1,34 @@
+type: object
+title: Hyper parameter group
+properties:
+  name:
+    type: string
+    description: Name of the hyper parameter group
+  id:
+    type: string
+    minLength: 26
+    maxLength: 27
+    example: "60d31793d5f1fb7e6e3c1a4c-1"
+    description: "ID of the hyper parameter group. The first 24 characters refer to the ID of the underlying
+    HyperParameter object. This is followed by a dash ('-') and the group number (0 to 99) of this particular hyper
+    parameter group."
+  type:
+    type: string
+    description: Type of the configurable parameters. For a hyper parameter group the type is always 'PARAMETER_GROUP'.
+    enum: ["CONFIGURABLE_PARAMETERS", "PARAMETER_GROUP"]
+  entity_identifier:
+    $ref: "../entity_identifiers/entity_identifier.yaml"
+  header:
+    type: string
+    description: The name of the hyper parameter group
+    example: Learning parameters
+  description:
+    type: string
+    description: Description of the hyper parameter group.
+    example: A set of parameters that control the training process.
+  groups:
+    type: array
+    items:
+      $ref: "../parameter_group/generic_group.yaml"
+  parameters:
+    $ref: "../configurable_parameters/parameters.yaml"

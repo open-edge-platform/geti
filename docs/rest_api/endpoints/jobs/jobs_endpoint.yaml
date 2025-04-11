@@ -1,0 +1,50 @@
+get:
+  tags:
+  - Jobs
+  summary: Get info on all jobs
+  description: Get info on all jobs, running and completed.
+  operationId: GetJobs
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/query/project_id.yaml'
+    - $ref: '../../parameters/query/job_state.yaml'
+    - $ref: '../../parameters/query/job_type.yaml'
+    - $ref: '../../parameters/query/key.yaml'
+    - $ref: '../../parameters/query/author_id.yaml'
+    - $ref: '../../parameters/query/start_time_from.yaml'
+    - $ref: '../../parameters/query/start_time_to.yaml'
+    - $ref: '../../parameters/query/skip.yaml'
+    - $ref: '../../parameters/query/limit.yaml'
+    - $ref: '../../parameters/query/jobs_sort_by.yaml'
+    - $ref: '../../parameters/query/sort_direction.yaml'
+  responses:
+    '200':
+      description: Jobs successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_list.yaml"
+          examples:
+            Multiple jobs response:
+              value:
+                $ref: "../../examples/jobs/responses/multiple_jobs_response.json"
+            No jobs response:
+              value:
+                {"jobs":[], "count":0}
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

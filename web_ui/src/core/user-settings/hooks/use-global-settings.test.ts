@@ -1,0 +1,100 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { act, waitFor } from '@testing-library/react';
+import { rest } from 'msw';
+
+import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
+import { server } from '../../annotations/services/test-utils';
+import { apiRequestUrl } from '../../services/test-utils';
+import { API_URLS } from '../../services/urls';
+import { GENERAL_SETTINGS_KEYS } from '../dtos/user-settings.interface';
+import { INITIAL_GLOBAL_SETTINGS } from '../utils';
+import { useUserGlobalSettings } from './use-global-settings.hook';
+
+const USER_GLOBAL_SETTINGS_URL = `api/${API_URLS.GLOBAL_SETTINGS()}`;
+
+describe('useUserGlobalSettings', () => {
+    it('returns initial global settings if there is no backend data', async () => {
+        server.use(rest.get(USER_GLOBAL_SETTINGS_URL, (_req, res, ctx) => res(ctx.status(204))));
+
+        const { result } = renderHookWithProviders(() => useUserGlobalSettings(), {
+            providerProps: { useInMemoryEnvironment: false },
+        });
+
+        await waitFor(() => {
+            expect(result.current.config).toEqual(INITIAL_GLOBAL_SETTINGS);
+        });
+    });
+
+    it('returns global settings from the backend', async () => {
+        const globalSettings = {
+            ...INITIAL_GLOBAL_SETTINGS,
+            [GENERAL_SETTINGS_KEYS.MAINTENANCE_BANNER]: {
+                wasDismissed: true,
+                window: {
+                    start: 1711312113376,
+                    end: 1711513116880,
+                },
+            },
+        };
+
+        server.use(
+            rest.get(apiRequestUrl(USER_GLOBAL_SETTINGS_URL), (_req, res, ctx) =>
+                res(ctx.status(200), ctx.json({ settings: JSON.stringify(globalSettings) }))
+            )
+        );
+
+        const { result } = renderHookWithProviders(() => useUserGlobalSettings(), {
+            providerProps: { useInMemoryEnvironment: false },
+        });
+
+        await waitFor(() => {
+            expect(result.current.config).toEqual(globalSettings);
+        });
+    });
+
+    it('save global settings to the backend', async () => {
+        const globalSettings = {
+            ...INITIAL_GLOBAL_SETTINGS,
+            [GENERAL_SETTINGS_KEYS.MAINTENANCE_BANNER]: {
+                wasDismissed: true,
+                window: {
+                    start: 1711312113376,
+                    end: 1711513116880,
+                },
+            },
+        };
+
+        server.use(rest.get(USER_GLOBAL_SETTINGS_URL, (_req, res, ctx) => res(ctx.status(204))));
+
+        server.use(
+            rest.post(USER_GLOBAL_SETTINGS_URL, (req, res, ctx) => {
+                expect(req.body).toEqual({ settings: JSON.stringify(globalSettings) });
+
+                return res(ctx.status(200));
+            })
+        );
+
+        const { result } = renderHookWithProviders(() => useUserGlobalSettings(), {
+            providerProps: { useInMemoryEnvironment: false },
+        });
+
+        await waitFor(() => {
+            expect(result.current.config).toEqual(INITIAL_GLOBAL_SETTINGS);
+        });
+
+        await act(async () => {
+            await result.current.saveConfig(globalSettings);
+        });
+    });
+});

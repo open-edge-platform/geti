@@ -1,0 +1,12 @@
+in: query
+name: end_frame
+style: form
+description: :-
+  The ending index of the range of interest. This is a 0-based inclusive index, meaning to include the last frame of the video, 
+  this parameter should be set to `frame_count-1`; the value cannot be bigger than `frame_count-1`. 
+  The `frame_count` is the total number of frames contained in the video
+  and it can be retrieved from the response body of [video detail](#Media/GetVideoDetail) endpoint. 
+schema:
+  type: integer
+  example: 0
+required: false

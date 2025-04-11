@@ -1,0 +1,5 @@
+{
+    "error_code": "active_set_on_non_trainable_task",
+    "http_status": 400,
+    "message": "Task node with ID 63120c2a5ca5eb9986a821c8 is not trainable."
+}

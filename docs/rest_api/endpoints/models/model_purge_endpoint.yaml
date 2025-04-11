@@ -1,0 +1,50 @@
+post:
+  tags:
+    - Models
+  summary: Archive a model
+  description: |-
+    Archive a model. This will permanently delete all the binary files related to the model including base model 
+    weights, optimized model weights and exportable code. This endpoint can only be called on base models, not optimized 
+    models. Additionally, the model must not be the latest in a model group or be the active model.
+  operationId: ArchiveModel
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/model_group_id.yaml'
+    - $ref: '../../parameters/path/model_id.yaml'
+  responses:
+    '204':
+      description: Model archived successfully
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Model group not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_group_not_found.json"
+            Model not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_not_found.json"
+    '422':
+      description: Model can not be archived.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Optimized model can not be archived response:
+              value:
+                $ref: "../../examples/models/error_responses/model_can_not_be_archived.json"

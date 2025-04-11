@@ -1,0 +1,35 @@
+.buttonGroup {
+    flex-wrap: wrap;
+    padding-top: var(--spectrum-global-dimension-static-size-250);
+}
+
+.trainingDialogDescription {
+    color: var(--spectrum-global-color-gray-800);
+    font-size: var(--spectrum-global-dimension-static-font-size-100);
+    font-weight: 300;
+}
+
+.trainingDialogStepNumber {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-static-font-size-75);
+}
+
+.selectedInactiveModelWrapper {
+    box-sizing: border-box;
+    margin-top: var(--spectrum-global-dimension-size-200) !important;
+    background-color: var(--spectrum-global-color-gray-50);
+    padding: var(--spectrum-global-dimension-size-100);
+    border: var(--spectrum-alias-border-size-thick) solid var(--energy-blue);
+
+    & svg {
+        color: var(--energy-blue);
+    }
+}
+
+.selectedInactiveModelText {
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.notEnoughAnnotations {
+    font-size: var(--spectrum-global-dimension-size-200);
+}

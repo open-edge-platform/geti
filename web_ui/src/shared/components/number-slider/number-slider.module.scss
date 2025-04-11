@@ -1,0 +1,58 @@
+.picker {
+    align-items: center !important;
+
+    * {
+        font-size: var(--spectrum-global-dimension-font-size-50) !important;
+    }
+
+    button {
+        height: var(--spectrum-global-dimension-size-250);
+        background-color: var(--spectrum-global-color-gray-100);
+    }
+}
+
+.sliderButton {
+    height: var(--spectrum-global-dimension-size-250);
+    background-color: var(--spectrum-global-color-gray-100);
+
+    &[class*='is-active'] {
+        background-color: var(--spectrum-global-color-gray-100);
+    }
+
+    span {
+        padding: 0 var(--spectrum-global-dimension-size-50) !important;
+    }
+
+    svg {
+        padding: 0 var(--spectrum-global-dimension-size-50) !important;
+        /* To avoid cutting the rounded border. Unfortunately one cannot set border-radius on svgs */
+        margin-right: 2px;
+    }
+}
+
+.text {
+    font-size: var(--spectrum-global-dimension-font-size-50) !important;
+    line-height: var(--spectrum-global-dimension-font-size-200) !important;
+}
+
+.editableInputSliderButton {
+    @extend .sliderButton;
+    @extend .text;
+    border-left: none !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    svg {
+        height: var(--spectrum-global-dimension-size-100);
+        width: var(--spectrum-global-dimension-size-100);
+    }
+}
+
+.textField {
+    input {
+        @extend .text;
+        height: inherit;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        padding: var(--spectrum-global-dimension-size-65);
+    }
+}

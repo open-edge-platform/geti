@@ -1,0 +1,41 @@
+.fitContent {
+    width: 100%;
+    height: 100%;
+}
+
+.canvas {
+    @extend .fitContent;
+}
+
+.zoomWrapper,
+.zoomWrapper > div {
+    @extend .fitContent;
+}
+
+.waitingWraper {
+    background: var(
+        --spectrum-alias-background-color-gray-50,
+        var(--spectrum-global-color-gray-50, var(--spectrum-semantic-gray-50-color-background))
+    );
+    margin-top: var(--spectrum-global-dimension-size-200);
+    padding: var(--spectrum-global-dimension-size-200) var(--spectrum-global-dimension-size-275);
+}
+
+.cancelInference {
+    margin-left: auto !important;
+    color: var(--spectrum-global-color-negative) !important;
+
+    &[class*='is-hovered'] {
+        border: none !important;
+        color: var(--spectrum-global-color-negative) !important;
+    }
+}
+
+.livePredictionNotification {
+    border: 1px solid var(--energy-blue);
+    padding: var(--spectrum-global-dimension-size-100);
+}
+
+.infoIcon {
+    color: var(--energy-blue);
+}

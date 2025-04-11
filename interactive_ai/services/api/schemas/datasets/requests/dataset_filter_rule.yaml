@@ -1,0 +1,21 @@
+type: object
+required:
+  - field
+  - operator
+  - value
+properties:
+  field:
+    description: "Field to filter on in the database. Can be one of 'media_upload_date', 'media_height', 'media_width' , 'media_name', 'label_id', 'annotation_creation_date', 'annotation_scene_state', 'shape_type', 'shape_size' or 'user_name'.
+    Note that media related filters do not affect the outcome when using the filter video endpoint as each frame will have the same values."
+    type: string
+    enum: ['media_upload_date', 'media_height', 'media_width' , 'media_name', 'label_id', 'annotation_creation_date', 'annotation_scene_state', 'shape_type', 'shape_area_percentage', 'shape_area_pixel', 'user_name']
+  operator:
+    description: Operator to filter with. Can be one of 'greater', 'less', 'greater_or_equal' , 'less_or_equal', 'equal', 'not_equal', 'in', 'not_in', 'regex'
+    type: string
+    enum: ['greater', 'less', 'greater_or_equal' , 'less_or_equal', 'equal', 'not_equal', 'in', 'not_in', 'regex']
+  value:
+    description: Value that the field should match to in combination with the operator
+    type:
+      - "array"
+      - "string"
+      - "integer"

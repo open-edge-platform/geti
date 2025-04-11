@@ -1,0 +1,26 @@
+{
+  "predictions": [
+    {
+      "id": "6138bca43b7b11505c43f2c1",
+      "labels": [
+        {
+          "id": "61387685df33ae8280c33d9d",
+          "probability": 0.87
+        }
+      ],
+      "shape": {
+        "height": 34,
+        "type": "RECTANGLE",
+        "width": 28,
+        "x": 25,
+        "y": 40
+      }
+    }
+  ],
+  "id": "6138afea3b7b11505c43f2c0",
+  "media_identifier": {
+    "image_id": "6138af293b7b11505c43f2bc",
+    "type": "image"
+  },
+  "created": "2021-09-08T12:43:22.290000+00:00"
+}

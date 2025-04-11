@@ -1,0 +1,5 @@
+in: query
+name: include_unannotated_media
+description: "Boolean that indicates if unannotated media should be included in the export dataset."
+schema:
+  type: boolean

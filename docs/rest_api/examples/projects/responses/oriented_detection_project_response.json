@@ -1,0 +1,67 @@
+{
+    "creation_time": "2022-06-18T12:23:38.616000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "62adc3caa4002f5a6757534a",
+            "name": "Boat detection"
+        }
+    ],
+    "id": "62adc3caa4002f5a67575349",
+    "storage_info": {},
+    "name": "Boat detection",
+    "performance": {
+        "score": 0.7,
+        "task_performances": [
+            {
+                "task_id": "62adc3caa4002f5a67575348",
+                "score": {
+                    "value": 0.7,
+                    "metric_type": "f-measure"
+                }
+            }
+        ]
+    },
+    "pipeline": {
+        "connections": [
+            {
+                "from": "62adc3caa4002f5a67575347",
+                "to": "62adc3caa4002f5a67575348"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "62adc3caa4002f5a67575347",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "62adc3caa4002f5a67575348",
+                "label_schema_id": "62adc3caa4002f5a67575354",
+                "labels": [
+                    {
+                        "color": "#cc94daff",
+                        "group": "Default group",
+                        "hotkey": "",
+                        "id": "62adc3caa4002f5a67575350",
+                        "is_empty": false,
+                        "name": "Boat",
+                        "parent_id": null
+                    },
+                    {
+                        "color": "#94cef2ff",
+                        "group": "No object",
+                        "hotkey": "",
+                        "id": "62adc3caa4002f5a67575352",
+                        "is_empty": true,
+                        "name": "No object",
+                        "parent_id": null
+                    }
+                ],
+                "task_type": "rotated_detection",
+                "title": "Detection oriented task"
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/workspaces/62909fdf003ddb3967f14382/projects/62adc3caa4002f5a67575349/thumbnail"
+}

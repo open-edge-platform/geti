@@ -1,0 +1,89 @@
+{
+            "creation_time": "2024-10-16T14:45:01.917000+00:00",
+            "id": "62946c61003ddb3967f14751",
+            "name": "Human pose detection",
+            "storage_info": {},
+            "performance": {
+                "score": 0.54,
+                "task_performances": [
+                    {
+                        "task_id": "62946c61003ddb3967f1474f",
+                        "score": {
+                            "value": 0.54,
+                            "metric_type": "Percentage of Correct Keypoints"
+                        }
+                    }
+                ]
+            },
+            "datasets": [
+                {
+                    "id": "62946c61003ddb3967f1474e",
+                    "name": "Human pose detection",
+                    "creation_time": "2024-10-16T14:45:01.917000+00:00",
+                    "use_for_training": true
+                }
+            ],
+            "pipeline": {
+                "connections": [
+                    {
+                        "from": "62946c61003ddb3967f1474e",
+                        "to": "62946c61003ddb3967f1474d"
+                    }
+                ],
+                "tasks": [
+                    {
+                        "id": "62946c61003ddb3967f1474e",
+                        "task_type": "dataset",
+                        "title": "Dataset"
+                    },
+                    {
+                        "task_type": "keypoint_detection",
+                        "title": "Keypoint detection task",
+                        "id": "62946c61003ddb3967f1474d",
+                        "label_schema_id": "62946c62003ddb3967f14760",
+                        "labels": [
+                            {
+                                "color": "#26518eff",
+                                "group": "Default keypoint detection task",
+                                "hotkey": "",
+                                "id": "62946c62003ddb3967f1475c",
+                                "is_empty": false,
+                                "is_anomalous": false,
+                                "name": "head",
+                                "parent_id": null
+                            },
+                            {
+                                "color": "#a4fc32ff",
+                                "group": "Default keypoint detection task",
+                                "hotkey": "",
+                                "id": "62946c62003ddb3967f1475e",
+                                "is_empty": false,
+                                "is_anomalous": false,
+                                "name": "neck",
+                                "parent_id": null
+                            }
+                        ],
+                        "keypoint_structure":{
+                            "edges":[
+                                {
+                                    "nodes":["62946c62003ddb3967f1475c", "62946c62003ddb3967f1475e"]
+                                }
+                            ],
+                            "positions":[
+                                {
+                                    "label":"62946c62003ddb3967f1475c",
+                                    "x":0.1,
+                                    "y":0.2
+                                },
+                                {
+                                    "label":"62946c62003ddb3967f1475e",
+                                    "x":0.3,
+                                    "y":0.4
+                                }
+                            ]
+                        }
+                    }
+                ]
+            },
+            "thumbnail": "/api/v1/organizations/61b3a664-822d-45c5-beb1-8b10187e301d/workspaces/db99fa0c-46a2-427f-aba6-fd76f1b86d7f/projects/62946c61003ddb3967f14751/thumbnail"
+        }

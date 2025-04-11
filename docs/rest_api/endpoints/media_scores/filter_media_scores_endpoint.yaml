@@ -1,0 +1,68 @@
+post:
+  tags:
+    - Tests
+  summary: Retrieve specific media test results by applying a query on the test
+  description: "Allows the user to quickly filter through their test results by supplying one or more filters to match
+  results against. Currently you can filter on 'score' and 'label_id' fields. The following operators can be used for
+  score 'greater', 'less', 'greater_or_equal', 'less_or_equal'. The following operator can be used for label id 'equal'.
+  If a non-allowed filter is used, then the endpoint will respond with the possible operators that are allowed."
+  operationId: FilterDataset
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/model_test_id.yaml'
+    - $ref: '../../parameters/query/limit.yaml'
+    - $ref: '../../parameters/query/skip.yaml'
+    - $ref: '../../parameters/query/sort_direction.yaml'
+    - $ref: '../../parameters/query/filter_media_scores_sort_by.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/media_scores/requests/media_score_query.yaml'
+        examples:
+          Filtering a dataset:
+            value:
+              $ref: "../../examples/media_scores/requests/filter_media_scores.json"
+    required: true
+  responses:
+    '200':
+      description: Media items matching the filter
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../interactive_ai/services/api/schemas/media_scores/responses/filtered_media_scores.yaml'
+          examples:
+            Combined media list response:
+              value:
+                $ref: '../../examples/media_scores/responses/filtered_media_scores.json'
+    '400':
+      description: Bad request. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid filter exception:
+              value:
+                $ref: "../../examples/datasets/error_responses/invalid_filter_exception.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Test not found response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/model_test_not_found.json"

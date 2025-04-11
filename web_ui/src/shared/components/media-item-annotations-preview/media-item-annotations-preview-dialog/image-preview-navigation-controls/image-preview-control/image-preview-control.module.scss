@@ -1,0 +1,14 @@
+.navigationButton {
+    background-color: rgba(0, 0, 0, 0.38);
+    border: none;
+    border-radius: 0;
+    transition: background-color 0.3s ease-out;
+
+    svg {
+        transition: all 0.3s ease-out;
+    }
+
+    &:hover svg {
+        fill-opacity: 1;
+    }
+}

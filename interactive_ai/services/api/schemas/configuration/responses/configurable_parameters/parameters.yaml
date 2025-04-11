@@ -1,0 +1,9 @@
+type: array
+description: Array of configurable parameters
+items:
+  anyOf:
+    - $ref: boolean.yaml
+    - $ref: float.yaml
+    - $ref: integer.yaml
+    - $ref: string_selectable.yaml
+    - $ref: float_selectable.yaml

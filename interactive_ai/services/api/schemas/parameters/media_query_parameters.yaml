@@ -1,0 +1,18 @@
+type: object
+properties:
+  sort_by:
+    $ref: "sort_by.yaml"
+  sort_direction:
+    $ref: "sort_direction.yaml"
+  name:
+    $ref: "name.yaml"
+  annotation_status:
+    $ref: "annotation_status.yaml"
+  labels:
+    $ref: "labels.yaml"
+  limit:
+    $ref: "limit.yaml"
+  skiptoken:
+    $ref: "../mongo_id.yaml"
+  media_type:
+    $ref: "media_type.yaml"

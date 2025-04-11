@@ -1,0 +1,28 @@
+title: Import to project - new dataset body
+required:
+  - file_id
+  - labels_map
+  - dataset_id
+  - dataset_name
+type: object
+properties:
+  file_id:
+    title: File Id
+    type: string
+    example: 60d31793d5f1fb7e6e3c1a4c
+  dataset_id:
+    title: Dataset Id
+    type: string
+    enum: [""]
+    example: ""
+  dataset_name:
+    title: Dataset name
+    type: string
+    example: "New dataset name"
+  labels_map:
+    title: Map of dataset label names to project label ids
+    type: object
+    example:
+      person: 627d0c97bc34fab51b383f23
+      bicycle: 627d0c97bc34fab51b383f23
+      car: 627d0c97bc34fab51b383f22

@@ -1,0 +1,31 @@
+type: object
+properties:
+  overview:
+    description: Overview of the dataset statistics
+    type: object
+    properties:
+      images:
+        description: Number of images in the dataset
+        type: number
+        format: int32
+      videos:
+        description: Number of videos in the dataset
+        type: number
+        format: int32
+      annotated_frames:
+        description: Number of annotated video frames in the dataset
+        type: number
+        format: int32
+      annotated_images:
+        description: Number of annotated images in the dataset
+        type: number
+        format: int32
+      annotated_videos:
+        description: Number of annotated videos in the dataset
+        type: number
+        format: int32
+  tasks:
+    description: List with statistics for each task in the project
+    type: array
+    items:
+      $ref: "task_statistics.yaml"

@@ -1,0 +1,5 @@
+{
+  "http_status": 204,
+  "message": "No active media found in dataset.",
+  "error_code": "no_active_media"
+}

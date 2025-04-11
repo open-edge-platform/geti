@@ -1,0 +1,42 @@
+div[class*='spectrum-Modal'] {
+    overflow-y: auto !important;
+}
+
+.container {
+    padding: var(--spectrum-global-dimension-size-800);
+}
+
+.primaryTitle {
+    margin: 0;
+    margin-bottom: var(--spectrum-global-dimension-size-100);
+    font-size: var(--spectrum-global-dimension-font-size-900);
+    line-height: var(--spectrum-global-dimension-size-600);
+}
+
+.secondaryTitle {
+    margin: 0;
+    font-size: var(--spectrum-global-dimension-font-size-400);
+    line-height: var(--spectrum-global-dimension-size-300);
+}
+
+.description {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-font-size-200);
+    line-height: var(--spectrum-global-dimension-size-400);
+    margin-top: var(--spectrum-global-dimension-size-100);
+    margin-bottom: var(--spectrum-global-dimension-size-300);
+}
+
+.creditValue {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-font-size-200);
+    line-height: var(--spectrum-global-dimension-size-400);
+}
+
+.divider {
+    background-color: var(--brand-opacity-white-12);
+}
+
+.blue {
+    color: var(--energy-blue-light);
+}

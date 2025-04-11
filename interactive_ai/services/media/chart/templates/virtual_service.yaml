@@ -1,0 +1,43 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svc_name := printf "%s-%s" .Release.Namespace .Chart.Name -}}
+{{- $svc_port := .Values.service.port -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+    {{- range .Values.ingress.endpoints }}
+    - uri:
+        regex: {{ . | quote }}
+    {{- end }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "geti-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        add:
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 900s
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+{{- end }}

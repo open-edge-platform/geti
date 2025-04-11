@@ -1,0 +1,4 @@
+{
+  "script": "drop_unused_indexes.py",
+  "metadata": "drop_unused_indexes.json"
+}

@@ -1,0 +1,27 @@
+type: object
+properties:
+  id:
+    $ref: '../../mongo_id.yaml'
+  name:
+    type: string
+    description: Test name
+    minLength: 1
+  creation_time:
+    type: string
+    description: Creation time of the test
+  job_info:
+    $ref: 'job_info.yaml'
+  datasets_info:
+    $ref: 'datasets_info.yaml'
+  model_info:
+    $ref: 'model_info.yaml'
+  scores:
+    $ref: 'scores.yaml'
+required:
+  - id
+  - name
+  - creation_time
+  - datasets_info
+  - job_info
+  - model_info
+  - scores

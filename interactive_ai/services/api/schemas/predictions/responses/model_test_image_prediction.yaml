@@ -1,0 +1,19 @@
+type: object
+properties:
+  predictions:
+    description: List of predictions
+    type: array
+    items:
+      $ref: 'prediction.yaml'
+  media_identifier:
+    type: object
+    properties:
+      image_id:
+        $ref: '../../mongo_id.yaml'
+      type:
+        type: string
+        enum: ["image"]
+        description: Type of media. 'image' for images, 'video' for videos.
+  created:
+    type: string
+    description: Modification date

@@ -1,0 +1,13 @@
+.secondaryToolbarMapPicker {
+    > button {
+        background-color: var(--spectrum-global-color-gray-50) !important;
+    }
+}
+
+.secondaryToolbarTextEntry {
+    white-space: nowrap;
+}
+
+.secondaryToolbarTextEntryDisabled {
+    color: var(--spectrum-global-color-gray-500);
+}

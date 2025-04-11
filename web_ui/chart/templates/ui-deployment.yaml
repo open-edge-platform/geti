@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Values.ui_app_name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Values.ui_app_name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.ui_app_name }}
+      release: {{ .Release.Name }}
+      heritage: {{ .Release.Service }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.ui_app_name }}
+        release: {{ .Release.Name }}
+        heritage: {{ .Release.Service }}
+        authorization: public_api
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Values.ui_app_name }}
+      containers:
+        - name: {{ .Values.ui_app_name }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+{{ toYaml .Values.ui_resources | indent 11 }}
+          stdin: true
+          tty: true
+          ports:
+          - containerPort: {{ .Values.ui_port }}
+          env:
+            - name: REACT_APP_BACKEND_URL
+              value: {{ .Values.ui_endpoint }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+          volumeMounts:
+            - mountPath: /var/log/nginx
+              name: nginx-log
+            - mountPath: /var/cache/nginx
+              name: nginx-cache
+            - mountPath: /tmp
+              name: nginx-tmp
+            - mountPath: /usr/share/nginx/webui/deployment-config.json
+              name: deployment-config
+              subPath: geti-deployment
+            - mountPath: /usr/share/nginx/admin-app/deployment-config.json
+              name: deployment-config
+              subPath: admin-deployment
+            - mountPath: /usr/share/nginx/flags
+              name: impt-feature-flags
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              scheme: HTTP
+              path: /index.html
+              port: {{ .Values.ui_port }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+      volumes:
+        - name: nginx-log
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-tmp
+          emptyDir: {}
+        - name: deployment-config
+          configMap:
+            name: web-ui-deployment-config
+        - name: impt-feature-flags
+          configMap:
+            name: {{ .Release.Namespace }}-feature-flags
+            items:
+              - key: feature-flags.json
+                path: ./feature-flags.json

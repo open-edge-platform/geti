@@ -1,0 +1,45 @@
+get:
+  tags:
+    - Training dataset versions
+  summary: Get statistics for a training revision
+  description: Retrieves the training revision statistics overview. A training revision is a specific dataset that has been split into
+    the three Deep Learning subsets; Train, Test, and Validation. The "subset_info" retrieves the split of images and 
+    frames (aggregated together from the dataset) among the Train, Test, and Validation subsets. 
+    The "dataset_info" retrieves the distribution of images, videos, and frames within the whole dataset.
+  operationId: GetTrainingRevisionStatistics
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/dataset_id.yaml"
+    - $ref: "../../parameters/path/dataset_revision_id.yaml"
+  responses:
+    '200':
+      description: Statistics for the requested training revision
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/datasets/responses/training_revision.yaml"
+          examples:
+            Training revision detail response:
+              value:
+                $ref: "../../examples/datasets/responses/training_revision_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"

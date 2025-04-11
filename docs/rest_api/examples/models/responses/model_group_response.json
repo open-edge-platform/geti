@@ -1,0 +1,46 @@
+{
+   "id": "60dc3b8b3fc7834f46ea90d5",
+   "name": "U-Net",
+   "task_id": "60db493fd20945a0046f56d2",
+   "model_template_id": "U-Net",
+   "models": [
+      {
+         "name": "U-Net",
+         "creation_date": "2021-06-30T09:45:19.677000+00:00",
+         "id": "60dc3b8b3fc7834f46ea90b0",
+         "size": 12813204,
+         "performance": {
+            "score": 0.43
+         },
+         "label_schema_in_sync": true,
+         "score_up_to_date": true,
+         "active_model": true,
+         "version": 2,
+         "purge_info": {
+            "is_purged": false,
+            "purge_time": null,
+            "user_uid": null
+         }
+      },
+      {
+         "name": "U-Net",
+         "creation_date": "2021-06-30T09:38:19.677000+00:00",
+         "id": "60dc3b8b3fc7834f46ea90af",
+         "size": 12813101,
+         "performance": {
+            "score": 0.28953322601318
+         },
+         "label_schema_in_sync": false,
+         "score_up_to_date": true,
+         "active_model": false,
+         "version": 1,
+         "purge_info": {
+            "is_purged": false,
+            "purge_time": null,
+            "user_uid": null
+         }
+      }
+   ],
+   "learning_approach": "fully_supervised",
+   "lifecycle_stage": "active"
+}

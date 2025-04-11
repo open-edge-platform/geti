@@ -1,0 +1,4 @@
+{
+  "script": "remove_ndr.py",
+  "metadata": "remove_ndr.json"
+}

@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "message": "The provided annotation template value is not valid.",
+  "error_code": "bad_request"
+}

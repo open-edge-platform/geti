@@ -1,0 +1,7 @@
+in: path
+name: optimized_model_id
+style: simple
+description: The ID of the optimized model
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

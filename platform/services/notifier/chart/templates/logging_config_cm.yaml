@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.logging_config.name }}"
+  namespace: "{{ .Release.Namespace }}"
+data:
+  LOG_LEVEL: "{{ .Values.logging_config.log_level }}"
+  logging_config.json: |
+    {"LOG_LEVEL" : "{{ .Values.logging_config.log_level }}"}

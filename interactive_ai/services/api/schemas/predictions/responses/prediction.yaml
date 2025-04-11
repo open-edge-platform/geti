@@ -1,0 +1,10 @@
+type: object
+properties:
+  shape:
+    $ref: '../../annotations/shape.yaml'
+  labels:
+    description: List of labels
+    type: array
+    minItems: 1
+    items:
+      $ref: 'prediction_label.yaml'

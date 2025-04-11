@@ -1,0 +1,2 @@
+description: Text chart, containing string or number to display
+type: [string, number]

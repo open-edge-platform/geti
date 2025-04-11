@@ -1,0 +1,8 @@
+in: query
+name: include_deleted_labels
+style: form
+description: "Set to True to also include the deleted labels in the response. 
+  If set to true, each label will have a field called is_deleted that will be set to true if the label has been deleted.
+  Default value is False."
+schema:
+  type: boolean

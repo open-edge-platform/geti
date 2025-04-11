@@ -1,0 +1,46 @@
+{
+  "id": "60ed88029e7651b7da565005",
+  "creation_time": "2022-07-04T12:19:58.836000+00:00",
+  "name": "Train job",
+  "type": "train",
+  "start_time": "2022-07-04T12:20:58.836000+00:00",
+  "end_time": null,
+  "author": "fdd733a6-a55f-473f-9dc7-e34fe40a3242",
+  "state": "running",
+  "steps": [
+    {
+      "message": "Finished",
+      "index": 1,
+      "progress": 100,
+      "state": "finished",
+      "step_name": "First task",
+      "duration": 42.52
+    },
+    {
+      "message": "Running",
+      "index": 2,
+      "progress": 64.46280991735537,
+      "state": "running",
+      "step_name": "Second task",
+      "warning": "Step warning message."
+    }
+  ],
+  "cancellation_info": {
+      "is_cancelled": false,
+      "user_uid": null,
+      "cancel_time": null
+  },
+  "metadata": {
+    "task": {
+        "name": "Training task",
+        "task_id": "60ed89589e7651b7da5654ed",
+        "model_template_id": "Custom_Semantic_Segmentation_Lite-HRNet-18-mod2_OCR",
+        "model_architecture": "Custom Semantic Segmentation Lite-HRNet-18-mod2 OCR",
+        "dataset_storage_id": "60ec6bbfb98caeb87e3821b4"
+    },
+    "project":{
+        "id":"60ec6bbfb98caeb87e34306e",
+        "name": "Example project"
+    }
+  }
+}

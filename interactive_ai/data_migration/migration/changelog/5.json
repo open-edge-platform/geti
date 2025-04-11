@@ -1,0 +1,4 @@
+{
+  "script": "set_training_framework_in_models.py",
+  "metadata": "set_training_framework_in_models.json"
+}

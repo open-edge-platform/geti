@@ -1,0 +1,6 @@
+in: query
+name: raw
+style: form
+description: "Whether to return the map as raw or transformed. Transformations include resizing to the size of the prediction RoI and Jet color mapping"
+schema:
+  type: boolean

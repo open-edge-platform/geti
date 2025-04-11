@@ -1,0 +1,5 @@
+{
+    "error_code": "training_revision_not_found",
+    "http_status": 404,
+    "message": "Training revision with id '60ec6bbfb98caeb87e34306e' could not be found."
+}

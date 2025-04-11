@@ -1,0 +1,79 @@
+post:
+  tags:
+    - Dataset Import/Export
+  summary: Create a new project from a prepared dataset
+  description: |-
+    Finalize the creation of a new project from an imported dataset, that has been previously uploaded and prepared.
+
+    This endpoint submits a job to create a new project with a given project name, task type and labels, that will also
+    contain all the media and annotations from the imported dataset.
+    The status of this operation can be monitored in real-time through the [job status endpoint](#Jobs/GetJob);
+    once the job is finished, the id of the created project can be found in the job metadata.
+  operationId: ImportProjectFromDataset
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/dataset_import_export/requests/import_project.yaml"
+    required: true
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Job submitted successfully:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          examples:
+            File ID in wrong format:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_file_id.json'
+            An export dataset is used to import:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/import_from_export_dataset_error.json"
+            Unknown task_type:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/unknown_task_type.json"
+    '404':
+      description: File not found
+      content:
+        application/json:
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Dataset file not found:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/no_dataset_file_found.json"
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          examples:
+            Max projects reached:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/max_projects_reached.json"
+            Max labels reached:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/max_labels_reached.json"
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          examples:
+            File not fully uploaded:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/file_not_fully_uploaded.json"

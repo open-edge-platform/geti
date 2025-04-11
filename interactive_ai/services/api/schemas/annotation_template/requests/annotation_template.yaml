@@ -1,0 +1,11 @@
+type: object
+required:
+  - name
+  - value
+properties:
+  name:
+    type: string
+    description: Name of the annotation template
+  value:
+    type: string
+    description: The value of the annotation template

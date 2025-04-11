@@ -1,0 +1,375 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "resource.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "resource.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+        proxy.istio.io/config: |
+          terminationDrainDuration: 60s
+      labels:
+        {{- include "resource.selectorLabels" . | nindent 8 }}
+        authorization: public_api
+        opa_envoy_filter: enabled
+    spec:
+      terminationGracePeriodSeconds: 90
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+      initContainers:
+        - name: init-kafka
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: ['sh', '-c', 'until nc -w 5 -z {{ .Release.Namespace }}-kafka 9092; do echo wait...; sleep 2; done;']
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              mkdir -p "{{ .Values.mountPath }}"/storage
+              find {{ .Values.mountPath }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+              find {{ .Values.audit_logs_mount_path }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+          volumeMounts:
+            - name: data-storage
+              mountPath: {{ .Values.mountPath }}
+              readOnly: false
+              subPath: binary_data
+            - name: data-storage
+              mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: false
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.volumeSecurityContext | nindent 12 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s 
+              --for=condition=complete 
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}  
+      containers:
+        - name: &containerName resource
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.ports.resource.port }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.ports.resource.port }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          env:
+            - name: MAX_NUMBER_OF_PROJECTS_PER_ORGANIZATION
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_projects_per_organization
+                  name: impt-configuration
+            - name: MAX_NUMBER_OF_ANNOTATION_VERSIONS_PER_MEDIA
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_annotation_versions_per_media
+                  name: impt-configuration
+            - name: MAX_NUMBER_OF_DATASET_STORAGES
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_dataset_storages
+                  name: impt-configuration
+            - name: MAX_NUMBER_OF_TRAINABLE_TASKS
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_trainable_tasks
+                  name: impt-configuration
+            - name: MAX_NUMBER_OF_MEDIA_PER_PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_media_per_project
+                  name: impt-configuration
+            - name: MAX_NUMBER_OF_LABELS
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_labels
+                  name: impt-configuration
+            - name: MAX_NUMBER_OF_PIXELS
+              valueFrom:
+                configMapKeyRef:
+                  key: max_number_of_pixels
+                  name: impt-configuration
+            - name: MIN_IMAGE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  key: min_image_size
+                  name: impt-configuration
+            - name: MAX_IMAGE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  key: max_image_size
+                  name: impt-configuration
+            - name: MIN_VIDEO_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  key: min_video_size
+                  name: impt-configuration
+            - name: MAX_VIDEO_WIDTH
+              valueFrom:
+                configMapKeyRef:
+                  key: max_video_width
+                  name: impt-configuration
+            - name: MAX_VIDEO_HEIGHT
+              valueFrom:
+                configMapKeyRef:
+                  key: max_video_height
+                  name: impt-configuration
+            - name: MAX_VIDEO_LENGTH
+              valueFrom:
+                configMapKeyRef:
+                  key: max_video_length
+                  name: impt-configuration
+            - name: MIN_FREE_SPACE_GIB
+              value: "{{ .Values.global.min_free_disk_space_gib }}"
+            - name: LOGS_DIR
+              value: {{ .Values.global.logs_dir }}
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            {{- if .Values.global.enable_mongodb_credentials }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-mongodb-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-mongodb-password
+            {{- end }}
+            - name: KAFKA_ADDRESS
+              value: {{ .Release.Namespace }}-kafka
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: user
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: password
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: SPICEDB_LOG_PATH
+              value: {{ .Values.spicedb_log_file_path }}
+            - name: SPICEDB_ADDRESS
+              value: {{ .Release.Namespace }}-spice-db:50051
+            - name: SPICEDB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "spice-db.secretName" . }}
+                  key: SPICEDB_GRPC_PRESHARED_KEY
+            - name: SPICEDB_CREDENTIALS
+              value: "token_and_ca"
+            - name: SPICEDB_SSL_CERTIFICATES_DIR
+              value: "/etc/tls-secrets"
+            - name: WORKDIR
+              value: {{ .Values.mountPath }}
+            - name: MODEL_TEMPLATES_DIR
+              value: /model_templates
+            - name: PLATFORM_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: platformVersion
+            - name: BUILD_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: buildVersion
+            - name: INTEL_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: intelEmail
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: resource-microservice
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.instance.id=$(K8S_POD_NAME),k8s.pod.uid=$(K8S_POD_UID),k8s.container.name=$(K8S_CONTAINER_NAME)
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: MODEL_REGISTRATION_SERVICE
+              value: {{ .Release.Namespace }}-modelregistration.{{ .Release.Namespace }}:5555
+            - name: GRAFANA_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  key: "grafana_enabled"
+                  name: "{{ .Release.Namespace }}-configuration"
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  key: "environment"
+                  name: "{{ .Release.Namespace }}-configuration"
+                  optional: true
+            - name: MONGODB_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: mongodb_credentials_provider
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: S3_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: "s3_endpoint"
+                  name: "{{ .Release.Namespace }}-configuration"
+                  optional: true
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "resource_secret_key"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "resource_access_key"
+            - name: S3_PRESIGNED_URL_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "resource_s3_presigned_url_access_key"
+            - name: S3_PRESIGNED_URL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "resource_s3_presigned_url_secret_key"
+            {{- end }}
+            - name: GPU_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  key: accelerator_name
+                  name: accelerator-configuration
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+            - configMapRef:
+                name: {{ .Release.Namespace }}-s3-bucket-names
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: {{ .Values.global.logs_dir }}
+              readOnly: false
+              subPath: logs
+              name: data-storage
+            - mountPath: {{ .Values.mountPath }}
+              readOnly: false
+              name: data-storage
+              subPath: binary_data
+            - mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              name: data-storage
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: false
+            - mountPath: {{ .Values.secret_dir }}
+              name: smtp-server-secret
+              readOnly: true
+            - name: tls-secrets
+              mountPath: "/etc/tls-secrets"
+              readOnly: true
+            - mountPath: /tmp
+              name: temp
+          ports:
+            - name: resource
+              containerPort: {{ .Values.service.ports.resource.port }}
+              protocol: TCP
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "60s"]
+      volumes:
+        {{- if .Values.global.storage_volume_claim_name_resource }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_resource }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - name: smtp-server-secret
+          secret:
+            secretName: {{ .Release.Namespace }}-email-config
+            optional: true
+        - name: tls-secrets
+          secret:
+            secretName: {{ include "spice-db.tlsSecretName" . }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        - name: temp
+          emptyDir: {}

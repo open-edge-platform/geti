@@ -1,0 +1,9 @@
+.infoWrapper {
+    display: flex;
+    align-items: center;
+    margin-top: var(--spectrum-global-dimension-size-275);
+
+    span {
+        margin-left: var(--spectrum-global-dimension-size-75);
+    }
+}

@@ -1,0 +1,164 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "user-directory.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "user-directory.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "user-directory.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+      labels:
+        {{- include "user-directory.labels" . | nindent 8 }}
+        authorization: public_api
+        opa_envoy_filter: enabled
+    spec:
+      serviceAccountName: {{ include "user-directory.name" . }}
+      initContainers:
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.volumeSecurityContext | nindent 12 }}
+          command:
+            - /bin/sh
+          args:
+            - -ec
+            - |
+              find {{ .Values.audit_logs_mount_path }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+          volumeMounts:
+            - name: data-storage
+              mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: false
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+      containers:
+        - name: &containerName "{{ .Chart.Name }}"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+{{ toYaml .Values.resources | indent 11 }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          volumeMounts:
+            - mountPath: {{ .Values.tmp_dir }}
+              name: tmp
+              readOnly: false
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              name: data-storage
+              subPath: {{ .Values.audit_logs_mount_path }}
+            - mountPath: "{{ .Values.logs_mount_path }}"
+              name: data-storage
+              subPath: logs
+              readOnly: true
+            - name: spicedb-tls-secrets
+              mountPath: "/etc/tls-secrets"
+              readOnly: true
+          env:
+            - name: GETI_NOTIFICATION_TOPIC
+              value: "{{ .Values.kafka.topic }}"
+            - name: KAFKA_ADDRESS
+              value: "{{ .Release.Namespace }}-kafka:{{ .Values.kafka.port }}"
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: user
+                  optional: true
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: password
+                  optional: true
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+                  optional: true
+            - name: SPICEDB_LOG_PATH
+              value: {{ .Values.spicedb_log_file_path }}
+            - name: SPICEDB_ADDRESS
+              value: "{{ .Release.Namespace }}-spice-db:{{ .Values.grpc_port }}"
+            - name: SPICEDB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-spice-db"
+                  key: SPICEDB_GRPC_PRESHARED_KEY
+            - name: SPICEDB_CREDENTIALS
+              value: "token_and_ca"
+            - name: SPICEDB_SSL_CERTIFICATES_DIR
+              value: "/etc/tls-secrets"
+            - name: LDAP_ADMIN_USER
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: {{ .Values.global.ldap_service_user_secret_name }}
+            - name: LDAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: {{ .Values.global.ldap_service_user_secret_name }}
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: K8S_SECRETS_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: K8S_CR_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: IMPT_CONFIGURATION_CM
+              value: {{ .Values.configuration_cm_name }}
+            - name: LOGS_DIR
+              value: {{ .Values.logs_mount_path }}
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.port }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.port }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- if .Values.global.storage_volume_claim_name_gtw }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_gtw }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - name: spicedb-tls-secrets
+          secret:
+            secretName: {{ .Release.Namespace }}-spice-db-tls
+            items:
+              - key: ca.crt
+                path: ca.crt

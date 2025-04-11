@@ -1,0 +1,7 @@
+type: object
+properties:
+  data:
+    type: string
+    description: Binary representation of the saliency map
+  label_id:
+    $ref: "../../mongo_id.yaml"

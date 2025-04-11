@@ -1,0 +1,18 @@
+type: array
+description: Bar (also for radial bar) chart, depicted by an array containing values describing the bars in the chart.
+items:
+  type: object
+  description: Data for each bar in the chart
+  properties:
+    header:
+      type: string
+      description: Name of the bar
+    key:
+      type: string
+      description: Unique key for the bar
+    value:
+      type: number
+      description: Value for the bar
+    color:
+      type: [string, 'null']
+      description: Color of the bar in hex format

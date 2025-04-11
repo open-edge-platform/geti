@@ -1,0 +1,47 @@
+{
+    "name": "Example classification project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "Dataset",
+                "to": "Sample classification task"
+            }
+        ],
+        "tasks": [
+            {
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "labels": [
+                    {
+                        "color": "#0015ffff",
+                        "group": "species",
+                        "hotkey": "ctrl+5",
+                        "name": "horse"
+                    },
+                    {
+                        "color": "#00ffffff",
+                        "group": "species",
+                        "hotkey": "ctrl+6",
+                        "name": "donkey"
+                    },
+                    {
+                        "color": "#00aaaaff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+7",
+                        "name": "saddled"
+                    },
+                    {
+                        "color": "#00aaffff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+8",
+                        "name": "unsaddled"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    }
+}

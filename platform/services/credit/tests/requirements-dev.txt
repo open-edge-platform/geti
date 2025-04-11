@@ -1,0 +1,10 @@
+mypy==1.10.0
+pytest~=7.3.2
+pytest-cov==2.11.1
+click==8.1.7
+pre-commit==2.15.0
+pytest-html~=4.0.0
+ruff==0.9.5
+httpx~=0.23 # Required by starlette.testclient.TestClient
+types-python-dateutil==2.9.0.20240316
+pytest-freezegun==0.4.2

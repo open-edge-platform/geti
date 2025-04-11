@@ -1,0 +1,14 @@
+.barChartCartesianStroke {
+    stroke: var(--spectrum-global-color-gray-300);
+}
+
+.barChart {
+    overflow: hidden;
+    & tspan {
+        fill: var(--spectrum-global-color-gray-800) !important;
+    }
+
+    & path[class='recharts-rectangle recharts-tooltip-cursor'] {
+        display: none;
+    }
+}

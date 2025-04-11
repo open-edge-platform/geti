@@ -1,0 +1,44 @@
+post:
+  tags:
+  - Jobs
+  summary: Cancel a job
+  operationId: CancelJob
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/job_id.yaml'
+  responses:
+    '202':
+      description: Job marked as cancelled
+      content:
+        application/json:
+          examples:
+            Successful cancellation response:
+              value:
+                "Job with ID `60eda62eb49fdceefb757802` marked as cancelled."
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Job not found response:
+              value:
+                $ref: "../../examples/jobs/error_responses/job_not_found.json"
+    '412':
+      description: Job cannot be cancelled
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Job cannot be cancelled:
+              value:
+                $ref: "../../examples/jobs/error_responses/job_cannot_be_cancelled.json"

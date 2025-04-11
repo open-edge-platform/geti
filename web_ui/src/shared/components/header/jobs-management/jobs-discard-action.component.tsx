@@ -1,0 +1,123 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2023 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { useState } from 'react';
+
+import { Text } from '@adobe/react-spectrum';
+import { UseMutationResult } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import clsx from 'clsx';
+
+import { Delete } from '../../../../assets/icons';
+import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
+import { Job } from '../../../../core/jobs/jobs.interface';
+import { isJobTrain } from '../../../../core/jobs/utils';
+import { CustomAlertDialog } from '../../alert-dialog/custom-alert-dialog.component';
+import { ActionButton } from '../../button/button.component';
+import { TooltipWithDisableButton } from '../../custom-tooltip/tooltip-with-disable-button';
+import { LoadingIndicator } from '../../loading/loading-indicator.component';
+import { JobCancellationWarning } from './jobs-cancellation-warning.component';
+import { DISCARD_TYPE, isCancellableJob, isJobRunning } from './utils';
+
+import classes from './jobs.module.scss';
+
+interface JobsDiscardActionProps {
+    job: Job;
+    discardType: DISCARD_TYPE;
+    useDeleteJob: UseMutationResult<string, AxiosError, string, unknown>;
+    useCancelJob: UseMutationResult<string, AxiosError, string, unknown>;
+}
+
+const ButtonIcon = ({ isLoading, isCancel }: { isLoading: boolean; isCancel: boolean }) => {
+    if (isLoading) {
+        return <LoadingIndicator size='S' marginX='size-100' />;
+    }
+
+    if (isCancel) {
+        return <Text>{DISCARD_TYPE.CANCEL}</Text>;
+    }
+
+    return <Delete aria-label={'Delete job'} />;
+};
+
+export const JobsDiscardAction = ({
+    job,
+    discardType,
+    useDeleteJob,
+    useCancelJob,
+}: JobsDiscardActionProps): JSX.Element => {
+    const { FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
+
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+    const isCancel = discardType === DISCARD_TYPE.CANCEL;
+    const totalCreditsConsumed = job.cost?.consumed.reduce((total, current) => total + current.amount, 0) || 0;
+    const displayJobCancellationWarning = FEATURE_FLAG_CREDIT_SYSTEM && isJobTrain(job) && totalCreditsConsumed > 0;
+
+    const isNotCancellableRunningJob = isJobRunning(job) && !isCancellableJob(job);
+
+    const isDisabledDeleteButton = useDeleteJob.isPending || useDeleteJob.isSuccess;
+    const isDisabledCancelButton = useCancelJob.isPending || useCancelJob.isSuccess || isNotCancellableRunningJob;
+    const isPrimaryActionDisabled = isDisabledCancelButton || isDisabledDeleteButton;
+
+    const cancelJob = () => useCancelJob.mutate(job.id);
+    const deleteJob = () => useDeleteJob.mutate(job.id);
+
+    const action = () => {
+        setDialogOpen(false);
+
+        isCancel ? cancelJob() : deleteJob();
+    };
+
+    return (
+        <>
+            <TooltipWithDisableButton disabledTooltip={'For data consistency reasons, this job cannot be cancelled.'}>
+                <ActionButton
+                    isQuiet
+                    onPress={() => setDialogOpen(true)}
+                    isDisabled={isPrimaryActionDisabled}
+                    id={`job-scheduler-${job.id}-action-${discardType.toLowerCase()}`}
+                    data-testid={`job-scheduler-${job.id}-action-${discardType.toLowerCase()}`}
+                    UNSAFE_className={clsx({ [classes.discardActionLink]: isCancel })}
+                >
+                    <ButtonIcon isCancel={isCancel} isLoading={useDeleteJob.isPending || useCancelJob.isPending} />
+                </ActionButton>
+            </TooltipWithDisableButton>
+
+            {discardType === DISCARD_TYPE.CANCEL ? (
+                <JobCancellationWarning
+                    jobName={job.name}
+                    totalCreditsConsumed={totalCreditsConsumed}
+                    shouldShowLostCreditsContent={displayJobCancellationWarning}
+                    isOpen={dialogOpen}
+                    setIsOpen={setDialogOpen}
+                    onPrimaryAction={action}
+                    isPrimaryActionDisabled={isPrimaryActionDisabled}
+                />
+            ) : (
+                <CustomAlertDialog
+                    open={dialogOpen}
+                    setOpen={setDialogOpen}
+                    onPrimaryAction={action}
+                    primaryActionLabel='Delete'
+                    isPrimaryActionDisabled={isPrimaryActionDisabled}
+                    cancelLabel={'Back'}
+                    title={'Delete job'}
+                    message={`Are you sure you want to delete job "${job.name}"?`}
+                    cancelButtonAriaLabel={`Close delete job dialog`}
+                    primaryActionButtonAriaLabel='Delete job'
+                    id={`delete-job-dialog`}
+                />
+            )}
+        </>
+    );
+};

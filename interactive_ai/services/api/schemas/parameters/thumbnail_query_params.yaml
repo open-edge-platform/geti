@@ -1,0 +1,6 @@
+type: object
+properties:
+  height:
+    $ref: "thumbnail_height_width.yaml"
+  width:
+    $ref: "thumbnail_height_width.yaml"

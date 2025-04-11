@@ -1,0 +1,9 @@
+type: object
+required:
+  - range_labels
+properties:
+  range_labels:
+    description: List of frame ranges and their associated labels
+    type: array
+    items:
+      $ref: "range_labels.yaml"

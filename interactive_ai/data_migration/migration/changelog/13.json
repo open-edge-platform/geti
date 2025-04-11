@@ -1,0 +1,4 @@
+{
+  "script": "remove_auto_train_policy.py",
+  "metadata": "remove_auto_train_policy.json"
+}

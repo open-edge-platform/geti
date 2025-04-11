@@ -1,0 +1,65 @@
+{
+    "name": "Example chain project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "Dataset",
+                "to": "Sample detection task"
+            },
+            {
+                "from": "Sample detection task",
+                "to": "crop task"
+            },
+            {
+                "from": "crop task",
+                "to": "Sample classification task"
+            }
+        ],
+        "tasks": [
+            {
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_detection",
+                        "hotkey": "ctrl+5",
+                        "name": "object"
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Sample detection task"
+            },
+            {
+                "task_type": "crop",
+                "title": "crop task"
+            },
+            {
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+6",
+                        "name": "rectangle"
+                    },
+                    {
+                        "color": "#7F000AFF",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+7",
+                        "name": "circle"
+                    },
+                    {
+                        "color": "#15FF00FF",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+8",
+                        "name": "triangle"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    }
+}

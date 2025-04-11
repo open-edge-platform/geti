@@ -1,0 +1,38 @@
+{
+  "global": [
+    {
+      "type": "CONFIGURABLE_PARAMETERS",
+      "parameters": [
+        {
+          "value": "mean",
+          "name": "inter_task_reduce_fn"
+        },
+        {
+          "value": 500,
+          "name": "max_unseen_media"
+        }
+      ],
+      "entity_identifier": {
+        "type": "COMPONENT_PARAMETERS",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "component": "PROJECT_ACTIVE_LEARNING"
+      }
+    },
+    {
+      "type": "CONFIGURABLE_PARAMETERS",
+      "parameters": [
+        {
+          "value": true,
+          "name": "use_ndr"
+        }
+      ],
+      "entity_identifier": {
+        "type": "COMPONENT_PARAMETERS",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "component": "PIPELINE_DATASET_MANAGER"
+      }
+    }
+  ]
+}

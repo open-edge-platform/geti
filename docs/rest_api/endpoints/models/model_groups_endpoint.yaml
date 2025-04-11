@@ -1,0 +1,50 @@
+get:
+  tags:
+    - Models
+  summary: Get information on all models and their groups belonging to a project
+  description: |-
+    Get information on all model groups in a project. Each model group represents one model architecture that has been trained in the project and
+    contains a list of successfully trained models of that architecture. 
+    To obtain more detail on each of the model version, please use the [model detail](#Models/GetModelDetail) endpoint. 
+  operationId: GetModelGroups
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - in: query
+      name: task_id
+      description: |- 
+        Provide the task ID to get the model groups related to that task. For example in a task chain project, 
+        set this parameter to the ID of the first task if you are interested only in the model groups of the first task. 
+        The task ID can be found in the response body of the [project detail](#Projects/GetProjectInfo) endpoint.
+
+        If no task id is provided, the response will contain the model groups for all tasks in the project.
+      schema:
+        $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+  responses:
+    '200':
+      description: Information on all models and their groups belonging to a project
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/models/responses/model_group_list.yaml"
+          examples:
+            Model groups response:
+              value:
+                $ref: "../../examples/models/responses/model_group_list_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

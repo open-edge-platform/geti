@@ -1,0 +1,34 @@
+@use '../../../../shared/shared.module.scss';
+
+.header {
+    @extend .blueGreenGradient;
+    text-align: center;
+    padding-top: var(--spectrum-global-dimension-size-550);
+    padding-bottom: var(--spectrum-global-dimension-size-450);
+
+    h2 {
+        margin: 0px;
+        font-weight: 500;
+        font-size: var(--spectrum-global-dimension-size-400);
+    }
+
+    h3 {
+        margin: 0px;
+        font-weight: 400;
+    }
+}
+
+.container {
+    padding: var(--spectrum-global-dimension-size-500) var(--spectrum-global-dimension-size-400)
+        var(--spectrum-global-dimension-size-400);
+}
+
+.description {
+    font-size: var(--spectrum-global-dimension-size-225);
+}
+
+.divider {
+    height: 1px !important;
+    margin: var(--spectrum-global-dimension-size-300) 0px;
+    background-color: var(--spectrum-global-color-gray-300);
+}

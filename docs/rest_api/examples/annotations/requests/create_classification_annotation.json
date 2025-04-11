@@ -1,0 +1,18 @@
+{
+    "annotations":[
+       {
+          "shape":{
+             "type":"RECTANGLE",
+             "x":0,
+             "y":0,
+             "width":450,
+             "height":555
+          },
+          "labels":[
+             {
+                "id":"6654959a78e859591bd3e3b9"
+             }
+          ]
+       }
+    ]
+ }

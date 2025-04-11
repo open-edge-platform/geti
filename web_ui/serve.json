@@ -1,0 +1,21 @@
+{
+   "headers":[
+      {
+         "source":"**/*",
+         "headers":[
+            {
+               "key":"Cross-Origin-Embedder-Policy",
+               "value":"require-corp"
+            },
+            {
+               "key":"Cross-Origin-Opener-Policy",
+               "value":"same-origin"
+            },
+            {
+               "key":"Content-Security-Policy",
+               "value":"frame-ancestors 'none'; default-src 'self'; connect-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' blob:; media-src 'self' blob:; img-src 'self' data:; frame-src 'none'; object-src 'none'; form-action 'self'; worker-src 'self' blob:"
+            }
+         ]
+      }
+   ]
+}

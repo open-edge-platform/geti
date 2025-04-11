@@ -1,0 +1,7 @@
+in: path
+name: job_id
+style: simple
+description: The ID of the job of interest
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

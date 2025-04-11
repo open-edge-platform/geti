@@ -1,0 +1,32 @@
+.textField {
+    min-width: 38.4rem;
+    & input {
+        padding-left: 0;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+    }
+}
+
+.textFieldSmaller {
+    min-width: 20rem;
+    & input {
+        padding-left: 0;
+        font-size: 1.6rem;
+        line-height: 2.4rem;
+    }
+}
+
+.textFieldReadOnly input {
+    border: none;
+    &:hover {
+        cursor: default;
+    }
+    &:active {
+        color: currentColor;
+    }
+}
+
+.profileContainer {
+    overflow-x: hidden;
+    overflow-y: auto;
+}

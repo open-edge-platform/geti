@@ -1,0 +1,11 @@
+{
+    "projects": [
+        {"id": "610123e6efba22ca453f11bd", "name": "Example segmentation project"},
+        {"id": "60d31793d5f1fb7e6e3c1a4c", "name": "Example detection project"},
+        {"id": "61012cdb1d38a5e71ef3baf9", "name": "Example classification project"},
+        {"id": "61012b5cefba22ca453f11df", "name": "Example classification project - label hierarchy"},
+        {"id": "61012bf776379a12afa0789c", "name": "Example classification project - label hierarchy"},
+        {"id": "62adb9b2a4002f5a6757533c", "name": "Anomaly Detection Example"},
+        {"id": "62946c61003ddb3967f14750", "name": "Card detection"}
+    ]
+}

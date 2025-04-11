@@ -1,0 +1,60 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package user_common;
+
+import "google/protobuf/timestamp.proto";
+
+message UserData {
+  string id = 1;
+  string first_name = 2;
+  string second_name = 3;
+  string email = 4;
+  string external_id = 5;
+  string country = 6;
+  string status = 7;
+  string organization_id = 8;
+  string organization_status = 9;
+  repeated UserRole roles = 10;
+  google.protobuf.Timestamp last_successful_login = 11;
+  google.protobuf.Timestamp current_successful_login = 12;
+  google.protobuf.Timestamp created_at = 13;
+  string created_by = 14;
+  google.protobuf.Timestamp modified_at = 15;
+  string modified_by = 16;
+  optional string telemetry_consent = 17;
+  google.protobuf.Timestamp telemetry_consent_at = 18;
+  optional string user_consent = 19;
+  google.protobuf.Timestamp user_consent_at = 20;
+  string presigned_url = 21;
+  google.protobuf.Timestamp last_logout_date = 22;
+}
+
+message UserRole {
+  string role = 1;
+  string resource_type = 2;
+  string resource_id = 3;
+}
+
+message UserRoleOperation {
+  UserRole role = 1;
+  string operation = 2; // CREATE, DELETE, TOUCH
+}
+
+message UserInvitationRequest {
+  UserData user = 1;
+  repeated UserRoleOperation roles = 2;
+}

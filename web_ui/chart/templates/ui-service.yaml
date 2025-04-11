@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.ui_app_name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "true"
+    {{- end }}
+    app: {{ .Values.ui_app_name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.ui_app_name }}
+  ports:
+    - port: {{ .Values.ui_port }}
+      protocol: TCP
+      appProtocol: http

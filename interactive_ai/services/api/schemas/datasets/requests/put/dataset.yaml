@@ -1,0 +1,6 @@
+type: object
+properties:
+  name:
+    type: string
+    description: 'Dataset name'
+    minLength: 1

@@ -1,0 +1,54 @@
+get:
+  tags:
+  - Projects
+  summary: Download the thumbnail of a project
+  description: Download a project thumbnail with height and width as specified in the request parameters.
+  operationId: DownloadProjectThumbnail
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+  responses:
+    '200':
+      description: The requested project thumbnail
+      content:
+        image/*:
+          schema:
+            type: string
+            format: binary
+    '204':
+      description: No media in project.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            Media not found response:
+              value:
+                $ref: "../../examples/predictions/responses/media_not_found.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid scale dimensions:
+              value:
+                $ref: '../../examples/media/error_responses/thumbnail_invalid_scale_dimensions.json'

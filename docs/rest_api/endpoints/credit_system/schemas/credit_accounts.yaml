@@ -1,0 +1,134 @@
+CreditAccount:
+  properties:
+    id:
+      type: string
+      format: uuid
+      title: Id
+    organization_id:
+      type: string
+      title: Organization Id
+    name:
+      type: string
+      title: Name
+    renewable_amount:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Renewable Amount
+    renewal_day_of_month:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Renewal Day Of Month
+    created:
+      type: integer
+      title: Created
+    updated:
+      type: integer
+      title: Updated
+    expires:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Expires
+    balance:
+      $ref: 'balance.yaml#/BalanceResponse'
+  type: object
+  required:
+    - id
+    - organization_id
+    - name
+    - created
+    - updated
+    - balance
+  title: CreditAccount
+CreditAccountPostPayload:
+  properties:
+    name:
+      type: string
+      maxLength: 80
+      minLength: 1
+      title: Name
+    init_amount:
+      type: integer
+      maximum: 2147483647
+      minimum: 0
+      title: Init Amount
+      description: >-
+        The `init_amount` must be greater than or equal zero and less than
+        or equal to 2147483647.
+    renewable_amount:
+      anyOf:
+        - type: integer
+          maximum: 2147483647
+          minimum: 0
+        - type: 'null'
+      title: Renewable Amount
+      description: >-
+        The `renewable_amount` must be greater than or equal zero and less
+        than or equal to 2147483647.
+    expires:
+      anyOf:
+        - type: integer
+          maximum: 8023398574000
+          minimum: 1711929600000
+        - type: 'null'
+      title: Expires
+      description: >-
+        The expiration date should be provided in milliseconds and be in
+        [April 1, 2024; April 2, 2224] time interval.
+  type: object
+  required:
+    - name
+    - init_amount
+  title: CreditAccountPostPayload
+CreditAccountPutPayload:
+  properties:
+    name:
+      type: string
+      maxLength: 80
+      minLength: 1
+      title: Name
+    renewable_amount:
+      anyOf:
+        - type: integer
+          maximum: 2147483647
+          minimum: 0
+        - type: 'null'
+      title: Renewable Amount
+      description: >-
+        The `renewable_amount` must be greater than or equal zero and less
+        than or equal to 2147483647.
+    expires:
+      anyOf:
+        - type: integer
+          maximum: 8023398574000
+          minimum: 1711929600000
+        - type: 'null'
+      title: Expires
+      description: >-
+        The expiration date should be provided in milliseconds and be in
+        [April 1, 2024; April 2, 2224] time interval.
+  type: object
+  required:
+    - name
+  title: CreditAccountPutPayload
+CreditAccountsResponse:
+  properties:
+    total_matched:
+      type: integer
+      title: Total Matched
+    next_page:
+      anyOf:
+        - $ref: 'pagination.yaml#/NextPage'
+        - type: 'null'
+    credit_accounts:
+      items:
+        $ref: '#/CreditAccount'
+      type: array
+      title: Credit Accounts
+  type: object
+  required:
+    - total_matched
+    - credit_accounts
+  title: CreditAccountsResponse

@@ -1,0 +1,23 @@
+.headerJobsIcon {
+    & path {
+        fill: currentColor !important;
+    }
+}
+
+.userPhotoBtnBground {
+    &[class*='is-hovered'],
+    &[class*='is-selected'],
+    &[class*='is-active'] {
+        border-radius: 50% !important;
+    }
+}
+
+.userSummary {
+    font-size: var(--spectrum-global-dimension-font-size-100) !important;
+    font-weight: bold;
+}
+
+.email {
+    font-size: var(--spectrum-global-dimension-font-size-25) !important;
+    font-weight: lighter;
+}

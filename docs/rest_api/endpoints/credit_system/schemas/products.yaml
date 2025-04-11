@@ -1,0 +1,70 @@
+ListProductResponse:
+  properties:
+    total_matched:
+      type: integer
+      title: Total Matched
+    next_page:
+      anyOf:
+        - $ref: 'pagination.yaml#/NextPage'
+        - type: 'null'
+    products:
+      items:
+        $ref: '#/Product'
+      type: array
+      title: Products
+  type: object
+  required:
+    - total_matched
+    - products
+  title: ListProductResponse
+Product:
+  properties:
+    id:
+      type: string
+      format: uuid
+      title: Id
+    name:
+      type: string
+      title: Name
+    product_policies:
+      items:
+        $ref: '#/ProductPolicy'
+      type: array
+      title: Product Policies
+    created:
+      type: integer
+      title: Created
+    updated:
+      type: integer
+      title: Updated
+  type: object
+  required:
+    - id
+    - name
+    - product_policies
+    - created
+    - updated
+  title: Product
+ProductPolicy:
+  properties:
+    account_name:
+      type: string
+      title: Account Name
+    init_amount:
+      type: integer
+      title: Init Amount
+    renewable_amount:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Renewable Amount
+    expires_in:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Expires In
+  type: object
+  required:
+    - account_name
+    - init_amount
+  title: ProductPolicy

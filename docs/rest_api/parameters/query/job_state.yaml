@@ -1,0 +1,6 @@
+in: query
+name: state
+style: form
+description: Select only jobs in the given state.
+schema:
+  $ref: '../../../../interactive_ai/services/api/schemas/parameters/job_state.yaml'

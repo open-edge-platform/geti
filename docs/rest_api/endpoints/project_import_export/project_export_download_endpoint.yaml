@@ -1,0 +1,47 @@
+get:
+  tags:
+    - Project Import/Export
+  summary: Download an exported project archive
+  description: Download a project archive exported as a zip file.
+  operationId: DownloadExportedProject
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/export_operation_id.yaml'
+  responses:
+    '307':
+      description: Redirect to the pre-signed URL for downloading the exported project archive
+      headers:
+        Content-Type:
+          description: The MIME type of the returned content
+          schema:
+            type: string
+            example: application/zip
+        Accept-Ranges:
+          description: Indicates that the server supports range requests
+          schema:
+            type: string
+            example: bytes
+        Location:
+          description: The URL to which the client is redirected
+          schema:
+            type: string
+            format: uri
+            example: https://example.com/api/v1/fileservice/download?token=abc123
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

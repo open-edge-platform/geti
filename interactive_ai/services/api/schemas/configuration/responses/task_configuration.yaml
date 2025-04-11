@@ -1,0 +1,16 @@
+type: object
+properties:
+  components:
+    type: array
+    description: Array of configurable parameter objects for the different components in the task, as well as the
+      hyper parameters for the current algorithm in the task
+    items:
+      anyOf:
+        - $ref: "components/hyper_parameter_group.yaml"
+        - $ref: "components/component_parameters.yaml"
+        - $ref: "components/hyper_parameters.yaml"
+  task_id:
+    $ref: "../../mongo_id.yaml"
+  task_title:
+    type: string
+    description: Title of the task the configuration is connected to

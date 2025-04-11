@@ -1,0 +1,19 @@
+@use '../user-photo-placeholder/user-photo-placeholder.module';
+
+.userPhotoPreview {
+    border-radius: 50%;
+}
+
+.userPhotoWrapper {
+    height: 100%;
+
+    & > * {
+        cursor: pointer !important;
+    }
+}
+
+.userPhotoBtn {
+    @extend .userPhotoUploadBtn;
+
+    padding: 0 var(--spectrum-global-dimension-size-75) !important;
+}

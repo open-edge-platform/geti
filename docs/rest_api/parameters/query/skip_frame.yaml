@@ -1,0 +1,9 @@
+in: query
+name: skip_frame
+style: form
+description: Number indicating for how many frames in the video an annotation should be uploaded. A value of 1 means every 
+  frame is annotated while a value of 10 means every 10th frame gets an annotation. If nothing is passed, it defaults 
+  to the video fps.
+schema:
+  type: string
+  example: 50

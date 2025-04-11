@@ -1,0 +1,7 @@
+in: path
+name: export_dataset_id
+style: simple
+description: The ID of the export dataset of interest
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

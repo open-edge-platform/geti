@@ -1,0 +1,113 @@
+[project]
+name = "workflows-common"
+version = "1.0.0"
+description = "Common functions for Geti workflows"
+requires-python = ">=3.10, <3.11"
+
+dependencies = [
+    "dataclasses-json==0.5.7",
+    "flytekit==1.10.2",
+    "flytekitplugins-pod==1.2.4",
+    "s3fs==2023.9.2",  # to match flytekit fsspec dep"
+    "kubernetes-asyncio==29.0.0",
+    "geti-kafka-tools",
+    "geti-telemetry-tools[telemetry,grpc,kafka,logger]",
+    "geti-k8s-tools",
+    "geti-types",
+    "grpc_interfaces",
+    "sc-sdk",
+]
+
+[project.optional-dependencies]
+
+evaluation = [
+    "media-utils",
+    "openvino-model-api==0.2.5.2",
+    "scikit-learn==1.6.1",
+]
+
+shard-dataset = [
+    "datumaro==1.8.0",
+]
+
+datumaro-conversion = [
+    "media-utils",
+    "datumaro==1.8.0",
+]
+
+
+[tool.uv.sources]
+geti-kafka-tools = { path = "../../../../libs/kafka_tools", editable = true }
+geti-telemetry-tools = { path = "../../../../libs/telemetry_tools", editable = true }
+geti-k8s-tools = { path = "../../../../libs/k8s_tools", editable = true }
+geti-types = { path = "../../../../libs/types", editable = true }
+sc-sdk = { path = "../../../libs/sc_sdk", editable = true }
+media-utils = { path = "../../../libs/media_utils", editable = true }
+grpc_interfaces = { path = "../../../../grpc_interfaces", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "testfixtures==7.0.0",
+    "requests~=2.32",
+    "mypy~=1.15",
+    "types-cachetools",
+    "types-PyYAML",
+    "testcontainers[mongodb]~=4.9",
+
+    "asynctest==0.13.0",
+    "pytest-freezegun==0.4.2",
+    "types-requests==2.31.0",
+    "scikit-image==0.20.0",
+    "scikit-learn~=1.6",
+    
+    # For Datumaro Arrow data format export
+    "pyarrow==15.0.0",
+
+    "workflows-common[evaluation,shard-dataset,datumaro-conversion]"
+]
+
+[build-system]
+requires = [
+    "numpy~=1.26.0",
+    "hatchling"
+]
+
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["jobs_common", "jobs_common_extras"]
+
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012", "RUF046", "PLW1508"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "ARG", "SIM", "RUF", "TC", "PL", "C90", "D103", "RET504"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

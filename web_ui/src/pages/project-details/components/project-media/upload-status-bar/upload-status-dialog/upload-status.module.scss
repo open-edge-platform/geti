@@ -1,0 +1,15 @@
+.statusColumnContent {
+    display: flex !important;
+}
+
+.itemIconWrapper {
+    color: var(--spectrum-global-color-gray-400);
+}
+
+.fileSizeWrapper {
+    padding-right: var(--spectrum-global-dimension-size-100);
+
+    &.error {
+        padding-right: 0;
+    }
+}

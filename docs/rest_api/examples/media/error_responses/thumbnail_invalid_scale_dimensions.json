@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "message": "'1001' does not match '^([1-9][0-9]{0,2}|1000)$'. This fails to validate 'pattern' in the following schema: (['target_width', 'pattern'])",
+  "error_code": "bad_request"
+}

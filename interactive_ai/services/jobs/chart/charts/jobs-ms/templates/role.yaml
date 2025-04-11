@@ -1,0 +1,19 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+rules:
+  - apiGroups:
+      - "batch"
+    resources:
+      - jobs
+    verbs:
+      - watch
+      - get
+      - list

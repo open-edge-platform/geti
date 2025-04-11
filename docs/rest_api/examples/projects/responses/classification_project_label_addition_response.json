@@ -1,0 +1,111 @@
+{
+    "creation_time": "2021-07-28T09:37:17.319000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "6101254defba22ca453f11cc",
+            "name": "Example chain project",
+            "creation_time": "2022-10-24T11:21:50.030000+00:00",
+            "use_for_training": true
+        }
+    ],
+    "id": "6101254defba22ca453f11cd",
+    "storage_info": {},
+    "name": "Example classification project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "6101254defba22ca453f11ce",
+                "to": "6101254defba22ca453f11d1"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "6101254defba22ca453f11ce",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "6101254defba22ca453f11d1",
+                "label_schema_id": "6101254defba22ca453f11c2",
+                "labels": [
+                    {
+                        "color": "#0015ffff",
+                        "group": "species",
+                        "hotkey": "ctrl+5",
+                        "id": "6101254defba22ca453f11c6",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "horse"
+                    },
+                    {
+                        "color": "#00ffffff",
+                        "group": "species",
+                        "hotkey": "ctrl+6",
+                        "id": "6101254defba22ca453f11c7",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "donkey"
+                    },
+                    {
+                        "color": "#0022ffff",
+                        "group": "species",
+                        "hotkey": "ctrl+9",
+                        "id": "6101254defba22ca453f11dd",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "zebra"
+                    },
+                    {
+                        "color": "#00aaaaff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+7",
+                        "id": "6101254defba22ca453f11c8",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "saddled"
+                    },
+                    {
+                        "color": "#00aaffff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+8",
+                        "id": "6101254defba22ca453f11c9",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "unsaddled"
+                    },
+                    {
+                        "color": "#7ada55ff",
+                        "group": "No class",
+                        "hotkey": "ctrl+0",
+                        "id": "6101254defba22ca453f11ca",
+                        "parent_id": null,
+                        "is_empty": true,
+                        "is_anomalous": false,
+                        "name": "No class"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    },
+    "performance": {
+        "score": 0.7,
+        "task_performances": [
+            {
+                "task_id": "6101254defba22ca453f11d1",
+                "score": {
+                    "value": 0.7,
+                    "metric_type": "accuracy"
+                }
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/organizations/61b3a664-822d-45c5-beb1-8b10187e301d/workspaces/db99fa0c-46a2-427f-aba6-fd76f1b86d7f/projects/6101254defba22ca453f11cd/thumbnail"
+}

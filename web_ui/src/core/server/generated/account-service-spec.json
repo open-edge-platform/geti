@@ -1,0 +1,2297 @@
+{
+    "openapi": "3.0.1",
+    "info": { "title": "grpc/user_status/user_status.proto", "version": "version not set" },
+    "servers": [{ "url": "/" }],
+    "tags": [{ "name": "UserStatus" }],
+    "paths": {
+        "/organizations/users/external": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /organizations/users/{external_id}",
+                "operationId": "User_get_by_external_id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user_commonUserData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/activeUser": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /organizations/{organization_id}/users/active",
+                "operationId": "User_get_active_user",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user_commonUserData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/users": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /organizations/{organization_id}/users  - conditions passed in the query string",
+                "operationId": "User_find",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "firstName",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "secondName",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "externalId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "lastSuccessfulLoginFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "lastSuccessfulLoginTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "resourceType",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "resourceId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "workspaceId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "createdAtFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "createdAtTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "createdBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "modifiedAtFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modifiedAtTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modifiedBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "attribute name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDirection",
+                        "in": "query",
+                        "description": "asc/desc",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "user to search for first name OR second name OR email",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/userListUsersResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["User"],
+                "summary": "POST /organizations/{organization_id}/users",
+                "operationId": "User_create",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "firstName": {
+                                        "type": "string"
+                                    },
+                                    "secondName": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "externalId": {
+                                        "type": "string"
+                                    },
+                                    "country": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "organizationStatus": {
+                                        "type": "string"
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/user_commonUserRole"
+                                        }
+                                    },
+                                    "lastSuccessfulLogin": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                        "type": "string"
+                                    },
+                                    "modifiedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "modifiedBy": {
+                                        "type": "string"
+                                    },
+                                    "telemetryConsent": {
+                                        "type": "string"
+                                    },
+                                    "telemetryConsentAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "userConsent": {
+                                        "type": "string"
+                                    },
+                                    "userConsentAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "presignedUrl": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user_commonUserData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/organizations/{organizationId}/users/{id}": {
+            "put": {
+                "tags": ["User"],
+                "summary": "PUT /organizations/{organization_id}/users/{id}",
+                "operationId": "User_modify",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "firstName": {
+                                        "type": "string"
+                                    },
+                                    "secondName": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "externalId": {
+                                        "type": "string"
+                                    },
+                                    "country": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "organizationStatus": {
+                                        "type": "string"
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/user_commonUserRole"
+                                        }
+                                    },
+                                    "lastSuccessfulLogin": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                        "type": "string"
+                                    },
+                                    "modifiedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "modifiedBy": {
+                                        "type": "string"
+                                    },
+                                    "telemetryConsent": {
+                                        "type": "string"
+                                    },
+                                    "telemetryConsentAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "userConsent": {
+                                        "type": "string"
+                                    },
+                                    "userConsentAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "presignedUrl": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user_commonUserData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/organizations/{organizationId}/users/{userId}": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /organizations/{organization_id}/users/{id}",
+                "operationId": "User_get_by_id",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user_commonUserData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["User"],
+                "summary": "DELETE /organizations/{organization_id}/users/{id}",
+                "operationId": "User_delete",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/users/{userId}/photos": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /organizations/{organization_id}/users/{id}/photos",
+                "operationId": "User_get_photo",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/commonPreUrlResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["User"],
+                "summary": "DELETE /organization/{organization_id}/users/{id}/photos",
+                "operationId": "User_delete_photo",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/users/{userId}/roles": {
+            "put": {
+                "tags": ["User"],
+                "summary": "PUT /organizations/{organization_id}/users/{id}/roles",
+                "operationId": "User_set_roles",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/user_commonUserRoleOperation"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/organizations/{organizationId}/users/{userId}/roles/{resourceType}": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /organizations/{organization_id}/users/{id}/roles/{resource_type}",
+                "operationId": "User_get_roles",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "resourceType",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/userUserRolesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{user.organizationId}/users/invitations": {
+            "post": {
+                "tags": ["User"],
+                "summary": "POST /organizations/{organization_id}/users/invitations",
+                "operationId": "User_send_invitation",
+                "parameters": [
+                    {
+                        "name": "user.organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "user": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "firstName": {
+                                                "type": "string"
+                                            },
+                                            "secondName": {
+                                                "type": "string"
+                                            },
+                                            "email": {
+                                                "type": "string"
+                                            },
+                                            "externalId": {
+                                                "type": "string"
+                                            },
+                                            "country": {
+                                                "type": "string"
+                                            },
+                                            "status": {
+                                                "type": "string"
+                                            },
+                                            "organizationStatus": {
+                                                "type": "string"
+                                            },
+                                            "roles": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/components/schemas/user_commonUserRole"
+                                                }
+                                            },
+                                            "lastSuccessfulLogin": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "createdAt": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "createdBy": {
+                                                "type": "string"
+                                            },
+                                            "modifiedAt": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "modifiedBy": {
+                                                "type": "string"
+                                            },
+                                            "telemetryConsent": {
+                                                "type": "string"
+                                            },
+                                            "telemetryConsentAt": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "userConsent": {
+                                                "type": "string"
+                                            },
+                                            "userConsentAt": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "presignedUrl": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    },
+                                    "roles": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/user_commonUserRoleOperation"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/userUserInvitationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/profile": {
+            "get": {
+                "tags": ["User"],
+                "summary": "GET /api/v1/profile",
+                "operationId": "User_get_user_profile",
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/userUserProfileData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations": {
+            "get": {
+                "tags": ["Organization"],
+                "summary": "GET /organizations  - conditions passed in the query string",
+                "operationId": "Organization_find",
+                "parameters": [
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "country",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "cellId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "createdAtFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "createdAtTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "createdBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "modifiedAtFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modifiedAtTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modifiedBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "attribute name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDirection",
+                        "in": "query",
+                        "description": "asc/desc",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/organizationListOrganizationsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Organization"],
+                "summary": "POST /organizations",
+                "operationId": "Organization_create",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/organizationOrganizationData"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/organizationOrganizationData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/organizations/invitations": {
+            "post": {
+                "tags": ["Organization"],
+                "summary": "POST /organizations/invitations",
+                "operationId": "Organization_send_invitation",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/organizationOrganizationInvitiationRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/organizations/{id}": {
+            "get": {
+                "tags": ["Organization"],
+                "summary": "GET /organizations/{id}",
+                "operationId": "Organization_get_by_id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/organizationOrganizationData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Organization"],
+                "summary": "PUT /organizations/{id}",
+                "operationId": "Organization_modify",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "country": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "cellId": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "createdAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                        "type": "string"
+                                    },
+                                    "modifiedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "modifiedBy": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/organizationOrganizationData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            },
+            "delete": {
+                "tags": ["Organization"],
+                "summary": "DELETE /organizations/{id}",
+                "operationId": "Organization_delete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{id}/photos": {
+            "get": {
+                "tags": ["Organization"],
+                "summary": "GET /organizations/{organization_id}/photos",
+                "operationId": "Organization_get_photo",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/commonPreUrlResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Organization"],
+                "summary": "DELETE /organizations/{organization_id}/photos",
+                "operationId": "Organization_delete_photo",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/workspaces": {
+            "get": {
+                "tags": ["Workspace"],
+                "summary": "GET /organizations/{organization_id}/workspaces  - conditions passed in the query string",
+                "operationId": "Workspace_find",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "billingChildAccountId",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "createdAtFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "createdAtTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "createdBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "modifiedAtFrom",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modifiedAtTo",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date-time"
+                        }
+                    },
+                    {
+                        "name": "modifiedBy",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "attribute name",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "sortDirection",
+                        "in": "query",
+                        "description": "asc/desc",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/workspaceListWorkspacesResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Workspace"],
+                "summary": "POST /organizations/{organization_id}/workspaces",
+                "operationId": "Workspace_create",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "createdAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                        "type": "string"
+                                    },
+                                    "modifiedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "modifiedBy": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/workspaceWorkspaceData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        },
+        "/organizations/{organizationId}/workspaces/{id}": {
+            "get": {
+                "tags": ["Workspace"],
+                "summary": "GET /organizations/{organization_id}/workspaces/{id}",
+                "operationId": "Workspace_get_by_id",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/workspaceWorkspaceData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Workspace"],
+                "summary": "PUT /organizations/{organization_id}/workspaces",
+                "operationId": "Workspace_modify",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "createdAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "createdBy": {
+                                        "type": "string"
+                                    },
+                                    "modifiedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "modifiedBy": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/workspaceWorkspaceData"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            },
+            "delete": {
+                "tags": ["Workspace"],
+                "summary": "DELETE /organizations/{organization_id}/workspaces/{id}",
+                "operationId": "Workspace_delete",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organizationId}/users/{userId}/statuses": {
+            "put": {
+                "tags": ["UserStatus"],
+                "summary": "PUT /organizations/{organization_id}/users/{user_id}/statuses",
+                "operationId": "UserStatus_change",
+                "parameters": [
+                    {
+                        "name": "organizationId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "string"
+                                    },
+                                    "createdBy": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "A successful response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/user_statusUserStatusResponse"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "An unexpected error response.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/rpcStatus"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "body"
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ListUsersResponseNextPage": {
+                "type": "object",
+                "properties": {
+                    "skip": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "commonPreUrlResponse": {
+                "type": "object",
+                "properties": {
+                    "presignedUrl": {
+                        "type": "string"
+                    }
+                }
+            },
+            "rpcStatus": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "details": {
+                        "type": "array"
+                    }
+                }
+            },
+            "userListUsersResponse": {
+                "type": "object",
+                "properties": {
+                    "users": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/user_commonUserData"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalMatchedCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "nextPage": {
+                        "$ref": "#/components/schemas/ListUsersResponseNextPage"
+                    }
+                }
+            },
+            "userUserIdRequest": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string"
+                    },
+                    "organizationId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "userUserInvitationResponse": {
+                "type": "object",
+                "properties": {
+                    "userId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "userUserProfileData": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "type": "string"
+                    },
+                    "organizationId": {
+                        "type": "string"
+                    },
+                    "telemetryConsent": {
+                        "type": "string"
+                    },
+                    "telemetryConsentAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "userConsent": {
+                        "type": "string"
+                    },
+                    "userConsentAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
+            "userUserRolesResponse": {
+                "type": "object",
+                "properties": {
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/user_commonUserRole"
+                        }
+                    }
+                }
+            },
+            "user_commonUserData": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "secondName": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "externalId": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "organizationId": {
+                        "type": "string"
+                    },
+                    "organizationStatus": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/user_commonUserRole"
+                        }
+                    },
+                    "lastSuccessfulLogin": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdBy": {
+                        "type": "string"
+                    },
+                    "modifiedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "modifiedBy": {
+                        "type": "string"
+                    },
+                    "telemetryConsent": {
+                        "type": "string"
+                    },
+                    "telemetryConsentAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "userConsent": {
+                        "type": "string"
+                    },
+                    "userConsentAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "presignedUrl": {
+                        "type": "string"
+                    }
+                }
+            },
+            "user_commonUserRole": {
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "type": "string"
+                    },
+                    "resourceType": {
+                        "type": "string"
+                    },
+                    "resourceId": {
+                        "type": "string"
+                    }
+                }
+            },
+            "user_commonUserRoleOperation": {
+                "type": "object",
+                "properties": {
+                    "role": {
+                        "$ref": "#/components/schemas/user_commonUserRole"
+                    },
+                    "operation": {
+                        "title": "CREATE, DELETE, TOUCH",
+                        "type": "string"
+                    }
+                }
+            },
+            "ListOrganizationsResponseNextPage": {
+                "type": "object",
+                "properties": {
+                    "skip": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "organizationListOrganizationsResponse": {
+                "type": "object",
+                "properties": {
+                    "organizations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/organizationOrganizationData"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalMatchedCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "nextPage": {
+                        "$ref": "#/components/schemas/ListOrganizationsResponseNextPage"
+                    }
+                }
+            },
+            "organizationOrganizationData": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "country": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "cellId": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdBy": {
+                        "type": "string"
+                    },
+                    "modifiedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "modifiedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "organizationOrganizationIdRequest": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            },
+            "organizationOrganizationInvitiationRequest": {
+                "type": "object",
+                "properties": {
+                    "organizationData": {
+                        "$ref": "#/components/schemas/organizationOrganizationData"
+                    },
+                    "adminData": {
+                        "$ref": "#/components/schemas/user_commonUserData"
+                    }
+                }
+            },
+            "ListWorkspacesResponseNextPage": {
+                "type": "object",
+                "properties": {
+                    "skip": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "workspaceListWorkspacesResponse": {
+                "type": "object",
+                "properties": {
+                    "workspaces": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/workspaceWorkspaceData"
+                        }
+                    },
+                    "totalCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "totalMatchedCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "nextPage": {
+                        "$ref": "#/components/schemas/ListWorkspacesResponseNextPage"
+                    }
+                }
+            },
+            "workspaceWorkspaceData": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "organizationId": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "createdBy": {
+                        "type": "string"
+                    },
+                    "modifiedAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "modifiedBy": {
+                        "type": "string"
+                    }
+                }
+            },
+            "user_statusUserStatusResponse": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "organizationId": {
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    },
+                    "createdBy": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            }
+        }
+    },
+    "x-original-swagger-version": "2.0"
+}

@@ -1,0 +1,14 @@
+.optimizationLabel {
+    font-size: var(--spectrum-global-dimension-font-size-75) !important;
+    color: var(--spectrum-global-color-gray-700) !important;
+}
+
+.hideArrowInDisabledPickers {
+    div[class*='spectrum-Dropdown'] button[disabled] svg {
+        display: none;
+    }
+}
+
+.warningMessage {
+    margin-top: var(--spectrum-global-dimension-size-100) !important;
+}

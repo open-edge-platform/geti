@@ -1,0 +1,5 @@
+{
+  "http_status": 204,
+  "message": "There are no predictions that belong to the media with ID 62f0f3f94b38dd1d61d2458a.",
+  "error_code": "no_prediction_found"
+}

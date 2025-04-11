@@ -1,0 +1,58 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+.monthlyCreditConsumptionCard {
+    background-color: var(--spectrum-global-color-gray-75);
+    padding: var(--spectrum-global-dimension-size-200) var(--spectrum-global-dimension-size-300);
+}
+
+.withBottomBorder {
+    padding-bottom: var(--spectrum-global-dimension-size-50);
+    border-bottom-width: var(--spectrum-accordion-item-border-size, var(--spectrum-alias-border-size-thin));
+    border-bottom-style: solid;
+    border-bottom-color: var(--spectrum-accordion-border-color, var(--spectrum-global-color-gray-300));
+}
+
+.addCreditsConsumptionCardLink {
+    color: var(--spectrum-global-color-gray-900);
+}
+
+.creditsCardLegendContainer {
+    span {
+        color: var(--spectrum-global-color-gray-700);
+        font-size: var(--spectrum-global-dimension-font-size-50);
+    }
+}
+
+.consumptionByRecordsTable {
+    div[class*='Table-headCell'] {
+        background: var(--spectrum-global-color-gray-50);
+    }
+
+    div[class*='Table-row'] {
+        &:nth-child(odd) {
+            div[class*='Table-cellWrapper'] {
+                background: var(--spectrum-global-color-gray-75);
+            }
+        }
+
+        &:nth-child(even) {
+            div[class*='Table-cellWrapper'] {
+                background: var(--spectrum-global-color-gray-100);
+            }
+        }
+    }
+}
+
+.timeCreditConsumptionCardProjectPicker {
+    --spectrum-textfield-background-color: var(--spectrum-global-color-gray-100);
+}

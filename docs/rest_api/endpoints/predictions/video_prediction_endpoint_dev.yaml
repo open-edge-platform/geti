@@ -1,0 +1,51 @@
+get:
+  tags:
+    - Predictions
+  summary: INTERNAL ONLY Get predictions for a video
+  description: 'Get predictions for a video. Parameters start_frame, end_frame and frameskip can be used 
+  to only get predictions in a certain range. There is a maximum amount of 20 predictions that can be
+   returned by the endpoint. If the combination of start_frame, end_frame and frameskip results in more than 20 predictions,
+   only the first 20 frames will be returned.'
+  operationId: GetVideoPrediction
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+    - $ref: '../../parameters/path/prediction_type_or_id.yaml'
+    - $ref: '../../parameters/query/start_frame.yaml'
+    - $ref: '../../parameters/query/end_frame.yaml'
+    - $ref: '../../parameters/query/frameskip.yaml'
+  responses:
+    '200':
+      description: Predictions successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/predictions/responses/video_prediction.yaml"
+          examples:
+            Video predictions response:
+              value:
+                $ref: "../../examples/predictions/responses/video_prediction_response.json"
+    '204':
+      description: No prediction available for the requested media.
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"

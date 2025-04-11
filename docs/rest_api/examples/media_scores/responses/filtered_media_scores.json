@@ -1,0 +1,172 @@
+{
+    "media": [
+        {
+            "annotation_scene_id": null,
+            "annotation_state_per_task": [
+                {
+                    "state": "annotated",
+                    "task_id": "646c7357b16ae00cc67f2d2b"
+                }
+            ],
+            "last_annotator_id": null,
+            "id": "646c73b8b16ae00cc67f2e0e",
+            "media_information": {
+                "display_url": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/images/646c73b8b16ae00cc67f2e0e/display/full ",
+                "height": 549,
+                "size": 68583,
+                "width": 500,
+                "extension": ".png"
+            },
+            "preprocessing": "FINISHED",
+            "name": "image_0738",
+            "roi_id": null,
+            "test_result": {
+                "annotation_id": "646c73b8b16ae00cc67f2e10",
+                "prediction_id": "646c94e338f43e0a9cc18a47",
+                "scores": [
+                    {
+                        "label_id": null,
+                        "name": "Accuracy",
+                        "value": 1.0
+                    },
+                    {
+                        "label_id": "646c7357b16ae00cc67f2d2f",
+                        "name": "Accuracy",
+                        "value": 1.0
+                    }
+                ]
+            },
+            "thumbnail": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/images/646c73b8b16ae00cc67f2e0e/display/thumb",
+            "type": "image",
+            "upload_time": "2023-05-23T08:05:12.287000+00:00",
+            "uploader_id": "user@company.com"
+        },
+        {
+            "annotation_scene_id": null,
+            "annotation_state_per_task": [
+                {
+                    "state": "annotated",
+                    "task_id": "646c7357b16ae00cc67f2d2b"
+                }
+            ],
+            "last_annotator_id": null,
+            "id": "646c73b8b16ae00cc67f2e12",
+            "media_information": {
+                "display_url": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/images/646c73b8b16ae00cc67f2e12/display/full ",
+                "height": 512,
+                "size": 77353,
+                "width": 499,
+                "extension": ".png"
+            },
+            "preprocessing": "FINISHED",
+            "name": "image_0739",
+            "roi_id": null,
+            "test_result": {
+                "annotation_id": "646c73b8b16ae00cc67f2e14",
+                "prediction_id": "646c94e338f43e0a9cc18b5b",
+                "scores": [
+                    {
+                        "label_id": null,
+                        "name": "Accuracy",
+                        "value": 1.0
+                    },
+                    {
+                        "label_id": "646c7357b16ae00cc67f2d2f",
+                        "name": "Accuracy",
+                        "value": 1.0
+                    }
+                ]
+            },
+            "thumbnail": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/images/646c73b8b16ae00cc67f2e12/display/thumb",
+            "type": "image",
+            "upload_time": "2023-05-23T08:05:12.502000+00:00",
+            "uploader_id": "user@company.com"
+        },
+        {
+            "annotation_scene_id": null,
+            "annotation_state_per_task": [
+                {
+                    "state": "annotated",
+                    "task_id": "646c7357b16ae00cc67f2d2b"
+                }
+            ],
+            "last_annotator_id": null,
+            "frame_index": 408,
+            "media_information": {
+                "display_url": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/videos/646c9475b16ae00cc67f2ea6/frames/408/display/full",
+                "height": 180,
+                "width": 320
+            },
+            "preprocessing": "FINISHED",
+            "name": "BigBuckBunny_320x180_f408",
+            "roi_id": null,
+            "test_result": {
+                "annotation_id": "646c9476b16ae00cc67f2ecb",
+                "prediction_id": "646c94e338f43e0a9cc18a5f",
+                "scores": [
+                    {
+                        "label_id": null,
+                        "name": "Accuracy",
+                        "value": 1.0
+                    },
+                    {
+                        "label_id": "646c7357b16ae00cc67f2d2f",
+                        "name": "Accuracy",
+                        "value": 1.0
+                    }
+                ]
+            },
+            "thumbnail": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/videos/646c9475b16ae00cc67f2ea6/frames/408/display/thumb",
+            "type": "video_frame",
+            "upload_time": "2023-05-23T10:24:53.716000+00:00",
+            "uploader_id": "user@company.com",
+            "video_id": "646c9475b16ae00cc67f2ea6"
+        },
+        {
+            "annotation_scene_id": null,
+            "annotation_state_per_task": [
+                {
+                    "state": "annotated",
+                    "task_id": "646c7357b16ae00cc67f2d2b"
+                }
+            ],
+            "last_annotator_id": null,
+            "frame_index": 3096,
+            "media_information": {
+                "display_url": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/videos/646c9475b16ae00cc67f2ea6/frames/3096/display/full",
+                "height": 180,
+                "width": 320
+            },
+            "preprocessing": "FINISHED",
+            "name": "BigBuckBunny_320x180_f3096",
+            "roi_id": null,
+            "test_result": {
+                "annotation_id": "646c947cb16ae00cc67f2fab",
+                "prediction_id": "646c94e338f43e0a9cc18bd0",
+                "scores": [
+                    {
+                        "label_id": null,
+                        "name": "Accuracy",
+                        "value": 1.0
+                    },
+                    {
+                        "label_id": "646c7357b16ae00cc67f2d2f",
+                        "name": "Accuracy",
+                        "value": 1.0
+                    }
+                ]
+            },
+            "thumbnail": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/datasets/646c7381b16ae00cc67f2d89/media/videos/646c9475b16ae00cc67f2ea6/frames/3096/display/thumb",
+            "type": "video_frame",
+            "upload_time": "2023-05-23T10:24:53.716000+00:00",
+            "uploader_id": "user@company.com",
+            "video_id": "646c9475b16ae00cc67f2ea6"
+        }
+    ],
+    "total_images": 44,
+    "total_matched_images": 22,
+    "total_matched_video_frames": 16,
+    "total_matched_videos": 1,
+    "total_videos": 1,
+    "next_page": "/api/v1/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/646b7a57b16ae00cc67f2636/projects/646c7356b16ae00cc67f2d27/tests/60d31793d5f1fb7e6e3c1a59/results:query?limit=10&skip=10&sort_by=score&sort_direction=ASC"
+}

@@ -1,0 +1,104 @@
+{
+  "video_predictions": [
+    {
+      "annotations": [
+        {
+          "id": "6138bca43b7b11505c43f2c1",
+          "labels": [
+            {
+              "color": "#26518eff",
+              "id": "61387685df33ae8280c33d9d",
+              "name": "test",
+              "probability": 1,
+              "source": {
+                "user_id": null,
+                "model_id": "61387685df33ae8280c347b2",
+                "model_storage_id": "62387685df33ae8280c63a34"
+              }
+            }
+          ],
+          "modified": "2021-09-08T13:40:44.445000+00:00",
+          "shape": {
+            "height": 14,
+            "type": "ELLIPSE",
+            "width": 8,
+            "x": 37,
+            "y": 37
+          }
+        }
+      ],
+      "id": "6138bd5c3b7b11505c43f2c3",
+      "kind": "prediction",
+      "media_identifier": {
+        "frame_index": 630,
+        "type": "video_frame",
+        "video_id": "6138bca43b7b11505c43f2c1"
+      },
+      "modified": "2021-09-08T13:40:44.448000+00:00"
+    },
+    {
+      "annotations": [
+        {
+          "id": "6138bca43b7b11505c43f2c1",
+          "labels": [
+            {
+              "color": "#26518eff",
+              "id": "61387685df33ae8280c33d9d",
+              "name": "test",
+              "probability": 0.56,
+              "source": {
+                "user_id": null,
+                "model_id": "61387685df33ae8280c347b2",
+                "model_storage_id": "62387685df33ae8280c63a34"
+              }
+            }
+          ],
+          "modified": "2021-09-08T13:39:49.650000+00:00",
+          "shape": {
+            "type": "RECTANGLE",
+            "x": 10,
+            "y": 10,
+            "width": 20,
+            "height": 20
+          }
+        }
+      ],
+      "id": "6138bd253b7b11505c43f2c2",
+      "kind": "prediction",
+      "media_identifier": {
+        "frame_index": 240,
+        "type": "video_frame",
+        "video_id": "6138bca43b7b11505c43f2c1"
+      },
+      "modified": "2021-09-08T13:39:49.653000+00:00",
+      "maps": [
+        {
+          "id": "6138bca43b7b11505c43f2c1",
+          "labels_id": "6138bca43b7b11505c43f2c1",
+          "name": "Result media name",
+          "type": "Result media type",
+          "url": "/api/v1/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/{media_url}/predictions/{prediction.id}/maps/{combined_map_id}",
+          "roi": {
+            "id": "61387685df33ae8280c33d9d",
+            "shape": {
+              "type": "RECTANGLE",
+              "height": 45,
+              "width": 32,
+              "x": 19,
+              "y": 38
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "next_page": "/api/v1/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/predictions/{prediction_type}?start_frame=50&frameskip=1",
+  "video_prediction_properties": {
+    "total_count":2,
+    "start_frame":0,
+    "end_frame":630,
+    "total_requested_count":2,
+    "requested_start_frame":0,
+    "requested_end_frame": 1000
+  }
+}

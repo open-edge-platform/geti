@@ -1,0 +1,8 @@
+type: object
+required:
+  - nodes
+properties:
+  nodes:
+    type: array
+    items:
+      $ref: '../../../mongo_id.yaml'

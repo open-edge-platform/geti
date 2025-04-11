@@ -1,0 +1,34 @@
+@keyframes shine {
+    to {
+        background-position: 200% 0;
+    }
+}
+
+.gradient {
+    background:
+        linear-gradient(
+            to right,
+            var(--skeleton-background-color) 0%,
+            var(--skeleton-color) 50%,
+            var(--skeleton-background-color) 75%
+        ),
+        var(--skeleton-background-color);
+    background-repeat: repeat-y;
+    background-size: 50% 60%;
+    background-position: 0 0;
+    animation: shine 2s ease infinite;
+}
+
+.skeleton {
+    --skeleton-color: rgba(88, 90, 98, 0.25);
+    --skeleton-background-color: transparent;
+    @extend .gradient;
+}
+
+.circle {
+    border-radius: 50%;
+}
+
+.aspectRatio {
+    aspect-ratio: 1;
+}

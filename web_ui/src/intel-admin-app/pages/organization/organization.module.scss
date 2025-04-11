@@ -1,0 +1,52 @@
+.breadcrumbsProgressCircle {
+    top: var(--spectrum-global-dimension-size-40);
+    --spectrum-loader-circle-medium-track-fill-color: var(--spectrum-global-color-gray-800);
+    --spectrum-loader-circle-medium-track-color: var(--spectrum-global-color-gray-300);
+}
+
+.organizationOverviewPicture {
+    font-size: var(--spectrum-global-dimension-size-700);
+}
+
+.textField {
+    width: 100%;
+
+    & input {
+        padding-left: 0;
+    }
+}
+
+.textFieldReadOnly input {
+    border: none;
+
+    &:hover {
+        cursor: default;
+    }
+
+    &:active {
+        color: currentColor;
+    }
+}
+
+.organizationBalanceText {
+    font-size: var(--spectrum-global-dimension-size-400);
+    font-weight: 500;
+}
+
+.organizationBalanceTextSkeleton {
+    margin-top: var(--spectrum-global-dimension-size-150);
+    margin-bottom: var(--spectrum-global-dimension-size-50);
+}
+
+.breadcrumbsSkeleton {
+    position: absolute;
+    bottom: calc(0px - var(--spectrum-global-dimension-size-100));
+
+    --skeleton-background-color: #2084b6;
+    --skeleton-color: rgba(178, 181, 196, 0.25);
+}
+
+.tableCellSecondaryText {
+    font-size: var(--spectrum-global-dimension-font-size-50);
+    color: var(--spectrum-global-color-gray-700);
+}

@@ -1,0 +1,17 @@
+get:
+  tags:
+    - Status
+  summary: Get server status
+  description: Get the server status. Contains running jobs count, free disk space and used disk space in bytes.
+  operationId: GetServerStatus
+  responses:
+    '200':
+      description: The server status
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/status/responses/server_status.yaml"
+          examples:
+            Server status response:
+              value:
+                $ref: "../../examples/status/responses/server_status_response.json"

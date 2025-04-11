@@ -1,0 +1,8 @@
+in: query
+name: limit
+style: form
+description: "Number of items returned in the response. Default is 10 and maximum is 100."
+schema:
+  type: integer
+  default: 10
+  maximum: 100

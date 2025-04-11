@@ -1,0 +1,11 @@
+type: object
+properties:
+  display_url:
+    type: string
+    description: the url to the obtain the video frame image
+  height:
+    type: integer
+    description: the height of the video frame
+  width:
+    type: integer
+    description: the width of the video frame

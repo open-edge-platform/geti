@@ -1,0 +1,5 @@
+in: query
+name: save_video_as_images
+description: "If true, videos will be exported as a set of images, one for each annotated frame. If the specified dataset format cannot natively represent videos (e.g., VOC, COCO, ...), this parameter is overridden to true by the server. Conversely, if the format is Datumaro and this option is false, videos will be exported fully."
+schema:
+  type: boolean

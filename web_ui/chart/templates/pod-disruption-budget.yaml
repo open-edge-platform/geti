@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Values.ui_app_name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.ui_app_name }}
+      release: {{ .Release.Name }}
+      heritage: {{ .Release.Service }}
+  minAvailable: 1

@@ -1,0 +1,18 @@
+type: object
+required:
+  - start_frame
+  - end_frame
+  - label_ids
+properties:
+  start_frame:
+    type: integer
+    minimum: 0
+    description: Frame index that represents the left endpoint (inclusive) of the range
+  end_frame:
+    type: integer
+    description: Frame index that represents the right endpoint (inclusive) of the range
+  label_ids:
+    description: ids of the labels assigned to the range
+    type: array
+    items:
+      $ref: "../../mongo_id.yaml"

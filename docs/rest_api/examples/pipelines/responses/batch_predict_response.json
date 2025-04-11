@@ -1,0 +1,54 @@
+{
+  "batch_predictions": [
+    {
+      "predictions": [
+        {
+          "labels": [
+            {
+              "id": "61387685df33ae8280c33d9d",
+              "probability": 0.87
+            }
+          ],
+          "shape": {
+            "height": 34,
+            "type": "RECTANGLE",
+            "width": 28,
+            "x": 25,
+            "y": 40
+          }
+        }
+      ],
+      "created": "2021-09-08T12:43:22.290000+00:00",
+      "media_identifier": {
+        "video_id": "61387685df33ae8280c33d9d",
+        "type": "video_frame",
+        "frame_index": 1
+      }
+    },
+    {
+      "predictions": [
+        {
+          "labels": [
+            {
+              "id": "61387685df33ae8280c33d9d",
+              "probability": 0.82
+            }
+          ],
+          "shape": {
+            "height": 54,
+            "type": "RECTANGLE",
+            "width": 48,
+            "x": 50,
+            "y": 80
+          }
+        }
+      ],
+      "created": "2021-09-08T12:43:22.690000+00:00",
+      "media_identifier": {
+        "video_id": "61387685df33ae8280c33d9d",
+        "type": "video_frame",
+        "frame_index": 11
+      }
+    }
+  ]
+}

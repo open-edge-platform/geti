@@ -1,0 +1,107 @@
+post:
+  tags:
+    - Tests
+  summary: Start new model test job
+  description: Starts a new model test job which creates and populates a test resource
+  operationId: TriggerModelTestJob
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/model_test_results/requests/model_test_post.yaml"
+        examples:
+          Creating test:
+            value:
+              $ref: "../../examples/model_test_results/requests/model_test_request.json"
+  responses:
+    '200':
+      description: The requested tests info
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Successfully started job response:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Model not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+    '400':
+      description: Bad request error. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Missing required parameter response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/missing_required_parameter.json"
+            Invalid id response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/invalid_id.json"
+            Too many dataset ids response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/too_many_dataset_ids.json"
+
+
+get:
+  tags:
+    - Tests
+  summary: Get info about all tests in project
+  description: Get all tests in the project. Includes info of the model, datasets and the job id.
+  operationId: GetAllTestsInAProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  responses:
+    '200':
+      description: The requested tests info
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/model_test_results/responses/model_test_result_list.yaml"
+          examples:
+            Successful response:
+              value:
+                $ref: "../../examples/model_test_results/responses/model_test_result_list.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SC</title>
+</head>
+<body>
+    <form id="myForm">
+        <label for="email">Email:</label><br>
+        <input type="text" id="email" name="email"><br>
+        <input type="submit" value="Submit">
+      </form>      
+<script>
+var form = document.getElementById('myForm');
+form.onsubmit = function(event){
+		var xhr = new XMLHttpRequest();
+        var formData = new FormData(form);
+        //open the request
+        xhr.open('POST','/api/user/password_reset')
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        //send the form data
+        xhr.send(JSON.stringify(Object.fromEntries(formData)));
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                form.reset(); //reset form after AJAX success or do something else
+            }
+        }
+        //Fail the onsubmit to avoid page refresh.
+        return false;
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+get:
+  tags:
+    - Datasets
+  summary: Get info about dataset
+  description: Get information about a dataset in a project.
+  operationId: GetDatasetInfo
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/dataset_id.yaml"
+  responses:
+    '200':
+      description: Info about the dataset
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/datasets/responses/dataset.yaml"
+          examples:
+            Get dataset in project:
+              value:
+                $ref: "../../examples/datasets/responses/dataset_info.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+
+put:
+  tags:
+    - Datasets
+  summary: Update dataset
+  description: Edit a dataset, currently limited to dataset renaming. 
+  operationId: UpdateDatasetInfo
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/dataset_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/datasets/requests/put/dataset.yaml"
+        examples:
+          Update dataset name:
+            value:
+              $ref: "../../examples/datasets/requests/update_dataset.json"
+  responses:
+    '200':
+      description: Updated info about dataset
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/datasets/responses/dataset.yaml"
+          examples:
+            Dataset name updated successfully:
+              value:
+                $ref: "../../examples/datasets/responses/updated_dataset_info.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+    '409':
+      description: Dataset with same name already exists.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Dataset with same name already exists:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_already_exists.json"
+
+
+delete:
+  tags:
+    - Datasets
+  summary: Delete dataset
+  description: Delete dataset along with its media and annotations. Note that this operation is not reversible. 
+  operationId: DeleteDataset
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/dataset_id.yaml"
+  responses:
+    '200':
+      description: Dataset deleted successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            Dataset deleted successfully:
+              value: {"result": "success"}
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"

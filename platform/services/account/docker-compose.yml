@@ -1,0 +1,93 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+services:
+  kafka:
+    image: bitnami/kafka:3.7.1-debian-12-r7
+    environment:
+      KAFKA_ENABLE_KRAFT: yes
+      KAFKA_CFG_PROCESS_ROLES: broker,controller
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9094,PLAINTEXT_HOST://:9095
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_BROKER_ID: 1
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 1@kafka:9094
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9095
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      ALLOW_PLAINTEXT_LISTENER: yes
+      BITNAMI_DEBUG: yes
+    ports:
+      - 9095:9095
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--version"]
+      start_period: 15s
+      interval: 10s
+      retries: 5
+      timeout: 10s
+
+  s3:
+    image: chrislusf/seaweedfs:3.69
+    restart: always
+    command: server -s3
+    ports:
+      - "8333:8333"
+
+  spicedb:
+    image: authzed/spicedb:v1.34.0
+    command: serve --grpc-preshared-key "somerandomkeyhere"
+    restart: always
+    healthcheck:
+      test: ["CMD", "grpc_health_probe", "-v", "-addr=localhost:50051"]
+      start_period: 15s
+      interval: 10s
+      retries: 5
+      timeout: 10s
+
+  db:
+    image: postgres:14.13
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --dbname=${DB_NAME} --username=${DB_USER}"]
+      start_period: 20s
+      interval: 10s
+      retries: 5
+      timeout: 10s
+    restart: always
+
+  app:
+    image: ${IMAGE_TAG}
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PORT: 5432
+      POSTGRES_DB_NAME: ${DB_NAME}
+      S3_ENDPOINT: "http://s3:8333"
+      S3_ACCESS_KEY: "dummy"
+      S3_SECRET_KEY: "dummy"
+      SPICEDB_ADDRESS: "spicedb:50051"
+      SPICEDB_TOKEN: "somerandomkeyhere"
+      KAFKA_ADDRESS: "kafka:9092"
+      LOGGING_CONFIG_DIR: "/"
+      USERS_PER_ORG_LIMIT: 300
+      FEATURE_FLAG_MANAGE_USERS_ROLES: ${FEATURE_FLAG_MANAGE_USERS_ROLES}
+      FEATURE_FLAG_MANAGE_USERS: ${FEATURE_FLAG_MANAGE_USERS}
+      FEATURE_FLAG_REQ_ACCESS: ${FEATURE_FLAG_REQ_ACCESS}
+    ports:
+      - "5001:5001"
+      - "5002:5002"
+    depends_on:
+      db:
+        condition: service_healthy
+      s3:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+      spicedb:
+        condition: service_healthy
+    volumes:
+      - ./LOG_LEVEL:/LOG_LEVEL
+    restart: always

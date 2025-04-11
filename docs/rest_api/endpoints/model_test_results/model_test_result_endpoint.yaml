@@ -1,0 +1,87 @@
+get:
+  tags:
+    - Tests
+  summary: Get info about a test in project
+  description: Get info of test in the project. Includes info of the model, datasets and the job id.
+  operationId: GetTestInAProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/model_test_id.yaml"
+  responses:
+    '200':
+      description: The requested test info
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/model_test_results/responses/model_test_result.yaml"
+          examples:
+            Running test response:
+              value:
+                $ref: "../../examples/model_test_results/responses/running_model_test.json"
+            Finished test response:
+              value:
+                $ref: "../../examples/model_test_results/responses/finished_model_test.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Test not found response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/model_test_not_found.json"
+
+
+delete:
+  tags:
+    - Tests
+  summary: Delete all info about a test
+  description: Delete all the information relative to a test in the project.
+  operationId: DeleteTestInAProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/model_test_id.yaml"
+  responses:
+    '200':
+      description: Test successfully deleted
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            Successful delete:
+              value:
+                result: "success"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Test not found response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/model_test_not_found.json"

@@ -1,0 +1,53 @@
+.previewDialog {
+    --spectrum-dialog-padding: var(--spectrum-global-dimension-static-size-300);
+    background-color: var(--spectrum-global-color-gray-75) !important;
+}
+
+.content {
+    height: 100%;
+    background-color: var(--spectrum-global-color-gray-100) !important;
+    padding: 0 !important;
+    border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-50);
+    box-sizing: border-box;
+    border-radius: var(--spectrum-global-dimension-size-50) !important;
+}
+
+.previewContent {
+    --datasetSize: 80px;
+
+    @media only screen and (min-width: 1200px) {
+        --datasetSize: 100px;
+    }
+
+    @media only screen and (min-width: 1400px) {
+        --datasetSize: 120px;
+    }
+
+    @media only screen and (min-width: 1600px) {
+        --datasetSize: 150px;
+    }
+
+    @media only screen and (min-width: 2000px) {
+        --datasetSize: 200px;
+    }
+
+    .imagePreview {
+        width: calc(100% - var(--datasetSize));
+    }
+
+    .imagePreviewFullWidth {
+        width: 100%;
+    }
+
+    .datasetPreview {
+        background-color: var(--spectrum-global-color-gray-200);
+        padding: 8px;
+        width: var(--datasetSize);
+        min-width: var(--datasetSize);
+        box-sizing: border-box;
+
+        @media screen and (max-width: 1070px) {
+            margin-top: var(--spectrum-global-dimension-size-700);
+        }
+    }
+}

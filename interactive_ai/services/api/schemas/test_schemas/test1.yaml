@@ -1,0 +1,14 @@
+definitions: { }
+title: TestingObject
+type: object
+properties:
+  annotations:
+    title: test1
+    type: array
+    items:
+      $ref: "test2.yaml"
+  annotation:
+    title: test2
+    type: array
+    items:
+      $ref: "../annotations/responses/annotation.yaml"

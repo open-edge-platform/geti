@@ -1,0 +1,18 @@
+.learnMore {
+    color: var(--energy-blue) !important;
+}
+
+.uploadPanelContent {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.dialogContent {
+    background-color: var(--spectrum-global-color-gray-50) !important;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+    padding: var(--spectrum-global-dimension-size-550) !important;
+}

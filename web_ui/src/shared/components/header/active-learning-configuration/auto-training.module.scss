@@ -1,0 +1,42 @@
+.cornerIndicator {
+    top: -1px;
+    left: var(--spectrum-global-dimension-size-150);
+    padding: 1px 2px;
+    position: absolute;
+    box-sizing: border-box;
+    color: var(--spectrum-global-color-gray-50);
+    font-size: var(--spectrum-global-dimension-size-100);
+    min-width: var(--spectrum-global-dimension-size-150);
+    min-height: var(--spectrum-global-dimension-size-150);
+    border-radius: var(--spectrum-global-dimension-size-250);
+    border: var(--spectrum-global-dimension-size-10) solid var(--spectrum-global-color-gray-50);
+}
+
+.annotationsTitle {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-static-size-150);
+}
+
+.annotationsInfo {
+    text-align: center;
+    color: var(--spectrum-global-color-gray-700);
+    border-radius: var(--spectrum-global-dimension-size-25);
+    font-size: var(--spectrum-global-dimension-static-size-130);
+    padding: var(--spectrum-global-dimension-size-25) var(--spectrum-global-dimension-size-85);
+}
+
+.newAnnotations {
+    @extend .annotationsInfo;
+
+    background-color: var(--brand-moss);
+    color: var(--spectrum-global-color-gray-50);
+}
+
+.activeModelTitle {
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.modelLink {
+    font-size: var(--spectrum-global-dimension-font-size-100);
+}

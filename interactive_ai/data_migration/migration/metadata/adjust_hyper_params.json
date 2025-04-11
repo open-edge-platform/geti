@@ -1,0 +1,9 @@
+{
+  "description": "Update headers and description of a couple training related parameters",
+  "supports_downgrade": true,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["configurable_parameters"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

@@ -1,0 +1,123 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2023 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { FormEvent, useState } from 'react';
+
+import {
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    Divider,
+    Form,
+    Heading,
+    TextField,
+    View,
+} from '@adobe/react-spectrum';
+
+import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';
+import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
+import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
+import { Button } from '../../../shared/components/button/button.component';
+import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from './utils';
+
+export const CreateWorkspaceDialog = (): JSX.Element => {
+    const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState<boolean>(false);
+    const [workspaceName, setWorkspaceName] = useState<string>('');
+    const { organizationId } = useOrganizationIdentifier();
+    const { workspaces } = useWorkspaces();
+    const { useCreateWorkspaceMutation } = useWorkspacesApi(organizationId);
+
+    const workspacesNames = workspaces.map((workspace) => workspace.name);
+    const createWorkspace = useCreateWorkspaceMutation();
+
+    const isDuplicatedName = workspacesNames.some(
+        (name) => name.toLocaleLowerCase() === workspaceName.trim().toLocaleLowerCase()
+    );
+
+    const isCreateButtonDisabled = workspaceName === '' || isDuplicatedName;
+
+    const handleOpenCreateWorkspace = (): void => {
+        setIsCreateWorkspaceOpen(true);
+    };
+
+    const handleCloseCreateWorkspace = (): void => {
+        setIsCreateWorkspaceOpen(false);
+        setWorkspaceName('');
+    };
+
+    const handleOnSubmit = (event: FormEvent): void => {
+        event.preventDefault();
+
+        if (isCreateButtonDisabled) {
+            return;
+        }
+
+        createWorkspace.mutate(
+            { name: workspaceName.trim() },
+            {
+                onSuccess: () => {
+                    handleCloseCreateWorkspace();
+                },
+            }
+        );
+    };
+
+    return (
+        <View>
+            <Button variant={'accent'} onPress={handleOpenCreateWorkspace} marginTop={'size-200'}>
+                Create new workspace
+            </Button>
+            <DialogContainer onDismiss={handleCloseCreateWorkspace}>
+                {isCreateWorkspaceOpen && (
+                    <Dialog>
+                        <Heading>Create workspace</Heading>
+                        <Divider />
+                        <Content>
+                            <Form onSubmit={handleOnSubmit}>
+                                <TextField
+                                    // eslint-disable-next-line jsx-a11y/no-autofocus
+                                    autoFocus
+                                    minLength={MIN_LENGTH_OF_WORKSPACE_NAME}
+                                    maxLength={MAX_LENGTH_OF_WORKSPACE_NAME}
+                                    label={'Workspace name'}
+                                    value={workspaceName}
+                                    onChange={setWorkspaceName}
+                                    validationState={isDuplicatedName ? 'invalid' : undefined}
+                                    errorMessage={isDuplicatedName ? 'Workspace name must be unique' : undefined}
+                                    marginBottom={'size-200'}
+                                    aria-label='New workspace new'
+                                />
+
+                                <Divider size={'S'} marginY={'size-200'} />
+
+                                <ButtonGroup align={'end'}>
+                                    <Button variant={'secondary'} onPress={handleCloseCreateWorkspace}>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type={'submit'}
+                                        isPending={createWorkspace.isPending}
+                                        variant={'accent'}
+                                        isDisabled={isCreateButtonDisabled}
+                                    >
+                                        Create
+                                    </Button>
+                                </ButtonGroup>
+                            </Form>
+                        </Content>
+                    </Dialog>
+                )}
+            </DialogContainer>
+        </View>
+    );
+};

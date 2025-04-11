@@ -1,0 +1,24 @@
+.box {
+    height: var(--spectrum-global-dimension-size-150);
+    width: var(--spectrum-global-dimension-size-150);
+}
+
+.creamBox {
+    @extend .box;
+    background-color: var(--rust-tint-2);
+}
+
+.energyBlueBox {
+    @extend .box;
+    background-color: var(--energy-blue);
+}
+
+.lightBlueBox {
+    @extend .box;
+    background-color: var(--energy-blue-tint-2);
+}
+
+.orangeBox {
+    @extend .box;
+    background-color: var(--rust-tint-1);
+}

@@ -1,0 +1,8 @@
+in: query
+name: export_format
+description: The format to which to export the dataset
+schema:
+  type: string
+  enum: [coco, yolo, voc, datumaro]
+required: true
+

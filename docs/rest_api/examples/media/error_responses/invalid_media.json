@@ -1,0 +1,5 @@
+{
+  "http_status": 415,
+  "message": "Could not upload ``. The server was not able to interpret it.",
+  "error_code": "invalid_media"
+}

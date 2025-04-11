@@ -1,0 +1,4 @@
+{
+  "http_status": 412,
+  "message": "Version of tus used by client: '2.0' is not in the list of versions supported by server: '1.0'"
+}

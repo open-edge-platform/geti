@@ -1,0 +1,8 @@
+in: query
+name: model_only
+style: form
+description: |-
+  Only applicable to OpenVINO-optimized models. Set to `true` to only download the model binaries; set to `false` to also include
+  the code in the exported file. 
+schema:
+  type: boolean

@@ -1,0 +1,20 @@
+# This CODEOWNERS configuration is temporary and deliberately strict until we migrate the repo to open-edge-platform.
+# After that moment, we will revisit the CODEOWNERS list.
+
+# Default for anything not covered by one of the more specific rules below
+* @mpryahin @jcchr @leoll2 @piotrgrubicki @atwinand
+
+# Platform components
+account_service/ @jcchr @piotrgrubicki
+credit_system/ @jcchr @piotrgrubicki
+notifier/ @jcchr @piotrgrubicki
+observability/ @jcchr @piotrgrubicki
+onboarding_service/ @jcchr @piotrgrubicki
+user_directory/ @jcchr @piotrgrubicki
+
+# IAI components
+interactive_ai/ @leoll2 @AlbertvanHouten
+docs/rest_api/ @leoll2 @AlbertvanHouten
+
+# UI components
+web_ui/ @jpggvilaca @MarkRedeman @camiloHimura @pplaskie @ActiveChooN @dwesolow @romanowska

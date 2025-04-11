@@ -1,0 +1,5 @@
+{
+  "http_status": 204,
+  "message": "No media found.",
+  "error_code": "media_not_found"
+}

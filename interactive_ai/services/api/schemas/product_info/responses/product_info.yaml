@@ -1,0 +1,5 @@
+type: object
+properties:
+  product-version:
+    type: string
+    description: Version number of installed product.

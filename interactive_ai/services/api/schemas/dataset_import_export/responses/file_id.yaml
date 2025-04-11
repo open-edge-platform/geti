@@ -1,0 +1,2 @@
+type: string
+description: ID of the uploaded dataset file to be imported

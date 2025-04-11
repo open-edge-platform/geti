@@ -1,0 +1,169 @@
+# Default values for credit-system.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  debian:
+    registry: docker.io
+    repository: bitnami
+    name: bitnami-shell:11-debian-11-r136
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+  security_headers: ""
+  stripped_headers: ""
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+
+replicaCount: 1
+
+image: credit-system
+
+nameOverride: ""
+fullnameOverride: ""
+
+securityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  ports:
+    https: 9100
+    grpc: 5556
+
+initialDelaySeconds: 5
+periodSeconds: 45
+
+resources:
+  requests:
+    cpu: 400m
+    memory: 500Mi
+  limits:
+    cpu: 400m
+    memory: 500Mi
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    cpu: 50m
+    memory: 100Mi
+
+patterns:
+  uuid: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+  query_params: (?:\?([^&\s]+(?:&[^&\s\/]+)*))?
+
+postgresql:
+  port: "5432"
+  host: "impt-postgresql"
+  image:
+    registry: docker.io
+    repository: 
+    name: postgres:14.13
+  sslmode: "disable"
+
+kafka:
+  port: 9092
+  security_protocol: "SASL_PLAINTEXT"
+  sasl_mechanism: "SCRAM-SHA-512"
+
+timeout: 360s
+
+admin_endpoints:
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/balance{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/credit_accounts/{{ .Values.patterns.uuid }}/balance/?
+    methods:
+      - PUT
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/credit_accounts{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/credit_accounts/?
+    methods:
+      - POST
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/credit_accounts/{{ .Values.patterns.uuid }}/?
+    methods:
+      - PUT
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/subscriptions/active/quotas{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+      - PUT
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/subscriptions/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/subscriptions/active/?
+    methods:
+      - GET
+
+platform_endpoints:
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/balance{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/credit_accounts{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/products/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/products/{{ .Values.patterns.uuid }}/?
+    methods:
+      - GET
+#  - matches:
+#      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/workspaces/{{ .Values.patterns.uuid }}/subscriptions/?
+#    methods:
+#      - POST
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/subscriptions/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/subscriptions/active/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/transactions/aggregates{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/transactions{{ .Values.patterns.query_params }}
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.patterns.uuid }}/subscriptions/active/quotas{{ .Values.patterns.query_params }}
+    methods:
+      - GET

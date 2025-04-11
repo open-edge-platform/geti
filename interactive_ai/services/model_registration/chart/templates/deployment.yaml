@@ -1,0 +1,99 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "modelregistration.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "modelregistration.selectorLabels" . | nindent 6 }}
+      authorization: public_api
+      opa_envoy_filter: enabled
+  template:
+    metadata:
+      annotations: 
+        sidecar.opa-istio.io/inject: enabled
+      labels:
+        {{- include "modelregistration.selectorLabels" . | nindent 8 }}
+        authorization: public_api
+        opa_envoy_filter: enabled
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+      containers:
+        - name: &containerName modelregistration
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.ports.healthz.port }}
+            periodSeconds: 60
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.service.ports.healthz.port }}
+            periodSeconds: 60
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
+          env:
+            - name: LOGS_DIR
+              value: {{ .Values.global.logs_dir }}
+            - name: MODELMESH_NAMESPACE
+              value: {{ .Values.modelMeshNamespace | default .Release.Namespace }}
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: S3_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: "s3_endpoint"
+                  name: "{{ .Release.Namespace }}-configuration"
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "modelmesh_secret_key"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "modelmesh_access_key"
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+            - configMapRef:
+                name: {{ .Release.Namespace }}-s3-bucket-names
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: modelreg
+              containerPort: {{ .Values.service.ports.modelregistration.port }}
+              protocol: TCP
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - emptyDir: {}
+          name: tmp

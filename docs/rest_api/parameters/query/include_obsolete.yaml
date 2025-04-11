@@ -1,0 +1,6 @@
+in: query
+name: include_obsolete
+description: "Whether to include obsolete algorithms in the response."
+schema:
+  type: boolean
+  default: true

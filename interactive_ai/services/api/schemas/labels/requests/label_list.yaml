@@ -1,0 +1,25 @@
+type: object
+properties:
+  labels:
+    type: array
+    description: Array of labels
+    items:
+      type: object
+      properties:
+        id:
+          $ref: '../../mongo_id.yaml'
+        name:
+          type: string
+          description: 'Label name, must be unique'
+        color:
+          type: string
+          pattern: ^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$
+          description: 'Label color, picked at random if not specified'
+        hotkey:
+          type: string
+          description: 'Hotkey to quickly apply the label'
+          minLength: 0
+      required:
+        - id
+        - name
+        - color

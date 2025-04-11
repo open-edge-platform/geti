@@ -1,0 +1,29 @@
+{
+    "name": "Example detection project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "Dataset",
+                "to": "Sample detection task"
+            }
+        ],
+        "tasks": [
+            {
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_detection",
+                        "hotkey": "ctrl+5",
+                        "name": "object"
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Sample detection task"
+            }
+        ]
+    }
+}

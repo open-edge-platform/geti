@@ -1,0 +1,24 @@
+---
+image: notifier
+replicas: 1
+imagePullPolicy: IfNotPresent
+
+kafka:
+  topic: project_notifications
+  security_protocol: "SASL_PLAINTEXT"
+
+logging_config:
+  name: control-plane-logging-config
+  log_level: "INFO"
+
+global:
+  enable_local_image_pull_secret: false
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 10001

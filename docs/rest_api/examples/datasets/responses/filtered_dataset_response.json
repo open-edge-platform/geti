@@ -1,0 +1,80 @@
+{
+  "media": [
+    {
+      "id": "613a23866674c43ae7a777aa",
+      "media_information": {
+        "display_url": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/images/613a23866674c43ae7a777ab/display/full ",
+        "height": 331,
+        "width": 584,
+        "size": 128,
+        "extension": ".png"
+      },
+      "name": "dummy_images",
+      "annotation_state_per_task": [
+        {
+          "task_id": "61012cdb1d38a5e71ef3bafd",
+          "state": "to_revisit"
+        }
+      ],
+      "thumbnail": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/images/613a23866674c43ae7a777ab/display/thumb",
+      "type": "image",
+      "upload_time": "2021-09-09T15:08:54.118000+00:00",
+      "last_annotator_id": "2e1de607-b549-42bf-8031-fd16d87379e5"
+    },
+    {
+      "id": "613a23866674c43ae7a777ab",
+      "media_information": {
+        "display_url": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/videos/6139ec7555f78343bad38d2b/display/stream",
+        "duration": 30,
+        "frame_count": 901,
+        "frame_stride": 30,
+        "frame_rate": 30,
+        "height": 270,
+        "width": 480,
+        "size": 16384,
+        "extension": ".mp4"
+      },
+      "name": "dummy_video",
+      "thumbnail": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/images/613a23866674c43ae7a777ab/display/thumb",
+      "type": "video",
+      "annotation_state_per_task": [
+        {
+          "task_id": "61012cdb1d38a5e71ef3bafd",
+          "state": "to_revisit"
+        }
+      ],
+      "upload_time": "2021-09-09T15:08:54.118000+00:00"
+    },
+    {
+      "id": "613a23866674c43ae7a777ab",
+      "media_information": {
+        "display_url": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/videos/6139ec7555f78343bad38d2b/display/stream",
+        "duration": 30,
+        "frame_count": 901,
+        "frame_stride": 30,
+        "frame_rate": 30,
+        "height": 270,
+        "width": 480,
+        "size": 16384,
+        "extension": ".mp4"
+      },
+      "name": "dummy_video",
+      "thumbnail": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/videos/613a23866674c43ae7a777ab/display/thumb",
+      "type": "video",
+      "annotation_state_per_task": [
+        {
+          "task_id": "61012cdb1d38a5e71ef3bafd",
+          "state": "to_revisit"
+        }
+      ],
+      "upload_time": "2021-09-09T15:08:54.118000+00:00",
+      "matched_frames": 22
+    }
+  ],
+  "next_page": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media:query?limit=2&skip=4",
+  "total_matched_images": 1,
+  "total_matched_videos": 1,
+  "total_matched_video_frames": 2,
+  "total_images": 48,
+  "total_videos": 7
+}

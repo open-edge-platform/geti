@@ -1,0 +1,43 @@
+type: object
+title: Configurable integer
+properties:
+  header:
+    type: string
+    description: User friendly title for the integer.
+  description:
+    type: string
+    description: User friendly description for what the integer does.
+  warning:
+    description: Warning message (if any) that explains the user to use caution when changing this parameter, and why.
+  value:
+    type: integer
+    description: Value that this configurable integer currently takes.
+  default_value:
+    type: integer
+    description: Default value that should be set for this integer.
+  name:
+    type: string
+    description: Name to identify the configurable integer by in the system.
+  template_type:
+    type: string
+    enum: [input]
+    description: "Describes the template type of the parameter. 'selectable' is used for parameters with a fixed set of
+    possible values. 'input' is used for parameters that allow free input, possibly restricted to a certain range.
+    Template_type is always 'input' for a configurable integer."
+  data_type:
+    type: string
+    enum: [integer]
+    description: "Describes the type of parameter. Parameters can be integers, floats, boolean or string. Data_type is
+    always 'integer' for a configurable integer."
+  min_value:
+    type: integer
+    description: Minimum value that can be set for this parameter.
+  max_value:
+    type: integer
+    description: Minimum value that can be set for this parameter.
+  ui_rules:
+    type: object
+    description: Not implemented at this moment
+  editable:
+    type: boolean
+    description: Not implemented at this moment.

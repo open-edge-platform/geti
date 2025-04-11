@@ -1,0 +1,3 @@
+http_status: 415
+message: Not a valid image format. Use one of [".jpg", ".jpeg", ".bmp", ".png", ".tif", ".tiff", ".webp"]
+error_code: invalid_media

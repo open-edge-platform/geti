@@ -1,0 +1,49 @@
+get:
+  tags:
+    - Subscriptions
+  summary: "[SaaS] Get all organization's subscriptions"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Returns all organization's subscriptions.
+  operationId: >-
+    get_organization_subscriptions_api_v1_organizations__organization_id__subscriptions_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+    - name: skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 0
+        title: Skip
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 10
+        title: Limit
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/subscriptions.yaml#/OrgSubscriptionsResponse'
+          example:
+            $ref: '../../../examples/credit_system/subscriptions/subscriptions_page_response.json'
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

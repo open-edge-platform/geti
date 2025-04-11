@@ -1,0 +1,7 @@
+.primaryButton {
+    font-weight: 500;
+
+    &:not([class*='is-hovered']) {
+        background: transparent;
+    }
+}

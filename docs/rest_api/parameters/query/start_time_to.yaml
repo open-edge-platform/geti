@@ -1,0 +1,6 @@
+in: query
+name: start_time_to
+style: form
+description: Timestamp used to filter jobs which started before the given time (inclusive)
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/timestamp.yaml"

@@ -1,0 +1,111 @@
+get:
+  tags:
+    - Annotations
+  summary: Get the video annotation range
+  description: |-
+    Get the labels per frame range for a video. A frame range is a range from a start to end frame combined
+    with labels. The start and end frame are inclusive.
+  operationId: GetVideoAnnotationRange
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+  responses:
+    '200':
+      description: Annotation range successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/annotations/responses/video_annotation_range.yaml"
+          examples:
+            Video annotation range response:
+              value:
+                $ref: "../../examples/annotations/responses/video_annotation_range_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"
+
+post:
+  tags:
+    - Annotations
+  summary: Create a video annotation range
+  description: |-
+    Create a video annotation range for a video. The request body should contain the full list of 
+    frame ranges along with the ids of the labels associated with those ranges. Any previously submitted annotation range
+    for the same video is overridden by the new request; moreover, any interval of frames that is not explicitly specified 
+    in the request is marked as unannotated.
+  operationId: CreateVideoAnnotationRange
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+    - $ref: '../../parameters/query/skip_frame.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/annotations/requests/video_annotation_range.yaml'
+        examples:
+          Annotate some ranges of frames:
+            value:
+              $ref: "../../examples/annotations/requests/create_video_annotation_range_request.json"
+    required: true
+  responses:
+    '200':
+      description: Annotation range successfully uploaded
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/annotations/responses/video_annotation_range.yaml"
+          examples:
+            Annotation range created:
+              value:
+                $ref: "../../examples/annotations/responses/video_annotation_range_response.json"
+    '400':
+      description: Annotation range is invalid
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Video not found:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"
+            Label not found:
+              value:
+                $ref: "../../examples/projects/error_responses/label_not_found.json"

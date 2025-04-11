@@ -1,0 +1,7 @@
+type: array
+items:
+  type: string
+  enum:
+    - train
+    - optimize_pot
+    - test

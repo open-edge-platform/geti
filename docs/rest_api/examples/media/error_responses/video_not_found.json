@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Video with id 60ec6bbfb98caeb87e34306e not found",
+  "error_code": "video_not_found"
+}

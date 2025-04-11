@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "onboarding-service.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "onboarding-service.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "onboarding-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "onboarding-service.labels" . | nindent 8 }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+        sidecar.opa-istio.io/inject: enabled
+    spec:
+      serviceAccountName: {{ include "onboarding-service.name" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            - name: ACCOUNT_SERVICE_HOST
+              value: "{{ .Values.account_service.host }}"
+            - name: ACCOUNT_SERVICE_PORT
+              value: "{{ .Values.account_service.port }}"
+            - name: CREDITS_SERVICE
+              value: "{{ .Values.credit_system.host }}:{{ .Values.credit_system.port }}"
+            - name: MARKETING_PLATFORM_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "onboarding-service.name" . }}-configuration
+                  key: marketing_platform_url
+            - name: MARKETING_PLATFORM_FORM_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "onboarding-service.name" . }}-configuration
+                  key: marketing_platform_form_name
+            - name: MARKETING_PLATFORM_SITE_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "onboarding-service.name" . }}-configuration
+                  key: marketing_platform_site_id
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags

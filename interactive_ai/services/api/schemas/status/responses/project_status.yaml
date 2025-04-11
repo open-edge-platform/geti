@@ -1,0 +1,31 @@
+type: object
+properties:
+  is_training:
+    type: boolean
+    description: Boolean that indicates whether a model is currently training
+  n_required_annotations:
+    type: integer
+    description: Required number of annotations before training is allowed
+  n_new_annotations:
+    type: integer
+    description: Number of new annotations that have been added after the last training round
+  n_running_jobs:
+    type: integer
+    description: Number of running jobs across whole system
+  n_running_jobs_project:
+    type: integer
+    description: Number of running jobs for given project
+  project_performance:
+    $ref: "../../performance/responses/project_performance.yaml"
+  status:
+    type: object
+    properties:
+      progress:
+        type: number
+        format: float
+        description: Training progress, if a model is being trained
+  tasks:
+    type: array
+    description: Array that contains the status of every task
+    items:
+      $ref: "task_status.yaml"

@@ -1,0 +1,6 @@
+.dragAndDrop {
+    border: none !important;
+    padding: 0 !important;
+    --spectrum-dropzone-background-color-selected-hover: color(srgb 0.42 0.43 0.46 / 0.4);
+    background-color: var(--spectrum-global-color-gray-100);
+}

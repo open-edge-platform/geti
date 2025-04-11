@@ -1,0 +1,313 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { FormEvent, useState } from 'react';
+
+import { Item, Picker, TextField } from '@adobe/react-spectrum';
+import { AxiosError } from 'axios';
+import dayjs from 'dayjs';
+import { StatusCodes } from 'http-status-codes';
+import { jwtDecode } from 'jwt-decode';
+import isEmpty from 'lodash/isEmpty';
+import isObject from 'lodash/isObject';
+import { useAuth } from 'react-oidc-context';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
+import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
+import { useSelectedOrganization } from '../../core/organizations/hook/use-selected-organization.hook';
+import { paths } from '../../core/services/routes';
+import { useOnboardUserMutation } from '../../core/users/hook/use-onboard-user-mutation.hook';
+import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
+import { isOrgVisibleAndUserInvitedInOrg } from '../../routes/organizations/util';
+import { isNonEmptyString } from '../../shared/utils';
+import { InvalidOrganizationsScreen } from '../errors/invalid-organization/invalid-organization-screen.component';
+import { RequestAccessFlow } from './request-access-flow.component';
+import { SignUpFlow } from './sign-up-flow.component';
+
+enum OnboardingTokenStatus {
+    INVALID = 'INVALID',
+    VALID = 'VALID',
+    EXPIRED = 'EXPIRED',
+    EMPTY = 'EMPTY',
+}
+
+const validateToken = (onboardingToken: string | null): { status: OnboardingTokenStatus } => {
+    if (onboardingToken === null) {
+        return { status: OnboardingTokenStatus.EMPTY };
+    }
+
+    try {
+        const decodedToken = jwtDecode(onboardingToken);
+
+        if (decodedToken.exp === undefined || decodedToken.iat === undefined) {
+            return { status: OnboardingTokenStatus.INVALID };
+        }
+
+        const today = dayjs().unix();
+
+        const isValidToken = today <= decodedToken.exp && today >= decodedToken.iat;
+
+        return isValidToken ? { status: OnboardingTokenStatus.VALID } : { status: OnboardingTokenStatus.EXPIRED };
+    } catch {
+        return { status: OnboardingTokenStatus.INVALID };
+    }
+};
+
+const useOnboardingTokenRaw = (): string | null => {
+    const { user } = useAuth();
+    const [searchParams] = useSearchParams();
+
+    if (user?.url_state !== undefined) {
+        return user.url_state;
+    }
+
+    const token = searchParams.get('signup-token');
+    if (token !== null) {
+        return token;
+    }
+
+    return null;
+};
+
+const useOnboardingToken = (): { value: string | null; status: OnboardingTokenStatus } => {
+    const { user } = useAuth();
+    const { data } = useProfileQuery();
+
+    const { FEATURE_FLAG_FREE_TIER, FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK } = useFeatureFlags();
+    const onboardingTokenRaw = useOnboardingTokenRaw();
+
+    if (!FEATURE_FLAG_FREE_TIER || !FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK) {
+        return { value: null, status: OnboardingTokenStatus.VALID };
+    }
+
+    // if user got invited to the organization we don't need to get any token
+    if (!isEmpty(data?.organizations)) {
+        return { value: null, status: OnboardingTokenStatus.VALID };
+    }
+
+    // for internal intel users onboarding token is not required
+    if (user?.profile?.isInternal === true) {
+        return { value: null, status: OnboardingTokenStatus.VALID };
+    }
+
+    const { status } = validateToken(onboardingTokenRaw);
+
+    return {
+        value: onboardingTokenRaw,
+        status,
+    };
+};
+
+const isMaliciousTokenError = (error: AxiosError | null): boolean => {
+    return (
+        error?.response != null &&
+        error.response.data != null &&
+        isObject(error.response.data) &&
+        error.response.status === StatusCodes.UNAUTHORIZED &&
+        'detail' in error.response.data &&
+        error.response.data.detail === 'Invalid sign-up token'
+    );
+};
+
+const isInvalidToken = (status: OnboardingTokenStatus) =>
+    [OnboardingTokenStatus.INVALID, OnboardingTokenStatus.EXPIRED].includes(status);
+
+// Sign up flow should be visible only in three scenarios:
+// 1. User has been invited by intel admin (using invite organization feature).
+// - requirements: FEATURE_FLAG_USER_ONBOARDING
+// - renders: SignUpFlow
+// 2. User has received invitation link that is generated by intel admin (generate invitation link feature).
+// - requirements: FEATURE_FLAG_USER_ONBOARDING, FEATURE_FLAG_FREE_TIER, FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK
+// - renders: SignUpFlow
+// 3. User has no account in Geti and opens the platform for the first time, without any invitation.
+// - requirements: FEATURE_FLAG_USER_ONBOARDING, FEATURE_FLAG_REQ_ACCESS
+// - renders: RequestAccessFlow
+
+export const SignUpOnSaas = () => {
+    const { data: profileData } = useProfileQuery();
+
+    const navigate = useNavigate();
+    const [isChecked, setChecked] = useState(false);
+    const [organizationName, setOrganizationName] = useState('');
+    const [invitedOrganizationId, setInvitedOrganizationId] = useState('');
+    const {
+        FEATURE_FLAG_USER_ONBOARDING,
+        FEATURE_FLAG_FREE_TIER,
+        FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK,
+        FEATURE_FLAG_REQ_ACCESS,
+    } = useFeatureFlags();
+
+    const onboardingTokenRaw = useOnboardingTokenRaw();
+    const onboardingToken = useOnboardingToken();
+    const onboardUserMutation = useOnboardUserMutation();
+    const { selectedOrganization, organizations } = useSelectedOrganization();
+
+    const hasOrganizations = !isEmpty(organizations);
+
+    const isInvalidInvitationToken =
+        FEATURE_FLAG_FREE_TIER &&
+        FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK &&
+        (isMaliciousTokenError(onboardUserMutation.error) ||
+            (onboardingToken.value === null && onboardingToken.status === OnboardingTokenStatus.INVALID));
+
+    const getShowInvalidOrganization = () => {
+        if (!FEATURE_FLAG_FREE_TIER && !hasOrganizations && FEATURE_FLAG_REQ_ACCESS) {
+            return false;
+        }
+
+        if (!FEATURE_FLAG_FREE_TIER && !hasOrganizations) {
+            return true;
+        }
+
+        return isInvalidInvitationToken;
+    };
+
+    const showInvalidOrganization = getShowInvalidOrganization();
+
+    if (showInvalidOrganization) {
+        return <InvalidOrganizationsScreen />;
+    }
+
+    const organizationsVisibleAndUserInvited = organizations.filter(isOrgVisibleAndUserInvitedInOrg);
+    const hasInvitedOrganizations = organizationsVisibleAndUserInvited.length > 1;
+    const hasSingleInvitedOrganization = organizationsVisibleAndUserInvited.length === 1;
+
+    const isExpiredToken = onboardingToken.status === OnboardingTokenStatus.EXPIRED;
+    const showExtraOrganizationNameField = !hasOrganizations && (FEATURE_FLAG_FREE_TIER || FEATURE_FLAG_REQ_ACCESS);
+    const profileOrganizationId = hasSingleInvitedOrganization
+        ? String(organizationsVisibleAndUserInvited.at(0)?.id)
+        : (selectedOrganization?.id ?? '');
+
+    const isRequestAccessFlow = FEATURE_FLAG_REQ_ACCESS && !hasOrganizations && onboardingTokenRaw === null;
+
+    const isOpen =
+        !showInvalidOrganization &&
+        FEATURE_FLAG_USER_ONBOARDING &&
+        profileData?.hasAcceptedUserTermsAndConditions === false;
+
+    const isSubmitButtonDisabled =
+        !isChecked ||
+        isInvalidToken(onboardingToken.status) ||
+        (hasInvitedOrganizations && isEmpty(invitedOrganizationId)) ||
+        (showExtraOrganizationNameField && isEmpty(organizationName));
+
+    const handleSubmitOldFlow = (event: FormEvent) => {
+        event.preventDefault();
+
+        if (profileData === undefined) {
+            return;
+        }
+
+        onboardUserMutation.mutate(
+            {
+                userConsentIsGiven: isChecked,
+                organizationId: hasInvitedOrganizations ? invitedOrganizationId : profileOrganizationId,
+                userOrganizationName: showExtraOrganizationNameField ? organizationName : undefined,
+                onboardingToken: onboardingToken.value,
+            },
+            {
+                onSuccess: (_, variables) => {
+                    if (isNonEmptyString(variables.organizationId)) {
+                        navigate(paths.organization.index({ organizationId: variables.organizationId }));
+                    }
+                },
+            }
+        );
+    };
+
+    const handleRequestAccess = (requestAccessReason: string) => (event: FormEvent) => {
+        event.preventDefault();
+
+        if (profileData === undefined) {
+            return;
+        }
+
+        onboardUserMutation.mutate(
+            {
+                userConsentIsGiven: isChecked,
+                organizationId: hasInvitedOrganizations ? invitedOrganizationId : profileOrganizationId,
+                userOrganizationName: showExtraOrganizationNameField ? organizationName : undefined,
+                onboardingToken: onboardingToken.value,
+                requestAccessReason,
+            },
+            {
+                onSuccess: () => {
+                    navigate(paths.requestedAccess({}));
+                },
+            }
+        );
+    };
+
+    const organizationField = showExtraOrganizationNameField ? (
+        <TextField
+            isRequired
+            width={'100%'}
+            label={'Organization name'}
+            name={'Organization name'}
+            validationBehavior={'native'}
+            value={organizationName}
+            onChange={setOrganizationName}
+            data-testid={'organization-name-input'}
+        />
+    ) : hasSingleInvitedOrganization ? (
+        <TextField
+            isReadOnly
+            width={'100%'}
+            label={'Organization to onboard'}
+            name={'visible organization'}
+            aria-label={'visible organization'}
+            value={organizationsVisibleAndUserInvited.at(0)?.name}
+        />
+    ) : hasInvitedOrganizations ? (
+        <Picker
+            isRequired
+            width={'100%'}
+            label={'Select an organization to onboard'}
+            name={'visible organizations'}
+            items={organizationsVisibleAndUserInvited}
+            onSelectionChange={(key) => setInvitedOrganizationId(String(key))}
+            aria-label={'visible organizations'}
+        >
+            {({ id, name }) => <Item key={id}>{name}</Item>}
+        </Picker>
+    ) : null;
+
+    if (isRequestAccessFlow) {
+        return (
+            <RequestAccessFlow
+                isExpiredToken={isExpiredToken}
+                organizationField={organizationField}
+                hasError={onboardUserMutation.isError}
+                isOpen={isOpen}
+                onSubmit={handleRequestAccess}
+                isLoading={onboardUserMutation.isPending}
+                isChecked={isChecked}
+                isSubmitButtonDisabled={isSubmitButtonDisabled}
+                onCheckedChange={setChecked}
+            />
+        );
+    }
+
+    return (
+        <SignUpFlow
+            isExpiredToken={isExpiredToken}
+            organizationField={organizationField}
+            hasError={onboardUserMutation.isError}
+            isOpen={isOpen}
+            onSubmit={handleSubmitOldFlow}
+            isLoading={onboardUserMutation.isPending}
+            isChecked={isChecked}
+            isSubmitButtonDisabled={isSubmitButtonDisabled}
+            onCheckedChange={setChecked}
+        />
+    );
+};

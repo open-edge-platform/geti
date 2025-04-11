@@ -1,0 +1,149 @@
+.resizeIndicatorLeft,
+.resizeIndicatorRight {
+    position: relative;
+    --resize-indicator-color: white;
+}
+
+.indicator {
+    height: var(--spectrum-global-dimension-size-400);
+    width: var(--spectrum-global-dimension-size-25);
+    top: var(--spectrum-global-dimension-size-0);
+}
+
+.thumbIndicator {
+    @extend .indicator;
+    background-color: #fff;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 1; // thumb indicator needs to be on top of create range section
+}
+
+.rangeIcon {
+    position: absolute;
+    z-index: var(--range-index);
+    cursor: pointer;
+    top: -16px; // range icons need to be aligned with thumb slider icon
+}
+
+.startRangeIcon {
+    left: -14px;
+    @extend .rangeIcon;
+}
+
+.endRangeIcon {
+    @extend .rangeIcon;
+}
+
+.resizeIndicator {
+    @extend .indicator;
+    background-color: var(--resize-indicator-color);
+    position: absolute;
+    transform: translateX(-50%);
+}
+
+.resizeIndicator:hover,
+.resizeIndicatorActive {
+    --resize-indicator-color: var(--energy-blue);
+}
+
+.resizeIndicatorActive.resizeIndicatorLeft {
+    transform: translateX(-100%);
+}
+
+.resizeIndicatorActive.resizeIndicatorRight {
+    transform: translateX(0%);
+}
+
+.resizeIndicatorFocussed {
+    --resize-indicator-color: var(--energy-blue);
+}
+
+.timelineWrapper {
+    --thumb-index: 10;
+    --range-index: 9;
+
+    overflow: hidden auto;
+    padding: var(--spectrum-global-dimension-size-50) var(--spectrum-global-dimension-size-200)
+        var(--spectrum-global-dimension-size-50) 0;
+}
+
+.timelineGroup {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    touch-action: none;
+}
+
+.timelineTrackGroup {
+    position: relative;
+    height: 30px;
+    width: 100%;
+}
+
+.timelineTrack {
+    position: absolute;
+    top: 13px;
+    height: 3px;
+    background-color: var(--energy-blue);
+}
+
+.timelineThumb {
+    position: absolute;
+    top: 12px;
+    transform: translateX(-50%);
+    background-color: transparent;
+    width: 14px;
+    height: 17px;
+    z-index: var(--thumb-index);
+    cursor: pointer;
+}
+
+.rangeSectionCommon {
+    --rangeColor: rgba(0, 199, 253, 0.6);
+    --rangeColorHover: rgba(0, 199, 253, 0.8);
+}
+
+.createRangeSection {
+    @extend .rangeSectionCommon;
+
+    position: absolute;
+    width: 100%;
+    height: var(--spectrum-global-dimension-size-200);
+    cursor: pointer;
+    background: var(--rangeColor);
+
+    &:hover {
+        background: var(--rangeColorHover);
+    }
+}
+
+.createRangeGroup {
+    position: relative;
+}
+
+.createRangeGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    touch-action: none;
+}
+
+.createRangeTrack {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.rangeSection {
+    @extend .rangeSectionCommon;
+
+    position: absolute;
+    width: 100%;
+    cursor: pointer;
+    height: 8px;
+    top: 5px;
+    box-sizing: border-box;
+}

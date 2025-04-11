@@ -1,0 +1,113 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  architecture:
+    type: string
+    description: Network architecture of the model
+  name:
+    type: string
+    description: Name of the model
+  creation_date:
+    type: string
+    description: Creation date of the model
+  size:
+    type: number
+    format: int32
+    description: Model size in bytes
+  total_disk_size:
+    type: number
+    format: int32
+    description: |-
+      The aggregated size (bytes) for model-related files. This includes all the exportable binaries, such as exportable code, 
+      and the binaries from the optimized models.
+  performance:
+    $ref: "../../performance/responses/model_performance.yaml"
+  label_schema_in_sync:
+    type: boolean
+    description: Boolean that indicates whether the label schema for the model is in sync with the latest label schema for the task containing the model
+  score_up_to_date:
+    type: boolean
+    description: |-
+      Boolean that indicates whether the score of the model is the most recent score.
+      This parameter is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  fps_throughput:
+    type: number
+    format: int32
+    description: |-
+      FPS throughput for the model.
+      This parameter is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  latency:
+    type: number
+    format: int32
+    description: |-
+      Latency for the model, in ms.
+      This parameter is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  precision:
+    type: array
+    items:
+      type: string
+      description: Precision of the model
+  target_device:
+    type: string
+    description: |-
+      Type of device the model is best used on.
+      This parameter is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  target_device_type:
+    type: string
+    description: |-
+      Detailed type of device the model is best used on.
+      This parameter is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  version:
+    type: number
+    description: Version of the model
+  previous_revision_id:
+    type: string
+    description: ID of the previous model
+  previous_trained_revision_id:
+    type: string
+    description: ID of the previous trained model
+  optimized_models:
+    type: array
+    description: Array of optimized models
+    items:
+      $ref: "optimized_model.yaml"
+  labels:
+    type: array
+    description: Array of labels
+    items:
+      $ref: "../../../schemas/projects/responses/label.yaml"
+  training_dataset_info:
+    type: object
+    properties:
+      dataset_storage_id:
+        $ref: "../../mongo_id.yaml"
+      dataset_revision_id:
+        $ref: "../../mongo_id.yaml"
+      n_samples:
+        type: number
+        format: int32
+        description: |- 
+          The number of items in the training dataset. Note that for the second task in a task chain, this could be more than 
+          `n_images + n_frames` because each bounding box of the first task corresponds to one dataset item of the second task.
+      n_images:
+        type: number
+        format: int32
+        description: "The number of distinct images in the dataset"
+      n_frames:
+        type: number
+        format: int32
+        description: "The number of distinct video frames in the dataset"
+  training_framework:
+    $ref: "training_framework.yaml"
+  purge_info:
+    $ref: "model_purge_info.yaml"
+  learning_approach:
+    $ref: "learning_approach.yaml"
+  lifecycle_stage:
+    $ref: "model_lifecycle_stage.yaml"

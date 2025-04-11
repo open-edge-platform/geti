@@ -1,0 +1,56 @@
+image: media-ms
+imagePullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - all
+
+service:
+  type: ClusterIP
+  port: 5002
+
+ingress:
+  endpoints:
+    - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/datasets/(.*)/media/images/(.*)/display/full
+    - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/datasets/(.*)/media/images/(.*)/display/thumb
+
+resources:
+  requests:
+    cpu: '1'
+    memory: 1Gi
+  limits:
+    memory: 1Gi # if you change this value, remember to update 'global.mem_limit' too
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+mountPath: "/binary_data"
+
+global:
+  security_headers: ''
+  stripped_headers: ''
+  docker_namespace: impp
+  enable_master_node_selector: true
+  storage_volume_claim_name_media: ''
+  min_free_disk_space_gib: 20
+  running_on_vm: false
+  mem_limit: 900MiB # 90% of the hard memory limit https://go.dev/doc/gc-guide#Memory_limit
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false

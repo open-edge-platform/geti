@@ -1,0 +1,6 @@
+type: object
+properties:
+  annotation_templates:
+    type: array
+    items:
+      $ref: "annotation_template.yaml"

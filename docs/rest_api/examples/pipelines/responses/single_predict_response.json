@@ -1,0 +1,20 @@
+{
+  "predictions": [
+    {
+      "labels": [
+        {
+          "id": "61387685df33ae8280c33d9d",
+          "probability": 0.87
+        }
+      ],
+      "shape": {
+        "height": 34,
+        "type": "RECTANGLE",
+        "width": 28,
+        "x": 25,
+        "y": 40
+      }
+    }
+  ],
+  "created": "2021-09-08T12:43:22.290000+00:00"
+}

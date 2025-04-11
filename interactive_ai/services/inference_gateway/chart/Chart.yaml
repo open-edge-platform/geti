@@ -1,0 +1,6 @@
+---
+name: inference-gateway
+version: 0.0.1
+apiVersion: v2
+description: Inference gateway
+appVersion: v0.0.1

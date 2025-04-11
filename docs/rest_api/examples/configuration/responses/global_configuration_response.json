@@ -1,0 +1,76 @@
+{
+  "global": [
+    {
+      "description": "Specify the project-level configuration for active learning.",
+      "entity_identifier": {
+        "component": "PROJECT_ACTIVE_LEARNING",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "type": "COMPONENT_PARAMETERS",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab"
+      },
+      "header": "Active Learning",
+      "id": "62b2d940f54b4b5f9e4dcb36",
+      "parameters": [
+        {
+          "data_type": "string",
+          "default_value": "mean",
+          "description": "Function to aggregate the active scores of a media across the tasks",
+          "editable": true,
+          "enum_name": "ActiveScoreReductionFunction",
+          "header": "Inter-task scores reduction function",
+          "name": "inter_task_reduce_fn",
+          "options": [
+            "min",
+            "mean",
+            "max"
+          ],
+          "template_type": "selectable",
+          "ui_rules": {},
+          "value": "mean",
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 500,
+          "description": "Number of images analysed after training for active learning",
+          "editable": true,
+          "header": "Number of images analysed after training for active learning",
+          "max_value": 10000,
+          "min_value": 10,
+          "name": "max_unseen_media",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 500,
+          "warning": null
+        }
+      ],
+      "type": "CONFIGURABLE_PARAMETERS"
+    },
+    {
+      "description": "Specify parameters to control how datasets are managed in the system.",
+      "entity_identifier": {
+        "component": "PIPELINE_DATASET_MANAGER",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "type": "COMPONENT_PARAMETERS",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab"
+      },
+      "header": "Dataset management",
+      "id": "62b2d940f54b4b5f9e4dcb39",
+      "parameters": [
+        {
+          "data_type": "boolean",
+          "default_value": false,
+          "description": "Enabling NDR will help to prevent annotating very similar images. Note that this does not remove any data from the project,it is only used in selecting images for active learning.",
+          "editable": true,
+          "header": "Use Near Duplicate Removal (NDR) for active learning",
+          "name": "use_ndr",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": false,
+          "warning": null
+        }
+      ],
+      "type": "CONFIGURABLE_PARAMETERS"
+    }
+  ]
+}

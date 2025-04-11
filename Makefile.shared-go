@@ -1,0 +1,63 @@
+# INTEL CONFIDENTIAL
+#
+# Copyright (C) 2025 Intel Corporation
+#
+# This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+# the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+# you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+# without Intel's prior written permission.
+#
+# This software and the related documents are provided as is, with no express or implied warranties,
+# other than those that are expressly stated in the License.
+
+CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
+include $(CWD)/Makefile.shared
+
+.PHONY: build deps clean tests test-unit-default test-integration-default coverage static-code-analysis-default lint
+
+# Go commands
+GOCMD   := go
+GOBUILD := $(GOCMD) build
+GOTEST  := $(GOCMD) test
+
+# Build contexts for go-based images
+DOCKER_BUILD_CONTEXT := --build-context debian_image=docker-image://${BASE_IMAGES_REGISTRY}/debian:${BASE_DEBIAN_IMAGE_TAG} \
+                        --build-context dev_go=docker-image://${BASE_IMAGES_REGISTRY}/dev-go:${BASE_DEV_GO_IMAGE_TAG} \
+
+GOOS           ?= linux
+CGO_ENABLED    ?= 0
+GO_BUILD_FLAGS ?= -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a
+OUTPUT_BINARY  ?= service
+
+deps: ## Clean up and verify modules
+	$(GOCMD) mod tidy
+
+build-default: ## Build the Go binary
+	GOOS=$(GOOS) CGO_ENABLED=$(CGO_ENABLED) $(GOBUILD) $(GO_BUILD_FLAGS) -o $(OUTPUT_BINARY) .
+
+clean: ## Remove binary and coverage artifacts
+	rm -f $(OUTPUT_BINARY) coverage.out
+
+tests: test-unit test-integration
+
+test-unit-default: ## Run unit tests
+	$(GOTEST) -v -race -short ./...
+
+test-integration-default: ## Run integration tests (requires -tags=integration in code)
+	$(GOTEST) -v -race -tags=integration ./...
+
+coverage: ## Run tests and generate a coverage profile
+	$(GOTEST) -coverprofile=coverage.out ./...
+	@echo "Coverage report generated at coverage.out"
+
+## Run static analysis/linters in read-only mode (e.g., for CI checks).
+## This will fail on lint errors but won't modify any files.
+static-code-analysis-default:
+	GOPATH=$(HOME) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2 && \
+	$(HOME)/bin/golangci-lint run --timeout 15m
+
+## Run linter in "fix" mode to automatically correct code where possible.
+## Generally used locally to clean up code before committing.
+lint:
+	GOPATH=$(HOME) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2 && \
+	$(HOME)/bin/golangci-lint run --fix --timeout 15m

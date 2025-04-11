@@ -1,0 +1,20 @@
+get:
+  tags:
+    - Organizations
+  summary: Get Organization ID for Personal Access Token.
+  description: "Return ID for Organization that Personal Account Token is created for. Use returned value in all subsequent calls as `organization_id` parameter."
+  operationId: PersonalAccessTokenOrganization
+  responses:
+    '200':
+      description: Organization data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              organizationId:
+                type: string
+            required:
+              - organizationId
+          example:
+            organizationId: "2503c663-b4e1-4162-ba32-11ba5b50722d"

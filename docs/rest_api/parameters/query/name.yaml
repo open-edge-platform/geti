@@ -1,0 +1,6 @@
+in: query
+name: name
+style: form
+description: Fill this field to filter the list based on project name. This is an `include` filter.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/name.yaml"

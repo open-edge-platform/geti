@@ -1,0 +1,10 @@
+type: object
+description: Information about the framework used to train the model
+properties:
+  type:
+    type: string
+    enum: [otx, third_party]
+    description: Type of the training framework
+  version:
+    type: string
+    description: Version of the training framework

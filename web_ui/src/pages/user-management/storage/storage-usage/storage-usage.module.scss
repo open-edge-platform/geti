@@ -1,0 +1,7 @@
+.progressGraph {
+    display: block;
+    --spectrum-loader-circle-large-width: var(--spectrum-global-dimension-size-2400);
+    --spectrum-loader-circle-large-height: var(--spectrum-global-dimension-size-2400);
+    --spectrum-loader-circle-large-border-size: var(--spectrum-global-dimension-size-250);
+    --spectrum-loader-circle-medium-track-fill-color: var(--energy-blue);
+}

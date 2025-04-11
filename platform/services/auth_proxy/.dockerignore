@@ -1,0 +1,5 @@
+*
+!app
+!go.mod
+!go.sum
+!main.go

@@ -1,0 +1,6 @@
+# Returned by GET, not used in POST/PUT/PATCH
+type: string
+minLength: 24
+maxLength: 24
+example: "60d31793d5f1fb7e6e3c1a4c"
+description: Mongo ID of the object

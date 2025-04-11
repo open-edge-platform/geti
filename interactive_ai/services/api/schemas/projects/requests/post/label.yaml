@@ -1,0 +1,21 @@
+required:
+  - name
+type: object
+additionalProperties: false
+properties:
+  name:
+    type: string
+    description: 'Label name, must be unique'
+  color:
+    type: string
+    pattern: ^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$
+    description: 'Label color, picked at random if not specified'
+  hotkey:
+    type: string
+    description: 'Key or combination of key to select this label. Can be empty (no key).'
+    minLength: 0
+  group:
+    type: string
+    description: 'Name of label group'
+  parent_id:
+    description: 'Name of parent label'

@@ -1,0 +1,4 @@
+{
+  "script": "remove_result_media.py",
+  "metadata": "remove_result_media.json"
+}

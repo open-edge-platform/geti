@@ -1,0 +1,28 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  media_information:
+    $ref: "../../media/responses/video_information.yaml"
+  active_frames:
+    type: array
+    description: List of video frame indices
+    items:
+      type: integer
+  dataset_id:
+    $ref: "../../mongo_id.yaml"
+  name:
+    type: string
+    description: Name of the image
+  annotation_state_per_task:
+    $ref: "../../media/responses/annotation_state_per_task.yaml"
+  thumbnail:
+    type: string
+    description: Relative URL to the image thumbnail
+  type:
+    type: string
+    description: Type of media. 'image' for images, 'video' for video.
+    enum: [ video ]
+  upload_time:
+    type: string
+    description: Upload time of the media file

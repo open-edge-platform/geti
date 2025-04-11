@@ -1,0 +1,55 @@
+get:
+  tags:
+    - Datasets
+  summary: Get statistics for a dataset
+  description: Retrieve the dataset statistics overview, this includes the number of images/videos, number of
+   annotations, and number of objects per label. 
+  operationId: GetDatasetStatistics
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/dataset_id.yaml"
+    - in: query
+      name: task_id
+      description: |- 
+        Provide the task ID to get the statistics specifically for that task. For example in a task chain project, 
+        if you are interested only in the statistics of the first task, you need to specify the ID of the first task. 
+        The task ID can be found in the response body of the [project detail](#Projects/GetProjectInfo) endpoint.
+
+        If no task id is provided, the response will contain statistics for all tasks in the project.
+      schema:
+        $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+  responses:
+    '200':
+      description: Statistics for the requested dataset
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/datasets/responses/dataset_statistics.yaml"
+          examples:
+            Project with statistics response:
+              value:
+                $ref: "../../examples/datasets/responses/dataset_statistics_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Task not found response:
+              value:
+                $ref: "../../examples/training/error_responses/task_not_found.json"

@@ -1,0 +1,15 @@
+type: object
+properties:
+  predictions:
+    description: List of predictions
+    type: array
+    items:
+      $ref: "../../predictions/responses/prediction.yaml"
+  created:
+    type: string
+    description: Creation date
+  media_identifier:
+    description: Optional identifier for the media item on which the prediction was made. Only included for persistent media.
+    oneOf:
+      - $ref: "image_identifier.yaml"
+      - $ref: "video_frame_identifier.yaml"

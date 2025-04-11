@@ -1,0 +1,70 @@
+.linkGroup {
+    padding: var(--spectrum-popover-padding-y, var(--spectrum-global-dimension-size-50)) 0;
+}
+
+.linkItem {
+    padding-left: calc(2px + var(--spectrum-global-dimension-size-400)) !important;
+}
+
+.link {
+    text-decoration: none;
+    background-color: transparent !important;
+    display: flex;
+    align-items: center;
+    height: var(--spectrum-global-dimension-size-700) !important;
+    padding-left: calc(2px + var(--spectrum-global-dimension-size-400)) !important;
+    color: var(--spectrum-global-color-gray-800) !important;
+
+    --spectrum-selectlist-option-text-size: var(--spectrum-global-dimension-font-size-200);
+    font-size: var(--spectrum-selectlist-option-text-size, var(--spectrum-alias-font-size-default));
+    font-style: normal;
+    font-weight: var(--spectrum-selectlist-option-text-font-weight, var(--spectrum-global-font-weight-regular));
+}
+
+.activeLink {
+    background-color: var(--spectrum-global-color-gray-200) !important;
+    position: relative;
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-200) !important;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: var(--spectrum-global-dimension-size-50);
+        height: 100%;
+        background-color: var(--energy-blue);
+    }
+}
+
+.separator {
+    border: none;
+    box-sizing: initial;
+    height: var(--spectrum-selectlist-divider-size, var(--spectrum-alias-border-size-thick));
+    margin: calc(var(--spectrum-selectlist-divider-padding, 3px) / 2) var(--spectrum-global-dimension-size-150);
+    overflow: visible;
+    padding: 0;
+    background-color: var(--spectrum-global-color-gray-200) !important;
+    margin: 0 var(--spectrum-global-dimension-size-300) !important;
+}
+
+@media only screen and (max-width: 1023px) {
+    .linkHideable {
+        padding-left: 0 !important;
+        height: var(--spectrum-global-dimension-size-600) !important;
+        justify-content: center;
+    }
+
+    .linkGroup svg:not([aria-hidden='true']) {
+        display: block !important;
+        padding: 0 !important;
+    }
+
+    .linkTextHideable {
+        display: none !important;
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "description": "Empty the result_set and model_test_result collections, as they are replaced by evaluation_result",
+  "supports_downgrade": false,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": [],
+  "deprecated_collections": ["result_set", "model_test_result"],
+  "affects_binary_data": false
+}

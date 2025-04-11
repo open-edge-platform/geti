@@ -1,0 +1,12 @@
+.objectDistributionWrapper {
+    box-sizing: border-box;
+    padding-top: var(--spectrum-global-dimension-static-size-500);
+}
+
+.limitedNotice {
+    text-align: center;
+
+    svg {
+        margin: var(--spectrum-global-dimension-static-size-25);
+    }
+}

@@ -1,0 +1,7 @@
+in: path
+name: model_group_id
+style: simple
+description: The ID of the model group of interest. This can be found as `model_groups[].id` in the response body of [model group listing](#Models/GetModelGroups) endpoint.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

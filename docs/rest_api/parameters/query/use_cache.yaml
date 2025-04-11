@@ -1,0 +1,19 @@
+in: query
+name: use_cache
+description: |-
+  This parameter defines the origin of the predictions.  
+
+  When `use_cache=always`, the predictions are pulled from the database cache. If no prediction with the desired configuration exists in the
+  cache, a 'not found' respones will be returned. 
+  
+  When `use_cache=never`, the predictions are generated on the fly based on the request. Note that, the predictions are generated using
+  the OpenVINO model with FP32 precision with XAI. This model can be found under the [model detail](#Models/GetModelDetail) endpoint.  
+  
+  When `use_cache=auto`, the system will first attempt to retrieve an existing prediction for the media item from the
+  cache. If no prediction with the desired configuration exists in the cache, a new prediction will be generated on the
+  fly. By default, `auto` is used.
+schema:
+  type: string
+  enum: [always, never, auto]
+  example: "auto"
+required: false

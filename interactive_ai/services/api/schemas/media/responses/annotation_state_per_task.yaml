@@ -1,0 +1,13 @@
+description: List of per-task states obtained aggregating the annotation state with the revisit information
+type: array
+items:
+  type: object
+  properties:
+    task_id:
+      $ref: "../../mongo_id.yaml"
+    state:
+      type:
+      - "string"
+      - "null"
+      description: Annotation state of the media for this task
+      enum: ["annotated", "partially_annotated", "none", "to_revisit", null]

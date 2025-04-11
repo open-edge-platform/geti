@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Could not find workspace with id 60ec6bbfb98caeb87e34306e",
+  "error_code": "workspace_not_found"
+}

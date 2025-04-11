@@ -1,0 +1,118 @@
+.timeline {
+    display: grid;
+    grid-area: timeline;
+
+    scrollbar-width: var(--spectrum-global-dimension-size-100) !important;
+
+    ::-webkit-scrollbar {
+        width: var(--spectrum-global-dimension-size-100) !important;
+        height: var(--spectrum-global-dimension-size-100) !important;
+    }
+}
+
+.timelineOuterRef {
+    overflow: auto;
+}
+
+.timelineSliderWrapper {
+    margin-top: var(--spectrum-global-dimension-size-100);
+    margin-bottom: calc(-1 * var(--spectrum-global-dimension-size-100));
+}
+
+.timelineInnerRef {
+    display: grid;
+}
+
+.videoFrameSegment {
+    width: 100%;
+    position: relative;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.labelMarker {
+    background-color: var(--spectrum-global-color-gray-300);
+}
+
+.stripedBackground {
+    --striped-background-foreground-color: var(--spectrum-global-color-gray-300);
+    --striped-background-background-color: rgba(255, 255, 255, 0);
+    background-image: repeating-linear-gradient(
+        45deg,
+        var(--striped-background-foreground-color),
+        var(--striped-background-foreground-color) 4px,
+        var(--striped-background-background-color) 4px,
+        var(--striped-background-background-color) 6px
+    );
+}
+
+.groupedLabels {
+    font-size: var(--spectrum-global-dimension-font-size-25);
+}
+
+.activeFrameOverlay {
+    opacity: 0.25;
+}
+
+.activeFrame {
+    --top-position: var(--spectrum-global-dimension-size-100);
+    top: var(--top-position);
+    width: calc(100% - 1px);
+    height: calc(100% - var(--top-position));
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid var(--energy-blue);
+}
+
+.ticks {
+    margin-top: -0.5em;
+    padding-bottom: 0.5em;
+    position: relative;
+}
+
+.ticksText {
+    pointer-events: none;
+    position: absolute;
+    top: -28px;
+}
+
+.ticksIndicator {
+    position: relative;
+    height: 6px;
+    width: 1px;
+    border-left: var(--spectrum-global-color-gray-200) solid 1px;
+}
+
+.filteredFrame {
+    &::before {
+        content: '';
+        width: calc(100% - 1px);
+        position: absolute;
+        top: var(--spectrum-global-dimension-size-50);
+        height: var(--spectrum-global-dimension-size-25);
+        background-color: var(--brand-daisy);
+    }
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% 0;
+    }
+}
+
+.loadingGradient {
+    background:
+        linear-gradient(
+            to right,
+            var(--spectrum-global-color-gray-400) 0%,
+            var(--spectrum-global-color-gray-500) 50%,
+            var(--spectrum-global-color-gray-400) 75%
+        ),
+        var(--spectrum-global-color-gray-300);
+    background-repeat: repeat-y;
+    background-size: 50% 60%;
+    background-position: 0 0;
+    animation: shine 2s ease infinite;
+}

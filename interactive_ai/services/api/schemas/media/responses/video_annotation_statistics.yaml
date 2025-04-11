@@ -1,0 +1,11 @@
+type: object
+properties:
+  annotated:
+    type: integer
+    description: Number of annotated frames within video
+  partially_annotated:
+    type: integer
+    description: Number of partially annotated frames within video
+  unannotated:
+    type: integer
+    description: Number of unannotated frames within video

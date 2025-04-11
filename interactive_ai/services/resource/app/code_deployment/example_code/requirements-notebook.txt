@@ -1,0 +1,6 @@
+# Requirements for running the `demo_notebook.ipynb` and `demo_ovms.ipynb` Jupyter notebooks
+geti-sdk==2.6.*
+jupyterlab>=3.6
+opencv-python>=4.10
+Pillow>=9.4.0
+ipython>=8.10.0

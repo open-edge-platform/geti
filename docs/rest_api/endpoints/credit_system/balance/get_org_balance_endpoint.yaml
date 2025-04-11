@@ -1,0 +1,51 @@
+get:
+  tags:
+    - Balance
+  summary: "[SaaS] Get running credits balance"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    The running credit balance of an organization is calculated during the
+    current subscription cycle, and consists of 3 values:<br>
+      1) incoming - credits, allocated to the organization at the start of the subscription cycle;<br>
+      2) blocked - credits, temporary reserved for the training or optimization jobs in progress;<br>
+      3) available - credits, which are available for usage.
+  operationId: get_balance_api_v1_organizations__organization_id__balance_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+    - name: date
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: integer
+            maximum: 8023398574000
+            minimum: 1711929600000
+          - type: 'null'
+        description: Milliseconds timestamp
+        title: Date
+      description: >-
+        Optional parameter. If not provided, the current credits balance is returned.
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/balance.yaml#/BalanceResponse'
+          examples:
+            Balance on a date:
+              value:
+                $ref: '../../../examples/credit_system/balance/balance_response.json'
+    '404':
+      description: Organization doesn't have any active credit accounts
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

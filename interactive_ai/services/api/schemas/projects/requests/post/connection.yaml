@@ -1,0 +1,12 @@
+required:
+  - from
+  - to
+type: object
+additionalProperties: false
+properties:
+  from:
+    type: string
+    description: 'Title of source task'
+  to:
+    type: string
+    description: 'Title of destination task'

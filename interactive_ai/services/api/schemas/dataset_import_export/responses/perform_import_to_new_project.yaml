@@ -1,0 +1,16 @@
+title: Metadata of `perform_import_to_new_project` job
+type: object
+description: Created project ID
+properties:
+  file_id:
+    $ref: 'file_id.yaml'
+  project:
+    description: Information about the project to create
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+  project_id:
+    $ref: '../../mongo_id.yaml'

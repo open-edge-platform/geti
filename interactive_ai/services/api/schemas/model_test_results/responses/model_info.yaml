@@ -1,0 +1,23 @@
+type: object
+properties:
+  group_id:
+    $ref: '../../mongo_id.yaml'
+  id:
+    $ref: '../../mongo_id.yaml'
+  n_labels:
+    type: number
+    format: int32
+    description: Number of labels model was trained with
+  task_type:
+    type: string
+    description: 'Task type; should be one of: [ classification, detection, segmentation, crop, dataset ]'
+  template_id:
+    type: string
+    description: Name of the model template for the model
+  optimization_type:
+    type: string
+    description: Optimization type of the model, one of [ NONE, MO, POT, NNCF ]
+  version:
+    type: number
+    format: int32
+    description: Version of the model

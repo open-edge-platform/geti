@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "inference-gateway.fullname" . }}
+  namespace: {{ .Values.global.istio_ingress_namespace }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  host: {{ include "inference-gateway.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 9000
+        connectTimeout: 900s

@@ -1,0 +1,14 @@
+type: object
+properties:
+  global:
+    type: array
+    description: Array of configurable parameter objects for the different global (i.e. project-wide) components in the
+      project
+    items:
+      $ref: "components/component_parameters.yaml"
+  task_chain:
+    type: array
+    description: Array of task configurations
+    items:
+      $ref: task_configuration.yaml
+

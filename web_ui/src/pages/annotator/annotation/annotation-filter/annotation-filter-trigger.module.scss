@@ -1,0 +1,23 @@
+.filterPanelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--spectrum-alias-font-size-default);
+}
+
+.filterPanelMatches {
+    color: var(--spectrum-global-color-gray-75);
+    font-size: var(--spectrum-global-dimension-font-size-50);
+}
+
+.chips {
+    background: var(--spectrum-global-color-gray-75);
+    padding-top: var(--spectrum-global-dimension-size-50);
+    padding-bottom: var(--spectrum-global-dimension-size-50);
+
+    button {
+        width: var(--spectrum-global-dimension-size-200) !important;
+        height: var(--spectrum-global-dimension-size-200) !important;
+        min-width: var(--spectrum-global-dimension-size-200) !important;
+    }
+}

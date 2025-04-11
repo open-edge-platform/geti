@@ -1,0 +1,12 @@
+description: Media preprocessing related information
+type: object
+properties:
+  status:
+    type: string
+    description: Status of the preprocessing operation
+    enum: ["SCHEDULED", "IN_PROGRESS", "FINISHED", "FAILED"]
+  message:
+    type: string
+    description: Message associated with the preprocessing operation
+required:
+  - status

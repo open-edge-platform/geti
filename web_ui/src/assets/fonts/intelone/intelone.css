@@ -1,0 +1,31 @@
+@font-face {
+    font-family: intelOne;
+    src: url(./intelone-text-regular.woff);
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: intelOne;
+    src: url(./intelone-text-medium.woff);
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: intelOne;
+    src: url(./intelone-text-light.woff);
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: intelOne;
+    src: url(./intelone-text-bold.woff);
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}

@@ -1,0 +1,18 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  name:
+    type: string
+    description: Name of the dataset
+  creation_time:
+    type: string
+    description: Creation time of the dataset
+  use_for_training:
+    type: boolean
+    description: Indicates if the dataset is used to train the active model
+required:
+  - id
+  - name
+  - creation_time
+  - use_for_training

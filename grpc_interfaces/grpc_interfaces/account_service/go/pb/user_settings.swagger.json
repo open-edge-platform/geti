@@ -1,0 +1,168 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user_settings.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "UserSettingsService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/user_settings": {
+      "get": {
+        "summary": "GET /user_settings",
+        "operationId": "UserSettingsService_get",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_settingsUserSettings"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserSettingsService"
+        ]
+      },
+      "post": {
+        "summary": "POST /user_settings",
+        "operationId": "UserSettingsService_create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_settingsUserSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "settings",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/user_settingsUserSettingsPayload"
+            }
+          },
+          {
+            "name": "projectId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "UserSettingsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "user_settingsUserSettings": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modifiedBy": {
+          "type": "string"
+        }
+      }
+    },
+    "user_settingsUserSettingsPayload": {
+      "type": "object",
+      "properties": {
+        "settings": {
+          "type": "string"
+        }
+      }
+    },
+    "user_settingsUserSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

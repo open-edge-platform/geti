@@ -1,0 +1,7 @@
+in: path
+name: workspace_id
+style: simple
+description: The ID of the workspace.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/uuid.yaml"
+required: true
