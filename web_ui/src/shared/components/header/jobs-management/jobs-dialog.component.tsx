@@ -1,6 +1,6 @@
 // INTEL CONFIDENTIAL
 //
-// Copyright (C) 2023 Intel Corporation
+// Copyright (C) 2025 Intel Corporation
 //
 // This software and the related documents are Intel copyrighted materials, and your use of them is governed by
 // the express license under which they were provided to you ("License"). Unless the License provides otherwise,
@@ -10,9 +10,11 @@
 // This software and the related documents are provided as is, with no express or implied warranties,
 // other than those that are expressly stated in the License.
 
-import { Dispatch, Key, SetStateAction, useState } from 'react';
+import { Dispatch, Key, SetStateAction, useMemo, useState } from 'react';
 
 import { Content, Dialog, Flex, Text } from '@adobe/react-spectrum';
+import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
+import { RangeValue } from '@react-types/shared';
 import { keepPreviousData } from '@tanstack/react-query';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
@@ -20,7 +22,10 @@ import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { JobCount } from '../../../../core/jobs/jobs.interface';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
+import { CornerIndicator } from '../../corner-indicator/corner-indicator.component';
+import { DateRangePickerSmall } from '../../date-range-picker-small/date-range-picker-small.component';
 import { NumberBadge } from '../../number-badge/number-badge.component';
+import { RefreshButton } from '../../refresh-button/refresh-button.component';
 import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { Tabs } from '../../tabs/tabs.component';
 import { TabItem } from '../../tabs/tabs.interface';
@@ -36,7 +41,7 @@ interface JobsDialogProps {
 }
 
 const DEFAULT_LIMIT = 50;
-const defaultJobsCount: JobCount = {
+const DEFAULT_JOBS_COUNT: JobCount = {
     numberOfRunningJobs: null,
     numberOfFinishedJobs: null,
     numberOfScheduledJobs: null,
@@ -48,19 +53,35 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
     const { useGetJobs } = useJobs({ organizationId, workspaceId });
 
-    const [projectIdFilter, setProjectIdFilter] = useState<string | undefined>();
-    const [userIdFilter, setUserIdFilter] = useState<string | undefined>();
-    const [jobTypeFilter, setJobTypeFilter] = useState<JobType[]>([]);
+    const TODAY = today(getLocalTimeZone());
+    const INITIAL_DATES: RangeValue<DateValue> = useMemo(
+        () => ({
+            start: TODAY.subtract({ months: 3 }),
+            end: TODAY,
+        }),
+        [TODAY]
+    );
+
+    const [filters, setFilters] = useState({
+        projectId: undefined as string | undefined,
+        userId: undefined as string | undefined,
+        jobTypes: [] as JobType[],
+    });
+    const [range, setRange] = useState<RangeValue<DateValue>>(INITIAL_DATES);
+
     const [selectedJobState, setSelectedJobState] = useState<Key>(JobState.RUNNING);
     const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.DESC);
 
+    // Fetch jobs data
     const { data, isFetchingNextPage, isLoading, isPending, fetchNextPage, hasNextPage } = useGetJobs(
         {
             jobState: selectedJobState as JobState,
-            projectId: projectIdFilter,
-            jobTypes: jobTypeFilter,
-            author: userIdFilter,
+            projectId: filters.projectId,
+            jobTypes: filters.jobTypes,
+            author: filters.userId,
             limit: DEFAULT_LIMIT,
+            startTimeFrom: range.start.toString(),
+            startTimeTo: range.end.add({ days: 1 }).toString(),
             sortDirection,
         },
         {
@@ -69,193 +90,105 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         }
     );
 
-    const allJobs = getAllJobs(data);
+    const isInitialRange = useMemo(
+        () => JSON.stringify(range) === JSON.stringify(INITIAL_DATES),
+        [range, INITIAL_DATES]
+    );
+    const areFiltersChanged = useMemo(
+        () => !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length,
+        [isInitialRange, filters]
+    );
 
+    const allJobs = getAllJobs(data);
     const {
         numberOfRunningJobs,
         numberOfFinishedJobs,
         numberOfScheduledJobs,
         numberOfCancelledJobs,
         numberOfFailedJobs,
-    } = data?.pages?.at(0)?.jobsCount ?? defaultJobsCount;
+    } = data?.pages?.at(0)?.jobsCount ?? DEFAULT_JOBS_COUNT;
+
+    const createTab = (state: JobState, label: string, jobsNumber: number | null, testId: string): TabItem => ({
+        id: `${state.toLowerCase()}-jobs-id`,
+        key: state,
+        name: (
+            <>
+                <Text>{label}</Text>
+                <NumberBadge
+                    id={`${state.toLowerCase()}-jobs`}
+                    isPending={isPending}
+                    aria-label={`${label} badge`}
+                    data-testid={testId}
+                    jobsNumber={jobsNumber}
+                    isSelected={selectedJobState === state}
+                />
+            </>
+        ),
+        children: (
+            <JobsList
+                jobs={allJobs}
+                hasNextPage={hasNextPage}
+                fetchNextPage={fetchNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                isLoading={isLoading}
+                jobState={state}
+                jobClickHandler={onClose}
+                setSortDirection={setSortDirection}
+                sortDirection={sortDirection}
+            />
+        ),
+    });
 
     const tabs: TabItem[] = [
-        {
-            id: `${JobState.RUNNING.toLowerCase()}-jobs-id`,
-            key: JobState.RUNNING,
-            name: (
-                <>
-                    <Text>Running jobs</Text>
-                    <NumberBadge
-                        isAccented
-                        id='running-jobs'
-                        isPending={isPending}
-                        aria-label='Running jobs badge'
-                        data-testid='running-jobs'
-                        jobsNumber={numberOfRunningJobs}
-                        isSelected={selectedJobState === JobState.RUNNING}
-                    />
-                </>
-            ),
-            children: (
-                <JobsList
-                    jobs={allJobs}
-                    hasNextPage={hasNextPage}
-                    fetchNextPage={fetchNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                    isLoading={isLoading}
-                    jobState={JobState.RUNNING}
-                    jobClickHandler={onClose}
-                    setSortDirection={setSortDirection}
-                    sortDirection={sortDirection}
-                />
-            ),
-        },
-        {
-            id: `${JobState.FINISHED.toLowerCase()}-jobs-id`,
-            key: JobState.FINISHED,
-            name: (
-                <>
-                    <Text>Finished jobs</Text>
-
-                    <NumberBadge
-                        id='finished-jobs'
-                        isPending={isPending}
-                        aria-label='Finished jobs badge'
-                        data-testid='finished-jobs'
-                        jobsNumber={numberOfFinishedJobs}
-                        isSelected={selectedJobState === JobState.FINISHED}
-                    />
-                </>
-            ),
-            children: (
-                <JobsList
-                    jobs={allJobs}
-                    hasNextPage={hasNextPage}
-                    fetchNextPage={fetchNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                    isLoading={isLoading}
-                    jobState={JobState.FINISHED}
-                    jobClickHandler={onClose}
-                    setSortDirection={setSortDirection}
-                    sortDirection={sortDirection}
-                />
-            ),
-        },
-        {
-            id: `${JobState.SCHEDULED.toLowerCase()}-jobs-id`,
-            key: JobState.SCHEDULED,
-            name: (
-                <>
-                    <Text>Scheduled jobs</Text>
-
-                    <NumberBadge
-                        id='scheduled-jobs'
-                        isPending={isPending}
-                        aria-label='Scheduled jobs badge'
-                        data-testid='scheduled-jobs'
-                        jobsNumber={numberOfScheduledJobs}
-                        isSelected={selectedJobState === JobState.SCHEDULED}
-                    />
-                </>
-            ),
-            children: (
-                <JobsList
-                    jobs={allJobs}
-                    hasNextPage={hasNextPage}
-                    fetchNextPage={fetchNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                    isLoading={isLoading}
-                    jobState={JobState.SCHEDULED}
-                    jobClickHandler={onClose}
-                    setSortDirection={setSortDirection}
-                    sortDirection={sortDirection}
-                />
-            ),
-        },
-        {
-            id: `${JobState.CANCELLED.toLowerCase()}-jobs-id`,
-            key: JobState.CANCELLED,
-            name: (
-                <>
-                    <Text>Cancelled jobs</Text>
-
-                    <NumberBadge
-                        id='cancelled-jobs'
-                        isPending={isPending}
-                        aria-label='Cancelled jobs badge'
-                        data-testid='canceled-jobs'
-                        jobsNumber={numberOfCancelledJobs}
-                        isSelected={selectedJobState === JobState.CANCELLED}
-                    />
-                </>
-            ),
-            children: (
-                <JobsList
-                    jobs={allJobs}
-                    hasNextPage={hasNextPage}
-                    fetchNextPage={fetchNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                    isLoading={isLoading}
-                    jobState={JobState.CANCELLED}
-                    jobClickHandler={onClose}
-                    setSortDirection={setSortDirection}
-                    sortDirection={sortDirection}
-                />
-            ),
-        },
-        {
-            id: `${JobState.FAILED.toLowerCase()}-jobs-id`,
-            key: JobState.FAILED,
-            name: (
-                <>
-                    <Text>Failed jobs</Text>
-
-                    <NumberBadge
-                        id='failed-jobs'
-                        isPending={isPending}
-                        aria-label='Failed jobs badge'
-                        data-testid='failed-jobs'
-                        jobsNumber={numberOfFailedJobs}
-                        isSelected={selectedJobState === JobState.FAILED}
-                    />
-                </>
-            ),
-            children: (
-                <JobsList
-                    jobs={allJobs}
-                    hasNextPage={hasNextPage}
-                    fetchNextPage={fetchNextPage}
-                    isFetchingNextPage={isFetchingNextPage}
-                    isLoading={isLoading}
-                    jobState={JobState.FAILED}
-                    setSortDirection={setSortDirection}
-                    sortDirection={sortDirection}
-                />
-            ),
-        },
+        createTab(JobState.RUNNING, 'Running jobs', numberOfRunningJobs, 'running-jobs'),
+        createTab(JobState.FINISHED, 'Finished jobs', numberOfFinishedJobs, 'finished-jobs'),
+        createTab(JobState.SCHEDULED, 'Scheduled jobs', numberOfScheduledJobs, 'scheduled-jobs'),
+        createTab(JobState.CANCELLED, 'Cancelled jobs', numberOfCancelledJobs, 'cancelled-jobs'),
+        createTab(JobState.FAILED, 'Failed jobs', numberOfFailedJobs, 'failed-jobs'),
     ];
 
-    const onFilteringChange = (projectId: string | undefined, userId: string | undefined, type: JobType[]) => {
-        if (projectIdFilter !== projectId) {
-            setProjectIdFilter(projectId);
-        }
+    const resetFilters = () => {
+        setFilters({ projectId: undefined, userId: undefined, jobTypes: [] });
+        setRange(INITIAL_DATES);
+    };
 
-        if (userIdFilter !== userId) {
-            setUserIdFilter(userId);
-        }
-
-        setJobTypeFilter(type);
+    const handleFilteringChange = (projectId: string | undefined, userId: string | undefined, jobTypes: JobType[]) => {
+        setFilters((prev) => ({ ...prev, projectId, userId, jobTypes }));
+    };
+    const handleRangeChange = (value: SetStateAction<RangeValue<DateValue>> | null) => {
+        value === null ? setRange(INITIAL_DATES) : setRange(value);
     };
 
     return (
-        <Dialog width={'unset'} UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-50)' }}>
+        <Dialog width='unset' UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-50)' }}>
             <Content>
-                <Flex alignItems='center' marginBottom={'size-150'}>
+                <Flex alignItems='center' marginBottom='size-150'>
                     <Flex flex={4} alignItems='center' justifyContent='left' gap='size-300'>
                         <JobsFiltering
-                            onChange={onFilteringChange}
-                            defaultValues={{ projectIdFilter, userIdFilter, jobTypeFilter }}
+                            onChange={handleFilteringChange}
+                            defaultValues={{
+                                projectIdFilter: filters.projectId,
+                                userIdFilter: filters.userId,
+                                jobTypeFilter: filters.jobTypes,
+                            }}
+                            key={`${filters.projectId}${filters.userId}${filters.jobTypes}`}
+                        />
+
+                        <CornerIndicator isActive={!isInitialRange}>
+                            <DateRangePickerSmall
+                                onChange={handleRangeChange}
+                                value={range}
+                                maxValue={TODAY}
+                                defaultValue={INITIAL_DATES}
+                            />
+                        </CornerIndicator>
+                        <RefreshButton
+                            onPress={resetFilters}
+                            id='refresh-jobs-filters'
+                            ariaLabel='Reset all filters'
+                            tooltip='Reset all filters'
+                            isLoading={isLoading}
+                            isDisabled={!areFiltersChanged}
                         />
                     </Flex>
                     <Flex flex={1} alignItems='center' justifyContent='right'>
