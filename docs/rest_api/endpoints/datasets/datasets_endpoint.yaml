@@ -1,0 +1,96 @@
+post:
+  tags:
+    - Datasets
+  summary: Create dataset
+  description: |-
+    Create a new dataset in a project. 
+    At the moment, the new dataset can be used as a held-out testing dataset via model testing job.
+  operationId: CreateDataset
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/datasets/requests/post/dataset.yaml"
+        examples:
+          Create dataset:
+            value:
+              $ref: "../../examples/datasets/requests/create_dataset.json"
+  responses:
+    '200':
+      description: Created dataset successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/datasets/responses/dataset.yaml"
+          examples:
+            Dataset created successfully:
+              value:
+                $ref: "../../examples/datasets/responses/dataset_info.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+    '409':
+      description: dataset name already exists.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Dataset already exists:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_already_exists.json"
+
+get:
+  summary: Get datasets
+  tags:
+    - Datasets
+  description: List all the datasets in a project.
+  operationId: GetDatasetsInfo
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  responses:
+    '200':
+      description: Info of the datasets in project
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/datasets/responses/dataset_list.yaml"
+          examples:
+            Get datasets in project:
+              value:
+                $ref: "../../examples/datasets/responses/dataset_list_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

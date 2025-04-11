@@ -1,0 +1,11 @@
+type: object
+description: The media's test info
+properties:
+  annotation_id:
+    $ref: "../../mongo_id.yaml"
+  prediction_id:
+    $ref: "../../mongo_id.yaml"
+  scores:
+    type: array
+    items:
+      $ref: "score.yaml"

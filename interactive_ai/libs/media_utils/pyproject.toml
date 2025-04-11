@@ -1,0 +1,82 @@
+[project]
+name = "media_utils"
+version = "1.0.0"
+description = "Media utilities"
+requires-python = ">=3.10, <3.14"
+
+dependencies = [
+    "cachetools~=5.5",
+    "opencv-python-headless==4.10.0.84",
+    "geti-types",
+    "sc_sdk",
+    "geti_feature_tools",
+]
+
+[project.optional-dependencies]
+decord = ["decord==0.6.0"]
+
+
+[tool.uv.sources]
+geti-types = { path = "../../../libs/types", editable = true }
+geti-feature-tools = { path = "../../../libs/feature_tools", editable = true }
+sc_sdk = { path = "../sc_sdk", editable = true }
+
+[dependency-groups]
+dev = [
+    "testfixtures~=8.3",
+    "tenacity~=8.3",
+    "requests~=2.31",
+    "types-cachetools",
+    "mypy~=1.15",
+    "pytest~=7.0",
+    "pytest-cov~=2.12",
+    "click~=8.1",
+    "pre-commit~=2.15",
+    "pytest-html~=4.1",
+    "ruff~=0.11",
+    "testcontainers[mongodb]~=4.9",
+    "media-utils[decord]"
+]
+
+[build-system]
+requires = [
+    "numpy~=1.26.4",
+    "hatchling"
+]
+
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["media_utils"]
+
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012", "RUF046", "PLW1508"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "ARG", "SIM", "RUF", "TC", "PL", "C90", "D103", "RET504"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

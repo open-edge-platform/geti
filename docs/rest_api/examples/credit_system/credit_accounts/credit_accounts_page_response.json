@@ -1,0 +1,36 @@
+{
+  "total_matched": 2,
+  "next_page": null,
+  "credit_accounts": [
+    {
+      "id": "de13930f-0028-47e9-a228-21d511e8d281",
+      "organization_id": "8ee3f85c-6fa7-4e7b-be4e-ae05eda8774e",
+      "name": "Freemium Credits",
+      "renewable_amount": 1000,
+      "renewal_day_of_month": 31,
+      "created": 1722439231635,
+      "updated": 1722439231635,
+      "expires": null,
+      "balance": {
+        "incoming": 0,
+        "available": 0,
+        "blocked": 0
+      }
+    },
+    {
+      "id": "95e31d4b-5b48-4817-bdff-a4998f44bac9",
+      "organization_id": "8ee3f85c-6fa7-4e7b-be4e-ae05eda8774e",
+      "name": "Welcoming Credits",
+      "renewable_amount": 0,
+      "renewal_day_of_month": null,
+      "created": 1722439231576,
+      "updated": 1722439231576,
+      "expires": 1725117631575,
+      "balance": {
+        "incoming": 3000,
+        "available": 2941,
+        "blocked": 59
+      }
+    }
+  ]
+}

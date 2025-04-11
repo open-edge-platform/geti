@@ -1,0 +1,10 @@
+.customTooltipWrapper {
+    border-radius: var(--spectrum-alias-border-radius-small);
+    border-color: var(--spectrum-global-color-gray-100);
+    background-color: var(--spectrum-global-color-gray-400);
+    color: var(--spectrum-global-color-gray-800) !important;
+    padding: var(--spectrum-global-dimension-size-125);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: var(--spectrum-global-dimension-font-size-50) !important;
+}

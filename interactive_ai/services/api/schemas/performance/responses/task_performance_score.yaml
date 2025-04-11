@@ -1,0 +1,12 @@
+type: object
+properties:
+  value:
+    type: number
+    format: float
+    description: Value of the score.
+  metric_type:
+    type: string
+    description: Name of the algorithm that is used to calculate the metric value, eg dice average, f-measure, etc.
+required:
+  - value
+  - metric_type

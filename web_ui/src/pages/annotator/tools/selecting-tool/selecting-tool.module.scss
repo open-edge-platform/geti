@@ -1,0 +1,21 @@
+.ghostPolygon {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+}
+
+.drawingToolsTooltips {
+    padding: 0px;
+    border-radius: 0px;
+    box-shadow: 0px 0px 10px 1px var(--spectrum-global-color-gray-50);
+    background-color: var(--spectrum-global-color-gray-50) !important;
+    transform: translateX(var(--spectrum-global-dimension-size-400)) !important;
+
+    & > span:nth-child(1) {
+        width: auto;
+        max-width: min-content;
+    }
+
+    & > span:nth-child(2) {
+        display: none;
+    }
+}

@@ -1,0 +1,11 @@
+.image {
+    border-radius: var(--spectrum-global-dimension-size-50) 0 0 var(--spectrum-global-dimension-size-50);
+}
+
+.datasetImportPanels {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-150);
+    max-height: 40%;
+    overflow-y: scroll;
+}

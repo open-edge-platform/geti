@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "media-ms.fullname" . }}-test-connection"
+  labels:
+    {{- include "media-ms.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox:1.34.1@sha256:6bdd92bf5240be1b5f3bf71324f5e371fe59f0e153b27fa1f1620f78ba16963c
+      command: ['wget']
+      args: ['{{ include "media-ms.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

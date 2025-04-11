@@ -1,0 +1,24 @@
+.header {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    align-self: center;
+    margin: 0;
+}
+
+.projectName {
+    font-size: var(--spectrum-global-dimension-static-font-size-200);
+    font-weight: 500;
+}
+
+.clickable {
+    cursor: pointer !important;
+}
+
+.headerBox:hover .editNameButton {
+    opacity: 1 !important;
+}
+
+.editNameButton {
+    transition: opacity 0.3s ease-in-out !important;
+    opacity: 0 !important;
+}

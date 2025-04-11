@@ -1,0 +1,21 @@
+type: object
+properties:
+  id:
+    $ref: "../../uuid.yaml"
+  name:
+    type: string
+    minLength: 1
+    description: Name of the workspace
+  description:
+    type: string
+    minLength: 1
+    description: Description of the workspace
+  creator_name:
+    type: string
+    description: Name of the creator of the workspace
+  creation_date:
+    type: string
+    description: Creation date of the workspace
+required:
+- id
+- name

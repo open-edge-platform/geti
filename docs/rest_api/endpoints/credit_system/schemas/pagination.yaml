@@ -1,0 +1,13 @@
+NextPage:
+  properties:
+    limit:
+      type: integer
+      title: Limit
+    skip:
+      type: integer
+      title: Skip
+  type: object
+  required:
+    - limit
+    - skip
+  title: NextPage

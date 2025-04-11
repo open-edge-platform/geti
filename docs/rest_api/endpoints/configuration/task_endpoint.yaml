@@ -1,0 +1,120 @@
+get:
+  tags:
+    - Configuration
+  summary: Get the current configuration for a specific task
+  description: "This endpoint pulls the configuration for a specific task. The configuration is subdivided into
+  components, and every component is divided into parameter groups. This endpoint can also be used to pull the
+  configurable parameters related to a single model or an algorithm, from a trainable task."
+  operationId: GetTaskConfiguration
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/task_id.yaml"
+    - $ref: "../../parameters/query/model_id.yaml"
+    - $ref: "../../parameters/query/algorithm_name.yaml"
+  responses:
+    '200':
+      description: Get configuration response
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/configuration/responses/task_configuration.yaml"
+          examples:
+            Task configuration:
+              value:
+                $ref: "../../examples/configuration/responses/task_configuration_response.json"
+            Model configuration:
+              value:
+                $ref: "../../examples/configuration/responses/model_configuration_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Task not found response:
+              value:
+                $ref: "../../examples/configuration/error_responses/task_not_found.json"
+            Model not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_not_found.json"
+            Algorithm not found response:
+              value:
+                $ref: "../../examples/configuration/error_responses/algorithm_not_found.json"
+            Configuration not found response:
+              value:
+                $ref: "../../examples/configuration/error_responses/configuration_not_found.json"
+
+post:
+  tags:
+    - Configuration
+  summary: Set the configuration for a specific task.
+  description: "This endpoint sets the configuration for a specific task. The configuration is subdivided into
+  components, and every component is divided into parameter groups."
+  operationId: SetTaskConfiguration
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/task_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/configuration/requests/task_configuration.yaml"
+        examples:
+          Task configuration:
+            value:
+              $ref: "../../examples/configuration/requests/task_configuration_request.json"
+          Task configuration with hyper parameter groups:
+            value:
+              $ref: "../../examples/configuration/requests/task_configuration_request_hyper_param_groups.json"
+    required: true
+  responses:
+    '200':
+      description: Configuration updated successfully
+      content:
+        application/json:
+          examples:
+            Succesfully updated response:
+              value: success
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Task not found response:
+              value:
+                $ref: "../../examples/configuration/error_responses/task_not_found.json"
+    '500':
+      description: Configuration cannot be saved to the server
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Unable to save configuration:
+              value:
+                $ref: "../../examples/configuration/error_responses/cannot_set_configuration.json"

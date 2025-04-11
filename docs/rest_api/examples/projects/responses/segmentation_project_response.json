@@ -1,0 +1,71 @@
+{
+    "creation_time": "2021-07-28T09:31:18.137000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "6101254defba22ca453f11cc",
+            "name": "Example segmentation project",
+            "creation_time": "2022-10-24T11:21:50.030000+00:00",
+            "use_for_training": true
+        }
+    ],
+    "id": "610123e6efba22ca453f11bd",
+    "storage_info": {},
+    "name": "Example segmentation project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "610123e6efba22ca453f11be",
+                "to": "610123e6efba22ca453f11c1"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "610123e6efba22ca453f11be",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "610123e6efba22ca453f11c1",
+                "label_schema_id": "610123e6efba22ca453f11d1",
+                "labels": [
+                    {
+                        "color": "#0015ffff",
+                        "group": "default_segmentation",
+                        "hotkey": "ctrl+5",
+                        "id": "610123e5efba22ca453f11b9",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "object"
+                    },
+                    {
+                        "color": "#b10334ff",
+                        "group": "Empty",
+                        "hotkey": "ctrl+0",
+                        "id": "610123e5efba22ca453f11ba",
+                        "parent_id": null,
+                        "is_empty": true,
+                        "is_anomalous": false,
+                        "name": "Empty"
+                    }
+                ],
+                "task_type": "segmentation",
+                "title": "Sample segmentation task"
+            }
+        ]
+    },
+    "performance": {
+        "score": 0.7,
+        "task_performances": [
+            {
+                "task_id": "610123e6efba22ca453f11c1",
+                "score": {
+                    "value": 0.7,
+                    "metric_type": "dice_average"
+                }
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/organizations/61b3a664-822d-45c5-beb1-8b10187e301d/workspaces/db99fa0c-46a2-427f-aba6-fd76f1b86d7f/projects/610123e6efba22ca453f11bd/thumbnail"
+}

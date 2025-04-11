@@ -1,0 +1,25 @@
+.headerSubmenuItem {
+    color: var(--spectrum-global-color-gray-800) !important;
+    text-decoration: none !important;
+}
+
+.headerSubmenuButton {
+    border: 0 !important;
+    height: auto !important;
+
+    & > span {
+        @extend .headerSubmenuItem;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        font-weight: 400 !important;
+    }
+}
+
+.headerSubmenu {
+    & li[class*='spectrum-Menu-divider'] {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        background-color: var(--spectrum-global-color-gray-100) !important;
+        text-decoration-thickness: auto !important;
+    }
+}

@@ -1,0 +1,43 @@
+post:
+  tags:
+    - Dataset Import/Export
+  summary: Upload a dataset archive
+  description: |-
+    Upload a dataset archive to the server.
+    
+    This endpoint allows clients to upload a dataset archive directly to the server without using the TUS protocol.
+  operationId: DatasetImportUploadFile
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/dataset_import_export/requests/upload_file.yaml"
+    required: true
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          examples:
+            Successful upload:
+              value:
+                $ref: "../../examples/dataset_import_export/responses/successful_upload.json"
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          examples:
+            Could not upload a file with zero size:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/upload_zero_size.json"
+    '413':
+      description: Request Entity Too Large
+      content:
+        application/json:
+          examples:
+            Too large to upload:
+              value:
+                $ref: "../../examples/upload/error_responses/request_entity_too_large.json"

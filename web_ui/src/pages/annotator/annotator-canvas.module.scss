@@ -1,0 +1,31 @@
+.canvas {
+    position: relative;
+    stroke-width: calc(2px / var(--zoom-level));
+}
+
+.layer,
+.disabledLayer,
+.enabledLayer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.disabledLayer {
+    pointer-events: none;
+}
+
+.enabledLayer {
+    pointer-events: auto;
+}
+
+.image {
+    pointer-events: none;
+
+    filter: brightness(var(--image-brightness)) saturate(var(--image-saturation)) contrast(var(--image-contrast));
+
+    image-rendering: crisp-edges;
+    image-rendering: var(--pixel-view);
+}

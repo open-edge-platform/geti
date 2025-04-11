@@ -1,0 +1,32 @@
+.PHONY: clean tests test-unit test-integration coverage static-code-analysis lint
+
+# Go commands
+GOCMD   := go
+GOTEST  := $(GOCMD) test
+GOINSTALL := $(GOCMD) install
+
+clean: ## Remove coverage artifacts
+	rm -f coverage.out
+
+tests: test-unit test-integration
+
+test-unit: ## Run unit tests
+	$(GOTEST) -v -race -short ./...
+
+test-integration: ## Run integration tests (requires -tags=integration in code)
+	$(GOTEST) -v -race -tags=integration ./...
+
+coverage: ## Run tests and generate a coverage profile
+	$(GOTEST) -coverprofile=coverage.out ./...
+	@echo "Coverage report generated at coverage.out"
+
+## Run static analysis/linters in read-only mode (e.g., for CI checks).
+## This will fail on lint errors but won't modify any files.
+static-code-analysis:
+	$(GOINSTALL) github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2
+	golangci-lint run --timeout 15m
+
+## Run linter in "fix" mode to automatically correct code where possible.
+## Generally used locally to clean up code before committing.
+lint:
+	golangci-lint --fix

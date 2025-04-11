@@ -1,0 +1,6 @@
+type: string
+enum: [active, obsolete]
+description: |-
+  The current support status of the model format. 'Active' models are fully supported and maintained. 
+  'Obsolete' ones can be used for inference and deployment, but they can no longer be optimized.
+  In addition, training with an 'obsolete' happens from scratch rather than incrementally.

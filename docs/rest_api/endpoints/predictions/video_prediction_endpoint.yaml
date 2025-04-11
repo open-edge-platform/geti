@@ -1,0 +1,58 @@
+get:
+  tags:
+    - Predictions
+  summary: Get cached predictions for a video
+  description: |-
+    Get predictions for a video from the database cache. Note that this endpoint **does not** generate predictions on the fly. For predictions on the fly, 
+    use the [single prediction](#Predictions/GetSinglePrediction) or the [batch prediction](#Predictions/GetBatchPrediction) endpoints. 
+    
+    Parameters `start_frame`, `end_frame` and `frameskip` can be used 
+    to only get predictions in a certain range. There is a maximum amount of 20 predictions that can be
+    returned by the endpoint. If the combination of `start_frame`, `end_frame` and `frameskip` results in more than 20 predictions,
+    only the first 20 frames will be returned and there is a `next_page` object in the response pointing to the URL that will return 
+    the next predictions.
+  operationId: GetCachedVideoPrediction
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+    - $ref: '../../parameters/query/start_frame.yaml'
+    - $ref: '../../parameters/query/end_frame.yaml'
+    - $ref: '../../parameters/query/frameskip.yaml'
+  responses:
+    '200':
+      description: Predictions successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/predictions/responses/video_prediction.yaml"
+          examples:
+            Video predictions response:
+              value:
+                $ref: "../../examples/predictions/responses/video_prediction_response.json"
+    '204':
+      description: No predictions available for the requested media.
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"

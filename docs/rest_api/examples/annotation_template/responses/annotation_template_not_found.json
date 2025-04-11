@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Annotation template with id 60ec6bbfb98caeb87e343ab4 not found",
+  "error_code": "annotation_template_not_found"
+}

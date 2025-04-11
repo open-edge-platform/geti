@@ -1,0 +1,24 @@
+.banner {
+    background: var(--brand-daisy);
+    padding: var(--spectrum-global-dimension-size-300);
+    color: var(--spectrum-global-color-static-black);
+    height: var(--spectrum-global-dimension-size-1000);
+}
+
+.heading {
+    margin: 0;
+    font-size: var(--spectrum-global-dimension-font-size-400);
+    line-height: var(--spectrum-global-dimension-font-size-700);
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+}
+
+.alertIcon {
+    margin-right: var(--spectrum-global-dimension-size-100);
+}
+
+.closeButton {
+    background-color: none !important;
+    color: var(--spectrum-global-color-static-black);
+}

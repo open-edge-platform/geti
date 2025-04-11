@@ -1,0 +1,14 @@
+.buttonGroup {
+    display: flex;
+}
+
+.cancelAllButton {
+    color: var(--spectrum-global-color-red-400) !important;
+    border-color: var(--spectrum-global-color-red-400) !important;
+
+    &:hover {
+        background-color: var(--spectrum-global-color-red-400) !important;
+        border-color: var(--spectrum-global-color-red-400) !important;
+        color: var(--spectrum-global-color-static-white) !important;
+    }
+}

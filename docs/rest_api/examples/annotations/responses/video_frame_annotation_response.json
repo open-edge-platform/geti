@@ -1,0 +1,44 @@
+{
+    "annotations": [
+        {
+            "id": "5d33413a-bf99-4af7-bebb-e30d0c6cfc9f",
+            "labels": [
+                {
+                    "color": "#00c3ffff",
+                    "id": "610a9065a0d4fbb541cac729",
+                    "name": "test1",
+                    "probability": 1,
+                    "source": {
+                        "user_id": "default_user",
+                        "model_id": "61387685df33ae8280c347b2",
+                        "model_storage_id": "62387685df33ae8280c63a34"
+                    }
+                }
+            ],
+            "labels_to_revisit": ["610a9065a0d4fbb541cac729"],
+            "modified": "2021-08-04T13:06:47.056000+00:00",
+            "shape": {
+                "height": 20,
+                "type": "ELLIPSE",
+                "width": 20,
+                "x": 10,
+                "y": 10
+            }
+        }
+    ],
+    "id": "610a90e7a0d4fbb541cac7b0",
+    "kind": "annotation",
+    "media_identifier": {
+        "frame_index": 420,
+        "type": "video_frame",
+        "video_id": "610a908ea0d4fbb541cac741"
+    },
+    "modified": "2021-08-04T13:06:47.056000+00:00",
+    "labels_to_revisit_full_scene": ["610a9065a0d4fbb541cac729"],
+    "annotation_state_per_task": [
+        {
+            "task_id": "61012cdb1d38a5e71ef3bafd",
+            "state": "to_revisit"
+        }
+    ]
+}

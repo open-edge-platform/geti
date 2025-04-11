@@ -1,0 +1,33 @@
+{
+  "id": "6604440a93ae9dd902d2bc6c",
+  "type": "export_project",
+  "creation_time": "2024-03-27T16:06:34.087000+00:00",
+  "start_time": "2024-03-27T16:06:41.444000+00:00",
+  "end_time": "2024-03-27T16:08:11.303000+00:00",
+  "name": "Project Export",
+  "author": "bcc5fa82-7b94-4b1b-9c71-0526b793c3e0",
+  "state": "finished",
+  "steps": [
+    {
+      "message": "Project export complete",
+      "index": 1,
+      "progress": 100,
+      "state": "finished",
+      "step_name": "Exporting project",
+      "duration": 27.997
+    }
+  ],
+  "cancellation_info": {
+    "is_cancelled": false,
+    "user_uid": null,
+    "cancel_time": null
+  },
+  "metadata": {
+    "project": {
+      "id": "66042c987b4bd079335e9f8e",
+      "name": "MyProject"
+    },
+    "download_url": "api/v1/organizations/421867ab-c380-48d0-b3ca-5cdb605f3c60/workspaces/6c029d4a-b93f-4114-93bd-78e534b98f04/projects/66042c987b4bd079335e9f8e/exports/6604445ad378a62f4bac6c84/download",
+    "size": 123456789
+  }
+}

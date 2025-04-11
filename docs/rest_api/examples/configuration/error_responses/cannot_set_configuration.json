@@ -1,0 +1,5 @@
+{
+  "http_status": 500,
+  "message": "Unable to save configuration",
+  "error_code": "cannot_set_configuration"
+}

@@ -1,0 +1,599 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "personal_access_token.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "PersonalAccessToken"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/organizations/{organizationId}/users/{userId}/personal_access_tokens": {
+      "get": {
+        "summary": "GET /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens",
+        "operationId": "PersonalAccessToken_find",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenListPersonalAccessTokensResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "partial",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "expiresAtFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "expiresAtTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "createdAtFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "createdAtTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortDirection",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      },
+      "post": {
+        "summary": "POST /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens",
+        "operationId": "PersonalAccessToken_create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenCreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokencreateBody"
+            }
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users/{userId}/personal_access_tokens/{id}": {
+      "delete": {
+        "summary": "DELETE /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}",
+        "operationId": "PersonalAccessToken_revoke",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      },
+      "patch": {
+        "summary": "PATCH /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}",
+        "operationId": "PersonalAccessToken_extend",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PersonalAccessTokenextendBody"
+            }
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      }
+    },
+    "/api/v1/personal_access_tokens": {
+      "post": {
+        "summary": "POST /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens",
+        "operationId": "PersonalAccessToken_create2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenCreateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      }
+    },
+    "/api/v1/personal_access_tokens/organization": {
+      "get": {
+        "summary": "GET /api/v1/personal_access_tokens/organization",
+        "operationId": "PersonalAccessToken_get_org_from_token",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenGetOrganizationByTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      }
+    },
+    "/api/v1/personal_access_tokens/{hash}": {
+      "get": {
+        "summary": "GET /api/v1/personal_access_tokens/{hash}",
+        "operationId": "PersonalAccessToken_get_by_hash",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "hash",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      }
+    },
+    "/api/v1/personal_access_tokens/{id}": {
+      "delete": {
+        "summary": "DELETE /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}",
+        "operationId": "PersonalAccessToken_revoke2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "organizationId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      },
+      "patch": {
+        "summary": "PATCH /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}",
+        "operationId": "PersonalAccessToken_extend2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PersonalAccessTokenextendBody"
+            }
+          }
+        ],
+        "tags": [
+          "PersonalAccessToken"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "PersonalAccessTokenextendBody": {
+      "type": "object",
+      "properties": {
+        "organizationId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "personal_access_tokenGetOrganizationByTokenResponse": {
+      "type": "object",
+      "properties": {
+        "organizationId": {
+          "type": "string"
+        }
+      }
+    },
+    "personal_access_tokenListPersonalAccessTokensResponse": {
+      "type": "object",
+      "properties": {
+        "personalAccessTokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/personal_access_tokenPersonalAccessTokenResponse"
+          }
+        }
+      }
+    },
+    "personal_access_tokenPersonalAccessTokenCreateRequest": {
+      "type": "object",
+      "properties": {
+        "organizationId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "personal_access_tokenPersonalAccessTokenCreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "partial": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "personalAccessToken": {
+          "type": "string"
+        }
+      }
+    },
+    "personal_access_tokenPersonalAccessTokenResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "partial": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "personal_access_tokenPersonalAccessTokencreateBody": {
+      "type": "object",
+      "properties": {
+        "createdBy": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

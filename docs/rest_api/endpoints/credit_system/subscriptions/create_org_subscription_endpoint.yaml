@@ -1,0 +1,47 @@
+post:
+  tags:
+    - Subscriptions
+  summary: "[SaaS] Create a subscription"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Creates a new credits subscription for the specified product.
+  operationId: >-
+    create_subscription_api_v1_organizations__organization_id__workspaces__workspace_id__subscriptions_post
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+    - name: workspace_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Workspace Id
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../schemas/subscriptions.yaml#/SubscriptionPayload'
+  responses:
+    '201':
+      description: Subscription has been successfully created
+      content:
+        application/json:
+          schema: { }
+      headers:
+        location:
+          description: The id of the created subscription
+          schema:
+            type: string
+    '409':
+      description: Organization already has a subscription for the requested product
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

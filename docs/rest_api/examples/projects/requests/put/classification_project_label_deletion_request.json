@@ -1,0 +1,62 @@
+{
+    "id": "6101254defba22ca453f11cd",
+    "name": "Example classification project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "6101254defba22ca453f11ce",
+                "to": "6101254defba22ca453f11d1"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "6101254defba22ca453f11ce",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "6101254defba22ca453f11d1",
+                "labels": [
+                    {
+                        "id": "6101254defba22ca453f11c6",
+                        "color": "#0015ffff",
+                        "group": "species",
+                        "hotkey": "ctrl+5",
+                        "name": "horse"
+                    },
+                    {
+                        "id": "6101254defba22ca453f11c7",
+                        "color": "#00ffffff",
+                        "group": "species",
+                        "hotkey": "ctrl+6",
+                        "name": "donkey"
+                    },
+                    {
+                        "id": "6101254defba22ca453f11c8",
+                        "color": "#00ffffff",
+                        "group": "species",
+                        "hotkey": "ctrl+9",
+                        "name": "zebra",
+                        "is_deleted": true
+                    },
+                    {
+                        "id": "6101254defba22ca453f11c9",
+                        "color": "#00aaaaff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+7",
+                        "name": "saddled"
+                    },
+                    {
+                        "id": "6101254defba22ca453f11ca",
+                        "color": "#00aaffff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+8",
+                        "name": "unsaddled"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    }
+}

@@ -1,0 +1,39 @@
+.thumbnail {
+    border-radius: 20%;
+}
+
+.thumbnailContainer {
+    margin: var(--spectrum-global-dimension-size-400);
+
+    @media only screen and (max-width: 1023px) {
+        & {
+            margin: var(--spectrum-global-dimension-size-350) auto;
+        }
+
+        .thumbnail {
+            margin: auto;
+            max-width: var(--spectrum-global-dimension-size-450);
+            max-height: var(--spectrum-global-dimension-size-450);
+        }
+
+        .thumbnailPlaceholder {
+            &:is(div) {
+                display: none;
+            }
+
+            &:is(img) {
+                width: var(--spectrum-global-dimension-size-450);
+                margin: auto;
+            }
+        }
+
+        .projectNameContainer {
+            display: none;
+            max-height: 0px;
+        }
+    }
+}
+
+.performanceTooltip {
+    max-width: var(--spectrum-global-dimension-size-2000) !important;
+}

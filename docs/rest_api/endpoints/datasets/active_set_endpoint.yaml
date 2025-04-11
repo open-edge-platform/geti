@@ -1,0 +1,62 @@
+get:
+  tags:
+    - Active Learning
+  summary: Get the active dataset
+  description: "Retrieve active dataset for a project. The active dataset is the set of images and video frames that
+   are suggested for annotation by the active learning algorithm."
+  operationId: GetActiveDataset
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/query/limit.yaml'
+  responses:
+    '200':
+      description: The requested media entities
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../interactive_ai/services/api/schemas/datasets/responses/active_set.yaml'
+          examples:
+            Combined media list response:
+              value:
+                $ref: '../../examples/datasets/responses/active_dataset_response.json'
+    '204':
+      description: No active media found in dataset.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            No active media response:
+              value:
+                $ref: "../../examples/predictions/responses/no_active_media.json"
+    '400':
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Active set requested on a non-trainable task response:
+              value:
+                $ref: "../../examples/datasets/error_responses/active_set_on_non_trainable_task.json"
+            Task not part of the project response:
+              value:
+                $ref: "../../examples/datasets/error_responses/task_not_found_in_project.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

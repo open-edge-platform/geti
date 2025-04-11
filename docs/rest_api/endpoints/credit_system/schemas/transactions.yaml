@@ -1,0 +1,41 @@
+TransactionInfo:
+  properties:
+    credits:
+      type: integer
+      title: Credits
+    project_id:
+      anyOf:
+        - type: string
+        - type: 'null'
+      title: Project Id
+    service_name:
+      type: string
+      title: Service Name
+    milliseconds_timestamp:
+      type: integer
+      title: Milliseconds Timestamp
+  type: object
+  required:
+    - credits
+    - service_name
+    - milliseconds_timestamp
+  title: TransactionInfo
+TransactionsResponse:
+  properties:
+    total_matched:
+      type: integer
+      title: Total Matched
+    next_page:
+      anyOf:
+        - $ref: 'pagination.yaml#/NextPage'
+        - type: 'null'
+    transactions:
+      items:
+        $ref: '#/TransactionInfo'
+      type: array
+      title: Transactions
+  type: object
+  required:
+    - total_matched
+    - transactions
+  title: TransactionsResponse

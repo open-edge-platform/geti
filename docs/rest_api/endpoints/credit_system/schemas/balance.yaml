@@ -1,0 +1,41 @@
+BalancePayload:
+  properties:
+    add:
+      anyOf:
+        - type: integer
+          maximum: 2147483647
+          exclusiveMinimum: 0
+        - type: 'null'
+      title: Add
+      description: >-
+        The `add` field must be greater than zero and less than or equal to
+        2147483647.
+    subtract:
+      anyOf:
+        - type: integer
+          maximum: 2147483647
+          exclusiveMinimum: 0
+        - type: 'null'
+      title: Subtract
+      description: >-
+        The `subtract` field must be greater than zero and less than or
+        equal to 2147483647.
+  type: object
+  title: BalancePayload
+BalanceResponse:
+  properties:
+    incoming:
+      type: integer
+      title: Incoming
+    available:
+      type: integer
+      title: Available
+    blocked:
+      type: integer
+      title: Blocked
+  type: object
+  required:
+    - incoming
+    - available
+    - blocked
+  title: BalanceResponse

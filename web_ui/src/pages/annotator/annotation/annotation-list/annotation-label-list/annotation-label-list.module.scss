@@ -1,0 +1,33 @@
+.labelList {
+    display: flex;
+    align-items: center;
+
+    li {
+        display: flex;
+        align-items: center;
+        padding: 0 var(--spectrum-global-dimension-size-50);
+        border-radius: var(--spectrum-global-dimension-size-25);
+        background-color: var(--spectrum-global-color-gray-75);
+
+        & + li {
+            padding-left: 0px;
+        }
+
+        svg {
+            margin-right: var(--spectrum-global-dimension-size-50);
+        }
+    }
+}
+
+.predictionHidden {
+    border-color: var(--spectrum-global-color-gray-500);
+}
+
+.hasChildren {
+    border-right: none;
+    padding-right: 0px !important;
+
+    & + li {
+        border-left: none;
+    }
+}

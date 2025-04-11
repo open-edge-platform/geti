@@ -1,0 +1,35 @@
+title: export_dataset job
+type: object
+properties:
+  name:
+    type: string
+    description: Name of the job
+  creation_time:
+    type: string
+    description: The time at which the job was created
+  id:
+    $ref: "../../mongo_id.yaml"
+  author:
+    type: string
+    description: Identifier of the user who submitted the job
+  cancellation_info:
+    $ref: "cancellation_info.yaml"
+  steps:
+    $ref: "steps.yaml"
+  start_time:
+    $ref: "time.yaml"
+    description: Start time of the job
+    minLength: 0
+  end_time:
+    $ref: "time.yaml"
+    description: End time of the job
+  state:
+    type: string
+    description: The state of the job
+  type:
+    type: string
+    enum:
+      - export_dataset
+    description: Type of the job.
+  metadata:
+    $ref: '../../dataset_import_export/responses/export_dataset.yaml'

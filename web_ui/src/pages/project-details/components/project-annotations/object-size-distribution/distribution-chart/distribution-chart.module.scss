@@ -1,0 +1,15 @@
+.distributionChart {
+    // don't change - these values support smooth transition while resizing
+    $object-size-distribution-card-width-1350: 1350px;
+    $object-size-distribution-card-width-1506: 1506px;
+
+    @media (min-width: $object-size-distribution-card-width-1506) {
+        min-width: 85%;
+    }
+    @media (max-width: $object-size-distribution-card-width-1506) {
+        min-width: 80%;
+    }
+    @media (max-width: $object-size-distribution-card-width-1350) {
+        min-width: 72%;
+    }
+}

@@ -1,0 +1,26 @@
+type: object
+properties:
+  display_url:
+    type: string
+    description: Display URL of the image or video
+  duration:
+    type: integer
+    description: Duration of the video
+  frame_count:
+    type: integer
+    description: Number of frames in the video
+  frame_stride:
+    type: integer
+    description: Frame stride of the video
+  frame_rate:
+    type: number
+    description: Frame rate of the video
+  height:
+    type: integer
+    description: Height of the video
+  width:
+    type: integer
+    description: Width of the video
+  size:
+    type: integer
+    description: Size of the video in bytes

@@ -1,0 +1,87 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2022 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { DATASET_IMPORT_STATUSES, DATASET_IMPORT_TO_NEW_PROJECT_STEP } from './dataset.enum';
+
+export const DATASET_IMPORT_MESSAGE: Record<string, string> = {
+    // Common status messages
+    [DATASET_IMPORT_STATUSES.UPLOADING]: 'Uploading...',
+    [DATASET_IMPORT_STATUSES.IMPORTING_ERROR]: 'Importing error',
+    [DATASET_IMPORT_STATUSES.IMPORTING_INTERRUPTED]: 'Importing interrupted',
+
+    [DATASET_IMPORT_STATUSES.PREPARING]: 'Preparing...',
+    [DATASET_IMPORT_STATUSES.PREPARING_ERROR]: 'Preparing error',
+
+    [DATASET_IMPORT_STATUSES.READY]: 'Ready',
+
+    // New project creation status messages
+    [DATASET_IMPORT_STATUSES.TASK_TYPE_SELECTION_TO_NEW_PROJECT]: 'Select task type',
+    [DATASET_IMPORT_STATUSES.LABELS_SELECTION_TO_NEW_PROJECT]: 'Select labels',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_NEW_PROJECT]: 'Creating project...',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_NEW_PROJECT_ERROR]: 'Project creation error',
+
+    // Import to existing project status messages
+    [DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT]: 'Map labels for the uploaded dataset',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT]: 'Importing...',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT_ERROR]: 'Importing error',
+};
+
+export const DATASET_IMPORT_HEADER: Record<string, string> = {
+    // Common statuses
+    [DATASET_IMPORT_STATUSES.UPLOADING]: 'Uploading',
+    [DATASET_IMPORT_STATUSES.IMPORTING_ERROR]: 'Error',
+    [DATASET_IMPORT_STATUSES.IMPORTING_INTERRUPTED]: 'Interrupted',
+
+    [DATASET_IMPORT_STATUSES.PREPARING]: 'Preparing',
+    [DATASET_IMPORT_STATUSES.PREPARING_ERROR]: 'Error',
+
+    [DATASET_IMPORT_STATUSES.READY]: 'Completed',
+
+    // New project creation statuses
+    [DATASET_IMPORT_STATUSES.TASK_TYPE_SELECTION_TO_NEW_PROJECT]: 'Completed',
+    [DATASET_IMPORT_STATUSES.LABELS_SELECTION_TO_NEW_PROJECT]: 'Completed',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_NEW_PROJECT]: 'Completed',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_NEW_PROJECT_ERROR]: 'Error',
+
+    // Import to existing project statuses
+    [DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT]: 'Completed',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT]: 'Completed',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT_ERROR]: 'Error',
+};
+
+export const DATASET_IMPORT_DESCRIPTION: Record<string, string> = {
+    // Common statuses
+    [DATASET_IMPORT_STATUSES.UPLOADING]: 'Dataset is being imported',
+    [DATASET_IMPORT_STATUSES.IMPORTING_ERROR]: 'Dataset has not been imported',
+    [DATASET_IMPORT_STATUSES.IMPORTING_INTERRUPTED]: 'Dataset import has been interrupted',
+
+    [DATASET_IMPORT_STATUSES.PREPARING]: 'Dataset is being prepared',
+    [DATASET_IMPORT_STATUSES.PREPARING_ERROR]: 'Dataset has not been prepared',
+
+    [DATASET_IMPORT_STATUSES.READY]: 'Dataset is ready for import',
+
+    // New project creation statuses
+    [DATASET_IMPORT_STATUSES.TASK_TYPE_SELECTION_TO_NEW_PROJECT]: 'Task types selection in progress',
+    [DATASET_IMPORT_STATUSES.LABELS_SELECTION_TO_NEW_PROJECT]: 'Labels selection in progress',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_NEW_PROJECT]: 'Processing',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_NEW_PROJECT_ERROR]: 'Project has not been created',
+
+    // Import to existing project statuses
+    [DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT]: 'Labels mapping in progress',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT]: 'Processing',
+    [DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT_ERROR]: 'Dataset has not been imported',
+};
+
+export const DATASET_IMPORT_TO_NEW_PROJECT_STEP_TO_STATUS: Record<string, string> = {
+    [DATASET_IMPORT_TO_NEW_PROJECT_STEP.DOMAIN]: DATASET_IMPORT_STATUSES.TASK_TYPE_SELECTION_TO_NEW_PROJECT,
+    [DATASET_IMPORT_TO_NEW_PROJECT_STEP.LABELS]: DATASET_IMPORT_STATUSES.LABELS_SELECTION_TO_NEW_PROJECT,
+};

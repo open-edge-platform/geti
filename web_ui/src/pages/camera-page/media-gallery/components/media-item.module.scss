@@ -1,0 +1,21 @@
+.container {
+    overflow: hidden;
+    position: relative;
+
+    &:hover .deleteContainer {
+        opacity: 1;
+    }
+}
+
+.deleteContainer {
+    opacity: 0;
+    background: var(--spectrum-global-color-gray-50) !important;
+    border-radius: var(--spectrum-global-dimension-size-50) !important;
+
+    &[class*='is-hovered'] {
+        background: var(--spectrum-global-color-gray-50) !important;
+    }
+}
+.visible {
+    opacity: 1;
+}

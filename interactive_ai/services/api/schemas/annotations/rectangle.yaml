@@ -1,0 +1,35 @@
+type: object
+title: Rectangle
+properties:
+  type:
+    type: string
+    enum: [ "RECTANGLE" ]
+    description: Type of the shape.
+  x:
+    type: number
+    description: x-coordinate of the left side of the rectangle. Coordinates are pixel values.
+    minimum: 0
+  y:
+    type: number
+    description: y-coordinate of the top of the rectangle. Coordinates are pixel values.
+    minimum: 0
+  width:
+    type: number
+    description: Width of the rectangle. Coordinates are pixel values.
+    minimum: 1
+  height:
+    type: number
+    description: Height of the rectangle. Coordinates are pixel values.
+    minimum: 1
+required:
+  - type
+  - x
+  - y
+  - width
+  - height
+example:
+  type: RECTANGLE
+  x: 320
+  y: 240
+  width: 50
+  height: 25

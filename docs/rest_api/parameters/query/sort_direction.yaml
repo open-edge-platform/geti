@@ -1,0 +1,7 @@
+in: query
+name: sort_direction
+style: form
+description: |-
+  Sorting order, could be `asc` (ascending) or `dsc` (descending). 
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/sort_direction.yaml"

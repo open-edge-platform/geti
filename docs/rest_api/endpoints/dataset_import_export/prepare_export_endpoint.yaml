@@ -1,0 +1,63 @@
+post:
+  tags:
+    - Dataset Import/Export
+  summary: Export a dataset as an archive
+  description: |-
+    Export a dataset as a zip archive file, including all the media and the respective annotations.
+
+    This endpoint submits a job to export the dataset.
+    The status of the export operation can be monitored in real-time through the [job status endpoint](#Jobs/GetJob);
+    after it completes, the URL to download the exported zip archive can be found in the job metadata.
+
+    The downloaded dataset archive can be later imported as a new project, or merged into an existing dataset of compatible type.
+  operationId: TriggerDatasetExport
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/query/export_format.yaml'
+    - $ref: '../../parameters/query/include_unannotated_media.yaml'
+    - $ref: '../../parameters/query/save_video_as_images.yaml'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Export job submitted successfully:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          examples:
+            Export format not supported:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_export_format.json'
+            Project ID in wrong format:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_project_id.json'
+            Dataset Storage ID in wrong format:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_dataset_storage_id.json'
+    '404':
+      description: File not Found
+      content:
+        application/json:
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/project_not_found.json"
+            Dataset Storage not found:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/no_dataset_storage.json"

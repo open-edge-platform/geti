@@ -1,0 +1,223 @@
+---
+{{- if not .Values.global.istio_ambient_mesh }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "user-directory.name" . }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+    - uri:
+        regex: "/api/v[^/]*/users/request_password_reset/?"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+  - match:
+    - uri:
+        regex: "/api/v[^/]*/users/reset_password/?"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+  - match:
+    - uri:
+        regex: "/api/v(.*)/organizations/.*/users/create"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+  - match:
+    - uri:
+        regex: "/api/v(.*)/users/.*/update_password"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+  - match:
+    - uri:
+        regex: "/api/v[^/]*/users/confirm_registration"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+{{- if not .Values.global.oidc_cidaas }}
+  - match:
+    - uri:
+        regex: "/api/v(.*)/organizations/.*/users/invitations"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+{{- end }}
+{{- if not .Values.global.oidc_cidaas }}
+  - match:
+    - uri:
+        prefix: "/confirm-action/registration/reset-password"
+    rewrite:
+      uri: "/api/v1/users/registration/reset-password"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.port }}
+  {{- range $section := .Values.endpoints }}
+    {{- range $url := $section.matches }}
+      {{- $methods := $section.methods }}
+      {{- if $.Values.global.cors_policy.enabled }}
+        {{- $methods = append $methods "OPTIONS" }}
+      {{- end }}
+    {{- range $method := $methods }}
+  - match:
+    - uri:
+        regex: {{ tpl $url $ | quote }}
+      method:
+        exact: {{ $method }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "user-directory.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "user-directory.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ include "user-directory.name" $ }}.{{ $.Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $.Values.port }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}

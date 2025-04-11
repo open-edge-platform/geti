@@ -1,0 +1,5 @@
+{
+  "error_code": "bad_request",
+  "http_status": 400,
+  "message": "One of the edges of the graph has an incorrect name."
+}

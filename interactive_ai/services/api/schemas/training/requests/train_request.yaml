@@ -1,0 +1,45 @@
+type: object
+properties:
+  model_template_id:
+    type: string
+    description: |-
+      The ID of the model architecture to be trained. This can be obtained from the [supported algorithms endpoint](#Projects/GetSupportedAlgorithms).
+  task_id:
+    type: string
+    description: |-
+      The ID of the task to train. For task-chain projects, this is a required parameter.
+      The task ID can be found in the response body of the [project detail](#Projects/GetProjectInfo) endpoint.
+  train_from_scratch:
+    type: boolean
+    description: Set to `true` to train the model from scratch (i.e., not finetuning from previous version).
+  reshuffle_subsets:
+    type: boolean
+    description: Set to `true` to reset the train, test and validation subsets (Only valid when `train_from_scratch` is set to `true`).
+  max_training_dataset_size:
+    type: number
+    description: Defines the maximum dataset size for training. If no value is provided, the whole dataset is used.
+  enable_hyper_parameter_optimization:
+    type: boolean
+    description: |-
+      Boolean that indicates whether to run hyper-parameter optimization (HPO) before training.
+      This field is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  hpo_parameters:
+    type: object
+    description: >
+      These parameters control the automatic hyper parameter optimization process,
+      if it is enabled. If `enable_hyper_parameter_optimization` is set to `true`, the
+      hpo_parameters in this field must be specified. Otherwise, this field can
+      be left empty.
+    properties:
+      hpo_time_ratio:
+        type: number
+        format: float
+        description: >
+          This parameter controls the time allotted for automatic hyper
+          parameter optimization. It is measured in multiples of training time, e.g.
+          setting `hpo_time_ratio` to `4.0` will result in the hpo process taking
+          approximately 4 times as long as a normal training without hpo would.
+    deprecated: true
+  hyper_parameters:
+    $ref: ../../configuration/requests/hyper_parameters.yaml

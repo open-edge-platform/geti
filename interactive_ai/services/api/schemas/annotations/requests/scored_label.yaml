@@ -1,0 +1,6 @@
+type: object
+required:
+  - id
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"

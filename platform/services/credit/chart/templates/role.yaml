@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "credit-system.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "credit-system.labels" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - "batch"
+    resources:
+      - jobs
+    verbs:
+      - watch
+      - get
+      - list
+  - apiGroups:
+      - "apps"
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch

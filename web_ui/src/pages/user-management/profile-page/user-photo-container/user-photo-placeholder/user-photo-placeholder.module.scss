@@ -1,0 +1,22 @@
+.userPhotoPlaceholder {
+    font-size: var(--spectrum-global-dimension-size-900);
+}
+
+.userPhotoUploadPlaceholder {
+    @extend .userPhotoPlaceholder;
+    cursor: pointer;
+}
+
+.userPhotoUploadBtn {
+    color: var(--energy-blue) !important;
+    background-color: transparent !important;
+    border: none;
+
+    & > span {
+        padding-left: 0 !important;
+    }
+
+    &:hover {
+        color: var(--energy-blue);
+    }
+}

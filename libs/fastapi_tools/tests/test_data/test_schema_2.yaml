@@ -1,0 +1,42 @@
+title: Shape
+required:
+  - type
+  - x
+  - y
+  - width
+  - height
+  - points
+type: object
+properties:
+  type:
+    type: string
+  x:
+    type:
+    - "number"
+    - "null"
+  y:
+    type:
+    - "number"
+    - "null"
+  width:
+    type:
+    - "number"
+    - "null"
+  height:
+    type:
+    - "number"
+    - "null"
+  points:
+    type:
+    - "array"
+    - "null"
+    items:
+      $ref: 'point.yaml'
+    description: ''
+example:
+  type: RECTANGLE
+  x: 0.635174036
+  y: 0.393743843
+  width: 0.175549313
+  height: 0.204229221
+  points: ''

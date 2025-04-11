@@ -1,0 +1,11 @@
+in: query
+name: frameskip
+style: form
+description: |-
+  Set to the number of desired frame intervals in the response. For example, to retrieve all frame annotations of the video, set this value to `1`. 
+  If not set, this value will be equal to the video fps. The video fps can be obtained from the response of the [video detail](#Media/GetVideoDetail) 
+  endpoint.   
+schema:
+  type: integer
+  example: 1
+required: false

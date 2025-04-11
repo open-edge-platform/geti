@@ -1,0 +1,20 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  name:
+    type: string
+    description: Name for the result media option
+  type:
+    type: string
+    description: Type of the result media
+  url:
+    type: string
+    description: Url where the result media can be found
+  binary:
+    type: string
+    description: A base 64 encoded representation of the binary data of the result media
+  label_id:
+    $ref: "../../mongo_id.yaml"
+  roi:
+    $ref: "./roi.yaml"

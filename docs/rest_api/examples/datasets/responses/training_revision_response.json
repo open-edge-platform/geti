@@ -1,0 +1,14 @@
+{
+    "id": "619b97d3f19eee235e66b8f3",
+    "subset_info":{
+     "training": 40,
+     "testing": 10,
+     "validation": 10
+ },
+    "dataset_info": {
+     "videos": 1,
+     "frames": 30,
+     "images": 30
+ },
+    "creation_time": "2022-06-18T11:40:34.790000+00:00"
+}

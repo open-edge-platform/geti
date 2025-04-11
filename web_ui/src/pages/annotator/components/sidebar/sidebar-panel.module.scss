@@ -1,0 +1,31 @@
+.panel {
+    --sidebar-size: calc(var(--spectrum-global-dimension-size-600) + 1px);
+    --sidebar-top: calc(var(--spectrum-global-dimension-size-550) + 5px);
+
+    top: var(--sidebar-top);
+    opacity: 0;
+    z-index: 99999;
+    visibility: visible;
+    position: absolute;
+    box-sizing: border-box;
+    overflow: auto;
+    height: calc(100% - var(--sidebar-size));
+    right: calc(var(--sidebar-size) + var(--spectrum-overlay-negative-transform-distance));
+    width: var(--spectrum-global-dimension-size-3600, var(--spectrum-alias-size-3600));
+    transition:
+        transform var(--spectrum-global-animation-duration-100, var(--spectrum-global-animation-duration-100))
+            var(--spectrum-global-animation-ease-in-out),
+        opacity var(--spectrum-global-animation-duration-100, var(--spectrum-global-animation-duration-100))
+            var(--spectrum-global-animation-ease-in-out),
+        visibility 0ms linear
+            var(--spectrum-global-animation-duration-100, var(--spectrum-global-animation-duration-100));
+    background: var(
+        --spectrum-alias-background-color-gray-200,
+        var(--spectrum-global-color-gray-200, var(--spectrum-semantic-gray-200-color-background))
+    );
+}
+
+.panelOpened {
+    opacity: 0.9999;
+    transform: translateX(var(--spectrum-overlay-negative-transform-distance));
+}

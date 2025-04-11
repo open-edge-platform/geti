@@ -1,0 +1,13 @@
+type: object
+properties:
+  n_required_annotations:
+    type: integer
+    description: Required number of annotations before training is allowed
+  n_new_annotations:
+    type: integer
+    description: Number of new annotations that have been added after the last training round
+  status_per_task:
+    type: array
+    description: Array that contains the status of every task
+    items:
+      $ref: "incremental_learning_status_task.yaml"

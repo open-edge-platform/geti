@@ -1,0 +1,5 @@
+in: query
+name: task_id
+description: The ID of the task in the project.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"

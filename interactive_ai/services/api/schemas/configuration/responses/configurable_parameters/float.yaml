@@ -1,0 +1,47 @@
+type: object
+title: Configurable float
+properties:
+  header:
+    type: string
+    description: User friendly title for the float.
+  description:
+    type: string
+    description: User friendly description for what the float does.
+  warning:
+    description: Warning message (if any) that explains the user to use caution when changing this parameter, and why.
+  value:
+    type: number
+    format: float
+    description: Value that this configurable float currently takes.
+  default_value:
+    type: number
+    format: float
+    description: Default value that should be set for this float.
+  name:
+    type: string
+    description: Name to identify the configurable float by in the system.
+  template_type:
+    type: string
+    enum: [input]
+    description: "Describes the template type of the parameter. 'selectable' is used for parameters with a fixed set of
+    possible values. 'input' is used for parameters that allow free input, possibly restricted to a certain range.
+    Template_type is always 'input' for a configurable float."
+  data_type:
+    type: string
+    enum: [float]
+    description: "Describes the type of parameter. Parameters can be integers, floats, boolean or string. Data_type is
+    always 'float' for a configurable float."
+  min_value:
+    type: number
+    format: float
+    description: Minimum value that can be set for this parameter.
+  max_value:
+    type: number
+    format: float
+    description: Minimum value that can be set for this parameter.
+  ui_rules:
+    type: object
+    description: Not implemented at this moment
+  editable:
+    type: boolean
+    description: Not implemented at this moment.

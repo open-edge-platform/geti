@@ -1,0 +1,65 @@
+{
+  "overview": {
+    "images": 5,
+    "videos": 1,
+    "annotated_frames": 5,
+    "annotated_images": 5,
+    "annotated_videos": 1
+  },
+   "tasks": [
+      {
+         "annotated_frames": 5,
+         "annotated_images": 1,
+         "annotated_videos": 1,
+         "objects_per_label": [
+            {
+               "id": "60d31793d5f1fb7e6e3c1a50",
+               "name": "dog",
+               "color": "#ff0000ff",
+               "value": 4
+            }
+         ],
+         "object_size_distribution_per_label": [
+            {
+               "cluster_center": [
+                  160,
+                  112
+               ],
+               "cluster_width_height": [
+                  113,
+                  218
+               ],
+               "id": "60d31793d5f1fb7e6e3c1a50",
+               "color": "#ff0000ff",
+               "name": "dog",
+               "object_distribution_from_aspect_ratio": {
+                  "balanced": 4,
+                  "tall": 0,
+                  "wide": 0
+               },
+               "size_distribution": [
+                  [
+                     160,
+                     60
+                  ],
+                  [
+                     160,
+                     60
+                  ],
+                  [
+                     240,
+                     300
+                  ],
+                  [
+                     80,
+                     30
+                  ]
+               ],
+               "aspect_ratio_threshold_tall": 7.0,
+               "aspect_ratio_threshold_wide": 0.07
+            }
+         ],
+         "task_id": "60d31793d5f1fb7e6e3c1a5b"
+      }
+   ]
+}

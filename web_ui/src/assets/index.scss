@@ -1,0 +1,147 @@
+@import '../theme/geti/geti-global.module.css';
+@import '../theme/geti/geti-dark.module.css';
+@import '../theme/geti/geti-medium.module.css';
+@import 'react-notifications-component/dist/theme.css';
+@import 'fonts/intelone/intelone.css';
+
+@view-transition {
+    navigation: auto;
+}
+
+:root {
+    --intel-blue: #0095ca;
+    --energy-blue: #00c7fd;
+
+    height: 100vh;
+
+    [class*='spectrum'] {
+        font-family: intelOne !important;
+    }
+}
+
+html {
+    font-size: 62.5% !important;
+    padding: 0 !important;
+
+    // These rules will apply to Safari ONLY
+    @supports (font: -apple-system-body) {
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+body {
+    margin: 0;
+    font-family: intelOne !important;
+    max-width: 100vw;
+    scrollbar-width: var(--spectrum-global-dimension-size-65);
+    background-color: var(--spectrum-alias-background-color-default, var(--spectrum-global-color-gray-100));
+    background-image: url(./images/login_background.webp);
+    background-position: top center;
+    background-size: cover;
+}
+
+button,
+li[role='menuitem'],
+li[role='menuitemradio'],
+input[type='checkbox'],
+div[role='tab'],
+div[role='tab'] span {
+    cursor: pointer !important;
+}
+
+input:disabled,
+button:disabled,
+button[class*='is-disabled'],
+li[class*='is-disabled'] {
+    pointer-events: none;
+    cursor: default !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span {
+    font-family: intelOne !important;
+
+    /* Apply this rule only for firefox */
+    @supports (-moz-appearance: none) {
+        font-weight: normal !important;
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 500;
+}
+
+h6 {
+    font-size: 1.6rem;
+}
+
+ul,
+ol,
+nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+div[class*='spectrum-Modal-wrapper'] {
+    z-index: 100000 !important;
+}
+
+/* CUSTOM SVG STYLES */
+
+svg {
+    fill: currentColor;
+}
+
+svg[class*='spectrum-Textfield-validationIcon'][class$='-AlertMedium'] {
+    fill: var(--spectrum-semantic-negative-color-icon) !important;
+}
+
+/* CUSTOM SCROLLBAR STYLES */
+
+::-webkit-scrollbar {
+    width: var(--spectrum-global-dimension-size-65);
+    height: var(--spectrum-global-dimension-size-65);
+}
+
+::-webkit-scrollbar-track {
+    background-color: var(--spectrum-global-color-gray-50);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--spectrum-global-color-gray-400);
+    border-radius: var(--spectrum-global-dimension-size-325);
+}
+
+[class*='spectrum-Radio-input'] {
+    cursor: pointer !important;
+
+    &:checked + [class*='spectrum-Radio-button']:before {
+        border-color: var(--spectrum-global-color-informative) !important;
+    }
+}
+
+.recharts-legend-item-text {
+    color: var(--spectrum-global-color-gray-800) !important;
+}
+
+div[class*='spectrum-Tabs-selectionIndicator'] {
+    background-color: var(--energy-blue) !important;
+}
+
+@media (prefers-reduced-motion) {
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        animation: none;
+    }
+}

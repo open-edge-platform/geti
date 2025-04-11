@@ -1,0 +1,103 @@
+.customTabItemContainer {
+    // size of the button's border
+    border-left: var(--spectrum-global-dimension-size-10) solid transparent;
+    border-right: var(--spectrum-global-dimension-size-10) solid transparent;
+}
+
+.customTabItemName {
+    color: var(--spectrum-global-color-gray-900);
+}
+
+.customTabItemMenuTrigger {
+    border: none !important;
+
+    &:hover,
+    &[class*='is-selected'],
+    &[class*='is-active'] {
+        background-color: transparent !important;
+        border: none !important;
+    }
+}
+
+.noneSelected .tabList div[class*='is-selected']::after {
+    display: none;
+}
+
+/*
+    Overriding vertical tabs is necessary because if the user's monitor display settings
+    are higher than 100%, then spectrum's tabs collapses to a Picker. This doesn't happen on
+    vertical tabs. So we decided to use the vertical tabs logic with horizontal tabs layout.
+
+    https://react-spectrum.adobe.com/react-spectrum/Tabs.html#collapse-overflow-behavior
+ */
+.componentWrapper {
+    box-sizing: border-box;
+
+    div[class*='spectrum-Tabs--vertical'] {
+        border-left: 0 !important;
+        flex-direction: row !important;
+        padding-right: var(--spectrum-global-dimension-size-100) !important;
+
+        > div[class*='Tabs-item'] {
+            margin-bottom: 0 !important;
+            margin-left: 0 !important;
+            box-sizing: border-box !important;
+            display: flex;
+            align-items: center;
+
+            &:first-child {
+                padding-left: 0 !important;
+            }
+        }
+    }
+
+    div[class*='TabsPanel--vertical'] {
+        flex-direction: column !important;
+        padding: 0 !important;
+    }
+}
+
+.tabList {
+    span[class*='spectrum-Tabs-itemLabel'] {
+        font-size: var(--spectrum-global-dimension-font-size-200);
+    }
+
+    div[class*='is-selected']::after {
+        transition: background-color 0.15s ease-in-out;
+        content: '';
+        height: var(--spectrum-global-dimension-size-25);
+        background-color: transparent;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    div[class*='is-selected'] {
+        position: relative;
+
+        &:after {
+            background-color: var(--energy-blue);
+        }
+    }
+
+    div[class*='spectrum-Tabs-selectionIndicator'] {
+        display: none;
+    }
+
+    &.emptySelection {
+        div[class*='is-selected'] {
+            color: var(--spectrum-tabs-text-color, var(--spectrum-alias-label-text-color));
+        }
+    }
+
+    > div {
+        border-bottom-width: 0;
+    }
+}
+
+.tabWrapper {
+    border-bottom: var(--spectrum-global-dimension-size-10) solid
+        var(--spectrum-tabs-rule-color, var(--spectrum-global-color-gray-200)) !important;
+    box-sizing: border-box !important;
+}

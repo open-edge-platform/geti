@@ -1,0 +1,67 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024, Intel Corporation.
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+.textFieldReadOnly input {
+    border: none;
+    background-color: transparent;
+    &:hover {
+        cursor: default;
+    }
+    &:active {
+        color: currentColor;
+    }
+}
+
+.balanaceField {
+    ::before {
+        position: absolute;
+        top: var(--spectrum-global-dimension-size-100);
+        left: var(--spectrum-global-dimension-size-150);
+        width: var(--spectrum-global-dimension-size-200);
+        text-align: center;
+        padding: var(--spectrum-global-dimension-size-100) 0;
+        color: var(--spectrum-global-color-gray-700);
+        background-color: var(--spectrum-global-color-gray-400);
+    }
+
+    input {
+        padding-left: var(--spectrum-global-dimension-size-400);
+    }
+}
+
+.balanaceFieldAdd {
+    @extend .balanaceField;
+
+    div:has(input[type='text'])::before {
+        content: '+';
+    }
+}
+
+.balanaceFieldSubtract {
+    @extend .balanaceField;
+
+    div:has(input[type='text'])::before {
+        content: '-';
+    }
+}
+
+.balanceActionGroup {
+    --spectrum-accent-background-color-default: var(--energy-blue);
+    --spectrum-accent-background-color-hover: var(--energy-blue-shade);
+    --spectrum-accent-background-color-key-focus: var(--energy-blue-shade);
+    --spectrum-high-contrast-highlight-text: var(--spectrum-global-color-gray-100);
+}
+
+.dialogFormButtonGroup {
+    justify-content: end;
+    margin-top: var(--spectrum-global-dimension-size-400) !important;
+}

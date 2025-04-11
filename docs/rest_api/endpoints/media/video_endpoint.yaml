@@ -1,0 +1,100 @@
+get:
+  tags:
+    - Media
+  summary: Get video detail
+  description: "Retrieves the detail of a video."
+  operationId: GetVideoDetail
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+  responses:
+    '200':
+      description: The requested detailed video info. The 'size' field represents bits, "duration" is in seconds.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/media/responses/video.yaml"
+          examples:
+            Get image detail:
+              value:
+                $ref: "../../examples/media/responses/single_video.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"
+
+delete:
+  tags:
+    - Media
+  summary: Delete a video
+  description: Delete a video from a dataset. This operation is not reversible.
+  operationId: DeleteAVideo
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+  responses:
+    '200':
+      description: The video was successfully deleted
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            Video deleted successfully:
+              value: { "result": "success" }
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"
+    '409':
+      description: Requested video cannot be deleted due to running jobs connected to the video
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Cannot delete media response:
+              value:
+                $ref: "../../examples/media/error_responses/project_locked.json"

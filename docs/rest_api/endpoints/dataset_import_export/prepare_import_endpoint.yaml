@@ -1,0 +1,71 @@
+post:
+  tags:
+    - Dataset Import/Export
+  summary: Prepare a dataset to be imported as a new project
+  description: |-
+    Analyze an uploaded dataset archive file and prepare it to be imported as a new project.
+
+    This endpoint submits a job to prepare the dataset for import. Specifically, the job scans the dataset 
+    to determine the compatible task types and to identify potential issues in the data.
+    The status of this operation can be monitored in real-time through the [job status endpoint](#Jobs/GetJob);
+    once the job is finished, the list of compatible task types, labels and warnings can be found in the job metadata.
+  operationId: PrepareDatasetForImport
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/query/file_id.yaml'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Job submitted successfully:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          examples:
+            File ID in wrong format:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_file_id.json'
+            An export dataset is used to import:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/import_from_export_dataset_error.json"
+    '404':
+      description: File not found
+      content:
+        application/json:
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Dataset file not found:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/no_dataset_file_found.json"
+    '409':
+      description: Conflict
+      content:
+        application/json:
+          examples:
+            Max projects reached:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/max_projects_reached.json"
+            Max labels reached:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/max_labels_reached.json"
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          examples:
+            File not fully uploaded:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/file_not_fully_uploaded.json"

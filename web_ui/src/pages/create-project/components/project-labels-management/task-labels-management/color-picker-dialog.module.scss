@@ -1,0 +1,20 @@
+.dialog {
+    min-width: 0;
+    width: fit-content;
+
+    & > div {
+        display: block !important;
+    }
+}
+
+.colorHexInput {
+    background-color: var(--spectrum-global-color-gray-50);
+    border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-alias-border-color);
+    padding: var(--spectrum-global-dimension-static-size-40) var(--spectrum-global-dimension-static-size-125);
+    border-radius: var(--spectrum-alias-border-radius-regular);
+
+    &:focus-visible {
+        border-color: var(--spectrum-alias-border-color-mouse-focus);
+        outline: none;
+    }
+}

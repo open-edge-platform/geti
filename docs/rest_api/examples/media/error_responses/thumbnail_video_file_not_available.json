@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Thumbnail video for video with ID is not ready yet. Generation of the thumbnail video has been queued.",
+  "error_code": "thumbnail_video_not_found"
+}

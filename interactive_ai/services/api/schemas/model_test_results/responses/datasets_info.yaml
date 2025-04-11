@@ -1,0 +1,25 @@
+type: array
+description: Array of datasets
+items:
+  type: object
+  properties:
+    id:
+      $ref: '../../mongo_id.yaml'
+    is_deleted:
+      type: boolean
+      description: boolean showing whether the dataset is deleted
+    name:
+      type: string
+      description: Name of the dataset
+    n_images:
+      type: number
+      format: int32
+      description: Number of images in the dataset
+    n_frames:
+      type: number
+      format: int32
+      description: Number of frames in the dataset
+    n_samples:
+      type: number
+      format: int32
+      description: Number of samples in the dataset

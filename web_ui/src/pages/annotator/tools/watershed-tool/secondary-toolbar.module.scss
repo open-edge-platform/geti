@@ -1,0 +1,16 @@
+.picker {
+    align-items: center !important;
+
+    * {
+        font-size: var(--spectrum-global-dimension-font-size-50) !important;
+    }
+
+    button {
+        height: var(--spectrum-global-dimension-size-250);
+        background-color: var(--spectrum-global-color-gray-100);
+    }
+}
+
+.brushSizePreviewDivider {
+    background-color: var(--spectrum-global-color-gray-300);
+}

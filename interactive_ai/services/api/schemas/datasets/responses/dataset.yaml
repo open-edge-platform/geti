@@ -1,0 +1,14 @@
+type: object
+properties:
+  id:
+    $ref: '../../mongo_id.yaml'
+  name:
+    type: string
+    description: 'Dataset name'
+    minLength: 1
+  use_for_training:
+    type: boolean
+    description: 'Whether dataset is used for training'
+  creation_time:
+    type: string
+    description: 'Creation time of the dataset'

@@ -1,0 +1,10 @@
+required:
+  - http_status
+  - message
+properties:
+  http_status:
+    type: integer
+    enum: [200, 201, 202, 203, 204, 205, 206]
+  message:
+    type: string
+    description: "Message from server"

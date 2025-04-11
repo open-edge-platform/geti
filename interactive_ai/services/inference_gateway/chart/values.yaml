@@ -1,0 +1,71 @@
+image: inference-gateway
+imagePullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+
+securityContext:
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - all
+
+service:
+  type: ClusterIP
+  port: 7000
+
+ingress:
+  endpoints:
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*)/status
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*)/status
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):predict
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*):predict
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):explain
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*):explain
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):batch_predict
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*):batch_predict
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):batch_explain
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*):batch_explain
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):batch_predict_stream
+    - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*):batch_predict_stream
+
+resources:
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+  limits:
+    memory: 1Gi # if you change this value, remember to update 'global.mem_limit' too
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+modelMesh:
+  service: "modelmesh-serving.impt"
+  port: "8033"
+
+mountPath: "/binary_data"
+
+global:
+  security_headers: ''
+  stripped_headers: ''
+  docker_namespace: impp
+  enable_master_node_selector: true
+  storage_volume_claim_name_media: ''
+  min_free_disk_space_gib: 20
+  running_on_vm: false
+  mem_limit: 900MiB # 90% of the hard memory limit https://go.dev/doc/gc-guide#Memory_limit
+  max_multipart_memory_mb: 64 # the value should be aligned with the model-serving gRPC message size limit
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false

@@ -1,0 +1,421 @@
+{
+  "global": [
+    {
+      "description": "Specify the project-level configuration for active learning.",
+      "entity_identifier": {
+        "component": "PROJECT_ACTIVE_LEARNING",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "type": "COMPONENT_PARAMETERS",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab"
+      },
+      "header": "Active Learning",
+      "id": "62b2d940f54b4b5f9e4dcb36",
+      "parameters": [
+        {
+          "data_type": "string",
+          "default_value": "mean",
+          "description": "Function to aggregate the active scores of a media across the tasks",
+          "editable": true,
+          "enum_name": "ActiveScoreReductionFunction",
+          "header": "Inter-task scores reduction function",
+          "name": "inter_task_reduce_fn",
+          "options": [
+            "min",
+            "mean",
+            "max"
+          ],
+          "template_type": "selectable",
+          "ui_rules": {},
+          "value": "mean",
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 500,
+          "description": "Number of images analysed after training for active learning",
+          "editable": true,
+          "header": "Number of images analysed after training for active learning",
+          "max_value": 10000,
+          "min_value": 10,
+          "name": "max_unseen_media",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 500,
+          "warning": null
+        }
+      ],
+      "type": "CONFIGURABLE_PARAMETERS"
+    },
+    {
+      "description": "Specify parameters to control how datasets are managed in the system.",
+      "entity_identifier": {
+        "component": "PIPELINE_DATASET_MANAGER",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "type": "COMPONENT_PARAMETERS",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab"
+      },
+      "header": "Dataset management",
+      "id": "62b2d940f54b4b5f9e4dcb39",
+      "parameters": [
+        {
+          "data_type": "boolean",
+          "default_value": false,
+          "description": "Enabling NDR will help to prevent annotating very similar images. Note that this does not remove any data from the project,it is only used in selecting images for active learning.",
+          "editable": true,
+          "header": "Use Near Duplicate Removal (NDR) for active learning",
+          "name": "use_ndr",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": false,
+          "warning": null
+        }
+      ],
+      "type": "CONFIGURABLE_PARAMETERS"
+    }
+  ],
+  "task_chain": [
+    {
+      "components": [
+        {
+          "description": "Learning Parameters",
+          "entity_identifier": {
+            "group_name": "learning_parameters",
+            "model_storage_id": "62b2d9408fd8d1af66e5af0b",
+            "type": "HYPER_PARAMETER_GROUP",
+            "workspace_id": "62a9d380e287f1fcd1eed0ab"
+          },
+          "header": "Learning Parameters",
+          "id": "62b2d9478fd8d1af66e5af12-0",
+          "name": "learning_parameters",
+          "parameters": [
+            {
+              "data_type": "integer",
+              "default_value": 32,
+              "description": "The number of training samples seen in each iteration of training. Increasing this value improves training time and may make the training more stable. A larger batch size has higher memory requirements.",
+              "editable": true,
+              "header": "Batch size",
+              "max_value": 512,
+              "min_value": 1,
+              "name": "batch_size",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": 32,
+              "warning": "Increasing this value may cause the system to use more memory than available, potentially causing out of memory errors, please update with caution."
+            },
+            {
+              "data_type": "boolean",
+              "default_value": false,
+              "description": "Learning rate parameter value will be ignored if enabled.",
+              "editable": true,
+              "header": "Enable automatic learing rate estimation",
+              "name": "enable_lr_finder",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": false,
+              "warning": null
+            },
+            {
+              "data_type": "float",
+              "default_value": 0.007,
+              "description": "Increasing this value will speed up training convergence but might make it unstable.",
+              "editable": true,
+              "header": "Learning rate",
+              "max_value": 0.1,
+              "min_value": 1e-7,
+              "name": "learning_rate",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": 0.007,
+              "warning": null
+            },
+            {
+              "data_type": "integer",
+              "default_value": 200,
+              "description": "Increasing this value causes the results to be more robust but training time will be longer.",
+              "editable": true,
+              "header": "Maximum number of training epochs",
+              "max_value": 1000,
+              "min_value": 1,
+              "name": "max_num_epochs",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": 200,
+              "warning": null
+            }
+          ],
+          "type": "PARAMETER_GROUP"
+        },
+        {
+          "description": "Specify the distribution of annotated samples over the training, validation and test sets.",
+          "entity_identifier": {
+            "component": "SUBSET_MANAGER",
+            "project_id": "62b2d9408fd8d1af66e5af07",
+            "task_id": "62b2d9408fd8d1af66e5af06",
+            "type": "COMPONENT_PARAMETERS",
+            "workspace_id": "62a9d380e287f1fcd1eed0ab"
+          },
+          "groups": [
+            {
+              "description": "Specify the distributions of annotated samples over training, validation and test set.",
+              "header": "Subset distribution",
+              "name": "subset_parameters",
+              "parameters": [
+                {
+                  "data_type": "float",
+                  "default_value": 0.3,
+                  "description": "Fraction of annotated data that will be assigned to the test set",
+                  "editable": true,
+                  "header": "Test set proportion",
+                  "max_value": 1,
+                  "min_value": 0.1,
+                  "name": "test_proportion",
+                  "template_type": "input",
+                  "ui_rules": {
+                    "action": "SHOW",
+                    "operator": "AND",
+                    "rules": [
+                      {
+                        "operator": "EQUAL_TO",
+                        "parameter": [
+                          "auto_subset_fractions"
+                        ],
+                        "type": "RULE",
+                        "value": false
+                      }
+                    ],
+                    "type": "UI_RULES"
+                  },
+                  "value": 0.3,
+                  "warning": null
+                },
+                {
+                  "data_type": "float",
+                  "default_value": 0.5,
+                  "description": "Fraction of annotated data that will be assigned to the training set",
+                  "editable": true,
+                  "header": "Training set proportion",
+                  "max_value": 1,
+                  "min_value": 0.1,
+                  "name": "train_proportion",
+                  "template_type": "input",
+                  "ui_rules": {
+                    "action": "SHOW",
+                    "operator": "AND",
+                    "rules": [
+                      {
+                        "operator": "EQUAL_TO",
+                        "parameter": [
+                          "auto_subset_fractions"
+                        ],
+                        "type": "RULE",
+                        "value": false
+                      }
+                    ],
+                    "type": "UI_RULES"
+                  },
+                  "value": 0.5,
+                  "warning": null
+                },
+                {
+                  "data_type": "float",
+                  "default_value": 0.2,
+                  "description": "Fraction of annotated data that will be assigned to the validation set",
+                  "editable": true,
+                  "header": "Validation set proportion",
+                  "max_value": 1,
+                  "min_value": 0.1,
+                  "name": "validation_proportion",
+                  "template_type": "input",
+                  "ui_rules": {
+                    "action": "SHOW",
+                    "operator": "AND",
+                    "rules": [
+                      {
+                        "operator": "EQUAL_TO",
+                        "parameter": [
+                          "auto_subset_fractions"
+                        ],
+                        "type": "RULE",
+                        "value": false
+                      }
+                    ],
+                    "type": "UI_RULES"
+                  },
+                  "value": 0.2,
+                  "warning": null
+                }
+              ],
+              "type": "PARAMETER_GROUP"
+            }
+          ],
+          "header": "Subset splitting",
+          "id": "62b2d940f54b4b5f9e4dcb34",
+          "parameters": [
+            {
+              "data_type": "boolean",
+              "default_value": true,
+              "description": "If this setting is enabled, the system will automatically determine the most optimal distribution of the annotated samples over training, validation and test set. Disable this setting to manually specify the proportions.",
+              "editable": true,
+              "header": "Automatically determine subset proportions",
+              "name": "auto_subset_fractions",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": true,
+              "warning": null
+            }
+          ],
+          "type": "CONFIGURABLE_PARAMETERS"
+        },
+        {
+          "description": "Specify the number of required annotations for a task",
+          "entity_identifier": {
+            "component": "DATASET_COUNTER",
+            "project_id": "62b2d9408fd8d1af66e5af07",
+            "task_id": "62b2d9408fd8d1af66e5af06",
+            "type": "COMPONENT_PARAMETERS",
+            "workspace_id": "62a9d380e287f1fcd1eed0ab"
+          },
+          "header": "Annotation requirements",
+          "id": "62b2d940f54b4b5f9e4dcb35",
+          "parameters": [
+            {
+              "data_type": "boolean",
+              "default_value": true,
+              "description": "If this is ON, the first training will only be triggered when each label is present in N images, while N is number of required images for the first training. Otherwise, first training will be triggered when N images have been annotated. If first training has been triggered, this parameter will not take effect.",
+              "editable": true,
+              "header": "Label constraint for the first training",
+              "name": "label_constraint_first_training",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": true,
+              "warning": null
+            },
+            {
+              "data_type": "integer",
+              "default_value": 6,
+              "description": "The minimum number of new annotations required before auto-train is triggered. Auto-training will start every time that this number of annotations is created.",
+              "editable": true,
+              "header":"Number of images required for auto-training",
+              "max_value": 10000,
+              "min_value": 3,
+              "name": "required_images_auto_training",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": 6,
+              "warning": null
+            },
+            {
+              "data_type": "boolean",
+              "default_value": true,
+              "description": "Only applicable if auto-training is on. Set this parameter on to let the system dynamically compute the number of required annotations between training rounds based on model performance and training dataset size.",
+              "editable": true,
+              "header": "Dynamic required annotations",
+              "name": "use_dynamic_required_annotations",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": false,
+              "warning": null
+            }
+          ],
+          "type": "CONFIGURABLE_PARAMETERS"
+        },
+        {
+          "description": "Specify the task-level configuration for active learning.",
+          "entity_identifier": {
+            "component": "TASK_ACTIVE_LEARNING",
+            "project_id": "62b2d9408fd8d1af66e5af07",
+            "task_id": "62b2d9408fd8d1af66e5af06",
+            "type": "COMPONENT_PARAMETERS",
+            "workspace_id": "62a9d380e287f1fcd1eed0ab"
+          },
+          "groups": [
+            {
+              "description": "Score extractors",
+              "header": "Score extractors",
+              "name": "preprocessing",
+              "parameters": [
+                {
+                  "data_type": "boolean",
+                  "default_value": true,
+                  "description": "The feature vector score extractor outputs scores which reflect the distances between the known and unknown samples in the latent space.",
+                  "editable": true,
+                  "header": "Enable feature vector score extractor",
+                  "name": "feature_vector_extractor",
+                  "template_type": "input",
+                  "ui_rules": {},
+                  "value": true,
+                  "warning": null
+                },
+                {
+                  "data_type": "boolean",
+                  "default_value": true,
+                  "description": "The uncertainty score extractor outputs scores which reflect the uncertainty of the predictions on the respective media",
+                  "editable": true,
+                  "header": "Enable uncertainty score extractor",
+                  "name": "uncertainty_extractor",
+                  "template_type": "input",
+                  "ui_rules": {},
+                  "value": true,
+                  "warning": null
+                }
+              ],
+              "type": "PARAMETER_GROUP"
+            }
+          ],
+          "header": "Active Learning",
+          "id": "62b2d940f54b4b5f9e4dcb37",
+          "parameters": [
+            {
+              "data_type": "string",
+              "default_value": "mean",
+              "description": "Function to aggregate the active scores of a media within a task",
+              "editable": true,
+              "enum_name": "ActiveScoreReductionFunction",
+              "header": "Intra-task scores reduction function",
+              "name": "intra_task_reduce_fn",
+              "options": [
+                "min",
+                "mean",
+                "max"
+              ],
+              "template_type": "selectable",
+              "ui_rules": {},
+              "value": "mean",
+              "warning": null
+            }
+          ],
+          "type": "CONFIGURABLE_PARAMETERS"
+        },
+        {
+          "description": "General settings for a task.",
+          "entity_identifier": {
+            "component": "TASK_NODE",
+            "project_id": "62b2d9408fd8d1af66e5af07",
+            "task_id": "62b2d9408fd8d1af66e5af06",
+            "type": "COMPONENT_PARAMETERS",
+            "workspace_id": "62a9d380e287f1fcd1eed0ab"
+          },
+          "header": "General",
+          "id": "62b2d940f54b4b5f9e4dcb38",
+          "parameters": [
+            {
+              "data_type": "boolean",
+              "default_value": true,
+              "description": "Enable to allow the task to start training automatically when it is ready to train.",
+              "editable": true,
+              "header": "Auto-training",
+              "name": "auto_training",
+              "template_type": "input",
+              "ui_rules": {},
+              "value": true,
+              "warning": null
+            }
+          ],
+          "type": "CONFIGURABLE_PARAMETERS"
+        }
+      ],
+      "task_id": "62b2d9408fd8d1af66e5af06",
+      "task_title": "Classification task"
+    }
+  ]
+}

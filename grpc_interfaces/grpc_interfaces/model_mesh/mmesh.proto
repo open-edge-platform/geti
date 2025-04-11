@@ -1,0 +1,231 @@
+/*
+ * Copyright 2021 IBM Corporation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+
+syntax = "proto3";
+package mmesh;
+
+option go_package = "/modelmesh";
+
+// this is a grpc version of the external model-mesh interface
+// for managing and serving models
+service ModelMesh {
+
+  /* model lifecycle rpcs */
+
+  // Registers a trained model to this model-mesh cluster
+  rpc registerModel(RegisterModelRequest) returns (ModelStatusInfo) {}
+  // Unregisters (deletes) a model from this model-mesh cluster,
+  // has no effect if the specified model isn't found
+  rpc unregisterModel(UnregisterModelRequest)
+      returns (UnregisterModelResponse) {}
+
+  // Returns the status of the specified model. See the ModelStatus enum
+  rpc getModelStatus(GetStatusRequest) returns (ModelStatusInfo) {}
+  // Ensures the model with the specified id is loaded in this model-mesh
+  // cluster
+  rpc ensureLoaded(EnsureLoadedRequest) returns (ModelStatusInfo) {}
+
+  /* vmodel lifecycle rpcs */
+
+  // Creates a new vmodel id (alias) which maps to a new or existing
+  // concrete model, or sets the target model for an existing vmodel
+  // to a new or existing concrete model
+  rpc setVModel(SetVModelRequest) returns (VModelStatusInfo) {}
+
+  // Deletes a vmodel, optionally deleting any referenced concrete
+  // models at the same time
+  rpc deleteVModel(DeleteVModelRequest) returns (DeleteVModelResponse) {}
+
+  // Gets the status of a vmodel, including associated target/active model ids
+  // If the vmodel is not found, the returned VModelStatusInfo will have empty
+  // active and target model ids and an active model status of NOT_FOUND
+  rpc getVModelStatus(GetVModelStatusRequest) returns (VModelStatusInfo) {}
+
+  // TODO ensureVModelLoaded TBD
+}
+
+message RegisterModelRequest {
+  string modelId = 1;
+
+  ModelInfo modelInfo = 2;
+  // whether the model should be loaded immediately
+  bool loadNow = 3;
+  // if loadNow is true, whether this method should block until the load
+  // completes
+  bool sync = 4;
+
+  // OPTIONAL, ADVANCED - lastUsed timestamp to assign to newly registered
+  // model, for initial priority in cache. This should not typically be set
+  // (defaults to "recent")
+  uint64 lastUsedTime = 5;
+}
+
+// Parameters holding information necessary to locate and load a given model,
+// optional and for use only by your model runtime logic - they are passed to
+// the model runtime loadModel api each time the model is loaded.
+// These should *not* be use to store large amounts of data - the size of the
+// strings should be as small as possible.
+message ModelInfo {
+  // arbitrary model metadata parameter, must be non-empty
+  string type = 1;
+  // arbitrary model metadata parameter
+  string path = 2;
+  // arbitrary model metadata parameter
+  string key = 3;
+}
+
+message ModelStatusInfo {
+  enum ModelStatus {
+    // model is not registered with the cluster
+    NOT_FOUND = 0;
+    // model is registered but not currently loaded anywhere
+    NOT_LOADED = 1;
+    // model is in the process of loading somewhere (and otherwise not loaded)
+    LOADING = 2;
+    // model is loaded in at least one cluster instance
+    LOADED = 3;
+    // model loading failed; will be retried periodically
+    LOADING_FAILED = 4;
+    UNKNOWN = 5;
+  }
+  message ModelCopyInfo {
+    // id of instance in which the model copy resides
+    string location = 1;
+    // status of this copy, one of LOADING, LOADED, LOADING_FAILED, UNKNOWN
+    ModelStatus copyStatus = 2;
+    // time of latest state change
+    uint64 time = 3;
+  }
+  ModelStatus status = 1;
+  repeated string errors = 2;
+  // Internal state of individual copies of this model - intended for
+  // debugging/advanced uses only. The top-level model status field
+  // should be sufficient for most cases. Arranged in reverse chronological
+  // order.
+  repeated ModelCopyInfo modelCopyInfos = 3;
+}
+
+message UnregisterModelRequest { string modelId = 1; }
+
+message UnregisterModelResponse {}
+
+message GetStatusRequest { string modelId = 1; }
+
+message EnsureLoadedRequest {
+  string modelId = 1;
+  // timestamp to use when touching the model, 0 for "now" (default)
+  uint64 lastUsedTime = 2;
+
+  // DEPRECATED - don't use field #3
+  // repeated string excludeInstances = 3;
+  reserved 3;
+
+  // whether to block until specified model completes loading
+  bool sync = 4;
+}
+
+/* vmodel api messages below here */
+
+message VModelStatusInfo {
+  enum VModelStatus {
+    // vmodel is not registered with the cluster
+    NOT_FOUND = 0;
+    // vmodel is registered and in a steady-state (activeModelId ==
+    // targetModelId)
+    DEFINED = 1;
+    // vmodel is waiting for a new target model to be ready before
+    // transitioning to it (activeModelId != targetModelId)
+    TRANSITIONING = 2;
+    // the target model failed to load and so the transition is blocked;
+    // will be retried periodically so *may* automatically recover from this
+    // state
+    TRANSITION_FAILED = 3;
+    UNKNOWN = 5;
+  }
+  VModelStatus status = 1;
+  // id of underlying model to which apply/prediction
+  // requests sent to this vmodel will be routed
+  string activeModelId = 2;
+  // if targetModelId is not equal to activeModelId
+  // then the vmodel is in a transitional state (waiting for
+  // the target model to be in an appropriate state before
+  // it's promoted to be the active model)
+  string targetModelId = 3;
+  // status of the currently active model
+  ModelStatusInfo activeModelStatus = 4;
+  // status of the target model, set only if targetModelId != activeModelId
+  ModelStatusInfo targetModelStatus = 5;
+  // the owner of this vmodel, if any
+  string owner = 6;
+}
+
+message DeleteVModelRequest {
+  string vModelId = 1;
+
+  // if provided the specified vmodel will be deleted only if its owner matches
+  string owner = 2;
+}
+
+message DeleteVModelResponse {}
+
+message SetVModelRequest {
+  string vModelId = 1;
+
+  // if set and the vmodel does not already exist, it will be created with this
+  // owner. if set and the vmodel already exists, the existing vmodel's owner
+  // must match or else the call will fail with an ALREADY_EXISTS error
+  string owner = 10;
+
+  string targetModelId = 2;
+
+  // if true, the request will fail with NOT_FOUND if the vmodel does not
+  // already exist; if false, non-existent vmodel ids will be created
+  bool updateOnly = 3;
+  // optional ModelInfo for target model - if provided then target model will be
+  // created, otherwise it's expected to already exist
+  ModelInfo modelInfo = 4;
+  // whether the newly created target model should be automatically deleted
+  // once no longer referenced by any vmodel(s); applies only if modelInfo is
+  // provided
+  bool autoDeleteTargetModel = 5;
+  // whether the new target model should be loaded immediately, even if the
+  // current active model isn't loaded (otherwise the target model will be
+  // loaded to the same scale as the current active model before it becomes the
+  // active model)
+  bool loadNow = 6;
+  // if true, the active model will be updated immediately, regardless of the
+  // relative states of the target and currently-active models
+  bool force = 7;
+  // whether this method should block until the transition completes. if the
+  // vmodel didn't already exist and loadNow is set to true, this will cause the
+  // method to block until the target of the newly created vmodel has completed
+  // loading
+  bool sync = 8;
+  // if provided, the request will only succeed (atomically) if the value
+  // matches the vmodel's current targetModelId. If the provided value is equal
+  // to the targetModelId in this same request message, the request will succeed
+  // only if the vmodel doesn't already exist *or* exists with the same
+  // targetModelId (in the latter case having no effect)
+  string expectedTargetModelId = 9;
+}
+
+message GetVModelStatusRequest {
+  string vModelId = 1;
+
+  // if provided the specified vmodel must have matching owner or else the
+  // returned response will indicate not found
+  string owner = 2;
+}

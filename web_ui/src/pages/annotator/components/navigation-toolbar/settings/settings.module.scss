@@ -1,0 +1,48 @@
+.dialogWrapper {
+    background-color: var(--spectrum-global-color-gray-75);
+    width: 864px !important;
+    min-width: var(--spectrum-global-dimension-size-6000) !important;
+}
+
+.tabList {
+    border-right: 1px solid var(--spectrum-global-color-gray-400);
+    border-left: 0 !important;
+
+    div:last-child {
+        display: none !important;
+    }
+
+    [class*='spectrum-Tabs-item_'] {
+        border-radius: var(--spectrum-global-dimension-size-65);
+        border: 1px solid var(--spectrum-global-color-gray-400);
+        color: var(--spectrum-global-color-gray-800);
+        height: var(--spectrum-global-dimension-size-500);
+        padding: var(--spectrum-global-dimension-size-150) var(--spectrum-global-dimension-size-200) !important;
+        margin: 0 0 var(--spectrum-global-dimension-size-100) 0 !important;
+        width: var(--spectrum-global-dimension-size-3000);
+        line-height: normal;
+
+        &:before {
+            content: none !important;
+        }
+
+        &[class*='is-selected'] {
+            background-color: var(--spectrum-global-color-gray-200);
+        }
+    }
+
+    [class*='spectrum-Tabs-itemLabel'] {
+        display: inline;
+        line-height: var(--spectrum-global-dimension-size-175);
+    }
+}
+
+.tabPanels {
+    margin-left: var(--spectrum-global-dimension-size-300);
+}
+
+.dialogContent {
+    padding: var(--spectrum-global-dimension-size-300) !important;
+    height: var(--spectrum-global-dimension-size-3000);
+    background-color: var(--spectrum-global-color-gray-50);
+}

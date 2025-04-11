@@ -1,0 +1,92 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2022 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { defaultTheme, Provider } from '@adobe/react-spectrum';
+import { fireEvent, RenderResult, screen } from '@testing-library/react';
+
+import { ExportDatasetLSData, ExportFormats } from '../../../../../core/projects/dataset.interface';
+import { downloadFile, getDownloadNotificationMessage } from '../../../../../shared/utils';
+import { providersRender as render } from '../../../../../test-utils/required-providers-render';
+import { ExportDatasetDownload } from './export-dataset-download.component';
+
+jest.mock('../../../hooks/use-export-dataset.hook', () => ({
+    ...jest.requireActual('../../../hooks/use-export-dataset.hook'),
+    useExportDataset: jest.fn(() => ({ exportDatasetStatus: {} })),
+}));
+jest.mock('../../../../../shared/utils', () => ({
+    ...jest.requireActual('../../../../../shared/utils'),
+    downloadFile: jest.fn(),
+}));
+
+const mockLocalStorage: ExportDatasetLSData = {
+    datasetId: '123',
+    exportFormat: ExportFormats.COCO,
+    isPrepareDone: false,
+    exportDatasetId: '321',
+    downloadUrl: 'downloadUrl-test',
+    datasetName: 'testDataset',
+};
+
+describe('ExportDatasetDownload', () => {
+    const renderApp = (
+        localStorageData = mockLocalStorage
+    ): { mockOnCloseDownload: jest.Mock; component: RenderResult } => {
+        const mockOnCloseDownload = jest.fn();
+
+        const component = render(
+            <Provider theme={defaultTheme}>
+                <ExportDatasetDownload localStorageData={localStorageData} onCloseDownload={mockOnCloseDownload} />
+            </Provider>
+        );
+
+        return { mockOnCloseDownload, component };
+    };
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('empty `localStorageData` return empty', async () => {
+        renderApp({ ...mockLocalStorage, downloadUrl: '' });
+
+        expect(screen.queryByLabelText('export-dataset-download')).not.toBeInTheDocument();
+    });
+
+    it('calls "onCloseDownload" after closing', async () => {
+        const { mockOnCloseDownload } = renderApp();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+
+        expect(mockOnCloseDownload).toHaveBeenNthCalledWith(1, mockLocalStorage.datasetId);
+    });
+
+    it('triggers download and closes the view', async () => {
+        const { mockOnCloseDownload } = renderApp();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Download' }));
+
+        expect(downloadFile).toHaveBeenCalledWith(
+            `/api/${mockLocalStorage.downloadUrl}`,
+            `intel_geti_${mockLocalStorage.datasetId}.zip`
+        );
+        expect(mockOnCloseDownload).toHaveBeenCalledWith(mockLocalStorage.datasetId);
+        expect(await screen.findByText(getDownloadNotificationMessage('dataset'))).toBeInTheDocument();
+    });
+
+    it('renders dataset size after job "prepare" step is done', async () => {
+        renderApp({ ...mockLocalStorage, downloadUrl: 'fake-download-url', isPrepareDone: true, size: 12000000 });
+
+        expect(screen.getByText('Dataset "testDataset" is ready to download.')).toBeInTheDocument();
+        expect(screen.getByText('Format: COCO')).toBeInTheDocument();
+        expect(screen.getByText('Size: 12 MB')).toBeInTheDocument();
+    });
+});

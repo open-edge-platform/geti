@@ -1,0 +1,110 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "auth-proxy.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "auth-proxy.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "auth-proxy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "auth-proxy.labels" . | nindent 8 }}
+      annotations:
+        {{- if not .Values.global.istio_ambient_mesh }}
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "auth-proxy.name" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.http }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.http }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.service.ports.grpc }}
+              protocol: TCP
+            - name: http
+              containerPort: {{ .Values.service.ports.http }}
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: {{ .Values.global.logging_config_dir }}
+            - name: {{ .Values.certificate.volumeName }}
+              mountPath: {{ .Values.certificate.mountPath }}
+              readOnly: true
+          env:
+            - name: ACCOUNT_SERVICE_ADDRESS
+              value: "{{ .Release.Namespace }}-account-service.{{ .Release.Namespace }}.svc.cluster.local:5001"
+            - name: JWT_CERTIFICATE_PRIVATE_KEY_PATH
+              value: {{ .Values.certificate.mountPath }}/tls.key
+            - name: JWT_CERTIFICATE_PUBLIC_KEY_PATH
+              value: {{ .Values.certificate.mountPath }}/tls.crt
+            - name: JWKS_UPDATE_TIME
+              value: {{ .Values.certificate.jwksUpdateTime }}
+            - name: JWKS_ENTRY_EXPIRATION
+              value: {{ .Values.certificate.jwksEntryExpiration }}
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: ISS_INTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-authentication
+                  key: admin-issuer
+                  optional: true
+            - name: AUD_INTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-authentication
+                  key: admin-audience
+                  optional: true
+            - name: ISS_EXTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-authentication
+                  key: platform-issuer
+                  optional: true
+            - name: AUD_EXTERNAL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-authentication
+                  key: platform-audience
+                  optional: true
+            - name: REQUIRED_ROLES
+              valueFrom:
+                configMapKeyRef:
+                  name: config-authentication
+                  key: required-roles
+                  optional: true
+            - name: HTTP_SERVER_PORT
+              value: "{{ .Values.service.ports.http }}"
+        {{- range $key, $val := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+        {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - name: {{ .Values.certificate.volumeName }}
+          secret:
+            secretName: {{ .Values.certificate.secretName }}

@@ -1,0 +1,9 @@
+type: object
+properties:
+  type:
+    type: string
+    enum: [video_frame]
+  video_id:
+    $ref: "../../mongo_id.yaml"
+  frame_index:
+    type: integer

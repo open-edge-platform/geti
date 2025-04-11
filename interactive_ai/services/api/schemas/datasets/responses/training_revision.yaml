@@ -1,0 +1,45 @@
+type: object
+properties:
+  id:
+    description: Number of images in the dataset
+    type: number
+    format: int32
+  creation_time:
+    type: string
+    description: Creation time of the project
+  subset_info:
+    description: Number of items in each subset
+    type: array
+    items:
+      type: object
+      properties:
+        training:
+          type: number
+          format: int32
+          description: Number of media in the training set
+        testing:
+          type: number
+          format: int32
+          description: Number of media in the testing set
+        validation:
+          type: number
+          format: int32
+          description: Number of media in the validation set
+  dataset_info:
+    description: Amount per media type in the dataset
+    type: array
+    items:
+      type: object
+      properties:
+        videos:
+          type: number
+          format: int32
+          description: Number of videos in the dataset
+        frames:
+          type: number
+          format: int32
+          description: Number of frames in the dataset
+        images:
+          type: number
+          format: int32
+          description: Number of images in the dataset

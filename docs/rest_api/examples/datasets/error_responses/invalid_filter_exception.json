@@ -1,0 +1,5 @@
+{
+    "error_code": "invalid_filter",
+    "http_status": 400,
+    "message": "Invalid filter provided. greater is not a valid value for enum DatasetFilterField. Please choose one of ['MEDIA_UPLOAD_DATE', 'MEDIA_HEIGHT', 'MEDIA_WIDTH', 'MEDIA_NAME', 'LABEL_ID', 'ANNOTATION_CREATION_DATE', 'ANNOTATION_SCENE_STATE', 'SHAPE_TYPE', 'SHAPE_AREA_PERCENTAGE', 'SHAPE_AREA_PIXEL', 'USER_NAME', 'SUBSET']"
+}

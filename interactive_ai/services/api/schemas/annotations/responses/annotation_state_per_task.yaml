@@ -1,0 +1,24 @@
+type: object
+title: Annotation state aggregated per task
+properties:
+  task_id:
+    $ref: '../../mongo_id.yaml'
+  state:
+    type:
+    - "string"
+    - "null"
+    description: "Overall state obtained aggregating the annotation states
+      with the 'revisit' information on a per-task basis. This only has meaning for an 
+      image/frame/scene, as a video does not have an annotation scene.
+      - Image/VideoFrame/AnnotationScene:
+        - to_revisit: Some annotations need to be revisited by the user for this task
+        - annotated: All the ROIs for this task are annotated (contain a label for the task)
+        - partially_annotated: Some ROIs for this task do not contain labels, other ones do
+        - none: No label is present for this task
+      - Video:
+        - all tasks are set to null
+      "
+    enum: [ "to_revisit", "annotated", "partially_annotated", "none", null ]
+example:
+  task_id: "61012cdb1d38a5e71ef3bafd"
+  state: "to_revisit"

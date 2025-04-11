@@ -1,0 +1,59 @@
+post:
+  tags:
+    - Project Import/Export
+  summary: Import a project from an uploaded archive
+  description: |-
+    Create a project by importing a project archive file.
+    
+    The project archive file must be first uploaded using the TUS protocol,
+    by means of the [TUS upload endpoints](#Project%20Import%2FExport/CreateTusProjectUpload).
+    
+    This endpoint submits a job to import a project from the uploaded archive.
+    The status of the import operation can be monitored in real-time through the [job status endpoint](#Jobs/GetJob);
+    after it completes, the id of the imported project can be found in the job metadata.
+  operationId: ImportProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/project_import_export/requests/import_parameters.yaml"
+        examples:
+          Importing a project with custom name:
+            value:
+              $ref: "../../examples/project_import_export/requests/import_project.json"
+    required: true
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Import job submitted successfully:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+    '409':
+      description: Too many projects
+      content:
+        application/json:
+          examples:
+            Max projects reached:
+              value:
+                $ref: "../../examples/project_import_export/error_responses/too_many_projects.json"

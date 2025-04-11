@@ -1,0 +1,5 @@
+{
+  "http_status": 409,
+  "message": "Project SAMPLE_NAME is locked for deletion/modification. Please wait until all jobs related to this project are finished or cancel them to allow deletion/modification.",
+  "error_code": "project_locked"
+}

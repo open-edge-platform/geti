@@ -1,0 +1,9 @@
+.menuTrigger {
+    pointer-events: all;
+}
+
+.menuList {
+    & svg[class*='spectrum-Menu-checkmark'] {
+        padding-left: var(--spectrum-global-dimension-size-65);
+    }
+}

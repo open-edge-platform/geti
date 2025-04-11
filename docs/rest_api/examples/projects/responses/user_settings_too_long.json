@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "message": "Settings provided for user exceed 3000 characters.",
+  "error_code": "settings_too_long"
+}

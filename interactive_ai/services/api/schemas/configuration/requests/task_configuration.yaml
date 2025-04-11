@@ -1,0 +1,10 @@
+required:
+  - components
+type: object
+properties:
+  components:
+    type: array
+    description: Array of configurable parameter objects for the different components in the task, as well as the
+      hyper parameters for the current algorithm in the task
+    items:
+      $ref: "components/configurable_parameters.yaml"

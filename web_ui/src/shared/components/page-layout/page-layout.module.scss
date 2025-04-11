@@ -1,0 +1,13 @@
+.pageLayoutMain {
+    min-height: 0;
+    height: 100%;
+    display: flex;
+    flex: 1 1 0;
+    position: relative;
+    flex-direction: column;
+    overflow: hidden auto;
+}
+
+.pageLayoutTabs {
+    overflow: hidden auto;
+}

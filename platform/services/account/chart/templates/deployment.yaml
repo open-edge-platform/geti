@@ -1,0 +1,242 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "account-service.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    secret.reloader.stakater.com/reload: "{{ .Release.Namespace }}-spice-db-tls"
+  labels: {{- include "account-service.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "account-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "account-service.labels" . | nindent 8 }}
+      annotations:
+        {{- if not .Values.global.istio_ambient_mesh }}
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+        {{- end }}
+        sidecar.opa-istio.io/inject: enabled
+    spec:
+      serviceAccountName: {{ include "account-service.fullname" . }}
+      initContainers:
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s
+              --for=condition=complete
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.http }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.http }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.service.ports.grpc }}
+              protocol: TCP
+            - name: http
+              containerPort: {{ .Values.service.ports.http }}
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: {{ .Values.global.logging_config_dir }}
+            - name: spicedb-tls-secrets
+              mountPath: "/etc/tls-secrets"
+              readOnly: true
+          env:
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: POSTGRES_HOST
+              value: "{{ .Release.Namespace }}-postgresql"
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: accountservice-postgresql-db
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: accountservice-postgresql-password
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: accountservice-postgresql-username
+            - name: POSTGRES_SSLMODE
+              value: "{{ .Values.postgresql.sslmode }}"
+            - name: SPICEDB_ADDRESS
+              value: "{{ .Release.Namespace }}-spice-db:{{ .Values.spicedb.grpc_port }}"
+            - name: SPICEDB_LOG_PATH
+              value: {{ .Values.spicedb.log_file_path }}
+            - name: SPICEDB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-spice-db"
+                  key: SPICEDB_GRPC_PRESHARED_KEY
+            - name: SPICEDB_CREDENTIALS
+              value: "token_and_ca"
+            - name: SPICEDB_SSL_CERTIFICATES_DIR
+              value: "/etc/tls-secrets"
+            - name: KAFKA_ADDRESS
+              value: "{{ .Release.Namespace }}-kafka:{{ .Values.kafka.port }}"
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: user
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: password
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: GETI_NOTIFICATION_TOPIC
+              value: "{{ .Values.kafka.topic }}"
+            - name: INVITATION_FROM_ADDRESS
+              value: "{{ .Values.invitation.from_address }}"
+            - name: INVITATION_FROM_NAME
+              value: "{{ .Values.invitation.from_name }}"
+            - name: INVITATION_LINK
+              value: "{{ .Values.invitation.link }}"
+            - name: USERS_PER_ORG_LIMIT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: max_number_of_users_per_org
+            - name: USER_INVITATION_MAIL_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: UserInvitationMailMessage
+            - name: USER_INVITATION_MAIL_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: UserInvitationMailTopic
+            - name: ORGANIZATION_INVITATION_MAIL_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationInvitationMailMessage
+            - name: ORGANIZATION_INVITATION_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationInvitationTopic
+            - name: ORGANIZATION_ACCEPT_REQUEST_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationAcceptRequestedAccessMessage
+            - name: ORGANIZATION_ACCEPT_REQUEST_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationAcceptRequestedAccessTopic
+            - name: ORGANIZATION_REJECT_REQUEST_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationRejectRequestedAccessMessage
+            - name: ORGANIZATION_REJECT_REQUEST_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationRejectRequestedAccessTopic
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: S3_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: "s3_endpoint_accsvc"
+                  name: "{{ .Release.Namespace }}-configuration"
+                  optional: true
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "accountservice_secret_key"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "accountservice_access_key"
+            - name: S3_PRESIGNED_URL_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "accountservice_presigned_url_access_key"
+            - name: S3_PRESIGNED_URL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "accountservice_presigned_url_secret_key"
+            {{- end }}
+            # OTEL variables
+            - name: ENABLE_TRACING
+              value: "false"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: account-service
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: OTEL_TRACES_SAMPLER
+              value: parentbased_traceidratio
+            - name: OTEL_TRACES_SAMPLER_ARG
+              value: "0.1"
+            # end of OTEL variables
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - name: spicedb-tls-secrets
+          secret:
+            secretName: {{ .Release.Namespace }}-spice-db-tls
+            items:
+              - key: ca.crt
+                path: ca.crt

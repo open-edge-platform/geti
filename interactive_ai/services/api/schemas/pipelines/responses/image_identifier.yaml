@@ -1,0 +1,7 @@
+type: object
+properties:
+  type:
+    type: string
+    enum: [image]
+  image_id:
+    $ref: "../../mongo_id.yaml"

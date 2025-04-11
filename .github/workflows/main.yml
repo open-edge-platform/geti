@@ -1,0 +1,128 @@
+name: Detection workflow
+
+on:
+  merge_group:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+
+concurrency:
+    group: ${{ github.head_ref || github.ref_name }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  get-vars:
+    name: Get variables
+    runs-on: geti-core-c2m4
+    timeout-minutes: 10
+    outputs:
+      image-tag: "${{ steps.image-tag.outputs.image-tag }}"
+      components-list: ${{ steps.components-list.outputs.changes }}
+      filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Prepare image tag
+        id: image-tag
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+        run: |
+          short_sha=$(git rev-parse --short HEAD)
+          product_version=$(sed -ne 's/^.*PRODUCT_VERSION.*?= //p' Makefile.shared)
+          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
+              ref=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
+
+          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
+              ref=pr-"${GITHUB_EVENT_NUMBER}"
+
+          elif [[ "${GITHUB_EVENT_NAME}" == "merge_group" ]]; then
+              ref=mr
+          else
+              echo "unknown event ${github_event_name}!"
+              exit 1
+          fi
+
+          echo "image-tag=$product_version-$ref-$short_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Get changed files
+        id: changed-files
+        # TODO: CHANGE TO ORGINAL BEFORE OPEN SOURCE
+        uses: intel-innersource/frameworks.actions.thirdparty.changed-files@32ae20aabdcb5dd4c5e3a3933d0acf38d7b0f066
+        with:
+          files_yaml_from_source_file: "./.github/components-path-filters.yml"
+
+      - name: Get changed components
+        id: components-list
+        env:
+          CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
+        run: |
+          changes=$(python3 -c "print('$CHANGED_KEYS'.split())")
+          echo "::group::Components to run"
+          echo $changes
+          echo "::endgroup::"
+          echo "changes=$changes" >> "$GITHUB_OUTPUT"
+
+      - name: Filter components (exclude 'web_ui')
+        id: filtered-components-list
+        run: |
+          components=$(echo ${CHANGES} | sed "s/'/\"/g")
+          filtered=$(echo $components | jq -c '[.[] | select(. != "web_ui")]')
+          echo "filtered-list=$filtered" >> $GITHUB_OUTPUT
+        env:
+          CHANGES: ${{ steps.components-list.outputs.changes }}
+
+  component-workflow:
+    name: Component workflow
+    needs: get-vars
+    secrets: inherit
+    uses: ./.github/workflows/component.yml
+    if: ${{ !contains(needs.get-vars.outputs.filtered-components-list, '[]') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # The web-ui-workflow will call component-workflow after it succeeds,
+        # therefore we filter out the web_ui component here
+        component: ${{ fromJSON(needs.get-vars.outputs.filtered-components-list) }}
+    with:
+      image-tag: ${{ needs.get-vars.outputs.image-tag }}
+      component-dir: ${{ matrix.component }}
+
+  web-ui-workflow:
+    name: Web UI workflow
+    needs: get-vars
+    secrets: inherit
+    uses: ./.github/workflows/web-ui.yml
+    if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
+    with:
+      image-tag: ${{ needs.get-vars.outputs.image-tag }}
+
+  success:
+    name: Required status checks
+    needs:
+      - component-workflow
+      - web-ui-workflow
+    runs-on: geti-core-c2m4
+    if: ${{ always() && !cancelled() }}
+    env:
+      CHECKS: ${{ join(needs.*.result, ' ') }}
+    steps:
+      - name: Check
+        run: |
+          for check in ${CHECKS}; do
+            echo "::notice::check=${check}"
+            if [[ "$check" != "success" && "$check" != "skipped" ]]; then
+              echo "::error ::Required status checks failed. They must succeed before this pull request can be merged."
+              exit 1
+            fi
+          done

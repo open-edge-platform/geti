@@ -1,0 +1,28 @@
+---
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "observability.name" . }}
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+#  hostnames:
+#    - "*.intel.com"  # only for SaaS
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/v1/logs  # TODO test
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v1/logs/
+      backendRefs:
+        - name: {{ .Chart.Name }}
+          port: {{ .Values.port }}
+{{- end }}

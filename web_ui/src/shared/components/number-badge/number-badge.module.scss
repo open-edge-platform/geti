@@ -1,0 +1,38 @@
+.circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reversedColor {
+    color: var(--energy-blue-shade);
+    background-color: var(--spectrum-global-color-gray-900);
+}
+
+.accented {
+    background-color: var(--brand-coral-coral-shade1) !important;
+}
+
+.selected {
+    background-color: var(--energy-blue-shade) !important;
+}
+
+.basic {
+    background-color: var(--spectrum-global-color-gray-400) !important;
+}
+
+.number {
+    padding-top: 1px; /* Small offset, looks "more centered" */
+    padding-right: 1px; /* Same as above */
+    font-size: var(--spectrum-global-dimension-font-size-25);
+
+    &.medium {
+        font-size: var(--spectrum-global-dimension-size-115);
+        padding: 0; /* Reset the offset */
+    }
+
+    &.large {
+        font-size: var(--spectrum-global-dimension-size-100);
+        padding: 0; /* Reset the offset */
+    }
+}

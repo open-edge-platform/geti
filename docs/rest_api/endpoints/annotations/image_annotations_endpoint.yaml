@@ -1,0 +1,73 @@
+post:
+  tags:
+    - Annotations
+  summary: Create an annotation for an image
+  description: |-
+    Create a user annotation for an image. The user annotation scene contains multiple annotations, each of which is defined by a geometric shape and a
+    list of labels for that shape. The shape is defined in pixels.
+  operationId: CreateImageAnnotation
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/image_id.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/annotations/requests/annotation_scene_image.yaml'
+        examples:
+          Classification (or anomaly) annotation: 
+            description: |-
+              For tasks that do not depend on the geometric shape of the annotations, such as classification or anomaly tasks, the annotations are defined 
+              in a specific way, depending on the project. In a single-task project, the annotations will contain a single rectangle shape covering the full image. 
+              While in task chain, the classification labels are attached to the geometric shape of the preceding task. 
+            value: 
+              $ref: "../../examples/annotations/requests/create_classification_annotation.json"
+          Detection annotation: 
+            value:
+              $ref: "../../examples/annotations/requests/create_detection_annotation.json"
+          Rotated detection annotation:
+            value:
+              $ref: "../../examples/annotations/requests/create_rotated_detection_annotation.json"
+          Segmentation annotation:
+            value:         
+              $ref: "../../examples/annotations/requests/create_segmentation_annotation.json"
+    required: true
+  responses:
+    '200':
+      description: Annotation successfully uploaded for image
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/annotations/responses/annotation_scene_image.yaml"
+          examples:
+            Successfully created:
+              value:
+                $ref: "../../examples/annotations/responses/image_annotation_response.json"
+    '400':
+      description: Annotation is invalid
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Image not found response:
+              value:
+                $ref: "../../examples/media/error_responses/image_not_found.json"

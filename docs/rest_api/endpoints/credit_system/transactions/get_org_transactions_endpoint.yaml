@@ -1,0 +1,101 @@
+get:
+  tags:
+    - Transactions
+  summary: "[SaaS] Get transactions information"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Returns information about finished transactions within specified time range
+    [from_date, to_date].<br>
+    Supports sorting and filtering by project name and usage type.
+  operationId: get_transactions_api_v1_organizations__organization_id__transactions_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+    - name: skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+        title: Skip
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 3
+        title: Limit
+    - name: from_date
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: integer
+            maximum: 8023398574000
+            minimum: 1711929600000
+          - type: 'null'
+        description: Milliseconds timestamp
+        title: From Date
+      description: Milliseconds timestamp
+    - name: to_date
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: integer
+            maximum: 8023398574000
+            minimum: 1711929600000
+          - type: 'null'
+        description: Milliseconds timestamp
+        title: To Date
+      description: Milliseconds timestamp
+    - name: sort
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+        default:
+          - created,desc
+        title: Sort
+    - name: project_id
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: string
+          - type: 'null'
+        title: Project Id
+    - name: usage_type
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: string
+            enum:
+              - optimization
+              - training
+          - type: 'null'
+        title: Usage Type
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/transactions.yaml#/TransactionsResponse'
+          example:
+            $ref: '../../../examples/credit_system/transactions/transactions_page_response.json'
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

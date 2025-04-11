@@ -1,0 +1,33 @@
+type: object
+title: Ellipse
+properties:
+  type:
+    type: string
+    enum: [ "ELLIPSE" ]
+    description: Type of the shape.
+  x:
+    type: number
+    description: Lowest x-coordinate of the ellipse. Coordinates are pixel values.
+  y:
+    type: number
+    description: Lowest y-coordinate of the ellipse. Coordinates are pixel values.
+  width:
+    type: number
+    description: Width of the ellipse. Coordinates are pixel values.
+    minimum: 1
+  height:
+    type: number
+    description: Height of the ellipse. Coordinates are pixel values.
+    minimum: 1
+required:
+  - type
+  - x
+  - y
+  - width
+  - height
+example:
+  type: ELLIPSE
+  x: 300
+  y: 250
+  width: 75
+  height: 25

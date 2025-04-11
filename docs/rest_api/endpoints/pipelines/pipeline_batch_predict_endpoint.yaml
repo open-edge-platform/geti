@@ -1,0 +1,70 @@
+post:
+  tags:
+    - Predictions
+  summary: Generate or retrieve predictions for a batch of video frames
+  description: "Generate or retrieve the predictions for a sequence of video frames."
+  operationId: GetBatchPrediction
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/pipeline_id_or_active.yaml'
+    - $ref: '../../parameters/query/roi.yaml'
+    - $ref: '../../parameters/query/hyper_parameters.yaml'
+  requestBody:
+    description: |- 
+      An identifier for a range of video frames on which to perform inference. 
+      The predictions are strating from the `start_frame` of the range, for every frame at `frame_skip` intervals, and all 
+      the way up to the `end_frame`. 
+      
+      The maximum number of frames to generate predictions for is 20.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/pipelines/requests/video_frame_range_identifier.yaml"
+        examples:
+          Video frame range identifier:
+            value:
+              $ref: "../../examples/pipelines/request_body/video_frame_range_identifier.json"
+  responses:
+    '200':
+      description: Predictions successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/pipelines/responses/batch_prediction.yaml"
+          examples:
+            Batch prediction response:
+              value:
+                $ref: "../../examples/pipelines/responses/batch_predict_response.json"
+    '204':
+      description: No prediction available for the requested media.
+    '400':
+      description: Too many predictions requested.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Image not found response:
+              value:
+                $ref: "../../examples/media/error_responses/image_not_found.json"

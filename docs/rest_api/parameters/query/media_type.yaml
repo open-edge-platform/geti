@@ -1,0 +1,6 @@
+in: query
+name: media_type
+style: form
+description: Whether to get image or video entities
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/media_type.yaml"

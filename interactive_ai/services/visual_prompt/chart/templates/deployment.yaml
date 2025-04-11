@@ -1,0 +1,210 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "visual-prompt.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "visual-prompt.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+        proxy.istio.io/config: |
+          terminationDrainDuration: 60s
+      labels:
+        {{- include "visual-prompt.selectorLabels" . | nindent 8 }}
+        authorization: public_api
+        opa_envoy_filter: enabled
+    spec:
+      terminationGracePeriodSeconds: 90
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+      initContainers:
+        - name: init-kafka
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: ['sh', '-c', 'until nc -w 5 -z {{ .Release.Namespace }}-kafka 9092; do echo wait...; sleep 2; done;']
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s 
+              --for=condition=complete 
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}  
+      containers:
+        - name: &containerName visual-prompt
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - "uvicorn"
+            - "main:app"
+            - "--port={{ .Values.service.port }}"
+            - "--host=0.0.0.0"
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.port }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          env:
+            - name: MIN_FREE_SPACE_GIB
+              value: "{{ .Values.global.min_free_disk_space_gib }}"
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            {{- if .Values.global.enable_mongodb_credentials }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-mongodb-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-mongodb-password
+            {{- end }}
+            - name: KAFKA_ADDRESS
+              value: {{ .Release.Namespace }}-kafka
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: user
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: password
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: PLATFORM_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: platformVersion
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: visual-prompt-microservice
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.instance.id=$(K8S_POD_NAME),k8s.pod.uid=$(K8S_POD_UID),k8s.container.name=$(K8S_CONTAINER_NAME)
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: OTLP_PROCESSOR_DO_NOT_SEND_SPANS
+              value: "PATCH"
+            - name: MODEL_REGISTRATION_SERVICE
+              value: "{{ .Release.Namespace }}-modelregistration.{{ .Release.Namespace }}:5555"
+            - name: MONGODB_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: mongodb_credentials_provider
+            - name: SAM_ENCODER_XML_PATH
+              value: {{ .Values.global.sam_encoder_xml_path }}
+            - name: SAM_ENCODER_BIN_PATH
+              value: {{ .Values.global.sam_encoder_bin_path }}
+            - name: SAM_DECODER_XML_PATH
+              value: {{ .Values.global.sam_decoder_xml_path }}
+            - name: SAM_DECODER_BIN_PATH
+              value: {{ .Values.global.sam_decoder_bin_path }}
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: "S3_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "visual_prompt_secret_key"
+            - name: "S3_ACCESS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "visual_prompt_access_key"
+            - name: S3_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: "s3_endpoint"
+                  name: "{{ .Release.Namespace }}-configuration"
+                  optional: true
+            - name: S3_PRESIGNED_URL_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "visual_prompt_s3_presigned_url_access_key"
+            - name: S3_PRESIGNED_URL_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace}}-seaweed-fs"
+                  key: "visual_prompt_s3_presigned_url_secret_key"
+            {{- end }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+            - configMapRef:
+                name: {{ .Release.Namespace }}-s3-bucket-names
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: project
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "60s"]
+      volumes:
+        - emptyDir: {}
+          name: tmp

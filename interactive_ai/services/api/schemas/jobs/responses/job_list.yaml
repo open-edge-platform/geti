@@ -1,0 +1,37 @@
+type: object
+properties:
+  jobs:
+    type: array
+    description: Array of jobs
+    items:
+      anyOf:
+        - $ref: "job_train.yaml"
+        - $ref: "job_test.yaml"
+        - $ref: "job_optimize.yaml"
+        - $ref: "job_prepare_import_to_new_project.yaml"
+        - $ref: "job_perform_import_to_new_project.yaml"
+        - $ref: "job_prepare_import_to_existing_project.yaml"
+        - $ref: "job_perform_import_to_existing_project.yaml"
+        - $ref: "job_export_dataset.yaml"
+  jobs_count:
+    type: object
+    description: Jobs count information for each job state
+    properties:
+      n_scheduled_jobs:
+        type: integer
+        description: Number of scheduled jobs
+      n_running_jobs:
+        type: integer
+        description: Number of running jobs
+      n_finished_jobs:
+        type: integer
+        description: Number of finished jobs
+      n_failed_jobs:
+        type: integer
+        description: Number of failed jobs
+      n_cancelled_jobs:
+        type: integer
+        description: Number of cancelled jobs
+  next_page:
+    type: string
+    description: URL to the next jobs page

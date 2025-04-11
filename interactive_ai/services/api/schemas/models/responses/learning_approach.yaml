@@ -1,0 +1,9 @@
+type: string
+description: |-
+  The learning approach from which the model is generated. 
+  
+  `fully_supervised` is for models that are trained through training job; while `one_shot` models are not. For example, `one_shot` 
+  is used for visual prompt models.    
+enum: 
+  - fully_supervised
+  - one_shot

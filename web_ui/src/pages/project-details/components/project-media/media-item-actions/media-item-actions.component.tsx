@@ -1,0 +1,126 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2022 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { FC, Key, useState } from 'react';
+
+import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+
+import { Scope } from '../../../../../assets/icons';
+import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
+import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
+import { MediaIdentifier, MediaItem } from '../../../../../core/media/media.interface';
+import { isVideo, isVideoFrame } from '../../../../../core/media/video.interface';
+import { DatasetIdentifier } from '../../../../../core/projects/dataset.interface';
+import { isAnomalyDomain, isClassificationDomain } from '../../../../../core/projects/domains';
+import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
+import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
+import { VideoPlayerDialog } from '../../../../annotator/components/range-based-video-player/video-player-dialog.component';
+import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
+import { useMediaItemQuery } from '../../../../annotator/providers/selected-media-item-provider/use-media-item-query.hook';
+import { useProject } from '../../../providers/project-provider/project-provider.component';
+import { MediaItemMenu } from './media-item-menu.component';
+
+const useVideoMediaItemQuery = (datasetIdentifier: DatasetIdentifier, mediaItem: MediaItem) => {
+    const videoId: MediaIdentifier | undefined = isVideo(mediaItem)
+        ? mediaItem.identifier
+        : isVideoFrame(mediaItem)
+          ? {
+                type: MEDIA_TYPE.VIDEO,
+                videoId: mediaItem.identifier.videoId,
+            }
+          : undefined;
+
+    return useMediaItemQuery(datasetIdentifier, videoId, {
+        enabled: isVideoFrame(mediaItem),
+        placeholderData: isVideo(mediaItem) ? mediaItem : undefined,
+    });
+};
+
+interface QuickAnnotationButtonProps {
+    onClick: () => void;
+}
+
+const QuickAnnotationButton: FC<QuickAnnotationButtonProps> = ({ onClick }) => {
+    return (
+        <TooltipTrigger>
+            <QuietActionButton onPress={onClick} aria-label={'Quick annotation'}>
+                <Scope />
+            </QuietActionButton>
+            <Tooltip>
+                <Text>Quick annotation</Text>
+            </Tooltip>
+        </TooltipTrigger>
+    );
+};
+
+interface MediaItemActionsProps {
+    mediaItem: MediaItem;
+}
+
+export const MediaItemActions: FC<MediaItemActionsProps> = ({ mediaItem }) => {
+    const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
+    const { FEATURE_FLAG_CLASSIFICATION_RANGES } = useFeatureFlags();
+    const { isSingleDomainProject } = useProject();
+
+    const isAnomalyProject = isSingleDomainProject(isAnomalyDomain);
+    const isClassificationProject = isSingleDomainProject(isClassificationDomain);
+    const datasetIdentifier = useDatasetIdentifier();
+    const videoMediaItemQuery = useVideoMediaItemQuery(datasetIdentifier, mediaItem);
+    const isVideoMediaItem = isVideo(mediaItem);
+    const videoMediaItemForDialog = isVideoMediaItem ? mediaItem : videoMediaItemQuery.data;
+    const shouldShowQuickAnnotation =
+        isVideoMediaItem &&
+        videoMediaItemForDialog !== undefined &&
+        (isAnomalyProject || (isClassificationProject && FEATURE_FLAG_CLASSIFICATION_RANGES));
+
+    const isAnomalyVideo = isAnomalyProject && videoMediaItemForDialog !== undefined;
+
+    if (shouldShowQuickAnnotation) {
+        const handleOpenQuickAnnotation = () =>
+            setSelectedMediaItemAction(MediaItemMenuActions.QUICK_ANNOTATION.toLocaleLowerCase());
+
+        const handleCloseDialog = () => setSelectedMediaItemAction(undefined);
+
+        return (
+            <Flex alignItems={'center'}>
+                <QuickAnnotationButton onClick={handleOpenQuickAnnotation} />
+                <MediaItemMenu
+                    mediaItem={mediaItem}
+                    showQuickAnnotation
+                    isAnomalyVideo={isAnomalyVideo}
+                    selectedMediaItemAction={selectedMediaItemAction}
+                    onChangeSelectedMediaItemAction={setSelectedMediaItemAction}
+                />
+                <DialogContainer onDismiss={handleCloseDialog}>
+                    {selectedMediaItemAction === MediaItemMenuActions.QUICK_ANNOTATION.toLowerCase() &&
+                        isVideo(videoMediaItemForDialog) && (
+                            <VideoPlayerDialog
+                                datasetIdentifier={datasetIdentifier}
+                                mediaItem={videoMediaItemForDialog}
+                                close={handleCloseDialog}
+                            />
+                        )}
+                </DialogContainer>
+            </Flex>
+        );
+    }
+
+    return (
+        <MediaItemMenu
+            mediaItem={mediaItem}
+            showQuickAnnotation={false}
+            isAnomalyVideo={isAnomalyVideo}
+            selectedMediaItemAction={selectedMediaItemAction}
+            onChangeSelectedMediaItemAction={setSelectedMediaItemAction}
+        />
+    );
+};

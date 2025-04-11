@@ -1,0 +1,177 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-job-{{ include "credit-system.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "credit-system.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        {{- include "credit-system.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "credit-system.name" . }}
+      restartPolicy: Never
+      volumes:
+        - name: create-db
+          configMap:
+            name: create-db-sh
+            defaultMode: 0755
+        - name: "init"
+          emptyDir: {}
+      initContainers:
+        - name: init-postgresql
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          command: [ 'sh', '-c', "until nc -w 5 -z $POSTGRES_HOST $POSTGRES_PORT; do echo wait...; sleep 2; done;" ]
+          env:
+            - name: "POSTGRES_HOST"
+              value: "{{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}"
+            - name: "POSTGRES_PORT"
+              value: "5432"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+        - name: wait-for-acc-svc
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1800s
+              --for=condition=complete
+              --namespace {{ .Release.Namespace }}
+              impt-account-service-init-user
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+      containers:
+        - name: init-credit-system-db
+          image: "{{ .Values.postgresql.image.registry }}/{{ if .Values.postgresql.image.repository }}{{ .Values.postgresql.image.repository }}/{{ end }}{{ .Values.postgresql.image.name }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - |
+              /opt/psql-script/create-db.sh;
+              retVal=$?;
+              echo "done" > /init/1;
+              exit $retVal
+          env:
+            - name: PGHOST
+              value: "{{ .Values.postgresql.host }}"
+            - name: PGPORT
+              value: "{{ .Values.postgresql.port }}"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-username"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-password"
+            - name: TARGET_POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-username"
+            - name: TARGET_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-password"
+            - name: TARGET_POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-db"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: create-db
+              mountPath: "/opt/psql-script"
+            - name: "init"
+              mountPath: "/init"
+        - name: migrate-db
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ]; do
+                sleep 1
+              done;
+              ./migration.sh;
+              retVal=$?;
+              echo "done" > /init/2;
+              exit $retVal
+          env:
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: "POSTGRES_HOST"
+              value: "{{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}"
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-db"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-password"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-username"
+            - name: POSTGRES_SSLMODE
+              value: "{{ .Values.postgresql.sslmode }}"
+            - name: WELCOMING_CREDITS_AMOUNT
+              value: "3000"
+            - name: RENEWABLE_CREDITS_AMOUNT
+              value: "1000"
+            - name: INTERNAL_WELCOMING_CREDITS_AMOUNT
+              value: "10000"
+            - name: INTERNAL_RENEWABLE_CREDITS_AMOUNT
+              value: "10000"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- if not .Values.global.istio_ambient_mesh }}
+        - name: "istio-sidecar-quit"
+          image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/2 ]; do
+                sleep 1
+              done;
+              curl -XPOST 127.0.0.1:15020/quitquitquit
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- end }}

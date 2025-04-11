@@ -1,0 +1,107 @@
+post:
+  tags:
+    - Settings
+  summary: Create an Annotation Template
+  description: Create an annotation template.
+  operationId: CreateAnnotationTemplate
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/annotation_template/requests/annotation_template.yaml"
+        examples:
+          Creating an annotation template:
+            value:
+              $ref: "../../examples/annotation_template/requests/annotation_template_request.json"
+    required: true
+  responses:
+    '201':
+      description: Annotation template successfully created
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/annotation_template/responses/annotation_template.yaml"
+          examples:
+            Annotation template creation response:
+              value:
+                $ref: "../../examples/annotation_template/responses/annotation_template_response.json"
+    '400':
+      description: Bad request. The provided information is invalid to create an annotation template.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid name provided response:
+              value:
+                $ref: "../../examples/annotation_template/responses/annotation_template_invalid_name_response.json"
+            Invalid value provided response:
+              value:
+                $ref: "../../examples/annotation_template/responses/annotation_template_invalid_value_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+
+
+get:
+  tags:
+  - Settings
+  summary: Get all annotation templates of a project
+  description: Get a complete list of annotation templates which belong to the project.
+  operationId: GetAnnotationTemplates
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+  responses:
+    '200':
+      description: The requested list of annotation templates
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/annotation_template/responses/annotation_template.yaml"
+          example:
+            $ref: "../../examples/annotation_template/responses/annotation_template_response.json"
+    '204':
+      description: No annotation template in the project.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            Annotation template not found response:
+              value:
+                $ref: "../../examples/annotation_template/responses/annotation_template_not_found.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

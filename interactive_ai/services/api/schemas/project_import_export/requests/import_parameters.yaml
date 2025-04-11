@@ -1,0 +1,11 @@
+type: object
+required:
+  - file_id
+properties:
+  file_id:
+    description: The ID of the uploaded project archive zip file
+    $ref: "../../mongo_id.yaml"
+  project_name:
+    description: The name to assign to the imported project
+    schema:
+      type: string

@@ -1,0 +1,20 @@
+.inputTool {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 10;
+}
+
+.inputToolAnimated {
+    stroke-dasharray: 10;
+    stroke-dashoffset: 10;
+    animation: dash 40s linear infinite;
+}
+
+.accuracyPicker button {
+    min-width: var(--spectrum-global-dimension-size-1000) !important;
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: 1000;
+    }
+}

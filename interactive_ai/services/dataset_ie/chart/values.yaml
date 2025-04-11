@@ -1,0 +1,74 @@
+image: dataset-ie
+imagePullPolicy: IfNotPresent
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 800Mi
+  limits:
+    memory: 800Mi
+
+service:
+  type: ClusterIP
+  port: 8000
+
+serviceAccount:
+  create: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+storage_dir_path: 'ie_storage'
+mountPath: "/binary_data"
+audit_logs_mount_path: "audit_logs"
+
+global:
+  security_headers: ''
+  stripped_headers: ''
+  docker_namespace: impp
+  enable_master_node_selector: true
+  storage_volume_claim_name_dataset_ie: ''
+  min_free_disk_space_gib: 20
+  storage_clean_up_interval_in_hours: 24
+  running_on_vm: false
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  debian:
+    registry: docker.io
+    repository: bitnami
+    name: bitnami-shell:11-debian-11-r136
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0

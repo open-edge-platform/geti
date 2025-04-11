@@ -1,0 +1,144 @@
+{
+    "creation_time": "2021-06-29T16:24:30.928000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "6101254defba22ca453f11cc",
+            "name": "Example chain project",
+            "creation_time": "2022-10-24T11:21:50.030000+00:00",
+            "use_for_training": true
+        }
+    ],
+    "id": "60db493ed20945a0046f56ce",
+    "name": "Example chain project",
+    "storage_info": {},
+    "pipeline": {
+        "connections": [
+            {
+                "from": "60db493fd20945a0046f56cf",
+                "to": "60db493fd20945a0046f56d2"
+            },
+            {
+                "from": "60db493fd20945a0046f56d2",
+                "to": "60db493fd20945a0046f56d3"
+            },
+            {
+                "from": "60db493fd20945a0046f56d3",
+                "to": "60db493fd20945a0046f56d6"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "60db493fd20945a0046f56cf",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "60db493fd20945a0046f56d2",
+                "label_schema_id": "60db493fd20945a0046f56d5",
+                "labels": [
+                    {
+                        "color": "#0015ffff",
+                        "group": "default_detection",
+                        "hotkey": "ctrl+5",
+                        "id": "60db493ed20945a0046f56c6",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "object"
+                    },
+                    {
+                        "color": "#ea879cff",
+                        "group": "No object",
+                        "hotkey": "ctrl+0",
+                        "id": "60db493ed20945a0046f56ca",
+                        "parent_id": null,
+                        "is_empty": true,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "No object"
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Sample detection task"
+            },
+            {
+                "id": "60db493fd20945a0046f56d3",
+                "task_type": "crop",
+                "title": "crop task"
+            },
+            {
+                "id": "60db493fd20945a0046f56d6",
+                "labels": [
+                    {
+                        "color": "#0015ffff",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+6",
+                        "id": "60db493ed20945a0046f56c7",
+                        "is_empty": false,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "rectangle",
+                        "parent_id": "60db493ed20945a0046f56c6"
+                    },
+                    {
+                        "color": "#7f000aff",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+7",
+                        "id": "60db493ed20945a0046f56c8",
+                        "is_empty": false,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "circle",
+                        "parent_id": "60db493ed20945a0046f56c6"
+                    },
+                    {
+                        "color": "#15ff00ff",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+8",
+                        "id": "60db493ed20945a0046f56c9",
+                        "is_empty": false,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "triangle",
+                        "parent_id": "60db493ed20945a0046f56c6"
+                    },
+                    {
+                        "color": "#a311f7ff",
+                        "group": "No class",
+                        "hotkey": "ctrl+0",
+                        "id": "60db493ed20945a0046f56cb",
+                        "parent_id": null,
+                        "is_empty": true,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "No class"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    },
+    "performance": {
+        "score": 0.7,
+        "task_performances": [
+            {
+                "task_id": "60db493fd20945a0046f56d2",
+                "score": {
+                    "value": 0.5,
+                    "metric_type": "f-measure"
+                }
+            },
+            {
+                "task_id": "60db493fd20945a0046f56d6",
+                "score": {
+                    "value": 0.9,
+                    "metric_type": "accuracy"
+                }
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/organizations/61b3a664-822d-45c5-beb1-8b10187e301d/workspaces/db99fa0c-46a2-427f-aba6-fd76f1b86d7f/projects/60db493ed20945a0046f56ce/thumbnail"
+}

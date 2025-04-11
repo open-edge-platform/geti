@@ -1,0 +1,73 @@
+[project]
+name = "migration-job"
+version = "1.0.0"
+description = "Migration job for Geti"
+requires-python = ">=3.10, <3.11"
+dependencies = [
+    "boto3==1.28.17",
+    "psycopg2-binary==2.9.3",
+    "pymongo[aws]~=4.10",
+    "geti-telemetry-tools[telemetry,grpc,kafka,logger]",
+    "migration",
+]
+
+[project.scripts]
+run_migration = "migration_job.run_migration:main"
+mongodb_create_service_user = "migration_job.mongodb_create_service_user:main"
+
+[tool.uv.sources]
+geti-telemetry-tools = { path = "../../libs/telemetry_tools", editable = true }
+migration = { path = "../data_migration", editable = true }
+
+[dependency-groups]
+dev = [
+    "mypy==1.10.0",
+    "pytest~=7.3.2",
+    "pytest-cov==2.11.1",
+    "click==8.1.7",
+    "pre-commit==2.15.0",
+    "pytest-html~=4.0.0",
+    "ruff~=0.11",
+    "pytest-mock==3.8.*",
+    "protobuf~=4.23.4",
+    "types-requests",
+    "grpcio_tools==1.60.0",
+    "mypy-protobuf==3.5",
+    "mongomock==4.1.2"
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["migration_job"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+exclude = [".venv*"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012", "RUF046", "PLW1508"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "ARG", "SIM", "RUF", "TC", "PL", "C90", "D103", "RET504"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

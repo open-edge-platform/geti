@@ -1,0 +1,192 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2021 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useRef, useState } from 'react';
+
+import { UseMutateFunction, useMutation } from '@tanstack/react-query';
+
+import { ShapeType } from '../../../../core/annotations/shapetype.enum';
+import { AlgorithmType } from '../../../../hooks/use-load-ai-webworker/algorithm.interface';
+import { useLoadAIWebworker } from '../../../../hooks/use-load-ai-webworker/use-load-ai-webworker.hook';
+import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
+import { useNotification } from '../../../../notification/notification.component';
+import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { ToolType } from '../../core/annotation-tool-context.interface';
+import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
+import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
+import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
+import { Marker } from '../marker-tool/marker-tool.interface';
+import { StateProviderProps } from '../tools.interface';
+import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';
+import useUndoRedoState, { SetStateWrapper } from '../undo-redo/use-undo-redo-state';
+import { removeOffLimitPointsPolygon } from '../utils';
+import { RunWatershedProps, WatershedMethods, WatershedPolygon } from './watershed-tool.interface';
+
+interface WatershedState {
+    markers: Marker[];
+    watershedPolygons: WatershedPolygon[];
+}
+
+interface WatershedStateContextProps {
+    shapes: WatershedState;
+    setShapes: SetStateWrapper<WatershedState>;
+    watershedPolygons?: WatershedPolygon[];
+    undoRedoActions: UndoRedoActions<WatershedState>;
+    onComplete: (markers: Marker[]) => void;
+    runWatershed: UseMutateFunction<WatershedPolygon[], unknown, RunWatershedProps, unknown>;
+    reset: () => Promise<void>;
+    rejectAnnotation: () => Promise<void>;
+
+    brushSize: number;
+    setBrushSize: Dispatch<SetStateAction<number>>;
+
+    isBrushSizePreviewVisible: boolean;
+    setIsBrushSizePreviewVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+const WatershedStateContext = createContext<WatershedStateContextProps | undefined>(undefined);
+
+const DEFAULT_WATERSHED_STATE: WatershedState = {
+    markers: [],
+    watershedPolygons: [],
+};
+
+const useWatershedUndoRedoState = (): [
+    WatershedState,
+    SetStateWrapper<WatershedState>,
+    UndoRedoActions<WatershedState>,
+] => {
+    const [shapes, setShapes, undoRedoActions] = useUndoRedoState<WatershedState>(DEFAULT_WATERSHED_STATE);
+
+    const { roi } = useROI();
+
+    // For each polygon produced by watershed we will remove any points that are outside
+    // of the current ROI (selected input annotation in case of Task Chain)
+    const shapesWithConstrainedPolygons = useMemo(() => {
+        const polygons = shapes.watershedPolygons.map((watershedPolygon) => {
+            const { points } = removeOffLimitPointsPolygon(
+                { points: watershedPolygon.points, shapeType: ShapeType.Polygon },
+                roi
+            );
+
+            return { ...watershedPolygon, points };
+        });
+
+        return {
+            markers: shapes.markers,
+            watershedPolygons: polygons,
+        };
+    }, [shapes, roi]);
+
+    return [shapesWithConstrainedPolygons, setShapes, undoRedoActions];
+};
+
+export const WatershedStateProvider = ({ children }: StateProviderProps): JSX.Element => {
+    const { worker } = useLoadAIWebworker(AlgorithmType.WATERSHED);
+
+    const wsInstance = useRef<WatershedMethods | null>(null);
+
+    const { addNotification } = useNotification();
+    const { getToolSettings } = useAnnotationToolContext();
+
+    const [shapes, setShapes, undoRedoActions] = useWatershedUndoRedoState();
+
+    const watershedSettings = getToolSettings(ToolType.WatershedTool);
+
+    const [brushSize, setBrushSize] = useState<number>(watershedSettings.brushSize);
+    const [isBrushSizePreviewVisible, setIsBrushSizePreviewVisible] = useState<boolean>(false);
+
+    const { mutate, reset: resetMutation } = useMutation({
+        mutationFn: async (runWatershedProps: RunWatershedProps) => {
+            if (worker && !wsInstance.current) {
+                wsInstance.current = await new worker.Watershed(runWatershedProps.imageData);
+            }
+
+            if (wsInstance.current) {
+                return wsInstance.current.executeWatershed(runWatershedProps.markers, runWatershedProps.sensitivity);
+            }
+
+            return [];
+        },
+        onError: () => {
+            addNotification({
+                message: 'Failed to run watershed algorithm, could you please try again?',
+                type: NOTIFICATION_TYPE.ERROR,
+            });
+        },
+    });
+
+    const cleanUpWatershed = useCallback(async () => {
+        resetMutation();
+
+        // Clear instance memory and delete it afterwards
+        if (wsInstance.current) {
+            await wsInstance.current.clearMemory();
+
+            wsInstance.current = null;
+        }
+    }, [resetMutation, wsInstance]);
+
+    const reset = useCallback(async () => {
+        undoRedoActions.reset();
+
+        await cleanUpWatershed();
+    }, [cleanUpWatershed, undoRedoActions]);
+
+    const rejectAnnotation = useCallback(async () => {
+        setShapes(DEFAULT_WATERSHED_STATE);
+
+        await cleanUpWatershed();
+    }, [cleanUpWatershed, setShapes]);
+
+    const handleComplete = (newMarkers: Marker[]) => {
+        setShapes(
+            (previousShapes) => ({
+                markers: [...previousShapes.markers, ...newMarkers],
+                watershedPolygons: [...previousShapes.watershedPolygons],
+            }),
+            false
+        );
+    };
+
+    return (
+        <WatershedStateContext.Provider
+            value={{
+                shapes,
+                setShapes,
+                undoRedoActions,
+                runWatershed: mutate,
+                reset,
+                rejectAnnotation,
+                onComplete: handleComplete,
+
+                brushSize,
+                setBrushSize,
+
+                isBrushSizePreviewVisible,
+                setIsBrushSizePreviewVisible,
+            }}
+        >
+            <UndoRedoProvider state={undoRedoActions}>{children}</UndoRedoProvider>
+        </WatershedStateContext.Provider>
+    );
+};
+
+export const useWatershedState = (): WatershedStateContextProps => {
+    const context = useContext(WatershedStateContext);
+
+    if (context === undefined) {
+        throw new MissingProviderError('useWatershedState', 'WatershedStateProvider');
+    }
+
+    return context;
+};

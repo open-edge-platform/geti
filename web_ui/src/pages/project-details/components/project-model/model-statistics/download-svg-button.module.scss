@@ -1,0 +1,9 @@
+.downloadAllGraphs {
+    width: fit-content;
+    padding: 0px var(--spectrum-global-dimension-size-175) !important;
+    border: 1px solid var(--spectrum-actionbutton-quiet-border-color-selected, var(--spectrum-alias-border-color)) !important;
+
+    svg {
+        margin-left: var(--spectrum-global-dimension-size-125);
+    }
+}

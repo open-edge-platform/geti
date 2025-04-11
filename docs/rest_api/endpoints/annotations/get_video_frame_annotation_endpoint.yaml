@@ -1,0 +1,59 @@
+get:
+  tags:
+    - Annotations
+  summary: Get annotations from a video frame
+  description: "Get the user annotation of a video frame."
+  operationId: GetVideoFrameAnnotation
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+    - $ref: '../../parameters/path/frame_index.yaml'
+    - $ref: '../../parameters/path/annotation_id.yaml'
+    - $ref: '../../parameters/query/label_only.yaml'
+  responses:
+    '200':
+      description: Annotation successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/annotations/responses/annotation_scene_video_frame.yaml"
+          examples:
+            Video frame annotation response:
+              value:
+                $ref: "../../examples/annotations/responses/video_frame_annotation_response.json"
+    '204':
+      description: The latest annotation could not be found or does not exist for the requested video frame.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            Annotation not found response:
+              value:
+                $ref: "../../examples/annotations/responses/annotation_not_found.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"
+            Annotation Scene not found response:
+              description: "The annotation scene does not belong to the video frame, or it could not be found."
+              value:
+                $ref: "../../examples/media/error_responses/annotation_scene_not_found.json"

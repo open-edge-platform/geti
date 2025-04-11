@@ -1,0 +1,110 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2022 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { useState } from 'react';
+
+import isEmpty from 'lodash/isEmpty';
+import noop from 'lodash/noop';
+
+import {
+    CommonTreeViewProps,
+    LabelsTreeViewProps,
+    LabelTreeItem,
+    Readonly,
+    ValidationErrorType,
+} from '../../../core/labels/label-tree-view.interface';
+import { getFlattenedItems } from '../../../core/labels/utils';
+import { getIds, hasEqualId } from '../../utils';
+import { FlatTreeView } from './flat-tree-view.component';
+import { HierarchicalTreeView } from './hierarchical-tree-view.component';
+
+export const LabelTreeView = (props: LabelsTreeViewProps): JSX.Element => {
+    const {
+        type,
+        labelsTree,
+        save = noop,
+        addChild = noop,
+        deleteItem = noop,
+        domains = [],
+        projectLabels = labelsTree,
+        options,
+    } = props;
+    const isEditable = type === Readonly.NO ? props.isInEditMode : false;
+    const setLabelsValidationError = type === Readonly.NO ? props.setValidationError : false;
+    const [treeItemsValidationErrors, setTreeItemsValidationErrors] = useState<Record<string, Record<string, string>>>(
+        {}
+    );
+
+    const setLabelValidationError = (id: string, validationErrors: Record<string, string>) => {
+        let newValidationErrors: Record<string, Record<string, string>>;
+        // We could pass "item" as an argument to this function instead of "id" but then all
+        // interfaces and other utils would have to be updated. So we opted to make this check
+        // localized.
+        const labelItem = getFlattenedItems(projectLabels).find(hasEqualId(id));
+
+        if (isEmpty(validationErrors)) {
+            newValidationErrors = { ...treeItemsValidationErrors };
+
+            delete newValidationErrors[id];
+
+            // This means that the item is a GROUP item.
+            // So we have to also delete all errors from its descendants
+            if (!isEmpty(labelItem) && !isEmpty(labelItem.children)) {
+                const allLabelDescendantIds = getIds(getFlattenedItems(labelItem?.children));
+
+                allLabelDescendantIds.forEach((descendantId) => {
+                    delete newValidationErrors[descendantId];
+                });
+            }
+        } else {
+            newValidationErrors = {
+                ...treeItemsValidationErrors,
+                [id]: validationErrors,
+            };
+        }
+
+        setTreeItemsValidationErrors(newValidationErrors);
+        setLabelsValidationError &&
+            setLabelsValidationError({
+                type: ValidationErrorType.LABELS,
+                validationError: !isEmpty(newValidationErrors),
+            });
+    };
+
+    const saveHandler = (editedLabel?: LabelTreeItem, oldId?: string) => {
+        save(editedLabel, oldId);
+    };
+
+    const deleteItemHandler = (deletedItem: LabelTreeItem) => {
+        // Clear validation errors from deleted item
+        setLabelValidationError(deletedItem.id, {});
+        deleteItem(deletedItem);
+    };
+
+    const parameters: CommonTreeViewProps = {
+        labels: labelsTree,
+        isEditable,
+        save: saveHandler,
+        deleteItem: deleteItemHandler,
+        addChild,
+        projectLabels,
+        domains,
+        treeValidationErrors: treeItemsValidationErrors,
+        setValidationError: setLabelValidationError,
+    };
+
+    return props.isHierarchicalMode ? (
+        <HierarchicalTreeView options={options} {...parameters} />
+    ) : (
+        <FlatTreeView isCreationInNewProject={options?.newTree} {...parameters} />
+    );
+};

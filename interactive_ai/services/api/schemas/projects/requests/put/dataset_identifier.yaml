@@ -1,0 +1,7 @@
+type: object
+properties:
+  id:
+    $ref: "../../../mongo_id.yaml"
+  name:
+    type: string
+    description: Name of the dataset

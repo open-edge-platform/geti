@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Job with ID 123 is not found",
+  "error_code": "job_not_found"
+}

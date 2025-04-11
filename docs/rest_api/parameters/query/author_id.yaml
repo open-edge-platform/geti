@@ -1,0 +1,6 @@
+in: query
+name: author_id
+style: form
+description: Filter jobs by the author's unique identifier
+schema:
+  type: string

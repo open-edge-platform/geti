@@ -1,0 +1,15 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "strict": true,
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "target": "es5",
+        "lib": ["es5", "dom"]
+    },
+    "include": ["**/*", "../src/**/*"],
+    "exclude": ["./datasets/**/*", "../src/opencv-types/**"]
+}

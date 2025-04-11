@@ -1,0 +1,56 @@
+description: List with information on object size distribution per label
+type: array
+items:
+  type: object
+  properties:
+    cluster_center:
+      type: array
+      description: Mean x/y values of the sizes of the objects
+      items:
+        type: number
+        format: int32
+    cluster_width_height:
+      type: array
+      description: Width/height values for drawing ellipse from cluster center
+      items:
+        type: number
+        format: int32
+    id:
+      $ref: '../../mongo_id.yaml'
+    color:
+      type: string
+      description: Color of the label
+    name:
+      type: string
+      description: Name of the label
+    object_distribution_from_aspect_ratio:
+      description: Information on the distribution of aspect ratios of annotation shapes
+      type: object
+      properties:
+        balanced:
+          type: number
+          format: int32
+        tall:
+          type: number
+          format: int32
+        wide:
+          type: number
+          format: int32
+    size_distribution:
+      description: "Information on the size distribution of annotation shapes. Contains a list of width/height for
+      every object."
+      type: array
+      items:
+        type: array
+        description: Width and height of the object
+        items:
+          type: number
+          format: int32
+    aspect_ratio_threshold_tall:
+      type: number
+      format: float
+      description: Aspect ratio threshold for classifying a shape as tall
+    aspect_ratio_threshold_wide:
+      type: number
+      format: float
+      description: Aspect ratio threshold for classifying a shape as wide

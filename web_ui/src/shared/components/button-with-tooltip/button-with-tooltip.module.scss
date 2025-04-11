@@ -1,0 +1,14 @@
+.tooltipBtn {
+    outline: 0;
+    cursor: default !important;
+    border: 0;
+
+    &:active {
+        background: inherit;
+    }
+}
+
+.tooltipLink {
+    color: currentColor !important;
+    text-decoration: none !important;
+}

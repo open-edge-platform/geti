@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Could not find organization with id 60ec6bbfb98caeb87e34306f",
+  "error_code": "organization_not_found"
+}

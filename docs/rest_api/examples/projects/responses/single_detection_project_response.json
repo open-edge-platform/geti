@@ -1,0 +1,73 @@
+{
+    "creation_time": "2021-06-23T11:14:27.344000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "6101254defba22ca453f11cc",
+            "name": "Example detection project",
+            "creation_time": "2022-10-24T11:21:50.030000+00:00",
+            "use_for_training": true
+        }
+    ],
+    "id": "60d31793d5f1fb7e6e3c1a4c",
+    "storage_info": {},
+    "name": "Example detection project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "60d31793d5f1fb7e6e3c1a4e",
+                "to": "60d31793d5f1fb7e6e3c1a51"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "60d31793d5f1fb7e6e3c1a4e",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "60d31793d5f1fb7e6e3c1a51",
+                "label_schema_id": "60d31793d5f1fb7e6e3c1a62",
+                "labels": [
+                    {
+                        "color": "#0015ffff",
+                        "group": "default",
+                        "hotkey": "ctrl+5",
+                        "id": "60d31793d5f1fb7e6e3c1a46",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "rectangle"
+                    },
+                    {
+                        "color": "#2a2b2eff",
+                        "group": "No object",
+                        "hotkey": "ctrl+0",
+                        "id": "60d31793d5f1fb7e6e3c1a49",
+                        "parent_id": null,
+                        "is_empty": true,
+                        "is_deleted": false,
+                        "is_anomalous": false,
+                        "name": "No object"
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Sample detection task"
+            }
+        ]
+    },
+    "performance": {
+        "score": 0.7,
+        "task_performances": [
+            {
+                "task_id": "60d31793d5f1fb7e6e3c1a51",
+                "score": {
+                    "value": 0.7,
+                    "metric_type": "f-measure"
+                }
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/organizations/61b3a664-822d-45c5-beb1-8b10187e301d/workspaces/db99fa0c-46a2-427f-aba6-fd76f1b86d7f/projects/60d31793d5f1fb7e6e3c1a4c/thumbnail"
+}

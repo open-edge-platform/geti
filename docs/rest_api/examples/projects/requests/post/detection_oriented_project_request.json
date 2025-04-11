@@ -1,0 +1,29 @@
+{
+    "name":"Detection oriented example",
+    "pipeline":{
+        "connections":[
+            {
+                "from":"Dataset",
+                "to":"Detection oriented"
+            }
+        ],
+        "tasks":[
+            {
+                "title":"Dataset",
+                "task_type":"dataset"
+            },
+            {
+                "title":"Detection oriented",
+                "task_type":"rotated_detection",
+                "labels":[
+                    {
+                        "name":"Flower",
+                        "color":"#5b69ffff",
+                        "group":"Detection oriented labels",
+                        "parent_id":null
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "message": "No file provided",
+  "error_code": "bad_request"
+}

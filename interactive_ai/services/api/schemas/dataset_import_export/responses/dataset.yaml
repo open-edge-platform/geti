@@ -1,0 +1,8 @@
+type: object
+properties:
+  id:
+    type: string
+    description: ID of the dataset storage
+  name:
+    type: string
+    description: Name of the dataset storage

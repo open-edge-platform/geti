@@ -1,0 +1,82 @@
+post:
+  tags:
+    - Training dataset versions
+  summary: Retrieve specific frames from a video in a training revision by applying a query
+  description: "Allows the user to quickly filter through frames in a video in a specific training revision by supplying one or 
+  more filters to match frames against. Currently you can filter on 'label_id',  'annotation_scene_state', 
+  'annotation_creation_date', 'shape_type', 'shape_area_percentage', 'shape_area_pixel' and 'user_name'. The following 
+  operators can be used 'greater', 'less', 'greater_or_equal', 'less_or_equal', 'equal', 'not_equal', 'in' and 'not_in'.
+  Not all combinations of filter and operator can be used. If a combination is not supported, the endpoint will respond 
+  with the possible operators that are allowed for the filter."
+  operationId: FilterVideoFramesInTrainingRevision
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/dataset_revision_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+    - $ref: '../../parameters/query/limit.yaml'
+    - $ref: '../../parameters/query/skip.yaml'
+    - $ref: '../../parameters/query/sort_direction.yaml'
+    - $ref: '../../parameters/query/filter_sort_by.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/datasets/requests/dataset_filter.yaml'
+        examples:
+          Filtering a dataset:
+            value:
+              $ref: "../../examples/datasets/requests/filter_dataset_request.json"
+    required: true
+  responses:
+    '200':
+      description: Frames matching the filter
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../interactive_ai/services/api/schemas/datasets/responses/filtered_dataset.yaml'
+          examples:
+            Filtered video frames list response:
+              value:
+                $ref: '../../examples/datasets/responses/filtered_video_frames.json'
+    '400':
+      description: Bad request. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid filter exception:
+              value:
+                $ref: "../../examples/datasets/error_responses/invalid_filter_exception.json"
+            Dataset is not a training dataset:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_is_not_a_training_dataset.yaml"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Training revision not found response:
+              description: Note, a training revision is a type of dataset.
+              value:
+                $ref: "../../examples/datasets/error_responses/training_revision_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"

@@ -1,0 +1,62 @@
+name: "Workflows static analysis"
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches:
+      - develop
+      - release**
+  pull_request:
+    branches: ["*"]
+    paths:
+      - ".github/**"
+env:
+  ZIZMOR_VERSION: 1.5.2
+
+permissions: {}
+
+jobs:
+  zizmor-scan-full:
+    # Run on schedule, workflow_dispatch or push, all severity, publish results into Security tab (reporting)
+    # Skip Dependabot to avoid permission issues.
+    # TODO: Upload SARIF into Security tab will be introduced later
+    if:
+      ((github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.merged == true)
+      && github.actor != 'dependabot[bot]')
+    name: Check workflows with zizmor
+    permissions:
+      contents: read
+    runs-on: geti-core-c2m4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@22695119d769bdb6f7032ad67b9bca0ef8c4a174 # v5.4.0
+      - name: Run zizmor
+        run: uvx zizmor=="$ZIZMOR_VERSION" . --no-exit-codes > zizmor.txt
+      - name: Upload report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: zizmor-report
+          path: zizmor.txt
+          retention-days: 3
+  zizmor-scan-pr:
+    # Run only within Pull Requests, fail on high severity and high confidence
+    if: (github.event_name == 'pull_request')
+    name: Check PR with zizmor
+    permissions:
+      contents: read
+    runs-on: geti-core-c2m4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@22695119d769bdb6f7032ad67b9bca0ef8c4a174 # v5.4.0
+      - name: Run zizmor
+        run: uvx zizmor=="$ZIZMOR_VERSION" . --min-confidence high --min-severity high

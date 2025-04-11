@@ -1,0 +1,30 @@
+type: object
+properties:
+  task_id:
+    $ref: "../../mongo_id.yaml"
+  n_new_annotations:
+    type: integer
+    description: Number of new annotations for the task that have been added after the last training round
+  ready_to_train:
+    type: boolean
+    description: Boolean indicating whether the project is ready to be manually trained.
+  required_total:
+    type: integer
+    description: Total number of annotations required for this task before training can be started
+  required_per_label:
+    type: array
+    description: Required annotations per label
+    items:
+      type: object
+      properties:
+        id:
+          $ref: "../../mongo_id.yaml"
+        label_name:
+          type: string
+          description: Name of the label
+        label_color:
+          type: string
+          description: Color of the label
+        value:
+          type: integer
+          description: Number of required annotations for this label

@@ -1,0 +1,46 @@
+---
+image: onboarding-service
+replicas: 1
+imagePullPolicy: IfNotPresent
+onboarding_svc:
+  port: 9050
+  target_port: 9000
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 400Mi
+
+account_service:
+  host: "impt-account-service.impt.svc.cluster.local"
+  port: 5001
+
+credit_system:
+  host: "credit-system.impt.svc.cluster.local"
+  port: 5556
+
+global:
+  enable_local_image_pull_secret: false
+  running_on_vm: false
+  security_headers: ""
+  stripped_headers: ""
+  cors_policy:
+    enabled: false
+    allowed_origins: [ ]
+    allowed_headers: [ ]
+    allowed_methods: [ ]
+    max_age: 86400s
+    allow_credentials: false
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsNonRoot: true
+  runAsUser: 10001
+
+marketing_platform_url: ""
+marketing_platform_form_name: ""
+marketing_platform_site_id: ""

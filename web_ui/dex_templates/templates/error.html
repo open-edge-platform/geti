@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" class="spectrum spectrum--medium">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="/dex/static/page-index-vars.css">
+    <link rel="stylesheet" href="/dex/static/main.css">
+    <link rel="icon" href="/dex/static/img/logo.svg"/>
+</head>
+<body>
+    <div class="container">
+        <div class="errorBox box">
+            <div class="boxHeader">
+                <div class="boxHeader-logo" id="logo-id"></div>
+            </div>
+            <div class="boxHeaderSquare-medium"></div>
+            <div class="boxHeaderSquare-small"></div>
+            <div class="errorContent">
+                <div>
+                    <div class="errorImg"></div>
+                    <div class="errorMsg">{{ .ErrMsg }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

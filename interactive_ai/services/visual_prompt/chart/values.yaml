@@ -1,0 +1,76 @@
+image: visual-prompt
+imagePullPolicy: IfNotPresent
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+ingress:
+  endpoints:
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):prompt
+
+resources:
+  requests:
+    cpu: 1
+    memory: 2Gi
+  limits:
+    memory: 2Gi
+
+service:
+  type: ClusterIP
+  port: 8000
+
+serviceAccount:
+  create: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - all
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+global:
+  security_headers: ''
+  stripped_headers: ''
+  docker_namespace: impp
+  enable_master_node_selector: true
+  min_free_disk_space_gib: 20
+  running_on_vm: false
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  sam_encoder_xml_path: "sam_vit_b_zsl_encoder.xml"
+  sam_encoder_bin_path: "sam_vit_b_zsl_encoder.bin"
+  sam_decoder_xml_path: "sam_vit_b_zsl_decoder.xml"
+  sam_decoder_bin_path: "sam_vit_b_zsl_decoder.bin"
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  debian:
+    registry: docker.io
+    repository: bitnami
+    name: bitnami-shell:11-debian-11-r136
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0

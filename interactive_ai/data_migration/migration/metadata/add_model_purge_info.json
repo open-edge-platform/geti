@@ -1,0 +1,9 @@
+{
+  "description": "Adds the model purge info to models if it does not exist yet",
+  "supports_downgrade": true,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["model"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

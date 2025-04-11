@@ -1,0 +1,52 @@
+get:
+  tags:
+    - Predictions
+  summary: Get a prediction for an image
+  description: "Get a prediction for an image. This endpoint currently only supports 'latest' prediction type,
+    where the server returns the latest prediction from cache. Other types have been deprecated: if you want to generate
+    a fresh prediction with the active model ('online') then use the pipelines/<pipeline_id>:predict endpoint."
+  operationId: GetImagePrediction
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/image_id.yaml'
+    - $ref: '../../parameters/path/prediction_type_or_id.yaml'
+    - $ref: '../../parameters/query/task_id.yaml'
+    - $ref: '../../parameters/query/roi_id.yaml'
+  responses:
+    '200':
+      description: Prediction successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/predictions/responses/image_prediction.yaml"
+          examples:
+            Image prediction response:
+              value:
+                $ref: "../../examples/predictions/responses/image_prediction_response.json"
+    '204':
+      description: No prediction available for the requested media.
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Image not found response:
+              value:
+                $ref: "../../examples/media/error_responses/image_not_found.json"

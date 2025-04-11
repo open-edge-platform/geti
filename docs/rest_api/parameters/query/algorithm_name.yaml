@@ -1,0 +1,5 @@
+in: query
+name: algorithm_name
+description: The name of the algorithm for which we want to pull the configurable parameters
+schema:
+  type: string

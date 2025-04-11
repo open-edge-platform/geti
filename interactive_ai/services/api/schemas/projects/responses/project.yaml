@@ -1,0 +1,36 @@
+type: object
+properties:
+  name:
+    type: string
+    description: 'Project name'
+    minLength: 1
+  id:
+    $ref: '../../mongo_id.yaml'
+  pipeline:
+    $ref: "pipeline.yaml"
+  creation_time:
+    type: string
+    description: Creation time of the project
+  creator_id:
+    type: string
+    description: The ID of the user who created the project
+  performance:
+    $ref: "../../performance/responses/project_performance.yaml"
+  thumbnail:
+    type: string
+    description: 'Thumbnail url'
+  datasets:
+    type: array
+    description: List of datasets in the project
+    items:
+      $ref: "dataset_identifier.yaml"
+  storage_info:
+    type: object
+    properties:
+      size:
+        title: Project size in bytes
+        type: integer
+required:
+  - pipeline
+  - datasets
+  - storage_info

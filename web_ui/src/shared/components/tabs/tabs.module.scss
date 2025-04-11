@@ -1,0 +1,26 @@
+div[class*='spectrum-Tabs-selectionIndicator'] {
+    background: var(--energy-blue);
+}
+
+.tabPanels {
+    border: 0 !important;
+    margin-top: var(--spectrum-global-dimension-size-100, var(--spectrum-alias-size-100)) !important;
+    background-color: var(--spectrum-global-color-gray-50) !important;
+    position: relative;
+
+    > div {
+        overflow-x: hidden !important;
+    }
+}
+
+.hideSelectionBar {
+    margin-top: var(--spectrum-global-dimension-size-250);
+
+    div[class*='spectrum-Tabs-selectionIndicator'] {
+        display: none;
+    }
+
+    [role='tablist'] {
+        border: none;
+    }
+}

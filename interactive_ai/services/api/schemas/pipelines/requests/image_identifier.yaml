@@ -1,0 +1,7 @@
+type: object
+description: Identifier for an image which already exists on the system.
+properties:
+  dataset_id:
+    $ref: '../../mongo_id.yaml'
+  image_id:
+    $ref: '../../mongo_id.yaml'

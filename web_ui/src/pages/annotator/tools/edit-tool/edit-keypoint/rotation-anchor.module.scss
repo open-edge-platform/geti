@@ -1,0 +1,16 @@
+.line {
+    --size: calc(2px / var(--zoom-level));
+
+    fill: transparent;
+    stroke-width: var(--size);
+    stroke-dasharray: calc(var(--size) * 4);
+}
+
+.whiteDash {
+    stroke: var(--spectrum-gray-900);
+}
+
+.blackDash {
+    stroke: var(--spectrum-gray-50);
+    stroke-dashoffset: calc(var(--size) * 4);
+}

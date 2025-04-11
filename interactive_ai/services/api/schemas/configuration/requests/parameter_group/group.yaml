@@ -1,0 +1,14 @@
+required:
+  - parameters
+  - name
+type: object
+title: Parameter group
+properties:
+  name:
+    type: string
+    description: Name of the parameter group
+  parameters:
+    type: array
+    description: Array of parameters
+    items:
+      $ref: "../configurable_parameters/parameter.yaml"

@@ -1,0 +1,34 @@
+{
+  "aggregates": [
+    {
+      "group": [
+        {
+          "key": "service_name",
+          "value": "training"
+        }
+      ],
+      "result": {
+        "credits": 71,
+        "resources": {
+          "images": 71,
+          "frames": 0
+        }
+      }
+    },
+    {
+      "group": [
+        {
+          "key": "service_name",
+          "value": "optimization"
+        }
+      ],
+      "result": {
+        "credits": 12,
+        "resources": {
+          "images": 12,
+          "frames": 0
+        }
+      }
+    }
+  ]
+}

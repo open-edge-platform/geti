@@ -1,0 +1,4 @@
+{
+    "http_status": 400,
+    "message":  "Could not upload a file with a size of 0 bytes."
+}

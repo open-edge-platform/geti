@@ -1,0 +1,18 @@
+{
+  "condition": "and",
+  "rules": [
+    {
+      "field": "label_id",
+      "operator": "in",
+      "value": [
+        "id_1",
+        "id_2"
+      ]
+    },
+    {
+      "field": "media_width",
+      "operator": "greater",
+      "value": 10
+    }
+  ]
+}

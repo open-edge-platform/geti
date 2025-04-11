@@ -1,0 +1,50 @@
+type: object
+properties:
+  projects:
+    type: array
+    description: Array of projects
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 'Project name'
+          minLength: 1
+        id:
+          $ref: '../../mongo_id.yaml'
+        pipeline:
+          $ref: "pipeline.yaml"
+        creation_time:
+          type: string
+          description: Creation time of the project
+        creator_id:
+          type: string
+          description: Identifier of the user who created the project
+        performance:
+          $ref: "../../performance/responses/project_performance.yaml"
+        thumbnail:
+          type: string
+          description: 'Thumbnail URL'
+        storage_info:
+          type: object
+          properties:
+            size:
+              title: Project size in bytes
+              type: integer
+      required:
+        - id
+        - creation_time
+        - name
+        - pipeline
+        - storage_info
+        - thumbnail
+  next_page:
+    type: string
+    description: URL to the next projects page
+    minLength: 0
+  project_counts:
+    type: integer
+    description: Total number of projects in the workspace
+  project_page_count:
+    type: integer
+    description: Total number of projects in the response

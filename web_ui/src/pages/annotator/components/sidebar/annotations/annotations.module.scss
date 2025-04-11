@@ -1,0 +1,68 @@
+.countingList {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.countingList [class*='spectrum-TreeView-itemLink'] {
+    cursor: auto !important;
+}
+
+.singleLabelWrapper {
+    display: flex;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+}
+
+.multipleLabelWrapper {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    box-sizing: border-box;
+}
+
+.labelTreeWrapper {
+    height: calc(100% - var(--spectrum-global-dimension-size-1000)); /* subtract the header (counting) height */
+    overflow: auto;
+}
+
+.sliderLabel {
+    cursor: default !important;
+    font-size: var(--spectrum-global-dimension-size-160);
+    margin-right: var(--spectrum-global-dimension-size-50);
+}
+
+.sliderButton {
+    width: var(--spectrum-global-dimension-size-800);
+    height: var(--spectrum-global-dimension-size-300);
+    background-color: var(--spectrum-global-color-gray-100);
+
+    &[class*='is-active'] {
+        background-color: var(--spectrum-global-color-gray-100);
+    }
+
+    span {
+        padding: 0 var(--spectrum-global-dimension-size-50) !important;
+    }
+
+    div {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border-left: 1px solid;
+        border-color: var(--spectrum-actionbutton-border-color-down, var(--spectrum-alias-border-color-down));
+    }
+
+    &[class*='is-disabled'] {
+        div {
+            border: none;
+        }
+    }
+}
+
+.wrapperClass {
+    width: 100%;
+    height: 100%;
+}

@@ -1,0 +1,21 @@
+title: Metadata of `export_dataset` job
+type: object
+description: Information about the exported dataset
+properties:
+  project:
+    description: Information about the project to export
+    $ref: 'project.yaml'
+  dataset:
+    description: Thd dataset information to be exported
+    $ref: 'dataset.yaml'
+  export_format:
+    type: string
+    description: Format of the dataset to be exported
+    enum:
+      - voc
+      - coco
+      - yolo
+      - datumaro
+  download_url:
+    type: string
+    description: URL to download the prepared dataset

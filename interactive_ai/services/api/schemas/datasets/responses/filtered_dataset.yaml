@@ -1,0 +1,28 @@
+type: object
+properties:
+  media:
+    type: array
+    description: List of media items
+    items:
+      oneOf:
+        - $ref: 'filtered_image.yaml'
+        - $ref: 'filtered_video.yaml'
+        - $ref: 'filtered_video_frame.yaml'
+  next_page:
+    type: string
+    description: URL to the next page of results, if the same parameters are used.
+  total_matched_images:
+    type: integer
+    description: Total images that match the query.
+  total_matched_videos:
+    type: integer
+    description: Total videos that match the query.
+  total_matched_video_frames:
+    type: integer
+    description: Total video frames that match the query.
+  total_images:
+    type: integer
+    description: Total images in the dataset.
+  total_videos:
+    type: integer
+    description: Total videos in the dataset.

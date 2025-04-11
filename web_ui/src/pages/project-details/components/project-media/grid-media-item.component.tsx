@@ -1,0 +1,124 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2021 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { useRef } from 'react';
+
+import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { View } from '@react-spectrum/view';
+import { useHover } from 'react-aria';
+
+import { MediaItem } from '../../../../core/media/media.interface';
+import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
+import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
+import { MediaItemActions } from './media-item-actions/media-item-actions.component';
+import { MediaItemTooltipMessage } from './media-item-tooltip-message/media-item-tooltip-message';
+import { getMediaItemTooltipProps } from './media-item-tooltip-message/utils';
+
+import classes from './grid-media-item.module.scss';
+
+interface GridMediaItemProps {
+    id: string;
+    mediaItem: MediaItem;
+    isSelected: boolean;
+    isLargeSize: boolean;
+    isAtLeastOneMediaItemSelected?: boolean;
+    handleDblClick: () => void;
+    toggleMediaSelection: () => void;
+    shouldShowAnnotationIndicator: boolean;
+}
+
+export const GridMediaItem = ({
+    id,
+    mediaItem,
+    isSelected,
+    isAtLeastOneMediaItemSelected,
+    isLargeSize,
+    handleDblClick,
+    toggleMediaSelection,
+    shouldShowAnnotationIndicator,
+}: GridMediaItemProps): JSX.Element => {
+    const triggerRef = useRef(null);
+    const { hoverProps, isHovered } = useHover({});
+
+    const tooltipProps = getMediaItemTooltipProps(mediaItem);
+    const pressProps = isLargeSize
+        ? { onDoubleClick: handleDblClick, onClick: isAtLeastOneMediaItemSelected ? toggleMediaSelection : undefined }
+        : { onClick: handleDblClick };
+
+    return (
+        <div
+            id={`grid-media-item-${id}`}
+            className={[classes.mediaItem, isSelected ? classes.mediaItemSelected : ''].join(' ')}
+            {...hoverProps}
+        >
+            {(isHovered || isSelected) && (
+                <Flex
+                    wrap
+                    ref={triggerRef}
+                    width={'100%'}
+                    position={'absolute'}
+                    justifyContent={'space-between'}
+                    UNSAFE_className={classes.mediaItemActionsWrapper}
+                >
+                    <View width='size-500' height='size-500' zIndex={4}>
+                        <Flex
+                            position='relative'
+                            justifyContent='center'
+                            alignItems='center'
+                            width='100%'
+                            height='100%'
+                        >
+                            <View
+                                width={'100%'}
+                                height={'100%'}
+                                position={'absolute'}
+                                borderRadius={'regular'}
+                                backgroundColor={'gray-50'}
+                            />
+                            <Checkbox
+                                aria-label={'Select media item'}
+                                isSelected={isSelected}
+                                onChange={toggleMediaSelection}
+                                UNSAFE_style={{ padding: 8 }}
+                            />
+                        </Flex>
+                    </View>
+
+                    <View
+                        backgroundColor={'gray-50'}
+                        borderRadius={'regular'}
+                        UNSAFE_style={{ boxSizing: 'border-box', display: 'flex', alignItems: 'center' }}
+                        paddingY={'size-150'}
+                        paddingX={'size-75'}
+                        height={'size-500'}
+                        zIndex={10}
+                    >
+                        <MediaItemActions mediaItem={mediaItem} />
+                    </View>
+                </Flex>
+            )}
+
+            <TooltipTrigger>
+                <ActionElement {...pressProps}>
+                    <MediaItemView
+                        mediaItem={mediaItem}
+                        shouldShowAnnotationIndicator={shouldShowAnnotationIndicator}
+                    />
+                </ActionElement>
+                <Tooltip>
+                    <MediaItemTooltipMessage {...tooltipProps} />
+                </Tooltip>
+            </TooltipTrigger>
+        </div>
+    );
+};

@@ -1,0 +1,26 @@
+{
+    "n_required_annotations": 8,
+    "n_new_annotations": 0,
+    "status_per_task": [
+        {
+            "task_id": "60e710798cc17243dd2c2af4",
+            "required_per_label": [
+                    {
+                        "id": "60e710798cc17243dd2c2af7",
+                        "label_name": "rectangle",
+                        "label_color": "#ff007bff",
+                        "value": 4
+                    },
+                    {
+                        "id": "60e710798cc17243dd2c2af8",
+                        "label_name": "circle",
+                        "label_color": "#2a2b2eff",
+                        "value": 4
+                    }
+                ],
+            "required_total": 8,
+            "n_new_annotations": 0,
+            "ready_to_train": false
+        }
+    ]
+}

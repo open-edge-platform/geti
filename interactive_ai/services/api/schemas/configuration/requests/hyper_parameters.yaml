@@ -1,0 +1,10 @@
+required:
+  - components
+type: object
+description: Hyper parameters for the model to be trained
+properties:
+  components:
+    type: array
+    description: Array of hyper parameter groups
+    items:
+      $ref: "components/hyper_parameter_group.yaml"

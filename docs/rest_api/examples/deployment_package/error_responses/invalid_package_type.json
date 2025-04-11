@@ -1,0 +1,5 @@
+{
+    "http_status": 422,
+    "message": "Invalid package type. Supported types are: ['ovms', 'geti_sdk']",
+    "error_code": "invalid_package_type"
+}

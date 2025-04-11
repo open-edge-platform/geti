@@ -1,0 +1,9 @@
+{
+  "description": "Adds and populates the 'extension' field, if not present, from the binary_filename property for video documents",
+  "supports_downgrade": true,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["video"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

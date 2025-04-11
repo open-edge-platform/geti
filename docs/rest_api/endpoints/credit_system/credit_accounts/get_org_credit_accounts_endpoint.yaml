@@ -1,0 +1,50 @@
+get:
+  tags:
+    - Credit Accounts
+  summary: "[SaaS] Get credit accounts"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Returns active (not expired) credit accounts of the organization.
+  operationId: get_credit_accounts_api_v1_organizations__organization_id__credit_accounts_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+    - name: skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 0
+        default: 0
+        title: Skip
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 0
+        default: 50
+        title: Limit
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/credit_accounts.yaml#/CreditAccountsResponse'
+          example:
+            $ref: '../../../examples/credit_system/credit_accounts/credit_accounts_page_response.json'
+    '404':
+      description: Organization doesn't have any active credit accounts
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

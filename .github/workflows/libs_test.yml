@@ -1,0 +1,46 @@
+name: Libraries - tests and stylechecks
+
+on:
+  workflow_call:
+    inputs:
+      component-dir:
+        description: 'Dir in root directory'
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to checkout'
+        required: true
+        default: 'develop'
+      component-dir:
+        description: 'Path to the component (relative to the root of the repository)'
+        required: true
+
+permissions: {}
+
+env:
+  COMPONENT_DIR: ${{ inputs.component-dir  }}
+
+jobs:
+  component-tests:
+    name: Component workflow
+    runs-on: geti-core-c2m4
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.branch || '' }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+
+      - name: Static code analysis
+        run: make -C "$COMPONENT_DIR" static-code-analysis
+
+      - name: Tests
+        run: make -C "$COMPONENT_DIR" tests

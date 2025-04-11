@@ -1,0 +1,76 @@
+post:
+  tags:
+    - Predictions
+  summary: Generate or retrieve explanations for an image or video frame
+  description: |-
+    Generate or retrieve explanations of the inference output for an image or a single video frame. The explanation is typically the heatmap 
+    highlighting the area which the model finds to be salient. For more info, please refer to [OpenVINO XAI](https://github.com/openvinotoolkit/openvino_xai).
+  operationId: GetSingleExplanation
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/pipeline_id_or_active.yaml'
+    - $ref: '../../parameters/query/roi.yaml'
+    - $ref: '../../parameters/query/hyper_parameters.yaml'
+  requestBody:
+    description: Either an image file, or an identifier for an image or single video frame for which explanations should be returned.
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          required:
+            - file
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+              description: The image file to be uploaded for inference.
+      application/json:
+        schema:
+          oneOf:
+            - $ref: "../../../../interactive_ai/services/api/schemas/pipelines/requests/image_identifier.yaml"
+            - $ref: "../../../../interactive_ai/services/api/schemas/pipelines/requests/video_frame_identifier.yaml"
+        examples:
+          Image identifier:
+            value:
+              $ref: "../../examples/pipelines/request_body/image_identifier.json"
+          Video frame identifier:
+            value:
+              $ref: "../../examples/pipelines/request_body/video_frame_identifier.json"
+  responses:
+    '200':
+      description: Explanations successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/pipelines/responses/single_explanation.yaml"
+          examples:
+            Image explanation response:
+              value:
+                $ref: "../../examples/pipelines/responses/single_explain_response.json"
+    '204':
+      description: No explanation available for the requested media.
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Image not found response:
+              value:
+                $ref: "../../examples/media/error_responses/image_not_found.json"

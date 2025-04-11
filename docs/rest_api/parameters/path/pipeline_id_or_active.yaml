@@ -1,0 +1,14 @@
+in: path
+name: pipeline_id
+style: simple
+description: |-
+  Set this parameter to `active` request predictions generated using the currently active model(s) in the project.
+  For task chain, this parameter could be set to the task ID within the project to request for inference only for that task. 
+  The task ID can be found in the [project detail](#Projects/GetProjectInfo) endpoint. 
+schema:
+  oneOf:
+    - $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+    - type: string
+      enum: [active]
+required: true
+example: "active"

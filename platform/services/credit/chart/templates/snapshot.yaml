@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "credit-system.name" . }}-snapshot
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "credit-system.labels" . | nindent 4 }}
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        {{- if not .Values.global.istio_ambient_mesh }}
+        metadata:
+          annotations:
+            proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+        {{- end }}
+        spec:
+          serviceAccountName: {{ include "credit-system.name" . }}
+          containers:
+          - name: snapshot
+            image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+            imagePullPolicy: IfNotPresent
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            resources:
+{{ toYaml .Values.resources | indent 13 }}
+            command: ["/bin/sh", "-c"]
+            args:
+              - >-
+                curl -o /dev/null -s -w "%{http_code}\n" -XPOST "{{ include "credit-system.name" . }}:{{ .Values.service.ports.https }}/api/v1/internal/tasks/credit_accounts/snapshot";
+                retVal=$?;
+                {{- if not .Values.global.istio_ambient_mesh }}
+                until curl -XPOST 127.0.0.1:15020/quitquitquit;
+                  do sleep 3;
+                done;
+                {{- end }}
+                exit $retVal
+          restartPolicy: Never

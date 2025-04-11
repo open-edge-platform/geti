@@ -1,0 +1,7 @@
+in: path
+name: import_operation_id
+style: simple
+description: Identifier of the project import operation, that is the same id used for uploading the zip archive
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

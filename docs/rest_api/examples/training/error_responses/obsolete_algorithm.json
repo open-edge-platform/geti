@@ -1,0 +1,5 @@
+{
+  "http_status": 422,
+  "message": "The model template with id `Lite-HRNet-18` is obsolete and cannot be used for training.",
+  "error_code": "obsolete_training_algorithm"
+}

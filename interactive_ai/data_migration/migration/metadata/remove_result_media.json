@@ -1,0 +1,9 @@
+{
+  "description": "Drops the result media bucket and removes result media from the metadata_item collection.",
+  "supports_downgrade": false,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["metadata_item"],
+  "deprecated_collections": [],
+  "affects_binary_data": true
+}

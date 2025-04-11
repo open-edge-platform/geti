@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Unable to start training: Algorithm with name 'abc' was not found for task Sample detection task of type detection. Algorithms that are available to this task are: ['ote_anomaly_detection_stfpm', 'ote_anomaly_detection_padim'].",
+  "error_code": "algorithm_not_found"
+}

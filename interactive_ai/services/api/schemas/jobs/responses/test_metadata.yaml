@@ -1,0 +1,62 @@
+title: Metadata of train/optimize/test job
+type: object
+description: Additional information associated with the train/optimize/test job
+properties:
+  task:
+    type: object
+    description: Information about the task associated with the job, if any
+    properties:
+      name:
+        type: string
+        description: Name of the task
+      model_template_id:
+        type: string
+        description: Identifier of the model template used by the task
+      model_architecture:
+        type: string
+        description: Neural network architecture used for the model
+      dataset_storage_id:
+        $ref: "../../mongo_id.yaml"
+      task_id:
+        $ref: "../../mongo_id.yaml"
+  test:
+    type: object
+    description: Information about the test associated with the job, if any
+    properties:
+      model_template_id:
+        type: string
+        description: Identifier of the model template used by the task
+      model_architecture:
+        type: string
+        description: Neural network architecture used for the model
+      model:
+        id:
+          $ref: "../../mongo_id.yaml"
+        template_id:
+          type: string
+          description: Identifier of the model template used by the task
+        architecture:
+          type: string
+          description: Neural network architecture of the model
+        precision:
+          type: array
+          description: Precision of the model
+          items:
+            type: string
+        optimization_type:
+          type: string
+          description: Type of optimization used for the model
+        has_xai_head:
+          type: boolean
+          description: Whether the model has an XAI head to generate saliency maps
+      datasets:
+        $ref: '../../model_test_results/responses/datasets_info.yaml'
+  project:
+    type: object
+    description: Information about the project associated with the job
+    properties:
+      id:
+        $ref: "../../mongo_id.yaml"
+      name:
+        type: string
+        description: Name of the project

@@ -1,0 +1,10 @@
+in: path
+name: prediction_type_or_id
+style: simple
+description: Either the id of a prediction or 'latest'. The latter fetches the latest prediction from the cache, if available.
+schema:
+  oneOf:
+    - $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+    - $ref: "../../../../interactive_ai/services/api/schemas/parameters/prediction_type.yaml"
+required: true
+example: "latest"

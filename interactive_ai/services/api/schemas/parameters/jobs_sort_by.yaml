@@ -1,0 +1,7 @@
+type: string
+enum:
+    - job_name
+    - start_time
+    - end_time
+    - creation_date
+    - priority

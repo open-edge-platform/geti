@@ -1,0 +1,4 @@
+{
+  "script": "update_media_score.py",
+  "metadata": "update_media_score.json"
+}

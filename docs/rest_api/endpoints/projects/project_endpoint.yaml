@@ -1,0 +1,224 @@
+get:
+  tags:
+    - Projects
+  summary: Get info about a project
+  description: Get information about a project. 
+  operationId: GetProjectInfo
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/query/include_deleted_labels.yaml"
+    - $ref: "../../parameters/query/with_size.yaml"
+  responses:
+    '200':
+      description: Info about the requested project
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/projects/responses/project.yaml"
+          examples:
+            Task chain project response:
+              value:
+                $ref: "../../examples/projects/responses/task_chain_project_response.json"
+            Classification response:
+              value:
+                $ref: "../../examples/projects/responses/classification_project_response.json"
+            Detection response:
+              value:
+                $ref: "../../examples/projects/responses/single_detection_project_response.json"
+            Oriented detection response:
+              value:
+                $ref: "../../examples/projects/responses/oriented_detection_project_response.json"
+            Segmentation response:
+              value:
+                $ref: "../../examples/projects/responses/segmentation_project_response.json"
+            Anomaly detection response:
+              value:
+                $ref: "../../examples/projects/responses/anomaly_response.json"
+            Detection classification response:
+              value:
+                $ref: "../../examples/projects/responses/detection_classification_response.json"
+            Detection Segmentation response:
+              value:
+                $ref: "../../examples/projects/responses/detection_segmentation_task_chain_project_response.json"
+            Keypoint detection response:
+              value:
+                $ref: "../../examples/projects/responses/keypoint_detection_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+
+
+
+put:
+  tags:
+    - Projects
+  summary: Edit a project
+  description: |-
+    Edit project properties. This is limited to: 
+    - Editing project name
+    - Adding or removing labels
+    - Editing label name, color, and hotkey.
+  operationId: EditProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/projects/requests/put/project.yaml"
+        examples:
+          Updating task chain project:
+            value:
+              $ref: "../../examples/projects/requests/put/task_chain_project_update_request.json"
+          Updating single detection project:
+            value:
+              $ref: "../../examples/projects/requests/put/single_detection_project_update_request.json"
+          Adding a new label to classification project:
+            value:
+              $ref: "../../examples/projects/requests/put/classification_project_label_addition_request.json"
+          Deleting a label for a classification project:
+            value:
+              $ref: "../../examples/projects/requests/put/classification_project_label_deletion_request.json"
+          Editing the keypoint graph in a keypoint detection project:
+            value:
+              $ref: "../../examples/projects/requests/put/keypoint_detection_edit_request.json"
+    required: true
+  responses:
+    '200':
+      description: Project successfully edited
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/projects/responses/project.yaml"
+          examples:
+            Task chain update response:
+              value:
+                $ref: "../../examples/projects/responses/task_chain_project_response.json"
+            Single task update response:
+              value:
+                $ref: "../../examples/projects/responses/single_detection_project_response.json"
+            Classification project label addition response:
+              value:
+                $ref: "../../examples/projects/responses/classification_project_label_addition_response.json"
+    '400':
+      description: Request body is invalid
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Empty name:
+              value:
+                $ref: "../../examples/projects/error_responses/project_name_empty.json"
+            No name:
+              value:
+                $ref: "../../examples/projects/error_responses/no_project_name_provided.json"
+            No pipeline:
+              value:
+                $ref: "../../examples/projects/error_responses/no_pipeline_provided.json"
+            Invalid labels:
+              value:
+                $ref: "../../examples/projects/error_responses/invalid_labels.json"
+            Changed label group:
+              value:
+                $ref: "../../examples/projects/error_responses/cannot_change_label_group.json"
+            Wrong number of nodes:
+              value:
+                $ref: "../../examples/projects/error_responses/wrong_number_of_nodes.json"
+            Incorrect node name:
+              value:
+                $ref: "../../examples/projects/error_responses/incorrect_node_name.json"
+            Duplicate edge in graph:
+              value:
+                $ref: "../../examples/projects/error_responses/duplicate_edge_in_graph.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Label not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/label_not_found.json"
+    '409':
+      description: Requested project cannot be edited
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Cannot edit project response:
+              value:
+                $ref: "../../examples/projects/error_responses/cannot_edit_project.json"
+
+
+
+delete:
+  tags:
+    - Projects
+  summary: Delete a project
+  description: Delete a project. Note that a deleted project cannot be recovered. 
+  operationId: DeleteProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  responses:
+    '200':
+      description: Successfully deleted project
+      content:
+        application/json:
+          examples:
+            Project deletion response:
+              value:
+                {"result":"success"}
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+    '409':
+      description: Requested project cannot be deleted due to running jobs
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Cannot delete project response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_locked.json"

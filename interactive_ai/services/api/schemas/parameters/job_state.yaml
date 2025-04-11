@@ -1,0 +1,9 @@
+type: string
+enum:
+  - idle
+  - running
+  - paused
+  - finished
+  - error
+  - failed
+  - cancelled

@@ -1,0 +1,105 @@
+{
+  "video_annotations": [
+    {
+      "annotations": [
+        {
+          "id": "61df0314-9851-4fc9-8858-aaab8f0508c2",
+          "labels": [
+            {
+              "color": "#26518eff",
+              "id": "61387685df33ae8280c33d9d",
+              "name": "test",
+              "probability": 1,
+              "source": {
+                "user_id": "default_user",
+                "model_id": "61387685df33ae8280c347b2",
+                "model_storage_id": "62387685df33ae8280c63a34"
+              }
+            }
+          ],
+          "labels_to_revisit": [],
+          "modified": "2021-09-08T13:40:44.445000+00:00",
+          "shape": {
+            "height": 20,
+            "type": "ELLIPSE",
+            "width": 20,
+            "x": 100,
+            "y": 100
+          }
+        }
+      ],
+      "id": "6138bd5c3b7b11505c43f2c3",
+      "kind": "annotation",
+      "media_identifier": {
+        "frame_index": 630,
+        "type": "video_frame",
+        "video_id": "6138bca43b7b11505c43f2c1"
+      },
+      "modified": "2021-09-08T13:40:44.448000+00:00",
+      "labels_to_revisit_full_scene": [],
+      "annotation_state_per_task": [
+        {
+          "task_id": "61012cdb1d38a5e71ef3bafd",
+          "state": "annotated"
+        }
+      ]
+    },
+    {
+      "annotations": [
+        {
+          "id": "5d33413a-bf99-4af7-bebb-e30d0c6cfc9f",
+          "labels": [
+            {
+              "color": "#26518eff",
+              "id": "61387685df33ae8280c33d9d",
+              "name": "test",
+              "probability": 1,
+              "source": {
+                "user_id": "default_user",
+                "model_id": "61387685df33ae8280c347b2",
+                "model_storage_id": "62387685df33ae8280c63a34"
+              }
+            }
+          ],
+          "labels_to_revisit": [
+            "61387685df33ae8280c33d9d",
+            "61387685df33ae8280c33d9e"
+          ],
+          "modified": "2021-09-08T13:39:49.650000+00:00",
+          "shape": {
+            "type": "RECTANGLE",
+            "x": 100,
+            "y": 100,
+            "width": 20,
+            "height": 20
+          }
+        }
+      ],
+      "id": "6138bd253b7b11505c43f2c2",
+      "kind": "annotation",
+      "media_identifier": {
+        "frame_index": 240,
+        "type": "video_frame",
+        "video_id": "6138bca43b7b11505c43f2c1"
+      },
+      "modified": "2021-09-08T13:39:49.653000+00:00",
+      "labels_to_revisit_full_scene": [
+        "61387685df33ae8280c33d9d"
+      ],
+      "annotation_state_per_task": [
+        {
+          "task_id": "61012cdb1d38a5e71ef3bafd",
+          "state": "to_revisit"
+        }
+      ]
+    }
+  ],
+  "video_annotation_properties": {
+    "total_count":2,
+    "start_frame":0,
+    "end_frame":630,
+    "total_requested_count":2,
+    "requested_start_frame":0,
+    "requested_end_frame": 1000
+  }
+}

@@ -1,0 +1,29 @@
+get:
+  tags:
+    - Status
+  summary: Get server status for organization
+  description: Get the server status for a given organization. Contains running jobs count, free disk space and used disk space in bytes.
+  operationId: GetOrganizationStatus
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+  responses:
+    '200':
+      description: The server status for organization
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/status/responses/server_status.yaml"
+          examples:
+            Server status response:
+              value:
+                $ref: "../../examples/status/responses/server_status_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"

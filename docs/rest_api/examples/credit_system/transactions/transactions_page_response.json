@@ -1,0 +1,24 @@
+{
+    "total_matched": 3,
+    "next_page": null,
+    "transactions": [
+        {
+            "credits": 12,
+            "project_id": "66aa8abff93bad108c06ec0a",
+            "service_name": "optimization",
+            "milliseconds_timestamp": 1722512643184
+        },
+        {
+            "credits": 12,
+            "project_id": "66aa8abff93bad108c06ec0a",
+            "service_name": "training",
+            "milliseconds_timestamp": 1722511748352
+        },
+        {
+            "credits": 59,
+            "project_id": "66aa882df93bad108c06eb0d",
+            "service_name": "training",
+            "milliseconds_timestamp": 1722511718089
+        }
+    ]
+}

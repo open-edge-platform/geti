@@ -1,0 +1,26 @@
+.canvasComponent {
+    width: 100%;
+    height: 100%;
+}
+
+.transformWrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    touch-action: none;
+    user-select: none;
+}
+
+.transformContent {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+}
+
+.isPanning {
+    cursor: grab !important;
+
+    & * {
+        cursor: grab !important;
+    }
+}

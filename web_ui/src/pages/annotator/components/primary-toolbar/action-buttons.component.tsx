@@ -1,0 +1,96 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2021 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { useMemo } from 'react';
+
+import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex } from '@react-spectrum/layout';
+import isEmpty from 'lodash/isEmpty';
+
+import { Divider } from '../../../../shared/components/divider/divider.component';
+import { FitImageToScreenButton } from '../../../../shared/components/fit-image-to-screen-button/fit-image-to-screen-button.component';
+import { hasEqualId } from '../../../../shared/utils';
+import {
+    TOGGLE_VISIBILITY_COLOR_MODE,
+    ToggleVisibilityButton,
+} from '../../annotation/toggle-visibility-button/toggle-visibility-button.component';
+import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
+import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
+import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';
+import { getOutputFromTask } from '../../providers/task-chain-provider/utils';
+import { useTask } from '../../providers/task-provider/task-provider.component';
+import { CanvasAdjustments } from './canvas-adjustments/canvas-adjustments.component';
+import { HotKeysButton } from './hot-keys-button/hot-keys-button.component';
+
+interface ActionButtonsProps {
+    annotationToolContext: AnnotationToolContext;
+}
+
+export const ActionButtons = ({ annotationToolContext }: ActionButtonsProps): JSX.Element => {
+    const isSceneBusy = useIsSceneBusy();
+    const { tasks, selectedTask } = useTask();
+    const { isActiveLearningMode } = useAnnotatorMode();
+
+    const {
+        scene: { setHiddenAnnotations, annotations: annotationsScene },
+    } = annotationToolContext;
+
+    const annotations = getOutputFromTask(annotationsScene, tasks, selectedTask);
+    const allAnnotationsHidden = useMemo(
+        () => !isEmpty(annotations) && annotations.every((annotation) => annotation.isHidden),
+        [annotations]
+    );
+    const toggleAnnotationsTooltip = allAnnotationsHidden ? 'Show annotations' : 'Hide annotations';
+    const isToggleVisibilityButtonDisabled = isEmpty(annotations) || isSceneBusy;
+
+    const toggleVisibility = (isHidden: boolean) => {
+        setHiddenAnnotations((annotation) => {
+            if (annotations.some(hasEqualId(annotation.id))) {
+                return isHidden;
+            }
+
+            return annotation.isHidden;
+        });
+    };
+
+    const toggleVisibilityAnnotations = () => {
+        toggleVisibility(!allAnnotationsHidden);
+    };
+
+    return (
+        <Flex direction='column' gap='size-100' alignItems='center' justify-content='center'>
+            <TooltipTrigger placement={'right'}>
+                <FitImageToScreenButton key={'fit-image-to-screen-button'} />
+                <Tooltip>Fit image to screen</Tooltip>
+            </TooltipTrigger>
+
+            {isActiveLearningMode && (
+                <TooltipTrigger placement={'right'}>
+                    <ToggleVisibilityButton
+                        key={'all-annotations'}
+                        id={'all-annotations'}
+                        onPress={toggleVisibilityAnnotations}
+                        isHidden={allAnnotationsHidden}
+                        isDisabled={isToggleVisibilityButtonDisabled}
+                        colorMode={TOGGLE_VISIBILITY_COLOR_MODE.NEVER_GRAYED_OUT}
+                    />
+                    <Tooltip>{toggleAnnotationsTooltip}</Tooltip>
+                </TooltipTrigger>
+            )}
+
+            <CanvasAdjustments key={'canvas-adjustments'} />
+
+            <Divider size={'S'} />
+            <HotKeysButton />
+        </Flex>
+    );
+};

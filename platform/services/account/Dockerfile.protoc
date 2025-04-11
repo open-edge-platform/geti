@@ -1,0 +1,27 @@
+FROM golang:1.20.5
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y curl unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+# Manually install protoc
+RUN curl -sSL https://github.com/protocolbuffers/protobuf/releases/download/v23.3/protoc-23.3-linux-x86_64.zip -o protoc.zip && \
+    unzip protoc.zip -d /usr/local 'include/*' && \
+    unzip protoc.zip -d /usr/local 'bin/*' && \
+    rm -f protoc.zip
+
+# Install the protoc-gen-go and protoc-gen-go-grpc plugins
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31.0 \
+    && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
+RUN go install \
+        github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@v2.16.0 \
+        github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@v2.16.0
+
+# Download the Google common protos
+RUN mkdir /googleapis && \
+    curl -sSL https://github.com/googleapis/googleapis/archive/499a1f532e348dc3dbbeda9b6e65c5b4b0553517.zip -o googleapis.zip && \
+    unzip googleapis.zip -d /googleapis && \
+    cp -R /googleapis/googleapis-499a1f532e348dc3dbbeda9b6e65c5b4b0553517/google /usr/local/include/ && \
+    rm -rf googleapis.zip /googleapis
+
+ENV PATH="/usr/local/bin:/go/bin:${PATH}"

@@ -1,0 +1,58 @@
+type: object
+required:
+  - frame_index
+  - media_information
+  - name
+  - test_result
+  - thumbnail
+  - type
+  - video_id
+  - preprocessing
+
+properties:
+  annotation_scene_id:
+    oneOf:
+      - $ref: "../../mongo_id.yaml"
+      - type: "null"
+  annotation_state_per_task:
+    type: array
+    description: Annotation state per task of the image.
+    items:
+      $ref: "../../annotations/responses/annotation_state_per_task.yaml"
+  last_annotator_id:
+    type:
+      - "string"
+      - "null"
+  frame_index:
+    type: integer
+    description: The index of the video frame (0-based)
+  media_information:
+    $ref: "../../media/responses/media_information.yaml"
+  preprocessing:
+    type: string
+    description: Status of the preprocessing operation
+    enum: [ "SCHEDULED", "IN_PROGRESS", "FINISHED", "FAILED" ]
+  name:
+    type: string
+    description: The title of the video frame
+  roi_id:
+    oneOf:
+      - $ref: "../../annotations/uuid.yaml"
+      - type: "null"
+  test_result:
+    $ref: "test_result.yaml"
+  thumbnail:
+    type: string
+    description: Relative URL to the video frame thumbnail
+  type:
+    type: string
+    description: Type of media. 'image' for images, 'video' for video and 'video_frame' for video frames.
+    enum: [ video_frame ]
+  upload_time:
+    type: string
+    description: Upload time of the media file
+  uploader_id:
+    type: string
+    description: The ID of the user who uploaded the video
+  video_id:
+    $ref: "../../mongo_id.yaml"

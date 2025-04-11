@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "notifier.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "notifier.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels: {{- include "notifier.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "notifier.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "notifier.name" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            {{- if .Values.kafka.address }}
+            - name: KAFKA_ADDRESS
+              value: {{ .Values.kafka.address }}
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: user
+                  name: "{{ .Release.Namespace }}-kafka-jaas-{{ include "notifier.name" . }}"
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: "{{ .Release.Namespace }}-kafka-jaas-{{ include "notifier.name" . }}"
+            {{ else }}
+            - name: KAFKA_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  key: KAFKA_ADDRESS
+                  name: geti-configuration
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: "{{ include "notifier.name" . }}-kafka"
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: "{{ include "notifier.name" . }}-kafka"
+            {{- end }}
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "{{ .Values.kafka.security_protocol }}"
+            - name: SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  key: smtp_host
+                  name: "{{ .Release.Namespace }}-email-config"
+            - name: "SMTP_PORT"
+              valueFrom:
+                secretKeyRef:
+                  key: smtp_port
+                  name: "{{ .Release.Namespace }}-email-config"
+            - name: SMTP_LOGIN
+              valueFrom:
+                secretKeyRef:
+                  key: smtp_login
+                  name: "{{ .Release.Namespace }}-email-config"
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: smtp_password
+                  name: "{{ .Release.Namespace }}-email-config"
+            - name: GETI_NOTIFICATION_TOPIC
+              value: "{{ .Values.kafka.topic }}"
+          volumeMounts:
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: "{{ .Values.logging_config.name }}"

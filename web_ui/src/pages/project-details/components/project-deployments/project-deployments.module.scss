@@ -1,0 +1,54 @@
+.dialog {
+    hr {
+        margin-bottom: var(--spectrum-global-dimension-size-50) !important;
+    }
+}
+
+.modelInfo {
+    padding: var(--spectrum-global-dimension-size-100) var(--spectrum-global-dimension-size-200);
+    background-color: var(--spectrum-global-color-gray-200);
+    gap: var(--spectrum-global-dimension-size-300);
+}
+
+.infoItem {
+    min-width: 102px;
+}
+
+.headerInfo {
+    color: var(--spectrum-global-color-gray-800);
+}
+
+.title {
+    color: var(--spectrum-global-color-gray-600);
+    font-size: var(--spectrum-global-dimension-font-size-50);
+    text-transform: uppercase;
+    margin-right: var(--spectrum-global-dimension-size-100);
+}
+
+.description {
+    color: var(--spectrum-global-color-gray-800);
+}
+
+.taskInfoWrapper {
+    padding: var(--spectrum-global-dimension-size-100) var(--spectrum-global-dimension-size-200);
+    background-color: var(--spectrum-global-color-gray-200);
+}
+
+.taskTitle {
+    color: var(--spectrum-global-color-gray-600);
+    font-size: var(--spectrum-global-dimension-font-size-50);
+    text-transform: uppercase;
+}
+
+.label {
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    color: var(--spectrum-global-color-gray-700);
+    margin-bottom: var(--spectrum-global-dimension-size-100);
+}
+
+.taskChainButtonGroup,
+.taskChainButtonWithTooltip {
+    button {
+        margin-left: var(--spectrum-global-dimension-size-100) !important;
+    }
+}

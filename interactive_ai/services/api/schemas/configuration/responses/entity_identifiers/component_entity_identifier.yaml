@@ -1,0 +1,19 @@
+type: object
+title: Component entity identifier
+properties:
+  workspace_id:
+    oneOf:
+    - $ref: "../../../mongo_id.yaml"
+    - $ref: "../../../uuid.yaml"
+  project_id:
+    $ref: "../../../mongo_id.yaml"
+  task_id:
+    $ref: "../../../mongo_id.yaml"
+  component:
+    type: string
+    description: Describes the component to which the configurable parameters apply
+  type:
+    type: string
+    description: "Describes the type of the configuration. Set to COMPONENT_PARAMETERS for a configuration that
+      relates to a component."
+    enum: ["COMPONENT_PARAMETERS"]

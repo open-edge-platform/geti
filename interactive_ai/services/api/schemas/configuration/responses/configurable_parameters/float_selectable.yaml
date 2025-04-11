@@ -1,0 +1,43 @@
+type: object
+title: Selectable float
+properties:
+  header:
+    type: string
+    description: User friendly title for the selectable.
+  description:
+    type: string
+    description: User friendly description for what the selectable parameter does.
+  warning:
+    description: Warning message (if any) that explains the user to use caution when changing this parameter, and why.
+  value:
+    type: string
+    description: Value that this selectable currently takes.
+  default_value:
+    type: string
+    description: Default value that should be set for this selectable.
+  name:
+    type: string
+    description: Name to identify the selectable parameter by in the system.
+  template_type:
+    type: string
+    enum: [selectable]
+    description: "Describes the template type of the parameter. 'selectable' is used for parameters with a fixed set of
+    possible values. 'input' is used for parameters that allow free input, possibly restricted to a certain range.
+    Template_type is always 'selectable' for a selectable parameter."
+  data_type:
+    type: string
+    enum: [float]
+    description: "Describes the type of parameter. Parameters can be integers, floats, boolean or string. Data_type is
+    always 'float' for a selectable float."
+  options:
+    type: array
+    description: List of values that this float selectable can take.
+    items:
+      type: number
+      format: float
+  ui_rules:
+    type: object
+    description: Not implemented at this moment
+  editable:
+    type: boolean
+    description: Not implemented at this moment.

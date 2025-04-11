@@ -1,0 +1,93 @@
+post:
+  tags:
+    - Media
+  summary: Upload a video
+  description: |-
+    Upload a video to a dataset. Allowed formats are `.mp4`, `.avi`, `.mkv` `.mov`, `.webm` and `.m4v`. The maximum resolution for
+    videos is 8K and the file may not be larger than 4.7 GB. For a classification project, all frames of the uploaded
+    video can be annotated directly by specifying the labels in the field upload_info. 
+  operationId: UploadVideo
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+  requestBody:
+    content:
+      multipart/form-data:
+        schema:
+          required:
+            - file
+          type: object
+          properties:
+            file:
+              type: string
+              format: binary
+              description: The video file to be uploaded.
+            upload_info:
+              type: string
+              description: |-
+                IDs of the labels to apply to the video. Uses the format of a json decodable string. 
+                The label id's could be found from the response of the [project detail](#Projects/GetProjectInfo) endpoint. 
+                Labels are applied to all video frames at 1 fps. 
+                Example: *{\"label_ids\":[\"613776cec8223e455a88383d\", \"613776cec8223e455a88383e\"]}*. 
+  responses:
+    '200':
+      description: Video has been uploaded. The 'size' field represents bits, "duration" is in seconds.
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../interactive_ai/services/api/schemas/media/responses/video.yaml'
+          examples:
+            Video upload response:
+              value:
+                $ref: '../../examples/media/responses/single_video.json'
+    '400':
+      description: No file provided
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid media response:
+              value:
+                $ref: "../../examples/media/error_responses/no_file_provided.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+    '413':
+      description: Payload too large
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Payload too large response:
+              value:
+                $ref: "../../examples/error_responses/payload_too_large.yaml"
+    '415':
+      description: Invalid media
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid media response:
+              value:
+                $ref: "../../examples/media/error_responses/invalid_media.json"

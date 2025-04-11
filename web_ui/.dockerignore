@@ -1,0 +1,16 @@
+*
+!.prettierrc
+!eslint.config.mjs
+!.env
+!.env.production
+!tsconfig.json
+!.npmrc
+!.nvmrc
+!package.json
+!package-lock.json
+!src
+!public
+!nginx.repo
+!nginx.conf
+!rsbuild.config.ts
+!dev-proxy.ts

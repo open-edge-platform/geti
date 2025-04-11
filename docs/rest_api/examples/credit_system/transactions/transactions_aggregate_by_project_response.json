@@ -1,0 +1,34 @@
+{
+    "aggregates": [
+        {
+            "group": [
+                {
+                    "key": "project",
+                    "value": "66aa882df93bad108c06eb0d"
+                }
+            ],
+            "result": {
+                "credits": 59,
+                "resources": {
+                    "images": 59,
+                    "frames": 0
+                }
+            }
+        },
+        {
+            "group": [
+                {
+                    "key": "project",
+                    "value": "66aa8abff93bad108c06ec0a"
+                }
+            ],
+            "result": {
+                "credits": 24,
+                "resources": {
+                    "images": 24,
+                    "frames": 0
+                }
+            }
+        }
+    ]
+}

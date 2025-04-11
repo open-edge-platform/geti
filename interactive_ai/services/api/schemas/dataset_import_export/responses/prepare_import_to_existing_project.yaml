@@ -1,0 +1,16 @@
+title: Metadata of `prepare_import_to_existing_project` job
+type: object
+description: Labels in the dataset and warnings
+properties:
+  file_id:
+    $ref: 'file_id.yaml'
+  project:
+    description: Information about the project where the dataset is imported
+    $ref: 'project.yaml'
+  warnings:
+    $ref: 'warnings.yaml'
+  labels:
+    type: array
+    description: Label names in the dataset
+    items:
+      type: string

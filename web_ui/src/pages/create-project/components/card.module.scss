@@ -1,0 +1,68 @@
+.main {
+    cursor: pointer;
+    height: fit-content;
+    width: 95%;
+}
+
+.selected {
+    border: var(--spectrum-alias-border-size-thick) solid var(--energy-blue);
+    border-radius: var(--spectrum-alias-border-radius-regular);
+    @extend .main;
+}
+
+.card {
+    border: var(--spectrum-alias-border-size-thick) solid transparent;
+    @extend .main;
+}
+
+.disabled {
+    cursor: not-allowed;
+}
+
+.cardBody:last-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: var(--spectrum-card-border-radius);
+    border-bottom-left-radius: var(--spectrum-card-border-radius);
+}
+
+.coverPhoto {
+    height: var(--spectrum-global-dimension-size-1700) !important;
+    background-color: var(--spectrum-card-m-coverphoto-background-color, var(--spectrum-global-color-gray-200));
+    border-bottom-color: var(--spectrum-card-m-coverphoto-border-color, var(--spectrum-global-color-gray-200));
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: var(--spectrum-card-coverphoto-border-bottom-size) solid transparent;
+    border-top-left-radius: calc(var(--spectrum-card-border-radius) - 1px);
+    border-top-right-radius: calc(var(--spectrum-card-border-radius) - 1px);
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    background-size: cover;
+    background-position: center center;
+    position: relative;
+
+    img {
+        width: 90%;
+        height: auto;
+    }
+}
+
+.boxes {
+    position: absolute;
+    top: var(--spectrum-global-dimension-size-175);
+    left: var(--spectrum-global-dimension-size-175);
+}
+
+.cardRadioBtn {
+    display: flex !important;
+    align-items: center !important;
+    margin-block-start: 0 !important;
+    margin-inline-end: 0 !important;
+
+    span:last-child {
+        margin-block-start: 0 !important;
+        margin-inline-end: 0 !important;
+    }
+}

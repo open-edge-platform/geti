@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "message": "'pipeline' is a required property",
+  "error_code": "bad_request"
+}

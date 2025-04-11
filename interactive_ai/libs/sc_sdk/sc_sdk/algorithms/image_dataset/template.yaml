@@ -1,0 +1,8 @@
+task_family: "DATASET"
+task_type: "DATASET"
+name: "Dataset"
+model_template_id: "dataset"
+is_trainable: false
+instantiation: "CLASS"
+entrypoints:
+  base: "microservices.director_microservice.chaining.task_dataset_2d.Dataset2DTask"

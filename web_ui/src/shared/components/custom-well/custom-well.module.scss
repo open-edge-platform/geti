@@ -1,0 +1,44 @@
+.basicWell {
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+.common {
+    @extend .basicWell;
+
+    cursor: pointer !important;
+}
+
+.selectableWell {
+    @extend .common;
+
+    background: var(--spectrum-global-color-gray-75) !important;
+
+    &:hover {
+        background: var(--spectrum-global-color-gray-100) !important;
+    }
+}
+
+.selected {
+    @extend .common;
+
+    border: var(--spectrum-alias-border-size-thick) solid var(--energy-blue) !important;
+    border-radius: var(--spectrum-alias-border-radius-regular) !important;
+}
+
+.projectCreationWell {
+    &:not(.selected) {
+        border: var(--spectrum-alias-border-size-thick) solid transparent !important;
+    }
+}
+
+.customWellLink {
+    color: var(--spectrum-global-color-gray-800) !important;
+    text-decoration: none;
+}
+
+.notClickable {
+    & > * {
+        cursor: default !important;
+    }
+}

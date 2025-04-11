@@ -1,0 +1,5 @@
+{
+  "http_status": 405,
+  "message": "The model group cannot be activated",
+  "error_code": "model_storage_not_activable"
+}

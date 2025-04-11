@@ -1,0 +1,55 @@
+post:
+  tags:
+    - Models
+  summary: Set the latest model in the model group as the active model
+  description: |-
+    Set the latest model of the model group to be the active model.
+    Active model is used to generate predictions requested through the 
+    [predict](#Predictions/GetSinglePrediction) or [explain](#Predictions/GetSingleExplanation) endpoints 
+    (and their batch variants). 
+  operationId: ActivateModelGroup
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/model_group_id.yaml'
+  responses:
+    '200':
+      description: Model group successfully activated
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/models/responses/model_group.yaml"
+          examples:
+            Activated model group response:
+              value:
+                $ref: "../../examples/models/responses/model_group_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Model group not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_group_not_found.json"
+    '405':
+      description: Model group cannot be activated. It does not contain successful models
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Model group not activable response:
+              value:
+                $ref: "../../examples/models/error_responses/model_group_not_activable.json"

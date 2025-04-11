@@ -1,0 +1,49 @@
+.text {
+    font-size: var(--spectrum-global-dimension-font-size-50);
+    line-height: var(--spectrum-global-dimension-font-size-200);
+}
+
+.tooltipButton {
+    cursor: default !important;
+}
+
+.metaItemCommon {
+    display: flex;
+    align-items: center;
+    height: var(--spectrum-global-dimension-size-200) !important;
+}
+
+.metaItem {
+    border-right: 1px solid var(--spectrum-global-color-gray-50);
+    @extend .metaItemCommon;
+}
+
+.frameNumber {
+    @extend .metaItem;
+    box-sizing: border-box;
+    min-width: var(--spectrum-global-dimension-size-800);
+}
+
+.metaItemLeftBorder {
+    border-left: 1px solid var(--spectrum-global-color-gray-50);
+    @extend .metaItemCommon;
+}
+
+.mediaName {
+    flex: 2;
+}
+
+.dimensions {
+    white-space: nowrap;
+}
+
+.zoomLevel,
+.zoomLevelValue {
+    cursor: pointer;
+    padding-left: var(--spectrum-global-dimension-size-85);
+    padding-right: var(--spectrum-global-dimension-size-100);
+}
+
+.zoomLevelValue {
+    width: var(--spectrum-global-dimension-size-500); // To avoid flickering when the value changes
+}

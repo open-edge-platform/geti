@@ -1,0 +1,5 @@
+type: string
+minLength: 36
+maxLength: 36
+example: "2e1de607-b549-42bf-8031-fd16d87379e5"
+description: UUID of the object

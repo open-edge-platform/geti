@@ -1,0 +1,11 @@
+.idea
+.idea/*
+.coverage
+*.venv*
+common_libs/
+reports/
+__pycache__/
+*.egg-info/
+build/
+.DS_Store
+*.python-version

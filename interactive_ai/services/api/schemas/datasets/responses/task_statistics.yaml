@@ -1,0 +1,37 @@
+description: Statistics for the task of interest
+type: object
+properties:
+  annotated_frames:
+    description: Number of annotated frames per task
+    type: number
+    format: int32
+  annotated_images:
+    description: Number of annotated images per task
+    type: number
+    format: int32
+  annotated_videos:
+    description: Number of annotated videos per task
+    type: number
+    format: int32
+  objects_per_label:
+    description: Number of annotated shapes per label
+    type: array
+    items:
+      type: object
+      properties:
+        id:
+          $ref: '../../mongo_id.yaml'
+        name:
+          type: string
+          description: Name of the label
+        color:
+          type: string
+          description: Color of the label
+        value:
+          type: number
+          format: int32
+          description: Number of annotated shapes for this label
+  object_size_distribution_per_label:
+    $ref: "object_size_statistics.yaml"
+  task_id:
+    $ref: '../../mongo_id.yaml'

@@ -1,0 +1,34 @@
+required:
+  - title
+  - task_type
+  - id
+type: object
+additionalProperties: false
+properties:
+  title:
+    type: string
+    description: 'Task title, must be unique'
+  task_type:
+    type: string
+    description: 'Task type; should be one of: [ classification, detection, segmentation, anomaly, crop, dataset ]'
+  id:
+    $ref: "../../../mongo_id.yaml"
+  labels:
+    type: array
+    description: List of labels
+    items:
+      $ref: 'label.yaml'
+  label_schema_id:
+    $ref: "../../../mongo_id.yaml"
+    nullable: true
+  keypoint_structure:
+    type: object
+    description: "The keypoint structure which holds the edges of the graph, and the position of the keypoints. Supported only for Keypoint Detection tasks."
+    edges:
+      type: array
+      items:
+        $ref: 'keypoint_edge.yaml'
+    positions:
+      type: array
+      items:
+        $ref: 'keypoint_position.yaml'

@@ -1,0 +1,34 @@
+{
+  "id": "66042c7b93ae9dd902d2bc6a",
+  "type": "import_project",
+  "creation_time": "2024-03-27T14:26:03.565000+00:00",
+  "start_time": "2024-03-27T14:26:11.162000+00:00",
+  "end_time": "2024-03-27T14:26:55.735000+00:00",
+  "name": "Project Import",
+  "author": "bcc5fa82-7b94-4b1b-9c71-0526b793c3e0",
+  "state": "finished",
+  "steps": [
+    {
+      "message": "Project import complete",
+      "index": 1,
+      "progress": 100,
+      "state": "finished",
+      "step_name": "Importing project",
+      "duration": 29.827
+    }
+  ],
+  "cancellation_info": {
+    "is_cancelled": false,
+    "user_uid": null,
+    "cancel_time": null
+  },
+  "metadata": {
+    "parameters": {
+      "file_id": "66042c3a446e356aedce4cd3"
+    },
+    "project": {
+      "id": "66042c987b4bd079335e9f8e",
+      "name": "MyProject"
+    }
+  }
+}

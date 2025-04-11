@@ -1,0 +1,107 @@
+#  INTEL CONFIDENTIAL
+#
+#  Copyright (C) 2025 Intel Corporation
+#
+#  This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+#  the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+#  you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+#  without Intel's prior written permission.
+#
+#  This software and the related documents are provided as is, with no express or implied warranties,
+#  other than those that are expressly stated in the License.
+
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+#  hostnames:
+#    - "*.intel.com"  # only for SaaS
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects/.*/thumbnail
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/videos/.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/videos
+        - path:
+            type: RegularExpression
+            value: /api/v1/healthz
+        - path:
+            type: RegularExpression
+            value: /api/v1/product_info
+        - path:
+            type: RegularExpression
+            value: /api/.*/tests/.*/results:query
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects_names
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          port: {{ .Values.service.ports.resource.port }}
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects/[0-9a-fA-F]+
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects/.*/settings/annotation_templates
+        - path:
+            type: RegularExpression
+            value: /api/.*/media:query
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)
+        - path:
+            type: RegularExpression
+            value: /api/.*/models
+        - path:
+            type: RegularExpression
+            value: /api/.*/datasets
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          port: {{ .Values.service.ports.resource.port }}
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/.*/datasets/[0-9a-fA-F]+
+        - path:
+            type: RegularExpression
+            value: /api/.*/datasets/.*/statistics
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/images
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/images/[0-9a-fA-F]+
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/images/.*/annotations.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/code_deployments.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/deployment_package.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/training_revisions.*
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          port: {{ .Values.service.ports.resource.port }}
+{{- end}}

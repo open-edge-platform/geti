@@ -1,0 +1,179 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { View } from '@adobe/react-spectrum';
+import { useOverlayTriggerState } from '@react-stately/overlays';
+import { useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+
+import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
+import { DatasetImportItem, DatasetImportToExistingProjectItem } from '../../../../core/datasets/dataset.interface';
+import { useDatasetImportQueries } from '../../../../core/datasets/hooks/use-dataset-import-queries.hook';
+import { getCurrentJob, isImportingExistingProjectJob, isPreparingJob } from '../../../../core/datasets/utils';
+import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
+import { ProjectProps } from '../../../../core/projects/project.interface';
+import QUERY_KEYS from '../../../../core/requests/query-keys';
+import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
+import { useNotification } from '../../../../notification/notification.component';
+import { useDatasetImportToExistingProject } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
+import { getLabelsMap } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
+import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
+import { DatasetImportDeletionDialog } from '../../../../shared/components/dataset-import-deletion-dialog/dataset-import-deletion-dialog.component';
+import { DatasetImportPanel } from '../../../../shared/components/dataset-import-panel/dataset-import-panel.component';
+import { isNonEmptyArray, isNonEmptyString } from '../../../../shared/utils';
+import { useProject } from '../../providers/project-provider/project-provider.component';
+import { DatasetImportToExistingProjectDialog } from './dataset-import-to-existing-project/dataset-import-to-existing-project-dialog.component';
+import { useExportImportDatasetDialogStates } from './export-dataset/export-import-dataset-dialog-provider.component';
+
+interface DatasetImportJobStatusProps {
+    project: ProjectProps;
+    datasetImportItem: DatasetImportItem;
+    deleteDatasetImport: (id: string) => void;
+    patchDatasetImport: (partialItem: Partial<DatasetImportToExistingProjectItem>) => void;
+}
+
+const DatasetImportJobStatus = ({
+    project,
+    datasetImportItem,
+    patchDatasetImport,
+    deleteDatasetImport,
+}: DatasetImportJobStatusProps) => {
+    const client = useQueryClient();
+    const { organizationId, workspaceId } = useWorkspaceIdentifier();
+    const { addNotification } = useNotification();
+    const { usePreparingExistingProjectStatusJob, useImportingExistingProjectStatusJob } = useDatasetImportQueries();
+
+    const { id, uploadId, preparingJobId, importingJobId } = datasetImportItem;
+
+    usePreparingExistingProjectStatusJob({
+        data: { organizationId, workspaceId, jobId: String(preparingJobId) },
+        enabled: isPreparingJob(datasetImportItem),
+        onSuccess: ({ metadata }) => {
+            patchDatasetImport({
+                id,
+                uploadId,
+                labels: metadata.labels,
+                warnings: metadata.warnings,
+                labelsMap: isNonEmptyArray(metadata.labels) ? getLabelsMap(metadata.labels, project.labels) : undefined,
+                status: DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT,
+            });
+        },
+        onError: (error: AxiosError) => {
+            patchDatasetImport({ id, status: DATASET_IMPORT_STATUSES.PREPARING_ERROR });
+            addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+        },
+        onCancel: () => {
+            deleteDatasetImport(datasetImportItem.id);
+        },
+        onSettled: () => patchDatasetImport({ id, preparingJobId: null }),
+    });
+
+    useImportingExistingProjectStatusJob({
+        data: { organizationId, workspaceId, jobId: String(importingJobId) },
+        enabled: isImportingExistingProjectJob(datasetImportItem),
+        onSuccess: async ({ metadata }) => {
+            deleteDatasetImport(id);
+
+            await client.invalidateQueries({
+                queryKey: QUERY_KEYS.ADVANCED_MEDIA_ITEMS(
+                    {
+                        organizationId,
+                        workspaceId,
+                        projectId: project.id,
+                        datasetId: String(metadata.dataset?.id),
+                    },
+                    {},
+                    {}
+                ),
+            });
+        },
+        onError: (error: AxiosError) => {
+            patchDatasetImport({ id, status: DATASET_IMPORT_STATUSES.IMPORTING_TO_EXISTING_PROJECT_ERROR });
+            addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+        },
+        onCancel: () => {
+            deleteDatasetImport(datasetImportItem.id);
+        },
+    });
+
+    return <></>;
+};
+
+export const DatasetImports = () => {
+    const { datasetImportDialogState } = useExportImportDatasetDialogStates();
+    const datasetImportDeleteDialogState = useOverlayTriggerState({});
+
+    const { project, projectIdentifier } = useProject();
+    const { useCancelJob } = useJobs(projectIdentifier);
+
+    const {
+        isReady,
+        datasetImports,
+        importDataset,
+        deleteDatasetImport,
+        prepareDataset,
+        patchDatasetImport,
+        prepareDatasetActionJob,
+        setActiveDatasetImportId,
+        activeDatasetImport,
+        deleteActiveDatasetImport,
+    } = useDatasetImportToExistingProject();
+
+    const abortDatasetImportActionHandler = (datasetImportItem: DatasetImportItem) => {
+        const currentJobId = getCurrentJob(datasetImportItem);
+
+        isNonEmptyString(currentJobId) &&
+            useCancelJob.mutateAsync(currentJobId).then(() => deleteDatasetImport(datasetImportItem.id));
+    };
+
+    return (
+        <>
+            {datasetImports.map((datasetImportItem: DatasetImportItem) => (
+                <View key={datasetImportItem.id} marginTop='size-250'>
+                    <DatasetImportJobStatus
+                        project={project}
+                        datasetImportItem={datasetImportItem}
+                        patchDatasetImport={patchDatasetImport}
+                        deleteDatasetImport={deleteDatasetImport}
+                    />
+                    <DatasetImportPanel
+                        isReady={isReady}
+                        datasetImportItem={datasetImportItem}
+                        datasetImportDialogTrigger={datasetImportDialogState}
+                        datasetImportDeleteDialogTrigger={datasetImportDeleteDialogState}
+                        onPrimaryAction={() => importDataset(datasetImportItem.id)}
+                        onDeleteAction={() => deleteDatasetImport(datasetImportItem.id)}
+                        prepareDataset={prepareDataset}
+                        prepareDatasetAction={prepareDatasetActionJob}
+                        setActiveDatasetImportId={setActiveDatasetImportId}
+                        abortDatasetImportAction={() => abortDatasetImportActionHandler(datasetImportItem)}
+                    />
+                </View>
+            ))}
+
+            <DatasetImportToExistingProjectDialog
+                datasetImportDialogState={datasetImportDialogState}
+                datasetImportDeleteDialogState={datasetImportDeleteDialogState}
+            />
+
+            <DatasetImportDeletionDialog
+                datasetImportItem={activeDatasetImport}
+                trigger={datasetImportDeleteDialogState}
+                onPrimaryAction={() => {
+                    datasetImportDeleteDialogState.close();
+                    datasetImportDialogState.close();
+                    deleteActiveDatasetImport();
+                }}
+            />
+        </>
+    );
+};

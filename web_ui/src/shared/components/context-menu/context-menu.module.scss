@@ -1,0 +1,13 @@
+.container {
+    box-sizing: border-box;
+    z-index: 999999;
+    display: flex;
+    position: absolute;
+    pointer-events: auto;
+    flex-direction: column;
+    padding: var(--spectrum-global-dimension-size-100);
+}
+
+.shortcut {
+    color: var(--spectrum-global-color-gray-600);
+}

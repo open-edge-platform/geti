@@ -1,0 +1,18 @@
+{
+  "workspaces":[
+  {
+    "creation_date": "2021-07-28T09:07:13.999000+00:00",
+    "creator_name": "dummy",
+    "description": "This is the first workspace.",
+    "id": "97041954-7589-448a-808f-a32d607852cb",
+    "name": "Workspace 1"
+  },
+  {
+    "creation_date": "2021-07-28T09:07:15.985000+00:00",
+    "creator_name": "dummy",
+    "description": "This is another workspace.",
+    "id": "7a3cb253-4532-44b8-a490-6b0ca023b9b2",
+    "name": "Workspace 2"
+  }
+]
+}

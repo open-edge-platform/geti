@@ -1,0 +1,30 @@
+{
+    "id": "60e6b3c3f1decd1e32c24d73",
+    "uploader_id": "user@company.com",
+    "media_information": {
+        "display_url": "/v2/projects/60e57455075ee5535d16ffbc/media/videos/60e6b3c3f1decd1e32c24d73/display/stream",
+        "duration": 1388,
+        "frame_count": 13883,
+        "frame_stride": 10,
+        "frame_rate": 30,
+        "height": 480,
+        "width": 640,
+        "size": 16384,
+        "extension": ".mp4"
+    },
+    "name": "single_video",
+    "annotation_state_per_task": [
+        {
+            "task_id": "61012cdb1d38a5e71ef3bafd",
+            "state": null
+        }
+    ],
+    "annotation_statistics": {
+        "annotated": 5,
+        "partially_annotated": 3,
+        "unannotated": 142
+    },
+    "thumbnail": "/v2/projects/60e57455075ee5535d16ffbc/media/videos/60e6b3c3f1decd1e32c24d73/display/thumb",
+    "type": "video",
+    "upload_time": "2021-07-08T08:13:55.907000+00:00"
+}

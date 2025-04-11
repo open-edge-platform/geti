@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "message": "The annotation template name cannot be empty.",
+  "error_code": "bad_request"
+}

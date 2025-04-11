@@ -1,0 +1,32 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024, Intel Corporation.
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+.breadcrumbsContainer {
+    position: relative;
+    padding: var(--spectrum-global-dimension-size-100) var(--spectrum-global-dimension-size-1000);
+    padding-left: var(--spectrum-global-dimension-size-300);
+    color: var(--spectrum-global-color-gray-900);
+
+    @media (max-width: 1023px) {
+        padding: var(--spectrum-global-dimension-size-250) var(--spectrum-global-dimension-size-500);
+    }
+}
+
+.intelAdminBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}

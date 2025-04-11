@@ -1,0 +1,88 @@
+.boundingBoxLabel,
+.circleLabel,
+.polygonLabel {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+
+    display: flex;
+    flex-direction: row;
+    pointer-events: auto;
+}
+
+.label {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    gap: var(--spectrum-global-dimension-size-25);
+    height: var(--spectrum-global-dimension-size-300);
+
+    font-weight: 500;
+    font-size: var(--spectrum-global-dimension-static-font-size-75);
+    line-height: var(--spectrum-global-dimension-static-font-size-100);
+    padding-left: var(--spectrum-global-dimension-static-size-75);
+    padding-right: var(--spectrum-global-dimension-static-size-65);
+    padding-top: var(--spectrum-global-dimension-static-size-65);
+    padding-bottom: var(--spectrum-global-dimension-static-size-65);
+
+    border-radius: var(--spectrum-global-dimension-static-size-25);
+
+    // Make each label have a slight overlap
+    margin-right: -2px;
+}
+
+.annotationAction {
+    display: flex;
+}
+
+.boundingBoxLabel {
+    transform: translateY(-100%) scale(calc(1 / var(--zoom-level)));
+    transform-origin: bottom left;
+}
+
+.circleLabel,
+.polygonLabel {
+    transform: translate(-0%, -100%) scale(calc(1 / var(--zoom-level)));
+    transform-origin: bottom left;
+}
+
+.iconWrapper {
+    height: var(--spectrum-global-dimension-size-300) !important;
+    width: var(--spectrum-global-dimension-size-300) !important;
+}
+
+.selectLabel {
+    z-index: 0;
+
+    color: var(--spectrum-global-color-gray-700);
+    background-color: var(--spectrum-global-color-gray-50);
+
+    box-sizing: border-box !important;
+    border: thin solid var(--spectrum-global-color-gray-400);
+}
+
+.actionButtons {
+    background-color: var(--spectrum-global-color-gray-200);
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-right: 0;
+}
+
+.actionButtonDark {
+    height: 100%;
+    font-size: var(--spectrum-global-dimension-static-font-size-75);
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.labelFlag {
+    width: 1px;
+    pointer-events: none;
+    position: absolute;
+    transform: scaleX(calc(2 / var(--zoom-level)));
+    transform-origin: bottom left;
+}
+
+.tooltip {
+    text-align: center;
+}

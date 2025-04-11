@@ -1,0 +1,46 @@
+{
+  "next_page": "/api/v1/workspaces/62ff4089b2b8cfb7732d03f9/projects/60d31793d5f1fb7e6e3c1a50/datasets/62ff4089b2b8cfb7732d03fb}/media/videos/62ff4089b2b8cfb7732d03fc:query?limit=100&skip=100",
+  "video_frames": [
+    {
+      "annotation_state_per_task": [
+        {
+          "state": "annotated",
+          "task_id": "60d31793d5f1fb7e6e3c1a4f"
+        }
+      ],
+      "id": 1,
+      "media_information": {
+        "display_url": "/api/v1/workspaces/62ff4089b2b8cfb7732d03f9/projects/60d31793d5f1fb7e6e3c1a50/datasets/62ff4089b2b8cfb7732d03fb/media/videos/62ff4089b2b8cfb7732d03fc/frames/1/display/full",
+        "height": 360,
+        "width": 640
+      },
+      "last_annotator_id": "2e1de607-b549-42bf-8031-fd16d87379e5",
+      "name": "video 1_f1",
+      "thumbnail": "/api/v1/workspaces/62ff4089b2b8cfb7732d03f9/projects/60d31793d5f1fb7e6e3c1a50/datasets/62ff4089b2b8cfb7732d03fb/media/videos/62ff4089b2b8cfb7732d03fc/frames/1/display/thumb",
+      "type": "video_frame",
+      "upload_time": "2022-08-19T07:49:29.665000+00:00",
+      "uploader_id": ""
+    },
+    {
+      "annotation_state_per_task": [
+        {
+          "state": "none",
+          "task_id": "60d31793d5f1fb7e6e3c1a4f"
+        }
+      ],
+      "id": 3,
+      "media_information": {
+        "display_url": "/api/v1/workspaces/62ff4089b2b8cfb7732d03f9/projects/60d31793d5f1fb7e6e3c1a50/datasets/62ff4089b2b8cfb7732d03fb/media/videos/62ff4089b2b8cfb7732d03fc/frames/3/display/full",
+        "height": 360,
+        "width": 640
+      },
+      "last_annotator_id": "2e1de607-b549-42bf-8031-fd16d87379e5",
+      "name": "video 1_f3",
+      "thumbnail": "/api/v1/workspaces/62ff4089b2b8cfb7732d03f9/projects/60d31793d5f1fb7e6e3c1a50/datasets/62ff4089b2b8cfb7732d03fb/media/videos/62ff4089b2b8cfb7732d03fc/frames/3/display/thumb",
+      "type": "video_frame",
+      "upload_time": "2022-08-19T07:49:29.665000+00:00",
+      "uploader_id": ""
+    }
+  ],
+  "total_matched_video_frames": 2
+}

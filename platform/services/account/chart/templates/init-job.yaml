@@ -1,0 +1,163 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-job-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "account-service.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        {{- include "account-service.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "account-service.fullname" . }}
+      restartPolicy: Never
+      volumes:
+        - name: create-db
+          configMap:
+            name: create-db-sh
+            defaultMode: 0755
+        - name: "init"
+          emptyDir: {}
+      initContainers:
+        - name: init-postgresql
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          command: [ 'sh', '-c', "until nc -w 5 -z $POSTGRES_HOST $POSTGRES_PORT; do echo wait...; sleep 2; done;" ]
+          env:
+            - name: "POSTGRES_HOST"
+              value: "{{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}"
+            - name: "POSTGRES_PORT"
+              value: "5432"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      containers:
+        - name: "init-bucket-accountservice"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              create_s3_bucket;
+              retVal=$?;
+              echo "done" > /init/1; 
+              exit $retVal
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-configuration"
+                  key: "s3_credentials_provider"
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "admin_access_key"
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "admin_secret_key"
+            - name: S3_ADDRESS
+              value: "http://{{ .Values.global.s3_endpoint }}"
+            - name: S3_BUCKET
+              value: "logos;userphotos"
+            - name: USER_INVITATION_MAIL_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: UserInvitationMailMessage
+            - name: USER_INVITATION_MAIL_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: UserInvitationMailTopic
+            - name: ORGANIZATION_INVITATION_MAIL_MESSAGE
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationInvitationMailMessage
+            - name: ORGANIZATION_INVITATION_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: account-service
+                  key: OrganizationInvitationTopic
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        - name: init-accountservice-db
+          image: "{{ .Values.postgresql.image.registry }}/{{ if .Values.postgresql.image.repository }}{{ .Values.postgresql.image.repository }}/{{ end }}{{ .Values.postgresql.image.name }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - |
+              /opt/psql-script/create-db.sh;
+              retVal=$?;
+              echo "done" > /init/2; 
+              exit $retVal
+          env:
+            - name: PGHOST
+              value: "{{ .Values.postgresql.host }}"
+            - name: PGPORT
+              value: "{{ .Values.postgresql.port }}"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-db"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-username"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-password"
+            - name: TARGET_POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "accountservice-postgresql-username"
+            - name: TARGET_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "accountservice-postgresql-password"
+            - name: TARGET_POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "accountservice-postgresql-db"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: create-db
+              mountPath: "/opt/psql-script"
+            - name: "init"
+              mountPath: "/init"
+        {{- if not .Values.global.istio_ambient_mesh }}
+        - name: "istio-sidecar-quit"
+          image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ] && [ ! -f /init/2 ]; do
+                sleep 1
+              done;
+              curl -XPOST 127.0.0.1:15020/quitquitquit
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- end }}

@@ -1,0 +1,58 @@
+{
+  "id": "66056d9b93ae9dd902d2bc72",
+  "type": "train",
+  "creation_time": "2024-03-28T13:16:11.164000+00:00",
+  "start_time": "2024-03-28T13:16:17.155000+00:00",
+  "end_time": null,
+  "name": "Training",
+  "author": "bcc5fa82-7b94-4b1b-9c71-0526b793c3e0",
+  "state": "cancelled",
+  "steps": [
+    {
+      "message": "Training data prepared",
+      "index": 1,
+      "progress": 100,
+      "state": "finished",
+      "step_name": "Prepare training data",
+      "duration": 63.183
+    },
+    {
+      "message": "Training - Initialization",
+      "index": 2,
+      "progress": -1,
+      "state": "cancelled",
+      "step_name": "Model training",
+      "duration": 41.455
+    },
+    {
+      "message": null,
+      "index": 3,
+      "progress": -1,
+      "state": "cancelled",
+      "step_name": "Model evaluation and inference"
+    }
+  ],
+  "cancellation_info": {
+    "is_cancelled": true,
+    "user_uid": "bcc5fa82-7b94-4b1b-9c71-0526b793c3e0",
+    "cancel_time": "2024-03-28T13:18:22.733000+00:00"
+  },
+  "metadata": {
+    "project": {
+      "id": "660287b420d4f3a4595c3133",
+      "name": "MyProject"
+    },
+    "task": {
+      "task_id": "660287bb20d4f3a4595c3137",
+      "name": "Classification",
+      "model_template_id": "Custom_Image_Classification_EfficientNet-V2-S",
+      "model_architecture": "EfficientNet-V2-S",
+      "dataset_storage_id": "660287bc20d4f3a4595c313b"
+    },
+    "trained_model": {
+      "model_storage_id": "66056d9b190ccd857230f47d",
+      "model_id": "66056e0d78427dce8a7f3386",
+      "model_activated": false
+    }
+  }
+}

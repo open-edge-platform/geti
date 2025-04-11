@@ -1,0 +1,11 @@
+enum:
+  - classification
+  - classification_hierarchical
+  - detection
+  - segmentation
+  - instance_segmentation
+  - anomaly
+  - detection_oriented
+  - detection_classification
+  - detection_segmentation
+  - keypoint_detection

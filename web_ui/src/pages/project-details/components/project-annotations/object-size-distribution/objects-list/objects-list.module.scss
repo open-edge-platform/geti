@@ -1,0 +1,20 @@
+.objectSizeNearMean {
+    height: var(--spectrum-global-dimension-static-size-275);
+}
+
+.objectSize {
+    border-radius: 50%;
+    width: var(--spectrum-global-dimension-static-size-150);
+    height: var(--spectrum-global-dimension-static-size-150);
+}
+
+.objectSizeDashed {
+    @extend .objectSize;
+
+    border: var(--spectrum-global-dimension-static-size-10) dashed var(--spectrum-global-color-gray-700);
+}
+
+.classText {
+    font-size: var(--spectrum-global-dimension-font-size-200);
+    font-weight: var(--spectrum-global-font-weight-thin);
+}

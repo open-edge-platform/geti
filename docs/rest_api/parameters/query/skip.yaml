@@ -1,0 +1,8 @@
+in: query
+name: skip
+style: form
+description: |-
+  Number indicating how many items to skip from the first item that matches the query. 
+  This field is used in combination with the limit field for the pagination feature.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/skip.yaml"

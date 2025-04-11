@@ -1,0 +1,4 @@
+{
+  "http_status": 409,
+  "message":  "A project can only have a maximum of 1000 labels. Please try with fewer labels"
+}

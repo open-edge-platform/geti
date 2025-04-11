@@ -1,0 +1,27 @@
+.modelsArchitecture {
+    font-size: var(--spectrum-global-dimension-static-font-size-200);
+}
+
+.recommendedCategory {
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    font-weight: lighter;
+}
+
+.obsolete {
+    opacity: var(--spectrum-global-color-opacity-50);
+
+    div[class*='BarLoader-fill'] {
+        background: var(--spectrum-global-color-gray-500) !important;
+    }
+}
+
+.container {
+    padding: var(--spectrum-global-dimension-size-200);
+}
+
+.containerHovered {
+    &:hover {
+        cursor: pointer;
+        background: var(--spectrum-global-color-gray-200);
+    }
+}

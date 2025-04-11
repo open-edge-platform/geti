@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Model storage/model group with id 60ec6bbfb98caeb87e34306a could not be found.",
+  "error_code": "model_storage_not_found"
+}

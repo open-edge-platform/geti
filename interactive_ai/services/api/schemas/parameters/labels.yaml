@@ -1,0 +1,6 @@
+oneOf:
+  - $ref: "../mongo_id.yaml"
+  - type: array
+    items:
+      $ref: "../mongo_id.yaml"
+#one or more label ids can be specified.

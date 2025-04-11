@@ -1,0 +1,64 @@
+{
+    "creation_time": "2022-06-17T10:33:29.896000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "6290a8f9003ddb3967f14386",
+            "name": "Anomaly Detection Example"
+        }
+    ],
+    "id": "6290a8f9003ddb3967f14385",
+    "storage_info": {},
+    "name": "Anomaly Detection Example",
+    "performance": {
+        "score": null,
+        "task_performances": [
+            {
+                "task_id": "6290a8f9003ddb3967f14384",
+                "score": null
+            }
+        ]
+    },
+    "pipeline": {
+        "connections": [
+            {
+                "from": "6290a8f9003ddb3967f14383",
+                "to": "6290a8f9003ddb3967f14384"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "6290a8f9003ddb3967f14383",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "6290a8f9003ddb3967f14384",
+                "label_schema_id": "6290a8f9003ddb3967f1438f",
+                "labels": [
+                    {
+                        "color": "#8bae46ff",
+                        "group": "default - Anomaly task",
+                        "hotkey": "",
+                        "id": "6290a8f9003ddb3967f1438c",
+                        "is_empty": false,
+                        "name": "Normal",
+                        "parent_id": null
+                    },
+                    {
+                        "color": "#ff5662ff",
+                        "group": "default - Anomaly task",
+                        "hotkey": "",
+                        "id": "6290a8f9003ddb3967f1438d",
+                        "is_empty": false,
+                        "name": "Anomalous",
+                        "parent_id": null
+                    }
+                ],
+                "task_type": "anomaly",
+                "title": "Anomaly task"
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/workspaces/62909fdf003ddb3967f14382/projects/6290a8f9003ddb3967f14385/thumbnail"
+}

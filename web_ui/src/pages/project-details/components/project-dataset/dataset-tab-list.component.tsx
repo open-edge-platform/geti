@@ -1,0 +1,85 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+import { Flex, Item, TabList, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+
+import { Add } from '../../../../assets/icons';
+import { Dataset } from '../../../../core/projects/dataset.interface';
+import { useDataset } from '../../../../providers/dataset-provider/dataset-provider.component';
+import { ActionButton } from '../../../../shared/components/button/button.component';
+import { CollapsedItemsPicker } from '../../../../shared/components/collapsed-items-picker/collapsed-items-picker.component';
+import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
+import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
+import { hasEqualId } from '../../../../shared/utils';
+import { useProject } from '../../providers/project-provider/project-provider.component';
+import { ProjectDatasetTabActions } from './project-dataset-tab-actions.component';
+import { useSelectedDataset } from './use-selected-dataset/use-selected-dataset.hook';
+import { MAX_NUMBER_OF_DISPLAYED_DATASETS } from './utils';
+
+import classes from './project-dataset.module.scss';
+
+export const DatasetTabList = () => {
+    const selectedDataset = useSelectedDataset();
+    const { project } = useProject();
+
+    const numberOfDatasets = project.datasets.length;
+
+    const { createDataset, pinnedDatasets, collapsedDatasets, handleCreateDataset, handleSelectDataset } = useDataset();
+
+    const hasSelectedPinnedDataset = pinnedDatasets.find(hasEqualId(selectedDataset.id)) !== undefined;
+    const collapsedPickerItems = collapsedDatasets.map(({ id, name }) => ({ id, name }));
+
+    return (
+        <Flex
+            alignItems={'center'}
+            width={'100%'}
+            position={'relative'}
+            id={`dataset-${selectedDataset.id}`}
+            UNSAFE_className={classes.tabWrapper}
+        >
+            <TabList UNSAFE_className={classes.tabList}>
+                {(item: TabItem & { dataset: Dataset }) => (
+                    <Item textValue={String(item.dataset.name)} key={item.dataset.id}>
+                        <ProjectDatasetTabActions dataset={item.dataset} />
+                    </Item>
+                )}
+            </TabList>
+
+            {numberOfDatasets > MAX_NUMBER_OF_DISPLAYED_DATASETS ? (
+                <CollapsedItemsPicker
+                    items={collapsedPickerItems}
+                    ariaLabel={'Collapsed datasets'}
+                    onSelectionChange={handleSelectDataset}
+                    hasSelectedPinnedItem={hasSelectedPinnedDataset}
+                    numberOfCollapsedItems={collapsedDatasets.length}
+                />
+            ) : null}
+
+            <TooltipTrigger placement={'bottom'}>
+                <ActionButton
+                    isQuiet
+                    id='create-dataset-button-id'
+                    onPress={handleCreateDataset}
+                    isDisabled={createDataset.isPending}
+                    aria-label={'Create dataset'}
+                >
+                    {createDataset.isPending ? (
+                        <LoadingIndicator id='loading-indicator-id' size='S' />
+                    ) : (
+                        <Add color='white' />
+                    )}
+                </ActionButton>
+                <Tooltip>Create new testing set</Tooltip>
+            </TooltipTrigger>
+        </Flex>
+    );
+};

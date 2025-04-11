@@ -1,0 +1,30 @@
+required:
+  - title
+  - task_type
+type: object
+additionalProperties: false
+properties:
+  title:
+    type: string
+    description: 'Task title, must be unique'
+  task_type:
+    type: string
+    enum: [ 'dataset','crop','classification','detection','segmentation', 'rotated_detection', 'instance_segmentation',
+            'anomaly', 'keypoint_detection' ]
+    description: 'Type of task, can only be one of the predefined task types'
+  labels:
+    type: array
+    description: List of labels
+    items:
+      $ref: 'label.yaml'
+  keypoint_structure:
+    type: object
+    description: "The keypoint structure which holds the edges of the graph, and the position of the keypoints. Supported only for Keypoint Detection tasks."
+    edges:
+      type: array
+      items:
+        $ref: 'keypoint_edge.yaml'
+    positions:
+      type: array
+      items:
+        $ref: 'keypoint_position.yaml'

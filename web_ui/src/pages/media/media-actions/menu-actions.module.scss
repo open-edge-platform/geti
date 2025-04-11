@@ -1,0 +1,31 @@
+.searchFieldContainer {
+    min-width: 0 !important;
+
+    & > div,
+    button {
+        margin: 0 !important;
+    }
+
+    & > div {
+        min-width: 0 !important;
+        transition: width 0.3s ease-out;
+    }
+
+    .searchFieldActive {
+        width: var(--spectrum-global-dimension-size-2400) !important;
+    }
+
+    .searchFieldInactive {
+        width: var(--spectrum-global-dimension-size-400) !important;
+        border-bottom: 1px solid transparent !important; // To allow a smooth transition of the height change
+
+        & > input {
+            border-style: none;
+            display: none;
+        }
+
+        & > svg {
+            display: none !important;
+        }
+    }
+}

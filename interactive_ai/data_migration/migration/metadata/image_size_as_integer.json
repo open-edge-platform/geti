@@ -1,0 +1,9 @@
+{
+  "description": "Save size of image as integer",
+  "supports_downgrade": true,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["image"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

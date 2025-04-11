@@ -1,0 +1,15 @@
+task_family: "VISION"
+task_type: "SEGMENTATION"
+name: "UNet/DeepLab (PyTorch variant - Class)"
+is_trainable: true
+task_type_sort_priority: 100
+instantiation: "CLASS"
+exportable_code_paths: {
+  "default": "$EXPORTABLE_CODE_ROOT/torch_segmentation",
+  "openvino": "$EXPORTABLE_CODE_ROOT/openvino_torch_segmentation"
+}
+model_optimization_methods: ["OPENVINO"]
+entrypoints:
+  base: "algorithms.torch_segmentation.task.SegmentationTask"
+hyper_parameters:
+  base_path: "configuration.yaml"

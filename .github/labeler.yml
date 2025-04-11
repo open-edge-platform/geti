@@ -1,0 +1,17 @@
+UI:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'web_ui/**/*'
+
+IAI:
+  - all:
+    - changed-files:
+      - any-glob-to-any-file:
+        - 'docs/rest_api/**/*'
+        - 'interactive_ai/**/*'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'docs/**/*'
+      - 'interactive_ai/services/api/**/*'

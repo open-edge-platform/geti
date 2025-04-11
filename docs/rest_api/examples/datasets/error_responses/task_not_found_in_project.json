@@ -1,0 +1,5 @@
+{
+    "error_code": "active_set_on_non_trainable_task",
+    "http_status": 400,
+    "message": "Task with id 63120c2a5ca5eb9986a821c7 can not be found in project 63120c2a5ca5eb9986a821ca."
+}

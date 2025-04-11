@@ -1,0 +1,7 @@
+[aria-label='Model variant tabs'] [role='tab'][aria-selected='false'] {
+    opacity: 0.54;
+}
+
+[aria-label='Model variant tabs'] [role='tab'][aria-selected='false'][class*='is-hovered'] {
+    opacity: 0.9;
+}

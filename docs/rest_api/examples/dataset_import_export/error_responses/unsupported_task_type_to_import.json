@@ -1,0 +1,4 @@
+{
+    "http_status": 400,
+    "message":  "The project doesn't have a trainable task."
+}

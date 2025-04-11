@@ -1,0 +1,4 @@
+type: object
+properties:
+  inference_server_ready:
+    type: boolean

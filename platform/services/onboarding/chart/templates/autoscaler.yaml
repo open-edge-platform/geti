@@ -1,0 +1,31 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "onboarding-service.name" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "onboarding-service.name" . }}
+  minReplicas: 1
+  {{- if .Values.global.running_on_vm }}
+  maxReplicas: 1
+  {{- else }}
+  maxReplicas: 2
+  {{- end }}
+  metrics:
+    - type: ContainerResource
+      containerResource:
+        name: cpu
+        container: {{ .Chart.Name }}
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: ContainerResource
+      containerResource:
+        name: memory
+        container: {{ .Chart.Name }}
+        target:
+          type: Utilization
+          averageUtilization: 70

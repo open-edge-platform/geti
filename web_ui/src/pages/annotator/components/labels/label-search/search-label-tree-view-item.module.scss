@@ -1,0 +1,123 @@
+.viewCursor {
+    cursor: default;
+}
+
+.labelTreeItem {
+    overflow-x: auto !important;
+}
+
+.adjustableHeight {
+    height: max-content !important;
+
+    &::before {
+        height: 0 !important;
+        border: 0;
+        content: none !important;
+        background-color: transparent;
+    }
+}
+
+.lightMode {
+    background-color: var(--spectrum-global-color-gray-75);
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-200);
+    }
+}
+
+.listItem {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--spectrum-global-dimension-static-size-100);
+}
+
+.isClosed > ul {
+    visibility: hidden !important;
+    height: 0 !important;
+}
+
+.spectrum-TreeView {
+    --spectrum-treeview-item-background-color-selected: var(--spectrum-alias-highlight-selected);
+    --spectrum-treeview-item-background-color-quiet-selected: var(--spectrum-alias-highlight-hover);
+    --spectrum-treeview-item-icon-color: var(--spectrum-alias-icon-color, var(--spectrum-global-color-gray-700));
+    --spectrum-treeview-item-icon-color-hover: var(
+        --spectrum-alias-icon-color-hover,
+        var(--spectrum-global-color-gray-900)
+    );
+    --spectrum-treeview-item-icon-color-focus: var(
+        --spectrum-alias-icon-color-key-focus,
+        var(--spectrum-global-color-gray-900)
+    );
+    --spectrum-treeview-item-icon-color-selected: var(
+        --spectrum-alias-icon-color-selected-neutral,
+        var(--spectrum-global-color-gray-900)
+    );
+    --spectrum-treeview-item-icon-color-disabled: var(
+        --spectrum-alias-icon-color-disabled,
+        var(--spectrum-global-color-gray-400)
+    );
+    --spectrum-treeview-m-item-text-color-selected: var(
+        --spectrum-alias-text-color-selected-neutral,
+        var(--spectrum-global-color-gray-900)
+    );
+
+    --spectrum-treeview-heading-font-weight: var(--spectrum-global-font-weight-bold, 700);
+    --spectrum-treeview-item-hover-offset: var(--spectrum-global-dimension-size-25);
+    --spectrum-treeview-item-border-size-selected: var(
+        --spectrum-alias-border-size-thin,
+        var(--spectrum-global-dimension-static-size-10)
+    );
+
+    display: block;
+    list-style: none;
+    outline: none;
+    padding: 0;
+    position: relative;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.spectrum-TreeView-itemLink {
+    color: var(--spectrum-alias-component-text-color-default);
+    color: var(--spectrum-treeview-m-item-text-color, var(--spectrum-alias-component-text-color-default));
+
+    align-items: center;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    min-height: var(--spectrum-treeview-item-min-height);
+    outline: none;
+    overflow: hidden;
+    padding: var(--spectrum-treeview-item-text-padding-top) var(--spectrum-treeview-item-affordance-size)
+        var(--spectrum-treeview-item-text-padding-bottom);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.spectrum-TreeView--thumbnail .spectrum-TreeView-itemLink {
+    box-sizing: content-box;
+    height: var(--spectrum-treeview-item-affordance-size);
+    padding-bottom: calc(var(--spectrum-treeview-item-text-padding-bottom) - var(--spectrum-treeview-item-border-size));
+    padding-top: var(--spectrum-treeview-item-text-padding-top);
+}
+
+.spectrum-TreeView .spectrum-TreeView {
+    height: 0;
+    position: static;
+    visibility: hidden;
+}
+
+[dir='ltr'] .spectrum-TreeView .spectrum-TreeView {
+    padding-left: var(--spectrum-treeview-item-indentation);
+}
+
+.spectrum-TreeView-item {
+    overflow: hidden;
+}
+.spectrum-TreeView-item.is-open > .spectrum-TreeView {
+    height: auto;
+    visibility: visible;
+}

@@ -1,0 +1,9 @@
+in: path
+name: frame_index
+description: |-
+  This is a 0-based index, meaning to retrieve the first frame of the video, this parameter should be set to `0`. 
+  The possible values for this parameter range from `0` to `frame_count-1`. The `frame_count` is the total number of frames contained in the video
+  and it can be retrieved from the response body of [video detail](#Media/GetVideoDetail) endpoint. 
+schema:
+  type: integer
+required: true

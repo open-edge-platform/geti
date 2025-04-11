@@ -1,0 +1,6 @@
+---
+name: visual-prompt
+version: 0.0.1
+apiVersion: v2
+description: visual prompt service
+appVersion: v0.0.1

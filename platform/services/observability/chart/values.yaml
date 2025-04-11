@@ -1,0 +1,65 @@
+image: observability
+imagePullPolicy: IfNotPresent
+
+replicaCount: 1
+
+port: 9000
+
+audit_logs_mount_path: "audit_logs"
+logs_mount_path: "/logs"
+gtw_tmp_dir: "/tmp"
+configuration_cm_name: 'impt-configuration'
+dex_name: ''
+dex_port: "5556"
+grpc_port: "50051"
+
+jwk_cache_ttl: "900"
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 400m
+    memory: 500Mi
+  limits:
+    memory: 500Mi
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+
+initialDelaySeconds: 5
+periodSeconds: 45
+
+global:
+  security_headers: ""
+  stripped_headers: ""
+  logging_config_dir: ""
+  storage_volume_claim_name_gtw: 'data-storage-volume-claim'
+  enable_master_node_selector: true
+  docker_namespace: impp
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0

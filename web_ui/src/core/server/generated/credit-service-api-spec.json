@@ -1,0 +1,756 @@
+{
+    "openapi": "3.1.0",
+    "info": { "title": "FastAPI", "version": "0.1.0" },
+    "paths": {
+        "/products": {
+            "get": {
+                "tags": ["Products", "Products"],
+                "summary": "Get All Products",
+                "description": "Returns all available Geti SaaS subscription products",
+                "operationId": "get_all_products_api_v1_products_get",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "type": "integer", "default": 10, "title": "Limit" }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "type": "integer", "default": 0, "title": "Skip" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/ListProductResponse" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/products/{product_id}": {
+            "get": {
+                "tags": ["Products", "Products"],
+                "summary": "Get Product By Id",
+                "description": "Returns Geti SaaS subscription product with the specified id",
+                "operationId": "get_product_by_id_api_v1_products__product_id__get",
+                "parameters": [
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer", "title": "Product Id" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Product" } } }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{org_id}/balance": {
+            "get": {
+                "tags": ["Balance"],
+                "summary": "Get Balance",
+                "description": "The running credit balance of an organization is calculated during the current subscription cycle",
+                "operationId": "get_balance_api_v1_organizations__org_id__balance_get",
+                "parameters": [
+                    {
+                        "name": "org_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Org Id" }
+                    },
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Date" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/BalanceResponse" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{org_id}/credit_accounts/{account_id}/balance": {
+            "put": {
+                "tags": ["Balance"],
+                "summary": "Edit Account Balance",
+                "description": "Edits balance of a certain credit account by comparing current available balance\nwith a balance in the provided payload, and creating a credits transaction covering the difference.",
+                "operationId": "edit_account_balance_api_v1_organizations__org_id__credit_accounts__account_id__balance_put",
+                "parameters": [
+                    {
+                        "name": "org_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Org Id" }
+                    },
+                    {
+                        "name": "account_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Account Id" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BalancePayload" } } }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{org_id}/credit_accounts": {
+            "get": {
+                "tags": ["Credit accounts"],
+                "summary": "Get Credit Accounts",
+                "description": "Returns billable credit accounts of the organization ('asset' account type, not expired).\nLease and SaaS provider accounts not included.",
+                "operationId": "get_credit_accounts_api_v1_organizations__org_id__credit_accounts_get",
+                "parameters": [
+                    {
+                        "name": "org_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Org Id" }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "type": "integer", "default": 0, "title": "Skip" }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "type": "integer", "default": 50, "title": "Limit" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/CreditAccountsResponse" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Credit accounts"],
+                "summary": "Create Credit Account",
+                "description": "Creates a new asset account for the organization.",
+                "operationId": "create_credit_account_api_v1_organizations__org_id__credit_accounts_post",
+                "parameters": [
+                    {
+                        "name": "org_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Org Id" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/CreditAccountPostPayload" } }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{org_id}/credit_accounts/{acc_id}": {
+            "put": {
+                "tags": ["Credit accounts"],
+                "summary": "Update Credit Account",
+                "description": "Updates the credit account of the organization.",
+                "operationId": "update_credit_account_api_v1_organizations__org_id__credit_accounts__acc_id__put",
+                "parameters": [
+                    {
+                        "name": "org_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Org Id" }
+                    },
+                    {
+                        "name": "acc_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Acc Id" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/CreditAccountPutPayload" } }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/CreditAccount" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organization_id}/subscriptions": {
+            "post": {
+                "tags": ["Subscriptions"],
+                "summary": "Create Subscription",
+                "description": "Creates new subscription within organization for specified product",
+                "operationId": "create_subscription_api_v1_organizations__organization_id__subscriptions_post",
+                "parameters": [
+                    {
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Organization Id" }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/SubscriptionPayload" } }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{organization_id}/subscriptions/{subscription_id}": {
+            "get": {
+                "tags": ["Subscriptions"],
+                "summary": "Get Subscription By Id",
+                "description": "Returns organization's subscription with the requested id",
+                "operationId": "get_subscription_by_id_api_v1_organizations__organization_id__subscriptions__subscription_id__get",
+                "parameters": [
+                    {
+                        "name": "organization_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Organization Id" }
+                    },
+                    {
+                        "name": "subscription_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "integer", "title": "Subscription Id" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/SubscriptionResponse" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{org_id}/transactions/aggregates": {
+            "get": {
+                "tags": ["Transactions"],
+                "summary": "Get Credit Consumption Aggregates",
+                "description": "The Aggregating endpoint allows to retrieve credit consumption grouped by various\ndimensions such as project and workspace, date, etc.",
+                "operationId": "get_credit_consumption_aggregates_api_v1_organizations__org_id__transactions_aggregates_get",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": { "$ref": "#/components/schemas/AggregatesKey" },
+                            "title": "Key"
+                        }
+                    },
+                    {
+                        "name": "from_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "From Date" }
+                    },
+                    {
+                        "name": "to_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "To Date" }
+                    },
+                    {
+                        "name": "project_id",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [{ "type": "array", "items": { "type": "string" } }, { "type": "null" }],
+                            "title": "Project Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/AggregatesResponse" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/organizations/{org_id}/transactions": {
+            "get": {
+                "tags": ["Transactions"],
+                "summary": "Get Transactions",
+                "description": "The Aggregating endpoint allows to retrieve credit consumption grouped by various\ndimensions such as project and workspace, date, etc.",
+                "operationId": "get_transactions_api_v1_organizations__org_id__transactions_get",
+                "parameters": [
+                    {
+                        "name": "org_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string", "title": "Org Id" }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                            "default": 0,
+                            "title": "Skip"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "type": "integer", "default": 3, "title": "Limit" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/TransactionsResponse" } }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/internal/tasks/credit_accounts/rollover": {
+            "post": {
+                "tags": ["Credit accounts", "Internal"],
+                "summary": "Rollover Credit Accounts",
+                "description": "Performs credit accounts renewal.",
+                "operationId": "rollover_credit_accounts_api_v1_internal_tasks_credit_accounts_rollover_post",
+                "parameters": [
+                    {
+                        "name": "renewal_date",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Renewal Date" }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/internal/tasks/credit_accounts/snapshot": {
+            "post": {
+                "tags": ["Internal"],
+                "summary": "Calculate Snapshot",
+                "description": "Get all non-renewable, active (not expired) asset credit accounts,\nand for each of them calculate and write to the database a balance snapshot, with available and incoming balances.\n\nCalculation takes the latest account's snapshot value (if available) and incorporates\ntransactions created thereafter until the present moment",
+                "operationId": "calculate_snapshot_api_v1_internal_tasks_credit_accounts_snapshot_post",
+                "responses": {
+                    "200": { "description": "Successful Response", "content": { "application/json": { "schema": {} } } }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AggregateItem": {
+                "properties": {
+                    "group": {
+                        "items": { "$ref": "#/components/schemas/GroupItem" },
+                        "type": "array",
+                        "title": "Group"
+                    },
+                    "result": { "$ref": "#/components/schemas/AggregatesResult" }
+                },
+                "type": "object",
+                "required": ["group", "result"],
+                "title": "AggregateItem"
+            },
+            "AggregatesKey": {
+                "type": "string",
+                "enum": ["project", "service_name", "date"],
+                "title": "AggregatesKey",
+                "description": "Allowed keys for transaction aggregates"
+            },
+            "AggregatesResponse": {
+                "properties": {
+                    "aggregates": {
+                        "items": { "$ref": "#/components/schemas/AggregateItem" },
+                        "type": "array",
+                        "title": "Aggregates"
+                    }
+                },
+                "type": "object",
+                "required": ["aggregates"],
+                "title": "AggregatesResponse"
+            },
+            "AggregatesResult": {
+                "properties": {
+                    "credits": { "type": "integer", "title": "Credits" },
+                    "resources": { "$ref": "#/components/schemas/ResourcesAmount" }
+                },
+                "type": "object",
+                "required": ["credits", "resources"],
+                "title": "AggregatesResult"
+            },
+            "BalancePayload": {
+                "properties": {
+                    "add": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Add" },
+                    "subtract": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Subtract" }
+                },
+                "type": "object",
+                "title": "BalancePayload"
+            },
+            "BalanceResponse": {
+                "properties": {
+                    "incoming": { "type": "integer", "title": "Incoming" },
+                    "available": { "type": "integer", "title": "Available" }
+                },
+                "type": "object",
+                "required": ["incoming", "available"],
+                "title": "BalanceResponse"
+            },
+            "CreditAccount": {
+                "properties": {
+                    "id": { "type": "integer", "title": "Id" },
+                    "organization_id": { "type": "string", "title": "Organization Id" },
+                    "name": { "type": "string", "title": "Name" },
+                    "renewable_amount": {
+                        "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                        "title": "Renewable Amount"
+                    },
+                    "renewal_day_of_month": {
+                        "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                        "title": "Renewal Day Of Month"
+                    },
+                    "created": { "type": "integer", "title": "Created" },
+                    "updated": { "type": "integer", "title": "Updated" },
+                    "expires": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Expires" },
+                    "balance": { "$ref": "#/components/schemas/BalanceResponse" }
+                },
+                "type": "object",
+                "required": ["id", "organization_id", "name", "created", "updated", "balance"],
+                "title": "CreditAccount"
+            },
+            "CreditAccountPostPayload": {
+                "properties": {
+                    "name": { "type": "string", "title": "Name" },
+                    "init_amount": { "type": "integer", "title": "Init Amount" },
+                    "renewable_amount": {
+                        "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                        "title": "Renewable Amount"
+                    },
+                    "renewal_day_of_month": {
+                        "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                        "title": "Renewal Day Of Month"
+                    },
+                    "expires": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Expires" }
+                },
+                "type": "object",
+                "required": ["name", "init_amount"],
+                "title": "CreditAccountPostPayload"
+            },
+            "CreditAccountPutPayload": {
+                "properties": {
+                    "name": { "type": "string", "title": "Name" },
+                    "renewable_amount": {
+                        "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                        "title": "Renewable Amount"
+                    },
+                    "expires": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Expires" }
+                },
+                "type": "object",
+                "required": ["name"],
+                "title": "CreditAccountPutPayload"
+            },
+            "CreditAccountsResponse": {
+                "properties": {
+                    "total_matched": { "type": "integer", "title": "Total Matched" },
+                    "next_page": { "anyOf": [{ "$ref": "#/components/schemas/NextPage" }, { "type": "null" }] },
+                    "credit_accounts": {
+                        "items": { "$ref": "#/components/schemas/CreditAccount" },
+                        "type": "array",
+                        "title": "Credit Accounts"
+                    }
+                },
+                "type": "object",
+                "required": ["total_matched", "next_page", "credit_accounts"],
+                "title": "CreditAccountsResponse"
+            },
+            "GroupItem": {
+                "properties": {
+                    "key": { "type": "string", "title": "Key" },
+                    "value": { "anyOf": [{ "type": "string" }, { "type": "integer" }], "title": "Value" }
+                },
+                "type": "object",
+                "required": ["key", "value"],
+                "title": "GroupItem"
+            },
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": { "$ref": "#/components/schemas/ValidationError" },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "ListProductResponse": {
+                "properties": {
+                    "total_matched": { "type": "integer", "title": "Total Matched" },
+                    "next_page": { "anyOf": [{ "$ref": "#/components/schemas/NextPage" }, { "type": "null" }] },
+                    "products": {
+                        "items": { "$ref": "#/components/schemas/Product" },
+                        "type": "array",
+                        "title": "Products"
+                    }
+                },
+                "type": "object",
+                "required": ["total_matched", "next_page", "products"],
+                "title": "ListProductResponse"
+            },
+            "NextPage": {
+                "properties": {
+                    "limit": { "type": "integer", "title": "Limit" },
+                    "skip": { "type": "integer", "title": "Skip" }
+                },
+                "type": "object",
+                "required": ["limit", "skip"],
+                "title": "NextPage"
+            },
+            "Product": {
+                "properties": {
+                    "id": { "type": "integer", "title": "Id" },
+                    "name": { "type": "string", "title": "Name" },
+                    "product_policies": {
+                        "items": { "$ref": "#/components/schemas/ProductPolicy" },
+                        "type": "array",
+                        "title": "Product Policies"
+                    },
+                    "created": { "type": "integer", "title": "Created" },
+                    "updated": { "type": "integer", "title": "Updated" }
+                },
+                "type": "object",
+                "required": ["id", "name", "product_policies", "created", "updated"],
+                "title": "Product"
+            },
+            "ProductPolicy": {
+                "properties": {
+                    "account_name": { "type": "string", "title": "Account Name" },
+                    "init_amount": { "type": "integer", "title": "Init Amount" },
+                    "renewable_amount": {
+                        "anyOf": [{ "type": "integer" }, { "type": "null" }],
+                        "title": "Renewable Amount"
+                    },
+                    "expires_in": { "anyOf": [{ "type": "integer" }, { "type": "null" }], "title": "Expires In" }
+                },
+                "type": "object",
+                "required": ["account_name", "init_amount"],
+                "title": "ProductPolicy"
+            },
+            "ResourcesAmount": {
+                "properties": {
+                    "images": { "type": "integer", "title": "Images", "default": 0 },
+                    "frames": { "type": "integer", "title": "Frames", "default": 0 }
+                },
+                "type": "object",
+                "title": "ResourcesAmount"
+            },
+            "SubscriptionPayload": {
+                "properties": {
+                    "product_id": { "type": "integer", "title": "Product Id" },
+                    "status": { "allOf": [{ "$ref": "#/components/schemas/SubscriptionStatus" }], "default": "active" }
+                },
+                "type": "object",
+                "required": ["product_id"],
+                "title": "SubscriptionPayload"
+            },
+            "SubscriptionResponse": {
+                "properties": {
+                    "id": { "type": "integer", "title": "Id" },
+                    "organization_id": { "type": "string", "title": "Organization Id" },
+                    "product_id": { "type": "integer", "title": "Product Id" },
+                    "renewal_day_of_month": { "type": "integer", "title": "Renewal Day Of Month" },
+                    "status": { "type": "string", "title": "Status" },
+                    "created": { "type": "integer", "title": "Created" },
+                    "updated": { "type": "integer", "title": "Updated" }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "organization_id",
+                    "product_id",
+                    "renewal_day_of_month",
+                    "status",
+                    "created",
+                    "updated"
+                ],
+                "title": "SubscriptionResponse"
+            },
+            "SubscriptionStatus": {
+                "type": "string",
+                "enum": ["new", "active", "cancelled"],
+                "title": "SubscriptionStatus",
+                "description": "Possible organization's subscription states"
+            },
+            "TransactionInfo": {
+                "properties": {
+                    "credits": { "type": "integer", "title": "Credits" },
+                    "workspace_id": { "type": "string", "title": "Workspace Id" },
+                    "project_id": { "type": "string", "title": "Project Id" },
+                    "service_name": { "type": "string", "title": "Service Name" },
+                    "milliseconds_timestamp": { "type": "integer", "title": "Milliseconds Timestamp" }
+                },
+                "type": "object",
+                "required": ["credits", "workspace_id", "project_id", "service_name", "milliseconds_timestamp"],
+                "title": "TransactionInfo"
+            },
+            "TransactionsResponse": {
+                "properties": {
+                    "total_matched": { "type": "integer", "title": "Total Matched" },
+                    "next_page": { "anyOf": [{ "$ref": "#/components/schemas/NextPage" }, { "type": "null" }] },
+                    "transactions": {
+                        "items": { "$ref": "#/components/schemas/TransactionInfo" },
+                        "type": "array",
+                        "title": "Transactions"
+                    }
+                },
+                "type": "object",
+                "required": ["total_matched", "next_page", "transactions"],
+                "title": "TransactionsResponse"
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": { "type": "string", "title": "Message" },
+                    "type": { "type": "string", "title": "Error Type" }
+                },
+                "type": "object",
+                "required": ["loc", "msg", "type"],
+                "title": "ValidationError"
+            }
+        }
+    }
+}

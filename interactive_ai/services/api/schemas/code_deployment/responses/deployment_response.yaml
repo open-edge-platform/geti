@@ -1,0 +1,22 @@
+type: object
+properties:
+  id:
+    $ref: '../../mongo_id.yaml'
+  progress:
+    type: number
+    description: progress of code deployment
+  state:
+    type: string
+    description: State of the deployment
+    enum: [ 'NONE','PREPARING', 'DONE', 'FAILED' ]
+  models:
+    description: Identifiers of the exported models
+    type: array
+    items:
+      $ref: '../requests/model_identifier.yaml'
+  creator_id:
+    description: Id of the user who started the deployment
+    type: string
+  creation_time:
+    description: Creation time of the model
+    type: string

@@ -1,0 +1,40 @@
+image: auto-train-controller
+imagePullPolicy: IfNotPresent
+replicas: 1
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+initResources:
+  requests:
+    cpu: 10m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 200Mi
+  limits:
+    memory: 200Mi
+
+global:
+  storage_volume_claim_name_auto_train: data-storage-volume-claim
+  docker_namespace: impp
+  workflow_versions: v1
+  enable_object_storage: true
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0

@@ -1,0 +1,116 @@
+get:
+  tags:
+  - Jobs
+  summary: Get info on a job
+  description: Get information on a running or completed job.
+  operationId: GetJob
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/job_id.yaml'
+  responses:
+    '200':
+      description: Information successfully retrieved
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_train.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_optimize.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_test.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_export_dataset.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_prepare_import_to_new_project.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_perform_import_to_new_project.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_prepare_import_to_existing_project.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_perform_import_to_existing_project.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_export_project.yaml"
+              - $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_import_project.yaml"
+          examples:
+            Train (scheduled):
+              value:
+                $ref: "../../examples/jobs/responses/train_scheduled.json"
+            Train (in progress):
+              value:
+                $ref: "../../examples/jobs/responses/train_running.json"
+            Train (finished):
+              value:
+                $ref: "../../examples/jobs/responses/train_finished.json"
+            Train (cancelled):
+              value:
+                $ref: "../../examples/jobs/responses/train_cancelled.json"
+            Export dataset:
+              value:
+                $ref: "../../examples/jobs/responses/export_dataset.json"
+            Prepare dataset for import as a new project:
+              value:
+                $ref: "../../examples/jobs/responses/prepare_import_to_new_project.json"
+            Import dataset as a new project:
+              value:
+                $ref: "../../examples/jobs/responses/perform_import_to_new_project.json"
+            Prepare dataset for import into an existing project:
+              value:
+                $ref: "../../examples/jobs/responses/prepare_import_to_existing_project.json"
+            Import dataset into existing project:
+              value:
+                $ref: "../../examples/jobs/responses/perform_import_to_existing_project.json"
+            Export project:
+              value:
+                $ref: "../../examples/jobs/responses/export_project.json"
+            Import project (finished):
+              value:
+                $ref: "../../examples/jobs/responses/import_project.json"
+            Import project (failed):
+              value:
+                $ref: "../../examples/jobs/responses/import_project_failed.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Job not found response:
+              value:
+                $ref: "../../examples/jobs/error_responses/job_not_found.json"
+
+delete:
+  tags:
+  - Jobs
+  summary: Delete a job
+  description: Mark a job as cancelled with a deletion flag
+  operationId: DeleteJob
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/job_id.yaml'
+  responses:
+    '202':
+      description: Job marked as cancelled with a deletion flag
+      content:
+        application/json:
+          examples:
+            Successful deletion response:
+              value:
+                "Job with ID `60eda62eb49fdceefb757802` marked as cancelled with deletion flag."
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Job not found response:
+              value:
+                $ref: "../../examples/jobs/error_responses/job_not_found.json"

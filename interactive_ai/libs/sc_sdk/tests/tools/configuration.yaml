@@ -1,0 +1,390 @@
+data_augmentation:
+  auto_augment:
+    affects_outcome_of: TRAINING
+    default_value: None
+    description: Options for data augmentation policies.
+    editable: true
+    enum_name: AutoAugmentStrategy
+    header: Auto augment option
+    options:
+      CIFAR10: cifar10
+      IMAGENET: ImageNet
+      NONE: None
+      SVHN: svhn
+    type: SELECTABLE
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: None
+    visible_in_ui: true
+    warning: null
+  description: Data Augmentation
+  header: Data Augmentation
+  rotation_range:
+    affects_outcome_of: TRAINING
+    default_value: 90
+    description: Degrees of rotation that the image will be rotated left and right.
+      This is only used if automatic augmentations are disabled.
+    editable: true
+    header: Rotation range of augmented image
+    max_value: 180
+    min_value: 0
+    type: INTEGER
+    ui_rules:
+      action: SHOW
+      operator: AND
+      rules:
+      - operator: EQUAL_TO
+        parameter:
+        - data_augmentation
+        - auto_augment
+        type: RULE
+        value: None
+      type: UI_RULES
+  scaling_range:
+    affects_outcome_of: TRAINING
+    default_value: 0.2
+    description: Amount of positive and negative scaling. Implemented as (1-amount,
+      1+amount). This is only used if automatic augmentations are disabled.
+    editable: true
+    header: Scaling range of augmented image
+    max_value: 0.99
+    min_value: 0.0
+    type: FLOAT
+    ui_rules:
+      action: SHOW
+      operator: AND
+      rules:
+      - operator: EQUAL_TO
+        parameter:
+        - data_augmentation
+        - auto_augment
+        type: RULE
+        value: None
+      type: UI_RULES
+  type: PARAMETER_GROUP
+  visible_in_ui: true
+description: Configuration for a segmentation task
+header: Configuration for a segmentation task
+learning_architecture:
+  description: Learning Architecture
+  header: Learning Architecture
+  model_architecture:
+    affects_outcome_of: ARCHITECTURE
+    default_value: U-Net
+    description: Switch between U-Net, DeepLab V3 or Fastseg network architecture
+    editable: true
+    enum_name: SegmentationNetwork
+    header: Model architecture
+    options:
+      DEEPLAB: DeepLab V3
+      FASTSEG: Fastseg
+      UNET: U-Net
+    type: SELECTABLE
+    ui_rules:
+      action: DISABLE_EDITING
+      operator: AND
+      rules: []
+      type: UI_RULES
+    value: U-Net
+    visible_in_ui: true
+    warning: null
+  type: PARAMETER_GROUP
+  visible_in_ui: true
+learning_parameters:
+  batch_size:
+    affects_outcome_of: TRAINING
+    default_value: 5
+    description: The number of training samples seen in each iteration of training.
+      Increasing this value improves training time and may make the training more
+      stable. A larger batch size has higher memory requirements.
+    editable: true
+    header: Batch size
+    max_value: 64
+    min_value: 2
+    type: INTEGER
+    warning: Increasing this value may cause the system to use more memory than available,
+      potentially causing out of memory errors, please update with caution.
+  deeplab_parameters:
+    backbone:
+      affects_outcome_of: ARCHITECTURE
+      default_value: ResNet 50
+      description: This controls which classification model to use as backbone for
+        the DeepLab model. ResNet 101 may lead to better segmentation performance
+        than ResNet 50, but has higher memory requirements.
+      editable: true
+      enum_name: DeeplabBackbone
+      header: Backbone
+      options:
+        RESNET_101: ResNet 101
+        RESNET_50: ResNet 50
+      type: SELECTABLE
+      ui_rules:
+        action: DISABLE_EDITING
+        operator: AND
+        rules: []
+        type: UI_RULES
+      value: ResNet 50
+      visible_in_ui: true
+      warning: ResNet 101 has higher memory requirements than ResNet 50. Switching
+        to ResNet 101 may cause out of memory errors.
+    description: DeepLab V3 settings
+    header: DeepLab V3 settings
+    pretrained:
+      affects_outcome_of: TRAINING
+      default_value: true
+      description: Enable this option to initialize the network with weights that
+        are pretrained on the COCO dataset.
+      editable: true
+      header: Use pretrained weights
+      type: BOOLEAN
+    type: PARAMETER_GROUP
+  description: Learning Parameters
+  early_stopping_patience:
+    affects_outcome_of: TRAINING
+    default_value: 30
+    description: Number of epochs without improvement before the system will automatically
+      stop training.
+    editable: true
+    header: Early stopping patience
+    max_value: 500
+    min_value: 1
+    type: INTEGER
+  header: Learning Parameters
+  learning_rate:
+    affects_outcome_of: TRAINING
+    default_value: 0.001
+    description: Increasing this value will speed up training convergence but might
+      make it unstable.
+    editable: true
+    header: Learning rate
+    max_value: 0.01
+    min_value: 1.0e-06
+    type: FLOAT
+  lossweighted:
+    affects_outcome_of: TRAINING
+    default_value: true
+    description: 'If this setting is enabled and there is more than one label, the
+      loss value in the network is a weighted average per label. Classes that are
+      underrepresented in the dataset (by number of pixels) get a higher weight. '
+    editable: true
+    header: Use weighted loss
+    type: BOOLEAN
+  max_train_size:
+    affects_outcome_of: TRAINING
+    default_value: 0
+    description: The number of images and/or video frames used for training for each
+      epoch. Setting this to a lower value allows the network to train faster, but
+      it may make the results less robust. Set to 0 to use all annotated images and/or
+      video frames.
+    editable: true
+    header: Number of images/frames to use for training per epoch
+    max_value: 10000
+    min_value: 0
+    type: INTEGER
+  num_epochs:
+    affects_outcome_of: TRAINING
+    default_value: 40
+    description: Increasing this value causes the results to be more robust but training
+      time will be longer.
+    editable: true
+    header: Number of epochs
+    max_value: 1000
+    min_value: 1
+    type: INTEGER
+  num_workers:
+    affects_outcome_of: NONE
+    default_value: 0
+    description: Increasing this value might improve training speed however it might
+      cause out of memory errors. If the number of workers is set to zero, data loading
+      will happen in the main training thread.
+    editable: true
+    header: Number of cpu threads to use during batch generation
+    max_value: 8
+    min_value: 0
+    type: INTEGER
+  type: PARAMETER_GROUP
+  unet_parameters:
+    depth:
+      affects_outcome_of: ARCHITECTURE
+      default_value: 5
+      description: The number of layers in the network. Increasing this value will
+        require more memory.
+      editable: true
+      header: Network depth
+      max_value: 6
+      min_value: 2
+      type: INTEGER
+      warning: Increasing this value may cause the system to use more memory than
+        available, potentially causing out of memory errors, please update with caution.
+    description: U-Net settings
+    grayscale_image:
+      affects_outcome_of: ARCHITECTURE
+      default_value: false
+      description: Enable this option if the dataset contains only grayscale images.
+        This is not necessary, but it can improve training speed.
+      editable: true
+      header: Grayscale image
+      type: BOOLEAN
+    header: U-Net settings
+    normalization:
+      affects_outcome_of: ARCHITECTURE
+      default_value: InstanceNorm
+      description: The normalization method used during training of the network.
+      editable: true
+      enum_name: NormalizationMethod
+      header: Normalization method
+      options:
+        BATCH_NORM: BatchNorm
+        INSTANCE_NORM: InstanceNorm
+      type: SELECTABLE
+      ui_rules:
+        action: DISABLE_EDITING
+        operator: AND
+        rules: []
+        type: UI_RULES
+      value: InstanceNorm
+      visible_in_ui: true
+      warning: null
+    type: PARAMETER_GROUP
+    wf:
+      affects_outcome_of: ARCHITECTURE
+      default_value: 5
+      description: Increasing this value will increase the number of learnable parameters
+        in the network, which requires more memory.
+      editable: true
+      header: Initial number of filters, 2^value
+      max_value: 6
+      min_value: 2
+      type: INTEGER
+      warning: Increasing this value may cause the system to use more memory than
+        available, potentially causing out of memory errors, please update with caution.
+postprocessing:
+  blur_strength:
+    affects_outcome_of: INFERENCE
+    default_value: 5
+    description: With a higher value, the segmentation output will be smoother, but
+      less accurate.
+    editable: true
+    header: Blur strength
+    max_value: 25
+    min_value: 1
+    type: INTEGER
+  description: Postprocessing
+  full_size_predictions:
+    affects_outcome_of: INFERENCE
+    default_value: true
+    description: For larger images or images with many annotations, disabling this
+      setting increases speed of generating results, at the cost of less smooth predictions.
+    editable: true
+    header: Generate full size predictions
+    type: BOOLEAN
+  header: Postprocessing
+  soft_threshold:
+    affects_outcome_of: INFERENCE
+    default_value: 0.5
+    description: The threshold to apply to the probability output of the model, for
+      each pixel. A higher value means a stricter segmentation prediction.
+    editable: true
+    header: Soft threshold
+    max_value: 1
+    min_value: 0.0
+    type: FLOAT
+  type: PARAMETER_GROUP
+pot_parameters:
+  deeplab_pot_parameters:
+    description: DeepLab V3 post-training optimization settings
+    header: DeepLab V3 post-training optimization settings
+    preset:
+      affects_outcome_of: NONE
+      default_value: Mixed
+      description: Quantization preset that defines quantization scheme.
+      editable: true
+      enum_name: POTQuantizationPreset
+      header: Preset
+      options:
+        MIXED: Mixed
+        PERFORMANCE: Performance
+      type: SELECTABLE
+    type: PARAMETER_GROUP
+  description: POT Parameters
+  header: POT Parameters
+  stat_subset_size:
+    affects_outcome_of: NONE
+    default_value: 300
+    description: 'Number of data samples used for post-training optimization '
+    editable: true
+    header: Number of data samples
+    max_value: 1000
+    min_value: 1
+    type: INTEGER
+  type: PARAMETER_GROUP
+  unet_pot_parameters:
+    description: UNet post-training optimization settings
+    header: UNet post-training optimization settings
+    preset:
+      affects_outcome_of: NONE
+      default_value: Mixed
+      description: Quantization preset that defines quantization scheme.
+      editable: true
+      enum_name: POTQuantizationPreset
+      header: Preset
+      options:
+        MIXED: Mixed
+        PERFORMANCE: Performance
+      type: SELECTABLE
+    type: PARAMETER_GROUP
+preprocessing:
+  auto_image_size:
+    affects_outcome_of: ARCHITECTURE
+    default_value: false
+    description: Enable this option to automatically determine the image size for
+      the network based on the size of the images. The automatic image size is never
+      larger than the settings for Image width and Image height.
+    editable: true
+    header: Automatic image size
+    type: BOOLEAN
+  description: Preprocessing
+  header: Preprocessing
+  image_height:
+    affects_outcome_of: ARCHITECTURE
+    default_value: 512
+    description: Images will be resized to this height before being propagated through
+      the network. If automatic image size is enabled, the image will be resized up
+      to a maximum of the width and height settings.
+    editable: true
+    header: Image height
+    options:
+    - 256
+    - 320
+    - 384
+    - 512
+    - 640
+    - 768
+    - 1024
+    type: FLOAT_SELECTABLE
+    warning: Increasing this value may cause the system to use more memory than available,
+      potentially causing out of memory errors, please update with caution.
+  image_width:
+    affects_outcome_of: ARCHITECTURE
+    default_value: 512
+    description: Images will be resized to this width before being propagated through
+      the network. If automatic image size is enabled, the image will be resized up
+      to a maximum of the width and height settings.
+    editable: true
+    header: Image width
+    options:
+    - 256
+    - 320
+    - 385
+    - 512
+    - 640
+    - 768
+    - 1024
+    type: FLOAT_SELECTABLE
+    warning: Increasing this value may cause the system to use more memory than available,
+      potentially causing out of memory errors, please update with caution.
+  type: PARAMETER_GROUP
+type: CONFIGURABLE_PARAMETERS

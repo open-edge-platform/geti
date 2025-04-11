@@ -1,0 +1,54 @@
+.testDetailsCardBoldItem {
+    display: inline-block !important;
+    margin: 0 !important;
+}
+
+.testDetailsCardItem {
+    font-size: var(--spectrum-global-dimension-font-size-200) !important;
+}
+
+.mediaItemsBucket {
+    background-color: var(--spectrum-global-color-gray-50);
+    border-radius: var(--spectrum-global-dimension-size-50);
+    padding: var(--spectrum-global-dimension-size-300);
+}
+
+.confidenceTextBucket {
+    color: var(--spectrum-global-color-gray-600) !important;
+}
+
+.sortButton {
+    border: none !important;
+    outline: none !important;
+    background-color: var(--spectrum-global-color-gray-50) !important;
+}
+
+.sortIcon {
+    color: var(--spectrum-global-color-gray-600);
+    height: var(--spectrum-global-dimension-size-250);
+    width: var(--spectrum-global-dimension-size-200);
+    cursor: pointer;
+
+    & svg {
+        height: var(--spectrum-global-dimension-size-250);
+        width: var(--spectrum-global-dimension-size-200);
+    }
+}
+
+.mediaItemsCount {
+    font-size: var(--spectrum-global-dimension-font-size-50) !important;
+}
+
+.mediaBucketContainer {
+    box-sizing: border-box;
+    border-radius: var(--spectrum-alias-border-radius-regular);
+    padding: var(--spectrum-global-dimension-size-200);
+}
+
+.mediaBucketBelow {
+    border: 1px solid var(--brand-coral-cobalt);
+}
+
+.mediaBucketAbove {
+    border: 1px solid var(--brand-moss);
+}

@@ -1,0 +1,11 @@
+.sortBy {
+    color: inherit;
+    text-decoration: none;
+    line-height: var(--spectrum-global-dimension-size-175);
+
+    & :hover,
+    & :active {
+        text-decoration: none;
+        line-height: var(--spectrum-global-dimension-size-175);
+    }
+}

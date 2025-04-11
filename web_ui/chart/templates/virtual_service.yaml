@@ -1,0 +1,78 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1/feature_flags"
+    - uri:
+        prefix: "/robots.txt"
+    - uri:
+        prefix: "/registration"
+    - uri:
+        prefix: "/user_email_form.html"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "geti-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    route:
+    - destination:
+        host: {{ .Values.ui_app_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.ui_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 30s
+      retryOn: connect-failure,refused-stream,503
+  - match:
+    - uri:
+        prefix: "/personal-access-token"
+    - uri:
+        prefix: "/"
+    rewrite:
+      uri: "/"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "geti-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    route:
+    - destination:
+        host: {{ .Values.ui_app_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.ui_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 30s
+      retryOn: connect-failure,refused-stream,503
+{{- end }}

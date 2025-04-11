@@ -1,0 +1,26 @@
+{
+   "supported_algorithms": [
+     {
+       "name": "Yolo",
+       "task_type": "detection",
+       "model_size": 200,
+       "model_template_id": "detection_yolo",
+       "gigaflops": 5,
+       "summary": "YOLO architecture for detection",
+       "default_algorithm": true,
+       "performance_category": "speed",
+       "lifecycle_stage": "active"
+     },
+      {
+       "name": "SSD",
+       "task_type": "detection",
+       "model_size": 200,
+       "model_template_id": "detection_ssd",
+       "gigaflops": 5,
+       "summary": "SSD architecture for detection",
+       "default_algorithm": false,
+       "performance_category": "balance",
+       "lifecycle_stage": "active"
+      }
+   ]
+}

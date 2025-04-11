@@ -1,0 +1,10 @@
+.thumbnailWrapper {
+    overflow: hidden;
+    background-color: var(--spectrum-alias-background-color-modal-overlay);
+    border: var(--spectrum-global-dimension-size-10) solid var(--spectrum-global-color-gray-50);
+    cursor: pointer;
+}
+
+.isSelected {
+    border-color: var(--energy-blue);
+}

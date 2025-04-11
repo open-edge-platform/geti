@@ -1,0 +1,7 @@
+type: object
+properties:
+  name:
+    type: string
+  color:
+    type: string
+    pattern: ^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$

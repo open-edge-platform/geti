@@ -1,0 +1,11 @@
+required:
+  - name
+  - pipeline
+type: object
+properties:
+  name:
+    type: string
+    description: 'Project name'
+    minLength: 1
+  pipeline:
+    $ref: "pipeline.yaml"

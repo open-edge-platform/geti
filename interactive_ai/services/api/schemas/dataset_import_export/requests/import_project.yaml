@@ -1,0 +1,25 @@
+title: Import project body
+required:
+  - file_id
+  - project_name
+  - task_type
+  - labels
+type: object
+properties:
+  file_id:
+    title: File Id
+    type: string
+    example: 60d31793d5f1fb7e6e3c1a4c
+  project_name:
+    title: Project Name
+    type: string
+    example: Pet Classification
+  task_type:
+    title: Task Type
+    type: string
+    $ref: "../project_types.yaml"
+  labels:
+    type: array
+    items:
+      $ref: "labels.yaml"
+    example: [{"name" : "cat", "color" : "#0014ffff"}, {"name" : "dog", "color" : "#0015ffff"}]

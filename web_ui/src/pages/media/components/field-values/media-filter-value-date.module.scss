@@ -1,0 +1,12 @@
+.mediaFilterDate {
+    button[class*='spectrum-FieldButton'] {
+        height: var(--spectrum-global-dimension-size-400) !important;
+        padding: 0 var(--spectrum-global-dimension-size-50) var(--spectrum-global-dimension-size-25)
+            var(--spectrum-global-dimension-size-125) !important;
+        margin-top: var(--spectrum-global-dimension-size-10);
+    }
+
+    div[class*='spectrum-Textfield-input_'] {
+        padding: 0 !important;
+    }
+}

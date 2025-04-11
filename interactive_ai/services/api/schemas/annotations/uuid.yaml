@@ -1,0 +1,3 @@
+type: string
+example: e42cf382-5f7b-4fda-980a-fa0fab00243c
+description: A UUID, used to identify an annotation.

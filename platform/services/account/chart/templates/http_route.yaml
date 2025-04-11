@@ -1,0 +1,120 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "account-service.fullname" . }}-admin
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+#  hostnames:
+#    - "*.intel.com"  # only for SaaS
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/invitations/?
+      backendRefs:
+        - name: {{ include "account-service.fullname" . }}
+          port: {{ .Values.service.ports.http }}
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "account-service.fullname" . }}-platform
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+#  hostnames:
+#    - "*.intel.com"  # only for SaaS
+  rules:
+    - matches:  # 8 items at most
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/workspaces/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/logout/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/roles/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/roles/[a-zA-z]*
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/activeUser
+      backendRefs:
+        - name: {{ include "account-service.fullname" . }}
+          port: {{ .Values.service.ports.http }}
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/profile/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/photos
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/personal_access_tokens/organization/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/personal_access_tokens/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/personal_access_tokens/{{ .Values.id_pattern }}/?
+          {{- if .Values.global.acc_svc_settings_enabled }}
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/user_settings/?
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/(.*)/user_settings/?
+          {{- end }}
+      backendRefs:
+        - name: {{ include "account-service.fullname" . }}
+          port: {{ .Values.service.ports.http }}
+    {{- if .Values.global.oidc_cidaas }}
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/invitations/
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/statuses
+      backendRefs:
+        - name: {{ include "account-service.fullname" . }}
+          port: {{ .Values.service.ports.http }}
+    {{- end }}
+{{/*    {{- if not .Values.global.oidc_cidaas }}*/}}
+{{/*    - matches:          */}}
+{{/*          - path:*/}}
+{{/*              type: RegularExpression*/}}
+{{/*              value: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/?  # TODO PUT method, previously without the condition - GET          */}}
+{{/*      backendRefs:*/}}
+{{/*        - name: {{ include "account-service.fullname" . }}*/}}
+{{/*          port: {{ .Values.service.ports.http }}*/}}
+{{/*    {{- end }}*/}}
+{{- end }}

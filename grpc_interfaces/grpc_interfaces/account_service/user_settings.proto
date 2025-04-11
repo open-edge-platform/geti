@@ -1,0 +1,67 @@
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package user_settings;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+message UserSettings {
+  string id = 1;
+  string user_id = 2;
+  string organization_id = 3;
+  string project_id = 4;
+  string settings = 5;
+  google.protobuf.Timestamp created_at = 6;
+  string created_by = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  string modified_by = 9;
+}
+
+message UserSettingsRequest {
+  string project_id = 1;
+}
+
+message UserSettingsResponse {
+  string message = 1;
+}
+
+message UserSettingsPayload {
+  string settings = 1;
+}
+
+message UserSettingsCreateRequest {
+  UserSettingsPayload settings = 1;
+  string project_id = 2;
+}
+
+service UserSettingsService {
+
+  // POST /user_settings
+  rpc create (UserSettingsCreateRequest) returns (UserSettingsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user_settings"
+      body: "settings"
+    };
+  }
+
+  // GET /user_settings
+  rpc get (UserSettingsRequest) returns (UserSettings) {
+    option (google.api.http) = {
+      get: "/api/v1/user_settings"
+    };
+  }
+}

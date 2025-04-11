@@ -1,0 +1,39 @@
+{
+    "id": "65e6c0afb4cf6365897776ff",
+    "type": "perform_import_to_existing_project",
+    "creation_time": "2024-03-05T06:50:23.213000+00:00",
+    "start_time": "2024-03-05T06:50:29.923000+00:00",
+    "end_time": "2024-03-05T06:50:42.821000+00:00",
+    "name": "Import Dataset to Existing Project",
+    "author": "f18674a7-a206-4166-9564-0888d5a3236e",
+    "state": "finished",
+    "steps": [
+        {
+            "message": "Project populated successfully",
+            "index": 1,
+            "progress": 100,
+            "state": "finished",
+            "step_name": "Import dataset to project",
+            "duration": 6.0
+        }
+    ],
+    "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+    },
+    "metadata": {
+        "file_id": "65e6bcf4c6ada55c64630357",
+        "project": {
+            "id": "65e6c01185ff89c56c11c5dc",
+            "name": "cat dog segmentation",
+            "type": "segmentation"
+        },
+        "dataset": {
+            "id": "65e6bcf8c6ada55c6463035f",
+            "name": "Dataset",
+            "use_for_training": true,
+            "creation_time": "2024-03-05T06:34:32.332000+00:00"
+        }
+    }
+}
