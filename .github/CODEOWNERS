@@ -2,7 +2,7 @@
 # After that moment, we will revisit the CODEOWNERS list.
 
 # Default for anything not covered by one of the more specific rules below
-* @mpryahin @jcchr @leoll2 @piotrgrubicki @atwinand
+* @mpryahin @jcchr @leoll2 @piotrgrubicki
 
 # Platform components
 platform/ @jcchr @piotrgrubicki
@@ -12,4 +12,4 @@ interactive_ai/ @open-edge-platform/geti-core-backend-write
 docs/rest_api/ @open-edge-platform/geti-core-backend-write
 
 # UI components
-web_ui/ @jpggvilaca @MarkRedeman @camiloHimura @pplaskie @ActiveChooN @dwesolow @romanowska
+web_ui/ @jpggvilaca @MarkRedeman @camiloHimura @pplaskie @ActiveChooN @romanowska  # TODO add @dwesolow
