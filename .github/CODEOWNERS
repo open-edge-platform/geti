@@ -2,19 +2,14 @@
 # After that moment, we will revisit the CODEOWNERS list.
 
 # Default for anything not covered by one of the more specific rules below
-* @mpryahin @jcchr @leoll2 @piotrgrubicki @atwinand
+* @mpryahin @jcchr @leoll2 @piotrgrubicki
 
 # Platform components
-account_service/ @jcchr @piotrgrubicki
-credit_system/ @jcchr @piotrgrubicki
-notifier/ @jcchr @piotrgrubicki
-observability/ @jcchr @piotrgrubicki
-onboarding_service/ @jcchr @piotrgrubicki
-user_directory/ @jcchr @piotrgrubicki
+platform/ @jcchr @piotrgrubicki
 
 # IAI components
-interactive_ai/ @leoll2 @AlbertvanHouten
-docs/rest_api/ @leoll2 @AlbertvanHouten
+interactive_ai/ @open-edge-platform/geti-core-backend-write
+docs/rest_api/ @open-edge-platform/geti-core-backend-write
 
 # UI components
-web_ui/ @jpggvilaca @MarkRedeman @camiloHimura @pplaskie @ActiveChooN @dwesolow @romanowska
+web_ui/ @jpggvilaca @MarkRedeman @camiloHimura @pplaskie @ActiveChooN @romanowska  # TODO add @dwesolow
