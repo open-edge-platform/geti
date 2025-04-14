@@ -33,4 +33,8 @@ USER non-root
 WORKDIR /app
 COPY --link --from=builder --chown=10001 entrypoints/. .
 
+COPY --chown=10001 --chmod=500 /entrypoints/check_liveliness ${VENV}/bin/
+COPY --chown=10001 --chmod=500 /entrypoints/run_with_liveliness_checking ${VENV}/bin/
+COPY --chown=10001 --chmod=500 /entrypoints/run ${VENV}/bin/
+
 ENTRYPOINT ["sh", "run_with_liveliness_checking"]
