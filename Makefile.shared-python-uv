@@ -110,3 +110,10 @@ developer-venv: pre-venv
 		uv sync --inexact --all-extras --active && \
 		cd -; \
 	done
+
+builder:
+	@docker run --rm -u $(id -u):$(getent group docker | cut -d: -f3) \
+		-v "$(ROOT_DIR):/app" \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ~/.docker/config.json:/home/bulider/.docker/config.json \
+		-w "/app/$(RELATIVE_PATH)" ${DOCKER_PROXY} ${PYTHON_BUILDER_IMAGE} make $(BUILDER_ARGS)

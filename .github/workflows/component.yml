@@ -42,32 +42,14 @@ jobs:
           persist-credentials: false
           ref: ${{ inputs.branch || '' }}
 
-      - name: Setup Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
-        with:
-          python-version: '3.10'
-
-      - name: Install missing dependencies
-        run: |
-          sudo -E apt update
-          sudo -E apt install -y libldap2-dev libsasl2-dev ffmpeg rsync
-
-      - name: Setup GO
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
       - name: Static code analysis
-        run: make -C ${COMPONENT_DIR} static-code-analysis
+        run: make builder -C ${COMPONENT_DIR} static-code-analysis
 
       - name: Unit testing
-        run: make -C ${COMPONENT_DIR} test-unit
+        run: make builder -C ${COMPONENT_DIR} test-unit
 
       - name: Integration testing
-        run: make -C ${COMPONENT_DIR} test-integration
+        run: make builder -C ${COMPONENT_DIR} test-integration
 
       - name: Configure AWS Credentials
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'

@@ -27,6 +27,13 @@ REGISTRY                          ?= local
 IMAGES_REGISTRY                   ?= ${REGISTRY}/impp
 CHARTS_REGISTRY                   ?= ${REGISTRY}/geti-helm
 BASE_IMAGES_REGISTRY              ?= ${REGISTRY}/base-images
+BUILDER_IMAGES_REGISTRY           ?= ${REGISTRY}/builder-images
+
+##
+# Builder images
+##
+PYTHON_BUILDER_IMAGE              ?= ${BUILDER_IMAGES_REGISTRY}/python-builder:v0.1
+GO_BUILDER_IMAGE                  ?= ${BUILDER_IMAGES_REGISTRY}/go-builder:v0.1
 
 ###
 # base images versions
@@ -61,6 +68,9 @@ DOCKER_BUILD_CONTEXT              ?=
 
 DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
 
+DOCKER_PROXY                      := -e http_proxy=$(http_proxy) \
+									 -e https_proxy=$(https_proxy) \
+									 -e no_proxy=$(no_proxy)
 
 ###
 # docker images
@@ -94,3 +104,10 @@ publish-chart:
 %:  %-default
 	@  true
 
+# Remove first goal from MAKECMDGOALS when using "make builder <goals_list>"
+ifeq (builder,$(firstword $(MAKECMDGOALS)))
+  BUILDER_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(BUILDER_ARGS):;@:)
+  ROOT_DIR=$(shell git rev-parse --show-toplevel)
+  RELATIVE_PATH=$(shell realpath --relative-to=$(ROOT_DIR) $(CURDIR))
+endif

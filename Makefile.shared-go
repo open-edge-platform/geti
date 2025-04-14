@@ -61,3 +61,6 @@ static-code-analysis-default:
 lint:
 	GOPATH=$(HOME) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2 && \
 	$(HOME)/bin/golangci-lint run --fix --timeout 15m
+
+builder:
+	@docker run --rm -v "$(ROOT_DIR):/app" -w "/app/$(RELATIVE_PATH)" ${DOCKER_PROXY} ${GO_BUILDER_IMAGE} make $(BUILDER_ARGS)
