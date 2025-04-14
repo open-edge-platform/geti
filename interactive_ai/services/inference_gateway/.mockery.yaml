@@ -1,0 +1,16 @@
+quiet: False
+disable-version-string: True
+with-expecter: True
+mockname: "Mock{{.InterfaceName}}"
+filename: "mock_{{.InterfaceName | snakecase}}.go"
+dir: "mock/{{.InterfaceDirRelative}}"
+packages:
+  inference_gateway/service:
+    config:
+      all: True
+  inference_gateway/usecase:
+    config:
+      all: True
+  inference_gateway/controllers:
+    config:
+      all: True
