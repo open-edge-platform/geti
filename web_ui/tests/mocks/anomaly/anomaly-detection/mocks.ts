@@ -1,14 +1,5 @@
-// INTEL CONFIDENTIAL
-//
-// Copyright (C) 2022 Intel Corporation
-//
-// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
-// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
-// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
-// without Intel's prior written permission.
-//
-// This software and the related documents are provided as is, with no express or implied warranties,
-// other than those that are expressly stated in the License.
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 export const annotatorUrl =
     // eslint-disable-next-line max-len
     'http://localhost:3000/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/61011e42d891c82e13ec92da/projects/6332b40a2dc03cc436625b63/datasets/6332b40a2dc03cc436625b64/annotator/image/6332b4482dc03cc436625ba6';
