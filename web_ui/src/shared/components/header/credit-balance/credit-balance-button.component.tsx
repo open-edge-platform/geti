@@ -1,5 +1,14 @@
-// Copyright (C) 2022-2025 Intel Corporation
-// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+// INTEL CONFIDENTIAL
+//
+// Copyright (C) 2024 Intel Corporation
+//
+// This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+// the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+// without Intel's prior written permission.
+//
+// This software and the related documents are provided as is, with no express or implied warranties,
+// other than those that are expressly stated in the License.
 
 import { forwardRef, useEffect, useRef } from 'react';
 
@@ -11,7 +20,6 @@ import { useOverlayTriggerState } from 'react-stately';
 
 import { CreditCard } from '../../../../assets/icons';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
-import { paths } from '../../../../core/services/routes';
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
@@ -122,8 +130,8 @@ const CreditBalanceButtonFuxNotification = ({ isDarkMode }: { isDarkMode: boolea
 
             {isFirstAutoTrainedProject ? (
                 <FuxNotification
+                    settingsKey={FUX_NOTIFICATION_KEYS.AUTO_TRAINING_NOTIFICATION}
                     state={fuxState}
-                    docUrl={activeUser?.isAdmin ? paths.account.usage({ organizationId }) : undefined}
                     triggerRef={triggerRef}
                     placement={'bottom right'}
                     onClose={handleCloseTrainingNotification}

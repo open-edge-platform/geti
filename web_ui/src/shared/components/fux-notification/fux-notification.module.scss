@@ -16,3 +16,20 @@
 .close {
     color: var(--spectrum-global-color-gray-900);
 }
+
+.fuxHeader {
+    margin-block-end: var(--spectrum-global-dimension-size-100);
+    width: 100%;
+    justify-content: space-between;
+    align-items: start;
+
+    .header {
+        font-size: var(--spectrum-global-dimension-font-size-400);
+        font-weight: 500;
+        width: 85%;
+    }
+
+    .steps {
+        font-size: var(--spectrum-global-dimension-font-size-50);
+    }
+}
