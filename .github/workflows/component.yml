@@ -42,6 +42,17 @@ jobs:
           persist-credentials: false
           ref: ${{ inputs.branch || '' }}
 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: Github
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
       - name: Static code analysis
         run: make builder -C ${COMPONENT_DIR} static-code-analysis
 
@@ -51,19 +62,6 @@ jobs:
       - name: Integration testing
         run: make builder -C ${COMPONENT_DIR} test-integration
 
-      - name: Configure AWS Credentials
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          role-session-name: Github
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
-      
       - name: Build image
         id: build-image
         run: |
