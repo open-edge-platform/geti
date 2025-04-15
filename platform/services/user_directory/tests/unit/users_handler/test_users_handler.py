@@ -20,6 +20,7 @@ TEST_USER_PREFIX = os.environ.get("TEST_USER_PREFIX", "unit_tests_")
 # because we have singleton for SpiceDB, when env var is set using mock.patch.dict such change will be global
 os.environ["SPICEDB_CREDENTIALS"] = "token"
 
+
 @pytest.fixture
 def random_user():
     user_id = TEST_USER_PREFIX + secrets.token_urlsafe(8)
