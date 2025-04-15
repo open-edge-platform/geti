@@ -20,26 +20,12 @@ TEST_USER_PREFIX = os.environ.get("TEST_USER_PREFIX", "unit_tests_")
 # because we have singleton for SpiceDB, when env var is set using mock.patch.dict such change will be global
 os.environ["SPICEDB_CREDENTIALS"] = "token"
 
-def generate_strong_password():
-    import random
-    import string
-
-    special_characters = "!@#$%^&*()_+-=[]{}|;:',.<>/?"
-    password = (
-        random.choice(string.ascii_uppercase) +
-        random.choice(string.ascii_lowercase) +
-        random.choice(string.digits) +
-        random.choice(special_characters) +
-        ''.join(random.choices(string.ascii_letters + string.digits + special_characters, k=12))
-    )
-    return password
-
 @pytest.fixture
 def random_user():
     user_id = TEST_USER_PREFIX + secrets.token_urlsafe(8)
     name = f"Test User {user_id}"
     mail = f"{user_id}@test.geti.com"
-    passwd = generate_strong_password()
+    passwd = utils_string.strong_password(32)
     password = base64.urlsafe_b64encode(passwd.encode()).decode()
     return name, user_id, mail, password
 
