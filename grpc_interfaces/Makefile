@@ -143,19 +143,10 @@ format:
 add-license-python-%:
 	@echo "Adding license header to Python files..."
 	@for file in $$(find $(PROTO_ROOT)/$* -name "*.py"); do \
-		if ! grep -q "Copyright" $$file; then \
+		if ! grep -q "LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE" $$file; then \
 			tmpfile=$$(mktemp); \
-			echo "# INTEL CONFIDENTIAL" > $$tmpfile; \
-			echo "# " >> $$tmpfile; \
 			echo "# Copyright (C) $(YEAR) $(COPYRIGHT_OWNER)" >> $$tmpfile; \
-			echo "# " >> $$tmpfile; \
-			echo "# This software and the related documents are Intel copyrighted materials, and your use of them is governed by" >> $$tmpfile; \
-			echo "# the express license under which they were provided to you (\"License\"). Unless the License provides otherwise," >> $$tmpfile; \
-			echo "# you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents" >> $$tmpfile; \
-			echo "# without Intel's prior written permission." >> $$tmpfile; \
-			echo "#" >> $$tmpfile; \
-			echo "# This software and the related documents are provided as is, with no express or implied warranties," >> $$tmpfile; \
-			echo "# other than those that are expressly stated in the License." >> $$tmpfile; \
+			echo "# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE" >> $$tmpfile; \
 			echo "" >> $$tmpfile; \
 			cat $$file >> $$tmpfile; \
 			mv $$tmpfile $$file; \
@@ -168,19 +159,10 @@ add-license-python-%:
 add-license-go-%:
 	@echo "Adding license header to Go files..."
 	@for file in $$(find $(PROTO_ROOT)/$*/go -name "*.go"); do \
-		if ! grep -q "INTEL CONFIDENTIAL" $$file; then \
+		if ! grep -q "LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE" $$file; then \
 			tmpfile=$$(mktemp); \
-			echo "// INTEL CONFIDENTIAL" > $$tmpfile; \
-			echo "// " >> $$tmpfile; \
 			echo "// Copyright (C) $(YEAR) $(COPYRIGHT_OWNER)" >> $$tmpfile; \
-			echo "// " >> $$tmpfile; \
-			echo "// This software and the related documents are Intel copyrighted materials, and your use of them is governed by" >> $$tmpfile; \
-			echo "// the express license under which they were provided to you (\"License\"). Unless the License provides otherwise," >> $$tmpfile; \
-			echo "// you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents" >> $$tmpfile; \
-			echo "// without Intel's prior written permission." >> $$tmpfile; \
-			echo "//" >> $$tmpfile; \
-			echo "// This software and the related documents are provided as is, with no express or implied warranties," >> $$tmpfile; \
-			echo "// other than those that are expressly stated in the License." >> $$tmpfile; \
+			echo "// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE" >> $$tmpfile; \
 			echo "" >> $$tmpfile; \
 			cat $$file >> $$tmpfile; \
 			mv $$tmpfile $$file; \
