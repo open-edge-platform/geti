@@ -1,16 +1,16 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "account-service.fullname" . }}
+  name: {{ include "initial-user.name" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "account-service.labels" . | nindent 4 }}
+    {{- include "initial-user.labels" . | nindent 4 }}
 rules:
   - apiGroups:
-      - "batch"
+      - "apps"
     resources:
-      - jobs
+      - deployments
     verbs:
-      - watch
       - get
       - list
+      - watch

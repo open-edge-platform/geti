@@ -2,8 +2,17 @@
 Utils to validate inputs
 """
 
-# Copyright (C) 2022-2025 Intel Corporation
-# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+# INTEL CONFIDENTIAL
+#
+# Copyright (C) 2021 Intel Corporation
+#
+# This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+# the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+# you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+# without Intel's prior written permission.
+#
+# This software and the related documents are provided as is, with no express or implied warranties,
+# other than those that are expressly stated in the License.
 
 import base64
 import re
@@ -49,7 +58,7 @@ def validate_user_input(user_input: dict) -> None:  # noqa: C901
                 user_input[key] = convert_from_base_64(user_input[key])
                 if not 8 <= len(user_input[key]) <= MAX_INPUT_LENGTH:
                     raise ValueError(
-                        f"Password must consist of 8 - {MAX_INPUT_LENGTH} characters, at least one capital letter, "
+                        f"Password must consist of 8 - {MAX_INPUT_LENGTH} characters,, at least one capital letter, "
                         "lower letter, digit or symbol"
                     )
             else:

@@ -1,9 +1,9 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ include "account-service.fullname" . }}-init-user
+  name: {{ include "initial-user.name" . }}
   namespace: {{ .Release.Namespace }}
-  labels: {{- include "account-service.labels" . | nindent 4 }}
+  labels: {{- include "initial-user.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
@@ -16,7 +16,7 @@ spec:
     {{- end }}
     spec:
       restartPolicy: Never
-      serviceAccountName: {{ include "account-service.fullname" . }}
+      serviceAccountName: {{ include "initial-user.name" . }}
       initContainers:
         - name: init-postgresql
           image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
@@ -26,9 +26,9 @@ spec:
             {{ toYaml .Values.securityContext | nindent 12 }}
           env:
             - name: "POSTGRES_HOST"
-              value: "{{ .Release.Namespace }}-postgresql"
+              value: "{{ .Values.postgresql.host }}"
             - name: "POSTGRES_PORT"
-              value: "5432"
+              value: "{{ .Values.postgresql.port }}"
         - name: "kubectl-wait"
           image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
           command: [ "/bin/bash", "-c" ]
@@ -38,27 +38,23 @@ spec:
               --timeout=1200s
               --for=condition=available
               --namespace {{ .Release.Namespace }}
-              {{ .Release.Namespace }}-{{ .Chart.Name }}
+              "{{ .Release.Namespace }}-account-service"
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          resources:
-            {{- toYaml .Values.initResources | nindent 12 }}
       containers:
       - name: init-user
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
+        image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Chart.Name }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
         command: [ "/bin/sh", "-c" ]
         args:
           - >-
             {{- if eq .Values.global.account_service_mode "migration" }}
-            migrate_to_account_service;
+            python run_migration.py;
             {{- else }}
-            create_initial_user;
+            python create_initial_user.py;
             {{- end }}
             retVal=$?;
-            {{- if not .Values.global.istio_ambient_mesh }}
-            curl -XPOST 127.0.0.1:15020/quitquitquit;
-            {{- end }}
+            echo "done" > /init/1;
             exit $retVal
         securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
@@ -89,9 +85,9 @@ spec:
               name: "{{ .Release.Namespace }}-spice-db"
               key: SPICEDB_GRPC_PRESHARED_KEY
         - name: "POSTGRES_HOST"
-          value: "{{ .Release.Namespace }}-postgresql"
+          value: "{{ .Values.postgresql.host }}"
         - name: "POSTGRES_PORT"
-          value: "5432"
+          value: "{{ .Values.postgresql.port }}"
         - name: "POSTGRES_DB"
           valueFrom:
             configMapKeyRef:
@@ -117,6 +113,24 @@ spec:
             readOnly: true
           - name: tmp
             mountPath: "/tmp"
+          - name: "init"
+            mountPath: "/init"
+      {{- if not .Values.global.istio_ambient_mesh }}
+      - name: "istio-sidecar-quit"
+        image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        command: [ "/bin/sh", "-c" ]
+        args:
+          - >-
+            while [ ! -f /init/1 ]; do
+              sleep 1
+            done;
+            curl -XPOST 127.0.0.1:15020/quitquitquit
+        volumeMounts:
+          - name: "init"
+            mountPath: "/init"
+      {{- end }}
       volumes:
         - name: config
           configMap:
@@ -128,4 +142,6 @@ spec:
               - key: ca.crt
                 path: ca.crt
         - name: tmp
+          emptyDir: {}
+        - name: "init"
           emptyDir: {}
