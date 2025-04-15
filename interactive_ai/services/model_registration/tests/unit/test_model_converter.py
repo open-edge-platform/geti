@@ -204,16 +204,16 @@ def test_check_dir_size(tmp_path, model_converter: ModelConverter):
 @pytest.mark.parametrize("model_size", [LARGE_MODEL_THRESHOLD_BYTES - 100, LARGE_MODEL_THRESHOLD_BYTES + 100])
 def test_prepare_graph(sample_project, sample_models, graph_variant, model_size, model_converter: ModelConverter):
     create_ovms_graph_files_mock = MagicMock(spec=model_converter._create_ovms_graph_files)
-    model_converter._create_ovms_graph_files = create_ovms_graph_files_mock
+    model_converter._create_ovms_graph_files = create_ovms_graph_files_mock  # type: ignore[method-assign]
 
     check_dir_size_mock = MagicMock(model_converter._check_dir_size, return_value=model_size)
-    model_converter._check_dir_size = check_dir_size_mock
+    model_converter._check_dir_size = check_dir_size_mock  # type: ignore[method-assign]
 
     create_subconfig_mock = MagicMock(model_converter._create_subconfig)
-    model_converter._create_subconfig = create_subconfig_mock
+    model_converter._create_subconfig = create_subconfig_mock  # type: ignore[method-assign]
 
     create_graph_mock = MagicMock(model_converter._create_graph)
-    model_converter._create_graph = create_graph_mock
+    model_converter._create_graph = create_graph_mock  # type: ignore[method-assign]
 
     model_converter.prepare_graph(project=sample_project, models=sample_models, graph_variant=graph_variant)
 
