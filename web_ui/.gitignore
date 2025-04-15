@@ -30,8 +30,11 @@ debug.log*
 /playwright-report/
 /dist-pw/
 playwright-report.*
-tests/datasets
-!tests/datasets/videos
+
+!tests/datasets/
+tests/datasets/*
+!tests/datasets/videos/
+
 tests/e2e/.auth
 
 public/openapi-spec.json
