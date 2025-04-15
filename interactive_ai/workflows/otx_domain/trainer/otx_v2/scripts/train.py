@@ -35,7 +35,7 @@ def train(
     dataset_dir: Path,
     work_dir: Path,
     resume: bool = False,
-) -> Path:
+) -> None:
     """Execute OTX model training."""
     otx2_config = config.to_otx2_config(work_dir=work_dir)
     engine, train_kwargs = ConfigConverter.instantiate(

@@ -23,6 +23,7 @@ from sc_sdk.entities.metrics import (
     MatrixChartInfo,
     MatrixMetric,
     MatrixMetricsGroup,
+    MetricEntity,
     MetricsGroup,
     MultiScorePerformance,
     NullMetric,
@@ -54,9 +55,7 @@ class MetricDeserializer:
     @staticmethod
     def backward(
         instance: dict,
-    ) -> (
-        ScoreMetric | CountMetric | StringMetric | DateMetric | DurationMetric | CurveMetric | MatrixMetric | NullMetric
-    ):
+    ) -> MetricEntity:
         metric_type = instance["type"]
         if metric_type == ScoreMetric.type():
             label_id = instance.get("label_id")
@@ -77,7 +76,7 @@ class MetricDeserializer:
                 value = instance["value"]
                 if isinstance(value, float):
                     value = np.nan_to_num(value)
-                return metric_class(name=instance["name"], value=value)
+                return metric_class(name=instance["name"], value=value)  # type: ignore
         if metric_type == CurveMetric.type():
             return CurveMetric(name=instance["name"], ys=instance["ys"], xs=instance.get("xs"))
         if metric_type == MatrixMetric.type():
@@ -98,38 +97,37 @@ class VisualizationInfoDeserializer:
         instance: dict,
     ) -> TextChartInfo | BarChartInfo | LineChartInfo | MatrixChartInfo:
         if instance is None:
-            output = VisualizationInfo(name="Placeholder", visualisation_type=VisualizationType.TEXT)
+            return VisualizationInfo(name="Placeholder", visualisation_type=VisualizationType.TEXT)
         if instance["type"] == VisualizationType.TEXT.name:
-            output = TextChartInfo(
+            return TextChartInfo(
                 name=instance["name"],
             )
-        elif instance["type"] in (
+        if instance["type"] in (
             VisualizationType.BAR.name,
             VisualizationType.RADIAL_BAR.name,
         ):
-            output = BarChartInfo(
+            return BarChartInfo(
                 name=instance["name"],
                 palette=ColorPalette[instance.get("palette", "LABEL")],
                 visualization_type=VisualizationType[instance["type"]],
             )
-        elif instance["type"] == VisualizationType.LINE.name:
-            output = LineChartInfo(
+        if instance["type"] == VisualizationType.LINE.name:
+            return LineChartInfo(
                 name=instance["name"],
                 x_axis_label=instance.get("x_axis_label"),
                 y_axis_label=instance.get("y_axis_label"),
                 palette=ColorPalette[instance.get("palette", "LABEL")],
             )
-        elif instance["type"] == VisualizationType.MATRIX.name:
-            output = MatrixChartInfo(
+        if instance["type"] == VisualizationType.MATRIX.name:
+            return MatrixChartInfo(
                 name=instance["name"],
                 header=instance.get("header"),
                 row_header=instance.get("row_header"),
                 column_header=instance.get("column_header"),
                 palette=ColorPalette[instance.get("palette", "LABEL")],
             )
-        else:
-            raise ValueError(f"Visualization type {instance['type']} is currently not implemented.")
-        return output
+
+        raise ValueError(f"Visualization type {instance['type']} is currently not implemented.")
 
 
 class MetricsGroupDeserializer:
@@ -139,20 +137,56 @@ class MetricsGroupDeserializer:
     def backward(instance: dict) -> MetricsGroup:
         visualization_info = VisualizationInfoDeserializer.backward(instance.get("visualization_info", {}))
         metrics = [MetricDeserializer.backward(metric) for metric in instance["metrics"]]
-        if visualization_info.type == VisualizationType.TEXT:
-            metrics_group = TextMetricsGroup(metrics, visualization_info)
-        elif visualization_info.type in (
-            VisualizationType.BAR,
-            VisualizationType.RADIAL_BAR,
-        ):
-            metrics_group = BarMetricsGroup(metrics, visualization_info)
-        elif visualization_info.type == VisualizationType.LINE:
-            metrics_group = LineMetricsGroup(metrics, visualization_info)
-        elif visualization_info.type == VisualizationType.MATRIX:
-            metrics_group = MatrixMetricsGroup(metrics, visualization_info)
-        else:
-            raise ValueError(f"Visualization type {visualization_info.type} is currently not implemented.")
-        return metrics_group
+        if isinstance(visualization_info, TextChartInfo):
+            return MetricsGroupDeserializer.backward_text_metrics(metrics, visualization_info)
+        if isinstance(visualization_info, BarChartInfo):
+            return MetricsGroupDeserializer.backward_bar_metrics(metrics, visualization_info)
+        if isinstance(visualization_info, LineChartInfo):
+            return MetricsGroupDeserializer.backward_line_metrics(metrics, visualization_info)
+        if isinstance(visualization_info, MatrixChartInfo):
+            return MetricsGroupDeserializer.backward_matrix_metrics(metrics, visualization_info)
+
+        raise ValueError(f"Visualization type {visualization_info.type} is currently not implemented.")
+
+    @staticmethod
+    def backward_text_metrics(metrics: list[MetricEntity], visualization_info: TextChartInfo) -> TextMetricsGroup:
+        filtered_metrics = []
+        for metric in metrics:
+            if isinstance(metric, ScoreMetric | CountMetric | StringMetric | DateMetric | DurationMetric):
+                filtered_metrics.append(metric)
+            else:
+                raise ValueError(f"Metric type {type(metric)} is not supported for text visualization.")
+        return TextMetricsGroup(filtered_metrics, visualization_info)
+
+    @staticmethod
+    def backward_bar_metrics(metrics: list[MetricEntity], visualization_info: BarChartInfo) -> BarMetricsGroup:
+        filtered_metrics = []
+        for metric in metrics:
+            if isinstance(metric, ScoreMetric | CountMetric):
+                filtered_metrics.append(metric)
+            else:
+                raise ValueError(f"Metric type {type(metric)} is not supported for bar visualization.")
+        return BarMetricsGroup(filtered_metrics, visualization_info)
+
+    @staticmethod
+    def backward_line_metrics(metrics: list[MetricEntity], visualization_info: LineChartInfo) -> LineMetricsGroup:
+        filtered_metrics = []
+        for metric in metrics:
+            if isinstance(metric, CurveMetric):
+                filtered_metrics.append(metric)
+            else:
+                raise ValueError(f"Metric type {type(metric)} is not supported for line visualization.")
+        return LineMetricsGroup(filtered_metrics, visualization_info)
+
+    @staticmethod
+    def backward_matrix_metrics(metrics: list[MetricEntity], visualization_info: MatrixChartInfo) -> MatrixMetricsGroup:
+        filtered_metrics = []
+        for metric in metrics:
+            if isinstance(metric, MatrixMetric):
+                filtered_metrics.append(metric)
+            else:
+                raise ValueError(f"Metric type {type(metric)} is not supported for matrix visualization.")
+        return MatrixMetricsGroup(filtered_metrics, visualization_info)
 
 
 class PerformanceDeserializer:
@@ -170,59 +204,79 @@ class PerformanceDeserializer:
         performance_type = instance.get("type", PerformanceDeserializer.PERFORMANCE_TYPE)
         score = instance["score"]
         if performance_type == PerformanceDeserializer.ANOMALY_PERFORMANCE_TYPE:
-            output_type = AnomalyLocalizationPerformance
-            score_arguments = {
-                "local_score": MetricDeserializer.backward(score["local_score"]),
-                "global_score": MetricDeserializer.backward(score["global_score"]),
-            }
-        elif performance_type == PerformanceDeserializer.MULTI_SCORE_PERFORMANCE_TYPE:
-            output_type = MultiScorePerformance
-            score_arguments = {
-                "primary_score": MetricDeserializer.backward(score["primary_score"]),
-                "additional_scores": [
-                    MetricDeserializer.backward(additional_score) for additional_score in score["additional_scores"]
-                ],
-            }
-        else:
-            output_type = Performance
-            score_arguments = {"score": MetricDeserializer.backward(instance["score"])}
+            return PerformanceDeserializer.backward_anomaly_performance(instance, score)
+        if performance_type == PerformanceDeserializer.MULTI_SCORE_PERFORMANCE_TYPE:
+            return PerformanceDeserializer.backward_multi_score_performance(instance, score)
 
-        # Validate that all score metrics are ScoreMetric instances. In the case of a
-        # NullMetric, convert to a ScoreMetric with a zero score
-        for score_name, score_metric in score_arguments.items():
-            if isinstance(score_metric, list):
-                score_entries: list[ScoreMetric] = []
-                for score_entry in score_metric:
-                    score_entries.append(PerformanceDeserializer._validate_score_metric(score_entry))
-                score_arguments[score_name] = score_entries
-            else:
-                score_arguments[score_name] = PerformanceDeserializer._validate_score_metric(
-                    score_metric, allow_optional=score_name == "local_score"
-                )
+        return PerformanceDeserializer.backward_score(instance, score)
 
-        return output_type(
-            **score_arguments,
+    @staticmethod
+    def backward_score(instance: dict, score: dict) -> Performance:
+        return Performance(
+            score=PerformanceDeserializer._validate_score_metric(MetricDeserializer.backward(score)),
             dashboard_metrics=[
                 MetricsGroupDeserializer.backward(metric_group) for metric_group in instance["dashboard_metrics"]
             ],
         )
 
     @staticmethod
-    def _validate_score_metric(
-        score_metric: ScoreMetric | NullMetric, allow_optional: bool = False
-    ) -> ScoreMetric | None:
+    def backward_multi_score_performance(instance: dict, score: dict) -> Performance:
+        return MultiScorePerformance(
+            primary_score=PerformanceDeserializer._validate_score_metric(
+                MetricDeserializer.backward(score["primary_score"])
+            ),
+            additional_scores=[
+                PerformanceDeserializer._validate_score_metric(MetricDeserializer.backward(additional_score))
+                for additional_score in score["additional_scores"]
+            ],
+            dashboard_metrics=[
+                MetricsGroupDeserializer.backward(metric_group) for metric_group in instance["dashboard_metrics"]
+            ],
+        )
+
+    @staticmethod
+    def backward_anomaly_performance(instance: dict, score: dict) -> Performance:
+        return AnomalyLocalizationPerformance(
+            local_score=PerformanceDeserializer._validate_optional_score_metric(
+                MetricDeserializer.backward(score["local_score"])
+            ),
+            global_score=PerformanceDeserializer._validate_score_metric(
+                MetricDeserializer.backward(score["global_score"])
+            ),
+            dashboard_metrics=[
+                MetricsGroupDeserializer.backward(metric_group) for metric_group in instance["dashboard_metrics"]
+            ],
+        )
+
+    @staticmethod
+    def _validate_score_metric(score_metric: MetricEntity) -> ScoreMetric:
         """
         Validate that a metric passed as a model or project score is of the correct
-        type, and convert to the proper type otherwise
+        type, and convert to a dummy score if not.
 
         :param score_metric: Metric to validate
         :raises ValueError: if the metric is not a ScoreMetric and cannot be converted
             to one
-        :return: ScoreMetric. If a NullMetric is passed and 'allow_optional' is set to
-            True, this method returns None
+        :return: The validated score metric
         """
         if isinstance(score_metric, NullMetric):
-            score_metric = None if allow_optional else ScoreMetric(name="Null score", value=0)
-        elif not isinstance(score_metric, ScoreMetric):
+            return ScoreMetric(name="Null score", value=0)
+        if not isinstance(score_metric, ScoreMetric):
             raise ValueError(f"Expected ScoreMetric for Performance.score, but got {score_metric.type()} instead.")
         return score_metric
+
+    @staticmethod
+    def _validate_optional_score_metric(score_metric: MetricEntity) -> ScoreMetric | None:
+        """
+        Validate that a metric passed as a model or project score is of the correct
+        type, and convert to a dummy score if not.
+
+        :param score_metric: Metric to validate
+        :raises ValueError: if the metric is not a ScoreMetric and cannot be converted
+            to one
+        :return: ScoreMetric. If a NullMetric is passed this method returns None
+        """
+        if isinstance(score_metric, NullMetric):
+            return None
+
+        return PerformanceDeserializer._validate_score_metric(score_metric)

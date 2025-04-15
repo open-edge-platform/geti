@@ -1,19 +1,15 @@
-# INTEL CONFIDENTIAL
-#
-# Copyright (C) 2025 Intel Corporation
-#
-# This software and the related documents are Intel copyrighted materials, and your use of them is governed by
-# the express license under which they were provided to you ("License"). Unless the License provides otherwise,
-# you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
-# without Intel's prior written permission.
-#
-# This software and the related documents are provided as is, with no express or implied warranties,
-# other than those that are expressly stated in the License.
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 include $(CWD)/Makefile.shared
 
-.PHONY: build deps clean tests test-unit-default test-integration-default coverage static-code-analysis-default lint
+.PHONY: build deps clean tests test-unit-default test-integration-default coverage static-code-analysis-default lint lint-install
+
+GOPATH ?= $(HOME)/go
+GOBIN ?= $(GOPATH)/bin
+GOLANGCI_LINT_VERSION = v1.64.2
+TIMEOUT = 15m
 
 # Go commands
 GOCMD   := go
@@ -52,15 +48,22 @@ coverage: ## Run tests and generate a coverage profile
 
 ## Run static analysis/linters in read-only mode (e.g., for CI checks).
 ## This will fail on lint errors but won't modify any files.
-static-code-analysis-default:
-	GOPATH=$(HOME) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2 && \
-	$(HOME)/bin/golangci-lint run --timeout 15m
+static-code-analysis-default: lint-install
+	$(GOBIN)/golangci-lint run --timeout $(TIMEOUT)
 
 ## Run linter in "fix" mode to automatically correct code where possible.
 ## Generally used locally to clean up code before committing.
-lint:
-	GOPATH=$(HOME) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.64.2 && \
-	$(HOME)/bin/golangci-lint run --fix --timeout 15m
+lint: lint-install
+	$(GOBIN)/golangci-lint run --fix --timeout $(TIMEOUT)
+
+lint-install:
+	@echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..."
+	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "$$($(GOBIN)/golangci-lint --version | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+		GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
+		echo "golangci-lint $(GOLANGCI_LINT_VERSION) installed at $(GOBIN)/golangci-lint"; \
+	else \
+		echo "golangci-lint $(GOLANGCI_LINT_VERSION) already installed"; \
+	fi
 
 builder:
 	@docker run --rm -v "$(ROOT_DIR):/app" -w "/app/$(RELATIVE_PATH)" ${DOCKER_PROXY} ${GO_BUILDER_IMAGE} make $(BUILDER_ARGS)

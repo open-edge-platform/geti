@@ -149,7 +149,7 @@ def fxt_dataset_task(fxt_ote_id, fxt_model_template_dataset):
         title="Sample dataset task",
         task_properties=TaskProperties.from_model_template(fxt_model_template_dataset),
         project_id=ID(fxt_ote_id()),
-        id_=ID(fxt_ote_id()),
+        id_=ID(fxt_ote_id(1)),
     )
 
 
@@ -159,7 +159,7 @@ def fxt_detection_task(fxt_ote_id, fxt_empty_project):
         title="dummy detection task",
         task_properties=TaskProperties.from_model_template(ModelTemplateList().get_by_id("detection")),
         project_id=fxt_ote_id(),
-        id_=fxt_ote_id(),
+        id_=fxt_ote_id(2),
     )
 
 
@@ -184,5 +184,5 @@ def fxt_classification_task(fxt_ote_id, fxt_model_storage_classification):
         title="dummy classification task",
         task_properties=TaskProperties.from_model_template(ModelTemplateList().get_by_id("classification")),
         project_id=fxt_ote_id(),
-        id_=fxt_ote_id(),
+        id_=fxt_ote_id(3),
     )

@@ -1,0 +1,111 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+[project]
+name = "initial-user"
+version = "1.0.0"
+description = "Creation of initial user in the account service"
+requires-python = ">=3.10, <3.14"
+dependencies = [
+    "psycopg2-binary~=2.9.9",
+    "Pillow>=10.2.0",
+    "pyjwt==2.4.0",
+    "python-ldap==3.4.4",
+    "grpc_interfaces[account-service]",
+    "geti-spicedb-tools",
+    "geti-telemetry-tools[logger]",
+    "users_handler"
+]
+
+[tool.uv.sources]
+geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
+grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+geti-spicedb-tools = { path = "../../../libs/spicedb_tools", editable = true }
+users_handler = { path = "../../libs/users_handler", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "mypy~=1.15",
+    "types-requests",
+    "pytest-mock>=3.14.0",
+    "protobuf~=4.23.4",
+    "grpcio_tools==1.60.0",
+    "mypy-protobuf==3.5"
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [
+    ".venv*",
+    "app/alembic/*.py",
+    "app/users_handler/subject_pb2.*",
+]
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+
+# Covers any pytest
+"*test*.py" = ["E741", "E402", "E501",
+    "S",
+    "RET",
+    "PL",
+    "RUF",
+    "SIM",
+    "D103",
+    "ARG",
+    "PYI024",
+    "ANN"]
+
+# Covers BDD tests
+"*features*.py" = ["E741", "E402", "E501",
+    "S",
+    "RET",
+    "PL",
+    "RUF",
+    "SIM",
+    "D103",
+    "ARG",
+    "PYI024",
+    "ANN"]
+
+[tool.ruff.lint.isort]
+# First-party = self-contained packages defined within Geti
+known-first-party = [
+    "base_logger", "common_logger", "datumaro_helper", "jobs_common",
+    "k8s_custom_resources", "load_tests", "microservices", "nodes_resource",
+    "platform_models", "sc_sdk", "telemetry", "users_handler", "account_service_client", "migration", "kafka_client"
+]
+# Local folder = Geti folder that often appears as base in import statements, but that doesn't qualify as a package logically
+known-local-folder = [
+    "application", "common", "communication", "config", "job", "migration_job", "tests", "platform_cleaner", "weights_uploader"
+]
+# Third-party = self-contained packages defined and maintained outside Geti
+known-third-party = ["grpc", "kafka", "kubernetes", "kubernetes_asyncio", "minio", "otx", "starlette", "sqlalchemy"]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+exclude = "^.*/tests/.*\\.py$"
+
+show_error_codes = true

@@ -328,7 +328,7 @@ def _generate_random_video(
     labels: list[Label],
     is_global_or_anomaly: bool,
 ) -> tuple[list[RangeLabels], list[list[Annotation]]]:
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")  # type: ignore
     video_writer = cv2.VideoWriter(video_path, fourcc, fps, (width, height))
 
     range_labels = []
@@ -547,7 +547,7 @@ def get_sc_labels(
     return [label_map[label_id] for label_id in label_id_set]
 
 
-def get_sc_labels_map(dataset_storage: DatasetStorage, dataset: Dataset | list[ScDatasetItem]) -> dict[str, set[ID]]:
+def get_sc_labels_map(dataset_storage: DatasetStorage, dataset: Dataset | list[ScDatasetItem]) -> dict[str, set[str]]:
     """
     get mapping of image name to set of global labels for that image for all images in
     SC dataset
@@ -797,7 +797,7 @@ def convert_dataset_definition_for_cross_project(
         src_types, dst_type = SUPPORTED_CONVERSION[mapping]
         out_dataset_definition: DatasetDefinition = {}
         for key, val in dm_dataset_definition.items():
-            anns = []
+            anns: AnnotationDefinition = []
             for ann in val:
                 if ann[0] in src_types:
                     anns.append((dst_type, ann[1]))
@@ -845,8 +845,8 @@ def get_sc_dataset_definition(  # noqa: C901
                     vis_map[label_idx] = 2 if shape.is_visible else 1
         if vis_map:
             visibilities = [0] * len(label_names)
-            for i, label in vis_map.items():
-                visibilities[i] = label
+            for i, visibility in vis_map.items():
+                visibilities[i] = visibility
             dataset_item_definition.append(("points", tuple(visibilities)))
         dataset_definition[str(ann_scene.id_)] = dataset_item_definition
     return dataset_definition
@@ -878,7 +878,7 @@ def check_thumbnails(project_id: ID, images: list[Image], videos: list[Video] = 
 def check_dataset_items(  # noqa: C901
     project_id: ID,
     project_type: GetiProjectType,
-    dm_dataset_definition: dict[str, set[tuple[str, int]]],
+    dm_dataset_definition: DatasetDefinition,
     annotation_scenes: list[AnnotationScene],
     all_labels: list[str],
     labels_to_keep: list[str],

@@ -8,7 +8,7 @@ securityContext:
   runAsNonRoot: true
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
-  runAsUser: 10001
+  runAsUser: 1002
   capabilities:
     drop:
       - all

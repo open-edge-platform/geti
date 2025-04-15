@@ -3,13 +3,13 @@ name: Detection workflow
 on:
   merge_group:
     branches:
-      - develop
+      - main
   pull_request:
     branches:
-      - develop
+      - main
   push:
     branches:
-      - develop
+      - main
 
 concurrency:
     group: ${{ github.head_ref || github.ref_name }}
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   get-vars:
     name: Get variables
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       image-tag: "${{ steps.image-tag.outputs.image-tag }}"
@@ -57,8 +57,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        # TODO: CHANGE TO ORGINAL BEFORE OPEN SOURCE
-        uses: intel-innersource/frameworks.actions.thirdparty.changed-files@32ae20aabdcb5dd4c5e3a3933d0acf38d7b0f066
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c
         with:
           files_yaml_from_source_file: "./.github/components-path-filters.yml"
 
@@ -112,7 +111,7 @@ jobs:
     needs:
       - component-workflow
       - web-ui-workflow
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     if: ${{ always() && !cancelled() }}
     env:
       CHECKS: ${{ join(needs.*.result, ' ') }}

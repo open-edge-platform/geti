@@ -24,11 +24,12 @@ properties:
   keypoint_structure:
     type: object
     description: "The keypoint structure which holds the edges of the graph, and the position of the keypoints. Supported only for Keypoint Detection tasks."
-    edges:
-      type: array
-      items:
-        $ref: 'keypoint_edge.yaml'
-    positions:
-      type: array
-      items:
-        $ref: 'keypoint_position.yaml'
+    properties:
+      edges:
+        type: array
+        items:
+          $ref: 'keypoint_edge.yaml'
+      positions:
+        type: array
+        items:
+          $ref: 'keypoint_position.yaml'

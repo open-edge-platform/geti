@@ -24,7 +24,7 @@ class TestTrainHelpers:
         fxt_dataset_with_images,
     ) -> None:
         # Arrange
-        mock_model_repo.generate_id.side_effect = [ID(i) for i in range(5)]
+        mock_model_repo.generate_id.side_effect = [ID(str(i)) for i in range(5)]
 
         # Act
         train_output_models = prepare_train(

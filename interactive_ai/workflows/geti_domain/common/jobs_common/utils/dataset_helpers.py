@@ -382,7 +382,7 @@ class DatasetHelpers:
             annotation_scene = AnnotationSceneRepo(dataset_storage.identifier).get_by_id(
                 annotation_state.annotation_scene_id
             )
-            if annotation_scene.annotations[0].get_labels()[0].label.is_anomalous:
+            if annotation_scene.annotations[0].get_labels()[0].label.is_anomalous:  # type: ignore
                 if create_new_annotations:
                     annotation_scene.id_ = AnnotationSceneRepo.generate_id()
                     annotation_scene.kind = AnnotationSceneKind.INTERMEDIATE

@@ -166,26 +166,26 @@ class GetiOTXInterfaceAdapter:
             )
             return
 
-        base_model = {}
+        model_repo = ModelRepo(model.model_storage_identifier)
+
         for model_key in model_keys:
             model_adapter = model.model_adapters.get(model_key)
             if not model_adapter:
                 logger.info("Model adapter with key '%s' is not found. Ignoring.", model_key)
                 continue
-            if not isinstance(model_adapter.data_source, DataSource):
+
+            data_source = model_adapter.data_source
+            if not isinstance(data_source, DataSource):
                 raise TypeError(
                     "Model with ID '%s' should have DataSource for the given model adapter key %s. But it has %s",
                     model.id_,
                     model_key,
                     str(type(model_adapter)),
                 )
-            base_model[model_key] = model_adapter
 
-        model_repo = ModelRepo(model.model_storage_identifier)
-        for model_key, model_item in base_model.items():
             self.binary_repo.copy_from(
                 model_binary_repo=model_repo.binary_repo,
-                src_filename=model_item.data_source.binary_filename,
+                src_filename=data_source.binary_filename,
                 dst_filepath=os.path.join(self.dst_path_prefix, "inputs", model_alias.get(model_key, model_key)),
             )
 
@@ -455,9 +455,9 @@ class GetiOTXInterfaceAdapter:
         elif self.binary_repo.exists(metrics_filepath):
             logger.info("Reading performance metrics from %s", metrics_filepath)
             try:
-                obj = self.binary_repo.storage_client.client.get_object(
-                    bucket_name=self.binary_repo.storage_client.bucket_name,
-                    object_name=os.path.join(self.binary_repo.storage_client.object_name_base, metrics_filepath),
+                obj = self.binary_repo.storage_client.client.get_object(  # type: ignore
+                    bucket_name=self.binary_repo.storage_client.bucket_name,  # type: ignore
+                    object_name=os.path.join(self.binary_repo.storage_client.object_name_base, metrics_filepath),  # type: ignore
                 )
                 table = pa.ipc.RecordBatchFileReader(io.BytesIO(obj.data)).read_all()
                 data_frame = table.to_pandas()
@@ -543,7 +543,7 @@ class GetiOTXInterfaceAdapter:
         dashboard_metrics = []
         for name, group in grouped:
             ys = group["value"].tolist()
-            xs = list(range(1, len(ys) + 1))
+            xs = [float(x) for x in range(1, len(ys) + 1)]
             metric = CurveMetric(name=name, ys=ys, xs=xs)
 
             info = LineChartInfo(name=name, x_axis_label="Timestamp", y_axis_label=name)

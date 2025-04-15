@@ -10,7 +10,7 @@ from sc_sdk.entities.image import Image
 from sc_sdk.entities.label import Domain, Label
 from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
 from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import BarMetricsGroup, MultiScorePerformance
+from sc_sdk.entities.metrics import BarMetricsGroup, MultiScorePerformance, ScoreMetric
 from sc_sdk.entities.scored_label import ScoredLabel
 from sc_sdk.entities.shapes import Rectangle
 
@@ -259,6 +259,8 @@ class TestFMeasureMetric:
         # f-measure per label
         assert isinstance(f_measure_per_label, BarMetricsGroup)
         f_measure_label_a, f_measure_label_b = f_measure_per_label.metrics
+        assert isinstance(f_measure_label_a, ScoreMetric)
+        assert isinstance(f_measure_label_b, ScoreMetric)
         assert f_measure_label_a.score == pytest.approx(fxt_overall_scores[label_a], 0.01)
         assert f_measure_label_b.score == pytest.approx(fxt_overall_scores[label_b], 0.01)
 

@@ -1194,7 +1194,7 @@ wheels = [
 
 [[package]]
 name = "grpc-interfaces"
-version = "1.0.1"
+version = "1.0.0"
 source = { editable = "../../../../grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
@@ -3433,7 +3433,7 @@ dev = [
     { name = "pyarrow", specifier = "==15.0.0" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "pytest-freezegun", specifier = "==0.4.2" },
-    { name = "requests", specifier = "~=2.32" },
+    { name = "requests", specifier = "~=2.31" },
     { name = "ruff", specifier = "~=0.11" },
     { name = "scikit-image", specifier = "==0.20.0" },
     { name = "scikit-learn", specifier = "~=1.6" },

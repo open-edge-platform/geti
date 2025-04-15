@@ -479,16 +479,17 @@ class TestImportDataRedactionUseCase:
 
     def test_recreate_media_based_objectid_in_mongodb_doc(self, fxt_ote_id) -> None:
         data_redaction_use_case = ImportDataRedactionUseCase()
+        media_identifier_doc = {
+            "type": "video_frame",
+            "media_id": ObjectId(fxt_ote_id(2)),
+            "frame_index": 10,
+        }
         doc = {
             "_id": ObjectId(fxt_ote_id(1)),
             "foo": "bar",
-            "media_identifier": {
-                "type": "video_frame",
-                "media_id": ObjectId(fxt_ote_id(2)),
-                "frame_index": 10,
-            },
+            "media_identifier": media_identifier_doc,
         }
-        media_identifier = MediaIdentifierToMongo.backward(doc["media_identifier"])
+        media_identifier = MediaIdentifierToMongo.backward(media_identifier_doc)
 
         out_doc = data_redaction_use_case.recreate_media_based_objectid_in_mongodb_doc(doc)
 

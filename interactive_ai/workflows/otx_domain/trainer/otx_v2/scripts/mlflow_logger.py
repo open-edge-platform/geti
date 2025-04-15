@@ -245,15 +245,16 @@ class MLFlowLogger(Logger):
 
     @rank_zero_only
     def log_metrics(self, metrics: Mapping[str, float], step: int | None = None) -> None:
-        assert rank_zero_only.rank == 0, "experiment tried to log from global_rank != 0"
+        # Ignore type because PyTorch Lightning defines the rank attribute using dynamic typing.
+        assert rank_zero_only.rank == 0, "experiment tried to log from global_rank != 0"  # type: ignore
 
         from mlflow.entities import Metric
 
-        metrics = _add_prefix(metrics, self._prefix, self.LOGGER_JOIN_CHAR)
+        prefixed_metrics = _add_prefix(metrics, self._prefix, self.LOGGER_JOIN_CHAR)
         metrics_list: list[Metric] = []
 
         timestamp_ms = int(time() * 1000)
-        for k, v in metrics.items():
+        for k, v in prefixed_metrics.items():
             if isinstance(v, str):
                 log.warning(f"Discarding metric with string value {k}={v}.")
                 continue

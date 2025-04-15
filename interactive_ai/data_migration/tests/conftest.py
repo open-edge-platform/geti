@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 
 @pytest.fixture(scope="session", autouse=True)
 def mongodb_testcontainer():
-    docker_registry = os.getenv("REGISTRY", "")
-    image_name = os.path.join(docker_registry, "mongo:7.0.7")
+    image_name = "mongo:7.0.7"
     logger.info(f"Pulling MongoDB testcontainer image from: {image_name}")
     with MongoDbContainer(image_name) as mongo:
         db_url = mongo.get_connection_url()

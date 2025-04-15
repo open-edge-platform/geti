@@ -50,7 +50,7 @@ class TestParseDatasetNewProject:
         exported_project_type: GetiProjectType = GetiProjectType.UNKNOWN,
     ) -> set[tuple]:
         warnings: set[tuple] = set()
-        warnings.update(domain_to_warnings.get(None, set()))
+        warnings.update(domain_to_warnings.get(Domain.NULL, set()))
         for project_type in project_types:
             domain = ImportUtils.project_type_to_label_domain(project_type=project_type)
             if domain in domain_to_warnings:

@@ -15,9 +15,9 @@ from sc_sdk.entities.label import Domain
 
 from job.utils.constants import MIN_IMAGE_SIZE
 
-LabelDefinition = tuple[str, int]
-PointsDefinision = tuple[str, tuple[int, ...]]
-AnnotationDefinition = list[LabelDefinition | PointsDefinision]
+LabelDefinition = int
+PointsDefinition = tuple[int, ...]
+AnnotationDefinition = list[tuple[str, LabelDefinition | PointsDefinition]]
 DatasetDefinition = dict[str, AnnotationDefinition]
 
 
@@ -99,7 +99,7 @@ def fxt_bbox_polygon_dataset_definition():
 
 
 @pytest.fixture
-def fxt_single_points_dataset_definision():
+def fxt_single_points_dataset_definition():
     return {
         "item1": [("points", (2, 2, 2, 2))],
         "item2": [("points", (0, 1, 2, 2))],
@@ -254,13 +254,13 @@ def fxt_dm_dataset_generator() -> Callable[
                     has_points = True
 
         if has_mask:
-            categories: dm.CategoriesInfo = {
+            categories: Sequence[str] | dm.CategoriesInfo = {
                 dm.AnnotationType.label: dm.LabelCategories.from_iterable(labels),
                 dm.AnnotationType.mask: dm.MaskCategories.generate(len(labels)),
             }
         elif has_points:
             # labels in points means point labels for the 1st label('object').
-            categories: dm.CategoriesInfo = {
+            categories = {
                 dm.AnnotationType.label: dm.LabelCategories.from_iterable(["object"]),  # detection label
                 dm.AnnotationType.points: dm.PointsCategories.from_iterable(
                     [(0, list(labels), {(1, i + 1) for i in range(1, len(labels))})]
@@ -624,28 +624,28 @@ _test_dataset_id__public = {
         label_names_by_ann_based_project={
             GetiProjectType.DETECTION: VOC_LABELS,
         },
-        warnings={None: {_warning_subset_merging()}},
+        warnings={Domain.NULL: {_warning_subset_merging()}},
         num_items=30,
     ),
     "fxt_roboflow_coco_dataset_id": DatasetInfo(
         label_names_by_ann_based_project={  # bbox
             GetiProjectType.DETECTION: ROBO_LABELS,
         },
-        warnings={None: {_warning_subset_merging()}},
+        warnings={Domain.NULL: {_warning_subset_merging()}},
         num_items=30,
     ),
     "fxt_roboflow_voc_dataset_id": DatasetInfo(
         label_names_by_ann_based_project={  # bbox
             GetiProjectType.DETECTION: ROBO_LABELS,
         },
-        warnings={None: {_warning_subset_merging()}},
+        warnings={Domain.NULL: {_warning_subset_merging()}},
         num_items=30,
     ),
     "fxt_roboflow_yolo_dataset_id": DatasetInfo(
         label_names_by_ann_based_project={  # bbox
             GetiProjectType.DETECTION: ROBO_LABELS,
         },
-        warnings={None: {_warning_subset_merging()}},
+        warnings={Domain.NULL: {_warning_subset_merging()}},
         num_items=30,
     ),
 }
@@ -721,7 +721,7 @@ def fxt_project(request: pytest.FixtureRequest):
     return request.param, request.getfixturevalue(request.param)
 
 
-def get_dataset_info(fxt_dataset_id_str: str) -> DatasetInfo | None:
+def get_dataset_info(fxt_dataset_id_str: str) -> DatasetInfo:
     # temporal until keypoint detection is fully supported
     if fxt_dataset_id_str == "fxt_dataumaro_dataset_keypoint_id":
         if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_KEYPOINT_DETECTION):
@@ -787,4 +787,12 @@ def get_dataset_info(fxt_dataset_id_str: str) -> DatasetInfo | None:
             num_items=4,
         )
 
-    return _test_dataset_id__datumaro.get(fxt_dataset_id_str, _test_dataset_id__public.get(fxt_dataset_id_str, None))
+    dataset_info = _test_dataset_id__public.get(fxt_dataset_id_str, None)
+
+    if dataset_info is None:
+        dataset_info = _test_dataset_id__datumaro.get(fxt_dataset_id_str, None)
+
+    if dataset_info is None:
+        raise ValueError(f"The dataset {fxt_dataset_id_str} is not found.")
+
+    return dataset_info

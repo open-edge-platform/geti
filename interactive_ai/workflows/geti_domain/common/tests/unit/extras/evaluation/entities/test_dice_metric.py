@@ -10,7 +10,7 @@ from sc_sdk.entities.image import Image
 from sc_sdk.entities.label import Domain, Label
 from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
 from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import BarMetricsGroup, Performance
+from sc_sdk.entities.metrics import BarMetricsGroup, Performance, ScoreMetric
 from sc_sdk.entities.scored_label import ScoredLabel
 from sc_sdk.entities.shapes import Rectangle
 
@@ -299,7 +299,8 @@ class TestDiceMetric:
         assert performance.score.score == pytest.approx(fxt_overall_scores[MetricAverageMethod.MACRO], 0.01)
         assert performance.dashboard_metrics is not None
         assert isinstance(performance.dashboard_metrics[0], BarMetricsGroup)
-        per_label_metrics = {m.label_id: m.score for m in performance.dashboard_metrics[0].metrics}
+        metrics = performance.dashboard_metrics[0].metrics
+        per_label_metrics = {m.label_id: m.score for m in metrics if isinstance(m, ScoreMetric)}
         assert per_label_metrics[label_a.id_] == pytest.approx(fxt_overall_scores[label_a], 0.01)
         assert per_label_metrics[label_b.id_] == pytest.approx(fxt_overall_scores[label_b], 0.01)
 

@@ -49,7 +49,7 @@ def validate_user_input(user_input: dict) -> None:  # noqa: C901
                 user_input[key] = convert_from_base_64(user_input[key])
                 if not 8 <= len(user_input[key]) <= MAX_INPUT_LENGTH:
                     raise ValueError(
-                        f"Password must consists of 8 - {MAX_INPUT_LENGTH} characters, at least one capital letter, "
+                        f"Password must consist of 8 - {MAX_INPUT_LENGTH} characters, at least one capital letter, "
                         "lower letter, digit or symbol"
                     )
             else:

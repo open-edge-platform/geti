@@ -9,8 +9,7 @@ import random
 import tempfile
 import unittest
 from collections.abc import Callable, Iterable, Iterator, Sequence
-from copy import deepcopy
-from typing import Any, cast
+from typing import cast
 
 import cv2
 import numpy as np
@@ -34,16 +33,13 @@ from sc_sdk.configuration.enums.model_lifecycle import ModelLifecycle
 from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
 from sc_sdk.entities.color import Color
 from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
 from sc_sdk.entities.datasets import Dataset
 from sc_sdk.entities.image import Image
 from sc_sdk.entities.label import Domain, Label
 from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, NullLabelSchema
 from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
 from sc_sdk.entities.model import ModelConfiguration
-from sc_sdk.entities.model_storage import ModelStorage
 from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.entities.persistent_entity import PersistentEntity
 from sc_sdk.entities.project import Project
 from sc_sdk.entities.scored_label import ScoredLabel
 from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
@@ -58,20 +54,6 @@ from sc_sdk.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from sc_sdk.repos.mappers.mongodb_mapper_interface import (
-    IMapperBackward,
-    IMapperDatasetStorageBackward,
-    IMapperDatasetStorageForward,
-    IMapperDatasetStorageIdentifierBackward,
-    IMapperForward,
-    IMapperModelStorageBackward,
-    IMapperModelStorageForward,
-    IMapperParametricBackward,
-    IMapperParametricForward,
-    IMapperProjectIdentifierBackward,
-    MappableEntityType,
-    MapperClassT,
-)
 from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo
 from sc_sdk.services.model_service import ModelService
 from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
@@ -79,7 +61,6 @@ from sc_sdk.utils.deletion_helpers import DeletionHelpers
 from sc_sdk.utils.identifier_factory import IdentifierFactory
 from sc_sdk.utils.media_factory import Media2DFactory
 from sc_sdk.utils.project_factory import ProjectFactory
-from testfixtures import compare
 
 from jobs_common_extras.evaluation.utils.segmentation_utils import create_annotation_from_segmentation_map
 
@@ -770,92 +751,6 @@ def create_empty_segmentation_project(
         else:
             test_case.addfinalizer(lambda: DeletionHelpers.delete_project_by_id(project_id=project.id_))
     return project
-
-
-def verify_mongo_mapper(  # noqa: C901
-    entity_to_map: MappableEntityType,
-    mapper_class: MapperClassT,
-    project: Project | None = None,
-    dataset_storage: DatasetStorage | None = None,
-    model_storage: ModelStorage | None = None,
-    forward_parameters: Any = None,
-    backward_parameters: Any = None,
-    extend_forward_output: dict | None = None,
-    compare_forward_maps: bool = True,
-    compare_backward_maps: bool = True,
-) -> tuple[dict, MappableEntityType]:
-    """
-    Check the correctness of a Mongo mapper.
-    Given a mapper and a test object X performing these steps:
-     1. Serialize X -> D
-     2. Deserialize D -> X'
-     3. Serialize X' -> D'
-     4. Verify that X' == X
-     5. Verify that D' == D
-
-    :param entity_to_map: Test object to map. It is recommended to create it with
-        non-default params, to guarantee that forward/backward are effectively tested
-    :param mapper_class: Mongo mapper
-    :param project: Project (if required by the mapper)
-    :param dataset_storage: DatasetStorage (if required by the mapper)
-    :param model_storage: ModelStorage (if required by the mapper)
-    :param forward_parameters: Parameters for the forward mapping (if required)
-    :param backward_parameters: Parameters for the backward mapping (if required)
-    :param extend_forward_output: Dictionary of items to update the output of forward.
-        Useful when some document fields are inserted outside of the MongoDB mapper.
-    :param compare_forward_maps: Compare the serialized representations (D' == D)
-    :param compare_backward_maps: Compare the original object with the
-        deserialized one (X' == X)
-    :return: Mapped and unmapped entities, in case any additional comparison needs
-        to be performed outside this method.
-    """
-    # Build forward parameters
-    forward_kwargs: dict[str, Any] = {}
-    if issubclass(mapper_class, IMapperForward):
-        pass
-    elif issubclass(mapper_class, IMapperDatasetStorageForward):
-        forward_kwargs["dataset_storage"] = dataset_storage
-    elif issubclass(mapper_class, IMapperModelStorageForward):
-        forward_kwargs["model_storage"] = model_storage
-    elif issubclass(mapper_class, IMapperParametricForward):
-        forward_kwargs["parameters"] = forward_parameters
-
-    # Build backward parameters
-    backward_kwargs: dict[str, Any] = {}
-    if issubclass(mapper_class, IMapperBackward):
-        pass
-    elif issubclass(mapper_class, IMapperProjectIdentifierBackward):
-        backward_kwargs["project_identifier"] = project.identifier  # type: ignore
-    elif issubclass(mapper_class, IMapperDatasetStorageBackward):
-        backward_kwargs["dataset_storage"] = dataset_storage
-    elif issubclass(mapper_class, IMapperDatasetStorageIdentifierBackward):
-        backward_kwargs["dataset_storage_identifier"] = dataset_storage.identifier  # type: ignore
-    elif issubclass(mapper_class, IMapperModelStorageBackward):
-        backward_kwargs["model_storage"] = model_storage
-    elif issubclass(mapper_class, IMapperParametricBackward):
-        backward_kwargs["parameters"] = backward_parameters
-
-    logger.info("Forward arguments: %s; Backward arguments: %s", forward_kwargs, backward_kwargs)
-
-    serialized_entity = mapper_class.forward(instance=entity_to_map, **forward_kwargs)
-    if extend_forward_output is not None:
-        serialized_entity |= extend_forward_output
-    # make a copy of the dictionary, in case the backward mapper extends it
-    serialized_entity_frozen = deepcopy(serialized_entity)
-    deserialized_entity = mapper_class.backward(instance=serialized_entity, **backward_kwargs)
-    reserialized_entity = mapper_class.forward(instance=deserialized_entity, **forward_kwargs)
-    if extend_forward_output is not None:
-        reserialized_entity |= extend_forward_output
-
-    if isinstance(entity_to_map, PersistentEntity):  # ignore ephemeral for testing
-        deserialized_entity._ephemeral = entity_to_map.ephemeral
-
-    if compare_forward_maps:
-        compare(serialized_entity_frozen, reserialized_entity)
-    if compare_backward_maps:
-        compare(entity_to_map, deserialized_entity)
-
-    return serialized_entity, deserialized_entity
 
 
 class LabelSchemaExample:

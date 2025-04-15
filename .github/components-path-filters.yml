@@ -48,6 +48,16 @@ platform/services/account:
   - Makefile.shared
   - builder-images/go-builder/Dockerfile
   - .github/workflows/component.yml
+platform/services/initial_user:
+  - platform/services/initial_user/**
+  - platform/libs/users_handler/**
+  - libs/telemetry_tools/**
+  - libs/spicedb_tools/**
+  - grpc_interfaces/account_service/**
+  - grpc_interfaces/pyproject.toml
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
 # IAI Services
 interactive_ai/services/auto_train:
   - interactive_ai/services/auto_train/**

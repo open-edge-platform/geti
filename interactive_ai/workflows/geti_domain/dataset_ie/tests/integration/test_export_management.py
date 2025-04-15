@@ -382,17 +382,15 @@ class TestExportManager:
     def _assert_datumaro_export_valid(
         dataset_storage: DatasetStorage, file_repo: ExportDataRepo, dataset_id: ID, *args, **kwargs
     ):
-        vars = {
-            "dataset_storage": dataset_storage,
-            "file_repo": file_repo,
-            "dataset_id": dataset_id,
-            "image_subdirs": ("images", "default"),
-        }
         save_video_as_images = kwargs.get("save_video_as_images", True)
-        if not save_video_as_images:
-            vars["video_subdirs"] = ("videos", "default")
 
-        sc_dataset, dataset_path = TestExportManager._assert_media_files(**vars)
+        sc_dataset, dataset_path = TestExportManager._assert_media_files(
+            dataset_storage=dataset_storage,
+            file_repo=file_repo,
+            dataset_id=dataset_id,
+            image_subdirs=("images", "default"),
+            video_subdirs=("videos", "default") if not save_video_as_images else None,
+        )
 
         dm_dataset = dm.Dataset.import_from(dataset_path)
         TestExportManager._assert_dm_label_map(dataset_storage, sc_dataset, dm_dataset)

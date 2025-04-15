@@ -97,7 +97,7 @@ class TestUploadUtils:
         assert "The maximum number of pixels" in str(e.value)
 
     @staticmethod
-    def _arrange_video_uploader() -> tuple[VideoUploadManager]:
+    def _arrange_video_uploader() -> VideoUploadManager:
         uploader = VideoUploadManager(
             dataset_storage_identifier=MagicMock(), uploader_id="uploader_id", get_video_name=MagicMock()
         )

@@ -341,9 +341,9 @@ class TestSubsetHelper:
             )
             fxt_configuration.auto_subset_fractions = param_fxt_auto_subset_fractions
             fxt_configuration.subset_parameters = ConfigurableParameters(header="subset_parameters")
-            fxt_configuration.subset_parameters.train_proportion = 1
-            fxt_configuration.subset_parameters.validation_proportion = 0
-            fxt_configuration.subset_parameters.test_proportion = 0
+            fxt_configuration.subset_parameters.train_proportion = 1  # type: ignore
+            fxt_configuration.subset_parameters.validation_proportion = 0  # type: ignore
+            fxt_configuration.subset_parameters.test_proportion = 0  # type: ignore
             subset_helper.config = fxt_configuration
             subset_helper.number_of_annotations = param_fxt_n_annotations
 
@@ -553,9 +553,9 @@ class TestAnomalySubsetHelper:
                 config=fxt_configuration,
             )
             fxt_configuration.subset_parameters = ConfigurableParameters(header="subset_parameters")
-            fxt_configuration.subset_parameters.train_proportion = 0.8
-            fxt_configuration.subset_parameters.validation_proportion = 0.1
-            fxt_configuration.subset_parameters.test_proportion = 0.1
+            fxt_configuration.subset_parameters.train_proportion = 0.8  # type: ignore
+            fxt_configuration.subset_parameters.validation_proportion = 0.1  # type: ignore
+            fxt_configuration.subset_parameters.test_proportion = 0.1  # type: ignore
             fxt_configuration.auto_subset_fractions = False
             subset_helper.config = fxt_configuration
 

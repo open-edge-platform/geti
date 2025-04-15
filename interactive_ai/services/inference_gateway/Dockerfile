@@ -18,17 +18,20 @@ RUN CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -
 
 RUN ls -al .
 
-# Production image
-FROM debian_image AS inference_gateway
+FROM golang:1.23.3 as ffmpeg
 
-# Install ffmpeg
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1
+
+FROM gcr.io/distroless/static-debian12:nonroot AS inference_gateway
+
+COPY --from=ffmpeg /usr/bin/ffmpeg /usr/bin/ffmpeg
+COPY --from=ffmpeg /usr/bin/ffprobe /usr/bin/ffprobe
+COPY --from=ffmpeg /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
+COPY --from=ffmpeg /usr/share/ffmpeg /usr/share/ffmpeg
 
 COPY --link --from=builder /build/interactive_ai/service/inference_gateway /
 
-RUN useradd -ms /bin/bash -l -u 10001 nonroot
 USER nonroot
 
 ENV GIN_MODE=release

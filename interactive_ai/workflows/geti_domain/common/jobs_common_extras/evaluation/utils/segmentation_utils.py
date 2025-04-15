@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import logging
 from copy import copy
-from typing import cast
+from typing import Any, cast
 
 import cv2
 import numpy as np
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 Contour = list[tuple[float, float]]
 ContourInternal = list[tuple[float, float] | None]
+Mask = np.ndarray[Any, np.dtype[np.uint8]]
 
 
 def create_hard_prediction_from_soft_prediction(
@@ -150,9 +151,9 @@ def create_annotation_from_segmentation_map(
                         mask = np.zeros(hard_prediction.shape, dtype=np.uint8)
                         cv2.drawContours(
                             mask,
-                            np.asarray([[[x, y]] for x, y in subcontour]),
+                            [np.asarray([[[x, y]] for x, y in subcontour])],
                             contourIdx=-1,
-                            color=1,
+                            color=(1,),
                             thickness=-1,
                         )
                         probability = cv2.mean(current_label_soft_prediction, mask)[0]
@@ -242,7 +243,7 @@ def mask_from_annotation(annotations: list[Annotation], labels: list[Label], wid
         for point in shape.points:
             contour.append([int(point.x * width), int(point.y * height)])
 
-        mask = cv2.drawContours(mask, np.asarray([contour]), 0, (class_idx, class_idx, class_idx), -1)
+        mask = cast("Mask", cv2.drawContours(mask, [np.asarray([contour])], 0, (class_idx, class_idx, class_idx), -1))
 
     return np.expand_dims(mask, axis=2)
 
@@ -258,7 +259,7 @@ def get_legacy_instance_segmentation_inferencer_configuration(model: Model) -> d
         logger.warning(f"Model {model.id_} is not a legacy OTX model. Skipping legacy segmentation configuration.")
         return {}
 
-    postprocessing = model.configuration.configurable_parameters.postprocessing
+    postprocessing = model.configuration.configurable_parameters.postprocessing  # type: ignore
 
     output_config: dict = {}
     output_config["use_ellipse_shapes"] = postprocessing.use_ellipse_shapes

@@ -2,6 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import datetime
 import uuid
+from typing import cast
 from unittest.mock import MagicMock, patch
 
 import datumaro as dm
@@ -144,7 +145,7 @@ class TestRoiMapper:
     def test_forward(self) -> None:
         roi_id = ID(str(uuid.uuid4()))
         roi_date = datetime.datetime.now(tz=datetime.timezone.utc)
-        mocked_label = MagicMock(spec=Label)
+        mocked_label = cast(Label, MagicMock(spec=Label))
         label_id = ID(str(uuid.uuid4()))
         label_map = {label_id: mocked_label}
         roi_label = ScoredLabel(label_id=label_id, is_empty=False, probability=0.8)
