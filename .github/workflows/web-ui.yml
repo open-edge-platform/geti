@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build UI
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -42,7 +42,7 @@ jobs:
 
   lint:
     name: Eslint checks
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -76,7 +76,7 @@ jobs:
 
   unit-tests:
     name: Jest tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -105,9 +105,9 @@ jobs:
     name: Playwright Tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
     needs: build
     timeout-minutes: 60
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     container:
-      image: ${{ vars.DOCKER_REGISTRY }}/third-party/playwright:v1.51.1-jammy
+      image: mcr.microsoft.com/playwright:v1.51.1-jammy
     strategy:
       fail-fast: false
       matrix:
@@ -158,7 +158,7 @@ jobs:
     if: always()
     needs: [playwright-tests]
 
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2

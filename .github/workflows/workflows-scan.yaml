@@ -6,7 +6,7 @@ on:
     - cron: "0 0 * * *"
   push:
     branches:
-      - develop
+      - main
       - release**
   pull_request:
     branches: ["*"]
@@ -28,7 +28,7 @@ jobs:
     name: Check workflows with zizmor
     permissions:
       contents: read
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -50,7 +50,7 @@ jobs:
     name: Check PR with zizmor
     permissions:
       contents: read
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2

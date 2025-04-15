@@ -1,5 +1,4 @@
-ARG REGISTRY=ghcr.io
-FROM ${REGISTRY}/astral-sh/uv:python3.10-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
 
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
@@ -23,7 +22,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
-FROM ${REGISTRY}/astral-sh/uv:python3.10-bookworm-slim AS project_ie
+FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS project_ie
 RUN useradd -l -u 10001 non-root
 
 # Copy the application from the builder

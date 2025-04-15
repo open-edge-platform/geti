@@ -1,5 +1,10 @@
-ARG REGISTRY=ghcr.io
-FROM ${REGISTRY}/astral-sh/uv:python3.10-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
+
+# Install Git and clone the OTX at the specified tag
+ARG OTX_RELEASE_TAG=2.2.0rc12
+
+RUN apt-get update && apt-get install -y git
+RUN git clone --branch $OTX_RELEASE_TAG --single-branch https://github.com/open-edge-platform/training_extensions.git
 
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
@@ -23,12 +28,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
-FROM ${REGISTRY}/astral-sh/uv:python3.10-bookworm-slim
+FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim
 RUN useradd -l -u 10001 non-root
 
 # Copy the application from the builder
 COPY --link --from=builder --chown=10001 /builder/interactive_ai/services/director /app
-COPY --link --from=training_extensions_v2 --chown=10001 /model_templates /model_templates
+COPY --link --from=builder --chown=10001 /training_extensions/src/otx/tools/templates /model_templates
 COPY --link --from=schemas . /api
 
 # Place executables in the environment at the front of the path

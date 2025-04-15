@@ -16,7 +16,7 @@ on:
       branch:
         description: 'Branch to checkout'
         required: true
-        default: 'develop'
+        default: 'main'
       component-dir:
         description: 'Path to the component (relative to the root of the repository)'
         required: true
@@ -27,7 +27,7 @@ env:
 jobs:
   component-check:
     name: Component workflow
-    runs-on: geti-core-c2m4
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
