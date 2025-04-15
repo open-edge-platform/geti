@@ -46,7 +46,7 @@ def get_legacy_detection_inferencer_configuration(model: Model) -> dict:
         logger.warning(f"Model {model.id_} is not a legacy OTX model. Skipping legacy detection configuration.")
         return {}
 
-    postprocessing = model.configuration.configurable_parameters.postprocessing
+    postprocessing = model.configuration.configurable_parameters.postprocessing  # type: ignore
 
     output_config: dict = {}
     try:

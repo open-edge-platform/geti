@@ -44,6 +44,7 @@ dev = [
     # with the version of Flytekit that we use. In the meantime, we downgrade
     # the "requests" package.
     "requests==2.31",
+    "types-requests~=2.31",
 ]
 
 [build-system]

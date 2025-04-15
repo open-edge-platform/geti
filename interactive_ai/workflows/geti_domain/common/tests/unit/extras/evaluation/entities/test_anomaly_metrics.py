@@ -217,6 +217,7 @@ class TestAnomalyMetrics:
         performance = metric.get_performance()
         assert isinstance(performance, AnomalyLocalizationPerformance)
         assert performance.global_score.score == 0.7
+        assert performance.local_score is not None
         assert performance.local_score.score == 1.0
 
     def test_anomaly_segmentation_scores(
@@ -234,4 +235,5 @@ class TestAnomalyMetrics:
         performance = metric.get_performance()
         assert isinstance(performance, AnomalyLocalizationPerformance)
         assert performance.global_score.score == 0.7
+        assert performance.local_score is not None
         assert performance.local_score.score == pytest.approx(0.9, 0.01)

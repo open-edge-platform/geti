@@ -3,6 +3,8 @@
 
 """This module contains helper functions for evaluation."""
 
+from collections.abc import Sequence
+
 import numpy as np
 from sc_sdk.entities.shapes import Rectangle
 
@@ -50,8 +52,8 @@ def intersection_over_union(box1: Rectangle, box2: Rectangle, intersection: list
 
 
 def get_iou_matrix(
-    ground_truth: list[tuple[float, float, float, float, str, float]],
-    predicted: list[tuple[float, float, float, float, str, float]],
+    ground_truth: Sequence[tuple[float, float, float, float, str, float]],
+    predicted: Sequence[tuple[float, float, float, float, str, float]],
 ) -> np.ndarray:
     """
     Constructs an iou matrix of shape [num_ground_truth_boxes, num_predicted_boxes].

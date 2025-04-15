@@ -85,8 +85,8 @@ class AnomalyMetric(PerformanceMetric, ABC):
         # Update metrics to label's name
         label_scores = list(self.global_metric.get_per_label_scores())
         for score in label_scores:
-            label = self.label_schema.get_label_by_id(score.label_id)
-            score.name = label.name
+            label = self.label_schema.get_label_by_id(score.label_id)  # type: ignore
+            score.name = label.name  # type: ignore
         self.dashboard_metrics.append(
             MetricsGroup(
                 metrics=label_scores,

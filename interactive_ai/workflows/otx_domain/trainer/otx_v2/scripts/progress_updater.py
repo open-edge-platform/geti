@@ -153,4 +153,6 @@ class ProgressUpdaterCallback(Callback):
 
     @staticmethod
     def _get_progress(trainer: Trainer, batch_idx: int) -> float:
+        if trainer.num_training_batches is None or trainer.max_epochs is None:
+            return 0.0
         return round(((trainer.current_epoch + batch_idx / trainer.num_training_batches) / trainer.max_epochs) * 100, 2)

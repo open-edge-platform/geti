@@ -118,7 +118,7 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
                 ),
             ),
             BarMetricsGroup(
-                metrics=self.acc_value_per_label.values(),
+                metrics=list(self.acc_value_per_label.values()),
                 visualization_info=BarChartInfo(
                     name="Accuracy per label",
                     palette=ColorPalette.LABEL,
@@ -166,7 +166,7 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             keypoints: list[tuple[float, float, str, bool]] = []
             for annotation in item.get_annotations():
                 label = annotation.get_labels()[0]  # always contains a list with one label
-                keypoint_shape: Keypoint = annotation.shape
+                keypoint_shape: Keypoint = annotation.shape  # type: ignore
                 keypoints.append((keypoint_shape.x, keypoint_shape.y, label.id_, keypoint_shape.is_visible))
             keypoints_per_item.append(keypoints)
         return keypoints_per_item

@@ -29,12 +29,11 @@ from model_api.tilers import DetectionTiler, InstanceSegmentationTiler
 from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
 from sc_sdk.entities.label import Domain
 from sc_sdk.entities.media_2d import Media2D
-from sc_sdk.entities.metadata import FloatType, IMetadata
+from sc_sdk.entities.metadata import FloatMetadata, FloatType, IMetadata
 from sc_sdk.entities.model import Model
 from sc_sdk.entities.model_template import TaskType
 from sc_sdk.entities.tensor import Tensor
 from sc_sdk.repos import AnnotationSceneRepo
-from sc_sdk.repos.metadata_repo import FloatMetadata
 
 from jobs_common_extras.evaluation.utils.configuration_utils import get_tiler_configuration, get_tiling_parameters
 from jobs_common_extras.evaluation.utils.detection_utils import get_legacy_detection_inferencer_configuration

@@ -30,8 +30,8 @@ from jobs_common_extras.evaluation.services.inferencer import (
     InferencerFactory,
 )
 
-ASYNC_INFERENCE_SIZE_MB_THRESHOLD = os.environ.get("ASYNC_INFERENCE_SIZE_MB_THRESHOLD", 150)
-ASYNC_INFERENCE_GIGAFLOPS_THRESHOLD = os.environ.get("ASYNC_INFERENCE_GIGAFLOPS_THRESHOLD", 400)
+ASYNC_INFERENCE_SIZE_MB_THRESHOLD = int(os.environ.get("ASYNC_INFERENCE_SIZE_MB_THRESHOLD", 150))
+ASYNC_INFERENCE_GIGAFLOPS_THRESHOLD = int(os.environ.get("ASYNC_INFERENCE_GIGAFLOPS_THRESHOLD", 400))
 ASYNC_INFERENCE_MODEL_TEMPLATE_ID_BLACKLIST = [
     "Custom_Counting_Instance_Segmentation_MaskRCNN_SwinT_FP16",
     "visual_prompting_model",

@@ -8,6 +8,7 @@ output models of a training
 
 import typing
 from dataclasses import dataclass
+from typing import overload
 
 from dataclasses_json import dataclass_json
 from geti_telemetry_tools import unified_tracing
@@ -131,6 +132,12 @@ class TrainOutputModels:
         model_storage_identifier: ModelStorageIdentifier,
     ) -> "TrainOutputModels":
         model_repo = ModelRepo(model_storage_identifier)
+
+        @overload
+        def _parse(id_: str) -> Model: ...
+
+        @overload
+        def _parse(id_: None) -> None: ...
 
         def _parse(id_: str | None) -> Model | None:
             if id_ is None:

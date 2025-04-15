@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from bson import ObjectId
+from geti_types import ID
 from migration.utils import ChangesetMetadata, IMigrationScript, MongoDBConnection, VersionManager
 from sc_sdk.versioning.data_version import DataVersion
 
@@ -49,7 +50,8 @@ class MockedMigrationScriptBar(IMigrationScript):
         pass
 
 
-migration_metadata_foo = ChangesetMetadata.from_dict(
+# Ignore type because the method from_dict is defined dynamically.
+migration_metadata_foo = ChangesetMetadata.from_dict(  # type: ignore
     {
         "description": "Update some field in the 'foo' collection",
         "supports_downgrade": True,
@@ -61,7 +63,8 @@ migration_metadata_foo = ChangesetMetadata.from_dict(
     }
 )
 
-migration_metadata_bar = ChangesetMetadata.from_dict(
+# Ignore type because the method from_dict is defined dynamically.
+migration_metadata_bar = ChangesetMetadata.from_dict(  # type: ignore
     {
         "description": "Update some field in the 'bar' collection",
         "supports_downgrade": True,
@@ -78,7 +81,7 @@ migration_metadata_bar = ChangesetMetadata.from_dict(
 class TestDataMigrationUseCase:
     def test_upgrade_project_to_current_version(self, request, fxt_session_ctx) -> None:
         # Arrange
-        project_id = ObjectId()
+        project_id = ID()
         import_version = DataVersion("1.0")
         current_version = DataVersion("2.0")
         intermedia_versions = ("1.5", "2.0")

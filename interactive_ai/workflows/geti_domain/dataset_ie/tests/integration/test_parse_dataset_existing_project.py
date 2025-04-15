@@ -7,6 +7,7 @@ import pytest
 from geti_types import ID
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
+from sc_sdk.entities.label import Domain
 from sc_sdk.entities.project import Project
 from sc_sdk.utils.deletion_helpers import DeletionHelpers
 
@@ -31,7 +32,7 @@ class TestParseDatasetExistingProject:
         possible_domains_from_cross: bool = False,
     ) -> set[tuple]:
         warnings: set[tuple] = set()
-        warnings.update(dataset_info.warnings.get(None, set()))
+        warnings.update(dataset_info.warnings.get(Domain.NULL, set()))
         if possible_domains_from_cross:
             domain = ImportUtils.project_type_to_label_domain(dataset_info.exported_project_type)
             possible_domains = {domain}

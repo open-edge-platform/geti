@@ -73,6 +73,6 @@ class MetricsHelper:
                 ground_truth_dataset=ground_truth_dataset,
                 prediction_dataset=prediction_dataset,
                 label_schema=label_schema,
-                relative_distance_threshold=relative_distance_threshold,
+                relative_distance_threshold=relative_distance_threshold,  # type: ignore
             )
         raise ValueError(f"Cannot determine metrics for task type '{task_type}'.")

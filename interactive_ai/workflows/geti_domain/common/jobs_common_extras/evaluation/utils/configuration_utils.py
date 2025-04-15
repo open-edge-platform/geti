@@ -10,7 +10,7 @@ def get_tiling_parameters(model: Model) -> dict:
     :param model: the model to extract the tiling parameters from
     :return: dictionary containing the tiling parameters
     """
-    tiling_parameters = model.configuration.configurable_parameters.tiling_parameters
+    tiling_parameters = model.configuration.configurable_parameters.tiling_parameters  # type: ignore
     tiling_param_dict = {param: tiling_parameters.__dict__[param] for param in tiling_parameters.parameters}
     tiling_param_dict["enable_tile_classifier"] = tiling_param_dict.get("enable_tile_classifier", False)
     # Note: tile scaling is only configurable for instance segmentation models and is not present for detection

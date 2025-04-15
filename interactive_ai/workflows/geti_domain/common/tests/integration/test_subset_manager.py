@@ -192,12 +192,12 @@ class TestSubsetManager:
     def set_config(
         project: Project,
         task_node: TaskNode,
-        auto_subset_fractions: bool | None = True,
-        train_proportion: float | None = 0.5,
-        validation_proportion: float | None = 0.2,
-        test_proportion: float | None = 0.3,
+        auto_subset_fractions: bool = True,
+        train_proportion: float = 0.5,
+        validation_proportion: float = 0.2,
+        test_proportion: float = 0.3,
     ):
-        new_config = SubsetManagerConfig()
+        new_config = SubsetManagerConfig()  # type: ignore
 
         new_config.auto_subset_fractions = auto_subset_fractions
         new_config.subset_parameters.train_proportion = train_proportion

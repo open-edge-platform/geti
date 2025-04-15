@@ -56,7 +56,7 @@ class IPredictionToAnnotationConverter(metaclass=abc.ABCMeta):
             self.label_map_ids[str(label.id_)] = label
             # Using a dict of list to handle duplicates label names (e.g. "foo bar", "foo_bar")
             self.legacy_label_map_names[label.name.replace(" ", "_")].append(label)
-        self.legacy_label_map_names["otx_empty_lbl"] = [self.empty_label]
+        self.legacy_label_map_names["otx_empty_lbl"] = [self.empty_label]  # type: ignore
 
         # Create a mapping of ModelAPI label indices to label objects
         self.idx_to_label = {}

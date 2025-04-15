@@ -48,7 +48,7 @@ from job.utils.exceptions import (
 )
 from job.utils.import_utils import ImportUtils
 from tests.conftest import URL_DATASETS, download_file
-from tests.fixtures.datasets import get_dataset_info
+from tests.fixtures.datasets import AnnotationDefinition, DatasetDefinition, get_dataset_info
 from tests.test_helpers import (
     check_dataset_items,
     check_thumbnails,
@@ -189,8 +189,8 @@ class TestImportDataset:
         project_type: GetiProjectType,
         label_names: list[str],
         keypoint_structure: dict[str, list[dict]] = {"edges": [], "positions": []},
-    ) -> str:
-        project_id = ""
+    ) -> ID:
+        project_id = ID("")
 
         def _get_metadata(metadata: dict):
             nonlocal project_id
@@ -640,7 +640,7 @@ class TestImportDataset:
                 GetiProjectType.SEGMENTATION,
             ],
             [
-                "fxt_single_points_dataset_definision",
+                "fxt_single_points_dataset_definition",
                 "datumaro",
                 0,
                 GetiProjectType.KEYPOINT_DETECTION,
@@ -1387,7 +1387,6 @@ class TestImportDataset:
         )  ## this is tested @ test_load_and_stage_dataset.py, too
 
         dataset_info = get_dataset_info(fxt_dm_dataset_id_str)
-        assert dataset_info is not None
         expected_labels = dataset_info.label_names_by_cross_project[project_type]
         labels_to_keep = self._get_all_label_names_from_supported_project_types(supported_project_types, project_type)
         assert set(labels_to_keep) == expected_labels  ## this is tested @ test_load_and_stage_dataset.py, too
@@ -1457,7 +1456,6 @@ class TestImportDataset:
         fxt_export_data_repo.zip_dataset(dataset_id)
 
         dataset_info = get_dataset_info("fxt_datumaro_dataset_chained_det_seg_id")
-        assert dataset_info is not None
         expected_labels = dataset_info.label_names_by_cross_project[project_type]
         label_names, _ = self._prepare_import_existing_project_workflow(
             data_repo=fxt_import_data_repo, dataset_id=dataset_id, project=project
@@ -1510,14 +1508,16 @@ class TestImportDataset:
             task_type_to_labels[task_type] = labels
 
         dm_label_names = list(labels_map.keys())
-        dm_dataset_definition = {}
+        dm_dataset_definition: DatasetDefinition = {}
         for item in dm_dataset:
-            annotations = set()
+            annotations: AnnotationDefinition = []
             for ann in item.annotations:
                 label_name = label_cat.items[ann.label]
                 if label_name in task_type_to_labels[TaskType.SEGMENTATION]:  # accept segmentation labels only
                     label_index = dm_label_names.index(label_name)
-                    annotations.add((ann.type.name, label_index))
+                    name = ann.type.name
+                    assert isinstance(name, str)
+                    annotations.append((name, label_index))
             if item.annotations or item.attributes.get("has_empty_label", False):
                 dm_dataset_definition[item.id] = annotations
 
@@ -2379,7 +2379,7 @@ class TestImportDataset:
         fxt_datumaro_dataset_path = download_file(
             URL_DATASETS + video_dataset_path_value, Path(fxt_temp_directory) / video_dataset_path_value
         )
-        dataset_id = save_dataset_with_path(fxt_import_data_repo, fxt_datumaro_dataset_path)
+        dataset_id = save_dataset_with_path(fxt_import_data_repo, str(fxt_datumaro_dataset_path))
         fmt = "datumaro"
 
         # get dataset definition
@@ -2425,7 +2425,7 @@ class TestImportDataset:
         request.addfinalizer(lambda: DeletionHelpers.delete_project_by_id(project_id=project_id))
         project = ProjectRepo().get_by_id(project_id)
 
-        dataset_id = save_dataset_with_path(fxt_import_data_repo, fxt_datumaro_dataset_path)
+        dataset_id = save_dataset_with_path(fxt_import_data_repo, str(fxt_datumaro_dataset_path))
         new_label_names, _ = self._prepare_import_existing_project_workflow(
             data_repo=fxt_import_data_repo, dataset_id=dataset_id, project=project
         )
@@ -2508,7 +2508,7 @@ class TestImportDataset:
             URL_DATASETS + fxt_datumaro_video_dataset_shape_classification_path,
             Path(fxt_temp_directory) / fxt_datumaro_video_dataset_shape_classification_path,
         )
-        dataset_id = save_dataset_with_path(fxt_import_data_repo, fxt_datumaro_dataset_path)
+        dataset_id = save_dataset_with_path(fxt_import_data_repo, str(fxt_datumaro_dataset_path))
         fmt = "datumaro"
 
         # get dataset definition
@@ -2560,7 +2560,7 @@ class TestImportDataset:
 
         # dataset is deleted when the previous import process is done.
         # we need to save(==upload) this dataset again.
-        dataset_id = save_dataset_with_path(fxt_import_data_repo, fxt_datumaro_dataset_path)
+        dataset_id = save_dataset_with_path(fxt_import_data_repo, str(fxt_datumaro_dataset_path))
         new_label_names, _ = self._prepare_import_existing_project_workflow(
             data_repo=fxt_import_data_repo, dataset_id=dataset_id, project=project
         )
@@ -2657,7 +2657,7 @@ class TestImportDataset:
     def _check_mapped_annotations(
         self,
         annotation_scenes: list[AnnotationScene],
-        dm_dataset_definition: dict[str, Any],
+        dm_dataset_definition: DatasetDefinition,
         dm_label_names: list[str],
         project_type_from: GetiProjectType,
         project_type_to: GetiProjectType,
@@ -2681,7 +2681,7 @@ class TestImportDataset:
                 empty_indice.append(dm_label_names.index(label_name))
 
         # get dataset definition from the project
-        sc_label_ids: list[str] = [label.id_ for label in sc_labels]
+        sc_label_ids = [label.id_ for label in sc_labels]
         sc_definition = self._get_sc_dataset_definition_as_sorted_list(
             annotation_scenes, sc_label_ids, include_empty=len(empty_indice) > 0
         )
@@ -2700,10 +2700,11 @@ class TestImportDataset:
         label_domain = ImportUtils.project_type_to_label_domain(project_type_to)
 
         dm_items = []
-        for dm_item in list(converted_dataset_definition.values()):
+        for definition in list(converted_dataset_definition.values()):
             valid_anns = set()
             empty_anns = set()
-            for ann_type, label in dm_item:
+            for ann_type, label in definition:
+                assert isinstance(label, int)
                 if label in empty_indice:
                     empty_anns.add((ann_type, label))
                 elif label in labels_to_keep_indices and ann_type in domain_to_valid_types[label_domain]:
@@ -2720,8 +2721,8 @@ class TestImportDataset:
             for ann in dm_item:
                 dm_label_name = dm_label_names[ann[1]]
                 sc_label_id = labels_map[dm_label_name].id_
-                sc_label = sc_label_ids.index(sc_label_id)
-                anns.append((ann[0], sc_label))
+                sc_label_index = sc_label_ids.index(sc_label_id)
+                anns.append((ann[0], sc_label_index))
             anns = sorted(anns)
             assert anns in sc_items
 

@@ -427,7 +427,6 @@ class ScExtractorForFlyteJob(ScExtractor):
                     label_categories=self.categories().get(dm_AnnotationType.label),
                     point_categories=self.categories().get(dm_AnnotationType.points),
                 ),
-                user_id=sc_dataset.id_,
             ),
             label_id_to_label=self._label_id_to_label,
         )

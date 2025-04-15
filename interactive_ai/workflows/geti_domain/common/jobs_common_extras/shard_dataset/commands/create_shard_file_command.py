@@ -6,7 +6,6 @@
 import logging
 import os
 import shutil
-from collections.abc import Sequence
 from uuid import uuid4
 
 import datumaro as dm
@@ -43,7 +42,7 @@ class CreateShardFileCommand(ICommand):
         self,
         dataset_storage_identifier: DatasetStorageIdentifier,
         dataset_id: str,
-        dataset_items: Sequence[DatasetItem],
+        dataset_items: list[DatasetItem],
         label_schema: LabelSchema,
         work_dir: utils.AutoDeletingTempDir,
         shard_idx: int,

@@ -200,8 +200,8 @@ class AnnotationSceneMapper:
         attributes: dict[str, list] = {self.ATTR_KEYPOINT_LABELS: []}
 
         for ann in annotations:
-            points.extend([ann.shape.x * width, ann.shape.y * height])
-            visibilities.append(dm.Points.Visibility.visible if ann.shape.is_visible else dm.Points.Visibility.hidden)
-            attributes[self.ATTR_KEYPOINT_LABELS].append(ann.get_labels()[0].name)
+            points.extend([ann.shape.x * width, ann.shape.y * height])  # type: ignore
+            visibilities.append(dm.Points.Visibility.visible if ann.shape.is_visible else dm.Points.Visibility.hidden)  # type: ignore
+            attributes[self.ATTR_KEYPOINT_LABELS].append(ann.get_labels()[0].name)  # type: ignore
 
         return dm.Points(points=points, visibility=visibilities, label=0, attributes=attributes)

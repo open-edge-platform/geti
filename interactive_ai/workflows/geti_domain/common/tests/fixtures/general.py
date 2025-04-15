@@ -7,17 +7,14 @@ from pytest import FixtureRequest
 from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
 from sc_sdk.entities.dataset_storage import DatasetStorage
 from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label import Label
 from sc_sdk.entities.label_schema import NullLabelSchema
 from sc_sdk.entities.model import Model, ModelConfiguration, ModelStatus
 from sc_sdk.entities.project import Project
 from sc_sdk.entities.task_graph import TaskGraph
-from sc_sdk.repos import DatasetRepo, DatasetStorageRepo, LabelRepo, LabelSchemaRepo, ModelRepo, ProjectRepo
+from sc_sdk.repos import DatasetRepo, DatasetStorageRepo, LabelSchemaRepo, ModelRepo, ProjectRepo
 from sc_sdk.services.model_service import ModelService
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
 
 from tests.test_helpers import (
-    TestProject,
     generate_and_save_random_simple_segmentation_project,
     generate_training_dataset_of_all_annotated_media_in_project,
 )
@@ -56,20 +53,6 @@ def project_empty(request):
     return project
 
 
-@pytest.fixture(scope="function")
-def project_with_data(request, sample_project: Project):
-    dataset = sample_dataset(sample_project)
-    labels = list(LabelRepo(sample_project.identifier).get_all())
-    request.addfinalizer(lambda: DeletionHelpers.delete_project_by_id(project_id=sample_project.id_))
-    return TestProject(
-        project=sample_project,
-        dataset=dataset,
-        segmentation_model=sample_segmentation_model(sample_project, dataset),
-        circle_dataset=circle_dataset(dataset, labels),
-        triangle_dataset=triangle_dataset(dataset, labels),
-    )
-
-
 def sample_segmentation_model(project, dataset):
     task_node = project.tasks[-1]
     assert task_node.task_properties.is_trainable
@@ -91,16 +74,6 @@ def sample_segmentation_model(project, dataset):
         model_status=ModelStatus.NOT_IMPROVED,
     )
     return segmentation_model
-
-
-def triangle_dataset(dataset: Dataset, labels: list[Label]):
-    triangle_label_id = next(label.id_ for label in labels if labels.name == "triangle")
-    return get_figures_dataset(dataset, triangle_label_id)
-
-
-def circle_dataset(dataset: Dataset, labels: list[Label]):
-    circle_label_id = next(label.id_ for label in labels if labels.name == "ellipse")
-    return get_figures_dataset(dataset, circle_label_id)
 
 
 def empty_dataset_item(dataset):

@@ -677,6 +677,7 @@ class TestAccuracyMetric:
         per_label_scores = metric.get_per_label_scores()
         for score_point in per_label_scores:
             assert score_point.name == AccuracyMetric.metric_name
+            assert score_point.label_id is not None
             label = label_schema.get_label_by_id(score_point.label_id)
             assert label is not None
             assert score_point.score == pytest.approx(label_acc[label.name], abs=0.01), (

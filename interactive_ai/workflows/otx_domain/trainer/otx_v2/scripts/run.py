@@ -13,10 +13,11 @@ from typing import TYPE_CHECKING
 
 import mlflow
 from minio_util import download_file_from_s3
-from mlflow_io import AsyncCaller, download_config_file, download_shard_files, log_error, log_full
 from optimize import optimize
 from train import train
 from utils import JobType, MLFlowTrackerAccessInfo, OTXConfig, logging_elapsed_time
+
+from .mlflow_io import AsyncCaller, download_config_file, download_shard_files, log_error, log_full
 
 if TYPE_CHECKING:
     from mlflow import MlflowClient

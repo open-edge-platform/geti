@@ -27,7 +27,6 @@ from .performance_metric import PerformanceMetric
 
 logger = logging.getLogger(__name__)
 
-ALL_CLASSES_NAME = "All Classes"
 BOX_CLASS_INDEX = 4
 BOX_SCORE_INDEX = 5
 
@@ -168,7 +167,7 @@ class FMeasureMetric(PerformanceMetric):
         label_ids = {label.id_ for label in labels}
         dataset_items = (item for item in dataset) if isinstance(dataset, Dataset) else dataset
         for item in dataset_items:
-            boxes: list[tuple[float, float, float, float, str, float]] = []
+            boxes: list[tuple[float, float, float, float, ID, float]] = []
             roi_as_box = Annotation(ShapeFactory.shape_as_rectangle(item.roi.shape), labels=[])
             for annotation in item.annotation_scene.annotations:
                 shape_as_box = ShapeFactory.shape_as_rectangle(annotation.shape)
@@ -255,7 +254,7 @@ class _OverallResults:
 
     def __init__(
         self,
-        f_measure_per_class: dict[str, float],
+        f_measure_per_class: dict[ID, float],
         f_measure: float,
         precision: float,
         recall: float,
@@ -283,8 +282,8 @@ class _FMeasureCalculator:
 
     def __init__(
         self,
-        ground_truth_boxes_per_image: list[list[tuple[float, float, float, float, str, float]]],
-        prediction_boxes_per_image: list[list[tuple[float, float, float, float, str, float]]],
+        ground_truth_boxes_per_image: list[list[tuple[float, float, float, float, ID, float]]],
+        prediction_boxes_per_image: list[list[tuple[float, float, float, float, ID, float]]],
         empty_label: str | None = None,
     ):
         self.ground_truth_boxes_per_image = ground_truth_boxes_per_image
@@ -293,7 +292,7 @@ class _FMeasureCalculator:
 
     def evaluate_detections(
         self,
-        classes: list[str],
+        classes: list[ID],
         iou_threshold: float = 0.5,
     ) -> _OverallResults:
         """
@@ -307,13 +306,13 @@ class _FMeasureCalculator:
         f_measure_per_class = {}
 
         # F-measure with no optimization
-        result = self.evaluate_classes(
+        result, all_classes_result = self.evaluate_classes(
             classes=classes.copy(),
             iou_threshold=iou_threshold,
         )
-        f_measure = result[ALL_CLASSES_NAME].f_measure
-        precision = result[ALL_CLASSES_NAME].precision
-        recall = result[ALL_CLASSES_NAME].recall
+        f_measure = all_classes_result.f_measure
+        precision = all_classes_result.precision
+        recall = all_classes_result.recall
         for class_name in classes:
             f_measure_per_class[class_name] = result[class_name].f_measure
 
@@ -324,7 +323,7 @@ class _FMeasureCalculator:
             recall=recall,
         )
 
-    def evaluate_classes(self, classes: list[str], iou_threshold: float) -> dict[str, _Metrics]:
+    def evaluate_classes(self, classes: list[ID], iou_threshold: float) -> tuple[dict[ID, _Metrics], _Metrics]:
         """
         Returns dict of f_measure, precision and recall for each class.
 
@@ -332,12 +331,10 @@ class _FMeasureCalculator:
         :param iou_threshold: IoU threshold to use for false negatives.
         :return: The metrics (e.g. F-measure) for each class.
         """
-        result: dict[str, _Metrics] = {}
+        result: dict[ID, _Metrics] = {}
 
         all_classes_counters = _ResultCounters(0, 0, 0)
 
-        if ALL_CLASSES_NAME in classes:
-            classes.remove(ALL_CLASSES_NAME)
         for class_name in classes:
             metrics, counters = self.get_f_measure_for_class(
                 class_name=class_name,
@@ -354,17 +351,17 @@ class _FMeasureCalculator:
             all_classes_counters.n_predicted += counters.n_predicted
 
         # for all classes
-        result[ALL_CLASSES_NAME] = all_classes_counters.calculate_f_measure()
+        all_classes_result = all_classes_counters.calculate_f_measure()
         logger.debug(
             "F-measure for all classes (n_true=%s, n_false_negative=%s, n_predicted=%s): %s",
             all_classes_counters.n_true,
             all_classes_counters.n_false_negatives,
             all_classes_counters.n_predicted,
-            result[ALL_CLASSES_NAME].f_measure,
+            all_classes_result.f_measure,
         )
-        return result
+        return result, all_classes_result
 
-    def get_f_measure_for_class(self, class_name: str, iou_threshold: float) -> tuple[_Metrics, _ResultCounters]:
+    def get_f_measure_for_class(self, class_name: ID, iou_threshold: float) -> tuple[_Metrics, _ResultCounters]:
         """
         Get f_measure for specific class and iou threshold.
 
@@ -395,8 +392,8 @@ class _FMeasureCalculator:
 
     @staticmethod
     def __filter_class(
-        boxes_per_image: list[list[tuple[float, float, float, float, str, float]]], class_name: str
-    ) -> list[list[tuple[float, float, float, float, str, float]]]:
+        boxes_per_image: list[list[tuple[float, float, float, float, ID, float]]], class_name: ID
+    ) -> list[list[tuple[float, float, float, float, ID, float]]]:
         """
         Filters boxes to only keep members of one class.
 
