@@ -36,6 +36,8 @@ dev = [
     "mypy~=1.15",
     "pytest-freezegun~=0.4",
     "httpx~=0.23",
+    "testfixtures~=8.0",
+    "testcontainers[mongodb]~=4.9",
 ]
 
 [tool.ruff]

@@ -73,6 +73,7 @@ class DummyValues:
     N_ANNOTATED_IMAGES = 5
     N_ANNOTATED_FRAMES = 5
     N_ANNOTATED_VIDEOS = 1
+    CREATOR_NAME = "Geti"
 
 
 class IDOffsets:

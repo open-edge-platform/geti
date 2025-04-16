@@ -65,9 +65,8 @@ def fxt_reference_feature_3(fxt_ote_id, fxt_task_id_2):
     )
 
 
-@pytest.mark.VisualPromptServiceComponent
 class TestReferenceFeatureRepo:
-    def test_save(self, request, fxt_session_ctx, fxt_project_identifier, fxt_reference_feature_1) -> None:
+    def test_save(self, request, fxt_project_identifier, fxt_reference_feature_1) -> None:
         # Arrange
         repo = ReferenceFeatureRepo(fxt_project_identifier)
         request.addfinalizer(lambda: repo.delete_all())

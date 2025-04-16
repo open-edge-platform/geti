@@ -2,42 +2,123 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from tests.fixtures.values import DummyValues
+from _pytest.fixtures import FixtureRequest
+from tests.fixtures.values import DummyValues, IDOffsets
 
 from geti_types import ProjectIdentifier
-from sc_sdk.entities.dataset_storage import DatasetStorage
 from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskGraph
+from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
+from sc_sdk.repos import ProjectRepo
 
 
 @pytest.fixture
-def fxt_project_identifier_1(fxt_workspace_id, fxt_ote_id):
+def fxt_project_identifier(fxt_session_ctx, fxt_ote_id):
     yield ProjectIdentifier(
-        workspace_id=fxt_workspace_id,
+        workspace_id=fxt_session_ctx.workspace_id,
         project_id=fxt_ote_id(1),
     )
 
 
 @pytest.fixture
-def fxt_project_identifier_2(fxt_workspace_id, fxt_ote_id):
-    yield ProjectIdentifier(
-        workspace_id=fxt_workspace_id,
-        project_id=fxt_ote_id(2),
+def fxt_empty_project(fxt_dataset_storage, fxt_ote_id):
+    yield Project(
+        name="dummy_empty_project",
+        creator_id="",
+        description="dummy empty project",
+        dataset_storages=[fxt_dataset_storage],
+        task_graph=TaskGraph(),
+        id=fxt_ote_id(IDOffsets.EMPTY_PROJECT),
+        creation_date=DummyValues.CREATION_DATE,
+        user_names=[DummyValues.CREATOR_NAME],
     )
 
 
 @pytest.fixture
-def fxt_project_identifier(fxt_project_identifier_1):
-    yield fxt_project_identifier_1
+def fxt_empty_project_persisted(
+    request: FixtureRequest,
+    fxt_empty_project,
+    fxt_dataset_storage_persisted,
+):
+    project_repo = ProjectRepo()
+    project_repo.save(fxt_empty_project)
+    request.addfinalizer(lambda: project_repo.delete_by_id(fxt_empty_project.id_))
+    yield fxt_empty_project
 
 
 @pytest.fixture
-def fxt_dataset_storage(fxt_project_identifier, fxt_ote_id):
-    yield DatasetStorage(
-        _id=fxt_ote_id(3),
-        name="dummy_dataset_storage",
-        project_id=fxt_project_identifier.project_id,
-        use_for_training=True,
+def fxt_detection_segmentation_chain_project(
+    fxt_dataset_storage,
+    fxt_ote_id,
+    fxt_detection_task,
+    fxt_segmentation_task,
+    fxt_dataset_task,
+    fxt_crop_task,
+):
+    task_graph = TaskGraph()
+    task_graph.add_node(fxt_dataset_task)
+    task_graph.add_node(fxt_detection_task)
+    task_graph.add_node(fxt_crop_task)
+    task_graph.add_node(fxt_segmentation_task)
+    task_graph.add_task_edge(TaskEdge(from_task=fxt_dataset_task, to_task=fxt_detection_task))
+    task_graph.add_task_edge(TaskEdge(from_task=fxt_detection_task, to_task=fxt_crop_task))
+    task_graph.add_task_edge(TaskEdge(from_task=fxt_crop_task, to_task=fxt_segmentation_task))
+    yield Project(
+        name="dummy_task_chain_project",
+        creator_id="",
+        description="dummy task chain project",
+        dataset_storages=[fxt_dataset_storage],
+        task_graph=task_graph,
+        id=fxt_dataset_storage.project_id,
+        creation_date=DummyValues.CREATION_DATE,
+        user_names=[DummyValues.CREATOR_NAME],
+    )
+
+
+@pytest.fixture
+def fxt_detection_segmentation_chain_project_persisted(
+    request: FixtureRequest,
+    fxt_detection_segmentation_chain_project,
+    fxt_dataset_storage_persisted,
+):
+    project = fxt_detection_segmentation_chain_project
+    project_repo = ProjectRepo()
+    project_repo.save(project)
+    request.addfinalizer(lambda: project_repo.delete_by_id(project.id_))
+    yield fxt_detection_segmentation_chain_project
+
+
+@pytest.fixture
+def fxt_multi_dataset_storages_project(
+    fxt_ote_id,
+    fxt_dataset_storage,
+    fxt_testing_dataset_storage,
+    fxt_detection_task_graph,
+):
+    yield Project(
+        name="dummy_multi_dataset_project",
+        creator_id="",
+        description="Sample detection project with multiple dataset storages",
+        user_names=["alice", "bob"],
+        dataset_storages=[fxt_dataset_storage, fxt_testing_dataset_storage],
+        task_graph=fxt_detection_task_graph,
+        id=fxt_ote_id(IDOffsets.SINGLE_TASK_PROJECT),
+    )
+
+
+@pytest.fixture
+def fxt_detection_project(
+    fxt_ote_id,
+    fxt_dataset_storage,
+    fxt_detection_task_graph,
+):
+    yield Project(
+        name="dummy_multi_dataset_project",
+        creator_id="",
+        description="Sample detection project",
+        user_names=["alice", "bob"],
+        dataset_storages=[fxt_dataset_storage],
+        task_graph=fxt_detection_task_graph,
+        id=fxt_ote_id(IDOffsets.SINGLE_TASK_PROJECT),
     )
 
 

@@ -19,7 +19,6 @@ def return_none(*args, **kwargs) -> None:
     return None
 
 
-@pytest.mark.VisualPromptServiceComponent
 class TestPredictController:
     @freeze_time("2024-01-01 00:00:01")
     def test_predict(self, fxt_project_identifier, fxt_ote_id, fxt_image):
