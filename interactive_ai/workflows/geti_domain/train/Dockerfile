@@ -1,5 +1,10 @@
-# TODO: Use image from our own registry
 FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
+
+# Install Git and clone the OTX at the specified tag
+ARG OTX_RELEASE_TAG=2.4.0
+
+RUN apt-get update && apt-get install -y git
+RUN git clone --branch $OTX_RELEASE_TAG --single-branch https://github.com/open-edge-platform/training_extensions.git
 
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
@@ -37,7 +42,7 @@ RUN apt-get update && \
 
 # Copy the application from the builder
 COPY --link --from=builder --chown=10001 /builder/interactive_ai/workflows/geti_domain/workflow /builder/interactive_ai/workflows/geti_domain/workflow
-COPY --link --from=training_extensions_v2 --chown=10001 /model_templates /model_templates
+COPY --link --from=builder --chown=10001 /training_extensions/src/otx/tools/templates /model_templates
 
 ENV MODEL_TEMPLATES_DIR=/model_templates
 
