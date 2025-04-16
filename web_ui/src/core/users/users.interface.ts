@@ -29,6 +29,7 @@ export interface UserDTO {
     roles: RoleResourceDTO[];
     telemetryConsentAt?: string | null;
     userConsentAt?: string | null;
+    userConsent?: string | null;
     presignedUrl?: string;
     lastLogoutDate?: string | null;
 }
@@ -156,6 +157,7 @@ export interface User {
     lastName: string;
     email: string;
     userPhoto: string | null;
+    userConsent?: string | null;
     externalIdentitySystemId: string;
     country: string;
     status: AccountStatus;

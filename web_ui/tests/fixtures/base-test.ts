@@ -13,6 +13,7 @@ import { DatasetStatisticsPage } from './page-objects/dataset-statistics-page';
 import { ImportProjectDatasetPage } from './page-objects/import-project-dataset.page';
 import { IntelAdminPage } from './page-objects/intel-admin-page';
 import { LabelsPage } from './page-objects/labels-page';
+import { LicenseModalPage } from './page-objects/license-modal';
 import { LoginPage } from './page-objects/login-page';
 import { MembersPage } from './page-objects/members-page';
 import { ModelMetricsPage } from './page-objects/model-metrics-page';
@@ -54,6 +55,7 @@ interface BaseFixtures {
     intelAdminPage: IntelAdminPage;
     modelMetricsPage: ModelMetricsPage;
     datasetStatisticsPage: DatasetStatisticsPage;
+    licenseModalPage: LicenseModalPage;
 }
 
 const test = extendWithOpenApi(baseTest).extend<BaseFixtures>({
@@ -128,6 +130,9 @@ const test = extendWithOpenApi(baseTest).extend<BaseFixtures>({
     },
     datasetStatisticsPage: async ({ page }, use) => {
         await use(new DatasetStatisticsPage(page));
+    },
+    licenseModalPage: async ({ page }, use) => {
+        await use(new LicenseModalPage(page));
     },
 });
 
