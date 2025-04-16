@@ -7,7 +7,6 @@ import { expose } from 'comlink';
 import ndarray from 'ndarray';
 import ops from 'ndarray-ops';
 import * as ort from 'onnxruntime-web';
-import OpenCV from 'opencv';
 import OpenCVTypes from 'OpenCVTypes';
 
 import { RegionOfInterest } from '../core/annotations/annotation.interface';
@@ -21,13 +20,12 @@ import {
 } from '../pages/annotator/tools/ritm-tool/ritm-tool.interface';
 import { isPolygonValid } from '../pages/annotator/tools/utils';
 import { sessionParams } from '../pages/annotator/tools/wasm-utils';
+import cv from './opencv-loader';
 import { approximateShape, concatFloat32Arrays, loadSource, stackPlanes } from './utils';
 
-let CV: OpenCVTypes.cv | null = null;
+declare const self: DedicatedWorkerGlobalScope;
 
-OpenCV.then((cvInstance: OpenCVTypes.cv) => {
-    CV = cvInstance;
-});
+let CV: OpenCVTypes.cv | null = null;
 
 const terminate = (): void => {
     self.close();
@@ -52,8 +50,8 @@ class RITM implements RITMMethods {
     async load() {
         ort.env.wasm.wasmPaths = sessionParams.wasmRoot;
         this.models = {
-            main: await this.loadModel('/assets/ritm/main.onnx'),
-            preprocess: await this.loadModel('/assets/ritm/preprocess.onnx'),
+            main: await this.loadModel(new URL('./ritm/main.onnx', import.meta.url).toString()),
+            preprocess: await this.loadModel(new URL('./ritm/preprocess.onnx', import.meta.url).toString()),
         };
     }
 
@@ -361,7 +359,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCV.then((cvInstance) => {
+        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

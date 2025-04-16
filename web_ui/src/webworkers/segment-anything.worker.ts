@@ -4,7 +4,6 @@
 //  Dependencies get bundled into the worker
 
 import { expose } from 'comlink';
-import OpenCV from 'opencv';
 import type OpenCVTypes from 'OpenCVTypes';
 
 import { AlgorithmType } from '../hooks/use-load-ai-webworker/algorithm.interface';
@@ -12,12 +11,11 @@ import { SegmentAnythingModel } from '../pages/annotator/tools/segment-anything-
 import { SegmentAnythingPrompt } from '../pages/annotator/tools/segment-anything-tool/model/segment-anything-decoder';
 import { EncodingOutput } from '../pages/annotator/tools/segment-anything-tool/model/segment-anything-encoder';
 import { SegmentAnythingResult } from '../pages/annotator/tools/segment-anything-tool/model/segment-anything-result';
+import cv from './opencv-loader';
+
+declare const self: DedicatedWorkerGlobalScope;
 
 let CV: OpenCVTypes.cv | null = null;
-
-OpenCV.then((cvInstance: OpenCVTypes.cv) => {
-    CV = cvInstance;
-});
 
 const terminate = (): void => {
     self.close();
@@ -27,7 +25,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCV.then((cvInstance) => {
+        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;
@@ -52,8 +50,8 @@ class SegmentAnythingModelWrapper {
                 padSize: 1024,
             },
             modelPaths: new Map([
-                ['encoder', '/assets/segment-anything/mobile_sam.encoder.onnx'],
-                ['decoder', '/assets/segment-anything/sam_vit_h_4b8939.decoder.onnx'],
+                ['encoder', new URL('./segment-anything/mobile_sam.encoder.onnx', import.meta.url).toString()],
+                ['decoder', new URL('./segment-anything/sam_vit_h_4b8939.decoder.onnx', import.meta.url).toString()],
             ]),
         };
 
