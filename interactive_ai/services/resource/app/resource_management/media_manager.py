@@ -43,7 +43,6 @@ from geti_telemetry_tools.metrics import (
 )
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaType
 from media_utils import (
-    USE_DECORD,
     VideoDecoder,
     VideoFileRepair,
     VideoFrameOutOfRangeInternalException,
@@ -679,34 +678,21 @@ class MediaManager:
             f"Saved bytes of video `{basename}{extension.value}` (ID `{video_id}`) in {dataset_storage_identifier}",
         )
 
-        if USE_DECORD:
-            try:
-                info = VideoDecoder.get_video_information(
-                    str(video_binary_repo.get_path_or_presigned_url(binary_filename))
-                )
-            except (RuntimeError, KeyError):
-                video_binary_repo.delete_by_filename(filename=binary_filename)
-                raise InvalidMediaException("Video file can not be read.")
-        else:
-            logger.debug(f"Getting video information for video with ID {video_id} with name {binary_filename}.")
-            try:
-                info = VideoDecoder.get_video_information(
-                    str(video_binary_repo.get_path_or_presigned_url(binary_filename))
-                )
-            except KeyError:
-                video_binary_repo.delete_by_filename(filename=binary_filename)
-                raise InvalidMediaException("Video file can not be read.")
+        logger.debug(f"Getting video information for video with ID {video_id} with name {binary_filename}.")
+        try:
+            info = VideoDecoder.get_video_information(str(video_binary_repo.get_path_or_presigned_url(binary_filename)))
+        except KeyError:
+            video_binary_repo.delete_by_filename(filename=binary_filename)
+            raise InvalidMediaException("Video file can not be read.")
 
-            logger.debug(f"Successfully fetched video information for video with ID {video_id}.")
-            if not VideoFileRepair.check_and_repair_video(
-                video_binary_repo=video_binary_repo, filename=binary_filename
-            ):
-                video_binary_repo.delete_by_filename(filename=binary_filename)  # Delete binary
-                raise InvalidMediaException(
-                    "The video file is corrupt. "
-                    "The server was not able to read the last frame of the video, "
-                    "and it was not able to repair the video"
-                )
+        logger.debug(f"Successfully fetched video information for video with ID {video_id}.")
+        if not VideoFileRepair.check_and_repair_video(video_binary_repo=video_binary_repo, filename=binary_filename):
+            video_binary_repo.delete_by_filename(filename=binary_filename)  # Delete binary
+            raise InvalidMediaException(
+                "The video file is corrupt. "
+                "The server was not able to read the last frame of the video, "
+                "and it was not able to repair the video"
+            )
 
         video = Video(
             id=video_id,

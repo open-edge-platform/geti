@@ -9,18 +9,11 @@ from .media_utils import (
     get_video_bytes,
     get_video_frame_numpy,
 )
-from .video_decoder import (
-    USE_DECORD,
-    VideoDecoder,
-    VideoFrameOutOfRangeInternalException,
-    VideoFrameReadingError,
-    VideoInformation,
-)
+from .video_decoder import VideoDecoder, VideoFrameOutOfRangeInternalException, VideoFrameReadingError, VideoInformation
 from .video_file_repair import VideoFileRepair
 from .video_frame_reader import VideoFrameReader
 
 __all__ = [
-    "USE_DECORD",
     "VideoDecoder",
     "VideoFileRepair",
     "VideoFrameOutOfRangeInternalException",
