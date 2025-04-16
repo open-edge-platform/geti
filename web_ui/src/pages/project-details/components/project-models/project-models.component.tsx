@@ -4,6 +4,7 @@
 import { Flex, View } from '@adobe/react-spectrum';
 
 import { NoTrainedModels } from '../../../../assets/images';
+import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { EmptyData } from '../../../../shared/components/empty-data/empty-data.component';
@@ -25,6 +26,7 @@ export const ProjectModels = (): JSX.Element => {
     const { useProjectModelsQuery } = useModels();
     const { tasksWithSupportedAlgorithms } = useTasksWithSupportedAlgorithms();
     const isTraining = useIsTraining();
+    const { FEATURE_FLAG_TRAINING_FLOW_REVAMP } = useFeatureFlags();
 
     const {
         project: { tasks },
@@ -43,7 +45,7 @@ export const ProjectModels = (): JSX.Element => {
                 breadcrumbs={[{ id: 'models-id', breadcrumb: 'Models' }]}
                 header={
                     <Flex alignItems={'center'} gap={'size-150'}>
-                        <ReconfigureModels />
+                        {!FEATURE_FLAG_TRAINING_FLOW_REVAMP && <ReconfigureModels />}
                         {!isLoadingModels && <TrainModel models={formattedModelsGroups} />}
                     </Flex>
                 }
