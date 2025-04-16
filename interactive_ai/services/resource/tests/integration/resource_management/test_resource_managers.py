@@ -171,6 +171,82 @@ def fxt_create_upload_annotate_project(
     yield project, annotations
 
 
+@pytest.fixture
+def fxt_anomaly_classification_project_data():
+    yield {
+        "name": "Test anomaly classification project",
+        "tasks_dict": {
+            "Dataset": {"task_type": "dataset"},
+            "Anomaly task": {
+                "task_type": "anomaly_classification",
+            },
+        },
+    }
+
+
+@pytest.fixture
+def fxt_hierarchy_classification_project_data_2():
+    yield {
+        "name": "Test hierarchy classification project",
+        "tasks_dict": {
+            "Dataset": {"task_type": "dataset"},
+            "Classification task": {
+                "task_type": "classification",
+                "labels": {
+                    "1": {
+                        "color": "#edb200ff",
+                        "group": "Group 1",
+                        "parent_id": None,
+                        "hotkey": "",
+                    },
+                    "1.1": {
+                        "color": "#548fadff",
+                        "group": "Group 1.X",
+                        "parent_id": "1",
+                        "hotkey": "",
+                    },
+                    "1.1.1": {
+                        "color": "#00f5d4ff",
+                        "group": "Group 1.1.X",
+                        "parent_id": "1.1",
+                        "hotkey": "",
+                    },
+                    "1.1.2": {
+                        "color": "#5b69ffff",
+                        "group": "Group 1.1.X",
+                        "parent_id": "1.1",
+                        "hotkey": "",
+                    },
+                    "1.2": {
+                        "color": "#9d3b1aff",
+                        "group": "Group 1.X",
+                        "parent_id": "1",
+                        "hotkey": "",
+                    },
+                    "1.3": {
+                        "color": "#d7bc5eff",
+                        "group": "Group 1.X",
+                        "parent_id": "1",
+                        "hotkey": "",
+                    },
+                    "2": {
+                        "color": "#708541ff",
+                        "group": "Group 2",
+                        "parent_id": None,
+                        "hotkey": "",
+                    },
+                    "2.1": {
+                        "color": "#c9e649ff",
+                        "group": "Group 2.X",
+                        "parent_id": "2",
+                        "hotkey": "",
+                    },
+                },
+            },
+        },
+    }
+
+
 class TestResourceManagers:
     def test_create_delete_project(self, fxt_create_upload_annotate_project) -> None:
         """
@@ -289,7 +365,6 @@ class TestResourceManagers:
         "lazyfxt_project_request, model_template_id",
         [
             ("fxt_hierarchy_classification_project_data_2", "classification"),
-            ("fxt_anomaly_classification_project_data", "anomaly_classification"),
         ],
     )
     def test_update_project(
@@ -433,3 +508,56 @@ class TestResourceManagers:
         assert third_updated_project.name == pre_update_project_name
         assert third_updated_label.color.hex_str == third_updated_label_color
         assert third_updated_label.name == pre_update_label_name
+
+    def test_update_project_anomaly(self, fxt_anomaly_classification_project_data) -> None:
+        model_template_id = "anomaly_classification"
+        project_type = fxt_anomaly_classification_project_data
+        session = CTX_SESSION_VAR.get()
+        project_manager = ProjectManager()
+        with patch.object(
+            ProjectBuilder,
+            "get_default_model_template_by_task_type",
+            side_effect=[
+                ModelTemplateList().get_by_id("dataset"),
+                ModelTemplateList().get_by_id(model_template_id),
+            ],
+        ):
+            project, label_schema, task_schema = PersistedProjectBuilder.build_full_project(
+                creator_id="Geti",
+                parser_class=CustomTestProjectParser,
+                parser_kwargs=project_type,
+            )
+        label_schema_per_task: dict[ID, LabelSchemaView | NullLabelSchema] = {
+            task_node.id_: (
+                LabelSchemaService.get_latest_label_schema_for_task(
+                    project_identifier=project.identifier,
+                    task_node_id=task_node.id_,
+                )
+                if task_node.task_properties.is_trainable
+                else NullLabelSchema()
+            )
+            for task_node in project.task_graph.tasks
+        }
+
+        # update name and one label
+        pipeline_rest = ProjectRESTViews.project_to_rest(
+            organization_id=session.organization_id,
+            project=project,
+            label_schema_per_task=label_schema_per_task,
+            storage_info={},
+        )["pipeline"]
+
+        new_project_name = "New Anomaly project name"
+        data = {
+            "id": project.id_,
+            "name": new_project_name,
+            "pipeline": pipeline_rest,
+        }
+        project_manager.update_project(
+            project=project,
+            project_update_parser=RestProjectUpdateParser,
+            parser_kwargs={"rest_data": data},
+        )
+
+        first_updated_project = ProjectRepo().get_by_id(project.id_)
+        assert first_updated_project.name == new_project_name

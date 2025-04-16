@@ -45,24 +45,24 @@ class TestMediaRESTEndpoint:
                     ),
                 ),
             ]
-        with (
-            patch.object(
-                ProjectManager,
-                "get_project_by_id",
-                return_value=fxt_project,
-            ),
-            patch.object(
-                ProjectManager,
-                "get_dataset_storage_by_id",
-                return_value=fxt_filled_image_dataset_storage,
-            ),
-        ):
-            url = (
-                f"/api/v1/organizations/{str(fxt_organization_id)}/workspaces/{str(fxt_filled_image_dataset_storage.workspace_id)}"
-                f"/projects/{fxt_project.id_}/datasets/{fxt_filled_image_dataset_storage.id_}/media/images"
-            )
+            with (
+                patch.object(
+                    ProjectManager,
+                    "get_project_by_id",
+                    return_value=fxt_project,
+                ),
+                patch.object(
+                    ProjectManager,
+                    "get_dataset_storage_by_id",
+                    return_value=fxt_filled_image_dataset_storage,
+                ),
+            ):
+                url = (
+                    f"/api/v1/organizations/{str(fxt_organization_id)}/workspaces/{str(fxt_filled_image_dataset_storage.workspace_id)}"
+                    f"/projects/{fxt_project.id_}/datasets/{fxt_filled_image_dataset_storage.id_}/media/images"
+                )
 
-            result = fxt_resource_rest.post(url, files=file, data={"upload_info": '"foo"'})
+                result = fxt_resource_rest.post(url, files=file, data={"upload_info": '"foo"'})
             assert result.status_code == HTTPStatus.BAD_REQUEST
             data = result.json()
             expected_error = (

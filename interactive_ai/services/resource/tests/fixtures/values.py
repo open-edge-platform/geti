@@ -12,6 +12,16 @@ from sc_sdk.entities.color import Color
 from sc_sdk.entities.label import Domain
 
 
+class DefaultImageValues:
+    IMAGE_WIDTH = 480
+    IMAGE_HEIGHT = 640
+    MIN_SHAPE_SIZE = 50
+    MAX_SHAPE_SIZE = 1000
+    INTENSITY_RANGE = [(100, 200)]
+    MAX_NUMBER_OF_SHAPES = 10
+    ALLOWED_SHAPE_NAMES = ["rectangle", "ellipse", "triangle"]
+
+
 class DummyValues:
     X = 0.375
     Y = 0.25
@@ -73,6 +83,7 @@ class DummyValues:
     N_ANNOTATED_IMAGES = 5
     N_ANNOTATED_FRAMES = 5
     N_ANNOTATED_VIDEOS = 1
+    CREATOR_NAME = "Resource fixture"
 
 
 class IDOffsets:

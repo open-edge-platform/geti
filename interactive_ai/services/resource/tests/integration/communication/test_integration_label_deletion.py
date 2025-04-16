@@ -63,7 +63,7 @@ class TestLabelDeletionEndpoint:
             model_templates=model_templates,
         )
         initial_project_labels = fxt_db_project_service.label_schema.get_labels(include_empty=True)
-        assert len(initial_project_labels) == 3
+        assert len(initial_project_labels) == 2
         image = fxt_db_project_service.create_and_save_random_image("image 1")
 
         fxt_db_project_service.create_and_save_random_annotation_scene(
@@ -99,7 +99,7 @@ class TestLabelDeletionEndpoint:
 
         fxt_db_project_service.reload_label_schema()
         project_labels = fxt_db_project_service.label_schema.get_labels(include_empty=True)
-        assert len(project_labels) == 2
+        assert len(project_labels) == 1
 
         # Check that the expected Kafka message is sent
         patched_pub_proj.assert_called_once_with(

@@ -187,7 +187,7 @@ class TestLabelAdditionRestEndpoint:
         }
         project_update_endpoint = (
             f"/api/v1/organizations/{str(session.organization_id)}/workspaces/{str(session.workspace_id)}"
-            "/projects/{project.id_}"
+            f"/projects/{project.id_}"
         )
         logger.info("Adding new label with data: %s", new_label_data)
         with (
@@ -496,20 +496,17 @@ class TestLabelAdditionRestEndpoint:
             dataset_storage_id=project.training_dataset_storage_id,
         )
         project_labels = fxt_db_project_service.label_schema.get_labels(include_empty=True)
-        assert len(project_labels) == 2
-        assert project_labels[1].is_empty
-        empty_label = project_labels[1]
+        assert len(project_labels) == 1
 
         # Step 2: add images
         logger.info("Creating and saving 3 images")
-        images = [fxt_db_project_service.create_and_save_random_image(f"image {i}") for i in range(3)]
+        images = [fxt_db_project_service.create_and_save_random_image(f"image {i}") for i in range(2)]
 
         # Step 3: annotate
         images_and_labels = zip(
             images,
             (
                 (project_labels[0],),
-                (empty_label,),
                 (),
             ),
         )
@@ -561,10 +558,10 @@ class TestLabelAdditionRestEndpoint:
         # Step 5: verify that the project contains the new label
         logger.info("Checking the presence of the new label in the project REST view")
         project_update_response_body = project_update_response.json()
-        assert len(project_update_response_body["pipeline"]["tasks"][1]["labels"]) == 3
+        assert len(project_update_response_body["pipeline"]["tasks"][1]["labels"]) == 2
         fxt_db_project_service.reload_label_schema()
         project_labels = fxt_db_project_service.label_schema.get_labels(include_empty=True)
-        assert len(project_labels) == 3
+        assert len(project_labels) == 2
 
         # Step 6: check that the expected Kafka message is sent
         patched_pub_proj.assert_called_once_with(
@@ -594,20 +591,21 @@ class TestLabelAdditionRestEndpoint:
 
         # Step 7: check that the images with annotations are 'to revisit'
         for i, image in enumerate(images):
-            # TODO CVS-88275 re-enable check after fixing the response code
-            # assert annotation_get_response.status_code == HTTPStatus.NO_CONTENT
-            if i != 2:  # unannotated image
-                logger.info("Pulling the annotation scene of %s", image.name)
-                annotation_get_endpoint = (
-                    f"/api/v1/organizations/{str(session.organization_id)}/workspaces/{str(session.workspace_id)}/projects/{project.id_}"
-                    f"/datasets/{project.training_dataset_storage_id}/media/images/{image.id_}/annotations/latest"
+            logger.info("Pulling the annotation scene of %s", image.name)
+            annotation_get_endpoint = (
+                f"/api/v1/organizations/{str(session.organization_id)}/workspaces/{str(session.workspace_id)}/projects/{project.id_}"
+                f"/datasets/{project.training_dataset_storage_id}/media/images/{image.id_}/annotations/latest"
+            )
+            with PATCHED_SPICEDB_CREATE_PROJECT:
+                annotation_get_response = fxt_resource_rest.get(
+                    annotation_get_endpoint,
+                    headers={"x-auth-request-access-token": "testing"},
                 )
-                with PATCHED_SPICEDB_CREATE_PROJECT:
-                    annotation_get_response = fxt_resource_rest.get(
-                        annotation_get_endpoint,
-                        headers={"x-auth-request-access-token": "testing"},
-                    )
 
+            if i == 1:
+                # unannotated image -> NO_CONTENT (204)
+                assert annotation_get_response.status_code == HTTPStatus.NO_CONTENT
+            else:
                 assert annotation_get_response.status_code == HTTPStatus.OK
                 logger.info("Verifying the state of the annotation scene of %s", image.name)
                 annotation_get_response_body = annotation_get_response.json()
