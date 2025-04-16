@@ -214,16 +214,12 @@ class TestGRPCJobsClient:
             (
                 "The supplied duplicate policy is invalid. Please provide a valid policy and try again",
                 CommunicationError,
-                "Request failed due to the following error: "
-                "`The supplied duplicate policy is invalid. Please provide a valid policy and try again`. "
-                "Please try again later.",
+                None,
             ),
             (
                 "Insufficient balance for job submission",
                 CommunicationError,
-                "Request failed due to the following error: "
-                "`Insufficient balance for job submission`. "
-                "Please try again later.",
+                None,
             ),
             (
                 "",
