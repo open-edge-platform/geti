@@ -29,7 +29,8 @@ pre-venv:
 	fi
 
 venv: pre-venv
-	uv sync ${PIP_INSTALL_PARAMS}
+	uv lock --check
+	uv sync --frozen ${PIP_INSTALL_PARAMS}
 
 venv-lock: pre-venv
 	uv lock
@@ -98,6 +99,6 @@ developer-venv: pre-venv
 	for service in $$SERVICES; do \
 		echo "Installing dependencies for $$service"; \
 		cd interactive_ai/services/$$service && \
-		uv sync --inexact --all-extras --active && \
+		uv sync --frozen --inexact --all-extras --active && \
 		cd -; \
 	done
