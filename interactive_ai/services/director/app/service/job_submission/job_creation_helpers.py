@@ -192,7 +192,6 @@ class ModelTestJobData:
     model_test_result: ModelTestResult
     model: Model
     model_storage: ModelStorage
-    is_local_anomaly_test: bool
     task_node: TaskNode
     min_annotation_size: int | None = None
     max_number_of_annotations: int | None = None
@@ -228,7 +227,6 @@ class ModelTestJobData:
         return {
             "project_id": self.project.id_,
             "model_test_result_id": self.model_test_result.id_,
-            "is_local_anomaly_test": self.is_local_anomaly_test,
             "min_annotation_size": self.min_annotation_size,
             "max_number_of_annotations": self.max_number_of_annotations,
         }

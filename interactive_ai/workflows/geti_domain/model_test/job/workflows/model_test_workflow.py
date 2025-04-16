@@ -15,7 +15,6 @@ from job.tasks.model_testing import run_model_test
 def model_test_workflow(
     project_id: str,
     model_test_result_id: str,
-    is_local_anomaly_test: bool,
     min_annotation_size: Optional[int] = None,  # noqa: UP007
     max_number_of_annotations: Optional[int] = None,  # noqa: UP007
 ) -> None:
@@ -24,8 +23,6 @@ def model_test_workflow(
 
     :param project_id: ID of the project
     :param model_test_result_id: ID of the model test result
-    :param is_local_anomaly_test: set to True to only use media that are fully annotated
-     for the corresponding task (which the model is trained for)
     :param min_annotation_size: Minimum size of an annotation in pixels. Any annotation smaller than this will be
      ignored during evaluation
     :param max_number_of_annotations: Maximum number of annotation allowed in one annotation scene. If exceeded, the
@@ -34,7 +31,6 @@ def model_test_workflow(
     run_model_test(
         project_id=project_id,
         model_test_result_id=model_test_result_id,
-        is_local_anomaly_test=is_local_anomaly_test,
         min_annotation_size=min_annotation_size,
         max_number_of_annotations=max_number_of_annotations,
     )

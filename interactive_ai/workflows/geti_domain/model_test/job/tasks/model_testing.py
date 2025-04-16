@@ -47,7 +47,6 @@ logger = logging.getLogger(__name__)
 def run_model_test(
     project_id: str,
     model_test_result_id: str,
-    is_local_anomaly_test: bool,
     min_annotation_size: Optional[int] = None,  # noqa: UP007
     max_number_of_annotations: Optional[int] = None,  # noqa: UP007
 ) -> None:
@@ -57,8 +56,6 @@ def run_model_test(
 
     :param project_id: ID of the project
     :param model_test_result_id: ID of the model test result
-    :param is_local_anomaly_test:  set to True to only use media that are fully annotated
-     for the corresponding task (which the model is trained for)
     :param min_annotation_size: Minimum size of an annotation in pixels. Any annotation smaller than this will be
      ignored during evaluation
     :param max_number_of_annotations: Maximum number of annotation allowed in one annotation scene. If exceeded, the
@@ -68,7 +65,6 @@ def run_model_test(
     gt_dataset = create_testing_dataset(
         project_id=project_id,
         model_test_result_id=model_test_result_id,
-        is_local_anomaly_test=is_local_anomaly_test,
         min_annotation_size=min_annotation_size,
         max_number_of_annotations=max_number_of_annotations,
     )
@@ -85,14 +81,12 @@ def run_model_test(
         model_test_result_id=model_test_result_id,
         gt_dataset=gt_dataset,
         output_dataset=output_dataset,
-        is_local_anomaly_test=is_local_anomaly_test,
     )
 
 
 def create_testing_dataset(  # pylint: disable=unused-argument
     project_id: str,
     model_test_result_id: str,
-    is_local_anomaly_test: bool,
     min_annotation_size: int | None = None,
     max_number_of_annotations: int | None = None,
 ) -> Dataset:
@@ -101,8 +95,6 @@ def create_testing_dataset(  # pylint: disable=unused-argument
 
     :param project_id: ID of the project
     :param model_test_result_id: ID of the model test result
-    :param is_local_anomaly_test:  set to True to only use media that are fully annotated
-     for the corresponding task (which the model is trained for)
     :param min_annotation_size: Minimum size of an annotation in pixels. Any annotation smaller than this will be
      ignored during evaluation
     :param max_number_of_annotations: Maximum number of annotation allowed in one annotation scene. If exceeded, the
@@ -125,7 +117,6 @@ def create_testing_dataset(  # pylint: disable=unused-argument
         project=project,
         dataset_storage=model_test_result.get_dataset_storages()[0],
         task_node_id=model_storage.task_node_id,
-        is_local_anomaly_test=is_local_anomaly_test,
         min_annotation_size=min_annotation_size,
         max_number_of_annotations=max_number_of_annotations,
     )
@@ -198,7 +189,6 @@ def evaluate_results(
     model_test_result_id: str,
     gt_dataset: Dataset,
     output_dataset: Dataset,
-    is_local_anomaly_test: bool,
 ) -> None:
     """
     Evaluates the results of the model test
@@ -207,7 +197,6 @@ def evaluate_results(
     :param model_test_result_id: ID of the model test result
     :param gt_dataset: Ground truth dataset
     :param output_dataset: output dataset
-    :param is_local_anomaly_test: whether the test uses local anomaly metric (detection or segmentation)
     :return mo_model_id and optimized model id
     """
     project = ProjectRepo().get_by_id(ID(project_id))
@@ -229,7 +218,6 @@ def evaluate_results(
         task_type=task_node.task_properties.task_type,
         progress_callback=report_progress,
         progress_message="Evaluating on testing dataset",
-        is_local_anomaly_test=is_local_anomaly_test,
     )
 
     model_test_result.state = TestState.DONE

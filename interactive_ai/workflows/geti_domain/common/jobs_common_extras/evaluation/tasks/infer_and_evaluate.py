@@ -111,7 +111,6 @@ def evaluate_and_save_results(
     task_type: TaskType,
     progress_callback: Callable[[float, str], None],
     progress_message: str,
-    is_local_anomaly_test: bool = False,
     relative_distance_threshold: float | None = None,
 ) -> list[EvaluationResult] | list[ModelTestResult]:
     """
@@ -122,8 +121,6 @@ def evaluate_and_save_results(
     :param task_type: the type of task for which the metric is computed
     :param progress_callback: callback function to update progress
     :param progress_message: string message to use when updating the progress
-    :param is_local_anomaly_test: whether the test uses local anomaly metric (detection or segmentation).
-        Only applicable for anomaly model test results.
     :param relative_distance_threshold: the relative distance threshold to be used for keypoint detection tasks.
     :return: updated evaluation results with the computed metrics
     """
@@ -133,7 +130,6 @@ def evaluate_and_save_results(
                 project_identifier=project_identifier,
                 model_test_result=evaluation_result,
                 task_type=task_type,
-                is_local_anomaly_test=is_local_anomaly_test,
                 relative_distance_threshold=relative_distance_threshold,
             )
         else:
@@ -171,7 +167,6 @@ def _compute_and_save_model_test(
     project_identifier: ProjectIdentifier,
     model_test_result: ModelTestResult,
     task_type: TaskType,
-    is_local_anomaly_test: bool = False,
     relative_distance_threshold: float | None = None,
 ) -> None:
     """
@@ -180,14 +175,12 @@ def _compute_and_save_model_test(
     :param project_identifier: the identifier of the project
     :param model_test_result: the model test result to compute the metric for
     :param task_type: the type of task for which the metric is computed
-    :param is_local_anomaly_test: whether the test uses local anomaly metric (detection or segmentation)
     :param relative_distance_threshold: the relative distance threshold to be used for keypoint detection tasks.
     """
     model_test_result.state = TestState.EVALUATING
     metric = MetricsHelper.compute_metric_by_task_type(
         evaluation_result=model_test_result,
         task_type=task_type,
-        is_local_anomaly_test=is_local_anomaly_test,
         relative_distance_threshold=relative_distance_threshold,
     )
     metric_performance = metric.get_performance()

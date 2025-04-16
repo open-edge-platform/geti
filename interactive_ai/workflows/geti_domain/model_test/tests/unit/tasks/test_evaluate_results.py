@@ -49,7 +49,6 @@ class TestEvaluateResults:
                 model_test_result_id=MODEL_TEST_RESULT_ID,
                 gt_dataset=fxt_dataset,
                 output_dataset=fxt_dataset,
-                is_local_anomaly_test=False,
             )
 
         mocked_evaluate.assert_called_once_with(
@@ -58,6 +57,5 @@ class TestEvaluateResults:
             task_type=fxt_task_node.task_properties.task_type,
             progress_callback=mock_report_progress,
             progress_message="Evaluating on testing dataset",
-            is_local_anomaly_test=False,
         )
         mocked_model_test_result_save.assert_called()

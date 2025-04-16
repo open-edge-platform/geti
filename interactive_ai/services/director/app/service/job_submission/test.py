@@ -13,7 +13,7 @@ from sc_sdk.repos import ConfigurableParametersRepo
 
 class ModelTestingJobSubmitter(ModelJobSubmitter):
     def prepare_data(  # type: ignore
-        self, model_test_result: ModelTestResult, project: Project, author: ID, is_local_anomaly_test: bool = False
+        self, model_test_result: ModelTestResult, project: Project, author: ID
     ) -> JobParams:
         """
         Prepares data for a model testing job submission
@@ -21,7 +21,6 @@ class ModelTestingJobSubmitter(ModelJobSubmitter):
         :param project: project containing model and dataset storage
         :param model_test_result: model test result
         :param author: ID of the user submitting the job
-        :param is_local_anomaly_test: set to True if the model test is for local metric of local anomaly task
         :return: ID of the model test job that has been submitted to the jobs client
         """
         model = model_test_result.get_model()
@@ -44,7 +43,6 @@ class ModelTestingJobSubmitter(ModelJobSubmitter):
             model_test_result=model_test_result,
             model=model,
             model_storage=model.model_storage,
-            is_local_anomaly_test=is_local_anomaly_test,
             project=project,
             workspace_id=project.workspace_id,
             dataset_storage=model_test_result.get_dataset_storages()[0],

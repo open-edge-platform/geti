@@ -25,7 +25,6 @@ class CreateTaskTestingDatasetCommand(CreateDatasetCommand):
     :param project: project containing dataset storage
     :param dataset_storage: dataset storage containing media and annotations
     :param task_node_id: ID of the task node for which to create the dataset
-    :param is_local_anomaly_test: set to True if this command is to create testing dataset for local anomaly model test.
     """
 
     def __init__(
@@ -33,14 +32,12 @@ class CreateTaskTestingDatasetCommand(CreateDatasetCommand):
         project: Project,
         dataset_storage: DatasetStorage,
         task_node_id: ID,
-        is_local_anomaly_test: bool = False,
         min_annotation_size: int | None = None,
         max_number_of_annotations: int | None = None,
     ) -> None:
         super().__init__(project, dataset_storage)
         self.task_node_id = task_node_id
         self.dataset: Dataset = NullDataset()
-        self._is_local_anomaly_test = is_local_anomaly_test
         self.min_annotation_size = min_annotation_size
         self.max_number_of_annotations = max_number_of_annotations
 
@@ -48,19 +45,12 @@ class CreateTaskTestingDatasetCommand(CreateDatasetCommand):
         try:
             create_new_annotations = self.max_number_of_annotations is not None or self.min_annotation_size is not None
 
-            if self._is_local_anomaly_test:
-                self.dataset = DatasetHelpers.construct_fully_annotated_anomalous_dataset(
-                    project=self.project,
-                    dataset_storage=self.dataset_storage,
-                    task_node_id=self.task_node_id,
-                )
-            else:
-                self.dataset = DatasetHelpers.construct_testing_dataset(
-                    project=self.project,
-                    dataset_storage=self.dataset_storage,
-                    task_node_id=self.task_node_id,
-                    create_new_annotations=create_new_annotations,
-                )
+            self.dataset = DatasetHelpers.construct_testing_dataset(
+                project=self.project,
+                dataset_storage=self.dataset_storage,
+                task_node_id=self.task_node_id,
+                create_new_annotations=create_new_annotations,
+            )
 
             AnnotationFilter.apply_annotation_filters(
                 dataset=self.dataset,

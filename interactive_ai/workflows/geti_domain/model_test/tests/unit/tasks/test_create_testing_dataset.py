@@ -41,7 +41,6 @@ class TestCreateTestingDataset:
             result = create_testing_dataset(
                 project_id=PROJECT_ID,
                 model_test_result_id=MODEL_TEST_RESULT_ID,
-                is_local_anomaly_test=False,
             )
 
         mock_lock_project.assert_called_once()
