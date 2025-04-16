@@ -2,17 +2,20 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, View } from '@adobe/react-spectrum';
+import isEmpty from 'lodash/isEmpty';
 
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
+import { JobInfoStatus } from '../../../../core/tests/dtos/tests.interface';
 import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { filterOutUnsuccessfulTest } from '../../../../core/tests/services/utils';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
-import { useRefetchTests } from './hooks/use-refetch-tests.hook';
 import { RunTestButton } from './run-test-dialog/run-test-button.component';
 import { TestsTable } from './tests-table.component';
+
+const TIME_TO_REFETCH_TESTS = 2000;
 
 export const Tests = (): JSX.Element => {
     const projectIdentifier = useProjectIdentifier();
@@ -23,13 +26,25 @@ export const Tests = (): JSX.Element => {
     const { data: modelsGroups = [] } = projectModelsQuery;
     const isLoadingModels = projectModelsQuery.isPending || projectModelsQuery.isLoading;
 
-    const testsListsQuery = useTestsListQuery(projectIdentifier);
-    const { data: tests = [], refetch, isLoading: areTestsLoading } = testsListsQuery;
-    const isLoadingTests = testsListsQuery.isPending || testsListsQuery.isLoading;
+    const {
+        data: tests = [],
+        isLoading: areTestsLoading,
+        isPending: areTestsPending,
+    } = useTestsListQuery(projectIdentifier, {
+        refetchInterval: (query) => {
+            const data = query.state.data;
 
-    useRefetchTests(tests, async () => {
-        await refetch();
+            const shouldRefetch =
+                data !== undefined &&
+                !isEmpty(data) &&
+                !data.every(
+                    ({ jobInfo }) => jobInfo.status === JobInfoStatus.DONE || jobInfo.status === JobInfoStatus.ERROR
+                );
+
+            return shouldRefetch ? TIME_TO_REFETCH_TESTS : false;
+        },
     });
+    const isLoadingTests = areTestsPending || areTestsLoading;
 
     const successfulTests = tests.filter(filterOutUnsuccessfulTest);
 
