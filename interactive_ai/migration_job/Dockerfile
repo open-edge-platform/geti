@@ -22,7 +22,6 @@ COPY --link migration_job/ .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -34,14 +33,14 @@ RUN apt-get update && \
     useradd -l -u 10001 non-root && \
 	pip3 uninstall -y setuptools pip wheel && \
     rm -rf /root/.cache/pip
-   
-COPY --link --from=build --chown=10001 /builder/interactive_ai/migration_job /app/migration_job
+
+COPY --link --from=build --chown=10001 /builder/interactive_ai/migration_job /builder/interactive_ai/migration_job
 
 ARG VENV="/app/migration_job/.venv"
 ENV PATH="$VENV/bin:$PATH"
 ENV PYTHONPATH="/app"
 
 USER non-root
-WORKDIR /app
-COPY --link --chown=10001 entrypoint.sh .
+WORKDIR /builder/interactive_ai/migration_job
+COPY --link --chown=10001 entrypoint.sh /builder/interactive_ai/migration_job
 ENTRYPOINT [ "./entrypoint.sh"]

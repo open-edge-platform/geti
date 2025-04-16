@@ -23,7 +23,6 @@ COPY --link app/ .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -33,12 +32,12 @@ RUN useradd -l -u 10001 non-root && \
     rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/interactive_ai/services/project_ie /app
+COPY --link --from=build --chown=10001 /builder/interactive_ai/services/project_ie /builder/interactive_ai/services/project_ie
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app"
+ENV PATH="/builder/interactive_ai/services/project_ie/.venv/bin:$PATH"
+ENV PYTHONPATH="/builder/interactive_ai/services/project_ie"
 
 USER non-root
-WORKDIR /app/communication/endpoints
+WORKDIR /builder/interactive_ai/services/project_ie/communication/endpoints
 CMD ["python", "main.py"]

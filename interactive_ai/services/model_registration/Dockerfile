@@ -21,7 +21,6 @@ COPY --link app/ .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -37,12 +36,12 @@ RUN apt-get update && \
     rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/interactive_ai/services/model_registration /app
+COPY --link --from=build --chown=10001 /builder/interactive_ai/services/model_registration /builder/interactive_ai/services/model_registration
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app"
+ENV PATH="/builder/interactive_ai/services/model_registration/.venv/bin:$PATH"
+ENV PYTHONPATH="/builder/interactive_ai/services/model_registration"
 
 USER non-root
-WORKDIR /app
+WORKDIR /builder/interactive_ai/services/model_registration
 CMD ["python", "main.py"]

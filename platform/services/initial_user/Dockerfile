@@ -31,7 +31,6 @@ COPY --link app .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -50,9 +49,9 @@ RUN apt-get update && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/platform/services/initial_user /app
+COPY --link --from=build --chown=10001 /builder/platform/services/initial_user /builder/platform/services/initial_user
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/builder/platform/services/initial_user/.venv/bin:$PATH"
 
-WORKDIR /app
+WORKDIR /builder/platform/services/initial_user
