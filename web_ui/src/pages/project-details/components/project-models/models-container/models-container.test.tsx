@@ -18,7 +18,6 @@ import { providersRender as render } from '../../../../../test-utils/required-pr
 import { getById } from '../../../../../test-utils/utils';
 import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import { ProjectProvider, useProject } from '../../../providers/project-provider/project-provider.component';
-import { getModelTemplateDetails } from '../train-model-dialog/utils';
 import { ModelVersion } from './model-card/model-card.interface';
 import { ModelsContainer } from './models-container.component';
 import { ModelContainerProps } from './models-container.interface';
@@ -79,10 +78,7 @@ describe('Model container', () => {
         }));
     });
 
-    const { templateName, summary } = getModelTemplateDetails(
-        mockedDetectionSupportedAlgorithms[0].modelTemplateId,
-        mockedDetectionSupportedAlgorithms
-    );
+    const { templateName, summary } = mockedDetectionSupportedAlgorithms[0];
 
     const defaultModelsHistory: ModelVersion[] = [
         getMockedModelVersion({

@@ -15,7 +15,6 @@ import { getMockedProject } from '../../../../../../test-utils/mocked-items-fact
 import { getMockedTask } from '../../../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectRender as render } from '../../../../../../test-utils/project-provider-render';
 import { ProjectProvider } from '../../../../providers/project-provider/project-provider.component';
-import { getModelTemplates } from '../utils';
 import { ModelTemplatesSelection } from './model-templates-selection.component';
 import { ModelConfigurationOption } from './utils';
 
@@ -76,7 +75,7 @@ describe('ModelTemplatesSelection', () => {
         }),
     ];
 
-    const modelTemplates = getModelTemplates(mockedSupportedAlgorithmsForDetection);
+    const modelTemplateId = mockedSupportedAlgorithmsForDetection[0].modelTemplateId;
 
     const selectedDetectionTask = getMockedTask({
         id: '1',
@@ -144,7 +143,7 @@ describe('ModelTemplatesSelection', () => {
                 modelConfigurationOption={modelConfigurationOption}
                 setModelConfigurationOption={setModelConfigurationOption}
                 tasksWithSupportedAlgorithms={tasksWithSupportedAlgorithms}
-                selectedModelTemplateId={modelTemplates[0].modelTemplateId}
+                selectedModelTemplateId={modelTemplateId}
                 handleSelectedTemplateId={handleSelectedTemplateId}
                 selectedTask={selectedDetectionTask}
                 setSelectedTask={setSelectedTask}
@@ -167,7 +166,7 @@ describe('ModelTemplatesSelection', () => {
                     modelConfigurationOption={modelConfigurationOption}
                     setModelConfigurationOption={setModelConfigurationOption}
                     tasksWithSupportedAlgorithms={tasksWithSupportedAlgorithms}
-                    selectedModelTemplateId={modelTemplates[0].modelTemplateId}
+                    selectedModelTemplateId={modelTemplateId}
                     handleSelectedTemplateId={handleSelectedTemplateId}
                     selectedTask={selectedDetectionTask}
                     setSelectedTask={setSelectedTask}
@@ -191,7 +190,7 @@ describe('ModelTemplatesSelection', () => {
                 modelConfigurationOption={modelConfigurationOption}
                 setModelConfigurationOption={setModelConfigurationOption}
                 tasksWithSupportedAlgorithms={tasksWithSupportedAlgorithms}
-                selectedModelTemplateId={modelTemplates[0].modelTemplateId}
+                selectedModelTemplateId={modelTemplateId}
                 handleSelectedTemplateId={handleSelectedTemplateId}
                 selectedTask={selectedDetectionTask}
                 setSelectedTask={setSelectedTask}
@@ -252,7 +251,7 @@ describe('ModelTemplatesSelection', () => {
                 modelConfigurationOption={modelConfigurationOption}
                 setModelConfigurationOption={setModelConfigurationOption}
                 tasksWithSupportedAlgorithms={mockTasksWithSupportedAlgorithms}
-                selectedModelTemplateId={modelTemplates[0].modelTemplateId}
+                selectedModelTemplateId={modelTemplateId}
                 handleSelectedTemplateId={handleSelectedTemplateId}
                 selectedTask={selectedDetectionTask}
                 setSelectedTask={setSelectedTask}

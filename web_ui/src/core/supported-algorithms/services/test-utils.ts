@@ -47,7 +47,7 @@ export const mockedSupportedAlgorithmsDTO: SupportedAlgorithmDTO[] = [
         summary: 'YOLO architecture for detection',
         default_algorithm: false,
         lifecycle_stage: LifecycleStage.ACTIVE,
-        performance_category: PerformanceCategory.OTHER,
+        performance_category: PerformanceCategory.ACCURACY,
     },
     {
         name: 'SSD',

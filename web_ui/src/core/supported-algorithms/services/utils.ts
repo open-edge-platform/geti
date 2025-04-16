@@ -1,9 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import capitalize from 'lodash/capitalize';
+
 import { DOMAIN } from '../../projects/core.interface';
 import { getDomain } from '../../projects/project.interface';
-import { SupportedAlgorithmDTO, SupportedAlgorithmsResponseDTO } from '../dtos/supported-algorithms.interface';
+import {
+    PerformanceCategory,
+    SupportedAlgorithmDTO,
+    SupportedAlgorithmsResponseDTO,
+} from '../dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../supported-algorithms.interface';
 
 const getSupportedAlgorithmEntity = (supportedAlgorithm: SupportedAlgorithmDTO): SupportedAlgorithm => {
@@ -26,7 +32,7 @@ const getSupportedAlgorithmEntity = (supportedAlgorithm: SupportedAlgorithmDTO):
         gigaflops,
         name,
         modelSize: model_size,
-        templateName: undefined,
+        templateName: performance_category !== PerformanceCategory.OTHER ? capitalize(performance_category) : undefined,
         isDefaultAlgorithm: default_algorithm,
         modelTemplateId: model_template_id,
         lifecycleStage: lifecycle_stage,
