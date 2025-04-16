@@ -19,7 +19,7 @@ pre-venv:
 	fi
 
 venv: pre-venv
-	uv sync --frozen ${PIP_INSTALL_PARAMS}
+	uv sync ${PIP_INSTALL_PARAMS}
 
 tests: venv
 	@if [ -d "./tests" ]; then \

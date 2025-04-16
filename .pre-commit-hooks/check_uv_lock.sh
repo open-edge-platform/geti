@@ -5,8 +5,10 @@ set -e
 echo "Running 'uv lock --check' on all projects with pyproject.toml..."
 
 # Find all directories containing a pyproject.toml file
-mapfile -t PYPROJECT_DIRS < <(find . -path "*/.venv" -prune -o -type f -name "pyproject.toml" -exec dirname {} \;)
-
+PYPROJECT_DIRS=()
+while IFS= read -r dir; do
+  PYPROJECT_DIRS+=("$dir")
+done < <(find . -path "*/.venv" -prune -o -type f -name "pyproject.toml" -exec dirname {} \;)
 EXIT_CODE=0
 
 for dir in "${PYPROJECT_DIRS[@]}"; do
