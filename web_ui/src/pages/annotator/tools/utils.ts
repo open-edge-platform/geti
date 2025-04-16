@@ -268,6 +268,10 @@ export const removeOffLimitPoints = (shape: Shape, roi: RegionOfInterest): Shape
         return shape;
     }
 
+    if (isPoseShape(shape)) {
+        return shape;
+    }
+
     return isRect(shape) ? removeOffPointsRect(shape, roi) : removeOffLimitPointsPolygon(shape, roi);
 };
 

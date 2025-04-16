@@ -13,7 +13,7 @@ import { labelFromUser } from '../../../../core/annotations/utils';
 import { Label } from '../../../../core/labels/label.interface';
 import { isPrediction } from '../../../../core/labels/utils';
 import { MediaItem } from '../../../../core/media/media.interface';
-import { isClassificationDomain } from '../../../../core/projects/domains';
+import { isClassificationDomain, isKeypointDetection } from '../../../../core/projects/domains';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
@@ -34,30 +34,35 @@ import { getTranslateVector, hasValidLabelsAndStructure } from './utils';
 interface UseCopyPasteAnnotation {
     scene: AnnotationScene;
     taskLabels: Label[];
-    selectedAnnotations: Annotation[];
     image: ImageData;
     selectedMediaItem: MediaItem | undefined;
+    hasMultipleAnnotations?: boolean;
+    selectedAnnotations: Annotation[];
 }
 
 const OFFSET = 10;
 
 export const useCopyPasteAnnotation = ({
     scene,
-    taskLabels,
-    selectedAnnotations,
     image,
+    taskLabels,
     selectedMediaItem,
+    selectedAnnotations,
+    hasMultipleAnnotations = false,
 }: UseCopyPasteAnnotation) => {
-    const { hotkeys } = useAnnotatorHotkeys();
     const { roi } = useROI();
-    const { addNotification } = useNotification();
+    const { hotkeys } = useAnnotatorHotkeys();
     const { selectedTask } = useTask();
+    const { addNotification } = useNotification();
     const { organizationId } = useOrganizationIdentifier();
+
     const {
         zoomState: { zoom },
     } = useZoom();
 
     const isNotClassificationTask = !(selectedTask && isClassificationDomain(selectedTask.domain));
+    // Todo: This will be removed once support for multiple keypoint annotations is implemented
+    const canHaveMultipleAnnotations = selectedTask?.domain && !isKeypointDetection(selectedTask.domain);
 
     const pasteCounter = useRef<number>(0);
     const mediaId = useRef<string>('');
@@ -117,6 +122,14 @@ export const useCopyPasteAnnotation = ({
             if (hasInvalidLabels) {
                 addNotification({
                     message: 'You can only paste annotations in the same task context.',
+                    type: NOTIFICATION_TYPE.INFO,
+                });
+                return;
+            }
+
+            if (!canHaveMultipleAnnotations && hasMultipleAnnotations) {
+                addNotification({
+                    message: 'Multiple annotations are not allowed for this task.',
                     type: NOTIFICATION_TYPE.INFO,
                 });
                 return;

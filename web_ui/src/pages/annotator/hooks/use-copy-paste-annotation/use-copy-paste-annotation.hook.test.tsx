@@ -15,6 +15,7 @@ import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/n
 import { getImageData } from '../../../../shared/canvas-utils';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
+import { getMockedKeypointNode } from '../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedImageMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
@@ -433,6 +434,78 @@ describe('useCopyPasteAnnotation', () => {
                         id: annotationId,
                     }),
                 ]);
+            });
+        });
+
+        describe('keypoint detection', () => {
+            it('multiple annotations are not allowed', async () => {
+                const mockedScene = fakeAnnotationToolContext({}).scene;
+                jest.mocked(usehooks.useLocalStorage).mockReturnValueOnce([[], mockedSetLsAnnotation, jest.fn()]);
+                jest.mocked<() => string>(uuid.v4).mockReturnValue('annotation-id');
+
+                renderHook(() =>
+                    useCopyPasteAnnotation({
+                        scene: mockedScene,
+                        taskLabels: [mockedLabel],
+                        selectedAnnotations: [],
+                        image: mockImage,
+                        selectedMediaItem,
+                        hasMultipleAnnotations: true,
+                    })
+                );
+                await paste();
+
+                await waitFor(() => {
+                    expect(mockedAddNotification).toHaveBeenCalledWith({
+                        message: 'Multiple annotations are not allowed for this task.',
+                        type: NOTIFICATION_TYPE.INFO,
+                    });
+
+                    expect(mockedScene.addAnnotations).not.toHaveBeenCalled();
+                });
+            });
+
+            it('paste a new annotation', async () => {
+                const annotationId = 'annotation-id';
+
+                const mockedKeypointAnnotation = getMockedAnnotation({
+                    id: annotationId,
+                    labels: [],
+                    shape: {
+                        shapeType: ShapeType.Pose,
+                        points: [
+                            getMockedKeypointNode({ label: mockedLabel, x: 0, y: 0 }),
+                            getMockedKeypointNode({ label: mockedLabel, x: 10, y: 10 }),
+                            getMockedKeypointNode({ label: mockedLabel, x: 0, y: 10 }),
+                        ],
+                    },
+                });
+
+                const mockedScene = fakeAnnotationToolContext({}).scene;
+                jest.mocked(usehooks.useLocalStorage).mockReturnValueOnce([
+                    [mockedKeypointAnnotation],
+                    mockedSetLsAnnotation,
+                    jest.fn(),
+                ]);
+                jest.mocked<() => string>(uuid.v4).mockReturnValue(annotationId);
+
+                renderHook(() =>
+                    useCopyPasteAnnotation({
+                        scene: mockedScene,
+                        taskLabels: [mockedLabel],
+                        selectedAnnotations: [],
+                        image: mockImage,
+                        selectedMediaItem,
+                        hasMultipleAnnotations: false,
+                    })
+                );
+                await paste();
+
+                await waitFor(() => {
+                    expect(mockedScene.addAnnotations).toHaveBeenCalledWith([
+                        { ...mockedKeypointAnnotation, isSelected: true },
+                    ]);
+                });
             });
         });
     });
