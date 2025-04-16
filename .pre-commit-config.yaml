@@ -13,12 +13,12 @@ repos:
 
 - repo: local
   hooks:
-  - id: uv-lock
-    name: uv lock
-    entry: python
-    types: ["python"]
-    args: ["ci/find_py_projects_and_run_make_target.py", "venv-lock"]
-    language: python
+  - id: uv-lock-check
+    name: uv lock check
+    entry: .pre-commit-hooks/check_uv_lock.sh
+    language: script
+    always_run: true
+    pass_filenames: false
 
 - repo: local
   hooks:
@@ -26,7 +26,7 @@ repos:
     name: mypy
     entry: python
     types: ["python"]
-    args: ["ci/find_py_projects_and_run_make_target.py", "mypy"]
+    args: [".pre-commit-hooks/find_py_projects_and_run_make_target.py", "mypy"]
     language: python
 
 - repo: https://github.com/APIDevTools/swagger-cli
