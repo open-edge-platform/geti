@@ -10,7 +10,7 @@ platform/ @jcchr @piotrgrubicki
 # IAI components
 interactive_ai/ @open-edge-platform/geti-core-backend-write
 docs/rest_api/ @open-edge-platform/geti-core-backend-write
-libs/ @open-edge-platform/geti-core-backend-write
+/libs/ @open-edge-platform/geti-core-backend-write
 
 # UI components
 web_ui/ @jpggvilaca @MarkRedeman @camiloHimura @pplaskie @ActiveChooN @romanowska @dwesolow
