@@ -2,7 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING
 
 import numpy as np
 from geti_types import MediaIdentifierEntity
@@ -21,11 +20,9 @@ from sc_sdk.entities.metrics import (
     TextMetricsGroup,
     VisualizationType,
 )
+from sc_sdk.entities.shapes import Keypoint
 
 from .performance_metric import PerformanceMetric
-
-if TYPE_CHECKING:
-    from sc_sdk.entities.shapes import Keypoint
 
 logger = logging.getLogger(__name__)
 
@@ -165,9 +162,11 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
         for item in dataset_items:
             keypoints: list[tuple[float, float, str, bool]] = []
             for annotation in item.get_annotations():
-                label = annotation.get_labels()[0]  # always contains a list with one label
-                keypoint_shape: Keypoint = annotation.shape  # type: ignore
-                keypoints.append((keypoint_shape.x, keypoint_shape.y, label.id_, keypoint_shape.is_visible))
+                if isinstance(annotation.shape, Keypoint):
+                    label = annotation.get_labels()[0]  # always contains a list with one label
+                    keypoints.append((annotation.shape.x, annotation.shape.y, label.id_, annotation.shape.is_visible))
+                else:
+                    raise ValueError(f"Unexpected shape of type {annotation.shape.type}")
             keypoints_per_item.append(keypoints)
         return keypoints_per_item
 
