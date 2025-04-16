@@ -1,38 +1,39 @@
 # syntax=docker/dockerfile:1.7
 
 # Builder image
-FROM dev-go as builder
+FROM golang:1.23.3 AS builder
 
 WORKDIR /build/interactive_ai/service
 
-COPY --link go.mod .
-COPY --link go.sum .
 COPY --link --from=go_sdk . ../../libs/go_sdk
 COPY --link --from=modelmesh . ../../../grpc_interfaces/grpc_interfaces/model_mesh/go/pb
 COPY --link --from=modelregistration . ../../../grpc_interfaces/grpc_interfaces/model_registration/go/pb
 COPY --link --from=predict . ../../../grpc_interfaces/grpc_interfaces/predict/go/pb
-RUN go mod download
 
-COPY --link . .
-RUN CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a -o inference_gateway .
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    go mod download -x
 
-RUN ls -al .
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    --mount=type=bind,source=main.go,target=main.go \
+    --mount=type=bind,source=app,target=app \
+	CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a -o inference_gateway . 
 
-FROM golang:1.23.3 as ffmpeg
+# Production image
+FROM debian:bookworm-slim AS inference_gateway
 
+# Install ffmpeg
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1
+    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 && \
+    rm -rf /var/lib/apt/lists/*
 
-FROM gcr.io/distroless/static-debian12:nonroot AS inference_gateway
+COPY --link --from=builder /build/interactive_ai/service/inference_gateway .
 
-COPY --from=ffmpeg /usr/bin/ffmpeg /usr/bin/ffmpeg
-COPY --from=ffmpeg /usr/bin/ffprobe /usr/bin/ffprobe
-COPY --from=ffmpeg /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
-COPY --from=ffmpeg /usr/share/ffmpeg /usr/share/ffmpeg
-
-COPY --link --from=builder /build/interactive_ai/service/inference_gateway /
-
-USER nonroot
+RUN useradd -l -u 10001 non-root
+USER non-root
 
 ENV GIN_MODE=release
 ENV INFERENCE_GATEWAY_PORT=7000
