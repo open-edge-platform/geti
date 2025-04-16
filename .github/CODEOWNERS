@@ -2,7 +2,7 @@
 # After that moment, we will revisit the CODEOWNERS list.
 
 # Default for anything not covered by one of the more specific rules below
-* @mpryahin @jcchr @leoll2 @piotrgrubicki
+* @Radwan-Ibrahim @mpryahin @jcchr @leoll2 @piotrgrubicki
 
 # Platform components
 platform/ @jcchr @piotrgrubicki
