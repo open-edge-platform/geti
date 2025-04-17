@@ -8,7 +8,7 @@ securityContext:
   readOnlyRootFilesystem: true
   allowPrivilegeEscalation: false
   runAsNonRoot: true
-  runAsUser: 10001
+  runAsUser: 65532
   capabilities:
     drop:
       - all
@@ -41,7 +41,7 @@ mountPath: "/binary_data"
 global:
   security_headers: ''
   stripped_headers: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   storage_volume_claim_name_media: ''
   min_free_disk_space_gib: 20

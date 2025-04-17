@@ -1,4 +1,4 @@
-include ../Makefile.shared-python-uv
+include ../Makefile.shared-python
 
 # Variables
 PROTO_ROOT  	:= grpc_interfaces
@@ -8,6 +8,9 @@ PY_OUT_BASE 	:= $(PB_DIR)
 PROTOC      	:= protoc
 YEAR 	        := $(shell date +%Y)
 COPYRIGHT_OWNER := Intel Corporation
+
+venv: pre-venv
+	uv sync ${PIP_INSTALL_PARAMS}
 
 # Find all subdirectories containing .proto files
 SERVICE_DIRS := $(shell find $(PROTO_ROOT) -name "*.proto" -exec dirname {} \; | sort | uniq)

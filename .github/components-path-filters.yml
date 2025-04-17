@@ -4,12 +4,12 @@ platform/services/credit:
   - grpc_interfaces/pyproject.toml
   - grpc_interfaces/credit_system/**
   - grpc_interfaces/account_service/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/observability:
   - platform/services/observability/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/onboarding:
@@ -18,12 +18,12 @@ platform/services/onboarding:
   - grpc_interfaces/pyproject.toml
   - grpc_interfaces/credit_system/**
   - grpc_interfaces/account_service/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/notifier:
   - platform/services/notifier/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/user_directory:
@@ -32,7 +32,7 @@ platform/services/user_directory:
   - libs/spicedb_tools/**
   - grpc_interfaces/pyproject.toml
   - grpc_interfaces/account_service/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/account:
@@ -50,7 +50,7 @@ platform/services/initial_user:
   - libs/spicedb_tools/**
   - grpc_interfaces/account_service/**
   - grpc_interfaces/pyproject.toml
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 
@@ -61,7 +61,7 @@ interactive_ai/services/auto_train:
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/dataset_ie:
@@ -74,7 +74,7 @@ interactive_ai/services/dataset_ie:
   - libs/feature_tools/**
   - libs/kafka_tools/**
   - libs/fastapi_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/director:
@@ -88,7 +88,7 @@ interactive_ai/services/director:
   - libs/kafka_tools/**
   - libs/fastapi_tools/**
   - libs/spicedb_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/inference_gateway:
@@ -115,25 +115,25 @@ interactive_ai/services/jobs:
   - libs/k8s_tools/**
   - libs/fastapi_tools/**
   - libs/feature_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/media:
   - interactive_ai/services/media/**
   - interactive_ai/libs/go_sdk/**
-  - Makefile.shared-python-go
+  - Makefile.shared-go
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/mlflow_geti_store:
   - interactive_ai/services/mlflow_geti_store/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/model_registration:
   - interactive_ai/services/model_registration/**
   - grpc_interfaces/pyproject.toml
   - grpc_interfaces/model_registration/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/project_ie:
@@ -145,7 +145,7 @@ interactive_ai/services/project_ie:
   - libs/telemetry_tools/**
   - libs/feature_tools/**
   - libs/fastapi_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/resource:
@@ -157,7 +157,7 @@ interactive_ai/services/resource:
   - libs/feature_tools/**
   - libs/kafka_tools/**
   - libs/fastapi_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/visual_prompt:
@@ -169,7 +169,7 @@ interactive_ai/services/visual_prompt:
   - libs/feature_tools/**
   - libs/kafka_tools/**
   - libs/fastapi_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 
@@ -178,7 +178,7 @@ interactive_ai/migration_job:
   - interactive_ai/migration_job/**
   - interactive_ai/data_migration/**
   - libs/telemetry_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 
@@ -191,7 +191,7 @@ interactive_ai/workflows/geti_domain/common:
   - libs/kafka_tools/**
   - libs/telemetry_tools/**
   - libs/types/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/dataset_ie:
@@ -205,7 +205,7 @@ interactive_ai/workflows/geti_domain/dataset_ie:
   - libs/spicedb_tools/**
   - libs/telemetry_tools/**
   - libs/types/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/project_ie:
@@ -220,7 +220,7 @@ interactive_ai/workflows/geti_domain/project_ie:
   - libs/spicedb_tools/**
   - libs/telemetry_tools/**
   - libs/types/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/model_test:
@@ -232,7 +232,7 @@ interactive_ai/workflows/geti_domain/model_test:
   - libs/k8s_tools/**
   - libs/telemetry_tools/**
   - libs/types/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/optimize:
@@ -245,7 +245,7 @@ interactive_ai/workflows/geti_domain/optimize:
   - libs/k8s_tools/**
   - libs/telemetry_tools/**
   - libs/types/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/train:
@@ -259,14 +259,14 @@ interactive_ai/workflows/geti_domain/train:
   - libs/k8s_tools/**
   - libs/telemetry_tools/**
   - libs/types/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/workflows/otx_domain/trainer/otx_v2:
   - interactive_ai/workflows/otx_domain/trainer/otx_v2/**
   - libs/telemetry_tools/**
   - libs/kafka_tools/**
-  - Makefile.shared-python-uv
+  - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 

@@ -36,7 +36,7 @@ spec:
             - name: "POSTGRES_PORT"
               value: "5432"
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext_init | nindent 12 }}
       containers:
         - name: "init-bucket-accountservice"
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
@@ -48,7 +48,7 @@ spec:
               echo "done" > /init/1; 
               exit $retVal
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext_init | nindent 12 }}
           env:
             - name: S3_CREDENTIALS_PROVIDER
               valueFrom:
@@ -137,7 +137,7 @@ spec:
                   name: "{{ .Release.Namespace }}-postgresql"
                   key: "accountservice-postgresql-db"
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext_init | nindent 12 }}
           volumeMounts:
             - name: create-db
               mountPath: "/opt/psql-script"
@@ -147,7 +147,7 @@ spec:
         - name: "istio-sidecar-quit"
           image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext_init | nindent 12 }}
           resources:
             {{- toYaml .Values.initResources | nindent 12 }}
           command: [ "/bin/sh", "-c" ]

@@ -47,7 +47,7 @@ audit_logs_mount_path: "audit_logs"
 global:
   security_headers: ''
   stripped_headers: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   storage_volume_claim_name_dataset_ie: ''
   min_free_disk_space_gib: 20

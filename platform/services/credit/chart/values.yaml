@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 global:
+  docker_namespace: geti
   debian:
     registry: docker.io
     repository: bitnami

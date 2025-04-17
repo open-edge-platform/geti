@@ -36,7 +36,7 @@ service:
 global:
   logging_config_dir: ''
   storage_volume_claim_name_jobs: data-storage-volume-claim
-  docker_namespace: impp
+  docker_namespace: geti
   workflow_versions: v1
   busybox:
     registry: quay.io

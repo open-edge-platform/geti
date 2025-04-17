@@ -23,7 +23,7 @@ global:
   initial_admin_user_login: ""
   initial_admin_user_password: ""
   registry_address: ""
-  docker_namespace: "impp"
+  docker_namespace: geti
   running_on_vm: false
   account_service_mode: "setup"
   debian:

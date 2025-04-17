@@ -22,6 +22,7 @@ credit_system:
 global:
   enable_local_image_pull_secret: false
   running_on_vm: false
+  docker_namespace: geti
   security_headers: ""
   stripped_headers: ""
   cors_policy:

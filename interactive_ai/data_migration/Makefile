@@ -1,4 +1,4 @@
-include ../../Makefile.shared-python-uv
+include ../../Makefile.shared-python
 
 test: test-component
 

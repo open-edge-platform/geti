@@ -16,10 +16,6 @@ GOCMD   := go
 GOBUILD := $(GOCMD) build
 GOTEST  := $(GOCMD) test
 
-# Build contexts for go-based images
-DOCKER_BUILD_CONTEXT := --build-context debian_image=docker-image://${BASE_IMAGES_REGISTRY}/debian:${BASE_DEBIAN_IMAGE_TAG} \
-                        --build-context dev_go=docker-image://${BASE_IMAGES_REGISTRY}/dev-go:${BASE_DEV_GO_IMAGE_TAG} \
-
 GOOS           ?= linux
 CGO_ENABLED    ?= 0
 GO_BUILD_FLAGS ?= -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a

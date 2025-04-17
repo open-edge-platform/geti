@@ -2,6 +2,8 @@ module inference_gateway
 
 go 1.23.3
 
+toolchain go1.23.8
+
 replace (
 	geti.com/go_sdk => ./../../libs/go_sdk
 	geti.com/modelmesh => ./../../../grpc_interfaces/grpc_interfaces/model_mesh/go/pb

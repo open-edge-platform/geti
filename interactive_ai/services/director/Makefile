@@ -1,4 +1,4 @@
-include ../../../Makefile.shared-python-uv
+include ../../../Makefile.shared-python
 
 DOCKER_BUILD_CONTEXT := --build-context schemas=../api \
 						--build-context libs=../../../libs \

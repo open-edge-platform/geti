@@ -55,7 +55,7 @@ audit_logs_mount_path: "audit_logs"
 global:
   security_headers: ''
   stripped_headers: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   min_free_disk_space_gib: 20
   storage_clean_up_interval_in_hours: 24

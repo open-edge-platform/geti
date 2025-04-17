@@ -27,7 +27,7 @@ resources:
 
 global:
   storage_volume_claim_name_auto_train: data-storage-volume-claim
-  docker_namespace: impp
+  docker_namespace: geti
   workflow_versions: v1
   enable_object_storage: true
   busybox:

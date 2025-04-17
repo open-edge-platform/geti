@@ -51,7 +51,7 @@ audit_logs_mount_path: "audit_logs"
 global:
   logging_config_dir: ''
   storage_volume_claim_name_jobs: ''
-  docker_namespace: impp
+  docker_namespace: geti
   security_headers: ''
   stripped_headers: ''
   cors_policy:
