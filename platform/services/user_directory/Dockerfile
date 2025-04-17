@@ -12,12 +12,11 @@ RUN apt update && apt install -y libldap2-dev libsasl2-dev
 
 # Copy the service dependencies
 WORKDIR /builder
-COPY --link --from=libs . ../libs
-COPY --link --from=grpc_interfaces . ../grpc_interfaces
+COPY --link --from=libs . libs
+COPY --link --from=platform_libs . platform/libs
+COPY --link --from=grpc_interfaces . grpc_interfaces
 
-
-
-WORKDIR /builder/user_directory/app
+WORKDIR /builder/platform/services/user_directory
 
 COPY --link app .
 
@@ -36,11 +35,9 @@ RUN useradd -l -u 10001 non-root
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=builder --chown=10001 /builder/user_directory/app /app
+COPY --link --from=builder --chown=10001 /builder/platform/services/user_directory /app
 COPY --link entrypoint.sh /app
 COPY --link logconfig.ini /app
-
-
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
