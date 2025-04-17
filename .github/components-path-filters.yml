@@ -58,6 +58,7 @@ platform/services/initial_user:
   - grpc_interfaces/pyproject.toml
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # IAI Services
@@ -196,6 +197,7 @@ interactive_ai/migration_job:
   - libs/telemetry_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # Workflows
@@ -209,6 +211,7 @@ interactive_ai/workflows/geti_domain/common:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/dataset_ie:
   - interactive_ai/workflows/geti_domain/dataset_ie/**
@@ -223,6 +226,7 @@ interactive_ai/workflows/geti_domain/dataset_ie:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/project_ie:
   - interactive_ai/workflows/geti_domain/project_ie/**
@@ -238,6 +242,7 @@ interactive_ai/workflows/geti_domain/project_ie:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/model_test:
   - interactive_ai/workflows/geti_domain/model_test/**
@@ -250,6 +255,7 @@ interactive_ai/workflows/geti_domain/model_test:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/optimize:
   - interactive_ai/workflows/geti_domain/optimize/**
@@ -263,6 +269,7 @@ interactive_ai/workflows/geti_domain/optimize:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/train:
   - interactive_ai/workflows/geti_domain/train/**
@@ -277,6 +284,7 @@ interactive_ai/workflows/geti_domain/train:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/otx_domain/trainer/otx_v2:
   - interactive_ai/workflows/otx_domain/trainer/otx_v2/**
@@ -284,6 +292,7 @@ interactive_ai/workflows/otx_domain/trainer/otx_v2:
   - libs/kafka_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
+  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # gRPC interfaces
