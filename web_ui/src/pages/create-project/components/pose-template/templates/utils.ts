@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Key } from '@adobe/react-spectrum';
 import isEqual from 'lodash/isEqual';
 import isNil from 'lodash/isNil';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,6 +13,17 @@ import { denormalizePoint, EdgeLine, getDefaultLabelStructure, TemplateState } f
 export interface RawStructure {
     points: { label: string; x: number; y: number }[];
     edges: { to: string; from: string }[];
+}
+
+export interface RawTemplate {
+    name: string;
+    template: RawStructure;
+}
+
+export enum TemplatePose {
+    HumanPose = 'Human pose',
+    HumanFace = 'Human face',
+    AnimalPose = 'Animal pose',
 }
 
 export const formatTemplate = (structure: RawStructure, roi: RegionOfInterest): TemplateState => {
@@ -36,3 +48,15 @@ export const formatTemplate = (structure: RawStructure, roi: RegionOfInterest): 
 
     return { points, edges };
 };
+
+const PROJECT_TEMPLATE_SUFFIX = 'project-template';
+const GETI_TEMPLATE_SUFFIX = 'geti-template';
+
+export const isProjectTemplate = (name: Key): name is string => String(name).startsWith(PROJECT_TEMPLATE_SUFFIX);
+export const isGetiTemplate = (name: Key): name is string => String(name).startsWith(GETI_TEMPLATE_SUFFIX);
+
+export const getProjectTemplateKey = (name: string) => `${PROJECT_TEMPLATE_SUFFIX}-${name}`;
+export const getGetiTemplateKey = (name: string) => `${GETI_TEMPLATE_SUFFIX}-${name}`;
+
+export const getProjectTemplateName = (name: string) => name.replaceAll(`${PROJECT_TEMPLATE_SUFFIX}-`, '');
+export const getGetiTemplateName = (name: string) => name.replaceAll(`${GETI_TEMPLATE_SUFFIX}-`, '') as TemplatePose;
