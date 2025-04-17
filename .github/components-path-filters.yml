@@ -6,13 +6,11 @@ platform/services/credit:
   - grpc_interfaces/account_service/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 platform/services/observability:
   - platform/services/observability/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 platform/services/onboarding:
   - platform/services/onboarding/**
@@ -22,13 +20,11 @@ platform/services/onboarding:
   - grpc_interfaces/account_service/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 platform/services/notifier:
   - platform/services/notifier/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 platform/services/user_directory:
   - platform/services/user_directory/**
@@ -38,7 +34,6 @@ platform/services/user_directory:
   - grpc_interfaces/account_service/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 platform/services/account:
   - platform/services/account/**
@@ -47,7 +42,6 @@ platform/services/account:
   - grpc_interfaces/credit_system/**
   - Makefile.shared-go
   - Makefile.shared
-  - builder-images/go-builder/Dockerfile
   - .github/workflows/component.yml
 platform/services/initial_user:
   - platform/services/initial_user/**
@@ -58,7 +52,6 @@ platform/services/initial_user:
   - grpc_interfaces/pyproject.toml
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # IAI Services
@@ -70,7 +63,6 @@ interactive_ai/services/auto_train:
   - libs/feature_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/dataset_ie:
   - interactive_ai/services/dataset_ie/**
@@ -83,7 +75,6 @@ interactive_ai/services/dataset_ie:
   - libs/kafka_tools/**
   - libs/fastapi_tools/**
   - Makefile.shared-python-uv
-  - builder-images/python-builder/Dockerfile
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/director:
@@ -99,7 +90,6 @@ interactive_ai/services/director:
   - libs/spicedb_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/inference_gateway:
   - interactive_ai/services/inference_gateway/**
@@ -110,7 +100,6 @@ interactive_ai/services/inference_gateway:
   - grpc_interfaces/predict/**
   - Makefile.shared-go
   - Makefile.shared
-  - builder-images/go-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/jobs:
   - interactive_ai/services/jobs/**
@@ -128,14 +117,12 @@ interactive_ai/services/jobs:
   - libs/feature_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/media:
   - interactive_ai/services/media/**
   - interactive_ai/libs/go_sdk/**
   - Makefile.shared-go
   - Makefile.shared
-  - builder-images/go-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/mlflow_geti_store:
   - interactive_ai/services/mlflow_geti_store/**
@@ -148,7 +135,6 @@ interactive_ai/services/model_registration:
   - grpc_interfaces/model_registration/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/project_ie:
   - interactive_ai/services/project_ie/**
@@ -161,7 +147,6 @@ interactive_ai/services/project_ie:
   - libs/fastapi_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/resource:
   - interactive_ai/services/resource/**
@@ -174,7 +159,6 @@ interactive_ai/services/resource:
   - libs/fastapi_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/services/visual_prompt:
   - interactive_ai/services/visual_prompt/**
@@ -187,7 +171,6 @@ interactive_ai/services/visual_prompt:
   - libs/fastapi_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # Migration job
@@ -197,7 +180,6 @@ interactive_ai/migration_job:
   - libs/telemetry_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # Workflows
@@ -211,7 +193,6 @@ interactive_ai/workflows/geti_domain/common:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/dataset_ie:
   - interactive_ai/workflows/geti_domain/dataset_ie/**
@@ -226,7 +207,6 @@ interactive_ai/workflows/geti_domain/dataset_ie:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/project_ie:
   - interactive_ai/workflows/geti_domain/project_ie/**
@@ -242,7 +222,6 @@ interactive_ai/workflows/geti_domain/project_ie:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/model_test:
   - interactive_ai/workflows/geti_domain/model_test/**
@@ -255,7 +234,6 @@ interactive_ai/workflows/geti_domain/model_test:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/optimize:
   - interactive_ai/workflows/geti_domain/optimize/**
@@ -269,7 +247,6 @@ interactive_ai/workflows/geti_domain/optimize:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/geti_domain/train:
   - interactive_ai/workflows/geti_domain/train/**
@@ -284,7 +261,6 @@ interactive_ai/workflows/geti_domain/train:
   - libs/types/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 interactive_ai/workflows/otx_domain/trainer/otx_v2:
   - interactive_ai/workflows/otx_domain/trainer/otx_v2/**
@@ -292,7 +268,6 @@ interactive_ai/workflows/otx_domain/trainer/otx_v2:
   - libs/kafka_tools/**
   - Makefile.shared-python-uv
   - Makefile.shared
-  - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
 
 # gRPC interfaces
