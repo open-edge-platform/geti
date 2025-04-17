@@ -753,7 +753,7 @@ def fxt_keypoint_detection(request: pytest.FixtureRequest) -> bool:
 
 @pytest.fixture(scope="session", autouse=True)
 def fxt_spicedb_server(request: FixtureRequest):
-    container = DockerContainer("092711417317.dkr.ecr.us-west-2.amazonaws.com/third-party/spicedb:v1.34.0.1")
+    container = DockerContainer("ghcr.io/authzed/spicedb:v1.34.0")
     container.with_bind_ports(50051, 50051)
     test_dir = pathlib.Path(__file__).parent
     container.with_volume_mapping((test_dir / "configs/spicedb.zaml").resolve(), "/schema/spicedb.zaml", "ro")

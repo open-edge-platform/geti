@@ -1853,7 +1853,7 @@ dev = [
     { name = "pytest-html" },
     { name = "requests" },
     { name = "ruff" },
-    { name = "testcontainers" },
+    { name = "testcontainers", extra = ["mongodb"] },
     { name = "testfixtures" },
 ]
 
@@ -1880,7 +1880,7 @@ dev = [
     { name = "pytest-html", specifier = "~=4.0.0" },
     { name = "requests", specifier = "==2.31" },
     { name = "ruff", specifier = "==0.9.5" },
-    { name = "testcontainers", specifier = "~=4.10.0" },
+    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.10.0" },
     { name = "testfixtures", specifier = "==8.3.0" },
 ]
 
@@ -2506,6 +2506,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/1c/0a/824b0c1ecf224802125279c3effff2e25ed785ed046e67da6e53d928de4c/testcontainers-4.10.0-py3-none-any.whl", hash = "sha256:31ed1a81238c7e131a2a29df6db8f23717d892b592fa5a1977fd0dcd0c23fc23", size = 107414 },
 ]
 
+[package.optional-dependencies]
+mongodb = [
+    { name = "pymongo" },
+]
+
 [[package]]
 name = "testfixtures"
 version = "8.3.0"
@@ -2657,7 +2662,7 @@ dev = [
     { name = "ruff", specifier = "~=0.11" },
     { name = "scikit-image", specifier = "==0.20.0" },
     { name = "scikit-learn", specifier = "~=1.6" },
-    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
+    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.10" },
     { name = "testfixtures", specifier = "==7.0.0" },
     { name = "types-cachetools" },
     { name = "types-pyyaml" },

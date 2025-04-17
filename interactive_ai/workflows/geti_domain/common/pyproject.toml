@@ -55,7 +55,7 @@ dev = [
     "mypy~=1.15",
     "types-cachetools",
     "types-PyYAML",
-    "testcontainers[mongodb]~=4.9",
+    "testcontainers[mongodb]~=4.10",
 
     "asynctest==0.13.0",
     "pytest-freezegun==0.4.2",
