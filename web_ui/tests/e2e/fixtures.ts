@@ -6,6 +6,7 @@ import path from 'path';
 import { mergeTests } from '@playwright/test';
 import dotenv from 'dotenv';
 
+import { LicenseModalPage } from '../fixtures/page-objects/license-modal';
 import { annotatorTest as baseTest } from './../fixtures/annotator-test';
 import { test as apiTest } from './api-fixtures';
 
@@ -26,6 +27,15 @@ const test = mergeTests(apiTest, baseTest).extend<{
             async (menu) => {
                 await menu.click();
                 await page.getByText('Dismiss all').click();
+            },
+            { times: 1 }
+        );
+
+        const licenseModalPage = new LicenseModalPage(page);
+        await page.addLocatorHandler(
+            licenseModalPage.getDialog(),
+            async () => {
+                await licenseModalPage.acceptLicense();
             },
             { times: 1 }
         );

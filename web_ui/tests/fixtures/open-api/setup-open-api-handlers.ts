@@ -294,7 +294,7 @@ const registerDefaultHandlers = (api: OpenAPIBackend) => {
                     modifiedBy: '',
                     telemetryConsent: '',
                     telemetryConsentAt: null,
-                    userConsent: '',
+                    userConsent: 'y',
                     userConsentAt: null,
                     presignedUrl: '',
                 })

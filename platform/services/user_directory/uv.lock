@@ -1536,6 +1536,7 @@ dependencies = [
     { name = "pyjwt" },
     { name = "python-ldap" },
     { name = "sherlock", extra = ["kubernetes"] },
+    { name = "users-handler" },
     { name = "uvicorn" },
 ]
 
@@ -1565,6 +1566,7 @@ requires-dist = [
     { name = "pyjwt", specifier = "==2.4.0" },
     { name = "python-ldap", specifier = "==3.4.4" },
     { name = "sherlock", extras = ["kubernetes"], specifier = "==0.4.0" },
+    { name = "users-handler", editable = "../../libs/users_handler" },
     { name = "uvicorn", specifier = "==0.19.0" },
 ]
 
@@ -1578,6 +1580,39 @@ dev = [
     { name = "pytest-mock", specifier = "~=3.14" },
     { name = "ruff", specifier = "~=0.11" },
     { name = "types-requests" },
+]
+
+[[package]]
+name = "users-handler"
+version = "1.0.0"
+source = { editable = "../../libs/users_handler" }
+dependencies = [
+    { name = "cryptography" },
+    { name = "geti-spicedb-tools" },
+    { name = "pillow" },
+    { name = "pyjwt" },
+    { name = "python-ldap" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "cryptography", specifier = "==43.0.1" },
+    { name = "geti-spicedb-tools", editable = "../../../libs/spicedb_tools" },
+    { name = "pillow", specifier = "==11.1.0" },
+    { name = "pyjwt", specifier = "==2.4.0" },
+    { name = "python-ldap", specifier = "==3.4.4" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = "~=1.15" },
+    { name = "mypy-protobuf", specifier = "~=3.5.0" },
+    { name = "pre-commit", specifier = "~=4.1" },
+    { name = "protobuf", specifier = "~=4.23.0" },
+    { name = "pytest", specifier = "~=8.3" },
+    { name = "pytest-mock", specifier = "~=3.14" },
+    { name = "ruff", specifier = "~=0.11" },
+    { name = "types-protobuf", specifier = "==4.24.0.20240129" },
 ]
 
 [[package]]

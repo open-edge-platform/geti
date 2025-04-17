@@ -8,10 +8,19 @@ export interface SessionParameters {
 }
 
 const wasmPaths = {
-    'ort-wasm.wasm': '/assets/onnx/ort-wasm.wasm',
-    'ort-wasm-simd.wasm': '/assets/onnx/ort-wasm-simd.wasm',
-    'ort-wasm-threaded.wasm': '/assets/onnx/ort-wasm-threaded.wasm',
-    'ort-wasm-simd-threaded.wasm': '/assets/onnx/ort-wasm-simd-threaded.wasm',
+    'ort-wasm.wasm': new URL('../../../../node_modules/onnxruntime-web/dist/ort-wasm.wasm', import.meta.url).toString(),
+    'ort-wasm-simd.wasm': new URL(
+        '../../../../node_modules/onnxruntime-web/dist/ort-wasm-simd.wasm',
+        import.meta.url
+    ).toString(),
+    'ort-wasm-threaded.wasm': new URL(
+        '../../../../node_modules/onnxruntime-web/dist/ort-wasm-threaded.wasm',
+        import.meta.url
+    ).toString(),
+    'ort-wasm-simd-threaded.wasm': new URL(
+        '../../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm',
+        import.meta.url
+    ).toString(),
 };
 
 export const sessionParams: SessionParameters = {

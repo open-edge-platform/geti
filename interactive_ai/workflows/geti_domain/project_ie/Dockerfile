@@ -1,4 +1,3 @@
-# TODO: Use image from our own registry
 FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
 
 ENV UV_COMPILE_BYTECODE=1

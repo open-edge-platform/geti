@@ -7,7 +7,7 @@ from freezegun import freeze_time
 
 from repos.vps_dataset_filter_repo import VPSDatasetFilterRepo
 
-from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, ProjectIdentifier
+from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity
 from sc_sdk.entities.annotation_scene_state import AnnotationState
 from sc_sdk.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
@@ -17,14 +17,6 @@ from sc_sdk.entities.dataset_storage_filter_data import (
 from sc_sdk.entities.media import ImageExtensions, MediaPreprocessingStatus, VideoExtensions
 from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 from sc_sdk.utils.time_utils import now
-
-
-@pytest.fixture
-def fxt_project_identifier(fxt_session_ctx, fxt_ote_id):
-    yield ProjectIdentifier(
-        workspace_id=fxt_session_ctx.workspace_id,
-        project_id=fxt_ote_id(1),
-    )
 
 
 @pytest.fixture
@@ -86,7 +78,6 @@ def fxt_construct_filter_data(fxt_dataset_filter_data_factory, fxt_project_ident
     yield construct
 
 
-@pytest.mark.VisualPromptServiceComponent
 class TestVPSDatesetFilterRepo:
     def test_get_by_id(
         self,

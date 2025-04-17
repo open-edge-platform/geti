@@ -37,12 +37,10 @@ class ReferenceFeatureToMongo(
 
     @staticmethod
     def forward(instance: ReferenceFeature) -> dict:
-        ref_feature_adapter = instance.reference_feature_adapter
-        binary_filename = ref_feature_adapter.binary_filename if ref_feature_adapter else ""
         return {
             "_id": IDToMongo.forward(instance.label_id),
             "task_id": IDToMongo.forward(instance.task_id),
-            "binary_filename": binary_filename,
+            "binary_filename": instance.data_binary_filename,
             "media_info": MediaInfoToMongo.forward(instance.media_info),
         }
 

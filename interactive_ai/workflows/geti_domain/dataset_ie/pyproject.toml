@@ -36,7 +36,6 @@ dev = [
     "pre-commit==2.15.0",
     "pytest-html~=4.0.0",
     "ruff==0.9.5",
-    "geti-types[bson]",
     "testcontainers~=4.10.0",
     # FIXME: The version of "requests" is pinned
     # to avoid the bug described in https://github.com/docker/docker-py/issues/3256

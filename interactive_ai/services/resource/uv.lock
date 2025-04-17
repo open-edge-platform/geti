@@ -871,18 +871,15 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cachetools", specifier = "~=5.5" },
-    { name = "decord", marker = "extra == 'decord'", specifier = "==0.6.0" },
     { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
     { name = "opencv-python-headless", specifier = "==4.10.0.84" },
     { name = "sc-sdk", editable = "../../libs/sc_sdk" },
 ]
-provides-extras = ["decord"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "click", specifier = "~=8.1" },
-    { name = "media-utils", extras = ["decord"] },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=2.15" },
     { name = "pytest", specifier = "~=7.0" },

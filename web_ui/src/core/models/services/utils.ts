@@ -3,7 +3,6 @@
 
 import isEmpty from 'lodash/isEmpty';
 
-import { getModelTemplateDetails } from '../../../pages/project-details/components/project-models/train-model-dialog/utils';
 import { getFileSize, isNonEmptyString, sortDescending } from '../../../shared/utils';
 import { TrainingDatasetInfoDTO } from '../../datasets/dtos/training-dataset.interface';
 import { TrainingDatasetInfo } from '../../datasets/services/training-dataset.interface';
@@ -52,10 +51,11 @@ export const getModelsEntity = (
     return modelsDTO.map(({ name, models, id, task_id, model_template_id, lifecycle_stage }) => {
         const sortedModelsByVersion: ModelDTO[] = sortDescending(models, 'version');
 
-        const { templateName, summary } = getModelTemplateDetails(
-            model_template_id,
-            tasksWithSupportedAlgorithms[task_id] ?? []
-        );
+        const algorithms = tasksWithSupportedAlgorithms[task_id] ?? [];
+        const usedAlgorithm = algorithms.find((algorithm) => algorithm.modelTemplateId === model_template_id);
+
+        const summary = usedAlgorithm?.summary ?? '';
+        const templateName = usedAlgorithm?.templateName ?? '';
 
         const modelsEntity: ModelVersion[] = sortedModelsByVersion.map((model) => {
             const {

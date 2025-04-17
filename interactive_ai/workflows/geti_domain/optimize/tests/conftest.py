@@ -1,8 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import logging
 import os
 import pathlib
+from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
@@ -14,10 +16,25 @@ from sc_sdk.entities.compiled_dataset_shards import (
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
+from sc_sdk.repos.base.mongo_connector import MongoConnector
+from testcontainers.mongodb import MongoDbContainer
 
 from job.models import OptimizationTrainerContext
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 CTX_SESSION_VAR.set(make_session())
+
+
+@pytest.fixture(scope="session", autouse=True)
+def mongodb_testcontainer() -> Generator[MongoDbContainer, None, None]:
+    image_name = "mongo:7.0.7"
+    logger.info(f"Pulling MongoDB testcontainer image from: {image_name}")
+    with MongoDbContainer(image_name) as mongo:
+        db_url = mongo.get_connection_url()
+        with patch.object(MongoConnector, "get_connection_string", return_value=db_url):
+            yield mongo
 
 
 def detect_fixtures(module_name: str) -> list:

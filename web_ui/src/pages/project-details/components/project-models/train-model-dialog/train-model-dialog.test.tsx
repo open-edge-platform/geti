@@ -8,6 +8,7 @@ import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
 import { createInMemorySupportedAlgorithmsService } from '../../../../../core/supported-algorithms/services/in-memory-supported-algorithms-service';
 import { getMockedSupportedAlgorithm } from '../../../../../core/supported-algorithms/services/test-utils';
+import { SupportedAlgorithm } from '../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import {
     getMockedModelsGroup,
@@ -19,10 +20,9 @@ import {
     getMockedProjectStatusTask,
 } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { projectRender as render } from '../../../../../test-utils/project-provider-render';
-import { Template } from './model-templates-selection/model-templates-list/model-templates-list.interface';
 import { ModelConfigurationOption } from './model-templates-selection/utils';
 import { TrainModelDialog } from './train-model-dialog.component';
-import { getModelTemplates, TRAIN_FROM_SCRATCH_TOOLTIP_MSG } from './utils';
+import { TRAIN_FROM_SCRATCH_TOOLTIP_MSG } from './utils';
 
 describe('Train model dialog', () => {
     const taskId = '1';
@@ -77,7 +77,6 @@ describe('Train model dialog', () => {
     const mockedModels = [getMockedModelsGroup()];
 
     const defaultAlgorithm = mockedSupportedAlgorithmsForDetection.find(({ isDefaultAlgorithm }) => isDefaultAlgorithm);
-    const templates = getModelTemplates(mockedSupportedAlgorithmsForDetection);
 
     const goToConfigureParametersStep = async () => {
         fireEvent.click(await screen.findByRole('radio', { name: ModelConfigurationOption.MANUAL_CONFIGURATION }));
@@ -122,9 +121,9 @@ describe('Train model dialog', () => {
         modelsService.getModels = jest.fn(async () => []);
 
         // speed
-        const defaultModelTemplate = templates.find(
+        const defaultModelTemplate = mockedSupportedAlgorithmsForDetection.find(
             ({ modelTemplateId }) => modelTemplateId === defaultAlgorithm?.modelTemplateId
-        ) as Template;
+        ) as SupportedAlgorithm;
 
         await renderTrainModelDialog({
             options: { services: { supportedAlgorithmsService, modelsService } },
@@ -139,15 +138,15 @@ describe('Train model dialog', () => {
     it('Template which has active model should be selected by default when there are models', async () => {
         const notDefaultAlgorithm = mockedSupportedAlgorithmsForDetection[1];
 
-        const defaultModelTemplate = templates.find(
+        const defaultModelTemplate = mockedSupportedAlgorithmsForDetection.find(
             ({ modelTemplateId }) => modelTemplateId === notDefaultAlgorithm?.modelTemplateId
-        ) as Template;
+        ) as SupportedAlgorithm;
 
         modelsService.getModels = jest.fn(async () => [
             getMockedModelsGroup({
                 taskId,
                 modelTemplateId: defaultModelTemplate.modelTemplateId,
-                modelTemplateName: defaultModelTemplate.text,
+                modelTemplateName: defaultModelTemplate.templateName,
                 modelVersions: [getMockedModelVersion({ isActiveModel: true })],
             }),
         ]);

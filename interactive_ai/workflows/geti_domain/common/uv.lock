@@ -1744,18 +1744,15 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cachetools", specifier = "~=5.5" },
-    { name = "decord", marker = "extra == 'decord'", specifier = "==0.6.0" },
     { name = "geti-feature-tools", editable = "../../../../libs/feature_tools" },
     { name = "geti-types", editable = "../../../../libs/types" },
     { name = "opencv-python-headless", specifier = "==4.10.0.84" },
     { name = "sc-sdk", editable = "../../../libs/sc_sdk" },
 ]
-provides-extras = ["decord"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "click", specifier = "~=8.1" },
-    { name = "media-utils", extras = ["decord"] },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=2.15" },
     { name = "pytest", specifier = "~=7.0" },
@@ -3119,7 +3116,7 @@ wheels = [
 
 [[package]]
 name = "testcontainers"
-version = "4.9.2"
+version = "4.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "docker" },
@@ -3128,9 +3125,9 @@ dependencies = [
     { name = "urllib3" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/83/15/68cee852bcafc18827db4deb6aa0dd3b2621eb21130a522184523ef2d379/testcontainers-4.9.2.tar.gz", hash = "sha256:348c72d369d0bd52b57ab4f07a965ae9562837098c28f0522b969b064b779f10", size = 62595 }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/49/9c618aff1c50121d183cdfbc3a4a5cf2727a2cde1893efe6ca55c7009196/testcontainers-4.10.0.tar.gz", hash = "sha256:03f85c3e505d8b4edeb192c72a961cebbcba0dd94344ae778b4a159cb6dcf8d3", size = 63327 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a2/71/5d4656efa6cf4a8b3bc361170b7df97fdd734aba1c7bfe592058bbab21e4/testcontainers-4.9.2-py3-none-any.whl", hash = "sha256:36bd2b58d91f2fc7ac4f4a73c6ec00e5e60c259c10f208dbfe3161029889be92", size = 105644 },
+    { url = "https://files.pythonhosted.org/packages/1c/0a/824b0c1ecf224802125279c3effff2e25ed785ed046e67da6e53d928de4c/testcontainers-4.10.0-py3-none-any.whl", hash = "sha256:31ed1a81238c7e131a2a29df6db8f23717d892b592fa5a1977fd0dcd0c23fc23", size = 107414 },
 ]
 
 [package.optional-dependencies]
@@ -3437,7 +3434,7 @@ dev = [
     { name = "ruff", specifier = "~=0.11" },
     { name = "scikit-image", specifier = "==0.20.0" },
     { name = "scikit-learn", specifier = "~=1.6" },
-    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
+    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.10" },
     { name = "testfixtures", specifier = "==7.0.0" },
     { name = "types-cachetools" },
     { name = "types-pyyaml" },

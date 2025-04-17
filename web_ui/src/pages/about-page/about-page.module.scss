@@ -21,3 +21,20 @@
 .link {
     color: var(--energy-blue) !important;
 }
+
+.licenceButton {
+    color: var(--energy-blue) !important;
+    text-decoration: underline !important;
+    width: max-content !important;
+    padding: 0 !important;
+    border: 0 !important;
+
+    &:hover {
+        border: 0 !important;
+        background: none !important;
+    }
+
+    span {
+        padding: 0 !important;
+    }
+}

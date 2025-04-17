@@ -15,14 +15,10 @@ from typing import Generic, NamedTuple, TypeVar
 import cv2
 import numpy as np
 from cachetools import TTLCache
-from geti_feature_tools import FeatureFlagProvider
 from geti_types import Singleton
-
-from media_utils.features import FeatureFlag
 
 logger = logging.getLogger(__name__)
 
-USE_DECORD = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_DECORD_VIDEO_DECODER)
 NUM_VIDEO_FRAME_DECODE_RETRIES = int(os.getenv("NUM_VIDEO_FRAME_DECODE_RETRIES", "5"))
 VIDEO_FRAME_CACHE_MAX_SIZE_BYTES = int(os.getenv("VIDEO_FRAME_CACHE_MAX_SIZE_BYTES", "100000000"))  # def 100MB
 # Note that the VIDEO_CACHE_TTL should be less than the expiry time for a video presigned URL.

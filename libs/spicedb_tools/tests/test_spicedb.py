@@ -105,7 +105,6 @@ class TestSpiceDB:
             (2, True),
         ],
     )
-    @pytest.mark.skip("CVS-164150")
     def test_check_user_workspace_permission(
         self,
         mocked_client,
@@ -116,7 +115,7 @@ class TestSpiceDB:
         # Arrange
         spicedb = SpiceDB()
         spicedb._client = mocked_client
-        mocked_client.CheckPermissions.return_value = CheckPermissionResponse(
+        mocked_client.CheckPermission.return_value = CheckPermissionResponse(
             checked_at=ZedToken(token="test_token"), permissionship=permissionship
         )
 
@@ -137,7 +136,7 @@ class TestSpiceDB:
             subject=SubjectReference(object=ObjectReference(object_type="user", object_id="dGVzdF91c2Vy")),
             consistency=Consistency(fully_consistent=True),
         )
-        mocked_client.CheckPermissions.assert_called_once_with(expected_arguments)
+        mocked_client.CheckPermission.assert_called_once_with(expected_arguments)
 
     @patch("authzed.api.v1.Client")
     @pytest.mark.parametrize("permission", Permissions)
@@ -326,7 +325,6 @@ class TestSpiceDB:
             (2, True),
         ],
     )
-    @pytest.mark.skip("CVS-164150")
     def test_check_user_project_permission(
         self,
         mocked_client,
@@ -337,7 +335,7 @@ class TestSpiceDB:
         # Arrange
         spicedb = SpiceDB()
         spicedb._client = mocked_client
-        mocked_client.CheckPermissions.return_value = CheckPermissionResponse(
+        mocked_client.CheckPermission.return_value = CheckPermissionResponse(
             checked_at=ZedToken(token="test_token"), permissionship=permissionship
         )
 
@@ -354,7 +352,7 @@ class TestSpiceDB:
             subject=SubjectReference(object=ObjectReference(object_type="user", object_id="dGVzdF91c2Vy")),
             consistency=Consistency(fully_consistent=True),
         )
-        mocked_client.CheckPermissions.assert_called_once_with(expected_arguments)
+        mocked_client.CheckPermission.assert_called_once_with(expected_arguments)
 
     @patch("authzed.api.v1.Client")
     @pytest.mark.parametrize("permission", Permissions)

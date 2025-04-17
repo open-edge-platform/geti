@@ -46,6 +46,7 @@ dev = [
   "types-PyYAML",
   "types-protobuf",
   "grpc-stubs",
+  "testcontainers[mongodb]~=4.9",
 ]
 
 [tool.ruff]

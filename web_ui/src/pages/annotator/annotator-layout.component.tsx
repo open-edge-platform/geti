@@ -11,7 +11,7 @@ import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flag
 import { Label } from '../../core/labels/label.interface';
 import { isExclusive } from '../../core/labels/utils';
 import { isVideo, isVideoFrame } from '../../core/media/video.interface';
-import { isNotKeypointTask } from '../../core/projects/utils';
+import { isKeypointTask } from '../../core/projects/utils';
 import {
     FUX_NOTIFICATION_KEYS,
     FUX_SETTINGS_KEYS,
@@ -37,6 +37,7 @@ import { VideoPlayer } from './components/video-player/video-player.component';
 import { AnnotationScene } from './core/annotation-scene.interface';
 import { useCopyPasteAnnotation } from './hooks/use-copy-paste-annotation/use-copy-paste-annotation.hook';
 import { useSelectedAnnotations } from './hooks/use-selected-annotations.hook';
+import { useVisibleAnnotations } from './hooks/use-visible-annotations.hook';
 import { AutoTrainingCreditsModalFactory } from './notification/auto-training-credits-modal/auto-training-credits-modal.component';
 import { AutoTrainingStartedNotification } from './notification/auto-training-started-notification/auto-training-started-notification.component';
 import { CreditDeductionNotification } from './notification/credit-deduction-notification/credit-deduction-notification.component';
@@ -75,13 +76,12 @@ const ErrorFallback = ({ error }: { error: { message: string } }) => {
 // For now we'll remove any empty labels from a sub task if we're in the "All tasks" view
 const useLabelShortcuts = (): Label[] => {
     const { labels: taskLabels, tasks, selectedTask } = useTask();
-    const filteredTask = tasks.filter(isNotKeypointTask);
 
-    if (filteredTask.length < 2 || selectedTask !== null) {
-        return taskLabels.filter((label) => filteredTask.some((task) => task.labels.some(hasEqualId(label.id))));
+    if (tasks.length < 2 || selectedTask !== null) {
+        return taskLabels.filter((label) => tasks.some((task) => task.labels.some(hasEqualId(label.id))));
     }
 
-    const secondTask = filteredTask[1];
+    const secondTask = tasks[1];
 
     return taskLabels.filter((label) => {
         if (!isExclusive(label)) {
@@ -90,7 +90,7 @@ const useLabelShortcuts = (): Label[] => {
 
         return (
             !secondTask.labels.some(hasEqualId(label.id)) &&
-            filteredTask.some((task) => task.labels.some(hasEqualId(label.id)))
+            tasks.some((task) => task.labels.some(hasEqualId(label.id)))
         );
     });
 };
@@ -102,10 +102,18 @@ interface CopyPasteProps {
 }
 
 const CopyPaste = ({ labels, scene, selectedMediaItem }: CopyPasteProps): JSX.Element => {
+    const { image } = useROI();
+    const visibleAnnotations = useVisibleAnnotations();
     const selectedAnnotations = useSelectedAnnotations(false);
 
-    const { image } = useROI();
-    useCopyPasteAnnotation({ scene, taskLabels: labels, selectedAnnotations, image, selectedMediaItem });
+    useCopyPasteAnnotation({
+        scene,
+        image,
+        taskLabels: labels,
+        selectedMediaItem,
+        selectedAnnotations,
+        hasMultipleAnnotations: visibleAnnotations.length >= 1,
+    });
 
     return <></>;
 };
@@ -118,15 +126,17 @@ export const AnnotatorLayout = (): JSX.Element => {
     const { selectedMediaItem } = useSelectedMediaItem();
     const annotationToolContext = useAnnotationToolContext();
     const { FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
+    const { isOpen: isAnnotateInteractivelyNotificationEnabled, close } = useTutorialEnablement(
+        FUX_NOTIFICATION_KEYS.ANNOTATE_INTERACTIVELY
+    );
 
     const hasPreviouslyAutoTrained = !getFuxSetting(FUX_SETTINGS_KEYS.NEVER_AUTOTRAINED, userGlobalSettings.config);
     const firstAutoTrainedProjectId = getFuxSetting(
         FUX_SETTINGS_KEYS.FIRST_AUTOTRAINED_PROJECT_ID,
         userGlobalSettings.config
     );
-    const { isOpen: isAnnotateInteractivelyNotificationEnabled, close } = useTutorialEnablement(
-        FUX_NOTIFICATION_KEYS.ANNOTATE_INTERACTIVELY
-    );
+
+    const filteredLabels = project.tasks.some(isKeypointTask) ? [] : labels;
 
     useEffect(() => {
         if (isAnnotateInteractivelyNotificationEnabled) {
@@ -165,7 +175,7 @@ export const AnnotatorLayout = (): JSX.Element => {
                         <PrimaryToolbar annotationToolContext={annotationToolContext} />
                         <SecondaryToolbar annotationToolContext={annotationToolContext} />
                         <ErrorBoundary FallbackComponent={ErrorFallback}>
-                            <MainContent labels={labels} annotationToolContext={annotationToolContext} />
+                            <MainContent labels={filteredLabels} annotationToolContext={annotationToolContext} />
                         </ErrorBoundary>
                     </ActiveToolProvider>
                     {selectedMediaItem !== undefined &&

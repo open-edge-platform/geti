@@ -10,7 +10,6 @@ from services.controllers.predict_controller import PredictController
 from services.models.media_info_payload import MediaInfoPayload
 
 
-@pytest.mark.VisualPromptServiceComponent
 class TestPredictEndpoints:
     def test_prompt_media_info(self, fxt_test_app, fxt_project_identifier, fxt_session_ctx, fxt_ote_id) -> None:
         # Arrange
@@ -51,7 +50,7 @@ class TestPredictEndpoints:
             f"/projects/{fxt_project_identifier.project_id}/pipelines/{task_id}:prompt"
         )
         dummy_predict_rest: dict = {"predictions": []}
-        image_file = os.path.join("tests", "data", "crate.png")
+        image_file = os.path.dirname(__file__) + "/../../../data/crate.png"
 
         # Act
         with (

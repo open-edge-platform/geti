@@ -1,6 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import datetime
 import io
 import os
 import tempfile
@@ -17,7 +18,7 @@ from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
 from sc_sdk.entities.annotation_scene_state import AnnotationState
 from sc_sdk.entities.datasets import DatasetIdentifier
 from sc_sdk.entities.image import Image
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
 from sc_sdk.entities.project import Project
 from sc_sdk.entities.video import Video, VideoExtensions
 from sc_sdk.repos import VideoRepo
@@ -292,3 +293,26 @@ def fxt_unannotated_video_factory(
         return video
 
     return _video_factory
+
+
+@pytest.fixture
+def fxt_image(fxt_ote_id) -> Image:
+    return Image(
+        name="dummy_image.jpg",
+        uploader_id=DummyValues.CREATOR_NAME,
+        id=fxt_ote_id(1),
+        creation_date=datetime.datetime(
+            year=2023,
+            month=9,
+            day=8,
+            hour=1,
+            minute=5,
+            second=12,
+            tzinfo=datetime.timezone.utc,
+        ),
+        width=100,
+        height=100,
+        size=100,
+        extension=ImageExtensions.JPG,
+        preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED),
+    )

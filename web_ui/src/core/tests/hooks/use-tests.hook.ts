@@ -10,6 +10,7 @@ import {
     UseMutationResult,
     useQuery,
     useQueryClient,
+    UseQueryOptions,
     UseQueryResult,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -30,7 +31,10 @@ import { RunTestBody } from './../services/tests-service.interface';
 
 interface UseTests {
     useTestQuery: (projectIdentifier: ProjectIdentifier, testId: string) => UseQueryResult<Test, AxiosError>;
-    useTestsListQuery: (projectIdentifier: ProjectIdentifier) => UseQueryResult<Test[], AxiosError>;
+    useTestsListQuery: (
+        projectIdentifier: ProjectIdentifier,
+        options?: Pick<UseQueryOptions<Test[], AxiosError, Test[]>, 'refetchInterval'>
+    ) => UseQueryResult<Test[], AxiosError>;
     useRunTestMutation: () => UseMutationResult<string, AxiosError, UseRunTestMutation>;
     useMediaItemsOfTestQuery: (
         projectIdentifier: ProjectIdentifier,
@@ -61,7 +65,10 @@ export const useTests = (): UseTests => {
         addNotification({ message: getErrorMessage(error), type: NOTIFICATION_TYPE.ERROR });
     };
 
-    const useTestsListQuery = (projectIdentifier: ProjectIdentifier): UseQueryResult<Test[], AxiosError> => {
+    const useTestsListQuery = (
+        projectIdentifier: ProjectIdentifier,
+        options?: Pick<UseQueryOptions<Test[], AxiosError, Test[]>, 'refetchInterval'>
+    ): UseQueryResult<Test[], AxiosError> => {
         const { useModelsQuery } = useModels();
         const { data: modelsGroups } = useModelsQuery(projectIdentifier);
 
@@ -72,6 +79,7 @@ export const useTests = (): UseTests => {
             },
             meta: { notifyOnError: true },
             enabled: !!modelsGroups,
+            ...options,
         });
     };
 

@@ -1,7 +1,7 @@
 FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
 
 # Install Git and clone the OTX at the specified tag
-ARG OTX_RELEASE_TAG=2.2.0rc12
+ARG OTX_RELEASE_TAG=2.4.0
 
 RUN apt-get update && apt-get install -y git
 RUN git clone --branch $OTX_RELEASE_TAG --single-branch https://github.com/open-edge-platform/training_extensions.git

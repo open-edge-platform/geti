@@ -4,16 +4,14 @@
 //  Dependencies get bundled into the worker
 
 import { expose } from 'comlink';
-import OpenCV from 'opencv';
 import type OpenCVTypes from 'OpenCVTypes';
 
+import cv from './opencv-loader';
 import { formatImageData } from './utils';
 
-let CV: OpenCVTypes.cv | null = null;
+declare const self: DedicatedWorkerGlobalScope;
 
-OpenCV.then((cvInstance: OpenCVTypes.cv) => {
-    CV = cvInstance;
-});
+let CV: OpenCVTypes.cv | null = null;
 
 const terminate = (): void => {
     self.close();
@@ -53,7 +51,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCV.then((cvInstance) => {
+        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

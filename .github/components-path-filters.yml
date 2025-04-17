@@ -1,3 +1,4 @@
+# Platform services
 platform/services/credit:
   - platform/services/credit/**
   - grpc_interfaces/pyproject.toml
@@ -58,6 +59,7 @@ platform/services/initial_user:
   - Makefile.shared-python-uv
   - Makefile.shared
   - .github/workflows/component.yml
+
 # IAI Services
 interactive_ai/services/auto_train:
   - interactive_ai/services/auto_train/**
@@ -186,6 +188,8 @@ interactive_ai/services/visual_prompt:
   - Makefile.shared
   - builder-images/python-builder/Dockerfile
   - .github/workflows/component.yml
+
+# Migration job
 interactive_ai/migration_job:
   - interactive_ai/migration_job/**
   - interactive_ai/data_migration/**
@@ -193,10 +197,100 @@ interactive_ai/migration_job:
   - Makefile.shared-python-uv
   - Makefile.shared
   - .github/workflows/component.yml
+
+# Workflows
+interactive_ai/workflows/geti_domain/common:
+  - interactive_ai/workflows/geti_domain/common/**
+  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/media_utils/**
+  - libs/k8s_tools/**
+  - libs/kafka_tools/**
+  - libs/telemetry_tools/**
+  - libs/types/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+interactive_ai/workflows/geti_domain/dataset_ie:
+  - interactive_ai/workflows/geti_domain/dataset_ie/**
+  - interactive_ai/workflows/geti_domain/common/jobs_common
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/datumaro_conversion
+  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/media_utils/**
+  - libs/k8s_tools/**
+  - libs/kafka_tools/**
+  - libs/spicedb_tools/**
+  - libs/telemetry_tools/**
+  - libs/types/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+interactive_ai/workflows/geti_domain/project_ie:
+  - interactive_ai/workflows/geti_domain/project_ie/**
+  - interactive_ai/workflows/geti_domain/common/jobs_common
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/datumaro_conversion
+  - interactive_ai/data_migration/**
+  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/media_utils/**
+  - libs/k8s_tools/**
+  - libs/kafka_tools/**
+  - libs/spicedb_tools/**
+  - libs/telemetry_tools/**
+  - libs/types/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+interactive_ai/workflows/geti_domain/model_test:
+  - interactive_ai/workflows/geti_domain/model_test/**
+  - interactive_ai/workflows/geti_domain/common/jobs_common
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/evaluation
+  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/media_utils/**
+  - libs/k8s_tools/**
+  - libs/telemetry_tools/**
+  - libs/types/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+interactive_ai/workflows/geti_domain/optimize:
+  - interactive_ai/workflows/geti_domain/optimize/**
+  - interactive_ai/workflows/geti_domain/common/jobs_common
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/evaluation
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/shard_dataset
+  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/media_utils/**
+  - libs/k8s_tools/**
+  - libs/telemetry_tools/**
+  - libs/types/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+interactive_ai/workflows/geti_domain/train:
+  - interactive_ai/workflows/geti_domain/train/**
+  - interactive_ai/workflows/geti_domain/common/jobs_common
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/evaluation
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/mlflow
+  - interactive_ai/workflows/geti_domain/common/jobs_common_extras/shard_dataset
+  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/media_utils/**
+  - libs/k8s_tools/**
+  - libs/telemetry_tools/**
+  - libs/types/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+interactive_ai/workflows/otx_domain/trainer/otx_v2:
+  - interactive_ai/workflows/otx_domain/trainer/otx_v2/**
+  - libs/telemetry_tools/**
+  - libs/kafka_tools/**
+  - Makefile.shared-python-uv
+  - Makefile.shared
+  - .github/workflows/component.yml
+
+# gRPC interfaces
 grpc_interfaces:
   - grpc_interfaces/**
   - libs/types/**
 
-# Web Ui
+# Web UI
 web_ui:
   - web_ui/**

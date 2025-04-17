@@ -200,8 +200,13 @@ class AnnotationSceneMapper:
         attributes: dict[str, list] = {self.ATTR_KEYPOINT_LABELS: []}
 
         for ann in annotations:
-            points.extend([ann.shape.x * width, ann.shape.y * height])  # type: ignore
-            visibilities.append(dm.Points.Visibility.visible if ann.shape.is_visible else dm.Points.Visibility.hidden)  # type: ignore
-            attributes[self.ATTR_KEYPOINT_LABELS].append(ann.get_labels()[0].name)  # type: ignore
+            shape = ann.shape
+            if isinstance(shape, Keypoint):
+                points.extend([shape.x * width, shape.y * height])
+                visibilities.append(dm.Points.Visibility.visible if shape.is_visible else dm.Points.Visibility.hidden)  # type: ignore
+                label_id = self.label_map.get_dm_label_by_sc_label_id(ann.get_labels()[0].id_)
+                attributes[self.ATTR_KEYPOINT_LABELS].append(label_id)
+            else:
+                raise ValueError(f"Unexpected shape of type {ann.shape.type}")
 
         return dm.Points(points=points, visibility=visibilities, label=0, attributes=attributes)

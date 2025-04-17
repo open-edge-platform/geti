@@ -8,20 +8,22 @@ import { AlgorithmType } from './algorithm.interface';
 export const getWorker = (algorithm: AlgorithmType): Worker => {
     switch (algorithm) {
         case AlgorithmType.WATERSHED:
-            return new Worker(new URL('../../webworkers/watershed.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/watershed.worker', import.meta.url), { type: 'module' });
         case AlgorithmType.GRABCUT:
-            return new Worker(new URL('../../webworkers/grabcut.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/grabcut.worker', import.meta.url), { type: 'module' });
         case AlgorithmType.INTELLIGENT_SCISSORS:
-            return new Worker(new URL('../../webworkers/intelligent-scissors.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/intelligent-scissors.worker', import.meta.url), {
+                type: 'module',
+            });
         case AlgorithmType.SSIM:
-            return new Worker(new URL('../../webworkers/ssim.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/ssim.worker', import.meta.url), { type: 'module' });
         case AlgorithmType.RITM:
-            return new Worker(new URL('../../webworkers/ritm.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/ritm.worker', import.meta.url), { type: 'module' });
         case AlgorithmType.INFERENCE_IMAGE:
-            return new Worker(new URL('../../webworkers/inference-image.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/inference-image.worker', import.meta.url), { type: 'module' });
         case AlgorithmType.SEGMENT_ANYTHING_ENCODER:
-            return new Worker(new URL('../../webworkers/segment-anything.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/segment-anything.worker', import.meta.url), { type: 'module' });
         case AlgorithmType.SEGMENT_ANYTHING_DECODER:
-            return new Worker(new URL('../../webworkers/segment-anything.worker', import.meta.url));
+            return new Worker(new URL('../../webworkers/segment-anything.worker', import.meta.url), { type: 'module' });
     }
 };

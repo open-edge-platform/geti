@@ -400,7 +400,6 @@ class TestModelTestRESTController:
             model_test_result=fxt_model_test_result,
             project=fxt_project,
             author=DUMMY_USER,
-            is_local_anomaly_test=False,
         )
         assert model_test_result is not None
         assert model_test_result.job_id == fxt_ote_id()
@@ -485,7 +484,6 @@ class TestModelTestRESTController:
             model_test_result=fxt_model_test_result,
             project=fxt_project_with_anomaly_detection_task,
             author=DUMMY_USER,
-            is_local_anomaly_test=False,
         )
         assert model_test_result is not None
         assert model_test_result.job_id == fxt_ote_id()

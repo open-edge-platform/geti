@@ -12,10 +12,6 @@ dependencies = [
     "geti_feature_tools",
 ]
 
-[project.optional-dependencies]
-decord = ["decord==0.6.0"]
-
-
 [tool.uv.sources]
 geti-types = { path = "../../../libs/types", editable = true }
 geti-feature-tools = { path = "../../../libs/feature_tools", editable = true }
@@ -35,7 +31,6 @@ dev = [
     "pytest-html~=4.1",
     "ruff~=0.11",
     "testcontainers[mongodb]~=4.9",
-    "media-utils[decord]"
 ]
 
 [build-system]

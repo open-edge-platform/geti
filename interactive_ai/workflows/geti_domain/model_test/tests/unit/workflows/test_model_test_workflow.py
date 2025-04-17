@@ -17,6 +17,5 @@ class TestModelTest:
             model_test_workflow(
                 project_id="project_id",
                 model_test_result_id="model_test_result_id",
-                is_local_anomaly_test=False,
             )
         mock_model_test.assert_called_once()

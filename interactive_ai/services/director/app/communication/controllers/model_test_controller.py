@@ -9,7 +9,6 @@ from typing import Any
 from communication.data_validator import ModelTestRestValidator
 from communication.exceptions import (
     DatasetStorageHasNoAnnotationsException,
-    DeprecatedMetricModelTestingException,
     DeprecatedModelTestException,
     ModelTestResultNotFoundException,
     PredictionNotFoundException,
@@ -18,7 +17,7 @@ from communication.exceptions import (
 )
 from communication.jobs_client import JobsClient
 from communication.views.job_rest_views import JobRestViews
-from communication.views.model_test_result_rest_views import MetricRESTEnum, ModelTestResultRestViews
+from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.prediction_rest_views import PredictionRESTViews
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from service.job_submission import ModelTestingJobSubmitter
@@ -38,7 +37,6 @@ from sc_sdk.entities.annotation_scene_state import AnnotationState
 from sc_sdk.entities.dataset_storage import NullDatasetStorage
 from sc_sdk.entities.model import Model, ModelFormat, NullModel
 from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.model_template import TaskType
 from sc_sdk.entities.model_test_result import ModelTestResult, NullModelTestResult
 from sc_sdk.entities.project import NullProject
 from sc_sdk.repos import (
@@ -185,7 +183,6 @@ class ModelTestController:
             project_id=project_id,
             dataset_storage_id=dataset_storage_id,
         )
-        metric = data.get("metric")
         project = ProjectRepo().get_by_id(project_id)
         if isinstance(project, NullProject):
             raise ProjectNotFoundException(project_id)
@@ -201,15 +198,6 @@ class ModelTestController:
         task_node = project.get_trainable_task_node_by_id(model.model_storage.task_node_id)
         if task_node is None:
             raise Exception(f"Task node {model.model_storage.task_node_id} not found in project {project_id}")
-        # for local metric and local anomaly tasks, we only run the test on fully annotated media~
-        # (i.e., annotated with local annotations).
-        is_local_anomaly_test = task_node.task_properties.task_type in [
-            TaskType.ANOMALY_DETECTION,
-            TaskType.ANOMALY_SEGMENTATION,
-        ] and (not metric or MetricRESTEnum[metric.upper()] is MetricRESTEnum.LOCAL)
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        if is_anomaly_reduced and is_local_anomaly_test:
-            raise DeprecatedMetricModelTestingException(metric=metric)  # type: ignore
 
         dataset_storage = DatasetStorageRepo(project.identifier).get_by_id(dataset_storage_id)
         if isinstance(dataset_storage, NullDatasetStorage):
@@ -239,7 +227,6 @@ class ModelTestController:
             job_id = job_submitter.execute(
                 model_test_result=model_test_result,
                 project=project,
-                is_local_anomaly_test=is_local_anomaly_test,
                 author=author,
             )
             model_test_result.job_id = job_id

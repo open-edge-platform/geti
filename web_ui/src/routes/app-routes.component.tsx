@@ -34,6 +34,7 @@ import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-p
 import { useWorkspaceIdentifier } from '../providers/workspaces-provider/use-workspace-identifier.hook';
 import { AccessDeniedDialog } from '../shared/components/access-denied-dialog/access-denied-dialog.component';
 import { LastLoginNotification } from '../shared/components/last-login-notification/last-login-notification';
+import { LicenseModal } from '../shared/components/license-modal/license-modal.component';
 import { IntelBrandedLoading } from '../shared/components/loading/intel-branded-loading.component';
 import { LOCAL_STORAGE_KEYS } from '../shared/local-storage-keys';
 import { ForgotPassword } from '../sign-up/pages/forgot-password/forgot-password.component';
@@ -115,6 +116,7 @@ const AppProviders = (): JSX.Element => {
                             <MediaUploadProvider>
                                 <Outlet />
                                 {FEATURE_FLAG_CREDIT_SYSTEM && isSaaS && <WelcomeTrialModal />}
+                                {!isSaaS && <LicenseModal />}
                             </MediaUploadProvider>
                         </TusUploadProvider>
                     </OrganizationsContext>

@@ -4,20 +4,18 @@
 //  Dependencies get bundled into the worker
 
 import { expose } from 'comlink';
-import OpenCV from 'opencv';
 import type OpenCVTypes from 'OpenCVTypes';
 
 import { Point, Polygon, Rect } from '../core/annotations/shapes.interface';
 import { ShapeType } from '../core/annotations/shapetype.enum';
 import { GrabcutToolType } from '../pages/annotator/tools/grabcut-tool/grabcut-tool.enums';
 import { GrabcutData } from '../pages/annotator/tools/grabcut-tool/grabcut-tool.interface';
+import cv from './opencv-loader';
 import { approximateShape, getMatFromPoints, getPointsFromMat } from './utils';
 
-let CV: OpenCVTypes.cv | null = null;
+declare const self: DedicatedWorkerGlobalScope;
 
-OpenCV.then((cvInstance: OpenCVTypes.cv) => {
-    CV = cvInstance;
-});
+let CV: OpenCVTypes.cv | null = null;
 
 const terminate = (): void => {
     self.close();
@@ -27,7 +25,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCV.then((cvInstance) => {
+        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

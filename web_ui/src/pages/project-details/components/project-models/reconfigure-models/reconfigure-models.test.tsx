@@ -25,7 +25,7 @@ describe('Reconfigure parameters of the model', () => {
     )}-${foldUnfoldButtonId}`;
 
     const renderReconfigureModels = async (): Promise<void> => {
-        render(<ReconfigureModels />);
+        render(<ReconfigureModels />, { featureFlags: { FEATURE_FLAG_TRAINING_FLOW_REVAMP: false } });
 
         fireEvent.click(screen.getByRole('button', { name: 'Reconfigure active model' }));
     };

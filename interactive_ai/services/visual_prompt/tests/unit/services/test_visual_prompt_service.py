@@ -24,7 +24,7 @@ from services.visual_prompt_service import (
     VPSPredictionResults,
 )
 
-from geti_types import DatasetStorageIdentifier, NullMediaIdentifier, ProjectIdentifier
+from geti_types import DatasetStorageIdentifier, NullMediaIdentifier
 from sc_sdk.algorithms import ModelTemplateList
 from sc_sdk.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
 from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
@@ -89,14 +89,6 @@ def fxt_s3_env_variables(request):
 
 
 @pytest.fixture
-def fxt_project_identifier(fxt_session_ctx, fxt_ote_id):
-    yield ProjectIdentifier(
-        workspace_id=fxt_session_ctx.workspace_id,
-        project_id=fxt_ote_id(1),
-    )
-
-
-@pytest.fixture
 def fxt_image(fxt_ote_id) -> Image:
     return Image(
         name="dummy_image.jpg",
@@ -148,7 +140,6 @@ def fxt_task_node(fxt_project, fxt_ote_id):
     )
 
 
-@pytest.mark.VisualPromptServiceComponent
 class TestVisualPromptService:
     @pytest.mark.parametrize(
         "label_domain", [Domain.ROTATED_DETECTION, Domain.DETECTION, Domain.SEGMENTATION, Domain.INSTANCE_SEGMENTATION]

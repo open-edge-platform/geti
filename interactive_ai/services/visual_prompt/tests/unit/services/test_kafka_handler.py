@@ -15,7 +15,6 @@ from sc_sdk.entities.model_template import TaskType
 from sc_sdk.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
 
 
-@pytest.mark.VisualPromptServiceComponent
 class TestVPSKafkaHandler:
     @pytest.mark.parametrize("label_schema_in_sync", [True, False])
     def test_on_project_updated(self, label_schema_in_sync, fxt_project, fxt_ote_id, fxt_label_schema):

@@ -4,19 +4,17 @@
 // Dependencies get bundled into the worker
 
 import { expose } from 'comlink';
-import OpenCV from 'opencv';
 import type OpenCVTypes from 'OpenCVTypes';
 
 import { Point } from '../core/annotations/shapes.interface';
 import { Marker } from '../pages/annotator/tools/marker-tool/marker-tool.interface';
 import { WatershedPolygon } from '../pages/annotator/tools/watershed-tool/watershed-tool.interface';
+import cv from './opencv-loader';
 import { approximateShape, formatContourToPoints } from './utils';
 
-let CV: OpenCVTypes.cv | null = null;
+declare const self: DedicatedWorkerGlobalScope;
 
-OpenCV.then((cvInstance: OpenCVTypes.cv) => {
-    CV = cvInstance;
-});
+let CV: OpenCVTypes.cv | null = null;
 
 const terminate = (): void => {
     self.close();
@@ -26,7 +24,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCV.then((cvInstance: OpenCVTypes.cv) => {
+        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

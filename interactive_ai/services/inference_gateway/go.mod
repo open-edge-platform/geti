@@ -1,6 +1,6 @@
 module inference_gateway
 
-go 1.23
+go 1.23.3
 
 replace (
 	geti.com/go_sdk => ./../../libs/go_sdk

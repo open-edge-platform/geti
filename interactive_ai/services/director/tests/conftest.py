@@ -1,7 +1,27 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+import logging
 import os
 import pathlib
+from unittest.mock import patch
+
+import pytest
+from testcontainers.mongodb import MongoDbContainer
+
+from sc_sdk.repos.base.mongo_connector import MongoConnector
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@pytest.fixture(scope="session", autouse=True)
+def mongodb_testcontainer():
+    image_name = "mongo:7.0.7"
+    logger.info(f"Pulling MongoDB testcontainer image from: {image_name}")
+    with MongoDbContainer(image_name) as mongo:
+        db_url = mongo.get_connection_url()
+        with patch.object(MongoConnector, "get_connection_string", return_value=db_url):
+            yield mongo
 
 
 def detect_fixtures(module_name: str) -> list:

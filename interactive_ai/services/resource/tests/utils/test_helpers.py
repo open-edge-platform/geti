@@ -119,8 +119,8 @@ def generate_random_annotated_image(
     :param max_size: Maximum size of the shape(s)
     :return: uint8 array, list of shapes
     """
-    assert min_size, max_size < image_width
-    assert min_size, max_size < image_height
+    assert min_size <= image_width <= max_size
+    assert min_size <= image_height <= max_size
     img = (np.random.standard_normal([image_height, image_width, 3]) * 255).astype(np.uint8)
     label_map = {label.name: label for label in labels}
     rng = np.random.default_rng()

@@ -148,6 +148,19 @@ wheels = [
 ]
 
 [[package]]
+name = "confluent-kafka"
+version = "2.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/f5/2dd545316e143f1707f8f9abfbb770bcd2a0046a32922ca146852dd5e266/confluent-kafka-2.3.0.tar.gz", hash = "sha256:4069e7b56e0baf9db18c053a605213f0ab2d8f23715dca7b3bd97108df446ced", size = 134602 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/4e/1040a8797d84f85ce0b47a9b7e337ba9646e6a2d5f38f5665114d5b8840c/confluent_kafka-2.3.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:5df845755cd3ebb9165ca00fd1d3a7d514c61e84d9fcbe7babb91193fe9b369c", size = 3352070 },
+    { url = "https://files.pythonhosted.org/packages/da/da/6e6bfd5e2cf1588094e3b378308fe602d64b4baa5bed6ff4b429734facb4/confluent_kafka-2.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9ab2217875b731bd390582952e0f9cbe3e7b34774490f01afca70728f0d8b469", size = 2868405 },
+    { url = "https://files.pythonhosted.org/packages/a8/62/29fac53969231809bdf59eed204e28369e14c99561859ce89d079fbde38e/confluent_kafka-2.3.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:62046e8a75c7a6883a0f1f4a635573fd7e1665eeacace65e7f6d59cbaa94697d", size = 4021998 },
+    { url = "https://files.pythonhosted.org/packages/b6/a3/ee62e1fbe154fb2ef7f3535e45adbd460cb4a0645e07a245b1f59e995e40/confluent_kafka-2.3.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:1eba38061e9ed1c0a369c129bf01d07499286cc3cb295398b88a7037c14371fb", size = 14108376 },
+    { url = "https://files.pythonhosted.org/packages/94/1d/89e5485fe8bde8a74977cdf87eb629fc086389e54ae3d8f23d213158e040/confluent_kafka-2.3.0-cp310-cp310-win_amd64.whl", hash = "sha256:a6abece28598fa2b59d2b9399fcec03440aaa73fd207fdad048a6030d7e897e1", size = 3444630 },
+]
+
+[[package]]
 name = "coverage"
 version = "7.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -240,6 +253,7 @@ grpc = [
     { name = "opentelemetry-instrumentation-grpc", extra = ["instruments"] },
 ]
 kafka = [
+    { name = "confluent-kafka" },
     { name = "opentelemetry-instrumentation-confluent-kafka" },
 ]
 logger = [
@@ -254,6 +268,7 @@ telemetry = [
 
 [package.metadata]
 requires-dist = [
+    { name = "confluent-kafka", marker = "extra == 'kafka'", specifier = ">=1.8.2,<=2.3.0" },
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = "~=0.115" },
     { name = "grpcio", marker = "extra == 'grpc'", specifier = ">=1.51.1,<2.0" },
     { name = "opentelemetry-api", marker = "extra == 'telemetry'", specifier = "==1.24.0" },

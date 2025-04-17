@@ -35,7 +35,7 @@ dev = [
     "pytest-html~=4.0.0",
     "ruff==0.9.5",
     "testfixtures==8.3.0",
-    "testcontainers~=4.10.0",
+    "testcontainers[mongodb]~=4.10.0",
     # FIXME: The version of "requests" is pinned
     # to avoid the bug described in https://github.com/docker/docker-py/issues/3256
     # We should upgrade to "docker~=7.1.0" to fix the issue but it is not compatible

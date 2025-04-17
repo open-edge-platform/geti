@@ -331,16 +331,6 @@ wheels = [
 ]
 
 [[package]]
-name = "bson"
-version = "0.5.10"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "python-dateutil" },
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4d/53/7c534a38850f2252275d7f949aed2219095e90df1e2d180a9c8ed139e499/bson-0.5.10.tar.gz", hash = "sha256:d6511b2ab051139a9123c184de1a04227262173ad593429d21e443d6462d6590", size = 10363 }
-
-[[package]]
 name = "cachetools"
 version = "5.5.2"
 source = { registry = "https://pypi.org/simple" }
@@ -642,7 +632,6 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "click" },
-    { name = "geti-types", extra = ["bson"] },
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest" },
@@ -673,7 +662,6 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "click", specifier = "==8.1.7" },
-    { name = "geti-types", extras = ["bson"], editable = "../../../../libs/types" },
     { name = "mypy", specifier = "==1.10.0" },
     { name = "pre-commit", specifier = "==2.15.0" },
     { name = "pytest", specifier = "~=7.3.2" },
@@ -1114,11 +1102,6 @@ dev = [
 name = "geti-types"
 version = "1.0.2"
 source = { editable = "../../../../libs/types" }
-
-[package.optional-dependencies]
-bson = [
-    { name = "bson" },
-]
 
 [package.metadata]
 requires-dist = [{ name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" }]
@@ -1863,18 +1846,15 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cachetools", specifier = "~=5.5" },
-    { name = "decord", marker = "extra == 'decord'", specifier = "==0.6.0" },
     { name = "geti-feature-tools", editable = "../../../../libs/feature_tools" },
     { name = "geti-types", editable = "../../../../libs/types" },
     { name = "opencv-python-headless", specifier = "==4.10.0.84" },
     { name = "sc-sdk", editable = "../../../libs/sc_sdk" },
 ]
-provides-extras = ["decord"]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "click", specifier = "~=8.1" },
-    { name = "media-utils", extras = ["decord"] },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=2.15" },
     { name = "pytest", specifier = "~=7.0" },
@@ -3467,7 +3447,7 @@ dev = [
     { name = "ruff", specifier = "~=0.11" },
     { name = "scikit-image", specifier = "==0.20.0" },
     { name = "scikit-learn", specifier = "~=1.6" },
-    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
+    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.10" },
     { name = "testfixtures", specifier = "==7.0.0" },
     { name = "types-cachetools" },
     { name = "types-pyyaml" },

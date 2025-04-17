@@ -4,17 +4,11 @@
 import { DOMAIN } from '../projects/core.interface';
 import { SupportedAlgorithmDTO } from './dtos/supported-algorithms.interface';
 
-export enum ModelTemplatesNames {
-    ACCURACY = 'Accuracy',
-    SPEED = 'Speed',
-    BALANCE = 'Balance',
-}
-
 export interface SupportedAlgorithm {
     name: SupportedAlgorithmDTO['name'];
     modelSize: SupportedAlgorithmDTO['model_size'];
     modelTemplateId: SupportedAlgorithmDTO['model_template_id'];
-    templateName: ModelTemplatesNames | undefined;
+    templateName: string | undefined;
     domain: DOMAIN;
     summary: string;
     gigaflops: number;

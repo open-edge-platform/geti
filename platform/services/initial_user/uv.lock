@@ -273,6 +273,7 @@ logger = [
 
 [package.metadata]
 requires-dist = [
+    { name = "confluent-kafka", marker = "extra == 'kafka'", specifier = ">=1.8.2,<=2.3.0" },
     { name = "fastapi", marker = "extra == 'fastapi'", specifier = "~=0.115" },
     { name = "grpcio", marker = "extra == 'grpc'", specifier = ">=1.51.1,<2.0" },
     { name = "opentelemetry-api", marker = "extra == 'telemetry'", specifier = "==1.24.0" },
@@ -1196,13 +1197,12 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "grpcio-tools", specifier = "~=1.60.0" },
     { name = "mypy", specifier = "~=1.15" },
     { name = "mypy-protobuf", specifier = "~=3.5.0" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "protobuf", specifier = "~=4.23.0" },
     { name = "pytest", specifier = "~=8.3" },
-    { name = "pytest-mock", specifier = "==3.12.0" },
+    { name = "pytest-mock", specifier = "~=3.14" },
     { name = "ruff", specifier = "~=0.11" },
     { name = "types-protobuf", specifier = "==4.24.0.20240129" },
 ]

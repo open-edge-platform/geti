@@ -162,72 +162,82 @@ test.describe('Test model train dialog pipeline', () => {
         await trainModelDialog.train();
     });
 
-    test('Check if tiling switch hides connected configurable parameters - reconfigure active model', async ({
-        configurationParametersPage,
-        page,
-        registerApiResponse,
-    }) => {
-        registerApiResponse('GetProjectStatus', (_, res, ctx) => {
-            return res(
-                // @ts-expect-error Issue ie openapi types
-                ctx.json(
-                    getMockedProjectStatusDTO({
-                        tasks: [getMockedProjectStatusTask({ id: '6101254defba22ca453f11d1', ready_to_train: true })],
-                    })
-                )
-            );
+    test.describe('Configure parameters', () => {
+        test.use({ featureFlags: { FEATURE_FLAG_TRAINING_FLOW_REVAMP: false } });
+
+        test('Check if tiling switch hides connected configurable parameters - reconfigure active model', async ({
+            configurationParametersPage,
+            page,
+            registerApiResponse,
+        }) => {
+            registerApiResponse('GetProjectStatus', (_, res, ctx) => {
+                return res(
+                    // @ts-expect-error Issue ie openapi types
+                    ctx.json(
+                        getMockedProjectStatusDTO({
+                            tasks: [
+                                getMockedProjectStatusTask({ id: '6101254defba22ca453f11d1', ready_to_train: true }),
+                            ],
+                        })
+                    )
+                );
+            });
+
+            registerApiResponse('GetFullConfiguration', (_, res, ctx) => {
+                return res(ctx.status(200), ctx.json(segmentationConfigurationMock));
+            });
+
+            await page.goto(CLASSIFICATION_MODELS_URL);
+            await configurationParametersPage.openConfigurableParameters();
+
+            await configurationParametersPage.openParametersSection('Instance segmentation');
+            await configurationParametersPage.openParametersGroup('Tiling');
+
+            await configurationParametersPage.toggleTiling(true);
+            await configurationParametersPage.checkTilingParametersVisibility(true);
+
+            await configurationParametersPage.toggleTiling(false);
+            await configurationParametersPage.checkTilingParametersVisibility(false);
+
+            await configurationParametersPage.closeConfigurableParameters();
         });
 
-        registerApiResponse('GetFullConfiguration', (_, res, ctx) => {
-            return res(ctx.status(200), ctx.json(segmentationConfigurationMock));
-        });
+        test(
+            'Check if tiling switch hides connected configurable parameters - new model, manual' + ' configuration',
+            async ({ configurationParametersPage, page, registerApiResponse }) => {
+                registerApiResponse('GetProjectStatus', (_, res, ctx) => {
+                    return res(
+                        // @ts-expect-error Issue ie openapi types
+                        ctx.json(
+                            getMockedProjectStatusDTO({
+                                tasks: [
+                                    getMockedProjectStatusTask({
+                                        id: '60db493fd20945a0046f56d2',
+                                        ready_to_train: true,
+                                    }),
+                                ],
+                            })
+                        )
+                    );
+                });
 
-        await page.goto(CLASSIFICATION_MODELS_URL);
-        await configurationParametersPage.openConfigurableParameters();
+                registerApiResponse('GetTaskConfiguration', (_, res, ctx) => {
+                    return res(ctx.status(200), ctx.json(segmentationConfigurationMock.task_chain[0]));
+                });
 
-        await configurationParametersPage.openParametersSection('Instance segmentation');
-        await configurationParametersPage.openParametersGroup('Tiling');
+                await page.goto(CLASSIFICATION_MODELS_URL);
+                await configurationParametersPage.openTrainNewModelConfigurableParameters();
 
-        await configurationParametersPage.toggleTiling(true);
-        await configurationParametersPage.checkTilingParametersVisibility(true);
+                await configurationParametersPage.openParametersGroup('Tiling');
 
-        await configurationParametersPage.toggleTiling(false);
-        await configurationParametersPage.checkTilingParametersVisibility(false);
+                await configurationParametersPage.toggleTiling(true);
+                await configurationParametersPage.checkTilingParametersVisibility(true);
 
-        await configurationParametersPage.closeConfigurableParameters();
-    });
+                await configurationParametersPage.toggleTiling(false);
+                await configurationParametersPage.checkTilingParametersVisibility(false);
 
-    test('Check if tiling switch hides connected configurable parameters - new model, manual configuration', async ({
-        configurationParametersPage,
-        page,
-        registerApiResponse,
-    }) => {
-        registerApiResponse('GetProjectStatus', (_, res, ctx) => {
-            return res(
-                // @ts-expect-error Issue ie openapi types
-                ctx.json(
-                    getMockedProjectStatusDTO({
-                        tasks: [getMockedProjectStatusTask({ id: '60db493fd20945a0046f56d2', ready_to_train: true })],
-                    })
-                )
-            );
-        });
-
-        registerApiResponse('GetTaskConfiguration', (_, res, ctx) => {
-            return res(ctx.status(200), ctx.json(segmentationConfigurationMock.task_chain[0]));
-        });
-
-        await page.goto(CLASSIFICATION_MODELS_URL);
-        await configurationParametersPage.openTrainNewModelConfigurableParameters();
-
-        await configurationParametersPage.openParametersGroup('Tiling');
-
-        await configurationParametersPage.toggleTiling(true);
-        await configurationParametersPage.checkTilingParametersVisibility(true);
-
-        await configurationParametersPage.toggleTiling(false);
-        await configurationParametersPage.checkTilingParametersVisibility(false);
-
-        await configurationParametersPage.closeConfigurableParameters();
+                await configurationParametersPage.closeConfigurableParameters();
+            }
+        );
     });
 });

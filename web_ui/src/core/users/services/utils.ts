@@ -120,6 +120,7 @@ export const getUserEntity = (user: UserDTO): User => {
         modifiedAt,
         userPhoto,
         roles,
+        userConsent,
         currentSuccessfulLogin,
     } = user;
 
@@ -138,6 +139,7 @@ export const getUserEntity = (user: UserDTO): User => {
         modifiedAt,
         modifiedBy,
         firstName,
+        userConsent,
         currentSuccessfulLogin,
         // TODO: remove ?? null statement when backend supports sending avatar
         userPhoto: userPhoto ?? null,
@@ -168,6 +170,7 @@ export const getUserDTO = (user: User): UserDTO => {
         modifiedAt,
         userPhoto,
         roles,
+        userConsent,
         currentSuccessfulLogin,
     } = user;
 
@@ -189,6 +192,7 @@ export const getUserDTO = (user: User): UserDTO => {
         status: USER_STATUS_MAPPING_DTO[status],
         organizationStatus: ORGANIZATION_STATUS_MAPPER_DTO[organizationStatus],
         roles: getRolesDTO(roles),
+        userConsent,
     };
 };
 

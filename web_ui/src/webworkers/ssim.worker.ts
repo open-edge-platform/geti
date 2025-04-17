@@ -4,19 +4,17 @@
 // Dependencies get bundled into the worker
 
 import { expose } from 'comlink';
-import OpenCV from 'opencv';
 import type OpenCVTypes from 'OpenCVTypes';
 
 import { RegionOfInterest } from '../core/annotations/annotation.interface';
 import { Rect } from '../core/annotations/shapes.interface';
 import { Vec2 } from '../core/annotations/vec2';
 import { MINIMUM_THRESHOLD, RunSSIMProps, SSIMMatch } from '../pages/annotator/tools/ssim-tool/ssim-tool.interface';
+import cv from './opencv-loader';
+
+declare const self: DedicatedWorkerGlobalScope;
 
 let CV: OpenCVTypes.cv | null = null;
-
-OpenCV.then((cvInstance: OpenCVTypes.cv) => {
-    CV = cvInstance;
-});
 
 const terminate = (): void => {
     self.close();
@@ -115,7 +113,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCV.then((cvInstance) => {
+        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;
