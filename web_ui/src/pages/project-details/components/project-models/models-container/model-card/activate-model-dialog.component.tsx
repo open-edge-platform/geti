@@ -8,7 +8,7 @@ import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Text }
 import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { Button } from '../../../../../../shared/components/button/button.component';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
-import { useTrainStateValue } from '../../train-model-dialog/use-training-state-value/use-training-state-value.hook';
+import { useTrainStateValue } from '../../legacy-train-model-dialog/use-training-state-value/use-training-state-value.hook';
 
 import classes from './model-card.module.scss';
 

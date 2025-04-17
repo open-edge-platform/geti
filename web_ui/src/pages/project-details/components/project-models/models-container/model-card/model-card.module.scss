@@ -46,7 +46,8 @@
     background-color: var(--energy-blue) !important;
 }
 
-.recommendedModelTag {
+.recommendedModelTag,
+.templateNameTag {
     @extend .modelTag;
     color: var(--spectrum-global-color-gray-900) !important;
     background-color: var(--spectrum-global-color-gray-400) !important;

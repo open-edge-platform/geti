@@ -11,7 +11,10 @@ import isEmpty from 'lodash/isEmpty';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
 import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
-import { isDeprecatedAlgorithm, isObsoleteAlgorithm } from '../train-model-dialog/model-templates-selection/utils';
+import {
+    isDeprecatedAlgorithm,
+    isObsoleteAlgorithm,
+} from '../legacy-train-model-dialog/model-templates-selection/utils';
 import { ModelCard } from './model-card/model-card.component';
 import { ModelVersion } from './model-card/model-card.interface';
 import { ModelsContainerHeader } from './models-container-header.component';

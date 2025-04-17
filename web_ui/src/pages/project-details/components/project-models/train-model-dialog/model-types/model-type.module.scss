@@ -1,0 +1,16 @@
+.trainTemplateName {
+    color: var(--spectrum-global-color-gray-900);
+    margin: 0;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.infoTooltip {
+    margin-left: calc(var(--spectrum-global-dimension-size-175) * -1);
+}
+
+.selected {
+    color: var(--energy-blue);
+}

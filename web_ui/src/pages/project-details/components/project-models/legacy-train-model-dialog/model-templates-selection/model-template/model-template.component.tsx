@@ -10,7 +10,7 @@ import { ModelArchitectureTooltipText } from '../../../model-architecture-toolti
 import { ActiveModelTag } from '../../../models-container/model-card/active-model-tag.component';
 import { DeprecatedTag } from '../../../models-container/model-card/deprecated-model-tag.component';
 import { RecommendedModelTag } from '../../../models-container/model-card/recommended-model-tag.component';
-import { SelectableCard } from '../../selectable-card/selectable-card.component';
+import { SelectableCard } from '../../../train-model-dialog/selectable-card/selectable-card.component';
 import { isDeprecatedAlgorithm } from '../utils';
 
 import classes from './model-template.module.scss';

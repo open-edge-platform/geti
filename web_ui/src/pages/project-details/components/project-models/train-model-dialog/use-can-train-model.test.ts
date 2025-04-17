@@ -26,14 +26,14 @@ describe('useCanTrainModel', () => {
                 })
             );
 
-        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier, task), {
+        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier), {
             providerProps: {
                 projectService,
             },
         });
 
         await waitFor(() => {
-            expect(result.current).toEqual({ canTrainModel: true, numberOfRequiredAnnotations: undefined });
+            expect(result.current(task)).toEqual({ canTrainModel: true, numberOfRequiredAnnotations: undefined });
         });
     });
 
@@ -46,14 +46,14 @@ describe('useCanTrainModel', () => {
                 })
             );
 
-        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier, task), {
+        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier), {
             providerProps: {
                 projectService,
             },
         });
 
         await waitFor(() => {
-            expect(result.current).toEqual({ canTrainModel: true, numberOfRequiredAnnotations: undefined });
+            expect(result.current(task)).toEqual({ canTrainModel: true, numberOfRequiredAnnotations: undefined });
         });
     });
 
@@ -66,14 +66,14 @@ describe('useCanTrainModel', () => {
                 })
             );
 
-        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier, task), {
+        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier), {
             providerProps: {
                 projectService,
             },
         });
 
         await waitFor(() => {
-            expect(result.current).toEqual({ canTrainModel: false, numberOfRequiredAnnotations: 2 });
+            expect(result.current(task)).toEqual({ canTrainModel: false, numberOfRequiredAnnotations: 2 });
         });
     });
 
@@ -86,14 +86,14 @@ describe('useCanTrainModel', () => {
                 })
             );
 
-        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier, task), {
+        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier), {
             providerProps: {
                 projectService,
             },
         });
 
         await waitFor(() => {
-            expect(result.current).toEqual({ canTrainModel: false, numberOfRequiredAnnotations: 3 });
+            expect(result.current(task)).toEqual({ canTrainModel: false, numberOfRequiredAnnotations: 3 });
         });
     });
 
@@ -112,14 +112,14 @@ describe('useCanTrainModel', () => {
                 })
             );
 
-        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier, task), {
+        const { result } = renderHookWithProviders(() => useCanTrainModel(projectIdentifier), {
             providerProps: {
                 projectService,
             },
         });
 
         await waitFor(() => {
-            expect(result.current).toEqual({ canTrainModel: false, numberOfRequiredAnnotations: 3 });
+            expect(result.current(task)).toEqual({ canTrainModel: false, numberOfRequiredAnnotations: 3 });
         });
     });
 });

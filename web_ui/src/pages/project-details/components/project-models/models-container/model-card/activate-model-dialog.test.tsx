@@ -15,8 +15,8 @@ jest.mock('../../../../hooks/use-credits-to-consume.hook', () => ({
     useTotalCreditPrice: jest.fn(),
 }));
 
-jest.mock('../../train-model-dialog/use-training-state-value/use-training-state-value.hook', () => ({
-    ...jest.requireActual('../../train-model-dialog/use-training-state-value/use-training-state-value.hook'),
+jest.mock('../../legacy-train-model-dialog/use-training-state-value/use-training-state-value.hook', () => ({
+    ...jest.requireActual('../../legacy-train-model-dialog/use-training-state-value/use-training-state-value.hook'),
 }));
 
 describe('ActivateModelDialog', () => {

@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { CSSProperties, FC, Key } from 'react';
+import { CSSProperties, FC } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { ButtonGroup, Content, Dialog, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { dimensionValue } from '@react-spectrum/utils';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import { Task } from '../../../../../core/projects/task.interface';
@@ -11,12 +12,9 @@ import { useNavigateToAnnotatorRoute } from '../../../../../core/services/use-na
 import { Button } from '../../../../../shared/components/button/button.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { NotEnoughWarning } from '../../common/not-enough-warning/not-enough-warning.component';
-import { TaskSelection } from './model-templates-selection/task-selection.component';
-
-import classes from './train-model-dialog.module.scss';
+import { TaskSelection } from './model-types/task-selection.component';
 
 interface NotEnoughAnnotationsDialogProps {
-    isOpen: boolean;
     onClose: () => void;
     tasks: Task[];
     selectedTask: Task;
@@ -30,7 +28,6 @@ const dialogStyles = {
 } as CSSProperties;
 
 export const NotEnoughAnnotationsDialog: FC<NotEnoughAnnotationsDialogProps> = ({
-    isOpen,
     onClose,
     tasks,
     selectedTask,
@@ -49,57 +46,39 @@ export const NotEnoughAnnotationsDialog: FC<NotEnoughAnnotationsDialogProps> = (
         });
     };
 
-    const handleChangeTask = (domain: Key) => {
-        const newSelectedTask = tasks.find((task) => task.domain === domain);
-
-        if (newSelectedTask === undefined || newSelectedTask.id === selectedTask.id) {
-            return;
-        }
-
-        onTaskChange(newSelectedTask);
-    };
-
     return (
-        <DialogContainer onDismiss={onClose}>
-            {isOpen && (
-                <Dialog maxWidth={'100rem'} width={'80vw'} UNSAFE_style={dialogStyles}>
-                    <Heading>Not enough annotations</Heading>
-                    <Divider size={'S'} />
-                    <Content>
-                        <Flex gap={'size-200'} direction={'column'}>
-                            {isTaskChainProject && (
-                                <TaskSelection
-                                    tasks={tasks}
-                                    onTaskChange={handleChangeTask}
-                                    selectedTask={selectedTask.domain}
-                                />
-                            )}
+        <Dialog maxWidth={'100rem'} width={'80vw'} UNSAFE_style={dialogStyles}>
+            <Heading>Not enough annotations</Heading>
+            <Divider size={'S'} />
+            <Content>
+                <Flex gap={'size-200'} direction={'column'}>
+                    {isTaskChainProject && (
+                        <TaskSelection tasks={tasks} onTaskChange={onTaskChange} selectedTask={selectedTask} />
+                    )}
 
-                            <NotEnoughWarning>
-                                <Text>
-                                    Required number of annotations for this training:{' '}
-                                    <Text UNSAFE_style={{ fontWeight: 700 }}>{numberOfRequiredAnnotations}</Text>
-                                </Text>
-                            </NotEnoughWarning>
-                            <Text UNSAFE_className={classes.notEnoughAnnotations}>
-                                You have not annotated enough media to train a model for {`"${selectedTask.title}" `}
-                                task.
-                                <br />
-                                Please annotate more media to train a model.
-                            </Text>
-                        </Flex>
-                    </Content>
-                    <ButtonGroup UNSAFE_className={classes.buttonGroup}>
-                        <Button variant={'secondary'} onPress={onClose} id={'cancel-button-id'}>
-                            Cancel
-                        </Button>
+                    <NotEnoughWarning>
+                        <Text>
+                            Required number of annotations for this training:{' '}
+                            <Text UNSAFE_style={{ fontWeight: 700 }}>{numberOfRequiredAnnotations}</Text>
+                        </Text>
+                    </NotEnoughWarning>
+                    <Text UNSAFE_style={{ fontStyle: dimensionValue('size-200') }}>
+                        You have not annotated enough media to train a model for {`"${selectedTask.title}" `}
+                        task.
+                        <br />
+                        Please annotate more media to train a model.
+                    </Text>
+                </Flex>
+            </Content>
+            <ButtonGroup>
+                <Button variant={'secondary'} onPress={onClose} id={'cancel-button-id'}>
+                    Cancel
+                </Button>
 
-                        <Button variant={'accent'} onPress={handleGoToAnnotator}>
-                            {isAnomalyProject ? 'Explore' : 'Annotate interactively'}
-                        </Button>
-                    </ButtonGroup>
-                </Dialog>
-            )}
-        </DialogContainer>
+                <Button variant={'accent'} onPress={handleGoToAnnotator}>
+                    {isAnomalyProject ? 'Explore' : 'Annotate interactively'}
+                </Button>
+            </ButtonGroup>
+        </Dialog>
     );
 };

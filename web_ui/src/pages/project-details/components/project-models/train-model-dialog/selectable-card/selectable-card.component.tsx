@@ -68,7 +68,7 @@ export const SelectableCard = ({
                 borderBottomEndRadius={'regular'}
                 borderBottomStartRadius={'regular'}
                 borderBottomColor={'gray-100'}
-                height={'size-1000'}
+                minHeight={'size-1000'}
                 UNSAFE_className={[
                     classes.selectableCardDescription,
                     isSelected ? classes.selectedDescription : '',

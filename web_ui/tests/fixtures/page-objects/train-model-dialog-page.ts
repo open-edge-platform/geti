@@ -3,7 +3,7 @@
 
 import { Page } from '@playwright/test';
 
-import { ModelConfigurationOption } from '../../../src/pages/project-details/components/project-models/train-model-dialog/model-templates-selection/utils';
+import { ModelConfigurationOption } from '../../../src/pages/project-details/components/project-models/legacy-train-model-dialog/model-templates-selection/utils';
 
 export class TrainModelDialogPage {
     constructor(private page: Page) {}
