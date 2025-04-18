@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-email-templates
+  namespace: {{ .Release.Namespace }}
+data:
+  InvitationMailTopic: {{ .Values.templates.InvitationMailTopic | quote }}
+  InvitationMailMessage: {{ .Values.templates.InvitationMailMessage | quote }}
+  PasswordResetTopic: {{ .Values.templates.PasswordResetTopic | quote }}
+  PasswordResetMessage: {{ .Values.templates.PasswordResetMessage | quote }}
