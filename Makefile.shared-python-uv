@@ -108,4 +108,7 @@ builder:
 		-v "$(ROOT_DIR):/app" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v ~/.docker/config.json:/home/bulider/.docker/config.json \
+		-v /app/$(RELATIVE_PATH)/.venv \
+		-v /app/$(RELATIVE_PATH)/.mypy_cache \
+		-v /app/$(RELATIVE_PATH)/.ruff_cache \
 		-w "/app/$(RELATIVE_PATH)" ${DOCKER_PROXY} ${PYTHON_BUILDER_IMAGE} make $(BUILDER_ARGS)

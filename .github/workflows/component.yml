@@ -35,6 +35,9 @@ jobs:
     env:
       TAG: ${{ inputs.image-tag || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
+      USE_PROXY: true
+      PYTHON_BUILDER_IMAGE: ${{ secrets.REGISTRY }}/builder-images/python-builder:v0.1
+      GO_BUILDER_IMAGE: ${{ secrets.REGISTRY }}/builder-images/go-builder:v0.1
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2

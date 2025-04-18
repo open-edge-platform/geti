@@ -18,13 +18,12 @@ REGISTRY                          ?= local
 IMAGES_REGISTRY                   ?= ${REGISTRY}/geti
 CHARTS_REGISTRY                   ?= ${REGISTRY}/geti/charts
 BASE_IMAGES_REGISTRY              ?= ${REGISTRY}/base-images
-BUILDER_IMAGES_REGISTRY           ?= ${REGISTRY}/builder-images
 
 ##
 # Builder images
 ##
-PYTHON_BUILDER_IMAGE              ?= ${BUILDER_IMAGES_REGISTRY}/python-builder:v0.1
-GO_BUILDER_IMAGE                  ?= ${BUILDER_IMAGES_REGISTRY}/go-builder:v0.1
+PYTHON_BUILDER_IMAGE              ?= python-builder
+GO_BUILDER_IMAGE                  ?= go-builder
 
 ###
 # base images versions
@@ -57,11 +56,16 @@ DOCKER_REGISTRY					  := $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY),)
 
 DOCKER_BUILD_CONTEXT              ?=
 
+ifdef USE_PROXY
 DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
-
 DOCKER_PROXY                      := -e http_proxy=$(http_proxy) \
 									 -e https_proxy=$(https_proxy) \
 									 -e no_proxy=$(no_proxy)
+else
+DOCKER_EXTRA_ARGS	              ?=
+DOCKER_PROXY                      ?=
+endif
+
 
 ###
 # docker images
