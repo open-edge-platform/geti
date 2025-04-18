@@ -46,7 +46,7 @@ global:
   logging_config_dir: "/mnt/logging_config"
   tag: ""
   docker_namespace: geti
-  registry_address: dev-registry.toolbox.iotg.sclab.intel.com
+  registry_address: ""
   enable_local_image_pull_secret: false
   cors_policy:
     enabled: false
