@@ -29,6 +29,15 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
+  runAsUser: 65532
+  capabilities:
+    drop:
+      - ALL
+        
+securityContext_init:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
   runAsUser: 10001
   capabilities:
     drop:
@@ -57,6 +66,7 @@ invitation:
   link: "geti.com/invitation_link"
 
 global:
+  docker_namespace: geti
   manage_users: false
   manage_users_roles: false
   acc_svc_mod: false

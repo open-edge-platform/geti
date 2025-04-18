@@ -27,7 +27,7 @@ import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.ho
 import { isModelDeleted } from '../../../../utils';
 import { NotEnoughCreditsDialog } from '../../../common/not-enough-credits-dialog/not-enough-credits-dialog.component';
 import { RunTestDialog } from '../../../project-tests/run-test-dialog/run-test-dialog.component';
-import { getTrainingBodyDTO } from '../../train-model-dialog/utils';
+import { getTrainingBodyDTO } from '../../legacy-train-model-dialog/utils';
 import { ActivateModelDialog } from './activate-model-dialog.component';
 import { DeleteModelDialog } from './delete-model-dialog.component';
 import { ModelVersion } from './model-card.interface';

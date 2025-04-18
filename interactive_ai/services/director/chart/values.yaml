@@ -68,7 +68,7 @@ global:
   logs_dir: ''
   logging_config_dir: ''
   storage_volume_claim_name_director: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   min_free_disk_space_gib: 20
   running_on_vm: false

@@ -39,5 +39,5 @@ global:
   overwrite_resources: false
   logging_config_dir: ''
   enable_master_node_selector: true
-  docker_namespace: impp
+  docker_namespace: geti
   use_dynamic_helm_chart_tag: false

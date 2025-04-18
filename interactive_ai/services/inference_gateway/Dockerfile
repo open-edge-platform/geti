@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Builder image
-FROM golang:1.23.3 AS builder
+FROM golang:1.23.8 AS builder
 
 WORKDIR /build/interactive_ai/service
 

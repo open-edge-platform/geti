@@ -9,13 +9,14 @@ interface InfoTooltipProps {
     id: string;
     tooltipText: ReactNode;
     iconColor?: string | undefined;
+    className?: string;
 }
 
-export const InfoTooltip = ({ tooltipText, id, iconColor }: InfoTooltipProps): JSX.Element => {
+export const InfoTooltip = ({ tooltipText, id, iconColor, className }: InfoTooltipProps): JSX.Element => {
     const style = iconColor ? ({ '--spectrum-alias-icon-color': iconColor } as CSSProperties) : {};
 
     return (
-        <ContextualHelp variant='info' id={id} data-testid={id} UNSAFE_style={style}>
+        <ContextualHelp variant='info' id={id} data-testid={id} UNSAFE_className={className} UNSAFE_style={style}>
             <Content marginTop='0'>
                 <Text>{tooltipText}</Text>
             </Content>

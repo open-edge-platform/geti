@@ -1,8 +1,8 @@
 module geti.com/account_service_grpc
 
-go 1.23.0
+go 1.23.3
 
-toolchain go1.23.3
+toolchain go1.23.8
 
 require (
 	github.com/golang/protobuf v1.5.4

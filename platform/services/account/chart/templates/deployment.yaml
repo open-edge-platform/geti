@@ -35,7 +35,7 @@ spec:
               --namespace {{ .Release.Namespace }}
               init-job-{{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext_init | nindent 12 }}
           resources:
             {{- toYaml .Values.initResources | nindent 12 }}
       containers:

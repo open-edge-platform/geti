@@ -1,80 +1,62 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { CSSProperties } from 'react';
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Flex,
-    Form,
-    Heading,
-    Text,
-} from '@adobe/react-spectrum';
-import isFunction from 'lodash/isFunction';
+import { FC } from 'react';
+
+import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { Button } from '../../../../../shared/components/button/button.component';
 import { ButtonCreditsToConsume } from '../../project-model/components/button-credits-to-consume/button-credits-to-consume.component';
 import { NotEnoughAnnotationsDialog } from './not-enough-annotations-dialog.component';
+import { TrainModelBasic } from './train-model-basic.component';
 import { useCanTrainModel } from './use-can-train-model.hook';
-import { useTrainStateValue } from './use-training-state-value/use-training-state-value.hook';
-import { TrainingSteps } from './use-training-state-value/use-training-state-value.interface';
+import { useTrainModelState } from './use-train-model-state.hook';
 
-import sharedClasses from '../../../../../shared/shared.module.scss';
-import classes from './train-model-dialog.module.scss';
-
-interface TrainModelDialogProps {
+interface TrainModelProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
 }
 
-const dialogStyles = {
-    '--spectrum-dialog-padding-x': 'var(--spectrum-global-dimension-size-250)',
-    '--spectrum-dialog-padding-y': 'var(--spectrum-global-dimension-size-350)',
-} as CSSProperties;
+interface TrainModelDialogProps {
+    onClose: () => void;
+    onSuccess?: () => void;
+    isAllowedToTrainModel: ReturnType<typeof useCanTrainModel>;
+}
 
-export const TrainModelDialog = ({ isOpen, onClose, onSuccess }: TrainModelDialogProps): JSX.Element => {
-    const { useTrainModelMutation } = useModels();
-    const trainModel = useTrainModelMutation();
+const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAllowedToTrainModel }) => {
     const projectIdentifier = useProjectIdentifier();
 
+    const { useTrainModelMutation } = useModels();
+    const trainModel = useTrainModelMutation();
+
     const {
-        stepConfig,
-        showNextButton,
-        showBackButton,
-        nextAction,
-        prevAction,
+        isBasicMode,
+        openAdvancedSettingsMode,
+        openBasicMode,
+        algorithms,
+        selectedModelTemplateId,
+        changeSelectedTemplateId,
+        activeModelTemplateId,
         selectedTask,
-        trainingBodyDTO,
-        handleDefaultStateOnClose,
-        renderCurrentStep,
-        handleChangeSelectedTask,
+        changeTask,
         tasks,
-    } = useTrainStateValue();
+        trainingBodyDTO,
+        isTaskChainProject,
+    } = useTrainModelState();
 
-    const isConfigParamsStep = stepConfig.key === TrainingSteps.CONFIGURABLE_PARAMETERS;
-
-    const { canTrainModel, numberOfRequiredAnnotations } = useCanTrainModel(projectIdentifier, selectedTask);
-
-    const handleOnDismiss = (): void => {
-        onClose();
-        handleDefaultStateOnClose();
-    };
+    const { canTrainModel, numberOfRequiredAnnotations } = isAllowedToTrainModel(selectedTask);
 
     const handleSubmit = (): void => {
         trainModel.mutate(
             { projectIdentifier, body: trainingBodyDTO },
             {
-                onSuccess: () => {
-                    handleOnDismiss();
-                    isFunction(onSuccess) && onSuccess();
-                },
+                onSuccess,
             }
         );
     };
@@ -82,79 +64,74 @@ export const TrainModelDialog = ({ isOpen, onClose, onSuccess }: TrainModelDialo
     if (!canTrainModel) {
         return (
             <NotEnoughAnnotationsDialog
-                isOpen={isOpen}
-                onClose={handleOnDismiss}
+                onClose={onClose}
                 tasks={tasks}
                 selectedTask={selectedTask}
-                onTaskChange={handleChangeSelectedTask}
+                onTaskChange={changeTask}
                 numberOfRequiredAnnotations={numberOfRequiredAnnotations}
             />
         );
     }
 
     return (
-        <DialogContainer onDismiss={handleOnDismiss}>
+        <Dialog maxWidth={'100rem'} width={'80vw'}>
+            <Heading>Train Model</Heading>
+            <Divider />
+            <Content>
+                {isBasicMode ? (
+                    <TrainModelBasic
+                        selectedTask={selectedTask}
+                        tasks={tasks}
+                        onChangeTask={changeTask}
+                        isTaskChainProject={isTaskChainProject}
+                        activeModelTemplateId={activeModelTemplateId}
+                        selectedModelTemplateId={selectedModelTemplateId}
+                        onChangeSelectedTemplateId={changeSelectedTemplateId}
+                        algorithms={algorithms}
+                    />
+                ) : (
+                    <div>Advanced settings</div>
+                )}
+            </Content>
+
+            <ButtonGroup UNSAFE_style={{ flexWrap: 'wrap' }}>
+                <Button variant={'secondary'} onPress={onClose}>
+                    Cancel
+                </Button>
+                {isBasicMode ? (
+                    <Button variant={'secondary'} onPress={openAdvancedSettingsMode}>
+                        Advanced settings
+                    </Button>
+                ) : (
+                    <Button variant={'secondary'} onPress={openBasicMode}>
+                        Back
+                    </Button>
+                )}
+                <ButtonCreditsToConsume
+                    aria-label={'Start'}
+                    taskId={selectedTask.id}
+                    getTooltip={(totalMedias) =>
+                        // eslint-disable-next-line max-len
+                        `Annotated dataset for this project contains ${totalMedias} images/frames that will be used for training`
+                    }
+                    isLoading={trainModel.isPending}
+                    isDisabled={trainModel.isPending}
+                    id={'start-button-id'}
+                    onPress={handleSubmit}
+                />
+            </ButtonGroup>
+        </Dialog>
+    );
+};
+
+export const TrainModel: FC<TrainModelProps> = ({ isOpen, onClose, onSuccess }) => {
+    const projectIdentifier = useProjectIdentifier();
+    const canTrainModel = useCanTrainModel(projectIdentifier);
+
+    return (
+        <DialogContainer onDismiss={onClose}>
             {isOpen && (
-                // we set height for the configurable parameters step because we don't want it to grow too much in
-                // case we have lots of parameters
-                <Dialog maxWidth={'100rem'} width={'80vw'} UNSAFE_style={dialogStyles}>
-                    <Heading>
-                        <Flex direction={'column'}>
-                            Train model
-                            <Flex
-                                justifyContent={'space-between'}
-                                alignItems={'center'}
-                                UNSAFE_className={classes.trainingDialogDescription}
-                            >
-                                <Text marginTop={'size-50'}>{stepConfig.description}</Text>
-                            </Flex>
-                        </Flex>
-                    </Heading>
-                    <Divider marginBottom={'size-100'} />
-                    <Content UNSAFE_className={trainModel.isPending ? sharedClasses.contentDisabled : ''}>
-                        <Form height={isConfigParamsStep ? '100%' : 'auto'} UNSAFE_style={{ marginTop: 0 }}>
-                            <>{renderCurrentStep(stepConfig.key)}</>
-                        </Form>
-                    </Content>
-                    <ButtonGroup UNSAFE_className={classes.buttonGroup}>
-                        <Button
-                            variant={'secondary'}
-                            onPress={handleOnDismiss}
-                            id={'cancel-button-id'}
-                            isDisabled={trainModel.isPending}
-                        >
-                            Cancel
-                        </Button>
-                        {showBackButton && (
-                            <Button
-                                variant={'primary'}
-                                onPress={prevAction}
-                                id={'back-button-id'}
-                                isDisabled={trainModel.isPending}
-                            >
-                                Back
-                            </Button>
-                        )}
-                        {showNextButton ? (
-                            <Button variant={'primary'} onPress={nextAction} id={'next-button-id'}>
-                                Next
-                            </Button>
-                        ) : (
-                            <ButtonCreditsToConsume
-                                aria-label={'Start'}
-                                taskId={selectedTask.id}
-                                getTooltip={(totalMedias) =>
-                                    // eslint-disable-next-line max-len
-                                    `Annotated dataset for this project contains ${totalMedias} images/frames that will be used for training`
-                                }
-                                isLoading={trainModel.isPending}
-                                isDisabled={trainModel.isPending}
-                                id={'start-button-id'}
-                                onPress={handleSubmit}
-                            />
-                        )}
-                    </ButtonGroup>
-                </Dialog>
+                <TrainModelDialog onClose={onClose} onSuccess={onSuccess} isAllowedToTrainModel={canTrainModel} />
             )}
         </DialogContainer>
     );

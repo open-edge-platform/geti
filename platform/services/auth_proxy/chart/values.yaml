@@ -25,7 +25,7 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 10001
+  runAsUser: 65532
   capabilities:
     drop:
       - ALL
@@ -45,8 +45,8 @@ global:
   istio_ambient_mesh: false
   logging_config_dir: "/mnt/logging_config"
   tag: ""
-  docker_namespace: "impp"
-  registry_address: dev-registry.toolbox.iotg.sclab.intel.com
+  docker_namespace: geti
+  registry_address: ""
   enable_local_image_pull_secret: false
   cors_policy:
     enabled: false

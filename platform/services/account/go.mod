@@ -1,8 +1,8 @@
 module account_service
 
-go 1.23.0
+go 1.23.3
 
-toolchain go1.23.3
+toolchain go1.23.8
 
 replace (
 	common/utils => ./app/common/utils

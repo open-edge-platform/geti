@@ -33,7 +33,7 @@ api_path: /api/graphql(/|$)(.*)
 global:
   security_headers: ''
   stripped_headers: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   cors_policy:
     enabled: false

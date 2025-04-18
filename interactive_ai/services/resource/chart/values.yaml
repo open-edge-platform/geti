@@ -52,7 +52,7 @@ global:
   logs_dir: ''
   logging_config_dir: ''
   storage_volume_claim_name_resource: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   acc_svc_settings_enabled: false
   min_free_disk_space_gib: 20

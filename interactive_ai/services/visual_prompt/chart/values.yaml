@@ -47,7 +47,7 @@ volumeSecurityContext:
 global:
   security_headers: ''
   stripped_headers: ''
-  docker_namespace: impp
+  docker_namespace: geti
   enable_master_node_selector: true
   min_free_disk_space_gib: 20
   running_on_vm: false

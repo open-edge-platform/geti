@@ -5,4 +5,4 @@ global:
   grafana_enabled: false
   enable_local_image_pull_secret: true
   registry_address: ""
-  docker_namespace: "impp"
+  docker_namespace: geti

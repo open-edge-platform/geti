@@ -12,6 +12,7 @@ logging_config:
   log_level: "INFO"
 
 global:
+  docker_namespace: geti
   enable_local_image_pull_secret: false
 
 securityContext:

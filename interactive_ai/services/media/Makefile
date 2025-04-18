@@ -3,6 +3,4 @@
 
 include ../../../Makefile.shared-go
 
-DOCKER_BUILD_CONTEXT := --build-context dev-go=docker-image://${BASE_IMAGES_REGISTRY}/dev-go:${BASE_DEV_GO_IMAGE_TAG} \
-						--build-context debian_image=docker-image://${BASE_IMAGES_REGISTRY}/debian:${BASE_DEBIAN_IMAGE_TAG} \
-						--build-context go_sdk=$(CWD)/interactive_ai/libs/go_sdk \
+DOCKER_BUILD_CONTEXT := --build-context go_sdk=$(CWD)/interactive_ai/libs/go_sdk

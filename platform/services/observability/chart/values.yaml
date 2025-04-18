@@ -47,7 +47,7 @@ global:
   logging_config_dir: ""
   storage_volume_claim_name_gtw: 'data-storage-volume-claim'
   enable_master_node_selector: true
-  docker_namespace: impp
+  docker_namespace: geti
   cors_policy:
     enabled: false
     allowed_origins: []

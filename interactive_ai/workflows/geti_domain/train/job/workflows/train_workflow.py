@@ -27,8 +27,8 @@ def train_workflow(  # noqa: PLR0913
     num_image_pulling_threads: int = 10,
     num_upload_threads: int = 2,
     max_training_dataset_size: Optional[int] = None,  # noqa: UP007,
-    min_annotation_size: int | None = None,
-    max_number_of_annotations: int | None = None,
+    min_annotation_size: Optional[int] = None,  # noqa: UP007,
+    max_number_of_annotations: Optional[int] = None,  # noqa: UP007,
     reshuffle_subsets: bool = False,
     # Training command
     command: list[str] = ["bash", "-c", "/opt/run"],

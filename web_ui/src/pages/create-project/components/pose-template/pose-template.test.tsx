@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { act, render, screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 
 import '@testing-library/jest-dom/extend-expect';
 
+import { annotatorRender } from '../../../annotator/test-utils/annotator-render';
 import { MIN_POINTS_MESSAGE } from '../../utils';
 import { EMPTY_POINT_MESSAGE } from './empty-point-message.component';
 import { PoseTemplate, PoseTemplateProps } from './pose-template.component';
@@ -19,13 +20,13 @@ const addPoint = (mouseEventInit: MouseEventInit) => {
 };
 
 describe('PoseTemplate', () => {
-    const renderApp = ({
+    const renderApp = async ({
         animationDirection = 0,
         setValidationError = jest.fn(),
         updateProjectState = jest.fn(),
         keypointError,
     }: Partial<PoseTemplateProps>) => {
-        render(
+        await annotatorRender(
             <PoseTemplate
                 keypointError={keypointError}
                 animationDirection={animationDirection}
@@ -40,8 +41,8 @@ describe('PoseTemplate', () => {
     });
 
     describe('error messages', () => {
-        it('message is visible', () => {
-            renderApp({ keypointError: MIN_POINTS_MESSAGE });
+        it('message is visible', async () => {
+            await renderApp({ keypointError: MIN_POINTS_MESSAGE });
 
             expect(screen.getByTestId('info-section')).toBeInTheDocument();
             expect(screen.getByText(MIN_POINTS_MESSAGE)).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe('PoseTemplate', () => {
 
     it('updates projectTypeMetadata after state updates', async () => {
         const mockUpdateProjectState = jest.fn();
-        renderApp({ updateProjectState: mockUpdateProjectState });
+        await renderApp({ updateProjectState: mockUpdateProjectState });
 
         addPoint({ clientX: 100, clientY: 100 });
 
@@ -68,7 +69,7 @@ describe('PoseTemplate', () => {
     });
 
     it('add points message is not visible when there are points', async () => {
-        renderApp({});
+        await renderApp({});
 
         expect(screen.queryByText(EMPTY_POINT_MESSAGE)).toBeInTheDocument();
 

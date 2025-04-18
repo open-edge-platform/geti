@@ -28,11 +28,6 @@ GO_BUILDER_IMAGE                  ?= go-builder
 ###
 # base images versions
 ###
-BASE_DEBIAN_IMAGE_TAG             ?= 12.8.1
-BASE_PYTHON_IMAGE_TAG             ?= 12.8.1.2
-BASE_DEV_PYTHON_IMAGE_TAG         ?= 12.8.1.2
-BASE_DEV_GO_IMAGE_TAG             ?= 12.8.1.6
-BASE_FFMPEG_TAG                   ?= 12.8.1.1
 BASE_OTE_V2_IMAGE_TAG             ?= 12.8.1.1.30
 
 ###

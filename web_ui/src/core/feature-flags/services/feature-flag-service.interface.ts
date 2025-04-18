@@ -34,7 +34,7 @@ export const DEV_FEATURE_FLAGS = {
     FEATURE_FLAG_MANAGE_USERS: false,
     FEATURE_FLAG_MANAGE_USERS_ROLES: false,
     FEATURE_FLAG_REQ_ACCESS: false,
-    FEATURE_FLAG_TRAINING_FLOW_REVAMP: true,
+    FEATURE_FLAG_TRAINING_FLOW_REVAMP: false,
 
     // Grafana: User has a choice: either to install platform with grafana stack or no, if platform has grafana stack
     // installed, we want to display button that redirects user to grafana page.

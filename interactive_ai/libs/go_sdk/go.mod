@@ -1,6 +1,8 @@
 module geti.com/go_sdk
 
-go 1.23
+go 1.23.3
+
+toolchain go1.23.8
 
 require (
 	github.com/caarlos0/env/v11 v11.2.2

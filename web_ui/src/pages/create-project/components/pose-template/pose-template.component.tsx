@@ -27,6 +27,8 @@ export const PoseTemplate = ({
     updateProjectState,
     setValidationError,
 }: PoseTemplateProps) => {
+    const hasErrors = isNonEmptyString(keypointError);
+
     useEffect(() => {
         setValidationError(getValidationError([]));
 
@@ -51,7 +53,7 @@ export const PoseTemplate = ({
             }}
         >
             <TemplateManager gap={'size-300'} onTemplateChange={handleTemplateChange}>
-                {isNonEmptyString(keypointError) ? (
+                {hasErrors ? (
                     <InfoSection icon={<InfoOutline />} message={keypointError} marginTop={0} height={'size-275'} />
                 ) : (
                     <View height={'size-275'}></View>
