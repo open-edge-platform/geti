@@ -42,8 +42,7 @@ COPY --link public/ public/
 COPY --from=docs_context rest_api /home/app/docs/rest_api/
 COPY --from=api_context schemas /home/app/interactive_ai/services/api/schemas/
 
-RUN REACT_APP_BUILD_TARGET=app npm run-script build && mv build main-app
-RUN REACT_APP_BUILD_TARGET=admin REACT_APP_PUBLIC_PATH=/intel-admin/ npm run-script build && mv build admin-app
+RUN npm run build
 
 #######
 # web_ui
@@ -51,8 +50,8 @@ RUN REACT_APP_BUILD_TARGET=admin REACT_APP_PUBLIC_PATH=/intel-admin/ npm run-scr
 
 FROM nginx_image AS web_ui
 
-COPY --link --from=web_ui_deps /home/app/web_ui/main-app/ /usr/share/nginx/webui/
-COPY --link --from=web_ui_deps /home/app/web_ui/admin-app/ /usr/share/nginx/admin-app/
+COPY --link --from=web_ui_deps /home/app/web_ui/build/app/ /usr/share/nginx/webui/
+COPY --link --from=web_ui_deps /home/app/web_ui/build/admin/ /usr/share/nginx/admin-app/
 RUN useradd -u 10001 webservice
 COPY --link nginx.conf /etc/nginx/nginx.conf
 COPY --link src/maintenance /maintenance

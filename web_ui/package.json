@@ -82,9 +82,12 @@
     "zipson": "^0.2.12"
   },
   "scripts": {
-    "start": "rsbuild dev",
-    "build": "rsbuild build",
+    "start": "rsbuild dev --environment dev",
     "preview": "rsbuild preview",
+    "build": "rsbuild build --environment geti --environment admin",
+    "build:all-routes": "rsbuild build --environment dev",
+    "build:geti": "rsbuild build --environment geti",
+    "build:admin": "rsbuild build --environment admin",
     "build:rest-openapi-spec": "npx @redocly/cli bundle --dereferenced ../docs/rest_api/openapi.yaml -o public/openapi-spec.json",
     "build:server": "npm run build:server-schema && npm run build:server-combine && npm run build:server-types",
     "build:server-combine": "ts-node ./src/core/server/combine.mjs",
