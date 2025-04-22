@@ -9,13 +9,13 @@ DOCKER_BUILD_CONTEXT := --build-context common=../common \
 						--build-context data_migration=../../../../interactive_ai/data_migration \
 						--build-context grpc_interfaces=../../../../grpc_interfaces \
 
-test-unit: venv-dev
+test-unit: venv
 	uv run pytest tests/unit --disable-warnings -v
 
-test-component: venv-dev
+test-component: venv
 	@echo "test-component not available"
 
 # TODO CVS-166347 remove '-' and 'true' workaround after fixing the tests
-test-integration: venv-dev
+test-integration: venv
 	-uv run pytest tests/integration --disable-warnings -v
 	true

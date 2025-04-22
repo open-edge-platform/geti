@@ -9,14 +9,14 @@ DOCKER_BUILD_CONTEXT := --build-context common=../common \
 						--build-context grpc_interfaces=../../../../grpc_interfaces \
 
 # TODO CVS-166211 remove the '-' and 'true' workaround after fixing the tests
-test-unit: venv-dev
+test-unit: venv
 	-uv run pytest tests/unit --disable-warnings -v
 	true
 
-test-component: venv-dev
+test-component: venv
 	@echo "test-component not available"
 
 # TODO CVS-166335 re-enable the tests that timeout due to unavailable Kafka broker
-test-integration: venv-dev
+test-integration: venv
 	# uv run pytest tests/integration --disable-warnings -v
 	@echo "test-integration temporarily disabled"
