@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Builder image
-FROM golang:1.23.8 AS builder
+FROM golang:1.23.8 AS build
 
 WORKDIR /build/interactive_ai/service
 
@@ -23,14 +23,14 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 	CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a -o inference_gateway . 
 
 # Production image
-FROM debian:bookworm-slim AS inference_gateway
+FROM debian:bookworm-slim AS runtime
 
 # Install ffmpeg
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --link --from=builder /build/interactive_ai/service/inference_gateway .
+COPY --link --from=build /build/interactive_ai/service/inference_gateway .
 
 RUN useradd -l -u 10001 non-root
 USER non-root

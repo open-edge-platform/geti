@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Builder image
-FROM golang:1.23.8 AS builder
+FROM golang:1.23.8 AS build
 
 WORKDIR /build/interactive_ai/service
 
@@ -20,9 +20,9 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 	CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a -o media_ms .
 
 # Production image
-FROM gcr.io/distroless/static-debian12:nonroot AS media
+FROM gcr.io/distroless/static-debian12:nonroot AS runtime
 
-COPY --link --from=builder /build/interactive_ai/service/media_ms .
+COPY --link --from=build /build/interactive_ai/service/media_ms .
 
 USER nonroot
 

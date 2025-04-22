@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.7
 
 # Builder image
-FROM golang:1.23.8 AS builder
+FROM golang:1.23.8 AS build
 
 WORKDIR /build/control_plane/auth_proxy
 
@@ -20,9 +20,9 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 	CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a -o auth_proxy .
 
 # Production image
-FROM gcr.io/distroless/static-debian12:nonroot AS auth_proxy
+FROM gcr.io/distroless/static-debian12:nonroot AS runtime
 
-COPY --link --from=builder /build/control_plane/auth_proxy/auth_proxy .
+COPY --link --from=build /build/control_plane/auth_proxy/auth_proxy .
 
 USER nonroot
 
