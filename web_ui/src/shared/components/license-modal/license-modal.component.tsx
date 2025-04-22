@@ -50,7 +50,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
     };
 
     return (
-        <DialogContainer onDismiss={handleDismissModal}>
+        <DialogContainer onDismiss={handleDismissModal} isKeyboardDismissDisabled>
             {isModalOpen && (
                 <Dialog maxHeight={'75vh'}>
                     <Heading marginBottom={'size-300'}>LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT</Heading>
