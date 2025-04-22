@@ -6,10 +6,10 @@ import { useEffect, useRef, useState } from 'react';
 import { KeypointAnnotation } from '../../../../../core/annotations/annotation.interface';
 import { getBoundingBox } from '../../../../../core/annotations/math';
 import { Point } from '../../../../../core/annotations/shapes.interface';
+import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
 import { PoseEdges } from '../../../annotation/shapes/pose-edges.component';
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
-import { useSelected } from '../../../providers/selected-provider/selected-provider.component';
 import { useZoom } from '../../../zoom/zoom-provider.component';
 import {
     getAnnotationInBoundingBox,

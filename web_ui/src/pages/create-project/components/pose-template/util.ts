@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
 import negate from 'lodash/negate';
 
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
@@ -11,7 +10,6 @@ import { LabelsRelationType } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
 import { DEFAULT_LABEL, getNextColor } from '../../../../shared/components/label-tree-view/utils';
-import { EMPTY_LABEL_MESSAGE, MIN_POINTS_MESSAGE } from '../../utils';
 
 export interface EdgeLine {
     id: string;
@@ -65,45 +63,6 @@ export const getDefaultLabelStructure = (name: string) => {
 export const rgbToHex = (r: number, g: number, b: number): string => {
     const toHex = (component: number) => component.toString(16).padStart(2, '0');
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-};
-
-export const getDuplicateLabelNames = (points: KeypointNode[]) => {
-    const duplicates = new Set();
-    const nameCounts: Record<string, number> = {};
-
-    for (const item of points) {
-        if (nameCounts[item.label.name]) {
-            duplicates.add(item.label.name);
-        } else {
-            nameCounts[item.label.name] = 1;
-        }
-    }
-
-    return [...duplicates];
-};
-
-export const getValidationError = (points: KeypointNode[]) => {
-    if (points.length < 1) {
-        return MIN_POINTS_MESSAGE;
-    }
-
-    const duplicates = getDuplicateLabelNames(points);
-    const hasEmptyLabels = points.some(({ label }) => label.name === '');
-
-    if (hasEmptyLabels) {
-        return EMPTY_LABEL_MESSAGE;
-    }
-
-    if (!isEmpty(duplicates)) {
-        const pluralizeLabel =
-            duplicates.length === 1
-                ? `label "${duplicates[0]}" is duplicated`
-                : `labels "${duplicates.join('" ,"')}" are duplicated`;
-
-        return `Label names must be unique, ${pluralizeLabel}`;
-    }
-
-    return undefined;
 };
 
 export const getLabelFromPoint = (point: KeypointNode): LabelTreeItem => {

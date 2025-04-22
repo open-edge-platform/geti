@@ -26,7 +26,8 @@ import {
     NewProjectDialogProvider,
     useNewProjectDialog,
 } from './new-project-dialog-provider/new-project-dialog-provider.component';
-import { MIN_NUMBER_OF_LABELS_FOR_CLASSIFICATION } from './utils';
+import { STEPS } from './new-project-dialog-provider/new-project-dialog-provider.interface';
+import { getLabelsNamesErrors, MIN_NUMBER_OF_LABELS_FOR_CLASSIFICATION } from './utils';
 
 import classes from './new-project-dialog.module.scss';
 
@@ -56,18 +57,20 @@ const NewProjectDialogInner: FC<NewProjectDialogInnerProps> = ({ onCloseDialog }
 
     const { content, hasNextStep, hasPreviousStep, goToNextStep, goToPreviousStep, validationError, metadata } =
         useNewProjectDialog();
+    const { name, selectedDomains, projectTypeMetadata } = metadata;
 
     // Content (<ProjectLabelsManagement />) gets the correct "selectedDomain" as props
     const isClassificationDomain = content.props.selectedDomain === DOMAIN.CLASSIFICATION;
+    const isPoseTemplate = metadata.currentStep === STEPS.POSE_TEMPLATE;
 
     const showClassificationInfo = isClassificationDomain && !hasNextStep;
 
-    const isCreationEnabled =
-        isEmpty(validationError?.tree) && !validationError?.labels && isEmpty(validationError?.keypoint);
+    const pointNames = projectTypeMetadata.at(0)?.keypointStructure?.positions ?? [];
+    const hasKeypointErrors = isPoseTemplate ? getLabelsNamesErrors(pointNames.map(({ label }) => label)) : undefined;
+
+    const isCreationEnabled = isEmpty(validationError?.tree) && !validationError?.labels && isEmpty(hasKeypointErrors);
 
     const handleCreateProject = (): void => {
-        const { name, selectedDomains, projectTypeMetadata } = metadata;
-
         createProjectMutation.mutate(
             {
                 workspaceIdentifier: { workspaceId, organizationId },
@@ -148,7 +151,7 @@ const NewProjectDialogInner: FC<NewProjectDialogInnerProps> = ({ onCloseDialog }
                 {!hasNextStep && (
                     <TooltipWithDisableButton
                         placement={'top'}
-                        disabledTooltip={validationError?.tree || validationError?.keypoint}
+                        disabledTooltip={validationError?.tree || hasKeypointErrors}
                     >
                         <Button
                             id='confirm-create-new-project-button'

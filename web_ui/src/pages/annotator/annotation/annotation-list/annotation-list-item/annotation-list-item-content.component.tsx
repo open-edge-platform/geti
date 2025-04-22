@@ -12,6 +12,7 @@ import { Annotation } from '../../../../../core/annotations/annotation.interface
 import { Label } from '../../../../../core/labels/label.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../../core/media/base.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
+import { useSetHoveredId } from '../../../../../providers/hovered-provider/hovered-provider.component';
 import { Checkbox } from '../../../../../shared/components/checkbox/checkbox.component';
 import { TaskLabelTreeSearchPopover } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search-popover.component';
 import { hasEqualId, runWhenTruthy } from '../../../../../shared/utils';
@@ -19,7 +20,6 @@ import { SelectionIndicator } from '../../../components/labels/label-search/sele
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';
 import { useIsSceneBusy } from '../../../hooks/use-annotator-scene-interaction-state.hook';
-import { useSetHoveredId } from '../../../providers/hovered-provider/hovered-provider.component';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { getAvailableLabelsForAnnotation, getLabelsFromTask } from '../../labels/utils';

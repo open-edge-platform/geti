@@ -5,16 +5,16 @@ import { fireEvent, screen } from '@testing-library/react';
 
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
+import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { getMockedKeypointNode } from '../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
-import { SelectedProvider } from '../../providers/selected-provider/selected-provider.component';
 import { NodeContent } from './node-content.component';
 
 const mockedSetHovered = jest.fn();
-jest.mock('../../providers/hovered-provider/hovered-provider.component', () => ({
+jest.mock('../../../../providers/hovered-provider/hovered-provider.component', () => ({
     useSetHoveredId: () => mockedSetHovered,
 }));
 

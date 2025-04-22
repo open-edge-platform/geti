@@ -7,9 +7,9 @@ import { AnnotationLabel, Annotation as AnnotationType } from '../../../core/ann
 import { Polygon as PolygonShape } from '../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../core/annotations/shapetype.enum';
 import { labelFromModel, labelFromUser } from '../../../core/annotations/utils';
+import { HoveredProvider } from '../../../providers/hovered-provider/hovered-provider.component';
 import { getMockedAnnotation } from '../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel } from '../../../test-utils/mocked-items-factory/mocked-labels';
-import { HoveredProvider } from '../providers/hovered-provider/hovered-provider.component';
 import { DEFAULT_ANNOTATION_STYLES, EDIT_ANNOTATION_STYLES } from '../tools/utils';
 import { Annotation } from './annotation.component';
 

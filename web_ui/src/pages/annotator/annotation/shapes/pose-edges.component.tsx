@@ -8,8 +8,8 @@ import isNil from 'lodash/isNil';
 
 import { BoundingBox, getBoundingBox } from '../../../../core/annotations/math';
 import { isKeypointTask } from '../../../../core/projects/utils';
+import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
-import { useSelected } from '../../providers/selected-provider/selected-provider.component';
 import { getOuterPaddedBoundingBox, getPointsEdges } from '../../tools/keypoint-tool/utils';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { KeypointProps } from './shape.interface';

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import isEmpty from 'lodash/isEmpty';
 import * as yup from 'yup';
 
 import { LabelItemType, LabelTreeItem } from '../../core/labels/label-tree-view.interface';
@@ -50,3 +51,42 @@ export const validateLabelsSchema = (domain: DOMAIN): yup.Schema<{ labels?: Labe
                 }
             }),
     });
+
+export const getDuplicateLabelNames = (names: string[]) => {
+    const duplicates = new Set();
+    const nameCounts: Record<string, number> = {};
+
+    for (const item of names) {
+        if (nameCounts[item]) {
+            duplicates.add(item);
+        } else {
+            nameCounts[item] = 1;
+        }
+    }
+
+    return [...duplicates];
+};
+
+export const getLabelsNamesErrors = (names: string[]) => {
+    if (names.length < 1) {
+        return MIN_POINTS_MESSAGE;
+    }
+
+    const duplicates = getDuplicateLabelNames(names);
+    const hasEmptyNames = names.some((name) => name === '');
+
+    if (hasEmptyNames) {
+        return EMPTY_LABEL_MESSAGE;
+    }
+
+    if (!isEmpty(duplicates)) {
+        const pluralizeLabel =
+            duplicates.length === 1
+                ? `label "${duplicates[0]}" is duplicated`
+                : `labels "${duplicates.join('" ,"')}" are duplicated`;
+
+        return `Label names must be unique, ${pluralizeLabel}`;
+    }
+
+    return undefined;
+};

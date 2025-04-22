@@ -22,15 +22,13 @@ const addPoint = (mouseEventInit: MouseEventInit) => {
 describe('PoseTemplate', () => {
     const renderApp = async ({
         animationDirection = 0,
-        setValidationError = jest.fn(),
         updateProjectState = jest.fn(),
-        keypointError,
+        metadata = [],
     }: Partial<PoseTemplateProps>) => {
         await annotatorRender(
             <PoseTemplate
-                keypointError={keypointError}
+                metadata={metadata}
                 animationDirection={animationDirection}
-                setValidationError={setValidationError}
                 updateProjectState={updateProjectState}
             />
         );
@@ -42,7 +40,7 @@ describe('PoseTemplate', () => {
 
     describe('error messages', () => {
         it('message is visible', async () => {
-            await renderApp({ keypointError: MIN_POINTS_MESSAGE });
+            await renderApp({});
 
             expect(screen.getByTestId('info-section')).toBeInTheDocument();
             expect(screen.getByText(MIN_POINTS_MESSAGE)).toBeInTheDocument();

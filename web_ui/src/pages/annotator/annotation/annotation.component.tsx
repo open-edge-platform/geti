@@ -6,7 +6,7 @@ import { memo } from 'react';
 import { Annotation as AnnotationInterface } from '../../../core/annotations/annotation.interface';
 import { isLocal, isPrediction } from '../../../core/labels/utils';
 import { Task } from '../../../core/projects/task.interface';
-import { useIsHovered } from '../providers/hovered-provider/hovered-provider.component';
+import { useIsHovered } from '../../../providers/hovered-provider/hovered-provider.component';
 import { DEFAULT_ANNOTATION_STYLES as defaultStyles, EDIT_ANNOTATION_STYLES as editStyles } from '../tools/utils';
 import { getLabelsColor } from './labels/utils';
 import { ShapeFactory } from './shapes/factory.component';

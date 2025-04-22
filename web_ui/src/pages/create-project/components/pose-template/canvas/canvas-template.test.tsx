@@ -7,9 +7,9 @@ import { act, fireEvent, screen } from '@testing-library/react';
 
 import '@testing-library/jest-dom/extend-expect';
 
+import { SelectedProvider } from '../../../../../providers/selected-provider/selected-provider.component';
 import { getMockedKeypointNode } from '../../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
-import { SelectedProvider } from '../../../../annotator/providers/selected-provider/selected-provider.component';
 import { annotatorRender } from '../../../../annotator/test-utils/annotator-render';
 import { TransformZoomAnnotation } from '../../../../annotator/zoom/transform-zoom-annotation.component';
 import { ZoomProvider } from '../../../../annotator/zoom/zoom-provider.component';

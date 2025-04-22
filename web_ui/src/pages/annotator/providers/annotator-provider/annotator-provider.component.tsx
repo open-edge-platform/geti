@@ -15,6 +15,8 @@ import {
     UseSettings,
 } from '../../../../core/user-settings/services/user-settings.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
+import { HoveredProvider } from '../../../../providers/hovered-provider/hovered-provider.component';
+import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { AskToResetFilterBeforeSubmittingAnnotations } from '../../annotation/annotation-filter/ask-to-reset-filter-before-submitting-annotations.component';
@@ -28,10 +30,8 @@ import { AnnotationSceneContext } from '../annotation-scene-provider/annotation-
 import { useAnnotationSceneState } from '../annotation-scene-provider/use-annotation-scene-state.hook';
 import { AnnotationThresholdProvider } from '../annotation-threshold-provider/annotation-threshold-provider.component';
 import { AnnotatorCanvasSettingsProvider } from '../annotator-canvas-settings-provider/annotator-canvas-settings-provider.component';
-import { HoveredProvider } from '../hovered-provider/hovered-provider.component';
 import { PredictionProvider } from '../prediction-provider/prediction-provider.component';
 import { useSelectedMediaItem } from '../selected-media-item-provider/selected-media-item-provider.component';
-import { SelectedProvider } from '../selected-provider/selected-provider.component';
 import { SubmitAnnotationsProvider } from '../submit-annotations-provider/submit-annotations-provider.component';
 import { TaskChainProvider } from '../task-chain-provider/task-chain-provider.component';
 import { useTask } from '../task-provider/task-provider.component';

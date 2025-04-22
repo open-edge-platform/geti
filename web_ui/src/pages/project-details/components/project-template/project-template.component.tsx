@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { ButtonGroup, View } from '@adobe/react-spectrum';
 import { v4 as uuidv4 } from 'uuid';
 
-import { InfoOutline } from '../../../../assets/icons';
+import { Alert } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
@@ -22,12 +22,8 @@ import { UnsavedChangesDialog } from '../../../../shared/components/unsaved-chan
 import { isNonEmptyString } from '../../../../shared/utils';
 import { InfoSection } from '../../../create-project/components/info-section/info-section.component';
 import { TemplateManager } from '../../../create-project/components/pose-template/template-manager.component';
-import {
-    EdgeLine,
-    getProjectTypeMetadata,
-    getValidationError,
-    TemplateState,
-} from '../../../create-project/components/pose-template/util';
+import { EdgeLine, getProjectTypeMetadata, TemplateState } from '../../../create-project/components/pose-template/util';
+import { getLabelsNamesErrors } from '../../../create-project/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 
 const hasEqualLabelId = (id: string) => (point: KeypointNode) => point.label.id === id;
@@ -67,7 +63,7 @@ export const ProjectTemplate = (): JSX.Element => {
 
     const [keypointStructure, setKeypointStructure] = useState(initialKeypointStructure);
 
-    const errors = getValidationError(keypointStructure.points);
+    const errors = getLabelsNamesErrors(keypointStructure.points.map(({ label }) => label.name));
 
     const handleSave = () => {
         editProjectMutation.mutate(
@@ -104,7 +100,12 @@ export const ProjectTemplate = (): JSX.Element => {
                         }}
                     >
                         {isNonEmptyString(errors) ? (
-                            <InfoSection icon={<InfoOutline />} message={errors} marginTop={0} height={'size-400'} />
+                            <InfoSection
+                                icon={<Alert style={{ fill: 'var(--brand-coral-cobalt)' }} />}
+                                height={'size-400'}
+                                message={errors}
+                                marginTop={0}
+                            />
                         ) : (
                             <ButtonGroup align='end'>
                                 <Button

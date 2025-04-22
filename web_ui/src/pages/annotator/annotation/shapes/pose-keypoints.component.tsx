@@ -5,9 +5,9 @@ import { SVGProps } from 'react';
 
 import { CloseBold } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
+import { useIsHovered } from '../../../../providers/hovered-provider/hovered-provider.component';
+import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';
 import { KEYPOINT_RADIUS } from '../../../utils';
-import { useIsHovered } from '../../providers/hovered-provider/hovered-provider.component';
-import { useSelected } from '../../providers/selected-provider/selected-provider.component';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { KeypointProps } from './shape.interface';
 
