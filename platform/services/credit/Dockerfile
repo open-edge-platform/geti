@@ -30,7 +30,7 @@ FROM base AS runtime
 
 RUN useradd -l -u 10001 non-root && \
 	pip3 uninstall -y setuptools pip wheel && \
-    rm -rf /root/.cache/pip \
+    rm -rf /root/.cache/pip
 
 USER non-root
 
