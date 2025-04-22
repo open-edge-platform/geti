@@ -6,13 +6,13 @@
 ###
 # builder image
 ###
-BUILDER_IMAGE_NAME			?= $(notdir $(CURDIR))
-BUILDER_TAG					?= latest
+BUILDER_IMAGE_NAME          ?= $(notdir $(CURDIR))
+BUILDER_TAG                 ?= latest
 
 ###
 # docker configuration
 ###
-BUILDER_PROXY          		:= --build-arg HTTP_PROXY=$(http_proxy) \
+BUILDER_PROXY               := --build-arg HTTP_PROXY=$(http_proxy) \
 							 --build-arg HTTPS_PROXY=$(https_proxy) \
 							 --build-arg NO_PROXY=$(no_proxy) \
 							 --build-arg http_proxy=$(http_proxy) \
@@ -20,9 +20,9 @@ BUILDER_PROXY          		:= --build-arg HTTP_PROXY=$(http_proxy) \
 							 --build-arg no_proxy=$(no_proxy)
 
 ifdef USE_PROXY
-BUILDER_DOCKER_EXTRA_ARGS	?= ${BUILDER_PROXY}
+BUILDER_DOCKER_EXTRA_ARGS   ?= ${BUILDER_PROXY}
 else
-BUILDER_DOCKER_EXTRA_ARGS	?=
+BUILDER_DOCKER_EXTRA_ARGS   ?=
 endif
 
 ###
