@@ -3,13 +3,15 @@
 
 import { useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
 import isFunction from 'lodash/isFunction';
 
 import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';
 import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { Button } from '../button/button.component';
+
+import classes from './license-modal.module.scss';
 
 interface LicenseModalProps {
     onClose?: () => void;
@@ -52,10 +54,10 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
     return (
         <DialogContainer onDismiss={handleDismissModal} isKeyboardDismissDisabled>
             {isModalOpen && (
-                <Dialog maxHeight={'75vh'}>
+                <Dialog maxHeight={'70vh'} UNSAFE_className={classes.licenseModal}>
                     <Heading marginBottom={'size-300'}>LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT</Heading>
                     <Content>
-                        <Flex direction={'column'} alignItems={'center'}>
+                        <Flex direction={'column'} gap={'size-100'}>
                             <Text>
                                 This LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT (“Agreement”) is a contract
                                 between you and Intel Corporation and its affiliates (“Intel”) and governs use of
@@ -65,6 +67,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 these terms on your own behalf or on behalf of your employer, as applicable. If you do
                                 not accept these terms, do not use any Material and destroy all copies of Material.
                             </Text>
+                            <Divider marginTop={'size-100'} size={'S'} />
                             <Text>1 DEFINITIONS.</Text>
                             <Text>
                                 1.1 “Including”, and its variants, whether or not capitalized, means including but not
@@ -86,6 +89,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 1.5 “Your Product” means product or a solution developed or to be developed by or for
                                 you that includes an Intel Component implementing or executing Material.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>2 LICENSES.</Text>
                             <Text>
                                 2.1 License. Subject to the terms of this Agreement, Intel grants to you, for the Term,
@@ -134,17 +138,21 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 Material is subject to your compliance with licensing you obtain directly from that
                                 third-party. A listing of any such third-party software may accompany the Material.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>3. [intentionally left blank].</Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>
                                 4 OWNERSHIP. Ownership of the Material and related intellectual property rights is
                                 unchanged. You must maintain all copyright or other proprietary notices in the Material.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>
                                 5 NO WARRANTY. The Material is provided “as is,” without any express or implied warranty
                                 of any kind including warranties of merchantability, non-infringement, title, or fitness
                                 for a particular purpose. The Material may be pre-release and may not be fully
                                 functional. Intel is not required to maintain, update, or support any Material.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>
                                 6 LIMITATION ON LIABILITY. Your use of Material is at your own risk. Intel will not be
                                 liable to you under any legal theory for any losses or damages in connection with the
@@ -154,12 +162,14 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 Agreement will not exceed $100.00 U.S. These liability limitations are a fundamental
                                 basis of our bargain and Intel would not have entered into this Agreement without them.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>
                                 7 INDEMNITY. You will indemnify, defend, and hold Intel harmless from any allegation
                                 against Intel arising in connection with your use of Material and you will pay all of
                                 Intel&apos;s losses, liabilities, and costs (including reasonable attorneys&apos; fees)
                                 arising from the allegation.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>8 PRIVACY; DATA COLLECTION.</Text>
                             <Text>
                                 8.1 Privacy. Intel&apos;s Privacy Notice governs how Intel may process personal
@@ -176,6 +186,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 support type, installation status, performance, and use. Intel&apos;s use of information
                                 may include combination of the information collected from you with other information.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>9 GENERAL.</Text>
                             <Text>
                                 9.1 Assignment. You may not assign your rights or obligations under this Agreement
@@ -225,6 +236,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 all prior and contemporaneous agreements, between Intel and you concerning its subject
                                 matter.
                             </Text>
+                            <Divider marginY={'size-200'} size={'S'} />
                             <Text>10 TERM; TERMINATION; SURVIVAL.</Text>
                             <Text>
                                 10.1 Term. This Agreement begins upon your acceptance of its terms and continues until
