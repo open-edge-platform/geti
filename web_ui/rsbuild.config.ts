@@ -28,14 +28,49 @@ export default defineConfig({
         // Needed for node functions like 'path'
         pluginNodePolyfill(),
     ],
+    environments: {
+        dev: {
+            source: {
+                entry: {
+                    index: './src/geti-dev-app.component.tsx',
+                },
+            },
+            output: {
+                distPath: {
+                    root: 'build',
+                },
+                assetPrefix: publicPath,
+            },
+        },
+        geti: {
+            output: {
+                distPath: {
+                    root: 'build/app',
+                },
+                assetPrefix: publicPath,
+            },
+            source: {
+                entry: {
+                    index: './src/index.tsx',
+                },
+            },
+        },
+        admin: {
+            output: {
+                distPath: {
+                    root: 'build/admin',
+                },
+                assetPrefix: '/intel-admin',
+            },
+            source: {
+                entry: {
+                    index: './src/intel-admin-app/index.component.tsx',
+                },
+            },
+        },
+    },
     html: {
         template: './public/index.html',
-    },
-    output: {
-        distPath: {
-            root: 'build',
-        },
-        assetPrefix: publicPath,
     },
     source: {
         define: {

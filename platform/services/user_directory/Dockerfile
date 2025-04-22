@@ -1,5 +1,6 @@
-# replaced slim image to have gcc available
-FROM ghcr.io/astral-sh/uv:python3.10-bookworm AS builder
+FROM python:3.10-slim-bookworm AS base
+
+FROM base AS build
 
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
@@ -8,7 +9,12 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # need to install the system dependencies for the python-ldap
-RUN apt update && apt install -y libldap2-dev libsasl2-dev
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    libldap2-dev \
+    libsasl2-dev \
+    libssl-dev
 
 # Copy the service dependencies
 WORKDIR /builder
@@ -18,6 +24,8 @@ COPY --link --from=grpc_interfaces . grpc_interfaces
 
 WORKDIR /builder/platform/services/user_directory
 
+COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
+
 COPY --link app .
 
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -26,16 +34,23 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
-FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim
+FROM base AS runtime
 
 # need to install the system dependencies for the python-ldaplibraries
-RUN apt update && apt install -y libldap2-dev && apt clean all && rm -rf /var/cache/apt/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libsasl2-2 \
+    libldap-2.5-0 && \
+    apt clean all && \
+    rm -rf /var/cache/apt/* && \
+    useradd -l -u 10001 non-root && \
+	pip3 uninstall -y setuptools pip wheel && \
+    rm -rf /root/.cache/pip
 
-RUN useradd -l -u 10001 non-root
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=builder --chown=10001 /builder/platform/services/user_directory /app
+COPY --link --from=build --chown=10001 /builder/platform/services/user_directory /app
 COPY --link entrypoint.sh /app
 COPY --link logconfig.ini /app
 

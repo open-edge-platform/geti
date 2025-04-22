@@ -41,7 +41,7 @@ const config: PlaywrightTestConfig = defineConfig({
     webServer: CI_E2E
         ? undefined
         : {
-              command: CI ? 'serve -s build -p 3000 -c ../serve.json' : 'npm run start',
+              command: CI ? 'npx serve -s build -p 3000 -c ../serve.json' : 'npm start',
               port: 3000,
               timeout: 5 * 60 * 1000,
               reuseExistingServer: true,

@@ -6,7 +6,7 @@ include $(CWD)/Makefile.shared
 
 .PHONY: tests test-unit-default test-component-default test-integration-default \
 		static-code-analysis-default ruff mypy style-fix \
-		pre-venv venv venv-lock venv-dev
+		pre-venv venv venv-lock
 
 PYTHONPATH_LOCAL     := tests:app
 

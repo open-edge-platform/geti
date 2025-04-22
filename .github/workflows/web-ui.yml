@@ -29,7 +29,7 @@ jobs:
 
       - name: Build UI
         working-directory: "web_ui"
-        run: REACT_APP_INCLUDE_ALL_ROUTES=true npm run build
+        run: npm run build:all-routes
 
       - name: Compress build
         working-directory: "web_ui"
@@ -136,10 +136,6 @@ jobs:
       - name: Unpack build
         working-directory: "web_ui"
         run: tar -xzf build.tar.gz
-
-      - name: Install serve dependencies
-        working-directory: "web_ui"
-        run: npm install -g serve@14.2.0
 
       - name: Run Playwright tests
         working-directory: "web_ui"

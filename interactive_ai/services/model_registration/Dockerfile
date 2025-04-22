@@ -1,4 +1,6 @@
-FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS builder
+FROM python:3.10-slim-bookworm AS base
+
+FROM base AS build
 
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
@@ -12,7 +14,9 @@ COPY --link --from=grpc_interfaces . grpc_interfaces
 
 WORKDIR /builder/interactive_ai/services/model_registration
 
-ADD app/ .
+COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
+
+COPY --link app/ .
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -20,19 +24,20 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
-FROM ghcr.io/astral-sh/uv:python3.10-bookworm-slim AS model_registration
-
-RUN useradd -l -u 10001 non-root
+FROM base AS runtime
 
 # Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libgl1=1.6.0-1 \
     libglib2.0-0=2.74.6-2+deb12u5 && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    useradd -l -u 10001 non-root && \
+	pip3 uninstall -y setuptools pip wheel && \
+    rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=builder --chown=10001 /builder/interactive_ai/services/model_registration /app
+COPY --link --from=build --chown=10001 /builder/interactive_ai/services/model_registration /app
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
