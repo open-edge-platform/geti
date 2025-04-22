@@ -20,11 +20,6 @@ CHARTS_REGISTRY                   ?= ${REGISTRY}/geti/charts
 BASE_IMAGES_REGISTRY              ?= ${REGISTRY}/base-images
 
 ###
-# base images versions
-###
-BASE_OTE_V2_IMAGE_TAG             ?= 12.8.1.1.30
-
-###
 # component
 ###
 CHART_DIR                         := ./chart
