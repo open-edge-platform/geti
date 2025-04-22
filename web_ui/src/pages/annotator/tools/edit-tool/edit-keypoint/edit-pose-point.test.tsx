@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import '@wessberg/pointer-events';
+
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { createInMemoryUserSettingsService } from '../../../../../core/user-settings/services/in-memory-user-settings-service';
 import { UserSettingsService } from '../../../../../core/user-settings/services/user-settings.interface';
 import { getMockedDatasetIdentifier } from '../../../../../test-utils/mocked-items-factory/mocked-identifiers';
@@ -14,21 +15,22 @@ import { AnnotatorContextMenuProvider } from '../../../providers/annotator-conte
 import { AnnotatorProviders } from '../../../test-utils/annotator-render';
 import { TransformZoomAnnotation } from '../../../zoom/transform-zoom-annotation.component';
 import { ZoomProvider } from '../../../zoom/zoom-provider.component';
-import { EditPosePoint } from './edit-pose-point.component';
+import { EditPosePoint, EditPosePointToolProps } from './edit-pose-point.component';
 
 const mockedLabel = getMockedLabel({ name: 'point-name' });
 
 describe('EditPosePoint', () => {
     const renderApp = async ({
+        isSelected = false,
         isLabelVisible = false,
         point = getMockedKeypointNode({}),
-        onToggleVisibility = jest.fn(),
         userSettingsService = createInMemoryUserSettingsService(),
-    }: {
-        point?: KeypointNode;
-        isLabelVisible?: boolean;
+        onToggleVisibility = jest.fn(),
+        onStart = jest.fn(),
+        onComplete = jest.fn(),
+        moveAnchorTo = jest.fn(),
+    }: Partial<EditPosePointToolProps> & {
         userSettingsService?: UserSettingsService;
-        onToggleVisibility?: () => void;
     }) => {
         projectRender(
             <AnnotatorProviders datasetIdentifier={getMockedDatasetIdentifier()}>
@@ -37,11 +39,13 @@ describe('EditPosePoint', () => {
                         <AnnotatorContextMenuProvider>
                             <svg>
                                 <EditPosePoint
+                                    isSelected={isSelected}
                                     isLabelVisible={isLabelVisible}
                                     roi={{ x: 1, y: 1, width: 1, height: 1 }}
                                     point={point}
-                                    onComplete={jest.fn()}
-                                    moveAnchorTo={jest.fn()}
+                                    onStart={onStart}
+                                    onComplete={onComplete}
+                                    moveAnchorTo={moveAnchorTo}
                                     onToggleVisibility={onToggleVisibility}
                                 />
                             </svg>
@@ -103,5 +107,43 @@ describe('EditPosePoint', () => {
         fireEvent.click(screen.getByRole('menuitem', { name: new RegExp(optionText, 'i') }));
 
         expect(mockedOnToggleVisibility).toHaveBeenLastCalledWith(optionText);
+    });
+
+    describe('trigger onComplete to indicate whether the item was updated', () => {
+        const mockedKeypointNode = getMockedKeypointNode({ label: mockedLabel, isVisible: false });
+
+        it('click unselected item', async () => {
+            const mockedOnComplete = jest.fn();
+            await renderApp({ point: mockedKeypointNode, onComplete: mockedOnComplete, isSelected: false });
+            const anchor = screen.getByLabelText(`Resize keypoint ${mockedLabel.name} anchor`);
+
+            fireEvent.pointerDown(anchor);
+            fireEvent.pointerUp(anchor);
+
+            expect(mockedOnComplete).toHaveBeenCalledWith(true);
+        });
+
+        it('click selected item', async () => {
+            const mockedOnComplete = jest.fn();
+            await renderApp({ point: mockedKeypointNode, onComplete: mockedOnComplete, isSelected: true });
+            const anchor = screen.getByLabelText(`Resize keypoint ${mockedLabel.name} anchor`);
+
+            fireEvent.pointerDown(anchor);
+            fireEvent.pointerUp(anchor);
+
+            expect(mockedOnComplete).toHaveBeenCalledWith(false);
+        });
+
+        it('click and move selected item', async () => {
+            const mockedOnComplete = jest.fn();
+
+            await renderApp({ point: mockedKeypointNode, onComplete: mockedOnComplete, isSelected: true });
+            const anchor = screen.getByLabelText(`Resize keypoint ${mockedLabel.name} anchor`);
+            fireEvent.pointerDown(anchor);
+            fireEvent.pointerMove(anchor, { clientX: 10, clientY: 80 });
+            fireEvent.pointerUp(anchor);
+
+            expect(mockedOnComplete).toHaveBeenCalledWith(true);
+        });
     });
 });

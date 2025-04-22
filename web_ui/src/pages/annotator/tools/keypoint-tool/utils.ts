@@ -20,6 +20,14 @@ export enum PointAxis {
     X = 'x',
     Y = 'y',
 }
+
+export enum CursorDirection {
+    SouthEast = 'south-east',
+    SouthWest = 'south-west',
+    NorthEast = 'north-east',
+    NorthWest = 'north-west',
+}
+
 export interface LabelPosition extends Partial<Point> {
     labelId: string;
 }
@@ -156,6 +164,34 @@ export const mirrorPointsAcrossAxis = <T extends Point>(points: T[], pointAxis: 
         ...point,
         [pointAxis]: axisCenter - (point[pointAxis] - axisCenter),
     }));
+};
+
+export const getDirection = (startPoint: Point, endPoint: Point): CursorDirection => {
+    if (endPoint.x >= startPoint.x && endPoint.y >= startPoint.y) {
+        return CursorDirection.SouthEast;
+    }
+
+    if (endPoint.x <= startPoint.x && endPoint.y >= startPoint.y) {
+        return CursorDirection.SouthWest;
+    }
+
+    if (endPoint.x >= startPoint.x && endPoint.y <= startPoint.y) {
+        return CursorDirection.NorthEast;
+    }
+    return CursorDirection.NorthWest;
+};
+
+export const getTemplateWithDirection = (templatePoints: KeypointNode[], cursorDirection: CursorDirection) => {
+    if (cursorDirection === CursorDirection.SouthWest) {
+        return mirrorPointsAcrossAxis(templatePoints, PointAxis.X);
+    }
+    if (cursorDirection === CursorDirection.NorthEast) {
+        return mirrorPointsAcrossAxis(templatePoints, PointAxis.Y);
+    }
+    if (cursorDirection === CursorDirection.NorthWest) {
+        return mirrorPointsAcrossAxis(mirrorPointsAcrossAxis(templatePoints, PointAxis.Y), PointAxis.X);
+    }
+    return templatePoints;
 };
 
 const getMaxMinPoint = <T extends Point>(points: T[], pointAxis: PointAxis) => {

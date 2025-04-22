@@ -14,12 +14,13 @@ import { Crosshair } from '../crosshair/crosshair.component';
 import { useCrosshair } from '../crosshair/utils';
 import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { PointerType } from '../tools.interface';
+import { CursorDirection, getDirection } from './utils';
 
 const CURSOR_OFFSET = '7 8';
 
 interface CrosshairDrawingBoxProps {
     onStart: () => void;
-    onMove: (box: RegionOfInterest) => void;
+    onMove: (box: RegionOfInterest, direction: CursorDirection) => void;
     onComplete: () => void;
     zoom: number;
 }
@@ -60,7 +61,7 @@ export const CrosshairDrawingBox = ({ onStart, onMove, onComplete, zoom }: Cross
 
         const endPoint = clampPoint(getRelativePoint(ref.current, { x: event.clientX, y: event.clientY }, zoom));
 
-        onMove(clampBox(pointsToRect(startPoint, endPoint), roi));
+        onMove(clampBox(pointsToRect(startPoint, endPoint), roi), getDirection(startPoint, endPoint));
     };
 
     const onPointerUp = onLeftClick((event: PointerEvent<SVGSVGElement>): void => {

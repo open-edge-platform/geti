@@ -17,13 +17,14 @@ import { useZoom } from '../../../zoom/zoom-provider.component';
 import { ResizeAnchor } from '../resize-anchor.component';
 import { ResizeAnchorType } from '../resize-anchor.enum';
 
-interface EditPosePointToolProps {
+export interface EditPosePointToolProps {
     roi: RegionOfInterest;
     point: KeypointNode;
     isLabelVisible: boolean;
-    onStart?: () => void;
+    isSelected: boolean;
+    onStart: () => void;
     onToggleVisibility: () => void;
-    onComplete: () => void;
+    onComplete: (isUpdated: boolean) => void;
     moveAnchorTo: (x: number, y: number) => void;
 }
 
@@ -43,11 +44,13 @@ export const EditPosePoint = ({
     roi,
     point,
     isLabelVisible,
+    isSelected,
     onStart,
     onComplete,
     moveAnchorTo,
     onToggleVisibility,
 }: EditPosePointToolProps) => {
+    const isUpdated = useRef(false);
     const { zoomState } = useZoom();
     const containerRef = useRef<SVGGElement | null>(null);
     const { showContextMenu, hideContextMenu, contextConfig } = useAnnotatorContextMenu();
@@ -91,11 +94,18 @@ export const EditPosePoint = ({
                 y={point.y}
                 x={point.x}
                 zoom={zoomState.zoom}
-                onStart={onStart}
-                onComplete={onComplete}
+                onStart={() => {
+                    onStart();
+                    isUpdated.current = isSelected === false;
+                }}
+                onComplete={() => {
+                    onComplete(isUpdated.current);
+                    isUpdated.current = false;
+                }}
                 cursor={'crosshair'}
                 label={`Resize keypoint ${point.label.name} anchor`}
                 moveAnchorTo={(x, y) => {
+                    isUpdated.current = true;
                     const pointInRoi = getPointInRoi({ x, y }, roi);
                     moveAnchorTo(pointInRoi.x, pointInRoi.y);
                 }}

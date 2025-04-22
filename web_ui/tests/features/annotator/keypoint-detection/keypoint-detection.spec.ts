@@ -83,6 +83,38 @@ test.describe(`keypoint detection`, () => {
         await assertPredictionVisibility(page, labels.rightBackLeg.name, 16);
     });
 
+    test('adjust template orientation based on mouse movement', async ({ page, templateManagerPage }) => {
+        await page.goto(annotatorUrl);
+
+        await page.getByLabel('Keypoint tool').click();
+        await page.mouse.move(600, 500);
+        await page.mouse.down({ button: 'left' });
+        await page.mouse.move(900, 800, { steps: 20 });
+
+        const container = page.getByLabel('Drag to move shape');
+        const headPosition = await templateManagerPage.getPosition(container.getByLabel(`label ${labels.head.name}`));
+        const leftBackLegPosition = await templateManagerPage.getPosition(
+            container.getByLabel(`label ${labels.leftBackLeg.name}`)
+        );
+
+        expect(headPosition.y).toBeLessThan(leftBackLegPosition.y);
+        expect(headPosition.x).toBeGreaterThan(leftBackLegPosition.x);
+
+        await page.mouse.move(300, 300, { steps: 20 });
+        await page.mouse.up({ button: 'left' });
+        await page.getByLabel('accept new keypoint annotation').click();
+
+        const updatedHeadPosition = await templateManagerPage.getPosition(
+            page.getByLabel(`Resize keypoint ${labels.head.name} anchor`)
+        );
+        const updatedLeftBackLegPosition = await templateManagerPage.getPosition(
+            page.getByLabel(`Resize keypoint ${labels.leftBackLeg.name} anchor`)
+        );
+
+        expect(updatedHeadPosition.x).toBeLessThan(updatedLeftBackLegPosition.x);
+        expect(updatedHeadPosition.y).toBeGreaterThan(updatedLeftBackLegPosition.y);
+    });
+
     test('rotate annotations', async ({ page, templateManagerPage }) => {
         await page.goto(annotatorUrl);
         await checkKeypointTools(page);

@@ -30,9 +30,9 @@ export const ShapeFactory = ({
             return <Polygon shape={shape} ariaLabel={ariaLabel} />;
         case ShapeType.Pose:
             return (
-                <g strokeLinecap={'butt'}>
+                <g strokeLinecap={'butt'} aria-label={ariaLabel}>
                     <PoseEdges shape={shape} showBoundingBox={false} />
-                    <PoseKeypoints shape={shape} ariaLabel={ariaLabel} />;
+                    <PoseKeypoints shape={shape} />;
                 </g>
             );
     }

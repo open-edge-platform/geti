@@ -41,14 +41,14 @@ export const PoseKeypointVisibility = ({ point, radius, ...svgProps }: PoseKeypo
     return <PoseKeypoint point={point} radius={radius} {...svgProps} />;
 };
 
-export const PoseKeypoints = ({ shape, ariaLabel }: KeypointProps) => {
+export const PoseKeypoints = ({ shape }: KeypointProps) => {
     return (
         <>
-            {shape.points.map((point, index) => (
+            {shape.points.map((point) => (
                 <PoseKeypointVisibility
-                    key={`annotation-${point.label.id}`}
+                    key={`label-${point.label.id}`}
                     point={point}
-                    aria-label={`${ariaLabel}-${index}`}
+                    aria-label={`label ${point.label.name}`}
                 />
             ))}
         </>

@@ -38,7 +38,7 @@ export const EditKeypointTool = ({ annotation, annotationToolContext }: EditKeyp
     const isEditing = useRef(false);
     const { zoomState } = useZoom();
     const { image, roi } = useROI();
-    const { setSelected } = useSelected();
+    const { isSelected, setSelected, removeSelected } = useSelected();
     const [angle, setAngle] = useState(0);
 
     const [localShape, setLocalShape] = useState(annotation.shape);
@@ -150,6 +150,7 @@ export const EditKeypointTool = ({ annotation, annotationToolContext }: EditKeyp
                                 key={`edit-keypoint-${point.label.id}`}
                                 roi={roi}
                                 point={point}
+                                isSelected={isSelected(point.label.id)}
                                 isLabelVisible={closestPoint?.label.id === point.label.id}
                                 onStart={() => {
                                     setSelected([point.label.id]);
@@ -157,8 +158,9 @@ export const EditKeypointTool = ({ annotation, annotationToolContext }: EditKeyp
                                 onToggleVisibility={() => {
                                     handleComplete({ ...localShape, points: toggleVisibility(localShape.points, idx) });
                                 }}
-                                onComplete={() => {
+                                onComplete={(isUpdated) => {
                                     handleComplete({ ...localShape, points: localShape.points });
+                                    isUpdated ? setSelected([point.label.id]) : removeSelected(point.label.id);
                                 }}
                                 moveAnchorTo={handleMovePointByIndex(idx)}
                             />

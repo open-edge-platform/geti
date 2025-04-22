@@ -5,13 +5,16 @@ import { KeypointStructure } from '../../../../core/projects/task.interface';
 import { getMockedKeypointNode } from '../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import {
+    CursorDirection,
     getAnnotationInBoundingBox,
+    getDirection,
     getInnerPaddedBoundingBox,
     getOuterPaddedBoundingBox,
     getPercentageFromPoint,
     getPointFromPercentage,
     getPointsEdges,
     getPoseLocations,
+    getTemplateWithDirection,
     groupByFirstNode,
     mirrorPointsAcrossAxis,
     PADDING_MULTIPLIER,
@@ -239,6 +242,68 @@ describe('keypoint-tool utils', () => {
                 { x: 3, y: 4 },
                 { x: 5, y: 2 },
             ]);
+        });
+    });
+
+    describe('getDirection', () => {
+        it('SouthEast when endPoint is below and to the right of startPoint', () => {
+            const startPoint = { x: 0, y: 0 };
+            const endPoint = { x: 10, y: 10 };
+            expect(getDirection(startPoint, endPoint)).toBe(CursorDirection.SouthEast);
+        });
+
+        it('SouthWest when endPoint is below and to the left of startPoint', () => {
+            const startPoint = { x: 10, y: 0 };
+            const endPoint = { x: 0, y: 10 };
+            expect(getDirection(startPoint, endPoint)).toBe(CursorDirection.SouthWest);
+        });
+
+        it('NorthEast when endPoint is above and to the right of startPoint', () => {
+            const startPoint = { x: 0, y: 10 };
+            const endPoint = { x: 10, y: 0 };
+            expect(getDirection(startPoint, endPoint)).toBe(CursorDirection.NorthEast);
+        });
+
+        it('NorthWest when endPoint is above and to the left of startPoint', () => {
+            const startPoint = { x: 10, y: 10 };
+            const endPoint = { x: 0, y: 0 };
+            expect(getDirection(startPoint, endPoint)).toBe(CursorDirection.NorthWest);
+        });
+    });
+
+    describe('getTemplateWithDirection', () => {
+        const templatePoints = [
+            getMockedKeypointNode({ x: 10, y: 20 }),
+            getMockedKeypointNode({ x: 30, y: 10 }),
+            getMockedKeypointNode({ x: 50, y: 20 }),
+        ];
+
+        it('mirrors points across the X axis for SouthWest direction', () => {
+            expect(getTemplateWithDirection(templatePoints, CursorDirection.SouthWest)).toEqual([
+                expect.objectContaining({ x: 50, y: 20 }),
+                expect.objectContaining({ x: 30, y: 10 }),
+                expect.objectContaining({ x: 10, y: 20 }),
+            ]);
+        });
+
+        it('mirrors points across the Y axis for NorthEast direction', () => {
+            expect(getTemplateWithDirection(templatePoints, CursorDirection.NorthEast)).toEqual([
+                expect.objectContaining({ x: 10, y: 10 }),
+                expect.objectContaining({ x: 30, y: 20 }),
+                expect.objectContaining({ x: 50, y: 10 }),
+            ]);
+        });
+
+        it('mirrors points across both axes for NorthWest direction', () => {
+            expect(getTemplateWithDirection(templatePoints, CursorDirection.NorthWest)).toEqual([
+                expect.objectContaining({ x: 50, y: 10 }),
+                expect.objectContaining({ x: 30, y: 20 }),
+                expect.objectContaining({ x: 10, y: 10 }),
+            ]);
+        });
+
+        it('returns the original template points for SouthEast direction', () => {
+            expect(getTemplateWithDirection(templatePoints, CursorDirection.SouthEast)).toEqual(templatePoints);
         });
     });
 

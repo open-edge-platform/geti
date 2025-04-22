@@ -20,6 +20,7 @@ import { ToolAnnotationContextProps } from '../tools.interface';
 import { CrosshairDrawingBox } from './crosshair-drawing-box.component';
 import { useKeypointState } from './keypoint-state-provider.component';
 import {
+    CursorDirection,
     getAnnotationInBoundingBox,
     getInnerPaddedBoundingBox,
     getMinBoundingBox,
@@ -30,7 +31,8 @@ export const KeypointTool = ({ annotationToolContext }: ToolAnnotationContextPro
     const { zoomState } = useZoom();
     const { image, roi } = useROI();
     const visibleAnnotations = useVisibleAnnotations();
-    const { templateLabels, templatePoints, currentBoundingBox, setCurrentBoundingBox } = useKeypointState();
+    const { templateLabels, templatePoints, currentBoundingBox, setCurrentBoundingBox, setCursorDirection } =
+        useKeypointState();
 
     const keypointAnnotation = currentBoundingBox
         ? getAnnotationInBoundingBox(
@@ -72,7 +74,8 @@ export const KeypointTool = ({ annotationToolContext }: ToolAnnotationContextPro
         currentBoundingBox && handleUpdateSkypeHistory(getClampedBoundingBox(point, currentBoundingBox, roi));
     };
 
-    const handleUpdateSkypeHistory = (newBoundingBox: RegionOfInterest) => {
+    const handleUpdateSkypeHistory = (newBoundingBox: RegionOfInterest, direction?: CursorDirection) => {
+        direction && setCursorDirection(direction);
         setCurrentBoundingBox(getMinBoundingBox(newBoundingBox), true);
     };
 
