@@ -5,11 +5,11 @@ import { screen } from '@testing-library/react';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
+import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedKeypointNode } from '../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
-import { SelectedProvider } from '../../providers/selected-provider/selected-provider.component';
 import { TaskProvider } from '../../providers/task-provider/task-provider.component';
 import { annotatorRender } from '../../test-utils/annotator-render';
 import { ShapeLabel } from './shape-label.component';

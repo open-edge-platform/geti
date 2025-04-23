@@ -6,10 +6,10 @@ import { useFocusManager } from 'react-aria';
 
 import { CloseSemiBold } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
+import { useSetHoveredId } from '../../../../providers/hovered-provider/hovered-provider.component';
+import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';
 import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
-import { useSetHoveredId } from '../../providers/hovered-provider/hovered-provider.component';
-import { useSelected } from '../../providers/selected-provider/selected-provider.component';
 import { ListItemGrid } from '../list-item-grid.component';
 import { ContentMenu } from './content-menu.component';
 import { NodeLabel } from './node-label.component';

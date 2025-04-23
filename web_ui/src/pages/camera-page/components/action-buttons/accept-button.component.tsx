@@ -42,6 +42,7 @@ export const AcceptButton = ({ isDisabled, isPending, onPress }: AcceptButtonPro
         if (!mediaUploadState.insufficientStorage) {
             const updatedSavedFiles = await savedFilesQuery.refetch();
             const screenshotDict = groupBy(updatedSavedFiles.data, ({ labelIds }) => String(labelIds));
+
             await Promise.all(
                 Object.entries(screenshotDict).map(async ([labelsIds, screenshots]) => {
                     await onUploadMedia({
@@ -61,7 +62,7 @@ export const AcceptButton = ({ isDisabled, isPending, onPress }: AcceptButtonPro
 
         await updateMany(getIds(savedFiles), { isAccepted: true });
 
-        handleStorageCheck();
+        await handleStorageCheck();
         handleRedirect();
     };
 

@@ -8,6 +8,7 @@ import { DOMAIN } from '../../../../core/projects/core.interface';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { initialAnnotatorConfig, initialConfig } from '../../../../core/user-settings/utils';
+import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedImageMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import {
@@ -30,7 +31,6 @@ import { DefaultHotkeys } from '../../providers/annotator-provider/utils';
 import { DatasetProvider } from '../../providers/dataset-provider/dataset-provider.component';
 import { PredictionProvider } from '../../providers/prediction-provider/prediction-provider.component';
 import { DefaultSelectedMediaItemProvider } from '../../providers/selected-media-item-provider/default-selected-media-item-provider.component';
-import { SelectedProvider } from '../../providers/selected-provider/selected-provider.component';
 import { SubmitAnnotationsProvider } from '../../providers/submit-annotations-provider/submit-annotations-provider.component';
 import { TaskChainProvider } from '../../providers/task-chain-provider/task-chain-provider.component';
 import { TaskProvider } from '../../providers/task-provider/task-provider.component';

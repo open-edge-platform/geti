@@ -13,7 +13,7 @@ export interface NewProjectDialogContextProps {
     goToPreviousStep: (() => void | null) | undefined;
     resetSteps: () => void;
     content: JSX.Element;
-    validationError?: { tree: string | undefined; labels: boolean; keypoint: string | undefined };
+    validationError?: { tree: string | undefined; labels: boolean };
 }
 
 export type SingleTaskTemplateType = 'Detection' | 'Segmentation' | 'Classification' | 'Anomaly' | 'Keypoint Detection';

@@ -6,6 +6,7 @@ import { Text } from '@react-spectrum/text';
 
 import { Delete, LineMappingLight, Reject } from '../../../../assets/icons';
 import { isKeypointAnnotation } from '../../../../core/annotations/services/utils';
+import { labelFromUser } from '../../../../core/annotations/utils';
 import { Divider } from '../../../../shared/components/divider/divider.component';
 import { AcceptButton } from '../../../../shared/components/quiet-button/accept-button.component';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
@@ -21,7 +22,7 @@ export const SecondaryToolbar = ({ annotationToolContext }: ToolAnnotationContex
 
     const { scene } = annotationToolContext;
     const keypointAnnotation = visibleAnnotations.find(isKeypointAnnotation);
-    const { templatePoints, currentBoundingBox, setCurrentBoundingBox } = useKeypointState();
+    const { templateLabels, templatePoints, currentBoundingBox, setCurrentBoundingBox } = useKeypointState();
     const hasAnnotations = keypointAnnotation !== undefined;
     const hasCurrentBoundingBox = currentBoundingBox !== null;
 
@@ -36,7 +37,7 @@ export const SecondaryToolbar = ({ annotationToolContext }: ToolAnnotationContex
             getInnerPaddedBoundingBox(currentBoundingBox, zoomState.zoom)
         );
 
-        scene.replaceAnnotations([{ ...annotation, isSelected: true }]);
+        scene.replaceAnnotations([{ ...annotation, labels: [labelFromUser(templateLabels[0])], isSelected: true }]);
     };
 
     const handleRejectAnnotation = () => {

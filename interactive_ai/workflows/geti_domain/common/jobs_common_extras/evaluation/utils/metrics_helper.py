@@ -9,6 +9,7 @@ from jobs_common_extras.evaluation.entities.accuracy_metric import AccuracyMetri
 from jobs_common_extras.evaluation.entities.dice_metric import DiceMetric
 from jobs_common_extras.evaluation.entities.f_measure_metric import FMeasureMetric
 from jobs_common_extras.evaluation.entities.percentage_of_correct_keypoints_metric import (
+    DEFAULT_RELATIVE_DISTANCE_THRESHOLD,
     PercentageCorrectKeypointsMetric,
 )
 from jobs_common_extras.evaluation.entities.performance_metric import MetricAverageMethod, PerformanceMetric
@@ -52,10 +53,12 @@ class MetricsHelper:
                 average=MetricAverageMethod.MICRO,
             )
         if task_type in [TaskType.KEYPOINT_DETECTION]:
+            if relative_distance_threshold is None:
+                relative_distance_threshold = DEFAULT_RELATIVE_DISTANCE_THRESHOLD
             return PercentageCorrectKeypointsMetric(
                 ground_truth_dataset=ground_truth_dataset,
                 prediction_dataset=prediction_dataset,
                 label_schema=label_schema,
-                relative_distance_threshold=relative_distance_threshold,  # type: ignore
+                relative_distance_threshold=relative_distance_threshold,
             )
         raise ValueError(f"Cannot determine metrics for task type '{task_type}'.")

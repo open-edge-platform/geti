@@ -6,14 +6,11 @@ import { LabelsRelationType } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { getMockedKeypointNode } from '../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
-import { EMPTY_LABEL_MESSAGE, MIN_POINTS_MESSAGE } from '../../utils';
 import {
     createRoi,
     getDefaultLabelStructure,
-    getDuplicateLabelNames,
     getLabelFromPoint,
     getProjectTypeMetadata,
-    getValidationError,
     isDifferentLabel,
     isEdgeConnectingPoints,
     isEqualLabel,
@@ -80,58 +77,6 @@ describe('post-template utils', () => {
         });
     });
 
-    describe('getDuplicateLabelNames', () => {
-        const pointA = getMockedKeypointNode({ label: getMockedLabel({ id: 'label A', name: 'label A' }) });
-        const pointB = getMockedKeypointNode({ label: getMockedLabel({ id: 'label B', name: 'label B' }) });
-        const pointC = getMockedKeypointNode({ label: getMockedLabel({ id: 'label A', name: 'label A' }) });
-
-        it('return an empty array if there are no duplicate labels', () => {
-            expect(getDuplicateLabelNames([pointA, pointB])).toEqual([]);
-        });
-
-        it('return an array with duplicate label names', () => {
-            expect(getDuplicateLabelNames([pointA, pointC])).toEqual(['label A']);
-        });
-
-        it('return an array with multiple duplicate label names', () => {
-            const pointD = getMockedKeypointNode({ label: getMockedLabel({ id: 'label B', name: 'label B' }) });
-            expect(getDuplicateLabelNames([pointA, pointB, pointC, pointD])).toEqual(['label A', 'label B']);
-        });
-    });
-
-    describe('getValidationError', () => {
-        const pointA = getMockedKeypointNode({ label: getMockedLabel({ id: 'label A', name: 'label A' }) });
-        const pointB = getMockedKeypointNode({ label: getMockedLabel({ id: 'label B', name: 'label B' }) });
-        const pointC = getMockedKeypointNode({ label: getMockedLabel({ id: 'label A', name: 'label A' }) });
-        const pointD = getMockedKeypointNode({ label: getMockedLabel({ id: 'label C', name: '' }) });
-        const pointF = getMockedKeypointNode({ label: getMockedLabel({ id: 'label F', name: '' }) });
-
-        it('returns MIN_POINTS_MESSAGE if no points are provided', () => {
-            expect(getValidationError([])).toBe(MIN_POINTS_MESSAGE);
-        });
-
-        it('returns EMPTY_LABEL_MESSAGE if there are empty labels', () => {
-            expect(getValidationError([pointA, pointD])).toBe(EMPTY_LABEL_MESSAGE);
-            expect(getValidationError([pointC, pointF])).toBe(EMPTY_LABEL_MESSAGE);
-        });
-
-        it('returns an error message if there are duplicate labels', () => {
-            expect(getValidationError([pointA, pointC])).toBe(
-                'Label names must be unique, label "label A" is duplicated'
-            );
-        });
-
-        it('returns an error message if there are multiple duplicate labels', () => {
-            const pointE = getMockedKeypointNode({ label: getMockedLabel({ id: 'label B', name: 'label B' }) });
-            expect(getValidationError([pointA, pointB, pointC, pointE])).toBe(
-                'Label names must be unique, labels "label A" ,"label B" are duplicated'
-            );
-        });
-
-        it('returns undefined if there are no duplicate labels and no empty labels', () => {
-            expect(getValidationError([pointA, pointB])).toBeUndefined();
-        });
-    });
     describe('getLabelFromPoint', () => {
         it('format KeypointNode to a LabelTreeItem', () => {
             const point = getMockedKeypointNode({ label: getMockedLabel({ id: 'label A', name: 'label A' }) });

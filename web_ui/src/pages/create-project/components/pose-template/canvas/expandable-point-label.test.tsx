@@ -4,10 +4,10 @@
 import { render, screen } from '@testing-library/react';
 
 import { Label } from '../../../../../core/labels/label.interface';
+import { SelectedProvider } from '../../../../../providers/selected-provider/selected-provider.component';
 import { getMockedKeypointNode } from '../../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { hover } from '../../../../../test-utils/utils';
-import { SelectedProvider } from '../../../../annotator/providers/selected-provider/selected-provider.component';
 import { ExpandablePointLabel } from './expandable-point-label.component';
 
 describe('ExpandablePointLabel', () => {

@@ -9,9 +9,9 @@ import isEmpty from 'lodash/isEmpty';
 
 import { Delete } from '../../../../assets/icons';
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
+import { HoveredProvider } from '../../../../providers/hovered-provider/hovered-provider.component';
+import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { ButtonWithSpectrumTooltip } from '../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
-import { HoveredProvider } from '../../../annotator/providers/hovered-provider/hovered-provider.component';
-import { SelectedProvider } from '../../../annotator/providers/selected-provider/selected-provider.component';
 import { SyncZoomState } from '../../../annotator/zoom/sync-zoom-state.component';
 import { ZoomProvider } from '../../../annotator/zoom/zoom-provider.component';
 import { TransformZoom } from '../../../shared/zoom/transform-zoom.component';

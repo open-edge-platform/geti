@@ -9,10 +9,10 @@ import { Delete } from '../../../../../assets/icons';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { useIsPressed } from '../../../../../hooks/use-is-pressed/use-is-pressed.hook';
+import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
 import { ButtonWithSpectrumTooltip } from '../../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
 import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
 import { hasDifferentId } from '../../../../../shared/utils';
-import { useSelected } from '../../../../annotator/providers/selected-provider/selected-provider.component';
 import {
     EdgeLine,
     isDifferentLabel,

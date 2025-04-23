@@ -5,7 +5,7 @@ import { createContext, ReactNode, useContext, useState } from 'react';
 
 import union from 'lodash/union';
 
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { MissingProviderError } from '../../shared/missing-provider-error';
 
 interface SelectedProviderProps {
     isSelected: (id: string) => boolean;

@@ -19,7 +19,7 @@ interface TrainModelBasicProps {
     onChangeSelectedTemplateId: (modelTemplateId: string | null) => void;
     tasks: Task[];
     selectedTask: Task;
-    onChangeTask: (task: Task) => void;
+    onTaskChange: (task: Task) => void;
     isTaskChainProject: boolean;
 }
 
@@ -28,7 +28,7 @@ export const TrainModelBasic: FC<TrainModelBasicProps> = ({
     activeModelTemplateId,
     selectedModelTemplateId,
     onChangeSelectedTemplateId,
-    onChangeTask,
+    onTaskChange,
     selectedTask,
     tasks,
     isTaskChainProject,
@@ -36,7 +36,7 @@ export const TrainModelBasic: FC<TrainModelBasicProps> = ({
     return (
         <Flex direction={'column'} gap={'size-200'}>
             {isTaskChainProject && (
-                <TaskSelection tasks={tasks} onTaskChange={onChangeTask} selectedTask={selectedTask} />
+                <TaskSelection tasks={tasks} onTaskChange={onTaskChange} selectedTask={selectedTask} />
             )}
 
             <View padding={'size-250'} backgroundColor={'gray-50'}>

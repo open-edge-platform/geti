@@ -97,6 +97,7 @@ describe('AcceptButton', () => {
         expect(mockedNavigate).toHaveBeenCalledWith(
             `/organizations/${mockedDatasetIdentifier.organizationId}/workspaces/${mockedDatasetIdentifier.workspaceId}/projects/${mockedDatasetIdentifier.projectId}/datasets/${mockedDatasetIdentifier.datasetId}`
         );
+        expect(mockedOnPress.mock.invocationCallOrder[0]).toBeLessThan(mockedNavigate.mock.invocationCallOrder[0]);
     });
 
     it('empty data', async () => {

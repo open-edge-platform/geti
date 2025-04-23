@@ -11,7 +11,7 @@ import { AiIcon } from '../../../../../assets/icons';
 import { AnnotationLabel } from '../../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { isPrediction } from '../../../../../core/labels/utils';
-import { useSelected } from '../../../../annotator/providers/selected-provider/selected-provider.component';
+import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
 
 import classes from './expandable-point-label.module.scss';
 

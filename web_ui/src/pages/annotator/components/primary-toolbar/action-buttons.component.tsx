@@ -7,6 +7,7 @@ import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { Flex } from '@react-spectrum/layout';
 import isEmpty from 'lodash/isEmpty';
 
+import { isKeypointTask } from '../../../../core/projects/utils';
 import { Divider } from '../../../../shared/components/divider/divider.component';
 import { FitImageToScreenButton } from '../../../../shared/components/fit-image-to-screen-button/fit-image-to-screen-button.component';
 import { hasEqualId } from '../../../../shared/utils';
@@ -30,6 +31,7 @@ export const ActionButtons = ({ annotationToolContext }: ActionButtonsProps): JS
     const isSceneBusy = useIsSceneBusy();
     const { tasks, selectedTask } = useTask();
     const { isActiveLearningMode } = useAnnotatorMode();
+    const isKeypoint = Boolean(selectedTask && isKeypointTask(selectedTask));
 
     const {
         scene: { setHiddenAnnotations, annotations: annotationsScene },
@@ -41,7 +43,7 @@ export const ActionButtons = ({ annotationToolContext }: ActionButtonsProps): JS
         [annotations]
     );
     const toggleAnnotationsTooltip = allAnnotationsHidden ? 'Show annotations' : 'Hide annotations';
-    const isToggleVisibilityButtonDisabled = isEmpty(annotations) || isSceneBusy;
+    const isToggleVisibilityButtonDisabled = isEmpty(annotations) || isSceneBusy || isKeypoint;
 
     const toggleVisibility = (isHidden: boolean) => {
         setHiddenAnnotations((annotation) => {

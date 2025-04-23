@@ -4,11 +4,11 @@
 import { useEffect } from 'react';
 
 import { isKeypointDetection } from '../../../../../core/projects/domains';
+import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
 import { Accordion } from '../../../../../shared/components/accordion/accordion.component';
 import { AnnotationListContainer } from '../../../annotation/annotation-list/annotation-list-container/annotation-list-container.component';
 import { PoseListContainer } from '../../../annotation/pose-list/pose-list-container.component';
 import { useSelectedMediaItem } from '../../../providers/selected-media-item-provider/selected-media-item-provider.component';
-import { useSelected } from '../../../providers/selected-provider/selected-provider.component';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { AnnotationsHeader } from './annotations-header.component';
 

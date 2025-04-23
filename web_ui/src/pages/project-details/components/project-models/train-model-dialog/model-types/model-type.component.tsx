@@ -57,6 +57,7 @@ export const ModelType: FC<ModelTypeProps> = ({
     const isSelected = selectedModelTemplateId === modelTemplateId;
 
     const shouldShowActiveTag = modelTemplateId === activeModelTemplateId;
+
     const isDeprecated = isDeprecatedAlgorithm(lifecycleStage);
 
     const handlePress = () => {

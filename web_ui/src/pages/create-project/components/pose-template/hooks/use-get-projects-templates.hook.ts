@@ -31,6 +31,7 @@ export const useGetProjectsTemplates = () => {
         return {
             name: capitalize(project.name),
             template: {
+                // Convert labels to use names instead of IDs since we don't have IDs when creating a new project
                 edges: keypointTask.keypointStructure.edges.map(({ nodes }) => ({
                     from: project.labels.find(hasEqualId(nodes[0]))?.name ?? '',
                     to: project.labels.find(hasEqualId(nodes[1]))?.name ?? '',

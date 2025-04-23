@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
-import { useSelected } from '../../../../annotator/providers/selected-provider/selected-provider.component';
+import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
 
 interface PointLabelProps {
     point: KeypointNode;

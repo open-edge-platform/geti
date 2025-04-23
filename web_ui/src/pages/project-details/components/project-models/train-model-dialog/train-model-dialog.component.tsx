@@ -12,6 +12,7 @@ import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { Button } from '../../../../../shared/components/button/button.component';
 import { ButtonCreditsToConsume } from '../../project-model/components/button-credits-to-consume/button-credits-to-consume.component';
+import { AdvancedSettings } from './advanced-settings/advanced-settings.component';
 import { NotEnoughAnnotationsDialog } from './not-enough-annotations-dialog.component';
 import { TrainModelBasic } from './train-model-basic.component';
 import { useCanTrainModel } from './use-can-train-model.hook';
@@ -38,7 +39,6 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
     const {
         isBasicMode,
         openAdvancedSettingsMode,
-        openBasicMode,
         algorithms,
         selectedModelTemplateId,
         changeSelectedTemplateId,
@@ -82,7 +82,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                     <TrainModelBasic
                         selectedTask={selectedTask}
                         tasks={tasks}
-                        onChangeTask={changeTask}
+                        onTaskChange={changeTask}
                         isTaskChainProject={isTaskChainProject}
                         activeModelTemplateId={activeModelTemplateId}
                         selectedModelTemplateId={selectedModelTemplateId}
@@ -90,7 +90,16 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                         algorithms={algorithms}
                     />
                 ) : (
-                    <div>Advanced settings</div>
+                    <AdvancedSettings
+                        selectedTask={selectedTask}
+                        tasks={tasks}
+                        onTaskChange={changeTask}
+                        isTaskChainProject={isTaskChainProject}
+                        selectedModelTemplateId={selectedModelTemplateId}
+                        onChangeSelectedTemplateId={changeSelectedTemplateId}
+                        algorithms={algorithms}
+                        activeModelTemplateId={activeModelTemplateId}
+                    />
                 )}
             </Content>
 
@@ -98,13 +107,9 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                 <Button variant={'secondary'} onPress={onClose}>
                     Cancel
                 </Button>
-                {isBasicMode ? (
+                {isBasicMode && (
                     <Button variant={'secondary'} onPress={openAdvancedSettingsMode}>
                         Advanced settings
-                    </Button>
-                ) : (
-                    <Button variant={'secondary'} onPress={openBasicMode}>
-                        Back
                     </Button>
                 )}
                 <ButtonCreditsToConsume

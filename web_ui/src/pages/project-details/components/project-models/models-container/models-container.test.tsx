@@ -227,9 +227,9 @@ describe('Model container', () => {
     });
 
     it.each([
-        [PerformanceCategory.SPEED, 'Recommended for speed'],
-        [PerformanceCategory.BALANCE, 'Recommended for balance'],
-        [PerformanceCategory.ACCURACY, 'Recommended for accuracy'],
+        [PerformanceCategory.SPEED, 'Recommended for Speed'],
+        [PerformanceCategory.BALANCE, 'Recommended for Balance'],
+        [PerformanceCategory.ACCURACY, 'Recommended for Accuracy'],
     ])(
         'should display recommended tag with performance category if the category is different than OTHER',
         async (performanceCategory, text) => {

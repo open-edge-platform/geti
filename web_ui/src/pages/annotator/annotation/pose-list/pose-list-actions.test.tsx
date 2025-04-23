@@ -6,13 +6,13 @@ import { act, fireEvent, screen, waitForElementToBeRemoved } from '@testing-libr
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { labelFromUser } from '../../../../core/annotations/utils';
+import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedDatasetIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { providersRender } from '../../../../test-utils/required-providers-render';
 import { checkTooltip } from '../../../../test-utils/utils';
 import { AnnotationToolProvider } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
-import { SelectedProvider } from '../../providers/selected-provider/selected-provider.component';
 import { AnnotatorProviders } from '../../test-utils/annotator-render';
 import { OCCLUDE_TOOLTIP, PoseListActions, VISIBLE_TOOLTIP } from './pose-list-actions.component';
 

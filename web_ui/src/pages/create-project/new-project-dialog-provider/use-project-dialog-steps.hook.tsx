@@ -31,7 +31,7 @@ interface UseProjectDialogSteps {
     goToPreviousStep: () => void;
     resetSteps: () => void;
     component: JSX.Element;
-    validationError: { tree: string | undefined; labels: boolean; keypoint: string | undefined };
+    validationError: { tree: string | undefined; labels: boolean };
 }
 
 const getNextStep = (domain: DOMAIN) => {
@@ -49,7 +49,6 @@ const getNextStep = (domain: DOMAIN) => {
 export const useProjectDialogSteps = (): UseProjectDialogSteps => {
     const [animationDirection, setAnimationDirection] = useState<number>(AnimationDirections.MOVE_LEFT);
     const [projectCreationState, setProjectCreationState] = useState<ProjectMetadata>(PROJECT_CREATION_INITIAL_STATE);
-    const [keypointError, setKeypointError] = useState<string | undefined>();
     const [treeValidationError, setTreeValidationError] = useState<string | undefined>();
     const [labelsValidationError, setLabelsValidationError] = useState<boolean>(false);
 
@@ -141,9 +140,8 @@ export const useProjectDialogSteps = (): UseProjectDialogSteps => {
                 return {
                     component: (
                         <PoseTemplate
-                            keypointError={keypointError}
+                            metadata={projectTypeMetadata}
                             animationDirection={animationDirection}
-                            setValidationError={setKeypointError}
                             updateProjectState={updateProjectState}
                         />
                     ),
@@ -190,6 +188,6 @@ export const useProjectDialogSteps = (): UseProjectDialogSteps => {
         goToPreviousStep,
         resetSteps,
         component: currentStep.component,
-        validationError: { tree: treeValidationError, labels: labelsValidationError, keypoint: keypointError },
+        validationError: { tree: treeValidationError, labels: labelsValidationError },
     };
 };
