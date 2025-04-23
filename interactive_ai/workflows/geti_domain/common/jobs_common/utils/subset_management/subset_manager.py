@@ -144,7 +144,7 @@ class _SubsetHelper:
         # Reset subset values for eligible items
         for item in items:
             if item.subset in eligible_subsets:
-                item.subset = None  # type: ignore
+                item.subset = Subset.UNASSIGNED
 
         if shuffle_items:
             random.shuffle(items)

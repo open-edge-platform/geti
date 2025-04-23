@@ -45,18 +45,18 @@ class IPredictionToAnnotationConverter(metaclass=abc.ABCMeta):
         # If label names consist of numbers, convert them to strings
         model_api_labels = [str(label_str) for label_str in model_api_labels]
         # Create a mapping of label ID to label objects
-        self.label_map_ids = {}
+        self.label_map_ids = {str(label.id_): label for label in self.labels}
         # Legacy OTX (<2.0) model configuration contains label names (without spaces) instead of IDs
         self.legacy_label_map_names = defaultdict(list)
 
         # get the first empty label
         self.empty_label = next((label for label in self.labels if label.is_empty), None)
 
-        for i, label in enumerate(self.labels):
-            self.label_map_ids[str(label.id_)] = label
+        for label in self.labels:
             # Using a dict of list to handle duplicates label names (e.g. "foo bar", "foo_bar")
             self.legacy_label_map_names[label.name.replace(" ", "_")].append(label)
-        self.legacy_label_map_names["otx_empty_lbl"] = [self.empty_label]  # type: ignore
+        if self.empty_label is not None:
+            self.legacy_label_map_names["otx_empty_lbl"] = [self.empty_label]
 
         # Create a mapping of ModelAPI label indices to label objects
         self.idx_to_label = {}
