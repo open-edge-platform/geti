@@ -254,7 +254,8 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 10.3 Effect of Termination. Upon termination of the Agreement, the licenses to you will
                                 immediately terminate and you must cease using any Material and destroy all copies in
                                 your possession and direct your subcontractors to do the same. Termination of this
-                                Agreement will not terminate the CNDA.
+                                Agreement will not terminate any CNDA that might be in place between the parties, if
+                                any.
                             </Text>
                             <Text>
                                 10.4 Survival. All sections except Section 2.1 survive termination of this Agreement.
