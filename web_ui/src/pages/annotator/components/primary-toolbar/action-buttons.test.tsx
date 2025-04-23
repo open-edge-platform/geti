@@ -64,15 +64,8 @@ describe('Action buttons', () => {
         );
     };
 
-    it('toggles visibility of annotations', async () => {
-        const annotationToolContext = fakeAnnotationToolContext({
-            annotations: [
-                getMockedAnnotation({ id: '1', isHidden: false }),
-                getMockedAnnotation({ id: '2', isHidden: false }),
-            ],
-        });
-
-        const { container } = render(
+    const renderApp = async ({ annotationToolContext }: { annotationToolContext: AnnotationToolContext }) => {
+        const response = render(
             <ProjectProvider
                 projectIdentifier={{
                     organizationId: 'organization-id',
@@ -95,6 +88,19 @@ describe('Action buttons', () => {
         );
 
         await waitForElementToBeRemoved(screen.getByRole('progressbar'));
+
+        return response;
+    };
+
+    it('toggles visibility of annotations', async () => {
+        const { container } = await renderApp({
+            annotationToolContext: fakeAnnotationToolContext({
+                annotations: [
+                    getMockedAnnotation({ id: '1', isHidden: false }),
+                    getMockedAnnotation({ id: '2', isHidden: false }),
+                ],
+            }),
+        });
 
         const visibilityButton = getById(container, 'annotation-all-annotations-toggle-visibility');
         expect(visibilityButton).toBeInTheDocument();
@@ -107,33 +113,23 @@ describe('Action buttons', () => {
     });
 
     it('toggle visibility button is disabled when annotations are empty', async () => {
-        const annotationToolContext = fakeAnnotationToolContext({
-            annotations: [],
-        });
+        await renderApp({ annotationToolContext: fakeAnnotationToolContext({ annotations: [] }) });
 
-        render(
-            <ProjectProvider
-                projectIdentifier={{
-                    organizationId: 'organization-id',
-                    workspaceId: 'workspace-id',
-                    projectId: 'project-id',
-                }}
-            >
-                <TaskProvider>
-                    <AnnotationSceneProvider
-                        annotations={annotationToolContext.scene.annotations}
-                        labels={annotationToolContext.scene.labels}
-                    >
-                        <ZoomProvider>
-                            <App annotationToolContext={annotationToolContext} />
-                            <TransformComponent>{''}</TransformComponent>
-                        </ZoomProvider>
-                    </AnnotationSceneProvider>
-                </TaskProvider>
-            </ProjectProvider>
+        expect(screen.getByTestId('annotation-all-annotations-toggle-visibility')).toBeDisabled();
+    });
+
+    it('toggle visibility button is disabled for keypoint detection', async () => {
+        const keypointTask = getMockedTask({ id: '1', domain: DOMAIN.KEYPOINT_DETECTION, labels: [] });
+
+        jest.mocked(useTask).mockReturnValue(
+            mockedTaskContextProps({ tasks: [keypointTask], selectedTask: keypointTask })
         );
 
-        await waitForElementToBeRemoved(screen.getByRole('progressbar'));
+        await renderApp({
+            annotationToolContext: fakeAnnotationToolContext({
+                annotations: [getMockedAnnotation({ id: '1', isHidden: false })],
+            }),
+        });
 
         expect(screen.getByTestId('annotation-all-annotations-toggle-visibility')).toBeDisabled();
     });
@@ -150,8 +146,8 @@ describe('Action buttons', () => {
                     getMockedAnnotation({
                         id: '1',
                         isHidden: false,
-                        labels: [labelFromUser(firstLabel)],
                         isSelected: true,
+                        labels: [labelFromUser(firstLabel)],
                     }),
                     getMockedAnnotation({ id: '2', isHidden: true, labels: [labelFromUser(otherLabels[0])] }),
                 ],
@@ -160,29 +156,7 @@ describe('Action buttons', () => {
 
             jest.mocked(useTask).mockReturnValue(mockedTaskContextProps({ tasks, selectedTask: tasks[1] }));
 
-            const { container } = render(
-                <ProjectProvider
-                    projectIdentifier={{
-                        organizationId: 'organization-id',
-                        workspaceId: 'workspace-id',
-                        projectId: 'project-id',
-                    }}
-                >
-                    <TaskProvider>
-                        <AnnotationSceneProvider
-                            annotations={annotationToolContext.scene.annotations}
-                            labels={annotationToolContext.scene.labels}
-                        >
-                            <ZoomProvider>
-                                <App annotationToolContext={annotationToolContext} />
-                                <TransformComponent>{''}</TransformComponent>
-                            </ZoomProvider>
-                        </AnnotationSceneProvider>
-                    </TaskProvider>
-                </ProjectProvider>
-            );
-
-            await waitForElementToBeRemoved(screen.getByRole('progressbar'));
+            const { container } = await renderApp({ annotationToolContext });
 
             const visibilityButton = getById(container, 'annotation-all-annotations-toggle-visibility');
             expect(visibilityButton).toBeInTheDocument();
