@@ -113,7 +113,7 @@ describe('ModelTemplate', () => {
 
         const templateCard = screen.getByTestId(`${defaultTemplate.name.toLocaleLowerCase()}-id`);
 
-        expect(within(templateCard).getByText('Recommended for balance')).toBeInTheDocument();
+        expect(within(templateCard).getByText('Recommended for Balance')).toBeInTheDocument();
     });
 
     it('Displays template metadata', () => {

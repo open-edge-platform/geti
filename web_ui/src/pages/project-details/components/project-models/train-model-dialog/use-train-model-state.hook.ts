@@ -67,10 +67,6 @@ export const useTrainModelState = () => {
         setMode(TrainModelMode.ADVANCED_SETTINGS);
     };
 
-    const openBasicMode = (): void => {
-        setMode(TrainModelMode.BASIC);
-    };
-
     const constructTrainingBodyDTO = (): TrainingBodyDTO => {
         const trainFromScratch = false;
         const isReshufflingSubsetsEnabled = false;
@@ -97,7 +93,6 @@ export const useTrainModelState = () => {
     return {
         isBasicMode,
         openAdvancedSettingsMode,
-        openBasicMode,
         selectedTask,
         tasks,
         activeModelTemplateId,
