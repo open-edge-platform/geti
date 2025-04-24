@@ -43,7 +43,7 @@ geti-k8s-tools = { path = "../../../../libs/k8s_tools", editable = true }
 geti-types = { path = "../../../../libs/types", editable = true }
 sc-sdk = { path = "../../../libs/sc_sdk", editable = true }
 media-utils = { path = "../../../libs/media_utils", editable = true }
-grpc_interfaces = { path = "../../../../grpc_interfaces", editable = true }
+grpc_interfaces = { path = "../../../../libs/grpc_interfaces", editable = true }
 
 [dependency-groups]
 dev = [

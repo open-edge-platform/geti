@@ -1,4 +1,4 @@
-include ../Makefile.shared-python
+include ../../Makefile.shared-python  # TODO use include ../Makefile.shared-python-libs ??
 
 # Variables
 PROTO_ROOT  	:= grpc_interfaces
