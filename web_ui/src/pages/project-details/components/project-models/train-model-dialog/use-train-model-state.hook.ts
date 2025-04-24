@@ -72,6 +72,7 @@ export const useTrainModelState = () => {
         },
         { enabled: isAdvancedSettingsMode }
     );
+
     const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
 
     if (selectedModelTemplateId === null) {

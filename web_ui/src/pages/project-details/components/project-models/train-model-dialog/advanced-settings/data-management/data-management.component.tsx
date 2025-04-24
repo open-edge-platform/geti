@@ -6,6 +6,7 @@ import { FC } from 'react';
 import { View } from '@adobe/react-spectrum';
 
 import { BalanceLabelsDistribution } from './balance-labels-distribution/balance-labels-distribution.component';
+import { Tiling } from './tiling/tiling.component';
 import { TrainingSubsets } from './training-subsets/training-subsets.component';
 
 interface DataManagementProps {
@@ -24,6 +25,7 @@ export const DataManagement: FC<DataManagementProps> = ({
                 isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
                 onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
             />
+            <Tiling />
         </View>
     );
 };
