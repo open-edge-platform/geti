@@ -3297,7 +3297,7 @@ dev = [
     { name = "pyarrow", specifier = "==15.0.0" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "pytest-freezegun", specifier = "==0.4.2" },
-    { name = "requests", specifier = "~=2.31" },
+    { name = "requests", specifier = "==2.31" },
     { name = "ruff", specifier = "~=0.11" },
     { name = "scikit-image", specifier = "==0.20.0" },
     { name = "scikit-learn", specifier = "~=1.6" },
@@ -3305,7 +3305,7 @@ dev = [
     { name = "testfixtures", specifier = "==7.0.0" },
     { name = "types-cachetools" },
     { name = "types-pyyaml" },
-    { name = "types-requests", specifier = "==2.31.0" },
+    { name = "types-requests", specifier = "~=2.31" },
     { name = "workflows-common", extras = ["evaluation", "shard-dataset", "datumaro-conversion"] },
 ]
 

@@ -2712,7 +2712,7 @@ wheels = [
 
 [[package]]
 name = "requests"
-version = "2.32.3"
+version = "2.31.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -2720,9 +2720,9 @@ dependencies = [
     { name = "idna" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760", size = 131218 }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/be/10918a2eac4ae9f02f6cfe6414b7a155ccd8f7f9d4380d62fd5b955065c3/requests-2.31.0.tar.gz", hash = "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1", size = 110794 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6", size = 64928 },
+    { url = "https://files.pythonhosted.org/packages/70/8e/0e2d847013cb52cd35b38c009bb167a1a26b2ce6cd6965bf26b47bc0bf44/requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f", size = 62574 },
 ]
 
 [[package]]
@@ -3371,7 +3371,7 @@ dev = [
     { name = "pyarrow", specifier = "==15.0.0" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "pytest-freezegun", specifier = "==0.4.2" },
-    { name = "requests", specifier = "~=2.31" },
+    { name = "requests", specifier = "==2.31" },
     { name = "ruff", specifier = "~=0.11" },
     { name = "scikit-image", specifier = "==0.20.0" },
     { name = "scikit-learn", specifier = "~=1.6" },
@@ -3379,7 +3379,7 @@ dev = [
     { name = "testfixtures", specifier = "==7.0.0" },
     { name = "types-cachetools" },
     { name = "types-pyyaml" },
-    { name = "types-requests", specifier = "==2.31.0" },
+    { name = "types-requests", specifier = "~=2.31" },
     { name = "workflows-common", extras = ["evaluation", "shard-dataset", "datumaro-conversion"] },
 ]
 

@@ -51,15 +51,20 @@ dev = [
     "ruff~=0.11",
     "pre-commit~=4.1",
     "testfixtures==7.0.0",
-    "requests~=2.31",
     "mypy~=1.15",
     "types-cachetools",
     "types-PyYAML",
     "testcontainers[mongodb]~=4.10",
+    # FIXME: The version of "requests" is pinned
+    # to avoid the bug described in https://github.com/docker/docker-py/issues/3256
+    # We should upgrade to "docker~=7.1.0" to fix the issue but it is not compatible
+    # with the version of Flytekit that we use. In the meantime, we downgrade
+    # the "requests" package.
+    "requests==2.31",
+    "types-requests~=2.31",
 
     "asynctest==0.13.0",
     "pytest-freezegun==0.4.2",
-    "types-requests==2.31.0",
     "scikit-image==0.20.0",
     "scikit-learn~=1.6",
     
