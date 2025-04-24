@@ -6,6 +6,7 @@ import { pluginNodePolyfill } from '@rsbuild/plugin-node-polyfill';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginSass } from '@rsbuild/plugin-sass';
 import { pluginSvgr } from '@rsbuild/plugin-svgr';
+import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
 
 import { devProxy } from './dev-proxy';
 
@@ -14,6 +15,13 @@ const { publicVars, rawPublicVars } = loadEnv({ prefixes: ['REACT_APP_'] });
 const publicPath = rawPublicVars['REACT_APP_PUBLIC_PATH'];
 
 export default defineConfig({
+    tools: {
+        rspack: {
+            plugins: [
+                process.env.RSDOCTOR && new RsdoctorRspackPlugin({ supports: { generateTileGraph: true } }),
+            ].filter(Boolean),
+        },
+    },
     plugins: [
         // Needed for React, JSX, etc
         pluginReact(),
