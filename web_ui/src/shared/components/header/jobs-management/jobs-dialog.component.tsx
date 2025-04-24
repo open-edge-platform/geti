@@ -180,6 +180,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
                                 value={range}
                                 maxValue={TODAY}
                                 defaultValue={INITIAL_DATES}
+                                hasManualEdition
                             />
                         </CornerIndicator>
                         <RefreshButton
