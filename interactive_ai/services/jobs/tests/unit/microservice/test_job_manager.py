@@ -17,6 +17,7 @@ from model.telemetry import Telemetry
 
 from geti_spicedb_tools import SpiceDB, SpiceDBResourceTypes
 from geti_types import ID
+from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 from sc_sdk.utils.constants import DEFAULT_USER_NAME
 from sc_sdk.utils.time_utils import now
 
@@ -172,7 +173,7 @@ def test_submit_replace(
             "metadata": {"project_name": "test_project"},
             "creation_time": ANY,
             "author": author,
-            "project_id": str(project_id),
+            "project_id": IDToMongo.forward(project_id),
             "executions": {"main": {}},
             "session": {
                 "organization_id": str(fxt_session_ctx.organization_id),
@@ -339,7 +340,7 @@ def test_submit_cost_requests(
             "metadata": {"project_name": "test_project"},
             "creation_time": ANY,
             "author": author,
-            "project_id": str(project_id),
+            "project_id": IDToMongo.forward(project_id),
             "executions": {"main": {}},
             "session": {
                 "organization_id": str(fxt_session_ctx.organization_id),
@@ -524,8 +525,11 @@ def test_get_jobs_count_filter(mock_repo_count, request) -> None:
             "key": DUMMY_JOB_KEY,
             "author": "author_uid",
             "start_time": {"$gte": from_val, "$lte": to_val},
-            "project_id": str(project_id),
-            "$or": [{"project_id": {"$in": [project_id]}}, {"project_id": {"$exists": False}, "author": "author_uid"}],
+            "project_id": IDToMongo.forward(project_id),
+            "$or": [
+                {"project_id": {"$in": [IDToMongo.forward(project_id)]}},
+                {"project_id": {"$exists": False}, "author": "author_uid"},
+            ],
         }
     )
 
@@ -606,12 +610,12 @@ def test_find_filtered(mock_repo_aggregate, request) -> None:
                 "$match": {
                     "type": {"$in": ["train"]},
                     "state_group": "SCHEDULED",
-                    "project_id": str(project_id),
+                    "project_id": IDToMongo.forward(project_id),
                     "key": DUMMY_JOB_KEY,
                     "author": "author_uid",
                     "start_time": {"$gte": from_val, "$lte": to_val},
                     "$or": [
-                        {"project_id": {"$in": [project_id]}},
+                        {"project_id": {"$in": [IDToMongo.forward(project_id)]}},
                         {"project_id": {"$exists": False}, "author": "author_uid"},
                     ],
                 }
@@ -651,7 +655,7 @@ def test_find_filtered_states(mock_repo_aggregate, request) -> None:
                 "$match": {
                     "type": {"$in": ["train"]},
                     "state": {"$in": [0, 4]},
-                    "project_id": str(project_id),
+                    "project_id": IDToMongo.forward(project_id),
                     "key": DUMMY_JOB_KEY,
                     "author": "author_uid",
                     "start_time": {"$gte": from_val, "$lte": to_val},
@@ -732,7 +736,9 @@ def test_get_acl_filter_permitted_projects() -> None:
     acl_filter = JobManager()._get_acl_filter(acl=acl)
 
     # Assert
-    assert acl_filter == {"$or": [{"project_id": {"$in": [project_id]}}, {"project_id": {"$exists": False}}]}
+    assert acl_filter == {
+        "$or": [{"project_id": {"$in": [IDToMongo.forward(project_id)]}}, {"project_id": {"$exists": False}}]
+    }
 
 
 def test_get_acl_filter_workspace_jobs_author() -> None:
@@ -757,5 +763,8 @@ def test_get_acl_filter_workspace_full() -> None:
 
     # Assert
     assert acl_filter == {
-        "$or": [{"project_id": {"$in": [project_id]}}, {"project_id": {"$exists": False}, "author": "author_id"}]
+        "$or": [
+            {"project_id": {"$in": [IDToMongo.forward(project_id)]}},
+            {"project_id": {"$exists": False}, "author": "author_id"},
+        ]
     }

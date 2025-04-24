@@ -27,6 +27,7 @@ from geti_spicedb_tools import SpiceDB, SpiceDBResourceTypes
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, Singleton
 from grpc_interfaces.credit_system.client import CreditSystemClient, ResourceRequest
+from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 from sc_sdk.utils.time_utils import now
 
 if TYPE_CHECKING:
@@ -203,7 +204,7 @@ class JobManager(metaclass=Singleton):
             "telemetry": {"context": _telemetry.context},
         }
         if project_id is not None:
-            document["project_id"] = str(project_id)
+            document["project_id"] = IDToMongo.forward(project_id)
         if gpu_num_required is not None:
             document["gpu"] = {"num_required": gpu_num_required, "state": JobGpuRequestState.WAITING.value}
 
@@ -508,7 +509,7 @@ class JobManager(metaclass=Singleton):
         if author_uid is not None:
             job_filter["author"] = author_uid
         if project_id is not None:
-            job_filter["project_id"] = str(project_id)
+            job_filter["project_id"] = IDToMongo.forward(project_id)
         start_time_filter = JobManager._get_timestamp_filter(start_time)
         if start_time_filter is not None:
             job_filter["start_time"] = start_time_filter
@@ -541,7 +542,7 @@ class JobManager(metaclass=Singleton):
 
         project_jobs_filter: dict[str, Any] = {"project_id": {"$exists": True}}
         if acl.permitted_projects is not None:
-            project_jobs_filter["project_id"] = {"$in": [str(_id) for _id in acl.permitted_projects]}
+            project_jobs_filter["project_id"] = {"$in": [IDToMongo.forward(_id) for _id in acl.permitted_projects]}
 
         workspace_jobs_filter: dict[str, Any] = {"project_id": {"$exists": False}}
         if acl.workspace_jobs_author is not None:
