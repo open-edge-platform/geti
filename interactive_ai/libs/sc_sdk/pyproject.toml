@@ -7,7 +7,7 @@ requires-python = ">=3.10, <3.14"
 dependencies = [
     "attrs~=24.3",
     "cachetools~=5.5",
-    "minio~=7.2",
+    "minio~=7.1.0",
     "networkx>=2.6,<=2.8",
     "numpy>=1.23.1,<=1.26.4",
     "omegaconf~=2.3",

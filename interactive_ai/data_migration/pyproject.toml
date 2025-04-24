@@ -7,7 +7,7 @@ requires-python = ">=3.10, <3.14"
 dependencies = [
     "dataclasses-json==0.5.7",
     "pymongo[aws]~=4.10",
-    "minio~=7.2",
+    "minio~=7.1",
 ]
 
 [dependency-groups]
