@@ -17,11 +17,11 @@ import (
 	"strings"
 	"time"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
 	grpcUtils "account_service/app/grpc/utils"
 	"account_service/app/models"
 	"account_service/app/roles"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 	"github.com/google/uuid"

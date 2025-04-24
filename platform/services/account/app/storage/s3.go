@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
-	"common/utils"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"

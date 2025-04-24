@@ -7,12 +7,12 @@ import (
 	"context"
 	"errors"
 
+	"account_service/app/common/utils"
 	accErr "account_service/app/errors"
 	"account_service/app/grpc/common"
 	grpcUtils "account_service/app/grpc/utils"
 	"account_service/app/models"
 	service "account_service/app/services/membership"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 

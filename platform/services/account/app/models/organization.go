@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"common/utils"
+	"account_service/app/common/utils"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

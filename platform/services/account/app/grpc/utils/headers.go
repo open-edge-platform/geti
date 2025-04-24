@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 
-	"common/utils"
+	"account_service/app/common/utils"
 
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/metadata"

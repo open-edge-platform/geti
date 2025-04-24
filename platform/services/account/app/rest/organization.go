@@ -11,8 +11,8 @@ import (
 	"net/http"
 	"time"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 	"google.golang.org/grpc"

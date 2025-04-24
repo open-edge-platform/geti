@@ -4,13 +4,14 @@
 package repository
 
 import (
+	"account_service/app/common/utils"
+	accErr "account_service/app/errors"
 	"account_service/app/grpc/common"
-    accErr "account_service/app/errors"
-    "account_service/app/models"
-	"common/utils"
+	"account_service/app/models"
 
-    "context"
-    "fmt"
+	"context"
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -29,7 +30,7 @@ func NewWorkspaceRepository(db *gorm.DB) WorkspaceRepository {
 }
 
 func (r *workspaceRepository) FindWorkspaces(ctx context.Context, findRequest models.FindWorkspaceRequest) ([]models.Workspace, int32, error) {
-    logger.Debugf("find workspace request: %v", findRequest)
+	logger.Debugf("find workspace request: %v", findRequest)
 
 	var workspaces []models.Workspace
 	statementSession := r.db.WithContext(ctx)

@@ -5,13 +5,11 @@ go 1.23.3
 toolchain go1.23.8
 
 replace (
-	common/utils => ./app/common/utils
 	geti.com/account_service_grpc => ../../../grpc_interfaces/grpc_interfaces/account_service/go
 	geti.com/credit_system => ../../../grpc_interfaces/grpc_interfaces/credit_system/go
 )
 
 require (
-	common/utils v0.0.0-00010101000000-000000000000
 	geti.com/account_service_grpc v1.0.0
 	geti.com/credit_system v0.0.0-00010101000000-000000000000
 	github.com/IBM/sarama v1.43.2

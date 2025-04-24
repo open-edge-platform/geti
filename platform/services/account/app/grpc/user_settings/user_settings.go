@@ -16,11 +16,11 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 
+	"account_service/app/common/utils"
 	"account_service/app/grpc/common"
 	grpcUtils "account_service/app/grpc/utils"
 	"account_service/app/grpc_gateway"
 	"account_service/app/models"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 )

@@ -9,12 +9,12 @@ import (
 	"errors"
 	"fmt"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
 	"account_service/app/grpc/common"
 	grpcUtils "account_service/app/grpc/utils"
 	"account_service/app/models"
 	"account_service/app/roles"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 

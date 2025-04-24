@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/proto"
 
-	"common/utils"
+	"account_service/app/common/utils"
 )
 
 const HttpStatusCodeResponseHeader = "x-http-code"
