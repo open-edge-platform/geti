@@ -112,6 +112,11 @@ export const Tiling: FC = () => {
                 Tiling<Accordion.Tag>{selectedTilingMode}</Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
+                <Accordion.Description>
+                    Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to
+                    increase accuracy for small object detection tasks.
+                </Accordion.Description>
+                <Accordion.Divider marginY={'size-200'} />
                 <Flex gap={'size-1000'}>
                     <Text UNSAFE_className={styles.title}>
                         Tiling mode <TilingModeTooltip />
