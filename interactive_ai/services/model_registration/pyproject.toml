@@ -5,7 +5,7 @@ description = "Model registration service for Geti"
 requires-python = ">=3.10, <3.14"
 
 dependencies = [
-    "openvino_model_api==0.2.5.2",
+    "openvino_model_api==0.3.0.2",
     "defusedxml==0.7.1",
     "moto==5.0.2",
     "asynctest==0.13.0",
