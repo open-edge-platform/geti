@@ -8,9 +8,9 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 # across both images.
 ENV UV_PYTHON_DOWNLOADS=0
 
+# Install the build dependencies for ldap
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    curl \
     gcc \
     libldap2-dev \
     libsasl2-dev \
@@ -35,6 +35,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM base AS runtime
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN useradd -l -u 10001 non-root && \
 	pip3 uninstall -y setuptools pip wheel && \
     rm -rf /root/.cache/pip 
@@ -43,7 +49,6 @@ USER non-root
 
 # Copy the application from the builder
 COPY --link --from=build --chown=10001 /builder/platform_cleaner/app /app
-COPY --link --from=build /usr/bin/curl /usr/bin/curl
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
