@@ -32,7 +32,7 @@ spec:
             command: ["/bin/sh", "-c"]
             args:
               - >-
-                delete_not_activated_users;
+                PYTHONPATH=. python3.10 delete_not_activated_users/delete_not_activated_users.py;
                 retVal=$?;
                 {{- if not .Values.global.istio_ambient_mesh }}
                 until curl -XPOST 127.0.0.1:15020/quitquitquit;

@@ -49,10 +49,8 @@ USER non-root
 
 # Copy the application from the builder
 COPY --link --from=build --chown=10001 /builder/platform_cleaner/app /app
-COPY --link entrypoint.sh /app
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
-ENTRYPOINT [ "./entrypoint.sh" ]

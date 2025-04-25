@@ -2,5 +2,4 @@
 !app
 !uv.lock
 !pyproject.toml
-!entrypoint.sh
 !common_libs
