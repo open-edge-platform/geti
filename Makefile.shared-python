@@ -104,11 +104,8 @@ developer-venv: pre-venv
 	done
 
 builder:
-	@docker run --rm -u $(id -u):$(getent group docker | cut -d: -f3) \
+	@docker run --rm -u $(shell id -u):$(shell getent group docker | cut -d: -f3) \
 		-v "$(ROOT_DIR):/app" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v ~/.docker/config.json:/home/bulider/.docker/config.json \
-		-v /app/$(RELATIVE_PATH)/.venv \
-		-v /app/$(RELATIVE_PATH)/.mypy_cache \
-		-v /app/$(RELATIVE_PATH)/.ruff_cache \
-		-w "/app/$(RELATIVE_PATH)" ${DOCKER_PROXY} ${PYTHON_BUILDER_IMAGE} make $(BUILDER_ARGS)
+		-w "/app" ${DOCKER_PROXY} ${PYTHON_BUILDER_IMAGE} make -C $(RELATIVE_PATH) $(BUILDER_ARGS)
