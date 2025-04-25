@@ -15,6 +15,7 @@ import { JobCount } from '../../../../core/jobs/jobs.interface';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { CornerIndicator } from '../../corner-indicator/corner-indicator.component';
 import { DateRangePickerSmall } from '../../date-range-picker-small/date-range-picker-small.component';
+import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
 import { NumberBadge } from '../../number-badge/number-badge.component';
 import { RefreshButton } from '../../refresh-button/refresh-button.component';
 import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
@@ -41,6 +42,9 @@ const DEFAULT_JOBS_COUNT: JobCount = {
 };
 
 export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialogProps): JSX.Element => {
+    const RANGE_FILTER_TOOLTIP =
+        'This component filters jobs by start date of the job. For example in you select range' +
+        ' between yesterday and today it will show jobs started yesterday or today.';
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
     const { useGetJobs } = useJobs({ organizationId, workspaceId });
 
@@ -58,6 +62,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         userId: undefined as string | undefined,
         jobTypes: [] as JobType[],
     });
+
     const [range, setRange] = useState<RangeValue<DateValue>>(INITIAL_DATES);
 
     const [selectedJobState, setSelectedJobState] = useState<Key>(JobState.RUNNING);
@@ -172,7 +177,9 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
                                 maxValue={TODAY}
                                 defaultValue={INITIAL_DATES}
                                 hasManualEdition
-                            />
+                            >
+                                <InfoTooltip id={`range-filter-tooltip`} tooltipText={RANGE_FILTER_TOOLTIP} />
+                            </DateRangePickerSmall>
                         </CornerIndicator>
                         <RefreshButton
                             onPress={resetFilters}
