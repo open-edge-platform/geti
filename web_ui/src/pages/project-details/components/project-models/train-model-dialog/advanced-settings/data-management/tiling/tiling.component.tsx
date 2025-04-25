@@ -1,110 +1,67 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 
-import { Content, ContextualHelp, Flex, Text, View } from '@adobe/react-spectrum';
-import clsx from 'clsx';
+import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
 
-import { Button } from '../../../../../../../../shared/components/button/button.component';
+import {
+    ConfigurableParametersComponents,
+    NumberGroupParams,
+} from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { Accordion } from '../../accordion/accordion.component';
+import { TILING_MODES, TilingModes } from './tiling-modes.component';
+import { TilingOptions } from './tiling-options.component';
 
 import styles from './tiling.module.scss';
 
-enum TILING_MODES {
-    OFF = 'Off',
-    Adaptive = 'Adaptive',
-    Manual = 'Manual',
+interface TilingProps {
+    tilingParameters: ConfigurableParametersComponents;
 }
 
-const TilingModeTooltip: FC = () => {
-    return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>
-                    Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to
-                    increase accuracy for small object detection tasks.
-                </Text>
-            </Content>
-        </ContextualHelp>
-    );
+const getTilingMode = (tilingParameters: ConfigurableParametersComponents): TILING_MODES => {
+    const adaptive = tilingParameters?.parameters?.find((parameter) => parameter.name === 'enable_adaptive_params');
+    const enablingTiling = tilingParameters?.parameters?.find((parameter) => parameter.name === 'enable_tiling');
+
+    if (adaptive !== undefined && adaptive.value === true) {
+        return TILING_MODES.Adaptive;
+    }
+
+    if (enablingTiling !== undefined && enablingTiling.value === false) {
+        return TILING_MODES.OFF;
+    }
+
+    return TILING_MODES.Manual;
 };
 
-interface TilingModesProps {
-    selectedTilingMode: TILING_MODES;
-    onTilingModeChange: (tilingMode: TILING_MODES) => void;
-}
+export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
+    const [selectedTilingMode, setSelectedTilingMode] = useState<TILING_MODES>(() => getTilingMode(tilingParameters));
 
-interface TilingModeButtonProps {
-    tilingMode: TILING_MODES;
-    selectedTilingMode: TILING_MODES;
-    onTilingModeChange: (mode: TILING_MODES) => void;
-    className: string | undefined;
-}
+    const manualTilingParameters = (tilingParameters.parameters?.filter(
+        (parameter) =>
+            !['enable_adaptive_params', 'enable_tiling'].includes(parameter.name) &&
+            ['integer', 'float'].includes(parameter.dataType)
+    ) ?? []) as NumberGroupParams[];
 
-const TilingModeButton: FC<TilingModeButtonProps> = ({
-    tilingMode,
-    selectedTilingMode,
-    onTilingModeChange,
-    className,
-}) => {
-    return (
-        <Button
-            variant={selectedTilingMode === tilingMode ? 'accent' : 'secondary'}
-            UNSAFE_className={clsx(styles.optionButton, className)}
-            onPress={() => {
-                onTilingModeChange(tilingMode);
-            }}
-        >
-            {tilingMode}
-        </Button>
-    );
-};
+    console.log({ tilingParameters, manualTilingParameters });
 
-const TILING_MODE_DESCRIPTIONS: Record<TILING_MODES, string> = {
-    [TILING_MODES.OFF]:
-        'Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is ' +
-        'straightforward but may struggle with detecting small objects in high-resolution images, as the model might ' +
-        'miss finer details',
-    [TILING_MODES.Adaptive]:
-        'Adaptive means that the system will automatically set the parameters ' +
-        'based on the images resolution and annotations size.',
-    [TILING_MODES.Manual]:
-        'Manual allows users to specify the size, position of tiles and max number of object per tile ' +
-        'manually. This approach provides greater control over the tiling process, enabling users to focus on ' +
-        'specific areas of interest within the image.',
-};
+    const TILING_MODE_COMPONENTS: Record<TILING_MODES, ReactNode> = {
+        [TILING_MODES.OFF]: (
+            <Text UNSAFE_className={styles.tilingModeDescription} gridColumn={'2/3'}>
+                Model processes the entire image as a single unit without dividing it into smaller tiles. This approach
+                is straightforward but may struggle with detecting small objects in high-resolution images, as the model
+                might miss finer details
+            </Text>
+        ),
 
-const TilingModes: FC<TilingModesProps> = ({ selectedTilingMode, onTilingModeChange }) => {
-    return (
-        <View>
-            <Flex marginBottom={'size-200'}>
-                <TilingModeButton
-                    tilingMode={TILING_MODES.OFF}
-                    selectedTilingMode={selectedTilingMode}
-                    onTilingModeChange={onTilingModeChange}
-                    className={selectedTilingMode === TILING_MODES.Adaptive ? styles.offMode : undefined}
-                />
-                <TilingModeButton
-                    tilingMode={TILING_MODES.Adaptive}
-                    selectedTilingMode={selectedTilingMode}
-                    onTilingModeChange={onTilingModeChange}
-                    className={selectedTilingMode !== TILING_MODES.Adaptive ? styles.adaptiveMode : undefined}
-                />
-                <TilingModeButton
-                    tilingMode={TILING_MODES.Manual}
-                    selectedTilingMode={selectedTilingMode}
-                    onTilingModeChange={onTilingModeChange}
-                    className={selectedTilingMode === TILING_MODES.Adaptive ? styles.manualMode : undefined}
-                />
-            </Flex>
-            <Text UNSAFE_className={styles.tilingModeDescription}>{TILING_MODE_DESCRIPTIONS[selectedTilingMode]}</Text>
-        </View>
-    );
-};
-
-export const Tiling: FC = () => {
-    const [selectedTilingMode, setSelectedTilingMode] = useState<TILING_MODES>(TILING_MODES.Adaptive);
+        [TILING_MODES.Adaptive]: (
+            <View UNSAFE_className={styles.tilingModeDescription} gridColumn={'2/3'}>
+                Adaptive means that the system will automatically set the parameters based on the images resolution and
+                annotations size.
+            </View>
+        ),
+        [TILING_MODES.Manual]: <TilingOptions parameters={manualTilingParameters} />,
+    };
 
     return (
         <Accordion>
@@ -117,12 +74,14 @@ export const Tiling: FC = () => {
                     increase accuracy for small object detection tasks.
                 </Accordion.Description>
                 <Accordion.Divider marginY={'size-200'} />
-                <Flex gap={'size-1000'}>
-                    <Text UNSAFE_className={styles.title}>
-                        Tiling mode <TilingModeTooltip />
-                    </Text>
+                <Grid
+                    columns={['max-content', minmax('size-3400', '1fr'), 'size-400']}
+                    gap={'size-300'}
+                    alignItems={'center'}
+                >
                     <TilingModes selectedTilingMode={selectedTilingMode} onTilingModeChange={setSelectedTilingMode} />
-                </Flex>
+                    {TILING_MODE_COMPONENTS[selectedTilingMode]}
+                </Grid>
             </Accordion.Content>
         </Accordion>
     );
