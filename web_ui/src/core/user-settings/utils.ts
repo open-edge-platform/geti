@@ -99,6 +99,7 @@ const initialGlobalModalsConfig: GlobalModalsConfig = {
 };
 
 export const initialGeneralSettingsConfig: GeneralSettingsConfig = {
+    [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: null },
     [GENERAL_SETTINGS_KEYS.MAINTENANCE_BANNER]: {
         wasDismissed: false,
         window: {
