@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"strconv"
 
+	"account_service/app/common/utils"
 	"account_service/app/fsm"
 	"account_service/app/grpc"
 	"account_service/app/models"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 	"github.com/golang/protobuf/ptypes/timestamp"

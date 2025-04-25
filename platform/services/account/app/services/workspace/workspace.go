@@ -4,9 +4,10 @@
 package workspace
 
 import (
+	"account_service/app/common/utils"
 	"account_service/app/models"
-	"common/utils"
 	"errors"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"

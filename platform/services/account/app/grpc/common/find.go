@@ -6,8 +6,8 @@ package common
 import (
 	"fmt"
 
+	"account_service/app/common/utils"
 	grpcUtils "account_service/app/grpc/utils"
-	"common/utils"
 
 	"golang.org/x/exp/slices"
 	"google.golang.org/grpc/codes"

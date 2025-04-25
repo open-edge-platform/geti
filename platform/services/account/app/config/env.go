@@ -6,7 +6,7 @@ package config
 import (
 	"fmt"
 
-	"common/utils"
+	"account_service/app/common/utils"
 )
 
 const (

@@ -8,12 +8,12 @@ import (
 	"errors"
 	"fmt"
 
+	"account_service/app/common/utils"
 	accErr "account_service/app/errors"
 	"account_service/app/models"
 	"account_service/app/repository"
 	"account_service/app/services"
 	roleService "account_service/app/services/role"
-	"common/utils"
 
 	"gorm.io/gorm"
 )

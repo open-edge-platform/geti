@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"time"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
 	"account_service/app/grpc/membership"
 	user_status "account_service/app/grpc/membership_status"
@@ -31,7 +32,6 @@ import (
 	usersSvc "account_service/app/services/user"
 	workspaceSvc "account_service/app/services/workspace"
 	"account_service/app/telemetry"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 

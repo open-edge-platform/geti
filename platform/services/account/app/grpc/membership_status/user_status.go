@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
 	"account_service/app/fsm"
 	"account_service/app/grpc/common"
@@ -14,7 +15,6 @@ import (
 	"account_service/app/models"
 	"account_service/app/roles"
 	service "account_service/app/services/membership"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 

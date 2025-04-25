@@ -10,7 +10,7 @@ import (
 	"io"
 	"time"
 
-	"common/utils"
+	"account_service/app/common/utils"
 
 	v1 "github.com/authzed/authzed-go/proto/authzed/api/v1"
 )

@@ -6,11 +6,11 @@ requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "mlflow==2.16.0",
-    "minio==7.2.3",
+    "minio~=7.1.0",
     "numpy==1.26.4",
     "requests==2.32.3",
     "tqdm==4.67.1",
-    "otx[base]==2.2.0rc12",
+    "otx[base]==2.4.1",
     "geti-kafka-tools",
     "geti-telemetry-tools[telemetry,kafka]",
     "torchmetrics<1.7.0",

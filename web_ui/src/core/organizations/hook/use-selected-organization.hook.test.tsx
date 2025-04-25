@@ -4,8 +4,14 @@
 import { act, waitFor } from '@testing-library/react';
 import { useLocation, useParams } from 'react-router-dom';
 
+import {
+    getMockedUserGlobalSettings,
+    getMockedUserGlobalSettingsObject,
+} from '../../../test-utils/mocked-items-factory/mocked-settings';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
 import { paths } from '../../services/routes';
+import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
+import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
 import { useProfileQuery } from '../../users/hook/use-profile.hook';
 import { createInMemoryOnboardingService } from '../../users/services/inmemory-onboarding-service';
 import { OrganizationMetadata } from '../../users/services/onboarding-service.interface';
@@ -23,6 +29,11 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('../../users/hook/use-profile.hook', () => ({ useProfileQuery: jest.fn() }));
 
+jest.mock('../../user-settings/hooks/use-global-settings.hook', () => ({
+    ...jest.requireActual('../../user-settings/hooks/use-global-settings.hook'),
+    useUserGlobalSettings: jest.fn(),
+}));
+
 const mockedOrganization = {
     id: '111',
     name: 'organization name',
@@ -33,7 +44,27 @@ const mockedOrganization = {
 
 const mockedOrganizationUserInvited = {
     ...mockedOrganization,
+    id: '222',
     userStatus: AccountStatus.INVITED,
+    status: AccountStatus.INVITED,
+};
+
+const mockedSuspendedOrganization = {
+    ...mockedOrganization,
+    id: '333',
+    status: AccountStatus.SUSPENDED,
+};
+
+const mockedDeletedOrganization = {
+    ...mockedOrganization,
+    id: '444',
+    status: AccountStatus.DELETED,
+};
+
+const mockedRequestedOrganization = {
+    ...mockedOrganization,
+    id: '555',
+    status: AccountStatus.REQUESTED_ACCESS,
 };
 
 const updateOrganizationQuery = (organizations: OrganizationMetadata[]) => {
@@ -58,6 +89,7 @@ describe('useSelectedOrganization', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        jest.mocked(useUserGlobalSettings).mockReturnValue(getMockedUserGlobalSettingsObject({}));
     });
 
     describe('single organization is selected by default', () => {
@@ -114,7 +146,7 @@ describe('useSelectedOrganization', () => {
             await waitFor(() => {
                 expect(mockedNavigate).toHaveBeenNthCalledWith(
                     1,
-                    paths.organization.index({ organizationId: mockedOrganization.id })
+                    paths.organization.index({ organizationId: mockedOrganizationUserInvited.id })
                 );
             });
 
@@ -125,6 +157,46 @@ describe('useSelectedOrganization', () => {
                     userConsentIsGiven: true,
                 })
             );
+        });
+
+        it('redirects to stored organization ID from settings', async () => {
+            jest.mocked(useUserGlobalSettings).mockReturnValue(
+                getMockedUserGlobalSettingsObject({
+                    config: getMockedUserGlobalSettings({
+                        [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: mockedOrganizationTwo.id },
+                    }),
+                })
+            );
+            updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
+            renderSelectedOrganizationHook(onboardingService);
+
+            await waitFor(() => {
+                expect(mockedNavigate).toHaveBeenNthCalledWith(
+                    1,
+                    paths.organization.index({ organizationId: mockedOrganizationTwo.id })
+                );
+            });
+        });
+
+        it.each([
+            ['deleted', mockedDeletedOrganization],
+            ['invited', mockedOrganizationUserInvited],
+            ['suspended', mockedSuspendedOrganization],
+            ['requested access', mockedRequestedOrganization],
+        ])('avoids redirection when the chosen organization has a status: %s', async (_, organization) => {
+            jest.mocked(useUserGlobalSettings).mockReturnValue(
+                getMockedUserGlobalSettingsObject({
+                    config: getMockedUserGlobalSettings({
+                        [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: organization.id },
+                    }),
+                })
+            );
+            updateOrganizationQuery([mockedOrganization, organization]);
+            renderSelectedOrganizationHook(onboardingService);
+
+            await waitFor(() => {
+                expect(mockedNavigate).not.toHaveBeenCalled();
+            });
         });
     });
 
@@ -152,17 +224,27 @@ describe('useSelectedOrganization', () => {
 
     describe('select new organization', () => {
         it('valid organization id', async () => {
+            const mockedSaveConfig = jest.fn();
             jest.mocked(useParams).mockReturnValue({ organizationId: undefined });
+            jest.mocked(useUserGlobalSettings).mockReturnValue(
+                getMockedUserGlobalSettingsObject({ saveConfig: mockedSaveConfig })
+            );
+
             updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
             const { result } = renderSelectedOrganizationHook();
-
             expect(result.current.selectedOrganization).toEqual(null);
+
             act(() => {
                 result.current.setSelectedOrganization(mockedOrganizationTwo.id);
             });
 
             expect(mockedNavigate).toHaveBeenCalledWith(
                 paths.organization.index({ organizationId: mockedOrganizationTwo.id })
+            );
+            expect(mockedSaveConfig).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: mockedOrganizationTwo.id },
+                })
             );
         });
 

@@ -353,12 +353,12 @@ class ModelConverter:
 
         # Add documentation and license files
         self._render_ovms_package_docs(
-            template_path=Path(os.path.join("app", "service", "ovms_package_docs", "README_template.md")),
+            template_path=Path(os.path.join("service", "ovms_package_docs", "README_template.md")),
             output_path=(export_dir_path / "README.md"),
             graph_name=graph_name,
         )
         self._copy_license_file(
-            license_path=Path(os.path.join("app", "service", "ovms_package_docs", "LICENSE")),
+            license_path=Path(os.path.join("service", "ovms_package_docs", "LICENSE")),
             output_path=(export_dir_path / "LICENSE"),
         )
 

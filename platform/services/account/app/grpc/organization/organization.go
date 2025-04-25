@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
 	"account_service/app/fsm"
 	"account_service/app/grpc/common"
@@ -27,7 +28,6 @@ import (
 	membershipService "account_service/app/services/membership"
 	orgService "account_service/app/services/organization"
 	"account_service/app/storage"
-	"common/utils"
 
 	"geti.com/account_service_grpc/pb"
 

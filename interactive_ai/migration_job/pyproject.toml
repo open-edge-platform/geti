@@ -7,6 +7,7 @@ dependencies = [
     "boto3==1.28.17",
     "psycopg2-binary==2.9.3",
     "pymongo[aws]~=4.10",
+    "minio~=7.1.0",
     "geti-telemetry-tools[telemetry,grpc,kafka,logger]",
     "migration",
 ]

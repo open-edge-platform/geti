@@ -4,6 +4,7 @@
 package membership
 
 import (
+	"account_service/app/common/utils"
 	"context"
 
 	accErr "account_service/app/errors"
@@ -12,7 +13,6 @@ import (
 	"account_service/app/repository"
 	orgService "account_service/app/services/organization"
 	roleService "account_service/app/services/role"
-	"common/utils"
 
 	proto "geti.com/account_service_grpc/pb"
 

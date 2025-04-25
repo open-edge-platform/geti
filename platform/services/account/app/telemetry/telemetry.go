@@ -9,10 +9,10 @@ import (
 
 	"google.golang.org/grpc"
 
+	"account_service/app/common/utils"
 	"account_service/app/config"
 	"account_service/app/grpc/organization"
 	"account_service/app/grpc/user"
-	"common/utils"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"

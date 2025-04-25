@@ -225,7 +225,12 @@ def test_prepare_graph(sample_project, sample_models, graph_variant, model_size,
     assert create_graph_mock.call_count == 1
 
 
-def test_create_ovms_graph_files(model_converter: ModelConverter, sample_project, tmp_path):
+def test_create_ovms_graph_files(
+    model_converter: ModelConverter, sample_project, tmp_path, monkeypatch: pytest.MonkeyPatch
+):
+    # Change current working directory to app
+    monkeypatch.chdir("app")
+
     # Prepare exported model files structure
     root_dir = tmp_path / "test-model"
     root_dir.mkdir()

@@ -4,8 +4,11 @@
 import { AccountStatus } from '../../core/organizations/organizations.interface';
 import { OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';
 
+export const isActiveOrganization = (organization: OrganizationMetadata) =>
+    organization.status === AccountStatus.ACTIVATED;
+
 export const isOrganizationVisible = (organization: OrganizationMetadata) =>
-    organization.status === AccountStatus.ACTIVATED || isInvitedOrganization(organization);
+    isActiveOrganization(organization) || isInvitedOrganization(organization);
 
 export const isInvitedOrganization = ({ status }: OrganizationMetadata) => status === AccountStatus.INVITED;
 
