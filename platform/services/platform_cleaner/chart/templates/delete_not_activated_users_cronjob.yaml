@@ -1,0 +1,63 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Chart.Name }}-{{ .Values.delete_not_activated_users }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}-{{ .Values.delete_not_activated_users }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          {{- if not .Values.global.istio_ambient_mesh }}
+          annotations:
+            proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+          {{- end }}
+        spec:
+          serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          containers:
+          - name: delete-not-activated-users
+            image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh", "-c"]
+            args:
+              - >-
+                delete_not_activated_users;
+                retVal=$?;
+                {{- if not .Values.global.istio_ambient_mesh }}
+                until curl -XPOST 127.0.0.1:15020/quitquitquit;
+                  do sleep 3;
+                done;
+                {{- end }}
+                exit $retVal
+            securityContext: {{- toYaml .Values.securityContext | nindent 14 }}
+            volumeMounts:
+              - mountPath: {{ .Values.global.logging_config_dir }}
+                name: logger-config
+            env:
+              - name: ACCOUNT_SERVICE_HOST
+                value: "{{ .Values.account_service.address }}"
+              - name: ACCOUNT_SERVICE_PORT
+                value: "{{ .Values.account_service.port }}"
+              - name: NOT_ACTIVATED_USER_EXPIRATION_IN_DAYS
+                valueFrom:
+                  configMapKeyRef:
+                    key: not_activated_user_expiration_in_days
+                    name: "{{ .Release.Namespace }}-configuration"
+              - name: LOGGING_CONFIG_DIR
+                value: {{ .Values.global.logging_config_dir }}
+          volumes:
+            - name: logger-config
+              configMap:
+                name: {{ .Release.Namespace }}-logging-config
+          restartPolicy: Never

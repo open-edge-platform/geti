@@ -1,0 +1,114 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+spec:
+  schedule: "*/30 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          {{- if not .Values.global.istio_ambient_mesh }}
+          annotations:
+            proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+          {{- end }}
+        spec:
+          serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          initContainers:
+            - name: volume-permissions
+              image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+              imagePullPolicy: {{ .Values.init.imagePullPolicy }}
+              command:
+                - /bin/sh
+              args:
+                - -c
+                - |
+                  find {{ .Values.global.logs_dir }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+              volumeMounts:
+                - name: data-storage
+                  mountPath: {{ .Values.global.logs_dir }}
+                  readOnly: false
+                  subPath: logs
+              resources:
+                {{- toYaml .Values.init.resources | nindent 16 }}
+              securityContext:
+                {{- toYaml .Values.volumeSecurityContext | nindent 16 }}
+          containers:
+          - name: platform-cleaner
+            image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: PLATFORM_NAMESPACE
+                value: {{ .Release.Namespace }}
+              - name: WORKLOAD_REMOVAL_DELAY_MINUTES
+                value: "{{ .Values.workload_removal_delay_minutes }}"
+              - name: GETI_TELEMETRY_RETENTION_DAYS
+                valueFrom:
+                  configMapKeyRef:
+                    name: "{{ .Release.Namespace }}-logging-config"
+                    key: retention
+              - name: K8S_TELEMETRY_RETENTION_DAYS
+                valueFrom:
+                  configMapKeyRef:
+                    name: "{{ .Release.Namespace }}-logging-config"
+                    key: retention_k8s
+              - name: MIN_FREE_DISK_SPACE_GIB
+                valueFrom:
+                  configMapKeyRef:
+                    name: "{{ .Release.Namespace }}-configuration"
+                    key: min_free_disk_space_gib
+              - name: TELEMETRY_CLEANUP_THRESHOLD_EXTRA_GIB
+                valueFrom:
+                  configMapKeyRef:
+                    name: "{{ .Release.Namespace }}-logging-config"
+                    key: telemetry_cleanup_threshold_extra_gib
+              - name: PATH_LOGS_DIR
+                value: {{ .Values.global.logs_dir }}
+              - name: TELEMETRY_CLEANUP_LIMIT_HOURS
+                valueFrom:
+                  configMapKeyRef:
+                    name: "{{ .Release.Namespace }}-logging-config"
+                    key: telemetry_cleanup_limit_hours
+            envFrom:
+              - configMapRef:
+                  name: {{ .Release.Namespace }}-feature-flags
+            volumeMounts:
+            - name: data-storage
+              mountPath: {{ .Values.global.logs_dir }}
+              readOnly: false
+              subPath: logs
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            resources:
+{{ toYaml .Values.resources | indent 13 }}
+            command: ["/bin/sh", "-c"]
+            args:
+              - >-
+                platform_cleaner;
+                retVal=$?;
+                {{- if not .Values.global.istio_ambient_mesh }}
+                until curl -XPOST 127.0.0.1:15020/quitquitquit; 
+                  do sleep 3; 
+                done;
+                {{- end }}
+                exit $retVal
+          restartPolicy: Never
+          volumes:
+          {{- if .Values.global.storage_volume_claim_name }}
+          - name: data-storage
+            persistentVolumeClaim:
+              claimName: {{ .Values.global.storage_volume_claim_name }}
+          {{- else }}
+          - name: data-storage
+            emptyDir: {}
+          {{- end }}
