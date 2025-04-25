@@ -1,0 +1,116 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+.PHONY: clean
+clean: clean-go clean-python
+
+.PHONY: clean-go
+clean-go:
+	@$(call run_for_each,$(GO_SUBPROJECTS),Cleaning for Go component,clean)
+
+.PHONY: clean-python
+clean-python:
+	@$(call run_for_each,$(PY_SUBPROJECTS),Cleaning for Python component,clean)
+
+.PHONY: build-image
+build-image: build-image-go build-image-python
+
+.PHONY: build-image-go
+build-image-go:
+	@$(call run_for_each,$(GO_BUILDABLE_SUBPROJECTS),Building image for Go component,build-image)
+
+.PHONY: build-image-python
+build-image-python:
+	@$(call run_for_each,$(PY_BUILDABLE_SUBPROJECTS),Building image for Python component,build-image)
+
+.PHONY: push-image
+push-image: push-image-go push-image-python
+
+.PHONY: push-image-go
+push-image-go:
+	@$(call run_for_each,$(GO_BUILDABLE_SUBPROJECTS),Pushing image for Go component,push-image)
+
+.PHONY: push-image-python
+push-image-python:
+	@$(call run_for_each,$(PY_BUILDABLE_SUBPROJECTS),Pushing image for Python component,push-image)
+
+.PHONY: tests
+tests: tests-go tests-python
+
+.PHONY: tests-go
+tests-go:
+	@$(call run_for_each,$(GO_SUBPROJECTS),Running tests for Go subproject,tests)
+
+.PHONY: tests-python
+tests-python:
+	@$(call run_for_each,$(PY_SUBPROJECTS),Running tests for Python subproject,tests)
+
+.PHONY: test-unit
+test-unit: test-unit-go test-unit-python
+
+.PHONY: test-unit-go
+test-unit-go:
+	@$(call run_for_each,$(GO_SUBPROJECTS),Running unit tests for Go subproject,test-unit)
+
+.PHONY: test-unit-python
+test-unit-python:
+	@$(call run_for_each,$(PY_SUBPROJECTS),Running unit tests for Python subproject,test-unit)
+
+.PHONY: test-integration
+test-integration: test-integration-go test-integration-python
+
+.PHONY: test-integration-go
+test-integration-go:
+	@$(call run_for_each,$(GO_SUBPROJECTS),Running integration tests for Go subproject,test-integration)
+
+.PHONY: test-integration-python
+test-integration-python:
+	@$(call run_for_each,$(PY_SUBPROJECTS),Running integration tests for Python subproject,test-integration)
+
+.PHONY: test-component
+test-component:
+	@$(call run_for_each,$(PY_SUBPROJECTS),Running component tests for Python subproject,test-component)
+
+.PHONY: static-code-analysis
+static-code-analysis: lint-go lint-python
+
+.PHONY: lint-go
+lint-go:
+	@$(call run_for_each,$(GO_SUBPROJECTS),Performing static code analysis for Go subproject,static-code-analysis)
+
+.PHONY: lint-python
+lint-python:
+	@$(call run_for_each,$(PY_SUBPROJECTS),Performing static code analysis for Python subproject,static-code-analysis)
+
+.PHONY: list-subprojects
+list-subprojects:
+	@echo "Available subprojects:"
+	@for svc in $(sort $(notdir $(SUBPROJECTS))); do \
+		echo "  - $$svc"; \
+	done
+
+.PHONY: list-services
+list-services:
+	@echo "Available services:"
+	@for svc in $(sort $(notdir $(SERVICES))); do \
+		echo "  - $$svc"; \
+	done
+
+.PHONY: list-buildable-subprojects
+list-buildable-subprojects:
+	@echo "Available buildable subprojects:"
+	@for svc in $(notdir $(BUILDABLE_SUBPROJECTS)); do \
+		echo "  - $$svc"; \
+	done
+
+define find_subprojects
+    $(shell find $(1) $(if $(3),-maxdepth $(3)) -path "*/.venv" -prune -o -name "$(2)" -exec dirname {} \;)
+endef
+
+define run_for_each
+    for item in $1; do \
+        echo "$2 in $$item"; \
+        (cd $$item && make $3); \
+    done
+endef
+
