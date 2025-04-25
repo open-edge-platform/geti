@@ -8,6 +8,14 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 # across both images.
 ENV UV_PYTHON_DOWNLOADS=0
 
+# need to install the system dependencies for the python-ldap
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    libldap2-dev \
+    libsasl2-dev \
+    libssl-dev
+
 # Copy the service dependencies
 WORKDIR /builder
 COPY --link --from=libs . ../libs
