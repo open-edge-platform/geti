@@ -28,9 +28,7 @@ def mock_account_service_client():
 
 @pytest.fixture
 def mock_days_difference_from_current_utc():
-    with patch(
-        "delete_not_activated_users.delete_not_activated_users._days_difference_from_current_utc"
-    ) as mock:
+    with patch("delete_not_activated_users.delete_not_activated_users._days_difference_from_current_utc") as mock:
         yield mock
 
 
@@ -124,7 +122,7 @@ def test_account_service_client_delete_not_activated_users(
 
     mock_account_service_client.assert_called_once()
     mock_instance.get_all_organizations.assert_called_once()
-    mock_instance.get_organizations_users.has_calls(2)  # 1 call for registered users, 1 for active users
+    assert mock_instance.get_organizations_users.call_count == 2  # 1 call for registered users, 1 for active users
     mock_instance.change_user_status.call_count = change_user_status_called
 
 

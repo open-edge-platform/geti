@@ -6,12 +6,13 @@
 import os
 from datetime import datetime
 
-from geti_logger_tools.logger_config import initialize_logger
 from grpc_interfaces.account_service.client import AccountServiceClient
 from grpc_interfaces.account_service.enums import OrganizationStatus, UserStatus
 from grpc_interfaces.account_service.pb.organization_status_pb2 import OrganizationStatusRequest
 from grpc_interfaces.account_service.pb.user_pb2 import FindUserRequest, UserIdRequest
 from grpc_interfaces.account_service.pb.user_status_pb2 import UserStatusRequest
+
+from geti_logger_tools.logger_config import initialize_logger
 
 logger = initialize_logger(__name__)
 
