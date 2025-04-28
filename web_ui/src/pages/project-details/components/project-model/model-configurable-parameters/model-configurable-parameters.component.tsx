@@ -16,7 +16,7 @@ interface ModelConfigurableParametersProps {
 export const ModelConfigurableParameters = ({ taskId }: ModelConfigurableParametersProps): JSX.Element => {
     const { modelId, ...projectIdentifier } = useModelIdentifier();
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
-    const { isLoading, data } = useGetModelConfigParameters(taskId, modelId);
+    const { isLoading, data } = useGetModelConfigParameters({ taskId, modelId });
 
     return isLoading ? (
         <Loading />

@@ -45,12 +45,11 @@ export const TrainConfigurableParameters = ({
 }: TrainConfigurableParametersProps): JSX.Element => {
     const projectIdentifier = useProjectIdentifier();
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
-    const { isLoading, data: configParametersData } = useGetModelConfigParameters(
+    const { isLoading, data: configParametersData } = useGetModelConfigParameters({
         taskId,
-        undefined,
         modelTemplateId,
-        true
-    );
+        editable: true,
+    });
 
     useEffect(() => {
         // update state only when configParameters are undefined

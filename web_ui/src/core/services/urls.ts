@@ -495,7 +495,7 @@ const MODEL_CONFIG_PARAMETERS = (
     projectIdentifier: ProjectIdentifier,
     taskId: string,
     modelId?: string,
-    modelTemplateId?: string
+    modelTemplateId?: string | null
 ): string => {
     const baseUrl = `${CONFIGURATION_PARAMETERS(projectIdentifier)}/task_chain/${taskId}`;
 

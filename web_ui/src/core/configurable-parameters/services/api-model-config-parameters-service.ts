@@ -18,7 +18,7 @@ export interface CreateApiModelConfigParametersService {
         projectIdentifier: ProjectIdentifier,
         taskId: string,
         modelId?: string,
-        modelTemplateId?: string,
+        modelTemplateId?: string | null,
         editable?: boolean
     ) => Promise<ConfigurableParametersTaskChain>;
 
@@ -37,7 +37,7 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         projectIdentifier: ProjectIdentifier,
         taskId: string,
         modelId?: string,
-        modelTemplateId?: string,
+        modelTemplateId?: string | null,
         editable?: boolean
     ): Promise<ConfigurableParametersTaskChain> => {
         const { data } = await instance.get<ConfigurableParametersTaskChainDTO>(
