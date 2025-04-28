@@ -31,7 +31,7 @@ LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 Intel® Geti™ enables anyone to build computer vision AI models in a fraction of the time and with minimal data. The software provides you with a seamless, end-to-end workflow to prepare state-of-the-art computer vision models in minutes.
 
 <p align="center">
- <img src="docs/static/geti-visual-prompt.jpg" width="600"/>
+ <img src="https://github.com/user-attachments/assets/af76a999-74d2-48bd-ae31-094e88a0d2e9" width="600"/>
 </p>
 
 
@@ -40,16 +40,30 @@ Intel® Geti™ enables anyone to build computer vision AI models in a fraction 
 <details>
 <summary>🏋️‍♂️ Interactive Model Training </summary>
 Intel® Geti™ enables users to start building computer vision models with as few as 10-20 images and iterate on those models with the help of domain experts. The algorithm selects samples from the dataset that help the model learn quickly and achieve high accuracy while reducing the sample biases and the number of data inputs required from the human expert (Active learning).
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/e8d2b02a-83ba-4d05-956a-c7308f7eaf84" width="600" alt="Interactive Model Training">
+</p>
+
 </details>
 
 <details>
 <summary>🧠 Smart Annotations </summary>
 Smart annotations in Intel® Geti™ enable users to easily create bounding boxes, rotated bounding boxes, segmentation boundaries, and more. These smart annotation features coupled with the AI-assisted annotations and state-of-the-art AI models such as the Segment Anything Model keep human experts in the loop while massively reducing the total annotation efforts needed by a human.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4cbdcd35-98b2-466e-ad24-737291cf9ab4" width="600" alt="Smart Annotations">
+</p>
 </details>
 
 <details>
 <summary>🤖 Visual Prompting </summary>
 With Intel® Geti™ Visual Prompting workflow, users can prompt a model with only a single annotation. Utilizing <a target="_blank" rel="noopener noreferrer" href="https://arxiv.org/abs/2304.02643">the Segment Anything Model from Meta AI</a>, the Visual Prompting workflow further accelerates the time-to-model for our users by providing state-of-the-art innovation.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/61247d1e-f4f4-4207-baee-f4330b1d65e1" width="600" alt="Visual Prompting">
+</p>
+
 </details>
 
 <details>
@@ -65,6 +79,11 @@ Intel® Geti™ supports <a target="_blank" rel="noopener noreferrer" href="http
 <details>
 <summary>🎯 Model Evaluation </summary>
 Intel® Geti™ provides users with comprehensive statistics to assess model’s performance and run live tests. Intel® Geti™ executes model testing to evaluate the model performance on unseen data to ensure that the model is fit for purpose for the real-life deployment setup.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9abb24b0-387b-4832-bf26-31aa0fbf0b18" width="600" alt="Model Evaluation">
+</p>
+
 </details>
 
 <details>
@@ -80,10 +99,10 @@ Intel® Geti™ supports several neural network architectures, each tailored to 
 
 | Computer Vision Task | Feature | Model Architectures Supported |
 | -------------------------| ---- | ----------------------------- |
-| Image Classification | Single label <br/>Multi-label <br/>Hierarchical | [Mobilenet-V3](https://arxiv.org/abs/1905.02244) <br/>[EfficientNet-B0](https://arxiv.org/abs/1905.11946) <br/>[DeitTiny](https://arxiv.org/abs/2012.12877) |
-| Object Detection | Counting <br/>Rotated Object Detection  | [ATSS with ResNet](https://arxiv.org/abs/1912.02424) or [MobilenetV2](https://arxiv.org/abs/1912.02424) <br/>[SSD with MobilenetV2](https://arxiv.org/abs/1512.02325) [RT-DETR](https://arxiv.org/abs/2304.08069) [YOLOX](https://arxiv.org/abs/2107.08430) [D-Fine](https://arxiv.org/abs/2410.13842) |
-| Image Segmentation | Instance Segmentation <br/>Semantic Segmentation | [MaskRCNN with EfficientNet](https://arxiv.org/abs/1703.06870) <br/>[ResNet50](https://arxiv.org/abs/1512.03385) <br/>[Swin Transformer](https://arxiv.org/abs/2103.14030) [RTMDet](https://arxiv.org/abs/2212.07784) <br/>[Lite-HRNet](https://arxiv.org/abs/2104.06403) <br/>[SegNext](https://arxiv.org/abs/2209.08575) <br/>[DinoV2](https://arxiv.org/abs/2304.07193)|
-| Anomaly-based Tasks | Anomaly classification <br/>Anomaly detection <br/>Anomaly segmentation | [Padim](https://arxiv.org/abs/2011.08785) <br/>[STFPM](https://arxiv.org/abs/2103.04257) <br/>[UFlow](https://arxiv.org/abs/2211.12353) |
+| Image Classification | Single label <br/>Multi-label <br/>Hierarchical | [Mobilenet-V3](https://arxiv.org/abs/1905.02244) <br/>[EfficientNet-B0](https://arxiv.org/abs/1905.11946) <br/>[EfficientNet-B3](https://arxiv.org/abs/1905.11946) <br/>[EfficientNet-V2](https://arxiv.org/abs/2104.00298) <br/>[DeitTiny](https://arxiv.org/abs/2012.12877) |
+| Object Detection | Counting <br/>Rotated Object Detection  | [MobileNetV2](https://arxiv.org/abs/1801.04381)+[ATSS](https://arxiv.org/abs/1912.02424) <br/>[ResNeXt101](https://arxiv.org/pdf/1611.05431)+[ATSS](https://arxiv.org/abs/1912.02424) <br/>[SSD](https://arxiv.org/abs/1512.02325) <br/>[YOLOX](https://arxiv.org/abs/2107.08430) <br/>[D-Fine](https://arxiv.org/abs/2410.13842) <br/>[RT-DETR](https://arxiv.org/abs/2304.08069) <br/>[MaskRCNN-EfficientNetB2B](https://arxiv.org/abs/1703.06870) <br/>[MaskRCNN-ResNet50](https://arxiv.org/abs/1703.06870) |
+| Image Segmentation | Instance Segmentation <br/>Semantic Segmentation | [MaskRCNN with EfficientNet](https://arxiv.org/abs/1703.06870) <br/>[ResNet50](https://arxiv.org/abs/1512.03385) <br/>[Swin Transformer](https://arxiv.org/abs/2103.14030) <br/>[RTMDet](https://arxiv.org/abs/2212.07784) <br/>[Lite-HRNet](https://arxiv.org/abs/2104.06403) <br/>[SegNext](https://arxiv.org/abs/2209.08575) <br/>[DinoV2](https://arxiv.org/abs/2304.07193)|
+| Anomaly-based Tasks | Anomaly detection | [Padim](https://arxiv.org/abs/2011.08785) <br/>[STFPM](https://arxiv.org/abs/2103.04257) <br/>[UFlow](https://arxiv.org/abs/2211.12353) |
 
 ## 🛫 Getting Started
 
@@ -148,7 +167,7 @@ We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING) to ge
 
 <p align="center">
     <a href="https://github.com/open-edge-platform/geti/graphs/contributors">
-      <img src="https://contrib.rocks/image?repo=open-edge-platform/geti-sdk" alt="Geti contributors" />
+      <img src="https://contrib.rocks/image?repo=open-edge-platform/geti" alt="Geti contributors" />
     </a>
 </p>
 
