@@ -24,6 +24,7 @@ telemetry =[
 [dependency-groups]
 dev = [
     "pytest~=8.3",
+    "mypy~=1.15",
     "ruff~=0.11",
     "pre-commit~=4.1",
     "pytest-freezegun",
