@@ -8,6 +8,7 @@ import { Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@adobe/react-s
 import { Task } from '../../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { TaskSelection } from '../model-types/task-selection.component';
+import { DataManagement } from './data-management/data-management.component';
 import { ModelArchitectures } from './model-architectures/model-architectures.component';
 
 const ContentWrapper: FC<{ children: ReactNode }> = ({ children }) => {
@@ -27,12 +28,14 @@ interface AdvancedSettingsProps {
     selectedModelTemplateId: string | null;
     onChangeSelectedTemplateId: (modelTemplateId: string | null) => void;
     activeModelTemplateId: string | null;
+    isReshufflingSubsetsEnabled: boolean;
+    onReshufflingSubsetsEnabledChange: (reshufflingSubsetsEnabled: boolean) => void;
 }
 
-type TabProps = {
+interface TabProps {
     name: string;
     children: ReactNode;
-};
+}
 
 export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
     tasks,
@@ -43,6 +46,8 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
     selectedModelTemplateId,
     onChangeSelectedTemplateId,
     activeModelTemplateId,
+    isReshufflingSubsetsEnabled,
+    onReshufflingSubsetsEnabledChange,
 }) => {
     const TABS: TabProps[] = [
         {
@@ -58,7 +63,12 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         },
         {
             name: 'Data management',
-            children: <></>,
+            children: (
+                <DataManagement
+                    isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
+                    onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
+                />
+            ),
         },
         {
             name: 'Training',

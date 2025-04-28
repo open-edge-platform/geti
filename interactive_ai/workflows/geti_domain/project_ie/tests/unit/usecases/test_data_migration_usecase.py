@@ -79,7 +79,6 @@ migration_metadata_bar = ChangesetMetadata.from_dict(  # type: ignore
 
 @pytest.mark.ProjectIEMsComponent
 class TestDataMigrationUseCase:
-    @pytest.mark.skip("CVS-166342 - Fix the connection with the database")
     def test_upgrade_project_to_current_version(self, request, fxt_session_ctx) -> None:
         # Arrange
         project_id = ID()

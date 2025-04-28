@@ -62,6 +62,7 @@ export const SelectableCard = ({
                 </Flex>
             </View>
             <View
+                flex={1}
                 paddingX={'size-250'}
                 paddingY={'size-225'}
                 borderBottomWidth={'thin'}

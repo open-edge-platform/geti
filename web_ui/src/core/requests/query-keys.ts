@@ -310,7 +310,7 @@ const MODEL_CONFIG_PARAMETERS = (
     projectIdentifier: ProjectIdentifier,
     taskId: string,
     modelId?: string,
-    modelTemplateId?: string
+    modelTemplateId?: string | null
 ): readonly [string, string, string, string, string, string | undefined] => {
     if (modelId) {
         return [...CONFIGURATION(projectIdentifier), taskId, modelId];

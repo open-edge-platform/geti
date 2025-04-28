@@ -48,6 +48,8 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
         tasks,
         trainingBodyDTO,
         isTaskChainProject,
+        isReshufflingSubsetsEnabled,
+        changeReshufflingSubsetsEnabled,
     } = useTrainModelState();
 
     const { canTrainModel, numberOfRequiredAnnotations } = isAllowedToTrainModel(selectedTask);
@@ -99,6 +101,8 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                         onChangeSelectedTemplateId={changeSelectedTemplateId}
                         algorithms={algorithms}
                         activeModelTemplateId={activeModelTemplateId}
+                        isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
+                        onReshufflingSubsetsEnabledChange={changeReshufflingSubsetsEnabled}
                     />
                 )}
             </Content>

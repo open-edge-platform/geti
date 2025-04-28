@@ -1,19 +1,16 @@
 .selectableCard {
     width: 100%;
-    flex-basis: 31%;
     cursor: pointer;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+
     border: var(--spectrum-global-dimension-size-25) solid transparent;
 
     transition: border 0.3s ease-in-out;
 
     &:hover .selectableCardDescription {
         background-color: var(--spectrum-global-color-gray-100);
-    }
-
-    // don't change - support for card display in small viewport width
-    @media (max-width: 740px) {
-        width: 95%;
     }
 }
 
