@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Divider, Flex, Grid, minmax, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Divider, Flex, Grid, minmax, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import dayjs from 'dayjs';
 import delay from 'lodash/delay';
 import { usePress } from 'react-aria';
@@ -12,7 +12,7 @@ import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideo } from '../../../../core/media/video.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
@@ -138,9 +138,9 @@ export const MediaItemDetails = ({
                             }`}
                         >
                             <TooltipTrigger placement={'bottom'}>
-                                <ActionElement>
+                                <PressableElement>
                                     <TruncatedText>{name}</TruncatedText>
-                                </ActionElement>
+                                </PressableElement>
                                 <Tooltip>{`${NAME_TOOLTIP}: ${name}`}</Tooltip>
                             </TooltipTrigger>
                         </Flex>
@@ -164,23 +164,25 @@ export const MediaItemDetails = ({
                     </Flex>
 
                     <TooltipTrigger placement={'bottom'}>
-                        <ActionElement width={'size-1000'}>{dayjs(uploadTime).format('DD.MM.YYYY')}</ActionElement>
+                        <PressableElement width={'size-1000'}>
+                            <Text>{dayjs(uploadTime).format('DD.MM.YYYY')}</Text>
+                        </PressableElement>
                         <Tooltip>{`${DATE_TOOLTIP}: ${dayjs(uploadTime).format('DD.MM.YYYY')}`}</Tooltip>
                     </TooltipTrigger>
 
                     <TooltipTrigger placement={'bottom'}>
-                        <ActionElement>
+                        <PressableElement>
                             <TruncatedText UNSAFE_className={classes.textCenter}>{getFileSize(size)}</TruncatedText>
-                        </ActionElement>
+                        </PressableElement>
                         <Tooltip>{`${FILE_SIZE_TOOLTIP}: ${getFileSize(size)}`}</Tooltip>
                     </TooltipTrigger>
 
                     <TooltipTrigger placement={'bottom'}>
-                        <ActionElement>
+                        <PressableElement>
                             <TruncatedText UNSAFE_className={classes.textCenter}>
                                 {getFullNameFromUser(uploaderQuery.data)}
                             </TruncatedText>
-                        </ActionElement>
+                        </PressableElement>
                         <Tooltip>{`${UPLOADER_TOOLTIP}: ${getFullNameFromUser(uploaderQuery.data)}`}</Tooltip>
                     </TooltipTrigger>
 

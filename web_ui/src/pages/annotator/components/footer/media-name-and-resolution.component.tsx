@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { trimText } from '../../../../shared/utils';
 
 import classes from './annotator-footer.module.scss';
@@ -30,9 +30,9 @@ export const MediaNameAndResolution = ({
     return (
         <View UNSAFE_className={`${classes.text} ${classes.metaItem}`} paddingX={paddingX}>
             <TooltipTrigger>
-                <ActionElement aria-label='media name' UNSAFE_className={`${classes.text} ${classes.mediaName}`}>
-                    {`${mediaName} (${width} px x ${height} px)`}
-                </ActionElement>
+                <PressableElement aria-label='media name' UNSAFE_className={`${classes.text} ${classes.mediaName}`}>
+                    <Text>{`${mediaName} (${width} px x ${height} px)`}</Text>
+                </PressableElement>
                 <Tooltip>{`${name} (${width} px x ${height} px)`}</Tooltip>
             </TooltipTrigger>
         </View>

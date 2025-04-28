@@ -9,7 +9,7 @@ import isEmpty from 'lodash/isEmpty';
 
 import { Info } from '../../../assets/icons';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { ActionElement } from '../action-element/action-element.component';
+import { PressableElement } from '../action-element/action-element.component';
 import { DownloadGraphMenu } from '../download-graph-menu/download-graph-menu.component';
 import { DownloadableData } from '../download-graph-menu/export-csv-utils';
 
@@ -59,9 +59,9 @@ export const CardContent = ({
 
                         {!isEmpty(tooltip) && (
                             <TooltipTrigger placement={'bottom'}>
-                                <ActionElement aria-label='label-relation' UNSAFE_style={{ display: 'flex' }}>
+                                <PressableElement aria-label='label-relation' UNSAFE_style={{ display: 'flex' }}>
                                     <Info width={16} height={16} />
-                                </ActionElement>
+                                </PressableElement>
                                 <Tooltip>{tooltip}</Tooltip>
                             </TooltipTrigger>
                         )}

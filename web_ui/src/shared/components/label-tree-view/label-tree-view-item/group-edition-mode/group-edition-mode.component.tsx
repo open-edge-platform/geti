@@ -13,7 +13,7 @@ import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { newLabelNameSchema } from '../../../../../pages/create-project/components/utils';
 import { isYupValidationError } from '../../../../../pages/user-management/profile-page/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
-import { ActionElement } from '../../../action-element/action-element.component';
+import { PressableElement } from '../../../action-element/action-element.component';
 import { LimitedTextField } from '../../../limited-text-field/limited-text-field.component';
 import { ValidationErrorMsg } from '../../../validation-error-msg/validation-error-msg.component';
 import { getEditedItem } from '../../utils';
@@ -135,11 +135,11 @@ export const GroupEditionMode = ({
                     </Flex>
 
                     <TooltipTrigger placement={'top'}>
-                        <ActionElement>
+                        <PressableElement>
                             <Text UNSAFE_style={{ whiteSpace: 'nowrap' }} key={'multiple-selection-text'}>
                                 Multiple selection
                             </Text>
-                        </ActionElement>
+                        </PressableElement>
                         <Tooltip>{MULTIPLE_SELECTION_SWITCH_TOOLTIP}</Tooltip>
                     </TooltipTrigger>
 

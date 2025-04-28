@@ -3,7 +3,7 @@
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { OrganizationAdminsCopyText } from './organization-admins-copy-text.component';
@@ -18,9 +18,9 @@ export const OrganizationNameCell = ({ id, name }: OrganizationNameCellProps): J
         <Flex width={'100%'} alignItems={'center'} gap={'size-100'}>
             <PhotoPlaceholder name={name} email={name} width={'size-300'} height={'size-300'} />
             <TooltipTrigger placement={'bottom left'}>
-                <ActionElement>
+                <PressableElement>
                     <TruncatedText>{name}</TruncatedText>
-                </ActionElement>
+                </PressableElement>
                 <Tooltip>
                     <OrganizationAdminsCopyText
                         text={id}
