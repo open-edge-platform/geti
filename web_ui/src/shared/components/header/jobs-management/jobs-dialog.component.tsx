@@ -177,9 +177,12 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
                                 maxValue={TODAY}
                                 defaultValue={INITIAL_DATES}
                                 hasManualEdition
-                            >
-                                <InfoTooltip id={`range-filter-tooltip`} tooltipText={RANGE_FILTER_TOOLTIP} />
-                            </DateRangePickerSmall>
+                                headerContent={
+                                    <Flex justifyContent={'end'}>
+                                        <InfoTooltip id={`range-filter-tooltip`} tooltipText={RANGE_FILTER_TOOLTIP} />
+                                    </Flex>
+                                }
+                            />
                         </CornerIndicator>
                         <RefreshButton
                             onPress={resetFilters}
