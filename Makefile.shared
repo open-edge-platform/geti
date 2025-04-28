@@ -19,12 +19,6 @@ IMAGES_REGISTRY                   ?= ${REGISTRY}/geti
 CHARTS_REGISTRY                   ?= ${REGISTRY}/geti/charts
 BASE_IMAGES_REGISTRY              ?= ${REGISTRY}/base-images
 
-##
-# Builder images
-##
-PYTHON_BUILDER_IMAGE              ?= python-builder
-GO_BUILDER_IMAGE                  ?= go-builder
-
 ###
 # base images versions
 ###
@@ -101,3 +95,11 @@ ifeq (builder,$(firstword $(MAKECMDGOALS)))
   ROOT_DIR=$(shell git rev-parse --show-toplevel)
   RELATIVE_PATH=$(shell realpath --relative-to=$(ROOT_DIR) $(CURDIR))
 endif
+
+# Run builder container when do "make builder -C <directory> <args>"
+builder:
+	@docker run --rm -u $(shell id -u):$(shell getent group docker | cut -d: -f3) \
+		-v "$(ROOT_DIR):/app" \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ~/.docker/config.json:/home/bulider/.docker/config.json \
+		-w "/app" ${DOCKER_PROXY} ${BUILDER_IMAGE} make -C $(RELATIVE_PATH) $(BUILDER_ARGS)

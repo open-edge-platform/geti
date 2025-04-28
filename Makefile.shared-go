@@ -61,7 +61,7 @@ lint-install:
 		echo "golangci-lint $(GOLANGCI_LINT_VERSION) already installed"; \
 	fi
 
-builder:
-	@docker run --rm -u $(shell id -u):$(shell getent group docker | cut -d: -f3) \
-		-v "$(ROOT_DIR):/app" \
-		-w "/app" ${DOCKER_PROXY} ${GO_BUILDER_IMAGE} make -C $(RELATIVE_PATH) $(BUILDER_ARGS)
+##
+# Builder container image
+##
+BUILDER_IMAGE ?= go-builder
