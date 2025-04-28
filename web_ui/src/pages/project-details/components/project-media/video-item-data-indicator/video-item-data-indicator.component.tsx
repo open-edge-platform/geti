@@ -3,9 +3,9 @@
 
 import { ReactNode } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 
-import { ActionElement } from '../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../shared/components/action-element/action-element.component';
 
 interface VideoItemDataIndicatorProps {
     children: ReactNode;
@@ -24,7 +24,9 @@ export const VideoItemDataIndicator = ({ children, tooltip, id }: VideoItemDataI
             borderRadius={'regular'}
         >
             <TooltipTrigger placement={'bottom'}>
-                <ActionElement>{children}</ActionElement>
+                <PressableElement>
+                    <Text>{children}</Text>
+                </PressableElement>
                 <Tooltip>{tooltip}</Tooltip>
             </TooltipTrigger>
         </View>

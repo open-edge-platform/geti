@@ -3,10 +3,10 @@
 
 import { CSSProperties } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import isEmpty from 'lodash/isEmpty';
 
-import { ActionElement } from '../action-element/action-element.component';
+import { PressableElement } from '../action-element/action-element.component';
 
 import classes from './tag.module.scss';
 
@@ -65,7 +65,9 @@ export const Tag = ({
             )}
 
             <TooltipTrigger placement={'top'} isDisabled={isEmpty(tooltip)}>
-                <ActionElement>{text}</ActionElement>
+                <PressableElement>
+                    <Text>{text}</Text>
+                </PressableElement>
                 <Tooltip>{tooltip}</Tooltip>
             </TooltipTrigger>
             {suffix ? <Flex UNSAFE_className={classes.tagSuffix}>{suffix}</Flex> : null}
