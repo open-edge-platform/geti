@@ -97,7 +97,9 @@ describe('DownloadDialogTaskChain', () => {
         it('allows user to select deployment package only in the first task', async () => {
             render();
 
-            expect(await screen.findByRole('button', { name: 'Next' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+            });
 
             await userEvent.click(
                 screen.getByRole('button', { name: `${DEPLOYMENT_PACKAGE_TYPES.CODE_DEPLOYMENT} Deployment package` })
@@ -130,7 +132,9 @@ describe('DownloadDialogTaskChain', () => {
                 },
             });
 
-            expect(await screen.findByRole('button', { name: 'Next' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+            });
 
             await userEvent.click(
                 screen.getByRole('button', { name: `${DEPLOYMENT_PACKAGE_TYPES.CODE_DEPLOYMENT} Deployment package` })
@@ -138,7 +142,9 @@ describe('DownloadDialogTaskChain', () => {
 
             await userEvent.click(screen.getByRole('option', { name: DEPLOYMENT_PACKAGE_TYPES.OVMS_DEPLOYMENT }));
 
-            expect(await screen.findByRole('button', { name: 'Next' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+            });
 
             await userEvent.click(screen.getByRole('button', { name: 'Next' }));
             await userEvent.click(screen.getByRole('button', { name: 'Download' }));
@@ -166,7 +172,9 @@ describe('DownloadDialogTaskChain', () => {
                 },
             });
 
-            expect(await screen.findByRole('button', { name: 'Next' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+            });
 
             await userEvent.click(screen.getByRole('button', { name: 'Next' }));
             await userEvent.click(screen.getByRole('button', { name: 'Download' }));
@@ -206,7 +214,9 @@ describe('DownloadDialogTaskChain', () => {
                 },
             });
 
-            expect(await screen.findByRole('button', { name: 'Next' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Next' })).toBeEnabled();
+            });
 
             await userEvent.click(screen.getByRole('button', { name: 'Next' }));
             await userEvent.click(screen.getByRole('button', { name: 'Download' }));

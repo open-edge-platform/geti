@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
@@ -38,14 +39,14 @@ describe('NodeContent', () => {
     });
 
     describe('grid', () => {
-        it('hover action', () => {
+        it('hover action', async () => {
             const labelId = 'mocked-label-id';
             renderApp({ label: getMockedLabel({ id: labelId, color: '#fff' }) });
 
-            fireEvent.mouseEnter(screen.getByRole('listitem'));
+            await userEvent.hover(screen.getByRole('listitem'));
             expect(mockedSetHovered).toHaveBeenLastCalledWith(labelId);
 
-            fireEvent.mouseLeave(screen.getByRole('listitem'));
+            await userEvent.unhover(screen.getByRole('listitem'));
             expect(mockedSetHovered).toHaveBeenLastCalledWith(null);
         });
     });
@@ -123,15 +124,15 @@ describe('NodeContent', () => {
     });
 
     describe('ListMenu', () => {
-        it('displays the menu trigger hovering', () => {
+        it('displays the menu trigger hovering', async () => {
             renderApp({ label: getMockedLabel({ name: 'label test', color: '#fff' }) });
 
-            fireEvent.mouseEnter(screen.getByRole('listitem'));
+            await userEvent.hover(screen.getByRole('listitem'));
 
             expect(screen.queryByRole('button', { name: 'menu trigger' })).toBeVisible();
         });
 
-        it('hidden the menu trigger on PREDICTION mode', () => {
+        it('hidden the menu trigger on PREDICTION mode', async () => {
             jest.mocked(useAnnotatorMode).mockReturnValueOnce({
                 isActiveLearningMode: false,
                 currentMode: ANNOTATOR_MODE.PREDICTION,
@@ -139,7 +140,7 @@ describe('NodeContent', () => {
 
             renderApp({ label: getMockedLabel({ name: 'label test', color: '#fff' }) });
 
-            fireEvent.mouseEnter(screen.getByRole('listitem'));
+            await userEvent.hover(screen.getByRole('listitem'));
 
             expect(screen.queryByRole('button', { name: 'menu trigger' })).not.toBeInTheDocument();
         });

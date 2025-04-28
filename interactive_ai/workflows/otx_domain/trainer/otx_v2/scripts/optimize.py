@@ -7,10 +7,9 @@ import logging
 from typing import TYPE_CHECKING
 
 from otx.tools.converter import ConfigConverter
-
-from .otx_io import load_trained_model_weights, save_openvino_exported_model
-from .progress_updater import ProgressUpdater, TrainingStage
-from .utils import OptimizationType, OTXConfig, PrecisionType, force_mlflow_async_logging, logging_elapsed_time
+from otx_io import load_trained_model_weights, save_openvino_exported_model
+from progress_updater import ProgressUpdater, TrainingStage
+from utils import OptimizationType, OTXConfig, PrecisionType, force_mlflow_async_logging, logging_elapsed_time
 
 if TYPE_CHECKING:
     from pathlib import Path

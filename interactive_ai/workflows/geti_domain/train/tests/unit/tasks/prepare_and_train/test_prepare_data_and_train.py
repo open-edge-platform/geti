@@ -98,7 +98,7 @@ class TestPrepareTrainingDataTask:
             num_image_pulling_threads=num_image_pulling_threads,
             num_upload_threads=num_upload_threads,
             max_training_dataset_size=100,
-            command=["bash", "-c", "/opt/run"],
+            command=["bash", "-c", "run"],
             reshuffle_subsets=reshuffle_subsets,
         )
 
@@ -156,7 +156,7 @@ class TestPrepareTrainingDataTask:
             compute_resources=ANY,
             ephemeral_storage_resources=ANY,
             trainer_image_info=ANY,
-            command=["bash", "-c", "/opt/run"],
+            command=["bash", "-c", "run"],
             container_name="train",
         )
         mocked_publish_consumed_resources.assert_called_once_with(

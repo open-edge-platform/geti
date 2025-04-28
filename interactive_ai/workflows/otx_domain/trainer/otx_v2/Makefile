@@ -1,12 +1,8 @@
 include ../../../Makefile.shared-workflows
 
-# TODO CVS-166109 remove this target after adding the Dockerfile
-build-image:
-	@echo "Dockerfile not available yet for ${COMPONENT_NAME}"
+COMPONENT_NAME := otx2-training
 
-# TODO CVS-166109 remove this target after adding the Dockerfile
-push-image:
-	@echo "Dockerfile not available yet for ${COMPONENT_NAME}"
+DOCKER_BUILD_CONTEXT := --build-context libs=../../../../../libs
 
 # TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
 test-unit: venv

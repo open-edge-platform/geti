@@ -62,15 +62,6 @@ export const checkTooltip = async (element: HTMLElement, tooltipText: Matcher) =
     expect(await screen.findByText(tooltipText)).toBeInTheDocument();
 };
 
-export const checkSpectrumButtonTooltip = async (element: HTMLElement, tooltipText: string | RegExp) => {
-    fireEvent.click(element);
-    fireEvent.mouseEnter(element);
-
-    expect(await screen.findByText(tooltipText)).toBeInTheDocument();
-
-    fireEvent.mouseLeave(element);
-};
-
 export const hover = (element: HTMLElement) => {
     fireEvent.mouseEnter(element);
 };

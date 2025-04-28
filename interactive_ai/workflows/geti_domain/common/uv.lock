@@ -869,6 +869,7 @@ source = { editable = "../../../../libs/feature_tools" }
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "ruff", specifier = "~=0.11" },
@@ -887,6 +888,7 @@ requires-dist = [{ name = "kubernetes-asyncio", specifier = "==29.0.0" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "ruff", specifier = "~=0.11" },
@@ -905,6 +907,7 @@ requires-dist = [{ name = "confluent-kafka", specifier = "~=2.3" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "ruff", specifier = "~=0.11" },
@@ -957,6 +960,7 @@ dev = [
     { name = "confluent-kafka", specifier = "~=2.3" },
     { name = "geti-telemetry-tools", extras = ["b3", "fastapi", "grpc", "jaeger", "kafka", "logger", "telemetry"] },
     { name = "httpx", specifier = "~=0.23" },
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "pytest-freezegun" },
@@ -976,6 +980,7 @@ provides-extras = ["bson"]
 [package.metadata.requires-dev]
 dev = [
     { name = "geti-types", extras = ["bson"] },
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "ruff", specifier = "~=0.11" },

@@ -1,4 +1,4 @@
-.PHONY: clean tests test-unit test-integration coverage static-code-analysis lint
+.PHONY: clean deps tests test-unit test-integration coverage static-code-analysis lint
 
 GOPATH ?= $(HOME)/go
 GOBIN ?= $(GOPATH)/bin
@@ -13,13 +13,16 @@ GOINSTALL := $(GOCMD) install
 clean: ## Remove coverage artifacts
 	rm -f coverage.out
 
+deps:
+	$(GOCMD) mod download
+
 tests: test-unit test-integration
 
 test-unit: ## Run unit tests
 	$(GOTEST) -v -race -short ./...
 
-test-integration: ## Run integration tests (requires -tags=integration in code)
-	$(GOTEST) -v -race -tags=integration ./...
+test-integration: ## Run integration tests (requires integration build tag in code)
+	$(GOTEST) -v -race -tags=integration -mod=readonly ./...
 
 coverage: ## Run tests and generate a coverage profile
 	$(GOTEST) -coverprofile=coverage.out ./...

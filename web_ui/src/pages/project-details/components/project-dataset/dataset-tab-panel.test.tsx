@@ -135,12 +135,8 @@ describe('DatasetTabPanel', () => {
     it('should render a button with "Annotate interactively" if it is NOT a single anomaly project', async () => {
         await renderDatasetTabPanel({});
 
-        const annotatorButton = screen.getByRole('button', { name: 'Annotate interactively' });
-
-        expect(annotatorButton).toBeInTheDocument();
-
         await waitFor(() => {
-            expect(annotatorButton).toBeEnabled();
+            expect(screen.getByRole('button', { name: 'Annotate interactively' })).toBeEnabled();
         });
     });
 
@@ -168,7 +164,7 @@ describe('DatasetTabPanel', () => {
     it('Annotate button should be DISABLED when there are no media items', async () => {
         await renderDatasetTabPanel({ services: { mediaService: createInMemoryMediaService([]) } });
 
-        await checkTooltip(screen.getByText('Annotate interactively'), NO_MEDIA_MESSAGE);
+        await checkTooltip(screen.getByLabelText('disabled tooltip trigger'), NO_MEDIA_MESSAGE);
         expect(screen.getByRole('button', { name: 'Annotate interactively' })).toBeDisabled();
     });
 });
