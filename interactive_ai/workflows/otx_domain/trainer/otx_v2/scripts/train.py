@@ -7,17 +7,16 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+from mlflow_logger import MLFlowLogger
 from otx.tools.converter import ConfigConverter
-
-from .mlflow_logger import MLFlowLogger
-from .otx_io import (
+from otx_io import (
     load_trained_model_weights,
     save_exported_model,
     save_openvino_exported_model,
     save_trained_model_weights,
 )
-from .progress_updater import ProgressUpdater, ProgressUpdaterCallback, TrainingStage
-from .utils import ExportFormat, OTXConfig, force_mlflow_async_logging, logging_elapsed_time
+from progress_updater import ProgressUpdater, ProgressUpdaterCallback, TrainingStage
+from utils import ExportFormat, OTXConfig, force_mlflow_async_logging, logging_elapsed_time
 
 if TYPE_CHECKING:
     from mlflow import MlflowClient

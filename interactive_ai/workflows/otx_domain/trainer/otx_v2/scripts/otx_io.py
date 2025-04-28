@@ -11,14 +11,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
 
-from .mlflow_io import download_model_artifact, upload_model_artifact
-from .utils import BASE_MODEL_FILENAME, ExportFormat
+from mlflow_io import download_model_artifact, upload_model_artifact
+from utils import BASE_MODEL_FILENAME, ExportFormat
 
 if TYPE_CHECKING:
     from mlflow import MlflowClient
     from mlflow.entities import Run
-
-    from .utils import ExportParameter
+    from utils import ExportParameter
 
 
 logger = logging.getLogger(__name__)
