@@ -11,6 +11,8 @@ import { Pressable } from 'react-aria-components';
 
 interface PressableElementProps extends ComponentProps<typeof Pressable>, StyleProps {
     id?: string;
+    isTruncated?: boolean;
+    onDoubleClick?: () => void;
 }
 
 interface ActionElementProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
@@ -49,12 +51,13 @@ export const ActionElement = forwardRef((props: ActionElementProps, ref: Focusab
     );
 });
 
-export const PressableElement = ({ id, children, ...props }: PressableElementProps) => {
+export const PressableElement = ({ id, children, isTruncated, ...props }: PressableElementProps) => {
     const { styleProps } = useStyleProps(props);
+    const styles = isTruncated ? TruncatedTextStyles : {};
 
     return (
         <Pressable {...props}>
-            <div role='button' id={id} {...styleProps}>
+            <div id={id} style={{ ...styles, ...styleProps.style }}>
                 {children}
             </div>
         </Pressable>
