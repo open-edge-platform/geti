@@ -38,3 +38,11 @@ build-image-default:
 # To suppress warnings when overriding Makefile targets, declare the abstract targets as <name>-default
 %:  %-default
 	@  true
+
+build-image:
+	@echo "Building docker image for: ${BUILDER_IMAGE_NAME}"
+	@echo ${BUILDER_DOCKER_EXTRA_ARGS}
+	@docker build \
+		${BUILDER_DOCKER_EXTRA_ARGS} \
+		-t ${BUILDER_IMAGE_NAME}:${BUILDER_TAG} \
+		-f ./Dockerfile .
