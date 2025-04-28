@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { act, fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
@@ -108,9 +108,7 @@ describe('PoseListActions', () => {
             fireEvent.click(selectAllItems(items.length));
             fireEvent.click(getButtonSelector());
 
-            await act(async () => {
-                await checkTooltip(getButtonSelector(), OCCLUDE_TOOLTIP);
-            });
+            await checkTooltip(getButtonSelector(), OCCLUDE_TOOLTIP);
 
             expect(mockedUpdateAnnotation).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -132,9 +130,7 @@ describe('PoseListActions', () => {
             fireEvent.click(selectAllItems(items.length));
             fireEvent.click(getButtonSelector());
 
-            await act(async () => {
-                await checkTooltip(getButtonSelector(), VISIBLE_TOOLTIP);
-            });
+            await checkTooltip(getButtonSelector(), VISIBLE_TOOLTIP);
 
             expect(mockedUpdateAnnotation).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -156,9 +152,7 @@ describe('PoseListActions', () => {
             fireEvent.click(selectAllItems(items.length));
             fireEvent.click(getButtonSelector());
 
-            await act(async () => {
-                await checkTooltip(getButtonSelector(), VISIBLE_TOOLTIP);
-            });
+            await checkTooltip(getButtonSelector(), VISIBLE_TOOLTIP);
 
             expect(mockedUpdateAnnotation).toHaveBeenCalledWith(
                 expect.objectContaining({

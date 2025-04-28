@@ -42,8 +42,6 @@ describe('StartOptimization', () => {
             />
         );
 
-        expect(screen.getByRole('button')).toBeDisabled();
-
-        await checkTooltip(screen.getByRole('button', { name: 'Start optimization' }), /The button is disabled!/i);
+        await checkTooltip(screen.getByLabelText('disabled tooltip trigger'), /The button is disabled!/i);
     });
 });

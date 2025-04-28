@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { View } from '@react-spectrum/view';
-import { useHover } from 'react-aria';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
@@ -39,7 +38,16 @@ export const GridMediaItem = ({
     shouldShowAnnotationIndicator,
 }: GridMediaItemProps): JSX.Element => {
     const triggerRef = useRef(null);
-    const { hoverProps, isHovered } = useHover({});
+
+    const [isHovered, setIsHovered] = useState(false);
+
+    const handlePointerOver = () => {
+        setIsHovered(true);
+    };
+
+    const handlePointerOut = () => {
+        setIsHovered(false);
+    };
 
     const tooltipProps = getMediaItemTooltipProps(mediaItem);
     const pressProps = isLargeSize
@@ -50,7 +58,8 @@ export const GridMediaItem = ({
         <div
             id={`grid-media-item-${id}`}
             className={[classes.mediaItem, isSelected ? classes.mediaItemSelected : ''].join(' ')}
-            {...hoverProps}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
         >
             {(isHovered || isSelected) && (
                 <Flex

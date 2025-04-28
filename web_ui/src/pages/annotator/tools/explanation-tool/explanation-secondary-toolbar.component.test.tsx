@@ -15,7 +15,7 @@ import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedTask, mockedTaskContextProps } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
-import { checkSpectrumButtonTooltip, checkTooltip } from '../../../../test-utils/utils';
+import { checkTooltip } from '../../../../test-utils/utils';
 import {
     useStreamingVideoPlayer,
     VideoPlayerPlayerContextProps,
@@ -30,6 +30,7 @@ import {
 import { TaskContextProps, useTask } from '../../providers/task-provider/task-provider.component';
 import { ExplanationSecondaryToolbar, KEYPOINT_DISABLE_MESSAGE } from './explanation-secondary-toolbar.component';
 import { formatExplanations, OVERLAP_LABEL_OPACITY } from './explanation-toolbar.component';
+import { activeExplanationTooltip } from './utils';
 
 const mockMapRoi = {
     id: '123',
@@ -186,10 +187,7 @@ describe('ExplanationSecondaryToolbar', () => {
     it('should show explanation description on hover over the toggle label', async () => {
         await renderApp({ tasks: [getMockedTask({ labels: mockLabels })] }, { explanations: mockExplanations });
 
-        await checkSpectrumButtonTooltip(
-            screen.getByLabelText('explanation-switcher'),
-            /The explanation map visually highlights/i
-        );
+        await checkTooltip(screen.getByLabelText('explanation-switcher'), activeExplanationTooltip);
     });
 
     it('renders map picker correctly', async () => {

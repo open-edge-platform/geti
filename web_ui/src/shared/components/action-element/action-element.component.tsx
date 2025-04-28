@@ -1,12 +1,17 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import React, { CSSProperties, forwardRef } from 'react';
+import React, { ComponentProps, CSSProperties, forwardRef } from 'react';
 
 import { SpectrumActionButtonProps, Text } from '@adobe/react-spectrum';
 import { useFocusableRef, useStyleProps } from '@react-spectrum/utils';
-import { FocusableRef } from '@react-types/shared';
+import { FocusableRef, StyleProps } from '@react-types/shared';
 import { FocusRing, useButton } from 'react-aria';
+import { Pressable } from 'react-aria-components';
+
+interface PressableElementProps extends ComponentProps<typeof Pressable>, StyleProps {
+    id?: string;
+}
 
 interface ActionElementProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
     id?: string;
@@ -43,3 +48,15 @@ export const ActionElement = forwardRef((props: ActionElementProps, ref: Focusab
         </FocusRing>
     );
 });
+
+export const PressableElement = ({ id, children, ...props }: PressableElementProps) => {
+    const { styleProps } = useStyleProps(props);
+
+    return (
+        <Pressable {...props}>
+            <div role='button' id={id} {...styleProps}>
+                {children}
+            </div>
+        </Pressable>
+    );
+};

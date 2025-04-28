@@ -11,7 +11,7 @@ import { getMockedExplanation } from '../../../../test-utils/mocked-items-factor
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { mockedTaskContextProps } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
-import { checkSpectrumButtonTooltip } from '../../../../test-utils/utils';
+import { checkTooltip } from '../../../../test-utils/utils';
 import { useAnnotatorCanvasSettings } from '../../providers/annotator-canvas-settings-provider/annotator-canvas-settings-provider.component';
 import {
     ExplanationOpacityProvider,
@@ -98,9 +98,6 @@ describe('ExplanationPreviewToolbar', () => {
             { setSelectedExplanation: mockSetSelectedExplanation }
         );
 
-        await checkSpectrumButtonTooltip(
-            screen.getByLabelText('explanation-switcher'),
-            /The explanation map visually highlights/i
-        );
+        await checkTooltip(screen.getByLabelText('explanation-switcher'), /The explanation map visually highlights/i);
     });
 });

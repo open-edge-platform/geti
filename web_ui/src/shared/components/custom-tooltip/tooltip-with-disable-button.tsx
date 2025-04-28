@@ -3,17 +3,17 @@
 
 import { isValidElement, ReactElement } from 'react';
 
-import { SpectrumActionButtonProps, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import isEmpty from 'lodash/isEmpty';
 import { Placement } from 'react-aria';
 
-import { ActionElement } from '../action-element/action-element.component';
+import { PressableElement } from '../action-element/action-element.component';
 
-interface TooltipWithDisableButtonProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
-    children: ReactElement;
+interface TooltipWithDisableButtonProps {
     activeTooltip?: ReactElement | string;
     disabledTooltip?: ReactElement | string;
     placement?: Placement;
+    children: ReactElement;
 }
 
 export const TooltipWithDisableButton = ({
@@ -26,15 +26,23 @@ export const TooltipWithDisableButton = ({
     const showDisabledTooltip =
         'isDisabled' in children.props ? children.props.isDisabled : 'disabled' in children.props;
 
-    return (
-        <TooltipTrigger placement={placement} isDisabled={!showDisabledTooltip || isEmpty(disabledTooltip)}>
-            <ActionElement {...props}>
-                <TooltipTrigger placement={placement} isDisabled={isEmpty(activeTooltip)}>
-                    {children}
-                    {isValidElement(activeTooltip) ? activeTooltip : <Tooltip>{activeTooltip}</Tooltip>}
-                </TooltipTrigger>
-            </ActionElement>
-            {isValidElement(disabledTooltip) ? disabledTooltip : <Tooltip>{disabledTooltip}</Tooltip>}
+    const Element = (
+        <TooltipTrigger placement={placement} isDisabled={isEmpty(activeTooltip)}>
+            {children}
+            {isValidElement(activeTooltip) ? activeTooltip : <Tooltip>{activeTooltip}</Tooltip>}
         </TooltipTrigger>
     );
+
+    if (showDisabledTooltip && !isEmpty(disabledTooltip)) {
+        return (
+            <TooltipTrigger placement={placement}>
+                <PressableElement {...props} aria-label='disabled tooltip trigger'>
+                    {Element}
+                </PressableElement>
+                {isValidElement(disabledTooltip) ? disabledTooltip : <Tooltip>{disabledTooltip}</Tooltip>}
+            </TooltipTrigger>
+        );
+    }
+
+    return Element;
 };

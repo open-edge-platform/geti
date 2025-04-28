@@ -95,11 +95,7 @@ export const ExplanationToolbar = ({
         >
             <SelectModel />
 
-            <TooltipWithDisableButton
-                disabledTooltip={disabledTooltip}
-                activeTooltip={activeExplanationTooltip}
-                aria-label='disabled tooltip trigger'
-            >
+            <TooltipWithDisableButton disabledTooltip={disabledTooltip} activeTooltip={activeExplanationTooltip}>
                 <Switch
                     margin={0}
                     isDisabled={isDisabled || hasEmptyLabelPredictions || isEmpty(finalExplanations)}

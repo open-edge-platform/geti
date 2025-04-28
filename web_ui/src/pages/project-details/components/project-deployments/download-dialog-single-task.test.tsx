@@ -77,7 +77,9 @@ describe('DownloadDialogSingleTask', () => {
         it('allows user to select deployment package', async () => {
             render({ task, modelsGroups });
 
-            expect(await screen.findByRole('button', { name: 'Download' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled();
+            });
 
             await userEvent.click(
                 screen.getByRole('button', { name: `${DEPLOYMENT_PACKAGE_TYPES.CODE_DEPLOYMENT} Deployment package` })
@@ -102,7 +104,9 @@ describe('DownloadDialogSingleTask', () => {
                 },
             });
 
-            expect(await screen.findByRole('button', { name: 'Download' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled();
+            });
 
             await userEvent.click(
                 screen.getByRole('button', { name: `${DEPLOYMENT_PACKAGE_TYPES.CODE_DEPLOYMENT} Deployment package` })
@@ -133,7 +137,9 @@ describe('DownloadDialogSingleTask', () => {
                 },
             });
 
-            expect(await screen.findByRole('button', { name: 'Download' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled();
+            });
 
             await userEvent.click(screen.getByRole('button', { name: 'Download' }));
 
@@ -171,7 +177,9 @@ describe('DownloadDialogSingleTask', () => {
                 },
             });
 
-            expect(await screen.findByRole('button', { name: 'Download' })).toBeEnabled();
+            await waitFor(() => {
+                expect(screen.getByRole('button', { name: 'Download' })).toBeEnabled();
+            });
 
             await userEvent.click(screen.getByRole('button', { name: 'Download' }));
 

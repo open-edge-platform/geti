@@ -1,29 +1,33 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 
-import { checkSpectrumButtonTooltip } from '../../../test-utils/utils';
+import { providersRender as render } from '../../../test-utils/required-providers-render';
+import { checkTooltip } from '../../../test-utils/utils';
+import { ActionButton } from '../button/button.component';
 import { TooltipWithDisableButton } from './tooltip-with-disable-button';
 
 describe('TooltipWithDisableButton', () => {
-    it('should show the active tooltip if the child element is not disabled', () => {
+    it('should show the active tooltip if the child element is not disabled', async () => {
+        const tooltip = 'active tooltip';
         render(
-            <TooltipWithDisableButton activeTooltip={'active tooltip'}>
-                <button>Click me!</button>
+            <TooltipWithDisableButton activeTooltip={tooltip}>
+                <ActionButton>Click me!</ActionButton>
             </TooltipWithDisableButton>
         );
 
-        checkSpectrumButtonTooltip(screen.getByText(/Click me!/), 'active tooltip');
+        await checkTooltip(screen.getByText(/Click me!/), tooltip);
     });
 
-    it('should show the disabled tooltip if the child element is disabled', () => {
+    it('should show the disabled tooltip if the child element is disabled', async () => {
+        const disabledTooltip = 'disabled tooltip';
         render(
-            <TooltipWithDisableButton activeTooltip={'active tooltip'} disabledTooltip={'disabled tooltip'}>
-                <button disabled>Click me!</button>
+            <TooltipWithDisableButton activeTooltip={'active tooltip'} disabledTooltip={disabledTooltip}>
+                <ActionButton isDisabled>Click me!</ActionButton>
             </TooltipWithDisableButton>
         );
 
-        checkSpectrumButtonTooltip(screen.getByText(/Click me!/), 'disabled tooltip');
+        await checkTooltip(screen.getByLabelText('disabled tooltip trigger'), disabledTooltip);
     });
 });

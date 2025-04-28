@@ -113,12 +113,7 @@ export const DatasetTabPanel = ({ dataset }: { dataset: Dataset }) => {
                                     />
                                 )}
 
-                                <TooltipWithDisableButton
-                                    marginStart={'auto'}
-                                    UNSAFE_style={{ width: 'fit-content' }}
-                                    activeTooltip={tooltipText}
-                                    disabledTooltip={tooltipText}
-                                >
+                                <TooltipWithDisableButton activeTooltip={tooltipText} disabledTooltip={tooltipText}>
                                     <Button
                                         id={'annotate-button-id'}
                                         variant={'accent'}

@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { FocusScope } from 'react-aria';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
@@ -172,7 +173,7 @@ describe('Annotations list item content', () => {
             screen.getByText(labels[0].name);
         });
 
-        fireEvent.mouseEnter(screen.getByLabelText('Labels of annotation with id test-rect'));
+        await userEvent.hover(screen.getByLabelText('Labels of annotation with id test-rect'));
 
         const selectLabel = screen.getByText(labels[0].name);
         expect(selectLabel).toBeInTheDocument();
@@ -205,7 +206,7 @@ describe('Annotations list item content', () => {
             screen.getByText(labels[0].name);
         });
 
-        fireEvent.mouseEnter(screen.getByLabelText('Labels of annotation with id test-rect'));
+        await userEvent.hover(screen.getByLabelText('Labels of annotation with id test-rect'));
 
         const selectLabel = screen.getByText(labels[0].name);
         expect(selectLabel).toBeInTheDocument();
