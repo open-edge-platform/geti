@@ -63,7 +63,12 @@ jobs:
         run: make builder -C ${COMPONENT_DIR} test-unit
 
       - name: Integration testing
-        run: make builder -C ${COMPONENT_DIR} test-integration
+        run: |
+          if [[ "${COMPONENT_DIR}" == "interactive_ai/workflows/geti_domain/project_ie" ]]; then
+            make -C ${COMPONENT_DIR} test-integration
+          else
+            make builder -C ${COMPONENT_DIR} test-integration
+          fi
 
       - name: Build image
         id: build-image
