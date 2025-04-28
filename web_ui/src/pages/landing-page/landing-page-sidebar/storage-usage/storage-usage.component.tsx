@@ -12,8 +12,8 @@ import {
     isBelowTooLowFreeDiskSpace,
     TOO_LOW_FREE_DISK_SPACE_IN_BYTES,
 } from '../../../../core/status/hooks/utils';
-import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { InfoTooltip } from '../../../../shared/components/info-tooltip/info-tooltip.component';
+import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { getFileSize } from '../../../../shared/utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 

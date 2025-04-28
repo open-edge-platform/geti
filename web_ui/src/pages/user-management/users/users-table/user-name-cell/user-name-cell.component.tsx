@@ -6,7 +6,7 @@ import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { UserCircleFilled as AdminIcon } from '../../../../../assets/icons';
 import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';
 import { USER_ROLE } from '../../../../../core/users/users.interface';
-import { ActionElement } from '../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../shared/components/pressable-element/pressable-element.component';
 import { UserPhotoPresentation } from '../../../profile-page/user-photo-container/user-photo-presentation.component';
 
 import classes from './user-name-cell.module.scss';
@@ -33,25 +33,27 @@ export const UserNameCell = ({
     return (
         <Flex alignItems='center' gap='size-200' id={`${id}-${dataKey}`} width={'100%'}>
             <TooltipTrigger placement={'bottom'}>
-                <ActionElement aria-label='label-relation'>
-                    <UserPhotoPresentation
-                        key={id}
-                        userName={fullName}
-                        email={email}
-                        userPhoto={userPhoto}
-                        handleUploadClick={null}
-                        width={'size-300'}
-                        height={'size-300'}
-                    />
-                    {isOrgAdmin && (
-                        <AdminIcon
-                            color={COLOR_MODE.NEGATIVE}
-                            fill='white'
-                            data-testid={'organization-admin-indicator'}
-                            className={classes.orgAdminIndicator}
+                <PressableElement aria-label='label-relation'>
+                    <>
+                        <UserPhotoPresentation
+                            key={id}
+                            userName={fullName}
+                            email={email}
+                            userPhoto={userPhoto}
+                            handleUploadClick={null}
+                            width={'size-300'}
+                            height={'size-300'}
                         />
-                    )}
-                </ActionElement>
+                        {isOrgAdmin && (
+                            <AdminIcon
+                                color={COLOR_MODE.NEGATIVE}
+                                fill='white'
+                                data-testid={'organization-admin-indicator'}
+                                className={classes.orgAdminIndicator}
+                            />
+                        )}
+                    </>
+                </PressableElement>
                 <Tooltip>{isOrgAdmin ? USER_ROLE.ORGANIZATION_ADMIN : ''}</Tooltip>
             </TooltipTrigger>
 

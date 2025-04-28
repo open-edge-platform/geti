@@ -9,7 +9,7 @@ import { StyleProps } from '@react-types/shared';
 import { PositionProps } from 'react-aria';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { PressableElement } from '../action-element/action-element.component';
+import { PressableElement } from '../pressable-element/pressable-element.component';
 
 const TruncatedTextStyles: CSSProperties = {
     display: 'block',
@@ -56,7 +56,7 @@ export const TruncatedTextWithTooltip = ({
     return (
         <TooltipTrigger placement={placement}>
             <PressableElement {...others} isTruncated>
-                <>{children}</>
+                {children}
             </PressableElement>
             <Tooltip>{children}</Tooltip>
         </TooltipTrigger>

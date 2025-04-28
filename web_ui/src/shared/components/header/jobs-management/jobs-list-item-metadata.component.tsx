@@ -6,8 +6,8 @@ import isNil from 'lodash/isNil';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { formatJobsCreationTime, isNonEmptyString, pluralize } from '../../../utils';
-import { PressableElement } from '../../action-element/action-element.component';
 import { DomainName } from '../../domain-name/domain-name.component';
+import { PressableElement } from '../../pressable-element/pressable-element.component';
 import { TruncatedText, TruncatedTextWithTooltip } from '../../truncated-text/truncated-text.component';
 import { getNameFromJob } from './utils';
 

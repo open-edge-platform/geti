@@ -3,8 +3,8 @@
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
-import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
+import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { OrganizationAdminsCopyText } from './organization-admins-copy-text.component';
 

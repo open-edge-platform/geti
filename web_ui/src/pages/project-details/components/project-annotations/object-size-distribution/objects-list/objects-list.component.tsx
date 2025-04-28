@@ -8,7 +8,7 @@ import { Heading } from '@react-spectrum/text';
 import capitalize from 'lodash/capitalize';
 import isEmpty from 'lodash/isEmpty';
 
-import { PressableElement } from '../../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../../shared/components/pressable-element/pressable-element.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 import { NEAR_MEAN_TOOLTIP_MSG } from '../utils';
 import { DistributionLabels } from './objects-list.interface';

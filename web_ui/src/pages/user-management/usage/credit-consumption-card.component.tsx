@@ -22,7 +22,7 @@ import { CONTACT_SUPPORT } from '../../../core/const';
 import { useCreditsQueries } from '../../../core/credits/hooks/use-credits-api.hook';
 import { getBalanceUsedCredits } from '../../../core/credits/services/utils';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { PressableElement } from '../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../shared/components/pressable-element/pressable-element.component';
 import { openNewTab, pluralize } from '../../../shared/utils';
 
 import classes from './usage.module.scss';

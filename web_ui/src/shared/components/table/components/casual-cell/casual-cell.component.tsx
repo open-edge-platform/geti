@@ -7,7 +7,7 @@ import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { formatUtcToLocal } from '../../../../utils';
-import { PressableElement } from '../../../action-element/action-element.component';
+import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../truncated-text/truncated-text.component';
 import { TableCellProps } from '../../table.interface';
 

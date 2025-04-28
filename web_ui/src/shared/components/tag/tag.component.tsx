@@ -6,7 +6,7 @@ import { CSSProperties } from 'react';
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import isEmpty from 'lodash/isEmpty';
 
-import { PressableElement } from '../action-element/action-element.component';
+import { PressableElement } from '../pressable-element/pressable-element.component';
 
 import classes from './tag.module.scss';
 

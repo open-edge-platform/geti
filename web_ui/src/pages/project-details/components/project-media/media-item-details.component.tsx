@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Divider, Flex, Grid, minmax, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Divider, Flex, Grid, minmax, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import dayjs from 'dayjs';
 import delay from 'lodash/delay';
 import { usePress } from 'react-aria';
@@ -12,9 +12,9 @@ import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideo } from '../../../../core/media/video.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
+import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize } from '../../../../shared/utils';
 import { getFullNameFromUser } from '../../../user-management/users/users-table/utils';
@@ -165,7 +165,7 @@ export const MediaItemDetails = ({
 
                     <TooltipTrigger placement={'bottom'}>
                         <PressableElement width={'size-1000'}>
-                            <Text>{dayjs(uploadTime).format('DD.MM.YYYY')}</Text>
+                            {dayjs(uploadTime).format('DD.MM.YYYY')}
                         </PressableElement>
                         <Tooltip>{`${DATE_TOOLTIP}: ${dayjs(uploadTime).format('DD.MM.YYYY')}`}</Tooltip>
                     </TooltipTrigger>
