@@ -73,7 +73,7 @@ export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
                     Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to
                     increase accuracy for small object detection tasks.
                 </Accordion.Description>
-                <Accordion.Divider marginY={'size-200'} />
+                <Accordion.Divider marginY={'size-250'} />
                 <Grid
                     columns={['max-content', minmax('size-3400', '1fr'), 'size-400']}
                     gap={'size-300'}
