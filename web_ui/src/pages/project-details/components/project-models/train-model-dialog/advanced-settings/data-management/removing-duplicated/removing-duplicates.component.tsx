@@ -5,7 +5,6 @@ import { FC, useState } from 'react';
 
 import { Content, ContextualHelp, Flex, Text } from '@adobe/react-spectrum';
 
-import { AlertOutlined } from '../../../../../../../../assets/icons';
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
 import { Accordion } from '../../accordion/accordion.component';
 
