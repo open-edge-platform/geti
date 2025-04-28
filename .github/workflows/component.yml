@@ -36,8 +36,8 @@ jobs:
       TAG: ${{ inputs.image-tag || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
       USE_PROXY: true
-      PYTHON_BUILDER_IMAGE: ${{ secrets.REGISTRY }}/builder-images/python-builder:v0.1
-      GO_BUILDER_IMAGE: ${{ secrets.REGISTRY }}/builder-images/go-builder:v0.1
+      PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
+      GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -55,6 +55,17 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Check if Python/Go project
+        id: check-python-go
+        run: |
+          if [ -f "${COMPONENT_DIR}/setup.py" ] || [ -f "${COMPONENT_DIR}/pyproject.toml" ]; then
+            echo "BUILDER_IMAGE=${REGISTRY}/${PYTHON_BUILDER_IMAGE}" >> $GITHUB_ENV
+          elif [ -f "${COMPONENT_DIR}/go.mod" ]; then
+            echo "BUILDER_IMAGE=${REGISTRY}/${GO_BUILDER_IMAGE}" >> $GITHUB_ENV
+          else
+            echo "BUILDER_IMAGE=builder_image_not_set" >> $GITHUB_ENV
+          fi
 
       - name: Static code analysis
         run: make builder -C ${COMPONENT_DIR} static-code-analysis
