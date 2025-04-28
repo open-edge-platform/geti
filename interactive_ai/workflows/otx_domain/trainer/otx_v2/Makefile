@@ -13,8 +13,12 @@ test-unit: venv
 	-uv run pytest --disable-warnings -v
 	true
 
-test-component: venv
+# TODO: Enable back venv when the tests are implemented
+# test-component: venv
+test-component:
 	@echo "test-component not available"
 
-test-integration: venv
+# TODO: Enable back venv when the tests are implemented
+# test-integration: venv
+test-integration:
 	@echo "test-integration not available"
