@@ -43,8 +43,6 @@ export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
             ['integer', 'float'].includes(parameter.dataType)
     ) ?? []) as NumberGroupParams[];
 
-    console.log({ tilingParameters, manualTilingParameters });
-
     const TILING_MODE_COMPONENTS: Record<TILING_MODES, ReactNode> = {
         [TILING_MODES.OFF]: (
             <Text UNSAFE_className={styles.tilingModeDescription} gridColumn={'2/3'}>

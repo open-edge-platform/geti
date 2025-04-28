@@ -8,6 +8,7 @@ import { View } from '@adobe/react-spectrum';
 import { ConfigurableParametersTaskChain } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { BalanceLabelsDistribution } from './balance-labels-distribution/balance-labels-distribution.component';
 import { DataAugmentation } from './data-augmentation/data-augmentation.component';
+import { Filters } from './filters/filters.component';
 import { Tiling } from './tiling/tiling.component';
 import { TrainingSubsets } from './training-subsets/training-subsets.component';
 
@@ -37,6 +38,7 @@ export const DataManagement: FC<DataManagementProps> = ({
             />
             {tilingParameters !== undefined && <Tiling tilingParameters={tilingParameters} />}
             <DataAugmentation />
+            <Filters />
         </View>
     );
 };
