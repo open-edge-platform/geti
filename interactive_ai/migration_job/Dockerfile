@@ -27,15 +27,21 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM base AS runtime
 
-# Install ffmpeg
+# Install ffmpeg and curl
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 && \
+    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 curl && \
     rm -rf /var/lib/apt/lists/* && \
     useradd -l -u 10001 non-root && \
 	pip3 uninstall -y setuptools pip wheel && \
     rm -rf /root/.cache/pip
    
-COPY --link --from=build --chown=10001 /builder/interactive_ai/migration_job/.venv /.venv
-COPY --link --chown=10001 entrypoint.sh .
+COPY --link --from=build --chown=10001 /builder/interactive_ai/migration_job /app/migration_job
+
+ARG VENV="/app/migration_job/.venv"
+ENV PATH="$VENV/bin:$PATH"
+ENV PYTHONPATH="/app"
+
 USER non-root
+WORKDIR /app
+COPY --link --chown=10001 entrypoint.sh .
 ENTRYPOINT [ "./entrypoint.sh"]

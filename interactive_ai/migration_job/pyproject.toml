@@ -8,13 +8,14 @@ dependencies = [
     "psycopg2-binary==2.9.3",
     "pymongo[aws]~=4.10",
     "minio~=7.1.0",
-    "geti-telemetry-tools[telemetry,grpc,kafka,logger]",
+    "geti-telemetry-tools[telemetry,grpc,logger]",
     "migration",
 ]
 
 [project.scripts]
 run_migration = "migration_job.run_migration:main"
 mongodb_create_service_user = "migration_job.mongodb_create_service_user:main"
+create_s3_bucket = "migration_job.create_s3_bucket:main"
 
 [tool.uv.sources]
 geti-telemetry-tools = { path = "../../libs/telemetry_tools", editable = true }

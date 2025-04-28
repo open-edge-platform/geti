@@ -9,7 +9,6 @@ from bson import ObjectId
 from migration_job.mongodb_upgrades_history import MigrationHistory
 
 
-@pytest.mark.component
 class TestMigrationHistory:
     @pytest.mark.parametrize("previous_upgrade_exists", [False, True], ids=["first upgrade", "previously upgraded"])
     def test_get_current_data_version(self, previous_upgrade_exists) -> None:
