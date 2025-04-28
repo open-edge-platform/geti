@@ -7,7 +7,7 @@ import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import isEmpty from 'lodash/isEmpty';
 import { Placement } from 'react-aria';
 
-import { PressableElement } from '../action-element/action-element.component';
+import { PressableElement } from '../pressable-element/pressable-element.component';
 
 interface TooltipWithDisableButtonProps {
     activeTooltip?: ReactElement | string;

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
-import { ActionElement } from '../../../action-element/action-element.component';
+import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { ConfigurableParametersComponents, ConfigurableParametersMany } from '../../configurable-parameters.interface';
 
 import classes from '../../selectable-customized-tabs/selectable-customized-tabs.module.scss';
@@ -22,12 +22,12 @@ export const SelectableTab = ({ component, isSelected, setSelectedComponentId }:
 
     return (
         <TooltipTrigger placement={'bottom'}>
-            <ActionElement
+            <PressableElement
                 UNSAFE_className={[classes.tabItem, isSelected ? classes.tabItemSelected : ''].join(' ')}
                 onPress={() => setSelectedComponentId(component.id)}
             >
-                {capitalizedHeader}
-            </ActionElement>
+                <Text>{capitalizedHeader}</Text>
+            </PressableElement>
             <Tooltip>{component.description}</Tooltip>
         </TooltipTrigger>
     );

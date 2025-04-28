@@ -4,7 +4,7 @@
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { formatPerformanceScore } from '../../../annotator/components/utils';
 
 interface PerformanceProps {
@@ -19,7 +19,7 @@ export const Performance = ({ project }: PerformanceProps) => {
     if (performance.type === 'default_performance') {
         return (
             <TooltipTrigger placement={'bottom'}>
-                <ActionElement>Score: {formatPerformanceScore(performance.score)}</ActionElement>
+                <PressableElement>Score: {formatPerformanceScore(performance.score)}</PressableElement>
                 <Tooltip>{tooltipText}</Tooltip>
             </TooltipTrigger>
         );
@@ -28,11 +28,11 @@ export const Performance = ({ project }: PerformanceProps) => {
     return (
         <Flex direction='column'>
             <TooltipTrigger placement={'bottom'}>
-                <ActionElement>Image Score: {formatPerformanceScore(performance.globalScore)}</ActionElement>
+                <PressableElement>Image Score: {formatPerformanceScore(performance.globalScore)}</PressableElement>
                 <Tooltip>{tooltipText}</Tooltip>
             </TooltipTrigger>
             <TooltipTrigger placement={'bottom'}>
-                <ActionElement>Object Score: {formatPerformanceScore(performance.localScore)}</ActionElement>
+                <PressableElement>Object Score: {formatPerformanceScore(performance.localScore)}</PressableElement>
                 <Tooltip>{tooltipText}</Tooltip>
             </TooltipTrigger>
         </Flex>

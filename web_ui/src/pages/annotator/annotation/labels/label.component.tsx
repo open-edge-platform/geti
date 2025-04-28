@@ -10,7 +10,7 @@ import { AnnotationLabel } from '../../../../core/annotations/annotation.interfa
 import { isPrediction, showLabelScore } from '../../../../core/labels/utils';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { FullnameWithLoading } from '../../../../shared/components/users/fullname.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

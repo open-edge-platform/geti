@@ -4,8 +4,8 @@
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
-import { PressableElement } from '../../../../../shared/components/action-element/action-element.component';
 import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
+import { PressableElement } from '../../../../../shared/components/pressable-element/pressable-element.component';
 import { DatasetItemGridMenu } from './dataset-item-grid-menu.component';
 import { DatasetItemMenu } from './dataset-item-menu.component';
 import { DatasetListItemDetails } from './dataset-list-item-details.component';

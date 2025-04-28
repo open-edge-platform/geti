@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 
-import { PressableElement } from '../../../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../../../shared/components/pressable-element/pressable-element.component';
 import { AccuracyHalfDonutChart } from './accuracy-half-donut-chart';
 
 interface AccuracyContainerProps {

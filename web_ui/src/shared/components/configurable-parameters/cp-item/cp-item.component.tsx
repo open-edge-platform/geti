@@ -5,8 +5,8 @@ import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react
 
 import { Alert } from '../../../../assets/icons';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { PressableElement } from '../../action-element/action-element.component';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
+import { PressableElement } from '../../pressable-element/pressable-element.component';
 import { ConfigParameterItemProp, ConfigurableParametersParams } from '../configurable-parameters.interface';
 import { CPEditableItem } from './cp-editable-item/cp-editable-item.component';
 import { CPStaticItem } from './cp-static-item/cp-static-item.component';

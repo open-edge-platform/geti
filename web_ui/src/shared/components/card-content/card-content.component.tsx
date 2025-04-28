@@ -9,9 +9,9 @@ import isEmpty from 'lodash/isEmpty';
 
 import { Info } from '../../../assets/icons';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { PressableElement } from '../action-element/action-element.component';
 import { DownloadGraphMenu } from '../download-graph-menu/download-graph-menu.component';
 import { DownloadableData } from '../download-graph-menu/export-csv-utils';
+import { PressableElement } from '../pressable-element/pressable-element.component';
 
 interface CardContentProps extends StyleProps {
     children: ReactNode;
