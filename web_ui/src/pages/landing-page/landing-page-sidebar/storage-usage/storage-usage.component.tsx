@@ -12,7 +12,7 @@ import {
     isBelowTooLowFreeDiskSpace,
     TOO_LOW_FREE_DISK_SPACE_IN_BYTES,
 } from '../../../../core/status/hooks/utils';
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 import { InfoTooltip } from '../../../../shared/components/info-tooltip/info-tooltip.component';
 import { getFileSize } from '../../../../shared/utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
@@ -77,7 +77,7 @@ export const StorageUsage = (): JSX.Element => {
                 </Flex>
             ) : (
                 <TooltipTrigger placement={'bottom'}>
-                    <ActionElement>
+                    <PressableElement>
                         <Meter
                             variant={variant}
                             aria-label={'Storage usage'}
@@ -94,7 +94,7 @@ export const StorageUsage = (): JSX.Element => {
                             width={'size-300'}
                             UNSAFE_className={classes.storageUsageMeter}
                         />
-                    </ActionElement>
+                    </PressableElement>
                     <Tooltip>{TOOLTIP_MESSAGE}</Tooltip>
                 </TooltipTrigger>
             )}

@@ -22,7 +22,7 @@ import { CONTACT_SUPPORT } from '../../../core/const';
 import { useCreditsQueries } from '../../../core/credits/hooks/use-credits-api.hook';
 import { getBalanceUsedCredits } from '../../../core/credits/services/utils';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { ActionElement } from '../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../shared/components/action-element/action-element.component';
 import { openNewTab, pluralize } from '../../../shared/utils';
 
 import classes from './usage.module.scss';
@@ -165,7 +165,7 @@ export const CreditConsumptionCard = (props: ViewProps<5>): JSX.Element => {
                 </Text>
                 <View paddingTop={!pendingPercentage ? 'size-200' : 'size-0'}>
                     <TooltipTrigger>
-                        <ActionElement>
+                        <PressableElement>
                             <Flex alignItems={'center'} gap={'size-50'} isHidden={!pendingPercentage}>
                                 <View
                                     width={'size-100'}
@@ -182,11 +182,11 @@ export const CreditConsumptionCard = (props: ViewProps<5>): JSX.Element => {
                                     {pendingPercentage}%
                                 </Text>
                             </Flex>
-                        </ActionElement>
+                        </PressableElement>
                         <Tooltip>Pending credits</Tooltip>
                     </TooltipTrigger>
                     <TooltipTrigger>
-                        <ActionElement>
+                        <PressableElement>
                             <Flex alignItems={'center'} gap={'size-50'}>
                                 <View
                                     width={'size-100'}
@@ -203,7 +203,7 @@ export const CreditConsumptionCard = (props: ViewProps<5>): JSX.Element => {
                                     {availablePercentage}%
                                 </Text>
                             </Flex>
-                        </ActionElement>
+                        </PressableElement>
                         <Tooltip>Available credits</Tooltip>
                     </TooltipTrigger>
                 </View>

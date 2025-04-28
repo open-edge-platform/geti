@@ -10,7 +10,7 @@ import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
 import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
 import { useToggleButton } from 'react-aria';
 
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../shared/components/action-element/action-element.component';
 
 import classes from './toggle-sidebar.module.scss';
 
@@ -29,9 +29,9 @@ export const ToggleSidebarButton = (props: ToggleProps): JSX.Element => {
             <View backgroundColor='gray-100' paddingY='size-50' paddingX='size-150'>
                 <Flex height='100%' justifyContent='end'>
                     <TooltipTrigger placement={'bottom'}>
-                        <ActionElement onPress={state.toggle}>
+                        <PressableElement onPress={state.toggle}>
                             {props.isSelected ? <ChevronDoubleRight size='XS' /> : <ChevronDoubleLeft size='XS' />}
-                        </ActionElement>
+                        </PressableElement>
                         <Tooltip>{props.isSelected ? 'Collapse sidebar' : 'Open sidebar'}</Tooltip>
                     </TooltipTrigger>
                 </Flex>

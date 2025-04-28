@@ -12,7 +12,7 @@ import { JobStepState } from '../../../../core/jobs/jobs.const';
 import { Job, JobStep } from '../../../../core/jobs/jobs.interface';
 import { ANIMATION_PARAMETERS } from '../../../animation-parameters/animation-parameters';
 import { isNonEmptyArray } from '../../../utils';
-import { ActionElement } from '../../action-element/action-element.component';
+import { PressableElement } from '../../action-element/action-element.component';
 import { LoadingIndicator } from '../../loading/loading-indicator.component';
 import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ThinProgressBar } from '../../thin-progress-bar/thin-progress-bar.component';
@@ -62,9 +62,9 @@ export const JobsListItemStatus = ({ expanded = false, job }: JobsListItemStatus
                 <Flex alignItems={'center'} justifyContent={'end'} flexGrow={1} flexShrink={1}>
                     {jobWarning !== undefined ? (
                         <TooltipTrigger placement={'bottom'}>
-                            <ActionElement UNSAFE_style={{ display: 'flex' }}>
+                            <PressableElement UNSAFE_style={{ display: 'flex' }}>
                                 <Alert aria-label={'Job step alert'} className={classes.warningSectionIcon} />
-                            </ActionElement>
+                            </PressableElement>
                             <Tooltip>{jobWarning.warning?.trim()}</Tooltip>
                         </TooltipTrigger>
                     ) : null}

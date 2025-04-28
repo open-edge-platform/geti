@@ -4,7 +4,7 @@
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
-import { ActionElement } from '../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../shared/components/action-element/action-element.component';
 import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
 import { DatasetItemGridMenu } from './dataset-item-grid-menu.component';
 import { DatasetItemMenu } from './dataset-item-menu.component';
@@ -37,7 +37,7 @@ export const DatasetItemFactory = ({
 
     return (
         <TooltipTrigger placement={'bottom'}>
-            <ActionElement>
+            <PressableElement>
                 {viewMode === ViewModes.DETAILS ? (
                     <DatasetListItemDetails
                         mediaItem={mediaItem}
@@ -65,7 +65,7 @@ export const DatasetItemFactory = ({
                         shouldShowVideoIndicator={shouldShowVideoIndicator}
                     />
                 )}
-            </ActionElement>
+            </PressableElement>
             <Tooltip>{tooltip}</Tooltip>
         </TooltipTrigger>
     );
