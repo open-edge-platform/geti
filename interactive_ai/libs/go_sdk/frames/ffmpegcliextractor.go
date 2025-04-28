@@ -8,9 +8,10 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"go.opentelemetry.io/otel/attribute"
-	"io"
 
 	"geti.com/go_sdk/entities"
 	"geti.com/go_sdk/logger"
