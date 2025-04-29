@@ -41,3 +41,7 @@ split-on-trailing-comma = false
 
 [tool.ruff.lint.pylint]
 max-args = 7
+
+[[tool.mypy.overrides]]
+module = "bson.*"
+ignore_missing_imports = true

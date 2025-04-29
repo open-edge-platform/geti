@@ -34,8 +34,8 @@ def fxt_metric_reader_for_testing() -> InMemoryMetricReader:
 
 class TestMetricsInstruments:
     def test_images_resolution_histogram(self, fxt_metric_reader_for_testing) -> None:
-        assert images_resolution_histogram.name == "geti.application.media.size.images.resolution"
-        assert images_resolution_histogram.unit == "MP"
+        assert images_resolution_histogram.name == "geti.application.media.size.images.resolution"  # type: ignore[attr-defined]
+        assert images_resolution_histogram.unit == "MP"  # type: ignore[attr-defined]
 
         # Verify that adding records does not throw errors
         images_resolution_histogram.record(3, EmptyInstrumentAttributes().to_dict())
@@ -45,8 +45,8 @@ class TestMetricsInstruments:
         # Verify the data
         metrics_data = fxt_metric_reader_for_testing.get_metrics_data()
         scope_metrics = next(sm for sm in metrics_data.resource_metrics[0].scope_metrics if sm.scope.name == meter.name)
-        image_res_metric_data = next(m for m in scope_metrics.metrics if m.name == images_resolution_histogram.name)
-        assert image_res_metric_data.unit == images_resolution_histogram.unit
+        image_res_metric_data = next(m for m in scope_metrics.metrics if m.name == images_resolution_histogram.name)  # type: ignore[attr-defined]
+        assert image_res_metric_data.unit == images_resolution_histogram.unit  # type: ignore[attr-defined]
         assert image_res_metric_data.data.aggregation_temporality == AggregationTemporality.CUMULATIVE
         datapoints = image_res_metric_data.data.data_points
         assert len(datapoints) == 1
@@ -58,8 +58,8 @@ class TestMetricsInstruments:
         assert datapoints[0].max == 15
 
     def test_videos_frames_histogram(self, fxt_metric_reader_for_testing) -> None:
-        assert videos_frames_histogram.name == "geti.application.media.size.videos.frames"
-        assert videos_frames_histogram.unit == "1"
+        assert videos_frames_histogram.name == "geti.application.media.size.videos.frames"  # type: ignore[attr-defined]
+        assert videos_frames_histogram.unit == "1"  # type: ignore[attr-defined]
 
         # Verify that adding a record does not throw errors
         videos_frames_histogram.record(10000, EmptyInstrumentAttributes().to_dict())
@@ -69,8 +69,8 @@ class TestMetricsInstruments:
         # Verify the data
         metrics_data = fxt_metric_reader_for_testing.get_metrics_data()
         scope_metrics = next(sm for sm in metrics_data.resource_metrics[0].scope_metrics if sm.scope.name == meter.name)
-        video_frames_metric_data = next(m for m in scope_metrics.metrics if m.name == videos_frames_histogram.name)
-        assert video_frames_metric_data.unit == videos_frames_histogram.unit
+        video_frames_metric_data = next(m for m in scope_metrics.metrics if m.name == videos_frames_histogram.name)  # type: ignore[attr-defined]
+        assert video_frames_metric_data.unit == videos_frames_histogram.unit  # type: ignore[attr-defined]
         assert video_frames_metric_data.data.aggregation_temporality == AggregationTemporality.CUMULATIVE
         datapoints = video_frames_metric_data.data.data_points
         assert len(datapoints) == 1
@@ -82,8 +82,8 @@ class TestMetricsInstruments:
         assert datapoints[0].max == 15000
 
     def test_videos_resolution_histogram(self, fxt_metric_reader_for_testing) -> None:
-        assert videos_resolution_histogram.name == "geti.application.media.size.videos.resolution"
-        assert videos_resolution_histogram.unit == "MP"
+        assert videos_resolution_histogram.name == "geti.application.media.size.videos.resolution"  # type: ignore[attr-defined]
+        assert videos_resolution_histogram.unit == "MP"  # type: ignore[attr-defined]
 
         # Verify that adding a record does not throw errors
         videos_resolution_histogram.record(3, EmptyInstrumentAttributes().to_dict())
@@ -93,8 +93,8 @@ class TestMetricsInstruments:
         # Verify the data
         metrics_data = fxt_metric_reader_for_testing.get_metrics_data()
         scope_metrics = next(sm for sm in metrics_data.resource_metrics[0].scope_metrics if sm.scope.name == meter.name)
-        video_res_metric_data = next(m for m in scope_metrics.metrics if m.name == videos_resolution_histogram.name)
-        assert video_res_metric_data.unit == videos_resolution_histogram.unit
+        video_res_metric_data = next(m for m in scope_metrics.metrics if m.name == videos_resolution_histogram.name)  # type: ignore[attr-defined]
+        assert video_res_metric_data.unit == videos_resolution_histogram.unit  # type: ignore[attr-defined]
         assert video_res_metric_data.data.aggregation_temporality == AggregationTemporality.CUMULATIVE
         datapoints = video_res_metric_data.data.data_points
         assert len(datapoints) == 1
@@ -120,8 +120,8 @@ class TestMetricsInstruments:
         }
 
     def test_model_exports_counter(self, fxt_metric_reader_for_testing) -> None:
-        assert model_exports_counter.name == "geti.application.models.exports.count"
-        assert model_exports_counter.unit == "1"
+        assert model_exports_counter.name == "geti.application.models.exports.count"  # type: ignore[attr-defined]
+        assert model_exports_counter.unit == "1"  # type: ignore[attr-defined]
         attributes = ModelExportsCounterAttributes(
             model_architecture="SSD",
             format="OPENVINO",
@@ -135,8 +135,8 @@ class TestMetricsInstruments:
         # Verify the data
         metrics_data = fxt_metric_reader_for_testing.get_metrics_data()
         scope_metrics = next(sm for sm in metrics_data.resource_metrics[0].scope_metrics if sm.scope.name == meter.name)
-        export_metric_data = next(m for m in scope_metrics.metrics if m.name == model_exports_counter.name)
-        assert export_metric_data.unit == model_exports_counter.unit
+        export_metric_data = next(m for m in scope_metrics.metrics if m.name == model_exports_counter.name)  # type: ignore[attr-defined]
+        assert export_metric_data.unit == model_exports_counter.unit  # type: ignore[attr-defined]
         assert export_metric_data.data.aggregation_temporality == AggregationTemporality.CUMULATIVE
         datapoints = export_metric_data.data.data_points
         assert len(datapoints) == 1

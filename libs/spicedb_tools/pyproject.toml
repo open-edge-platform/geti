@@ -46,3 +46,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "geti_spicedb_tools.*"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "grpcutil.*"
+ignore_missing_imports = true

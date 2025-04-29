@@ -64,3 +64,11 @@ split-on-trailing-comma = false
 
 [tool.ruff.lint.pylint]
 max-args = 7
+
+[[tool.mypy.overrides]]
+module = "testfixtures.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "confluent_kafka.*"
+ignore_missing_imports = true

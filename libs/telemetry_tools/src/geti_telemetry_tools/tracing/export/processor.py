@@ -24,10 +24,10 @@ class FilteredBatchSpanProcessor(BatchSpanProcessor):
     ) -> None:
         super().__init__(
             span_exporter=span_exporter,
-            max_queue_size=max_queue_size,
-            schedule_delay_millis=schedule_delay_millis,
-            max_export_batch_size=max_export_batch_size,
-            export_timeout_millis=export_timeout_millis,
+            max_queue_size=max_queue_size,  # type: ignore[arg-type]
+            schedule_delay_millis=schedule_delay_millis,  # type: ignore[arg-type]
+            max_export_batch_size=max_export_batch_size,  # type: ignore[arg-type]
+            export_timeout_millis=export_timeout_millis,  # type: ignore[arg-type]
         )
 
         self.do_not_send_spans = set(do_not_send_spans) if do_not_send_spans else set()

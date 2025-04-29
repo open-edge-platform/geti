@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class FeatureFlagProvider:
+    @staticmethod
     def _str2bool(text: str) -> bool:
         """
         Converts a string to a boolean based on common true/false representations.

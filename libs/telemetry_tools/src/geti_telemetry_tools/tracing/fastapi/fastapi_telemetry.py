@@ -41,7 +41,7 @@ class FastAPITelemetry:
         def response_hook(span: Span, message: dict) -> None:
             if span and span.is_recording() and message.get("type") == "http.response.start":
                 propagator.inject(
-                    setter=HttpEncodedHeaderSetter(),
+                    setter=HttpEncodedHeaderSetter(),  # type: ignore[arg-type]
                     carrier=message["headers"],
                 )
 
