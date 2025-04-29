@@ -551,12 +551,15 @@ class ScExtractorFromDatasetStorage(ScExtractor):
 
         self._identifiers: list[ImageIdentifier | VideoIdentifier | VideoFrameIdentifier | RangeIdentifier] = []
         self._identifiers.extend(image_repo.get_all_identifiers())
+        logger.info(f"@video_root {self._video_root}, ")
         for video_id in self._videos_dict:
             annotated_frame_identifiers = self._annotation_scene_repo.get_annotated_video_frame_identifiers_by_video_id(
                 video_id=video_id, annotation_kind=AnnotationSceneKind.ANNOTATION
             )
-            self._identifiers.extend(annotated_frame_identifiers)
-            if self._video_root:
+            if annotated_frame_identifiers:
+                self._identifiers.extend(annotated_frame_identifiers)
+            elif self._video_root:
+                logger.info(f"@video {video_id} has no annotated frames, saving as its original format.")
                 self._identifiers.append(VideoIdentifier(video_id))
 
         self._ranges_dict = {}
