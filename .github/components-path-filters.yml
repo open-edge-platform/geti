@@ -53,6 +53,14 @@ platform/services/initial_user:
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
+platform/services/platform_cleaner:
+  - platform/services/platform_cleaner/**
+  - libs/telemetry_tools/**
+  - grpc_interfaces/account_service/**
+  - grpc_interfaces/pyproject.toml
+  - Makefile.shared-python
+  - Makefile.shared
+  - .github/workflows/component.yml
 
 # IAI Services
 interactive_ai/services/auto_train:
@@ -279,3 +287,5 @@ grpc_interfaces:
 # Web UI
 web_ui:
   - web_ui/**
+  - docs/rest_api/**
+  - interactive_api/services/api/schemas/**

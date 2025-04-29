@@ -7,7 +7,7 @@ import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { formatUtcToLocal } from '../../../../utils';
-import { ActionElement } from '../../../action-element/action-element.component';
+import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../truncated-text/truncated-text.component';
 import { TableCellProps } from '../../table.interface';
 
@@ -34,11 +34,11 @@ export const CasualCell = ({ rowData, cellData, dataKey, tooltip, styles }: Casu
 
     return (
         <TooltipTrigger placement={'bottom left'}>
-            <ActionElement>
+            <PressableElement>
                 <TruncatedText id={id} data-testid={id} UNSAFE_style={styles}>
                     {cellData}
                 </TruncatedText>
-            </ActionElement>
+            </PressableElement>
             <Tooltip>{tooltip ?? cellData}</Tooltip>
         </TooltipTrigger>
     );

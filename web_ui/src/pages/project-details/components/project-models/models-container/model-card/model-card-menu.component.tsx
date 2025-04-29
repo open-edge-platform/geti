@@ -19,9 +19,9 @@ import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { ModelIdentifier } from '../../../../../../core/models/models.interface';
 import { NOTIFICATION_TYPE } from '../../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../../notification/notification.component';
-import { ActionElement } from '../../../../../../shared/components/action-element/action-element.component';
 import { ActionButton } from '../../../../../../shared/components/button/button.component';
 import { LoadingIndicator } from '../../../../../../shared/components/loading/loading-indicator.component';
+import { PressableElement } from '../../../../../../shared/components/pressable-element/pressable-element.component';
 import { formatDate } from '../../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
 import { isModelDeleted } from '../../../../utils';
@@ -216,7 +216,7 @@ export const ModelCardMenu = ({
                                 <Text id={id}>{key}</Text>
                             ) : (
                                 <TooltipTrigger placement={'bottom'}>
-                                    <ActionElement
+                                    <PressableElement
                                         id={id}
                                         gridRow={'2'}
                                         gridColumn={'3'}
@@ -228,7 +228,7 @@ export const ModelCardMenu = ({
                                     >
                                         {icon}
                                         {key}
-                                    </ActionElement>
+                                    </PressableElement>
                                     <Tooltip>{tooltip}</Tooltip>
                                 </TooltipTrigger>
                             )}

@@ -80,19 +80,13 @@ describe('Project', () => {
 
         await render(<Project project={mockProject} />);
 
-        expect(screen.getByText(mockProject.labels[0].name).parentElement).toHaveStyle('text-overflow: ellipsis');
-        expect(screen.getByText(mockProject.labels[1].name).parentElement).toHaveStyle('text-overflow: ellipsis');
-        expect(screen.getByText(mockProject.labels[2].name).parentElement).toHaveStyle('text-overflow: ellipsis');
+        expect(screen.getByText(mockProject.labels[0].name)).toHaveStyle('text-overflow: ellipsis');
+        expect(screen.getByText(mockProject.labels[1].name)).toHaveStyle('text-overflow: ellipsis');
+        expect(screen.getByText(mockProject.labels[2].name)).toHaveStyle('text-overflow: ellipsis');
 
-        expect(screen.getByText(mockProject.labels[0].name).parentElement).toHaveStyle(
-            `maxWidth: ${dimensionValue('size-2400')}`
-        );
-        expect(screen.getByText(mockProject.labels[1].name).parentElement).toHaveStyle(
-            `maxWidth: ${dimensionValue('size-2400')}`
-        );
-        expect(screen.getByText(mockProject.labels[2].name).parentElement).toHaveStyle(
-            `maxWidth: ${dimensionValue('size-2400')}`
-        );
+        expect(screen.getByText(mockProject.labels[0].name)).toHaveStyle(`maxWidth: ${dimensionValue('size-2400')}`);
+        expect(screen.getByText(mockProject.labels[1].name)).toHaveStyle(`maxWidth: ${dimensionValue('size-2400')}`);
+        expect(screen.getByText(mockProject.labels[2].name)).toHaveStyle(`maxWidth: ${dimensionValue('size-2400')}`);
     });
 
     it('Shows normal and anomalous labels', async () => {

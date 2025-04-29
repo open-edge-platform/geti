@@ -12,9 +12,9 @@ import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../assets/i
 import { LabelItemType, LabelTreeItem, LabelTreeLabelProps } from '../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../core/labels/label.interface';
 import { getLabelId } from '../../../core/labels/utils';
-import { ActionElement } from '../action-element/action-element.component';
 import { ActionButton } from '../button/button.component';
 import { LabelColorThumb } from '../label-color-thumb/label-color-thumb.component';
+import { PressableElement } from '../pressable-element/pressable-element.component';
 import { groupTitleStyles, LABEL_GAP, VIEW_GAP } from './utils';
 
 export interface SearchLabelTreeItemSuffix {
@@ -113,7 +113,7 @@ export const TaskLabelTreeItem = ({ label, children, level, suffix, prefix, onCl
 
                     <View UNSAFE_style={groupTitleStyles} marginStart={'auto'} marginEnd={'size-125'}>
                         <TooltipTrigger placement={'bottom'}>
-                            <ActionElement aria-label='label-relation'>{label.relation[0]}</ActionElement>
+                            <PressableElement aria-label='label-relation'>{label.relation[0]}</PressableElement>
                             <Tooltip>{label.relation}</Tooltip>
                         </TooltipTrigger>
                     </View>
