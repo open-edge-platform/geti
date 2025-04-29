@@ -57,36 +57,41 @@ class MetricDeserializer:
         instance: dict,
     ) -> MetricEntity:
         metric_type = instance["type"]
+        result: MetricEntity = NullMetric()
         if metric_type == ScoreMetric.type():
             label_id = instance.get("label_id")
-            return ScoreMetric(
+            result = ScoreMetric(
                 name=instance["name"],
                 value=float(np.nan_to_num(instance["value"])),
                 label_id=ID(label_id) if label_id else None,
             )
-        if metric_type == NullScoreMetric.type():
-            return NullScoreMetric()
-        for metric_class in (
-            CountMetric,
-            StringMetric,
-            DateMetric,
-            DurationMetric,
-        ):
-            if metric_type == metric_class.type():
-                value = instance["value"]
-                if isinstance(value, float):
-                    value = np.nan_to_num(value)
-                return metric_class(name=instance["name"], value=value)  # type: ignore
-        if metric_type == CurveMetric.type():
-            return CurveMetric(name=instance["name"], ys=instance["ys"], xs=instance.get("xs"))
-        if metric_type == MatrixMetric.type():
-            return MatrixMetric(
+        elif metric_type == NullScoreMetric.type():
+            result = NullScoreMetric()
+        elif metric_type == DurationMetric.type():
+            result = DurationMetric(
+                name=instance["name"], hour=instance["hour"], minute=instance["minute"], second=instance["second"]
+            )
+        elif metric_type == CurveMetric.type():
+            result = CurveMetric(name=instance["name"], ys=instance["ys"], xs=instance.get("xs"))
+        elif metric_type == MatrixMetric.type():
+            result = MatrixMetric(
                 name=instance["name"],
                 matrix_values=NumpyDeserializer.backward(instance["matrix_values"]),
                 row_labels=instance.get("row_labels"),
                 column_labels=instance.get("column_labels"),
             )
-        return NullMetric()
+        else:
+            for metric_class in (
+                CountMetric,
+                StringMetric,
+                DateMetric,
+            ):
+                if metric_type == metric_class.type():
+                    value = instance["value"]
+                    if isinstance(value, float):
+                        value = np.nan_to_num(value)
+                    result = metric_class(name=instance["name"], value=value)
+        return result
 
 
 class VisualizationInfoDeserializer:
