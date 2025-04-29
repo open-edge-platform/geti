@@ -11,6 +11,7 @@ import { LABEL_BEHAVIOUR } from '../../../../../core/labels/label.interface';
 import { createInMemoryMediaService } from '../../../../../core/media/services/in-memory-media-service/in-memory-media-service';
 import { MediaService } from '../../../../../core/media/services/media-service.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
+import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useDataset } from '../../../../../providers/dataset-provider/dataset-provider.component';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedPerformance, getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
@@ -34,6 +35,22 @@ jest.mock('../../../../annotator/hooks/use-dataset-identifier.hook', () => ({
     useDatasetIdentifier: jest.fn(),
 }));
 
+const mockInvalidateQueries = jest.fn();
+jest.mock('@tanstack/react-query', () => ({
+    ...jest.requireActual('@tanstack/react-query'),
+    useQueryClient: () => ({
+        invalidateQueries: mockInvalidateQueries,
+    }),
+}));
+
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useParams: () => ({
+        projectId: 'project-id',
+        workspaceId: 'workspace-id',
+    }),
+}));
+
 const anomalyLabels = [
     getMockedLabel({
         id: 'normal',
@@ -50,27 +67,6 @@ const anomalyLabels = [
 const anomalyProject = getMockedProject({
     tasks: [{ id: 'anomaly', domain: DOMAIN.ANOMALY_CLASSIFICATION, title: 'Anomaly', labels: anomalyLabels }],
 });
-
-beforeEach(() => {
-    // @ts-expect-error We only wish to mock the project
-    jest.mocked(useProject).mockImplementation(() => ({
-        project: anomalyProject,
-        isSingleDomainProject: () => true,
-    }));
-
-    // @ts-expect-error We only wish to mock the selected dataset
-    jest.mocked(useDataset).mockImplementation(() => ({
-        selectedDataset: anomalyProject.datasets[0],
-    }));
-
-    jest.mocked(useDatasetIdentifier).mockImplementation(() => ({
-        organizationId: 'organization-id',
-        workspaceId: 'workspace-id',
-        projectId: anomalyProject.id,
-        datasetId: anomalyProject.datasets[0].id,
-    }));
-});
-
 const TRAINING_DIALOG_TEXT = 'training dialog is open';
 const renderApp = ({
     featureFlags,
@@ -94,6 +90,26 @@ const renderApp = ({
 };
 
 describe('useShowStartTraining', () => {
+    beforeEach(() => {
+        // @ts-expect-error We only wish to mock the project
+        jest.mocked(useProject).mockImplementation(() => ({
+            project: anomalyProject,
+            isSingleDomainProject: () => true,
+        }));
+
+        // @ts-expect-error We only wish to mock the selected dataset
+        jest.mocked(useDataset).mockImplementation(() => ({
+            selectedDataset: anomalyProject.datasets[0],
+        }));
+
+        jest.mocked(useDatasetIdentifier).mockImplementation(() => ({
+            organizationId: 'organization-id',
+            workspaceId: 'workspace-id',
+            projectId: anomalyProject.id,
+            datasetId: anomalyProject.datasets[0].id,
+        }));
+    });
+
     it('if the project has trained models, the start-training notification should not show', async () => {
         // @ts-expect-error We only wish to mock the project
         jest.mocked(useProject).mockImplementation(() => ({
@@ -157,7 +173,7 @@ describe('useShowStartTraining', () => {
                 isSingleDomainProject: () => true,
             }));
 
-            // Using the default media service that returns 10 iamges and 10 frames
+            // Using the default media service that returns 10 images and 10 frames
             renderApp({});
 
             // Make sure we don't show a notification while still loading
@@ -226,6 +242,30 @@ describe('useShowStartTraining', () => {
 
             await waitFor(() => {
                 expect(screen.queryByText(START_TRAINING_MESSAGE)).not.toBeInTheDocument();
+            });
+        });
+
+        it('invalidates the project status query when the start-training notification is shown', async () => {
+            // @ts-expect-error We only wish to mock the project
+            jest.mocked(useProject).mockImplementation(() => ({
+                project: {
+                    ...anomalyProject,
+                    performance: getMockedPerformance({ ...anomalyProject, performance: undefined }, null),
+                },
+                isSingleDomainProject: () => true,
+            }));
+
+            renderApp({});
+
+            await waitFor(() => {
+                expect(screen.queryByText(START_TRAINING_MESSAGE)).toBeVisible();
+            });
+
+            expect(mockInvalidateQueries).toHaveBeenCalledWith({
+                queryKey: QUERY_KEYS.PROJECT_STATUS_KEY({
+                    workspaceId: 'workspace-id',
+                    projectId: 'project-id',
+                }),
             });
         });
     });
