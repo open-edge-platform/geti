@@ -12,8 +12,6 @@ interface LearningParametersProps {
 }
 
 export const LearningParameters: FC<LearningParametersProps> = ({ parameters }) => {
-    console.log({ parameters });
-
     return (
         <Accordion>
             <Accordion.Title>

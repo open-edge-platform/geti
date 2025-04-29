@@ -33,7 +33,7 @@ interface ParameterProps {
 interface ParameterLayoutProps {
     header: string;
     description: string;
-    onReset?: () => void;
+    onReset: () => void;
     children: ReactNode;
 }
 

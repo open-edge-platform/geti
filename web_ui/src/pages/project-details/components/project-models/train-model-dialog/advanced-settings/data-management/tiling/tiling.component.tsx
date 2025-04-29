@@ -5,13 +5,10 @@ import { FC, ReactNode, useState } from 'react';
 
 import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
 
-import {
-    ConfigurableParametersComponents,
-    NumberGroupParams,
-} from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { ConfigurableParametersComponents } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { Accordion } from '../../ui/accordion/accordion.component';
+import { Parameters } from '../../ui/parameters.component';
 import { TILING_MODES, TilingModes } from './tiling-modes.component';
-import { TilingOptions } from './tiling-options.component';
 
 import styles from './tiling.module.scss';
 
@@ -37,11 +34,10 @@ const getTilingMode = (tilingParameters: ConfigurableParametersComponents): TILI
 export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
     const [selectedTilingMode, setSelectedTilingMode] = useState<TILING_MODES>(() => getTilingMode(tilingParameters));
 
-    const manualTilingParameters = (tilingParameters.parameters?.filter(
-        (parameter) =>
-            !['enable_adaptive_params', 'enable_tiling'].includes(parameter.name) &&
-            ['integer', 'float'].includes(parameter.dataType)
-    ) ?? []) as NumberGroupParams[];
+    const manualTilingParameters =
+        tilingParameters.parameters?.filter(
+            (parameter) => !['enable_adaptive_params', 'enable_tiling'].includes(parameter.name)
+        ) ?? [];
 
     const TILING_MODE_COMPONENTS: Record<TILING_MODES, ReactNode> = {
         [TILING_MODES.OFF]: (
@@ -58,7 +54,11 @@ export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
                 annotations size.
             </View>
         ),
-        [TILING_MODES.Manual]: <TilingOptions parameters={manualTilingParameters} />,
+        [TILING_MODES.Manual]: (
+            <View gridColumn={'1/-1'}>
+                <Parameters parameters={manualTilingParameters} />
+            </View>
+        ),
     };
 
     return (

@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Content, ContextualHelp, Flex, Text } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
 
 import { OptionsButtons } from '../../ui/options-buttons/options-buttons.component';
 
@@ -36,16 +36,14 @@ interface TilingModesProps {
 export const TilingModes: FC<TilingModesProps> = ({ selectedTilingMode, onTilingModeChange }) => {
     return (
         <>
-            <Text UNSAFE_className={styles.title} gridColumn={'1/2'}>
+            <Text UNSAFE_className={styles.title} width={'size-3000'}>
                 Tiling mode <TilingModeTooltip />
             </Text>
-            <Flex gridColumn={'2/3'}>
-                <OptionsButtons
-                    options={[TILING_MODES.OFF, TILING_MODES.Adaptive, TILING_MODES.Manual]}
-                    selectedOption={selectedTilingMode}
-                    onOptionChange={onTilingModeChange}
-                />
-            </Flex>
+            <OptionsButtons
+                options={[TILING_MODES.OFF, TILING_MODES.Adaptive, TILING_MODES.Manual]}
+                selectedOption={selectedTilingMode}
+                onOptionChange={onTilingModeChange}
+            />
         </>
     );
 };
