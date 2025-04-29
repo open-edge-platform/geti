@@ -24,7 +24,7 @@ try:
     from opentelemetry import propagate  # type: ignore[attr-defined]
 except Exception:
     logger.error(
-        "Some OpenTelemetry propagation modules are missing on not properly installed. "
+        "Some OpenTelemetry propagation modules are missing or not properly installed. "
         "Make sure to install the 'telemetry' package with the right extra deps. "
         "Defaulting to W3C TraceContext + Baggage format for now."
     )
@@ -44,7 +44,7 @@ class HttpHeaderSetter(Setter):
         :param key: Key to set
         :param value: Value to set
         """
-        carrier.append((key, value))
+        carrier.append((key, value))  # type: ignore[attr-defined]
 
 
 class HttpEncodedHeaderSetter(Setter):
@@ -58,4 +58,4 @@ class HttpEncodedHeaderSetter(Setter):
         :param key: Key to set
         :param value: Value to set
         """
-        carrier.append((key.encode(), value.encode()))
+        carrier.append((key.encode(), value.encode()))  # type: ignore[attr-defined]

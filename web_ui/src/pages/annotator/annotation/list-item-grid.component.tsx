@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { createContext, ReactNode, useContext } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 import { Flex, FlexProps, Grid } from '@adobe/react-spectrum';
 import clsx from 'clsx';
-import { useHover } from 'react-aria';
 
 import classes from './list-item-grid.module.scss';
 
@@ -34,12 +33,23 @@ export const ListItemGrid = ({
     onHoverStart,
     onHoverEnd,
 }: ListItemGridProps) => {
-    const { hoverProps, isHovered } = useHover({ onHoverStart, onHoverEnd });
+    const [isHovered, setIsHovered] = useState(false);
+
+    const handlePointerOver = () => {
+        onHoverStart();
+        setIsHovered(true);
+    };
+
+    const handlePointerOut = () => {
+        onHoverEnd();
+        setIsHovered(false);
+    };
 
     return (
         <div
-            {...hoverProps}
             id={id}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
             role={'listitem'}
             aria-label={ariaLabel}
             className={clsx({

@@ -313,10 +313,10 @@ class TestIntegrationOtelKafka:
         assert message is not None, "Expected to have a message"
         with get_current_span() as span:
             assert span is not None, "Expected to have a span"
-            assert span.links is not None
-            assert len(span.links) == 1
-            assert span.links[0].context.trace_id == trace_id, "Expected to have a link with valid trace ID"
-            assert span.links[0].context.span_id == span_id, "Expected to have a link with valid parent span ID"
+            assert span.links is not None  # type: ignore[attr-defined]
+            assert len(span.links) == 1  # type: ignore[attr-defined]
+            assert span.links[0].context.trace_id == trace_id, "Expected to have a link with valid trace ID"  # type: ignore[attr-defined]
+            assert span.links[0].context.span_id == span_id, "Expected to have a link with valid parent span ID"  # type: ignore[attr-defined]
 
     @pytest.mark.skip
     def test_trace_propagation(self, producer, consumer, topic, instrumented_kafka) -> None:

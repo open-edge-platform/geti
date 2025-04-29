@@ -36,11 +36,21 @@ jobs:
           persist-credentials: false
           ref: ${{ inputs.branch || '' }}
 
+      - name: Install missing dependencies
+        run: |
+          sudo -E apt update
+          sudo -E apt install -y ffmpeg
+
       - name: Install uv
         uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
 
+      - name: Setup GO
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
       - name: Static code analysis
-        run: make -C "$COMPONENT_DIR" static-code-analysis
+        run: make -C ${COMPONENT_DIR} static-code-analysis
 
       - name: Tests
-        run: make -C "$COMPONENT_DIR" tests
+        run: make -C ${COMPONENT_DIR} tests

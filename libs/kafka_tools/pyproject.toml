@@ -6,7 +6,7 @@ requires-python = ">=3.10, <3.14"
 dependencies = ["confluent-kafka~=2.3"]
 
 [dependency-groups]
-dev = ["pytest~=8.3", "ruff~=0.11", "pre-commit~=4.1"]
+dev = ["pytest~=8.3", "mypy~=1.15", "ruff~=0.11", "pre-commit~=4.1"]
 
 [build-system]
 requires = ["hatchling"]
@@ -38,3 +38,7 @@ split-on-trailing-comma = false
 
 [tool.ruff.lint.pylint]
 max-args = 7
+
+[[tool.mypy.overrides]]
+module = "confluent_kafka.*"
+ignore_missing_imports = true

@@ -12,10 +12,11 @@ COPYRIGHT_OWNER := Intel Corporation
 venv: pre-venv
 	uv sync ${PIP_INSTALL_PARAMS}
 
-# Find all subdirectories containing .proto files
-SERVICE_DIRS := $(shell find $(PROTO_ROOT) -name "*.proto" -exec dirname {} \; | sort | uniq)
-# Get service names (e.g., account_service, credit_system)
-SERVICES := $(shell find $(PROTO_ROOT) -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+# Get interface names (e.g., account_service, credit_system)
+INTERFACES := $(shell find $(PROTO_ROOT) -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)
+# Find interface directories that contain __init__.py files directly
+PY_INTERFACES := $(shell find $(PROTO_ROOT) -mindepth 1 -maxdepth 1 -type d -exec test -f "{}"/__init__.py \; -print | xargs -I{} basename {} | sort)
+GO_INTERFACES := account_service credit_system model_mesh model_registration predict
 
 # Default target
 .PHONY: all
@@ -25,36 +26,36 @@ all: generate
 .PHONY: generate
 generate: generate-go generate-python
 
-# Generate Go code for all services
+# Generate Go code for all interfaces
 .PHONY: generate-go
-generate-go: $(foreach svc,$(SERVICES),generate-go-$(svc))
+generate-go: install-go-deps $(foreach svc,$(GO_INTERFACES),generate-go-$(svc))
 
-# Generate Python code for all services
+# Generate Python code for all interfaces
 .PHONY: generate-python
-generate-python: $(foreach svc,$(SERVICES),generate-python-$(svc))
+generate-python: $(foreach svc,$(PY_INTERFACES),generate-python-$(svc))
 
-# Rule pattern for generating Go code for each service
+# Rule pattern for generating Go code for each interface
 .PHONY: generate-go-%
 generate-go-%:
-	@echo "Generating Go code for $* service..."
+	@echo "Generating Go code for $* interface..."
 	@mkdir -p $(PROTO_ROOT)/$*/$(GO_OUT_BASE)
-	@$(PROTOC) -I $(PROTO_ROOT)/$* \
-		--proto_path=$(PROTO_ROOT)/$* \
-		--go_out=paths=source_relative:$(PROTO_ROOT)/$*/$(GO_OUT_BASE) \
-		--go-grpc_out=paths=source_relative:$(PROTO_ROOT)/$*/$(GO_OUT_BASE) \
-		$(if $(filter $*,account_service), \
-			--grpc-gateway_out=paths=source_relative:$(PROTO_ROOT)/$*/$(GO_OUT_BASE) \
-			--openapiv2_out=$(PROTO_ROOT)/$*/$(GO_OUT_BASE),) \
-		--experimental_allow_proto3_optional \
-		$(PROTO_ROOT)/$*/*.proto
-	@echo "Done generating Go code for $* service."
+	@PATH="$$PATH:$(shell go env GOPATH)/bin" $(PROTOC) -I $(PROTO_ROOT)/$* \
+        --proto_path=$(PROTO_ROOT)/$* \
+        --go_out=paths=source_relative:$(PROTO_ROOT)/$*/$(GO_OUT_BASE) \
+        --go-grpc_out=paths=source_relative:$(PROTO_ROOT)/$*/$(GO_OUT_BASE) \
+        $(if $(filter $*,account_service), \
+            --grpc-gateway_out=paths=source_relative:$(PROTO_ROOT)/$*/$(GO_OUT_BASE) \
+            --openapiv2_out=$(PROTO_ROOT)/$*/$(GO_OUT_BASE),) \
+        --experimental_allow_proto3_optional \
+        $(PROTO_ROOT)/$*/*.proto
+	@echo "Done generating Go code for $* interface."
 	@make add-license-go-$*
 
 
-# Rule pattern for generating Python code for each service
+# Rule pattern for generating Python code for each interface
 .PHONY: generate-python-%
 generate-python-%:
-	@echo "Generating Python code for $* service..."
+	@echo "Generating Python code for $* interface..."
 	@mkdir -p $(PROTO_ROOT)/$*/$(PY_OUT_BASE)
 	@cd $(PROTO_ROOT)/$* && python -m grpc_tools.protoc --plugin=protoc_gen_mypy -I. \
 		--proto_path=. \
@@ -64,19 +65,19 @@ generate-python-%:
 		*.proto
 	@echo "Fixing imports for relative imports..."
 	@find $(PROTO_ROOT)/$*/$(PY_OUT_BASE) -name "*.py" -exec sed -i 's/^import \(.*_pb2\)/from . import \1/' {} \;
-	@echo "Done generating Python code for $* service."
+	@echo "Done generating Python code for $* interface."
 	@make add-license-python-$*
 
-# Generate code for specific service (both Go and Python)
-.PHONY: generate-service-%
-generate-service-%: generate-go-% generate-python-%
-	@echo "Generated code for $* service (Go and Python)."
+# Generate code for specific interface (both Go and Python)
+.PHONY: generate-interface-%
+generate-interface-%: generate-go-% generate-python-%
+	@echo "Generated code for $* interface (Go and Python)."
 
-# List all services
-.PHONY: list-services
-list-services:
-	@echo "Available services:"
-	@for svc in $(SERVICES); do \
+# List all interfaces
+.PHONY: list-interfaces
+list-interfaces:
+	@echo "Available interfaces:"
+	@for svc in $(INTERFACES); do \
 		echo "  - $$svc"; \
 	done
 
@@ -86,19 +87,19 @@ clean: clean-go clean-python
 
 # Clean Go generated files
 .PHONY: clean-go
-clean-go: $(foreach svc,$(SERVICES),clean-go-$(svc))
+clean-go: $(foreach svc,$(INTERFACES),clean-go-$(svc))
 
 # Clean Python generated files
 .PHONY: clean-python
-clean-python: $(foreach svc,$(SERVICES),clean-python-$(svc))
+clean-python: $(foreach svc,$(INTERFACES),clean-python-$(svc))
 
-# Clean specific service
-.PHONY: clean-service-%
-clean-service-%:
-	@echo "Cleaning generated files for $* service..."
+# Clean specific interface
+.PHONY: clean-interface-%
+clean-interface-%:
+	@echo "Cleaning generated files for $* interface..."
 	@rm -rf $(PROTO_ROOT)/$*/$(GO_OUT_BASE)
 	@rm -rf $(PROTO_ROOT)/$*/$(PY_OUT_BASE)
-	@echo "Done cleaning $* service files."
+	@echo "Done cleaning $* interface files."
 
 # Install required protoc plugins
 .PHONY: install-deps
@@ -141,7 +142,7 @@ format:
 	@find $(PROTO_ROOT) -name "*.proto" -exec clang-format -i {} \;
 	@echo "Done formatting."
 
-# Add license header to Python files for specific service
+# Add license header to Python files for specific interface
 .PHONY: add-license-python
 add-license-python-%:
 	@echo "Adding license header to Python files..."
@@ -157,7 +158,7 @@ add-license-python-%:
 		fi; \
 	done
 
-# Add license header to Go files for specific service
+# Add license header to Go files for specific interface
 .PHONY: add-license-go
 add-license-go-%:
 	@echo "Adding license header to Go files..."
@@ -187,24 +188,24 @@ help:
 	@echo "  generate                  - Generate all code from proto files"
 	@echo "  generate-go               - Generate all Go code"
 	@echo "  generate-python           - Generate all Python code"
-	@echo "  generate-go-NAME          - Generate Go code for specific service (replace NAME with service name)"
-	@echo "  generate-python-NAME      - Generate Python code for specific service (replace NAME with service name)"
-	@echo "  generate-service-NAME     - Generate code for specific service (replace NAME with service name)"
-	@echo "  list-services             - List all available services"
+	@echo "  generate-go-NAME          - Generate Go code for specific interface (replace NAME with interface name)"
+	@echo "  generate-python-NAME      - Generate Python code for specific interface (replace NAME with interface name)"
+	@echo "  generate-interface-NAME   - Generate code for specific interface (replace NAME with interface name)"
+	@echo "  list-interfaces           - List all available interfaces"
 	@echo "  clean                     - Remove all generated files"
 	@echo "  clean-go                  - Remove only Go generated files"
 	@echo "  clean-python              - Remove only Python generated files"
-	@echo "  clean-service-NAME        - Clean generated files for specific service"
+	@echo "  clean-interface-NAME      - Clean generated files for specific interface"
 	@echo "  install-deps              - Install all required protoc plugins"
 	@echo "  install-go-deps           - Install only Go protoc plugins"
 	@echo "  install-python-deps       - Install only Python protoc plugins"
 	@echo "  verify-tools              - Verify that all required tools are installed"
 	@echo "  format                    - Format proto files using clang-format"
-	@echo "  add-license-python-NAME   - Add license header to Python files for specific service"
-	@echo "  add-license-go-NAME       - Add license header to Go files for specific service"
+	@echo "  add-license-python-NAME   - Add license header to Python files for specific interface"
+	@echo "  add-license-go-NAME       - Add license header to Go files for specific interface"
 	@echo "  help                      - Show this help message"
 	@echo ""
-	@echo "For service-specific commands, replace NAME with one of the following:"
-	@for svc in $(SERVICES); do \
+	@echo "For interface-specific commands, replace NAME with one of the following:"
+	@for svc in $(INTERFACES); do \
 		echo "  - $$svc"; \
 	done

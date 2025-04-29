@@ -29,7 +29,7 @@ def optimize_workflow_pot(  # noqa: PLR0913
     min_annotation_size: Optional[int] = None,  # noqa: UP007
     max_number_of_annotations: Optional[int] = None,  # noqa: UP007
     # Optimize command
-    command: list[str] = ["bash", "-c", "/opt/run"],
+    command: list[str] = ["bash", "-c", "run"],
     keep_mlflow_artifacts: bool = False,
 ) -> None:
     """

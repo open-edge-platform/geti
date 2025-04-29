@@ -44,7 +44,7 @@ func TestGetBucketName(t *testing.T) {
 				return
 			}
 			assert.Nil(t, err)
-			assert.Equal(t, tt.want, bucketName, "Bucket name doesn't match")
+			assert.Equal(t, tt.want, bucketName, "Bucket name doesn't match the expected value")
 		})
 	}
 }

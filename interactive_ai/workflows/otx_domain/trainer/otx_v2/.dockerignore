@@ -1,0 +1,6 @@
+*
+!scripts
+!run
+!download_pretrained_weights.py
+!pyproject.toml
+!uv.lock

@@ -92,19 +92,6 @@ wheels = [
 ]
 
 [[package]]
-name = "confluent-kafka"
-version = "2.3.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/82/f5/2dd545316e143f1707f8f9abfbb770bcd2a0046a32922ca146852dd5e266/confluent-kafka-2.3.0.tar.gz", hash = "sha256:4069e7b56e0baf9db18c053a605213f0ab2d8f23715dca7b3bd97108df446ced", size = 134602 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/4e/1040a8797d84f85ce0b47a9b7e337ba9646e6a2d5f38f5665114d5b8840c/confluent_kafka-2.3.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:5df845755cd3ebb9165ca00fd1d3a7d514c61e84d9fcbe7babb91193fe9b369c", size = 3352070 },
-    { url = "https://files.pythonhosted.org/packages/da/da/6e6bfd5e2cf1588094e3b378308fe602d64b4baa5bed6ff4b429734facb4/confluent_kafka-2.3.0-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:9ab2217875b731bd390582952e0f9cbe3e7b34774490f01afca70728f0d8b469", size = 2868405 },
-    { url = "https://files.pythonhosted.org/packages/a8/62/29fac53969231809bdf59eed204e28369e14c99561859ce89d079fbde38e/confluent_kafka-2.3.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:62046e8a75c7a6883a0f1f4a635573fd7e1665eeacace65e7f6d59cbaa94697d", size = 4021998 },
-    { url = "https://files.pythonhosted.org/packages/b6/a3/ee62e1fbe154fb2ef7f3535e45adbd460cb4a0645e07a245b1f59e995e40/confluent_kafka-2.3.0-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:1eba38061e9ed1c0a369c129bf01d07499286cc3cb295398b88a7037c14371fb", size = 14108376 },
-    { url = "https://files.pythonhosted.org/packages/94/1d/89e5485fe8bde8a74977cdf87eb629fc086389e54ae3d8f23d213158e040/confluent_kafka-2.3.0-cp310-cp310-win_amd64.whl", hash = "sha256:a6abece28598fa2b59d2b9399fcec03440aaa73fd207fdad048a6030d7e897e1", size = 3444630 },
-]
-
-[[package]]
 name = "coverage"
 version = "7.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -196,10 +183,6 @@ grpc = [
     { name = "grpcio" },
     { name = "opentelemetry-instrumentation-grpc", extra = ["instruments"] },
 ]
-kafka = [
-    { name = "confluent-kafka" },
-    { name = "opentelemetry-instrumentation-confluent-kafka" },
-]
 logger = [
     { name = "opentelemetry-instrumentation-logging" },
 ]
@@ -233,6 +216,7 @@ dev = [
     { name = "confluent-kafka", specifier = "~=2.3" },
     { name = "geti-telemetry-tools", extras = ["b3", "fastapi", "grpc", "jaeger", "kafka", "logger", "telemetry"] },
     { name = "httpx", specifier = "~=0.23" },
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "pytest-freezegun" },
@@ -427,7 +411,7 @@ version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "boto3" },
-    { name = "geti-telemetry-tools", extra = ["grpc", "kafka", "logger", "telemetry"] },
+    { name = "geti-telemetry-tools", extra = ["grpc", "logger", "telemetry"] },
     { name = "migration" },
     { name = "minio" },
     { name = "psycopg2-binary" },
@@ -454,7 +438,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "boto3", specifier = "==1.28.17" },
-    { name = "geti-telemetry-tools", extras = ["telemetry", "grpc", "kafka", "logger"], editable = "../../libs/telemetry_tools" },
+    { name = "geti-telemetry-tools", extras = ["telemetry", "grpc", "logger"], editable = "../../libs/telemetry_tools" },
     { name = "migration", editable = "../data_migration" },
     { name = "minio", specifier = "~=7.1.0" },
     { name = "psycopg2-binary", specifier = "==2.9.3" },
@@ -627,20 +611,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b2/bd/dcf2c4c1132c580b60b548b17c4d115f1a2224961eac0a0138bf5f84d751/opentelemetry_instrumentation-0.45b0.tar.gz", hash = "sha256:6c47120a7970bbeb458e6a73686ee9ba84b106329a79e4a4a66761f933709c7e", size = 23377 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fe/e5/cb0cfa596fa18d09f458058d6e55e2fc82300a45ae57c457c197949fd4a6/opentelemetry_instrumentation-0.45b0-py3-none-any.whl", hash = "sha256:06c02e2c952c1b076e8eaedf1b82f715e2937ba7eeacab55913dd434fbcec258", size = 28402 },
-]
-
-[[package]]
-name = "opentelemetry-instrumentation-confluent-kafka"
-version = "0.45b0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "opentelemetry-api" },
-    { name = "opentelemetry-instrumentation" },
-    { name = "wrapt" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/73/38/2530563b1c42c5fc43e5dce9f0583ff9488659da76b5e3a24f03f78ca159/opentelemetry_instrumentation_confluent_kafka-0.45b0.tar.gz", hash = "sha256:2eb264657558de5ae48a2f3539cf9c79be04fdb6acf1f350eae852acd0a2ac53", size = 10920 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/87/cb/26b889edcb29ff6da83d713bbd86bb48ee1de9eee7eb15a9dae3edc59ab2/opentelemetry_instrumentation_confluent_kafka-0.45b0-py3-none-any.whl", hash = "sha256:5298f04ad8a823dc9774edd8e18c441e267acc6f2f37756c6c9e6403d3fd4e92", size = 12463 },
 ]
 
 [[package]]

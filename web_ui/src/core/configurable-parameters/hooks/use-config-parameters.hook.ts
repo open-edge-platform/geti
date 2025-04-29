@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
+import { useMutation, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
@@ -16,10 +16,13 @@ import { ConfigurableParametersReconfigureDTO } from '../dtos/configurable-param
 interface UseConfigParameters {
     useGetConfigParameters: (isQueryEnabled: boolean) => UseQueryResult<ConfigurableParametersTaskChain[], AxiosError>;
     useGetModelConfigParameters: (
-        taskId: string,
-        modelId?: string,
-        modelTemplateId?: string,
-        editable?: boolean
+        args: {
+            taskId: string;
+            modelId?: string;
+            modelTemplateId?: string | null;
+            editable?: boolean;
+        },
+        options?: Pick<UseQueryOptions<ConfigurableParametersTaskChain, AxiosError>, 'enabled'>
     ) => UseQueryResult<ConfigurableParametersTaskChain, AxiosError>;
     reconfigureParametersMutation: UseMutationResult<void, AxiosError, ConfigurableParametersReconfigureDTO, unknown>;
 }
@@ -37,11 +40,9 @@ export const useConfigParameters = (projectIdentifier: ProjectIdentifier): UseCo
             enabled: isQueryEnabled,
         });
 
-    const useGetModelConfigParameters = (
-        taskId: string,
-        modelId?: string,
-        modelTemplateId?: string,
-        editable?: boolean
+    const useGetModelConfigParameters: UseConfigParameters['useGetModelConfigParameters'] = (
+        { taskId, modelId, modelTemplateId, editable },
+        options
     ) =>
         useQuery<ConfigurableParametersTaskChain, AxiosError>({
             queryKey: QUERY_KEYS.MODEL_CONFIG_PARAMETERS(projectIdentifier, taskId, modelId, modelTemplateId),
@@ -54,6 +55,7 @@ export const useConfigParameters = (projectIdentifier: ProjectIdentifier): UseCo
                     editable
                 ),
             meta: { notifyOnError: true },
+            ...options,
         });
 
     const reconfigureParametersMutation = useMutation({

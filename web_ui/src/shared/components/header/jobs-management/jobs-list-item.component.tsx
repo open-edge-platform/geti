@@ -8,7 +8,7 @@ import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 import { useNavigate } from 'react-router-dom';
 
-import { DownloadIcon } from '../../../../assets/icons';
+import { Copy, DownloadIcon } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobType } from '../../../../core/jobs/jobs.const';
@@ -22,15 +22,17 @@ import {
 } from '../../../../core/jobs/utils';
 import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { paths } from '../../../../core/services/routes';
+import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { downloadFile, formatDownloadUrl, sanitize } from '../../../utils';
 import { ActionLink } from '../../action-link/action-link.component';
+import { ActionButton } from '../../button/button.component';
 import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { JobListItemSkeletonLoader } from './job-list-item-skeleton-loader.component';
 import { JobsDiscardAction } from './jobs-discard-action.component';
 import { JobsListItemMetadata } from './jobs-list-item-metadata.component';
 import { JobsListItemStatus } from './jobs-list-item-status.component';
-import { DISCARD_TYPE, isJobExportDone } from './utils';
+import { DISCARD_TYPE, isJobExportDone, isJobFailed } from './utils';
 
 import classes from './jobs.module.scss';
 
@@ -63,6 +65,25 @@ const DownloadExportButton = ({ job }: { job: JobExportStatus | JobProjectExport
                 <DownloadIcon />
             </QuietActionButton>
             <Tooltip>{props.tooltip}</Tooltip>
+        </TooltipTrigger>
+    );
+};
+
+const CopyJobIdButton = ({ jobId }: { jobId: string }) => {
+    const { copy } = useClipboard();
+    const { workspaceId, organizationId } = useWorkspaceIdentifier();
+
+    return (
+        <TooltipTrigger placement={'bottom'}>
+            <ActionButton
+                aria-label='Copy job id'
+                onPress={() =>
+                    copy(JSON.stringify({ jobId, workspaceId, organizationId }), 'Job id copied successfully')
+                }
+            >
+                <Copy />
+            </ActionButton>
+            <Tooltip>Copy full job id</Tooltip>
         </TooltipTrigger>
     );
 };
@@ -176,6 +197,7 @@ export const JobsListItem = ({
                     </Text>
                 </ActionLink>
                 <Flex alignItems={'center'}>
+                    {isJobFailed(job) && <CopyJobIdButton jobId={job.id} />}
                     {isJobExportDone(job) && <DownloadExportButton job={job} />}
                     {discardType && (
                         <JobsDiscardAction

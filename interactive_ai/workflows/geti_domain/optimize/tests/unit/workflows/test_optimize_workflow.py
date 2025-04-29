@@ -34,7 +34,7 @@ class TestOptimize:
                 num_upload_threads=2,
                 enable_optimize_from_dataset_shard=True,
                 optimization_type=ModelOptimizationType.POT.name,
-                command=["bash", "-c", "/opt/run"],
+                command=["bash", "-c", "run"],
                 min_annotation_size=None,
                 max_number_of_annotations=None,
             )

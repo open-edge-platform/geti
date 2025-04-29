@@ -6,6 +6,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
+import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 import { getMockedDatasetExportJob, getMockedJob } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
 import { providersRender } from '../../../../test-utils/required-providers-render';
 import { onHoverTooltip } from '../../../../test-utils/utils';
@@ -79,6 +80,10 @@ jest.mock('react-router-dom', () => ({
         organizationId: 'organization-id',
         workspaceId: 'workspace_1',
     }),
+}));
+
+jest.mock('../../../../hooks/use-clipboard/use-clipboard.hook', () => ({
+    useClipboard: jest.fn(),
 }));
 
 describe('jobs list item', (): void => {
@@ -209,5 +214,44 @@ describe('jobs list item', (): void => {
         jest.advanceTimersByTime(750);
         expect(await screen.findByText('Credits requested: 20', { exact: false })).toBeVisible();
         expect(screen.getByText('Credits consumed: 10', { exact: false })).toBeVisible();
+    });
+
+    it('should render copy job id button for failed jobs', async (): Promise<void> => {
+        const mockCopy = jest.fn();
+        jest.mocked(useClipboard).mockReturnValue({ copy: mockCopy });
+
+        await renderComponent({
+            job: getMockedJob({
+                id: 'job-1',
+                state: JobState.FAILED,
+                metadata: mockedMetadata,
+                type: JobType.TRAIN,
+            }),
+        });
+
+        const copyButton = screen.getByRole('button', { name: 'Copy job id' });
+        expect(copyButton).toBeInTheDocument();
+
+        fireEvent.click(copyButton);
+        expect(mockCopy).toHaveBeenCalledWith(
+            JSON.stringify({
+                jobId: 'job-1',
+                workspaceId: 'workspace_1',
+                organizationId: 'organization-id',
+            }),
+            'Job id copied successfully'
+        );
+    });
+
+    it('should not render copy job id button for non-failed jobs', async (): Promise<void> => {
+        await renderComponent({
+            job: getMockedJob({
+                state: JobState.FINISHED,
+                metadata: mockedMetadata,
+                type: JobType.TRAIN,
+            }),
+        });
+
+        expect(screen.queryByRole('button', { name: 'Copy job id' })).not.toBeInTheDocument();
     });
 });

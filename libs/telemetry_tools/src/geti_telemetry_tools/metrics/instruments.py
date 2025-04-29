@@ -14,6 +14,7 @@ from opentelemetry.sdk.metrics import MeterProvider  # type: ignore[attr-defined
 from opentelemetry.sdk.metrics.export import (  # type: ignore[attr-defined]
     ConsoleMetricExporter,
     InMemoryMetricReader,
+    MetricExporter,
     MetricReader,
     PeriodicExportingMetricReader,
 )
@@ -71,6 +72,7 @@ class MetricName:
 metric_readers: list[MetricReader] = []
 in_memory_metric_reader: InMemoryMetricReader | None = None
 
+metric_exporter: MetricExporter
 # Set up the metric readers based on configuration
 if DEBUG_METRICS:  # Enable console exporter
     metric_exporter = ConsoleMetricExporter()

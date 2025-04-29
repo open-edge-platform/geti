@@ -6,6 +6,7 @@ import { useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
 
+import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { TrainingBodyDTO } from '../../../../../core/models/dtos/train-model.interface';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
@@ -13,6 +14,7 @@ import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { isActiveModel } from '../../../../../core/models/utils';
 import { Task } from '../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../core/supported-algorithms/supported-algorithms.interface';
+import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { isNotCropTask } from '../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../hooks/use-credits-to-consume.hook';
 import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
@@ -42,6 +44,7 @@ const getActiveModelTemplateId = (
 export const useTrainModelState = () => {
     const [mode, setMode] = useState<TrainModelMode>(TrainModelMode.BASIC);
 
+    const projectIdentifier = useProjectIdentifier();
     const { project, isTaskChainProject } = useProject();
     const { useProjectModelsQuery } = useModels();
     const { data: models } = useProjectModelsQuery();
@@ -57,11 +60,23 @@ export const useTrainModelState = () => {
     const activeModelTemplateId = getActiveModelTemplateId(models, algorithms, selectedTask.id);
     const [selectedModelTemplateId, setSelectedModelTemplateId] = useState<string | null>(activeModelTemplateId);
 
+    const isBasicMode = mode === TrainModelMode.BASIC;
+    const isAdvancedSettingsMode = mode === TrainModelMode.ADVANCED_SETTINGS;
+
+    const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
+    const { data: _configParameters } = useGetModelConfigParameters(
+        {
+            taskId: selectedTask.id,
+            modelTemplateId: selectedModelTemplateId,
+            editable: true,
+        },
+        { enabled: isAdvancedSettingsMode }
+    );
+    const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
+
     if (selectedModelTemplateId === null) {
         setSelectedModelTemplateId(activeModelTemplateId);
     }
-
-    const isBasicMode = mode === TrainModelMode.BASIC;
 
     const openAdvancedSettingsMode = (): void => {
         setMode(TrainModelMode.ADVANCED_SETTINGS);
@@ -69,7 +84,6 @@ export const useTrainModelState = () => {
 
     const constructTrainingBodyDTO = (): TrainingBodyDTO => {
         const trainFromScratch = false;
-        const isReshufflingSubsetsEnabled = false;
         const configParam = undefined;
 
         const { totalMedias } = getCreditPrice(selectedTask.id);
@@ -102,5 +116,7 @@ export const useTrainModelState = () => {
         changeSelectedTemplateId: setSelectedModelTemplateId,
         trainingBodyDTO: constructTrainingBodyDTO(),
         isTaskChainProject,
+        isReshufflingSubsetsEnabled,
+        changeReshufflingSubsetsEnabled: setIsReshufflingSubsetsEnabled,
     } as const;
 };

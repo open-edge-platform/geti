@@ -102,7 +102,7 @@ class TestTrainWorkflow:
                 from_scratch=from_scratch,
                 should_activate_model=should_activate_model,
                 infer_on_pipeline=infer_on_pipeline,
-                command=["bash", "-c", "/opt/run"],
+                command=["bash", "-c", "run"],
                 model_storage_id=MODEL_STORAGE_ID,
                 hyper_parameters_id=HYPER_PARAMETERS_ID,
                 enable_training_from_dataset_shard=enable_training_from_dataset_shard,

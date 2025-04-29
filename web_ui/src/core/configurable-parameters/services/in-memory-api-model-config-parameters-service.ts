@@ -8,23 +8,18 @@ import { CreateApiModelConfigParametersService } from './api-model-config-parame
 import { mockedConfigParamData, mockedReadOnlyConfigTaskChainData } from './test-utils';
 
 export const createInMemoryApiModelConfigParametersService = (): CreateApiModelConfigParametersService => {
-    const getModelConfigParameters = async (
-        _projectIdentifier: ProjectIdentifier,
-        _taskId: string,
-        _modelId?: string,
-        _modelTemplateId?: string,
-        _editable?: boolean
-    ): Promise<ConfigurableParametersTaskChain> => {
-        return Promise.resolve(mockedReadOnlyConfigTaskChainData);
-    };
+    const getModelConfigParameters: CreateApiModelConfigParametersService['getModelConfigParameters'] =
+        async (): Promise<ConfigurableParametersTaskChain> => {
+            return Promise.resolve(mockedReadOnlyConfigTaskChainData);
+        };
 
-    const getConfigParameters = async (
+    const getConfigParameters: CreateApiModelConfigParametersService['getConfigParameters'] = async (
         _projectIdentifier: ProjectIdentifier
     ): Promise<ConfigurableParametersTaskChain[]> => {
         return Promise.resolve(mockedConfigParamData);
     };
 
-    const reconfigureParameters = async (
+    const reconfigureParameters: CreateApiModelConfigParametersService['reconfigureParameters'] = async (
         _projectIdentifier: ProjectIdentifier,
         _body: ConfigurableParametersReconfigureDTO
     ): Promise<void> => {

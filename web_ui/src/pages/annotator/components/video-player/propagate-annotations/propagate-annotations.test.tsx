@@ -244,7 +244,9 @@ describe('Propagate annotations', () => {
             services: { annotationService },
         });
 
-        expect(screen.getByRole('button')).toBeDisabled();
+        expect(
+            screen.getByRole('button', { name: 'Propagate annotations from current frame to next frame' })
+        ).toBeDisabled();
     });
 
     it('Is disabled when there are no annotations to propagate', async () => {
@@ -258,7 +260,9 @@ describe('Propagate annotations', () => {
             </AnnotationThresholdProvider>
         );
 
-        expect(screen.getByRole('button')).toBeDisabled();
+        expect(
+            screen.getByRole('button', { name: 'Propagate annotations from current frame to next frame' })
+        ).toBeDisabled();
     });
 
     it('When merging annotations with duplicated ids it creates a new annotations if those annotations were changed', async () => {
@@ -334,6 +338,8 @@ describe('Propagate annotations', () => {
             </AnnotationThresholdProvider>
         );
 
-        expect(screen.getByRole('button')).toBeDisabled();
+        expect(
+            screen.getByRole('button', { name: 'Propagate annotations from current frame to next frame' })
+        ).toBeDisabled();
     });
 });

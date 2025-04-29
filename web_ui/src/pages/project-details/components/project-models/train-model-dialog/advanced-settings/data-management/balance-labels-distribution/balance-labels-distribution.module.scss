@@ -1,0 +1,14 @@
+.title {
+    display: block;
+    font-size: var(--spectrum-global-dimension-static-font-size-75);
+    font-weight: var(--spectrum-global-font-weight-regular);
+}
+
+.labelCountPercent {
+    font-size: var(--spectrum-global-dimension-static-font-size-50);
+}
+
+.meter {
+    height: var(--spectrum-global-dimension-size-100);
+    border-radius: var(--spectrum-global-dimension-size-100);
+}

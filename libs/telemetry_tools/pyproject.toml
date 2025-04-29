@@ -24,6 +24,7 @@ telemetry =[
 [dependency-groups]
 dev = [
     "pytest~=8.3",
+    "mypy~=1.15",
     "ruff~=0.11",
     "pre-commit~=4.1",
     "pytest-freezegun",
@@ -63,3 +64,11 @@ split-on-trailing-comma = false
 
 [tool.ruff.lint.pylint]
 max-args = 7
+
+[[tool.mypy.overrides]]
+module = "testfixtures.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "confluent_kafka.*"
+ignore_missing_imports = true

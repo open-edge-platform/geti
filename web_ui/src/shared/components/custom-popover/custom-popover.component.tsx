@@ -8,7 +8,7 @@ import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { OverlayProps } from '@react-types/overlays';
 import { DOMRefValue } from '@react-types/shared';
-import { DismissButton, FocusScope, useOverlay } from 'react-aria';
+import { DismissButton, FocusScope, useInteractOutside, useOverlay } from 'react-aria';
 
 interface CustomPopoverProps
     extends Omit<ComponentProps<typeof Popover>, 'triggerRef'>,
@@ -25,6 +25,18 @@ export const CustomPopover = forwardRef<DOMRefValue, CustomPopoverProps>(
         const popoverRef = useRef<DOMRefValue<HTMLDivElement>>(null);
         const unwrappedPopoverRef = useUnwrapDOMRef(popoverRef);
         const unwrappedTriggerRef = useUnwrapDOMRef(triggerRef);
+
+        useInteractOutside({
+            ref: unwrappedTriggerRef,
+            onInteractOutside: (event) => {
+                const target = event.target as Element;
+                if (unwrappedPopoverRef.current?.contains(target)) {
+                    return;
+                }
+
+                popoverState.close();
+            },
+        });
 
         const { overlayProps } = useOverlay(
             {

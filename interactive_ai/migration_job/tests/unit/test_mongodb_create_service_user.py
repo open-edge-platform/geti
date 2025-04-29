@@ -1,7 +1,7 @@
-"""Tests the mongodb_create_user module."""
-
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+"""Tests the mongodb_create_user module."""
 
 import os
 from collections.abc import Sequence
@@ -22,7 +22,6 @@ def mongo_client():
     return client
 
 
-@pytest.mark.component
 def test_main(mongo_client: pymongo.MongoClient):
     """Tests the main function."""
     db_username_service = "service user username"
@@ -85,7 +84,6 @@ def test_main(mongo_client: pymongo.MongoClient):
         ),
     ),
 )
-@pytest.mark.component
 def test_main_unset_env_var(db_username_service, db_password_service, service_user_all_db_roles):
     """Tests the main function, negative case.
 
@@ -105,7 +103,6 @@ def test_main_unset_env_var(db_username_service, db_password_service, service_us
         main()
 
 
-@pytest.mark.component
 def test_create_user(mongo_client: pymongo.MongoClient):
     """Tests the create_user function."""
     username: str = "new user username"
@@ -129,7 +126,6 @@ def test_create_user(mongo_client: pymongo.MongoClient):
         ({"users": [{"user": "foo"}, {"user": "bar"}]}, "other", False),
     ),
 )
-@pytest.mark.component
 def test_does_user_exist(
     mongo_client: pymongo.MongoClient,
     command_response,
@@ -156,7 +152,6 @@ def test_does_user_exist(
         (" a,b ", ["a", "b"]),
     ),
 )
-@pytest.mark.component
 def test_parse_roles(roles_str: str, roles_expected: Sequence[str]):
     """Tests the _parse_roles function."""
     roles_actual: Sequence[str] = _parse_roles(roles_str)
