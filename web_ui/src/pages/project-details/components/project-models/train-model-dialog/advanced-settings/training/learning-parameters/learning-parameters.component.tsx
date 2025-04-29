@@ -4,21 +4,8 @@
 import { FC } from 'react';
 
 import { ConfigurableParametersParams } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { Accordion } from '../../accordion/accordion.component';
-
-interface LearningParametersOptionsProps {
-    parameters: ConfigurableParametersParams[];
-}
-
-const LearningParametersOptions: FC<LearningParametersOptionsProps> = ({ parameters }) => {
-    return (
-        <>
-            {parameters.map((parameter) => {
-                return <></>;
-            })}
-        </>
-    );
-};
+import { Accordion } from '../../ui/accordion/accordion.component';
+import { Parameters } from '../../ui/parameters.component';
 
 interface LearningParametersProps {
     parameters: ConfigurableParametersParams[];
@@ -36,7 +23,7 @@ export const LearningParameters: FC<LearningParametersProps> = ({ parameters }) 
             <Accordion.Content>
                 <Accordion.Description>Specify the details of the learning process</Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
-                <LearningParametersOptions parameters={parameters} />
+                <Parameters parameters={parameters} />
             </Accordion.Content>
         </Accordion>
     );

@@ -6,7 +6,7 @@ import { FC, ReactNode } from 'react';
 import { Content, ContextualHelp, Grid, minmax, Text, View } from '@adobe/react-spectrum';
 import isFunction from 'lodash/isFunction';
 
-import { ConfigurableParametersParams } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { BooleanParameter } from './boolean-parameter.component';
 import { NumberParameter } from './number-parameter.component';
 import { OptionsButtons } from './options-buttons/options-buttons.component';

@@ -6,7 +6,7 @@ import { FC, useState } from 'react';
 import { Grid, minmax, Text } from '@adobe/react-spectrum';
 
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 import { FilterOption, FiltersOptions } from './filters-options.component';
 
 const OPTIONS: FilterOption[] = [

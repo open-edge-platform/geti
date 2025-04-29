@@ -6,8 +6,8 @@ import { FC, useState } from 'react';
 import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
 
 import { NumberGroupParams } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { NumberParameter } from '../ui/number-parameter.component';
-import { ResetButton } from '../ui/reset-button.component';
+import { NumberParameter } from '../../ui/number-parameter.component';
+import { ResetButton } from '../../ui/reset-button.component';
 
 const TilingManualModeOptionTooltip: FC<{ text: string }> = ({ text }) => {
     return (

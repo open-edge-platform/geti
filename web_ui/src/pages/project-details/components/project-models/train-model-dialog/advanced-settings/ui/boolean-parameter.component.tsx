@@ -3,7 +3,7 @@
 
 import { ComponentProps, FC } from 'react';
 
-import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
+import { Switch } from '../../../../../../../shared/components/switch/switch.component';
 
 type SwitchProps = ComponentProps<typeof Switch>;
 

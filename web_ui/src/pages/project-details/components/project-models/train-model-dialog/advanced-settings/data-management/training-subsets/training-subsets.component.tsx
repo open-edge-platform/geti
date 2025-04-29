@@ -9,7 +9,7 @@ import noop from 'lodash/noop';
 import { Refresh } from '../../../../../../../../assets/icons';
 import { ActionButton } from '../../../../../../../../shared/components/button/button.component';
 import { Checkbox } from '../../../../../../../../shared/components/checkbox/checkbox.component';
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 import { SubsetsDistributionSlider } from './subsets-distribution-slider/subsets-distribution-slider.component';
 
 import styles from './training-subsets.module.scss';

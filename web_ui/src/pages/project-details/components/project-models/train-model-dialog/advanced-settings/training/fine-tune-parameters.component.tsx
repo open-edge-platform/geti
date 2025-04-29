@@ -5,7 +5,7 @@ import { FC } from 'react';
 
 import { Radio, RadioGroup } from '@adobe/react-spectrum';
 
-import { Accordion } from '../accordion/accordion.component';
+import { Accordion } from '../ui/accordion/accordion.component';
 
 interface FineTuneParametersProps {
     trainFromScratch: boolean;

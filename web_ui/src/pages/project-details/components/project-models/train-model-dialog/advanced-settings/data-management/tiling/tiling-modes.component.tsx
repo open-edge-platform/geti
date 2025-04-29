@@ -5,7 +5,7 @@ import { FC } from 'react';
 
 import { Content, ContextualHelp, Flex, Text } from '@adobe/react-spectrum';
 
-import { OptionsButtons } from '../ui/options-buttons/options-buttons.component';
+import { OptionsButtons } from '../../ui/options-buttons/options-buttons.component';
 
 import styles from './tiling.module.scss';
 

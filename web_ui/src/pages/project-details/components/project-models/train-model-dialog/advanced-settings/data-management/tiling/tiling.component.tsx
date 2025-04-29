@@ -9,7 +9,7 @@ import {
     ConfigurableParametersComponents,
     NumberGroupParams,
 } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 import { TILING_MODES, TilingModes } from './tiling-modes.component';
 import { TilingOptions } from './tiling-options.component';
 
