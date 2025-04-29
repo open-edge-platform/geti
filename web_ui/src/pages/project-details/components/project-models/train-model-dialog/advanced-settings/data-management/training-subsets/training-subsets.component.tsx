@@ -162,11 +162,11 @@ export const TrainingSubsets: FC<TrainingSubsetsProps> = ({
                 </Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
-                <Text>
+                <Accordion.Description>
                     Specify the distribution of annotated samples over the training, validation and test subsets. Note:
                     items that have already been used for training will stay in the same subset even if these parameters
                     are changed.
-                </Text>
+                </Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
                 <SubsetsDistribution
                     subsetsDistribution={subsetsDistribution}

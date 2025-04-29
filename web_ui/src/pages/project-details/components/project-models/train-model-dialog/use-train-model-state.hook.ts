@@ -64,7 +64,7 @@ export const useTrainModelState = () => {
     const isAdvancedSettingsMode = mode === TrainModelMode.ADVANCED_SETTINGS;
 
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
-    const { data: _configParameters } = useGetModelConfigParameters(
+    const { data: configParameters } = useGetModelConfigParameters(
         {
             taskId: selectedTask.id,
             modelTemplateId: selectedModelTemplateId,
@@ -72,6 +72,7 @@ export const useTrainModelState = () => {
         },
         { enabled: isAdvancedSettingsMode }
     );
+
     const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
 
     if (selectedModelTemplateId === null) {
@@ -118,5 +119,6 @@ export const useTrainModelState = () => {
         isTaskChainProject,
         isReshufflingSubsetsEnabled,
         changeReshufflingSubsetsEnabled: setIsReshufflingSubsetsEnabled,
+        configParameters,
     } as const;
 };
