@@ -390,8 +390,8 @@ test.describe('Import dataset as new project', (): void => {
                 await Promise.all([
                     page.waitForRequest(async (res) => res.url().includes(`/jobs/${preparingJobId}`)),
                     loadFile(page, clickUpload(page), { name: fileName, size: fileSize }),
+                    waitForJobToFinish(page, preparingJob.id),
                 ]);
-                await waitForJobToFinish(page, preparingJob.id);
 
                 registerJobList(registerApiResponse, importingJob);
                 await fillProjectNameAndType(page, projectName, new RegExp(project_type, 'i'));

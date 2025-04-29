@@ -3,8 +3,9 @@
 
 import { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { useStyleProps } from '@react-spectrum/utils';
+import { useStyleProps, viewStyleProps } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
+import omit from 'lodash/omit';
 import { Pressable } from 'react-aria-components';
 
 interface PressableElementProps extends Omit<ComponentProps<typeof Pressable>, 'children'>, StyleProps {
@@ -20,12 +21,15 @@ const TruncatedTextStyles: CSSProperties = {
     textOverflow: 'ellipsis',
 };
 
+const viewStyleKeys = [...Object.keys(viewStyleProps), 'UNSAFE_className', 'UNSAFE_style'];
+
 export const PressableElement = ({ id, children, isTruncated, onDoubleClick, ...props }: PressableElementProps) => {
-    const { styleProps } = useStyleProps(props);
     const styles = isTruncated ? TruncatedTextStyles : {};
+    const pressableProps = omit(props, viewStyleKeys);
+    const { styleProps } = useStyleProps(props);
 
     return (
-        <Pressable {...props}>
+        <Pressable {...pressableProps}>
             <div id={id} {...styleProps} style={{ ...styles, ...styleProps.style }} onDoubleClick={onDoubleClick}>
                 {children}
             </div>
