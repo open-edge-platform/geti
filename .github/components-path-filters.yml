@@ -279,3 +279,5 @@ grpc_interfaces:
 # Web UI
 web_ui:
   - web_ui/**
+  - docs/rest_api/**
+  - interactive_api/services/api/schemas/**
