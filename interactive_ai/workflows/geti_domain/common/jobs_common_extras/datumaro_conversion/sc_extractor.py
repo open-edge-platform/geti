@@ -555,9 +555,8 @@ class ScExtractorFromDatasetStorage(ScExtractor):
             annotated_frame_identifiers = self._annotation_scene_repo.get_annotated_video_frame_identifiers_by_video_id(
                 video_id=video_id, annotation_kind=AnnotationSceneKind.ANNOTATION
             )
-            if annotated_frame_identifiers:
-                self._identifiers.extend(annotated_frame_identifiers)
-            elif self._video_root:
+            self._identifiers.extend(annotated_frame_identifiers)
+            if self._video_root:
                 self._identifiers.append(VideoIdentifier(video_id))
 
         self._ranges_dict = {}
