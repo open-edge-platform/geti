@@ -11,6 +11,7 @@ import { ConfigurableParametersTaskChain } from '../../../../../../shared/compon
 import { TaskSelection } from '../model-types/task-selection.component';
 import { DataManagement } from './data-management/data-management.component';
 import { ModelArchitectures } from './model-architectures/model-architectures.component';
+import { Training } from './training/training.component';
 
 const ContentWrapper: FC<{ children: ReactNode }> = ({ children }) => {
     return (
@@ -32,6 +33,8 @@ interface AdvancedSettingsProps {
     isReshufflingSubsetsEnabled: boolean;
     onReshufflingSubsetsEnabledChange: (reshufflingSubsetsEnabled: boolean) => void;
     configParameters: ConfigurableParametersTaskChain;
+    trainFromScratch: boolean;
+    onTrainFromScratchChange: (trainFromScratch: boolean) => void;
 }
 
 interface TabProps {
@@ -51,6 +54,8 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
     activeModelTemplateId,
     isReshufflingSubsetsEnabled,
     onReshufflingSubsetsEnabledChange,
+    trainFromScratch,
+    onTrainFromScratchChange,
 }) => {
     const TABS: TabProps[] = [
         {
@@ -76,7 +81,13 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         },
         {
             name: 'Training',
-            children: <></>,
+            children: (
+                <Training
+                    trainFromScratch={trainFromScratch}
+                    onTrainFromScratchChange={onTrainFromScratchChange}
+                    configParameters={configParameters}
+                />
+            ),
         },
         {
             name: 'Evaluation',
