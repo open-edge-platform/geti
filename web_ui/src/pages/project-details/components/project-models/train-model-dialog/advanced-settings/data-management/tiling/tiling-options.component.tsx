@@ -3,13 +3,11 @@
 
 import { FC, useState } from 'react';
 
-import { Content, ContextualHelp, Flex, NumberField, Text } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
 
-import { Refresh } from '../../../../../../../../assets/icons';
-import { ActionButton } from '../../../../../../../../shared/components/button/button.component';
 import { NumberGroupParams } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { Slider } from '../../../../../../../../shared/components/slider/slider.component';
-import { getFloatingPointStep } from '../../utils';
+import { NumberParameter } from '../ui/number-parameter.component';
+import { ResetButton } from '../ui/reset-button.component';
 
 const TilingManualModeOptionTooltip: FC<{ text: string }> = ({ text }) => {
     return (
@@ -26,10 +24,6 @@ const TilingOption: FC<{ parameter: NumberGroupParams }> = ({ parameter }) => {
 
     const [parameterValue, setParameterValue] = useState<number>(value);
 
-    const floatingPointStep = getFloatingPointStep(minValue, maxValue);
-
-    const step = parameter.dataType === 'integer' ? 1 : floatingPointStep;
-
     const handleResetToDefault = () => {
         setParameterValue(defaultValue);
     };
@@ -40,30 +34,14 @@ const TilingOption: FC<{ parameter: NumberGroupParams }> = ({ parameter }) => {
                 {header}
                 <TilingManualModeOptionTooltip text={description} />
             </Text>
-            <Flex gap={'size-100'}>
-                <Slider
-                    defaultValue={defaultValue}
-                    value={parameterValue}
-                    minValue={minValue}
-                    maxValue={maxValue}
-                    onChange={setParameterValue}
-                    step={step}
-                    isFilled
-                    flex={1}
-                />
-                <NumberField
-                    isQuiet
-                    step={step}
-                    defaultValue={defaultValue}
-                    value={parameterValue}
-                    minValue={minValue}
-                    maxValue={maxValue}
-                    onChange={setParameterValue}
-                />
-            </Flex>
-            <ActionButton isQuiet aria-label={`Reset ${header}`} gridColumn={'3/4'} onPress={handleResetToDefault}>
-                <Refresh />
-            </ActionButton>
+            <NumberParameter
+                value={parameterValue}
+                minValue={minValue}
+                maxValue={maxValue}
+                onChange={setParameterValue}
+                type={parameter.dataType}
+            />
+            <ResetButton aria-label={`Reset ${header}`} gridColumn={'3/4'} onPress={handleResetToDefault} />
         </>
     );
 };
