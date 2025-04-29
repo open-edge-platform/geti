@@ -34,8 +34,8 @@ def is_inference_service_older_than_threshold(inference_service_metadata: dict, 
     )
     current_date = get_utc_now()
 
-    print(f"{current_date=}")
-    print(f"{parsed_creation_timestamp=}")
+    logger.debug(f"{current_date=}")
+    logger.debug(f"{parsed_creation_timestamp=}")
 
     return (current_date - parsed_creation_timestamp).total_seconds() >= max_age_hours * 60 * 60
 
