@@ -45,7 +45,15 @@ DOCKER_REGISTRY					  := $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY),)
 
 DOCKER_BUILD_CONTEXT              ?=
 
+ifdef USE_PROXY
 DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
+DOCKER_PROXY                      := -e http_proxy=$(http_proxy) \
+									 -e https_proxy=$(https_proxy) \
+									 -e no_proxy=$(no_proxy)
+else
+DOCKER_EXTRA_ARGS	              ?=
+DOCKER_PROXY                      ?=
+endif
 
 
 ###
@@ -80,3 +88,18 @@ publish-chart:
 %:  %-default
 	@  true
 
+# Remove first goal from MAKECMDGOALS when using "make builder <goals_list>"
+ifeq (builder,$(firstword $(MAKECMDGOALS)))
+  BUILDER_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  $(eval $(BUILDER_ARGS):;@:)
+  ROOT_DIR=$(shell git rev-parse --show-toplevel)
+  RELATIVE_PATH=$(shell realpath --relative-to=$(ROOT_DIR) $(CURDIR))
+endif
+
+# Run builder container when do "make builder -C <directory> <args>"
+builder:
+	@docker run --rm -u $(shell id -u):$(shell getent group docker | cut -d: -f3) \
+		-v "$(ROOT_DIR):/app" \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ~/.docker/config.json:/home/bulider/.docker/config.json \
+		-w "/app" ${DOCKER_PROXY} ${BUILDER_IMAGE} make -C $(RELATIVE_PATH) $(BUILDER_ARGS)
