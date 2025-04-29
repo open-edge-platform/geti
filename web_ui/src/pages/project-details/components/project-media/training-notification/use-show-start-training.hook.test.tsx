@@ -265,6 +265,7 @@ describe('useShowStartTraining', () => {
                 queryKey: QUERY_KEYS.PROJECT_STATUS_KEY({
                     workspaceId: 'workspace-id',
                     projectId: 'project-id',
+                    organizationId: '',
                 }),
             });
         });
