@@ -1,0 +1,27 @@
+{
+  "model_template_id": "SSD",
+  "task_id": "60dd7ab4083bce31e1f38769",
+  "train_from_scratch": false,
+  "hyper_parameters": {
+    "components": [
+      {
+        "entity_identifier": {
+          "type": "HYPER_PARAMETER_GROUP",
+          "workspace_id": "61f3f66904b3fecbb2829af4",
+          "group_name": "learning_parameters",
+          "model_storage_id": "61f4057904b3fecbb2829f5d"
+        },
+        "parameters": [
+          {
+            "name": "batch_size",
+            "value": 2
+          },
+          {
+            "name": "learning_rate",
+            "value": 0.01
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+post:
+  tags:
+    - Deployment package
+  summary: Download the deployment package as a zip file
+  description: "Download the deployment package as a zip file, e.g. an archive containing trained model files and graphs for deploying model on OpenVino Model Server or locally using the Geti SDK."
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: '../../parameters/path/project_id.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/deployment_package/requests/deployment_package_request.yaml'
+        examples:
+          Request OpenVino Model Server deployment package for a task chain:
+            value:
+              $ref: "../../examples/deployment_package/requests/deployment_package_request_ovms.json"
+          Request Geti SDK deployment package for a task chain:
+            value:
+              $ref: "../../examples/deployment_package/requests/deployment_package_request_geti_sdk.json"
+    required: true
+  operationId: DownloadDeploymentPackage
+  responses:
+    '200':
+      description: Retrieved deployment package zipfile
+      content:
+        zip file:
+          schema:
+            type: string
+            format: binary
+    '404':
+      description: Object not found. See the examples for detail.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+    '422':
+      description: Invalid package type
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid package type:
+              value:
+                $ref: "../../examples/deployment_package/error_responses/invalid_package_type.json"

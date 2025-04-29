@@ -1,0 +1,8 @@
+image: "migration-job"
+
+global:
+  ff_ambient_mesh: false
+  grafana_enabled: false
+  enable_local_image_pull_secret: true
+  registry_address: ""
+  docker_namespace: geti

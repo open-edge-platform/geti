@@ -1,0 +1,7 @@
+.accordion {
+    box-sizing: border-box;
+}
+
+.accordionHeight {
+    height: calc(100% - 2 * var(--spectrum-global-dimension-size-150));
+}

@@ -1,0 +1,7 @@
+in: query
+name: include_frame_details
+description: |-
+  Set to true to include the frame details in the response. Note that this will increase the response size. 
+  Default is `false`. 
+schema:
+  type: boolean

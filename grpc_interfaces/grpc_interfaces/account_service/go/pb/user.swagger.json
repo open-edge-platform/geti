@@ -1,0 +1,1651 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "user.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "User"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/organizations/users/external": {
+      "get": {
+        "summary": "GET /organizations/users/{external_id}",
+        "operationId": "User_get_by_external_id",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_commonUserData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/activeUser": {
+      "get": {
+        "summary": "GET /organizations/{organization_id}/users/activeUser",
+        "operationId": "User_get_active_user",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userActiveUserData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/membership/{userId}/roles": {
+      "get": {
+        "summary": "GET /organizations/{org_id}/membership/{usr_id}/roles",
+        "operationId": "User_get_user_roles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users": {
+      "get": {
+        "summary": "GET /organizations/{organization_id}/users  - conditions passed in the query string",
+        "operationId": "User_find",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userListUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "firstName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "secondName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "externalId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "lastSuccessfulLoginFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "lastSuccessfulLoginTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "workspaceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "createdAtFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "createdAtTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "createdBy",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "modifiedAtFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "modifiedAtTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "modifiedBy",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sortBy",
+            "description": "attribute name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortDirection",
+            "description": "asc/desc",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "user to search for first name OR second name OR email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "summary": "POST /organizations/{organization_id}/users",
+        "operationId": "User_create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_commonUserData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUsercreateBody"
+            }
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users/{id}": {
+      "put": {
+        "summary": "PUT /organizations/{organization_id}/users/{id}",
+        "operationId": "User_modify",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_commonUserData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUsermodifyBody"
+            }
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users/{userId}": {
+      "get": {
+        "summary": "GET /organizations/{organization_id}/users/{id}",
+        "operationId": "User_get_by_id",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/user_commonUserData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      },
+      "delete": {
+        "summary": "DELETE /organizations/{organization_id}/users/{id}",
+        "operationId": "User_delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users/{userId}/photos": {
+      "get": {
+        "summary": "GET /organizations/{organization_id}/users/{id}/photos",
+        "operationId": "User_get_photo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/commonPreUrlResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      },
+      "delete": {
+        "summary": "DELETE /organization/{organization_id}/users/{id}/photos",
+        "operationId": "User_delete_photo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users/{userId}/roles": {
+      "put": {
+        "summary": "PUT /organizations/{organization_id}/users/{id}/roles",
+        "operationId": "User_set_roles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Userset_rolesBody"
+            }
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/users/{userId}/roles/{resourceType}": {
+      "get": {
+        "summary": "GET /organizations/{organization_id}/users/{id}/roles/{resource_type}",
+        "operationId": "User_get_roles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUserRolesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resourceType",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{user.organizationId}/membership/{user.userId}/roles": {
+      "delete": {
+        "summary": "DELETE /organizations/{user.organization_id}/membership/{user.user_id}/roles",
+        "operationId": "User_remove_role",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      },
+      "post": {
+        "summary": "POST /organizations/{organization_id}/membership/{user_id}/roles",
+        "operationId": "User_assign_role",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user.userId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Userassign_roleBody"
+            }
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/organizations/{user.organizationId}/users/invitations": {
+      "post": {
+        "summary": "POST /organizations/{organization_id}/users/invitations",
+        "operationId": "User_send_invitation",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUserInvitationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.organizationId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/userUsersend_invitationBody"
+            }
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/profile": {
+      "get": {
+        "summary": "GET /api/v1/profile",
+        "operationId": "User_get_user_profile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userUserProfileData"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "summary": "GET /users",
+        "operationId": "User_get_users",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/userListGetUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "firstName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "secondName",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "externalId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "lastSuccessfulLogin",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "currentSuccessfulLogin",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "createdAtFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "createdAtTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "modifiedAtFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "modifiedAtTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "userConsentFrom",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "userConsentTo",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "skip",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sortBy",
+            "description": "attribute name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sortDirection",
+            "description": "asc/desc",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "user to search for first name OR second name OR email",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "User"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Userassign_roleBody": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "object"
+        },
+        "role": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        }
+      }
+    },
+    "Userset_rolesBody": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRoleOperation"
+          }
+        }
+      }
+    },
+    "commonPreUrlResponse": {
+      "type": "object",
+      "properties": {
+        "presignedUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "userActiveUserData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "secondName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "organizationStatus": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRole"
+          }
+        },
+        "lastSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "telemetryConsent": {
+          "type": "string"
+        },
+        "userConsent": {
+          "type": "string"
+        }
+      }
+    },
+    "userListGetUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/userUserResponse"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalMatchedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nextPage": {
+          "$ref": "#/definitions/userListGetUsersResponseNextPage"
+        }
+      }
+    },
+    "userListGetUsersResponseNextPage": {
+      "type": "object",
+      "properties": {
+        "skip": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "userListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserData"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalMatchedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "nextPage": {
+          "$ref": "#/definitions/userListUsersResponseNextPage"
+        }
+      }
+    },
+    "userListUsersResponseNextPage": {
+      "type": "object",
+      "properties": {
+        "skip": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "userOrganizationExtended": {
+      "type": "object",
+      "properties": {
+        "organizationName": {
+          "type": "string"
+        },
+        "userStatus": {
+          "type": "string"
+        },
+        "organizationStatus": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "organizationCreatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "userRolePayload": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        }
+      }
+    },
+    "userRolesResponse": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/userRolePayload"
+          }
+        }
+      }
+    },
+    "userUserIdRequest": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        }
+      }
+    },
+    "userUserInvitationResponse": {
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "userUserPayload": {
+      "type": "object",
+      "properties": {
+        "organizationId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        }
+      }
+    },
+    "userUserProfileData": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "organizationStatus": {
+          "type": "string"
+        },
+        "organizations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/userOrganizationExtended"
+          }
+        },
+        "telemetryConsent": {
+          "type": "string"
+        },
+        "telemetryConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userConsent": {
+          "type": "string"
+        },
+        "userConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "userUserResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "secondName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "photoLocation": {
+          "type": "string"
+        },
+        "registrationToken": {
+          "type": "string"
+        },
+        "lastSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modifiedBy": {
+          "type": "string"
+        },
+        "telemetryConsent": {
+          "type": "string"
+        },
+        "telemetryConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userConsent": {
+          "type": "string"
+        },
+        "userConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "userUserRolesResponse": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRole"
+          }
+        }
+      }
+    },
+    "userUsercreateBody": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "secondName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "organizationStatus": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRole"
+          }
+        },
+        "lastSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modifiedBy": {
+          "type": "string"
+        },
+        "telemetryConsent": {
+          "type": "string"
+        },
+        "telemetryConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userConsent": {
+          "type": "string"
+        },
+        "userConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "presignedUrl": {
+          "type": "string"
+        },
+        "lastLogoutDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "userUsermodifyBody": {
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string"
+        },
+        "secondName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "organizationStatus": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRole"
+          }
+        },
+        "lastSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modifiedBy": {
+          "type": "string"
+        },
+        "telemetryConsent": {
+          "type": "string"
+        },
+        "telemetryConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userConsent": {
+          "type": "string"
+        },
+        "userConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "presignedUrl": {
+          "type": "string"
+        },
+        "lastLogoutDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "userUsersend_invitationBody": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "firstName": {
+              "type": "string"
+            },
+            "secondName": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "externalId": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string"
+            },
+            "status": {
+              "type": "string"
+            },
+            "organizationStatus": {
+              "type": "string"
+            },
+            "roles": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/user_commonUserRole"
+              }
+            },
+            "lastSuccessfulLogin": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "currentSuccessfulLogin": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "createdBy": {
+              "type": "string"
+            },
+            "modifiedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "modifiedBy": {
+              "type": "string"
+            },
+            "telemetryConsent": {
+              "type": "string"
+            },
+            "telemetryConsentAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "userConsent": {
+              "type": "string"
+            },
+            "userConsentAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "presignedUrl": {
+              "type": "string"
+            },
+            "lastLogoutDate": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRoleOperation"
+          }
+        }
+      }
+    },
+    "user_commonUserData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "secondName": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "externalId": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "organizationId": {
+          "type": "string"
+        },
+        "organizationStatus": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/user_commonUserRole"
+          }
+        },
+        "lastSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "currentSuccessfulLogin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        },
+        "modifiedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "modifiedBy": {
+          "type": "string"
+        },
+        "telemetryConsent": {
+          "type": "string"
+        },
+        "telemetryConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userConsent": {
+          "type": "string"
+        },
+        "userConsentAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "presignedUrl": {
+          "type": "string"
+        },
+        "lastLogoutDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "user_commonUserRole": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        }
+      }
+    },
+    "user_commonUserRoleOperation": {
+      "type": "object",
+      "properties": {
+        "role": {
+          "$ref": "#/definitions/user_commonUserRole"
+        },
+        "operation": {
+          "type": "string",
+          "title": "CREATE, DELETE, TOUCH"
+        }
+      }
+    }
+  }
+}

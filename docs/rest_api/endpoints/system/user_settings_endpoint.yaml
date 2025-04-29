@@ -1,0 +1,65 @@
+get:
+  tags:
+  - System
+  summary: Get the users' settings for a project or for the entire system
+  description: Get the users' settings for a project or the entire system. If project_id query parameter is not specified, the settings for the entire system are returned.
+  operationId: GetSettings
+  parameters:
+    - $ref: '../../parameters/query/project_id.yaml'
+  responses:
+    '200':
+      description: The settings for the user.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/projects/responses/user_settings.yaml"
+          examples:
+            User settings response:
+              value:
+                $ref: "../../examples/projects/responses/user_settings_response.json"
+    '204':
+      description: No settings found for user.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/success_response.yaml"
+          examples:
+            No settings found response:
+              value:
+                $ref: "../../examples/projects/responses/no_user_settings.json"
+post:
+  tags:
+  - System
+  summary: Set the users' settings for a project or for the entire system.
+  description: Set the users' settings for a project or for the entire system. If project_id query parameter is not specified, the settings for the entire system are set.
+  operationId: SetSettings
+  parameters:
+    - $ref: '../../parameters/query/project_id.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/projects/requests/post/user_settings.yaml"
+        examples:
+          User settings:
+            value:
+              $ref: "../../examples/projects/requests/user_settings_request.json"
+    required: true
+  responses:
+    '200':
+      description: Settings were successfully set.
+      content:
+        application/json:
+          examples:
+            Succesfully set response:
+              value: success
+    '400':
+      description: Posted settings exceed the maximum settings length.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Settings exceed maximum length response:
+              value:
+                $ref: "../../examples/projects/responses/user_settings_too_long.json"

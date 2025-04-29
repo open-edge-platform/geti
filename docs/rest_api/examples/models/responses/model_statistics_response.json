@@ -1,0 +1,248 @@
+{
+    "model_statistics": [
+        {
+            "header": "Training date",
+            "key": "Training date",
+            "type": "text",
+            "value": "2021-08-24T08:57:35.593000+00:00"
+        },
+        {
+            "header": "Training job duration",
+            "key": "Training job duration",
+            "type": "text",
+            "value": "0:03:20"
+        },
+        {
+            "header": "Training duration",
+            "key": "Training duration",
+            "type": "text",
+            "value": "0:02:20"
+        },
+        {
+            "header": "Dataset split",
+            "key": "Dataset split",
+            "type": "bar",
+            "value": [
+                {
+                    "header ": "Size of Training set",
+                    "key": "Size of Training set",
+                    "value": 6
+                },
+                {
+                    "header ": "Size of Validation set",
+                    "key": "Size of Validation set",
+                    "value": 3
+                },
+                {
+                    "header ": "Size of Test set",
+                    "key": "Size of Test set",
+                    "value": 3
+                }
+            ]
+        },
+        {
+            "header": "Dice average",
+            "key": "Dice average",
+            "type": "radial_bar",
+            "value": [
+                {
+                    "header ": "validation",
+                    "key": "validation",
+                    "value": 0.64
+                },
+                {
+                    "header ": "test",
+                    "key": "test",
+                    "value": 0.6
+                }
+            ]
+        },
+        {
+            "header": "Dice Average Per Label (validation)",
+            "key": "Dice Average Per Label (validation)",
+            "type": "bar",
+            "value": [
+                {
+                    "header ": "label1",
+                    "key": "label1",
+                    "value": 0.64,
+                    "color": "#00a5cfff"
+                }
+            ]
+        },
+        {
+            "header": "Loss curve",
+            "key": "Loss curve",
+            "type": "line",
+            "line_data": [
+                {
+                    "header": "Training",
+                    "key": "Training",
+                    "points": [
+                        {
+                            "type": "point",
+                            "x": 1.0,
+                            "y": 0.6773999929428101
+                        },
+                        {
+                            "type": "point",
+                            "x": 2.0,
+                            "y": 0.6610000133514404
+                        },
+                        {
+                            "type": "point",
+                            "x": 3.0,
+                            "y": 0.651199996471405
+                        },
+                        {
+                            "type": "point",
+                            "x": 4.0,
+                            "y": 0.6366999745368958
+                        }
+                    ]
+                },
+                {
+                    "header": "Validation",
+                    "key": "Validation",
+                    "points": [
+                        {
+                            "type": "point",
+                            "x": 1.0,
+                            "y": 0.654699981212616
+                        },
+                        {
+                            "type": "point",
+                            "x": 2.0,
+                            "y": 0.6394000053405762
+                        },
+                        {
+                            "type": "point",
+                            "x": 3.0,
+                            "y": 0.6254000067710876
+                        },
+                        {
+                            "type": "point",
+                            "x": 4.0,
+                            "y": 0.6122000217437744
+                        },
+                        {
+                            "type": "point",
+                            "x": 5.0,
+                            "y": 0.6122000217437744
+                        },
+                        {
+                            "type": "point",
+                            "x": 6.0,
+                            "y": 0.6039000153541565
+                        },
+                        {
+                            "type": "point",
+                            "x": 7.0,
+                            "y": 0.5975000262260437
+                        },
+                        {
+                            "type": "point",
+                            "x": 8.0,
+                            "y": 0.5950000286102295
+                        },
+                        {
+                            "type": "point",
+                            "x": 9.0,
+                            "y": 0.5950000286102295
+                        }
+                    ]
+                }
+            ],
+            "x_axis_label": "Epoch",
+            "y_axis_label": "Loss value"
+        },
+        {
+            "header": "Dice curve",
+            "key": "Dice curve",
+            "type": "line",
+            "line_data": [
+                {
+                    "header": "Validation",
+                    "key": "Validation",
+                    "points": [
+                        {
+                            "type": "point",
+                            "x": 1.0,
+                            "y": 0.196
+                        },
+                        {
+                            "type": "point",
+                            "x": 2.0,
+                            "y": 0.251
+                        },
+                        {
+                            "type": "point",
+                            "x": 3.0,
+                            "y": 0.334
+                        },
+                        {
+                            "type": "point",
+                            "x": 4.0,
+                            "y": 0.419
+                        },
+                        {
+                            "type": "point",
+                            "x": 5.0,
+                            "y": 0.419
+                        },
+                        {
+                            "type": "point",
+                            "x": 6.0,
+                            "y": 0.46
+                        },
+                        {
+                            "type": "point",
+                            "x": 7.0,
+                            "y": 0.462
+                        },
+                        {
+                            "type": "point",
+                            "x": 8.0,
+                            "y": 0.476
+                        }
+                    ]
+                }
+            ],
+            "x_axis_label": "Epoch",
+            "y_axis_label": "Dice score"
+        },
+        {
+            "header": "Confusion matrix",
+            "key": "Confusion matrix",
+            "type": "matrix",
+            "value": {
+                "column_header": "True label",
+                "matrix_data": [
+                    {
+                        "column_names": [
+                            "Background",
+                            "label1"
+                        ],
+                        "header ": "Confusion matrix (Validation)",
+                        "key": "Confusion matrix (Validation)",
+                        "matrix_values": [
+                            [
+                                0.9395321011543274,
+                                0.0604679211974144
+                            ],
+                            [
+                                0.17742396891117096,
+                                0.8225760459899902
+                            ]
+                        ],
+                        "row_names": [
+                            "Background",
+                            "label1"
+                        ]
+                    }
+                ],
+                "row_header": "Predicted label"
+            }
+        }
+    ]
+}

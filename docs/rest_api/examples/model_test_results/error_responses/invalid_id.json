@@ -1,0 +1,5 @@
+{
+    "error_code": "bad_request",
+    "http_status": 400,
+    "message": "'model_group_id' must be a well-formed MongoDB ObjectID - got '1234' instead."
+}

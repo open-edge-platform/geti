@@ -1,0 +1,58 @@
+.wellClickable {
+    min-height: var(--spectrum-global-dimension-size-1700);
+    max-height: calc(
+        var(--spectrum-global-dimension-size-1700) + var(--spectrum-global-dimension-size-800)
+    ); // Project item + project export container
+}
+
+.thumbnailWrapper {
+    height: var(--spectrum-global-dimension-size-1700);
+    background-color: var(--spectrum-global-color-gray-200);
+    width: var(--spectrum-global-dimension-size-3600);
+    min-width: var(--spectrum-global-dimension-size-3600);
+    text-align: center;
+    overflow: hidden;
+    border-bottom-left-radius: var(--spectrum-global-dimension-size-50);
+    border-top-left-radius: var(--spectrum-global-dimension-size-50);
+}
+
+.thumbnail {
+    width: var(--spectrum-global-dimension-size-3600);
+    height: var(--spectrum-global-dimension-size-1700);
+    object-fit: cover;
+}
+
+.icon {
+    width: var(--spectrum-global-dimension-size-400);
+    height: var(--spectrum-global-dimension-size-400);
+}
+
+.projectLabels {
+    flex: 1;
+    margin: var(--spectrum-global-dimension-size-125) 0;
+    overflow: hidden;
+}
+
+.exportStatus {
+    padding: 0 var(--spectrum-global-dimension-size-100);
+    min-height: var(--spectrum-global-dimension-size-600);
+}
+
+.projectNameLink {
+    text-decoration: none;
+    min-width: 0;
+    color: var(--spectrum-global-color-gray-900);
+}
+
+.projectName {
+    font-size: var(--spectrum-global-dimension-static-font-size-200);
+    font-weight: 500;
+    word-break: break-word;
+}
+
+.progressBar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

@@ -1,0 +1,42 @@
+post:
+  tags:
+    - Project Import/Export
+  summary: Export a project as an archive
+  description: |-
+    Export a project as a zip archive file, containing all the project data (including datasets and models).
+    
+    This endpoint submits a job to export a project.
+    The status of the export operation can be monitored in real-time through the [job status endpoint](#Jobs/GetJob); 
+    after it completes, the URL to download the exported zip archive can be found in the job metadata.
+    
+    The downloaded project archive can be later imported using the [import project endpoint](#Project%20Import%2FExport/ImportProject).
+  operationId: TriggerProjectExport
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          examples:
+            Export job submitted successfully:
+              value:
+                $ref: '../../examples/jobs/responses/single_job_id_response.json'
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

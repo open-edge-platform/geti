@@ -1,0 +1,191 @@
+{
+  "components": [
+    {
+      "description": "Learning Parameters",
+      "entity_identifier": {
+        "group_name": "learning_parameters",
+        "model_storage_id": "6193c24ed1f15d80895d99b2",
+        "type": "HYPER_PARAMETER_GROUP",
+        "workspace_id": "61938a645055d2dc122f5720"
+      },
+      "header": "Learning Parameters",
+      "id": "6193c256d1f15d80895d99b5-0",
+      "name": "learning_parameters",
+      "parameters": [
+        {
+          "data_type": "integer",
+          "default_value": 8,
+          "description": "The number of training samples seen in each iteration of training. Increasing this value improves training time and may make the training more stable. A larger batch size has higher memory requirements.",
+          "editable": true,
+          "header": "Batch size",
+          "max_value": 64,
+          "min_value": 1,
+          "name": "batch_size",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 8,
+          "warning": "Increasing this value may cause the system to use more memory than available, potentially causing out of memory errors, please update with caution."
+        },
+        {
+          "data_type": "float",
+          "default_value": 0.001,
+          "description": "Increasing this value will speed up training convergence but might make it unstable.",
+          "editable": true,
+          "header": "Learning rate",
+          "max_value": 0.1,
+          "min_value": 1e-07,
+          "name": "learning_rate",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 0.001,
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 50,
+          "description": "Number of iterations for fixed learning rate",
+          "editable": true,
+          "header": "Number of iterations for fixed learning rate",
+          "max_value": 5000,
+          "min_value": 0,
+          "name": "learning_rate_fixed_iters",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 50,
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 100,
+          "description": "Number of iterations for learning rate warmup",
+          "editable": true,
+          "header": "Number of iterations for learning rate warmup",
+          "max_value": 5000,
+          "min_value": 0,
+          "name": "learning_rate_warmup_iters",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 100,
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 5,
+          "description": "Number of checkpoints that is done during the single training round",
+          "editable": true,
+          "header": "Number of checkpoints that is done during the single training round",
+          "max_value": 100,
+          "min_value": 1,
+          "name": "num_checkpoints",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 5,
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 1000,
+          "description": "Increasing this value causes the results to be more robust but training time will be longer.",
+          "editable": true,
+          "header": "Number of training iterations",
+          "max_value": 100000,
+          "min_value": 1,
+          "name": "num_iters",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 1000,
+          "warning": null
+        },
+        {
+          "data_type": "integer",
+          "default_value": 0,
+          "description": "Increasing this value might improve training speed however it might cause out of memory errors. If the number of workers is set to zero, data loading will happen in the main training thread.",
+          "editable": true,
+          "header": "Number of cpu threads to use during batch generation",
+          "max_value": 8,
+          "min_value": 0,
+          "name": "num_workers",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 0,
+          "warning": null
+        }
+      ],
+      "type": "PARAMETER_GROUP"
+    },
+    {
+      "description": "Postprocessing",
+      "entity_identifier": {
+        "group_name": "postprocessing",
+        "model_storage_id": "6193c24ed1f15d80895d99b2",
+        "type": "HYPER_PARAMETER_GROUP",
+        "workspace_id": "61938a645055d2dc122f5720"
+      },
+      "header": "Postprocessing",
+      "id": "6193c256d1f15d80895d99b5-1",
+      "name": "postprocessing",
+      "parameters": [
+        {
+          "data_type": "float",
+          "default_value": 1,
+          "description": "With a higher value, the segmentation output will be smoother, but less accurate.",
+          "editable": true,
+          "header": "Blur strength",
+          "max_value": 25,
+          "min_value": 1,
+          "name": "blur_strength",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 1.0,
+          "warning": null
+        },
+        {
+          "data_type": "float",
+          "default_value": 0.5,
+          "description": "The threshold to apply to the probability output of the model, for each pixel. A higher value means a stricter segmentation prediction.",
+          "editable": true,
+          "header": "Soft threshold",
+          "max_value": 1.0,
+          "min_value": 0.0,
+          "name": "soft_threshold",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 0.5,
+          "warning": null
+        }
+      ],
+      "type": "PARAMETER_GROUP"
+    },
+    {
+      "description": "POT Parameters",
+      "entity_identifier": {
+        "group_name": "pot_parameters",
+        "model_storage_id": "6193c24ed1f15d80895d99b2",
+        "type": "HYPER_PARAMETER_GROUP",
+        "workspace_id": "61938a645055d2dc122f5720"
+      },
+      "header": "POT Parameters",
+      "id": "6193c256d1f15d80895d99b5-2",
+      "name": "pot_parameters",
+      "parameters": [
+        {
+          "data_type": "integer",
+          "default_value": 300,
+          "description": "Number of data samples used for post-training optimization",
+          "editable": true,
+          "header": "Number of data samples",
+          "max_value": 9223372036854775807,
+          "min_value": 1,
+          "name": "stat_subset_size",
+          "template_type": "input",
+          "ui_rules": {},
+          "value": 300,
+          "warning": null
+        }
+      ],
+      "type": "PARAMETER_GROUP"
+    }
+  ],
+  "task_id": "6193c24ed1f15d80895d99b4",
+  "task_title": "Sample segmentation task"
+}

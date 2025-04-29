@@ -1,0 +1,17 @@
+{
+  "total_matched": 1,
+  "next_page": null,
+  "subscriptions": [
+    {
+      "id": "e4187c27-2c1a-4265-9233-04950fd93471",
+      "organization_id": "8ee3f85c-6fa7-4e7b-be4e-ae05eda8774e",
+      "workspace_id": "23f347e1-cefc-4d98-9001-c551b6edb269",
+      "product_id": "fafa904e-4ae9-4a5c-a4a7-ea22eee73c03",
+      "status": "ACTIVE",
+      "created": 1722439231555,
+      "updated": 1722439231555,
+      "next_renewal_date": 1725062400000,
+      "previous_renewal_date": null
+    }
+  ]
+}

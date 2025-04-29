@@ -1,0 +1,26 @@
+type: object
+required:
+  - annotations
+properties:
+  annotations:
+    description: List of annotations
+    type: array
+    items:
+      $ref: 'annotation.yaml'
+  media_identifier:
+    type: object
+    properties:
+      image_id:
+        $ref: '../../mongo_id.yaml'
+      type:
+        type: string
+        enum: ['image']
+        description: Type of media. 'image' for images, 'video' for videos.
+  modified:
+    type: string
+    description: Modification date
+  labels_to_revisit_full_scene:
+    description: List of labels IDs for which the scene (full-image ROI) should be revisited
+    type: array
+    items:
+      $ref: '../uuid.yaml'

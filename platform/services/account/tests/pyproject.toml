@@ -1,0 +1,95 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+[project]
+name = "acc_tests"
+version = "1.0.0"
+description = "Account service component tests for Geti"
+requires-python = ">=3.10, <3.14"
+dependencies = [
+    "cryptography==43.0.1",
+    "PyJWT[crypto]==2.9.0",
+    "pyhumps==3.8.0",
+    "pytest==8.3.3",
+    "requests==2.32.3"
+]
+
+[dependency-groups]
+dev = ["pytest~=8.3"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [
+    ".venv*",
+]
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+
+# Covers any pytest
+"*test*.py" = ["E741", "E402", "E501",
+    "S",
+    "RET",
+    "PL",
+    "RUF",
+    "SIM",
+    "D103",
+    "ARG",
+    "PYI024",
+    "ANN"]
+
+# Covers BDD tests
+"*features*.py" = ["E741", "E402", "E501",
+    "S",
+    "RET",
+    "PL",
+    "RUF",
+    "SIM",
+    "D103",
+    "ARG",
+    "PYI024",
+    "ANN"]
+
+[tool.ruff.lint.isort]
+# First-party = self-contained packages defined within Geti
+known-first-party = [
+    "geti_logger_tools", "datumaro_helper", "jobs_common",
+    "k8s_custom_resources", "load_tests", "microservices", "nodes_resource",
+    "platform_models", "sc_sdk", "geti_telemetry_tools", "users_handler", "account_service_client", "migration", "geti_kafka_tools"
+]
+# Local folder = Geti folder that often appears as base in import statements, but that doesn't qualify as a package logically
+known-local-folder = [
+    "application", "common", "communication", "config", "job", "migration_job", "tests", "platform_cleaner", "weights_uploader"
+]
+# Third-party = self-contained packages defined and maintained outside Geti
+known-third-party = ["grpc", "kafka", "kubernetes", "kubernetes_asyncio", "minio", "otx", "starlette", "sqlalchemy"]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+exclude = "^.*/tests/.*\\.py|app/alembic/.*\\.py"
+
+show_error_codes = true
+
+[tool.mypy-torch]
+follow_imports = "skip"
+follow_imports_for_stubs = true

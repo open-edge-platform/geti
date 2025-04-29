@@ -1,0 +1,151 @@
+post:
+  tags:
+    - Projects
+  summary: Create a project
+  description: |-
+    Create a project in a workspace. Please refer to the schema to see all the supported tasks and please refer to the examples to see how
+    the project is constructed. At the moment, Geti supports projects with a single deep learning task, or with two in a 
+    chain (Detection -> Classification and Detection -> Segmentation).
+    A few label constraints:  
+    - Detection projects must have at least 1 label provided.
+    - A default 'No object' label is automatically created for detection and segmentation tasks. 
+    - Classification projects require at least two labels (top-level, if hierarchical). For binary classification, please declare the negative label explicitly.
+    - A default 'No class' label is automatically created for classification tasks if there are no exclusive groups with 2+ labels. In practice, multilabel classification has the empty label, multiclass classification does not.
+    - Anomaly project must either have 2 labels provided (one being is_anomalous), or no labels provided.
+  operationId: CreateProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/projects/requests/post/project.yaml"
+        examples:
+          Creating task chain project:
+            value:
+              $ref: "../../examples/projects/requests/post/task_chain_project_request.json"
+          Creating single detection project:
+            value:
+              $ref: "../../examples/projects/requests/post/single_detection_project_request.json"
+          Creating single classification project:
+            value:
+              $ref: "../../examples/projects/requests/post/classification_project_request.json"
+          Creating single classification project with label hierarchy:
+            value:
+              $ref: "../../examples/projects/requests/post/classification_label_hierarchy_project_request.json"
+          Creating single segmentation project:
+            value:
+              $ref: "../../examples/projects/requests/post/segmentation_project_request.json"
+          Creating keypoint project:
+            value:
+              $ref: "../../examples/projects/requests/post/keypoint_detection_project_request.json"
+    required: true
+  responses:
+    '201':
+      description: Project successfully created
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/projects/responses/project.yaml"
+          examples:
+            Task chain creation response:
+              value:
+                $ref: "../../examples/projects/responses/task_chain_project_response.json"
+            Detection Segmentation Task chain creation response:
+              value:
+                $ref: "../../examples/projects/responses/detection_segmentation_task_chain_project_response.json"
+            Single detection task creation response:
+              value:
+                $ref: "../../examples/projects/responses/single_detection_project_response.json"
+            Single classification task creation response:
+              value:
+                $ref: "../../examples/projects/responses/classification_project_response.json"
+            Single classification task creation with label hierarchy response:
+              value:
+                $ref: "../../examples/projects/responses/classification_label_hierarchy_project_response.json"
+            Single segmentation task creation response:
+              value:
+                $ref: "../../examples/projects/responses/segmentation_project_response.json"
+    '400':
+      description: Bad request. The provided information is insufficient to create a project.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            No pipeline:
+              value:
+                $ref: "../../examples/projects/error_responses/no_pipeline_provided.json"
+            No name:
+              value:
+                $ref: "../../examples/projects/error_responses/no_project_name_provided.json"
+            Duplicate task title:
+              value:
+                $ref: "../../examples/projects/error_responses/duplicate_task_title.json"
+            No connections:
+              value:
+                $ref: "../../examples/projects/error_responses/connections_not_supplied.json"
+            Unconnected task:
+              value:
+                $ref: "../../examples/projects/error_responses/unconnected_task.json"
+            Wrong number of nodes:
+              value:
+                $ref: "../../examples/projects/error_responses/wrong_number_of_nodes.json"
+            Incorrect node name:
+              value:
+                $ref: "../../examples/projects/error_responses/incorrect_node_name.json"
+            Duplicate edge in graph:
+              value:
+                $ref: "../../examples/projects/error_responses/duplicate_edge_in_graph.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+
+get:
+  tags:
+    - Projects
+  summary: Get info about all projects in a workspace
+  description: "Get all projects in the workspace."
+  operationId: GetAllProjectsInAWorkspace
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/query/name.yaml"
+    - $ref: "../../parameters/query/limit.yaml"
+    - $ref: "../../parameters/query/skip.yaml"
+    - $ref: "../../parameters/query/sort_direction.yaml"
+    - $ref: "../../parameters/query/sort_by.yaml"
+    - $ref: "../../parameters/query/with_size.yaml"
+  responses:
+    '200':
+      description: The requested project info
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/projects/responses/project_list.yaml"
+          example:
+            $ref: "../../examples/projects/responses/project_list_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"

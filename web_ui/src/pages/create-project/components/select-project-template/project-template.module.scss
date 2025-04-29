@@ -1,0 +1,16 @@
+.templateProjectSelection {
+    margin-top: var(--spectrum-global-dimension-size-300) !important;
+    margin-bottom: var(--spectrum-global-dimension-size-300);
+
+    @media (max-height: 700px) {
+        padding: var(--spectrum-global-dimension-size-175) !important;
+    }
+}
+
+.projectCreationWellWrapper {
+    @media (max-height: 700px) {
+        overflow: hidden auto;
+        /* 56 is the sum of all the vertical margins and paddings from the inner part of the dialog */
+        height: calc(var(--spectrum-global-dimension-size-4000) - 56px);
+    }
+}

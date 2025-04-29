@@ -1,0 +1,31 @@
+get:
+  tags:
+    - Credit Products
+  summary: "[SaaS] Get a product by ID"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Returns Geti SaaS subscription product with the specified UUID.
+  operationId: get_product_by_id_api_v1_products__product_id__get
+  parameters:
+    - name: product_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+        title: Product Id
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/products.yaml#/Product'
+          example:
+            $ref: '../../../examples/credit_system/products/product_response.json'
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

@@ -1,0 +1,40 @@
+imagePullPolicy: IfNotPresent
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+postgresql:
+  port: "5432"
+  host: "impt-postgresql"
+
+spicedb:
+  grpc_port: "50051"
+
+global:
+  enable_local_image_pull_secret: false
+  logging_config_dir: "/mnt/logging_config"
+  ldap_service_user_secret_name: "impt-ldap-service-user"
+  initial_admin_user_login: ""
+  initial_admin_user_password: ""
+  registry_address: ""
+  docker_namespace: geti
+  running_on_vm: false
+  account_service_mode: "setup"
+  debian:
+    registry: docker.io
+    repository: bitnami
+    name: os-shell:12-debian-12-r42
+  kubectl: 
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc

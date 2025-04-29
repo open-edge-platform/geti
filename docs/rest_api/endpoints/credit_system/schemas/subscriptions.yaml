@@ -1,0 +1,74 @@
+SubscriptionPayload:
+  properties:
+    product_id:
+      type: string
+      format: uuid
+      title: Product Id
+  type: object
+  required:
+    - product_id
+  title: SubscriptionPayload
+SubscriptionResponse:
+  properties:
+    id:
+      type: string
+      format: uuid
+      title: Id
+    organization_id:
+      type: string
+      title: Organization Id
+    workspace_id:
+      type: string
+      title: Workspace Id
+    product_id:
+      type: string
+      format: uuid
+      title: Product Id
+    status:
+      type: string
+      title: Status
+    created:
+      type: integer
+      title: Created
+    updated:
+      type: integer
+      title: Updated
+    next_renewal_date:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Next Renewal Date
+    previous_renewal_date:
+      anyOf:
+        - type: integer
+        - type: 'null'
+      title: Previous Renewal Date
+  type: object
+  required:
+    - id
+    - organization_id
+    - workspace_id
+    - product_id
+    - status
+    - created
+    - updated
+  title: SubscriptionResponse
+OrgSubscriptionsResponse:
+  properties:
+    total_matched:
+      type: integer
+      title: Total Matched
+    next_page:
+      anyOf:
+        - $ref: 'pagination.yaml#/NextPage'
+        - type: 'null'
+    subscriptions:
+      items:
+        $ref: '#/SubscriptionResponse'
+      type: array
+      title: Subscriptions
+  type: object
+  required:
+    - total_matched
+    - subscriptions
+  title: OrgSubscriptionsResponse

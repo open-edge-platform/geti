@@ -1,0 +1,45 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  name:
+    type: string
+    description: Name of the model.
+  creation_date:
+    type: string
+    description: Creation date of the model.
+  size:
+    type: number
+    format: int32
+    description: Model size in bytes.
+  total_disk_size:
+    type: number
+    format: int32
+    description: |-
+      The aggregated size (bytes) for model-related files. This includes all the exportable binaries, such as exportable code, 
+      and the binaries from the optimized models.
+  performance:
+    $ref: "../../performance/responses/model_performance.yaml"
+  label_schema_in_sync:
+    type: boolean
+    description: Boolean that indicates whether the label schema for the model is in sync with the latest label schema for the task containing the model
+  score_up_to_date:
+    type: boolean
+    description: |-
+      Boolean indicating whether the score of the model is the most recent score.
+      This parameter is deprecated and should not be used, it will be removed in the future.
+    deprecated: true
+  model_storage_id:
+    type: string
+    description: ID of the model storage
+  active_model:
+    type: boolean
+    description: |-
+      Boolean indicating that the model is used for inference requests for the project.
+  version:
+    type: number
+    description: Version of the model
+  purge_info:
+    $ref: "model_purge_info.yaml"
+  lifecycle_stage:
+    $ref: "model_lifecycle_stage.yaml"

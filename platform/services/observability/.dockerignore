@@ -1,0 +1,7 @@
+*
+!app
+!uv.lock
+!pyproject.toml
+!logconfig.ini
+!entrypoint.sh
+!common_libs

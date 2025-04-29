@@ -1,0 +1,28 @@
+{{ if and .Values.global.smtp_host .Values.global.smtp_port }}
+{{ if .Capabilities.APIVersions.Has "networking.istio.io/v1/ServiceEntry"}}
+apiVersion: networking.istio.io/v1
+{{ else }}
+apiVersion: networking.istio.io/v1beta1
+{{ end }}
+kind: ServiceEntry
+metadata:
+  name: smtp-ext
+  namespace: istio-system
+spec:
+  {{ if regexMatch "(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$" .Values.global.smtp_host }}
+  addresses:
+  - "{{ .Values.global.smtp_host }}"
+  hosts:
+  - example.intel.com
+  resolution: NONE
+  {{ else }}
+  hosts:
+  - "{{ .Values.global.smtp_host }}"
+  resolution: DNS
+  {{ end }}
+  location: MESH_EXTERNAL
+  ports:
+  - name: smtp
+    number: {{ .Values.global.smtp_port }}
+    protocol: tcp
+{{ end }}

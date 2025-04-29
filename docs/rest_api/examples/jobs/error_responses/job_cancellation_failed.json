@@ -1,0 +1,5 @@
+{
+  "http_status": 500,
+  "message": "Failed to cancel job with id 60edaa57b49fdceefb757bbe and name Train task job",
+  "error_code": "job_cancellation_failed"
+}

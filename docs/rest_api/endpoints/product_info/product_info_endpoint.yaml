@@ -1,0 +1,15 @@
+get:
+  tags:
+    - Product Info
+  summary: Get information about the product
+  description: Get information regarding product version.
+  operationId: GetProductInfo
+  responses:
+    '200':
+      description: Product Information
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/product_info/responses/product_info.yaml"
+          example:
+            $ref: "../../examples/product_info/responses/product_info_response.json"

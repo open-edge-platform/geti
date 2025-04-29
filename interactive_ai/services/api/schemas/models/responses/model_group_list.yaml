@@ -1,0 +1,7 @@
+type: object
+properties:
+  model_groups:
+    type: array
+    description: Array of model groups
+    items:
+      $ref: "model_group.yaml"

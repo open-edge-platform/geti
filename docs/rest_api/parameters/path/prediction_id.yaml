@@ -1,0 +1,7 @@
+in: path
+name: prediction_id
+style: simple
+description: The ID of the prediction
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

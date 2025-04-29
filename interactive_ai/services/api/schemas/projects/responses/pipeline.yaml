@@ -1,0 +1,15 @@
+type: object
+properties:
+  connections:
+    type: array
+    items:
+      $ref: 'connection.yaml'
+    description: 'List of connections between pipeline tasks'
+  tasks:
+    type: array
+    items:
+      $ref: 'task.yaml'
+    description: 'List of tasks in the pipeline'
+required:
+  - connections
+  - tasks

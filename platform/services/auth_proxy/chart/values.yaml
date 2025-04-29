@@ -1,0 +1,70 @@
+replicas: 1
+image: auth-proxy
+imagePullPolicy: IfNotPresent
+
+service:
+  ports:
+    grpc: "7001"
+    http: "7002"
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 400Mi
+  limits:
+    memory: 512Mi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  capabilities:
+    drop:
+      - ALL
+
+env:
+  JWT_TTL_GETI: 60m
+  CACHE_TTL_SECONDS: "60"
+  CACHE_SIZE_MB: "10"
+  UNAUTHORIZED_URLS: /api/v1/profile,/api/v1/logout,/api/v1/onboarding/user,/api/v1/feature_flags
+
+global:
+  running_on_vm: false
+  security_headers: ""
+  stripped_headers: ""
+  istio_ingress_namespace: "istio-system"
+  istio_gateway_name: "istio-gateway"
+  istio_ambient_mesh: false
+  logging_config_dir: "/mnt/logging_config"
+  tag: ""
+  docker_namespace: geti
+  registry_address: ""
+  enable_local_image_pull_secret: false
+  cors_policy:
+    enabled: false
+
+ingress:
+  endpoints:
+  - matches:
+    - /api/v(.*)/set_cookie
+    methods:
+      - DELETE
+      - POST
+
+certificate:
+  issuerRef:
+    name: ca-issuer
+  secretName: geti-jwt-secret
+  volumeName: geti-jwt-secret-volume
+  mountPath: /etc/geti-jwt-secret
+  jwksUpdateTime: 1s
+  jwksEntryExpiration: 15m
+

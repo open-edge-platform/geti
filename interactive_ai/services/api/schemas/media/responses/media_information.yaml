@@ -1,0 +1,17 @@
+type: object
+properties:
+  display_url:
+    type: string
+    description: Display URL of the image or video frame
+  height:
+    type: integer
+    description: Height of the image or video frame
+  width:
+    type: integer
+    description: Width of the image or video frame
+  size:
+    type: integer
+    description: Size of the image or video in bytes
+  extension:
+    type: string
+    description: Extension of the image or video in lowercase with a dot (e.g. '.jpg')

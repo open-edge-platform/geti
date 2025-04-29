@@ -1,0 +1,41 @@
+.radioSelection {
+    width: 100% !important;
+
+    span[class*='spectrum-Radio-label_'] {
+        width: 100%;
+        margin-left: var(--spectrum-global-dimension-size-100);
+
+        svg {
+            margin-left: calc(var(--spectrum-global-dimension-size-50) * -1);
+        }
+    }
+}
+
+.trainTemplateName {
+    color: var(--spectrum-global-color-gray-900);
+    margin: 0;
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.activeModelTag {
+    font-size: var(--spectrum-global-dimension-static-font-size-50);
+    padding: 0 var(--spectrum-global-dimension-size-50);
+    line-height: var(--spectrum-global-dimension-size-200);
+    max-height: var(--spectrum-global-dimension-size-200);
+}
+
+.subTitle {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-static-font-size-50);
+}
+
+.radioTrainTemplateName {
+    width: calc(100% - var(--spectrum-global-dimension-size-300));
+
+    .selected {
+        color: var(--energy-blue);
+    }
+}

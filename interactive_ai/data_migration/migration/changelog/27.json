@@ -1,0 +1,4 @@
+{
+  "script": "sanitize_media_binary_extension.py",
+  "metadata": "sanitize_media_binary_extension.json"
+}

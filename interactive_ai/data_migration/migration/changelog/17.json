@@ -1,0 +1,4 @@
+{
+  "script": "remove_binary_filename_from_media_docs.py",
+  "metadata": "remove_binary_filename_from_media_docs.json"
+}

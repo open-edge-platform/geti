@@ -1,0 +1,78 @@
+.annotationMeter {
+    margin-top: var(--spectrum-global-dimension-size-175, var(--spectrum-alias-size-175));
+    width: 100% !important;
+
+    & div[class*='spectrum-BarLoader-fill'] {
+        background-color: var(--intel-blue) !important;
+    }
+    & div[class*='spectrum-BarLoader-track'] {
+        border-radius: 0 !important;
+    }
+}
+
+.cameraSettingSlider {
+    & div[class*='spectrum-Slider-handle'] {
+        border: thin var(--intel-blue) !important;
+        background-color: var(--intel-blue) !important;
+        height: 'size-130' !important;
+        width: 'size-130' !important;
+    }
+}
+
+.toggleSidebarButton {
+    border: none !important;
+    height: var(--spectrum-global-dimension-size-150) !important;
+    border-top: 1px solid var(--spectrum-global-color-gray-50) !important;
+    background: var(--spectrum-global-color-gray-100) !important;
+    border-radius: 0px !important;
+
+    & > div {
+        height: var(--spectrum-global-dimension-size-150) !important;
+    }
+
+    &[class*='is-hovered'] {
+        border: none !important;
+        border-top: 1px solid var(--spectrum-global-color-gray-50) !important;
+    }
+}
+
+.closeSidebarValue,
+.closeSidebarTitle {
+    display: block;
+    text-align: center;
+    font-size: var(--spectrum-global-dimension-static-font-size-75);
+}
+
+.closeSidebarTitle {
+    color: var(--spectrum-global-color-gray-900);
+}
+
+.settingButton {
+    & span {
+        padding: 0px !important;
+        text-wrap: wrap;
+        text-align: center;
+        line-height: var(--spectrum-global-dimension-size-250);
+    }
+}
+
+.animatedThumbnailContainer {
+    position: relative;
+
+    &:hover .deleteContainer {
+        opacity: 1;
+    }
+}
+
+.deleteContainer {
+    opacity: 0;
+    background: var(--spectrum-global-color-gray-50) !important;
+    border-radius: var(--spectrum-global-dimension-size-50) !important;
+
+    &[class*='is-hovered'] {
+        background: var(--spectrum-global-color-gray-50) !important;
+    }
+}
+.visible {
+    opacity: 1;
+}

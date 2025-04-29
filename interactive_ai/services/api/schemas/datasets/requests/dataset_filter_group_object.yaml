@@ -1,0 +1,5 @@
+# Since we can't apply recursion on the schemas this doesn't validate the full dataset filter. Further validation
+# is handled in the DatasetFilter class.
+
+type: object
+description: Any additional filter rules or groups

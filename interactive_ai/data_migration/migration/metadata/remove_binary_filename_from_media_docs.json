@@ -1,0 +1,9 @@
+{
+  "description": "Remove the 'binary_filename' field in video and image documents",
+  "supports_downgrade": true,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["video","image"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

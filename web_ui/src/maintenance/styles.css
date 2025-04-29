@@ -1,0 +1,95 @@
+@font-face {
+    font-family: intelOne;
+    src: url(./intelone-text-regular.woff);
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+html {
+    font-size: 62.5% !important;
+    padding: 0 !important;
+
+    @supports (font: -apple-system-body) {
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+body {
+    margin: 0;
+    font-family: intelOne;
+    max-width: 100vw;
+    scrollbar-width: 5px;
+    background-color: #313236;
+}
+
+h2,
+p {
+    margin: 0;
+}
+
+.outerContainer {
+    height: 100vh;
+    background-image: url(./login_background.webp);
+    background-position: top center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.innerContainer {
+    position: relative;
+    background-color: #242528;
+    width: 80vw;
+}
+
+.intelBanner {
+    display: flex;
+    background-color: #484a50;
+    align-items: center;
+    justify-content: center;
+    column-gap: 8px;
+    padding: 34px;
+}
+
+.heading {
+    font-family: intelOne;
+    font-size: 36px;
+    color: #e3e3e5;
+}
+
+img {
+    margin-bottom: 20px;
+    width: 440px;
+    height: 280px;
+}
+
+.description {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 40px 80px;
+}
+
+.title {
+    font-size: 36px;
+    line-height: 48px;
+    color: #fff;
+}
+
+.text {
+    color: #8e9099;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+}
+
+.text #end {
+    color: #fff;
+}
+
+.description .text:last-child {
+    margin-top: 4px;
+}

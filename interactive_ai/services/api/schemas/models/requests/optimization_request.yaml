@@ -1,0 +1,12 @@
+type: object
+description: Request to optimize a model
+properties:
+  enable_nncf_optimization:
+    type: boolean
+    description: This field is deprecated and ignored by the server.
+  enable_pot_optimization:
+    type: boolean
+    description: This field is deprecated and ignored by the server.
+  optimization_parameters:
+    type: object
+    description: This field is deprecated and ignored by the server.

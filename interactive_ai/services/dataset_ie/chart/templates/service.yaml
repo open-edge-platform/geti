@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "true"
+    {{- end }}
+    {{- include "dataset-ie.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: dataset
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      appProtocol: http
+  selector:
+    {{- include "dataset-ie.selectorLabels" . | nindent 4 }}

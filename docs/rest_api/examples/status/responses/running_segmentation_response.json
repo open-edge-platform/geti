@@ -1,0 +1,33 @@
+{
+    "is_training": true,
+    "n_required_annotations": 0,
+    "n_new_annotations": 0,
+    "project_performance": {
+        "score": null,
+        "task_performances": [
+            {
+                "task_id": "60e829a2436a044be4109593",
+                "score": null
+            }
+        ]
+    },
+    "status": {
+        "progress": 4.132231404958678
+    },
+    "tasks": [
+        {
+            "id": "60e829a2436a044be4109593",
+            "is_training": true,
+            "required_annotations": {
+                "details": [],
+                "value": 0
+            },
+            "status": {
+                "progress": 4.132231404958678
+            },
+            "ready_to_train":  false,
+            "title": "torch_segmentation",
+            "n_new_annotations": 0
+        }
+    ]
+}

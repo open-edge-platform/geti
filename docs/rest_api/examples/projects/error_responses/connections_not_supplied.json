@@ -1,0 +1,5 @@
+{
+  "error_code": "bad_request",
+  "http_status": 400,
+  "message": "'connections' is a required property"
+}

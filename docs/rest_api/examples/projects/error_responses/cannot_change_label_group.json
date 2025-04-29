@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "error_code": "cannot_change_label_group",
+  "message": "Changing the group of a label is not allowed. Attempted to change label 'Label Name' from group 'Old Group' to group 'New Group'"
+}

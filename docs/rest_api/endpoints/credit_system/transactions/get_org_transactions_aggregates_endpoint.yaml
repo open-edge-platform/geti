@@ -1,0 +1,85 @@
+get:
+  tags:
+    - Transactions
+  summary: "[SaaS] Get credit consumption aggregates"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    The aggregating endpoint allows to retrieve credit consumption grouped
+    by various dimensions - such as project, date, usage type, etc.
+  operationId: >-
+    get_credit_consumption_aggregates_api_v1_organizations__organization_id__transactions_aggregates_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+    - name: from_date
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: integer
+            maximum: 8023398574000
+            minimum: 1711929600000
+          - type: 'null'
+        description: Milliseconds timestamp
+        title: From Date
+      description: Milliseconds timestamp
+    - name: to_date
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: integer
+            maximum: 8023398574000
+            minimum: 1711929600000
+          - type: 'null'
+        description: Milliseconds timestamp
+        title: To Date
+      description: Milliseconds timestamp
+    - name: project_id
+      in: query
+      required: false
+      schema:
+        anyOf:
+          - type: array
+            items:
+              type: string
+          - type: 'null'
+        title: Project Id
+    - name: key
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '../schemas/aggregates.yaml#/AggregatesKey'
+        title: Key
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/aggregates.yaml#/AggregatesResponse'
+          examples:
+            Aggregation by a service name:
+              value:
+                $ref: '../../../examples/credit_system/transactions/transactions_aggregate_by_service_name_response.json'
+            Aggregation by a project:
+              value:
+                $ref: '../../../examples/credit_system/transactions/transactions_aggregate_by_project_response.json'
+            Aggregation by a project and a service:
+              value:
+                $ref: '../../../examples/credit_system/transactions/transactions_aggregate_by_project_and_service_response.json'
+            Aggregation by a date:
+              value:
+                $ref: '../../../examples/credit_system/transactions/transactions_aggregate_by_date_response.json'
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

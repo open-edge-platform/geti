@@ -1,0 +1,5 @@
+{
+  "http_status": 412,
+  "message": "Job cannot be cancelled.",
+  "error_code": "job_cannot_be_cancelled"
+}

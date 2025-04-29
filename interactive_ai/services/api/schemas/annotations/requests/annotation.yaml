@@ -1,0 +1,20 @@
+type: object
+required:
+  - shape
+  - labels
+properties:
+  id:
+    $ref: '../uuid.yaml'
+  shape:
+    $ref: '../shape.yaml'
+  labels:
+    description: List of labels
+    type: array
+    minItems: 1
+    items:
+      $ref: 'scored_label.yaml'
+  labels_to_revisit:
+    description: List of labels IDs for which the annotation should be revisited
+    type: array
+    items:
+      $ref: '../uuid.yaml'

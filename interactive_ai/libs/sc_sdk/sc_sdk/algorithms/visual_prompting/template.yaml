@@ -1,0 +1,9 @@
+task_family: "VISION"
+task_type: "VISUAL_PROMPTING"
+name: "SAM"
+model_template_id: "visual_prompting_model"
+instantiation: "CLASS"
+
+# VISION task requires hyper parameters
+hyper_parameters:
+  base_path: ./configuration.yaml

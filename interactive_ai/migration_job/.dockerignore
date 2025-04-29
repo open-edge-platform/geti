@@ -1,0 +1,5 @@
+*
+!migration_job
+!pyproject.toml
+!uv.lock
+!entrypoint.sh

@@ -1,0 +1,7 @@
+title: Import project parameters
+type: object
+description: Parameters of the import request
+properties:
+  file_id:
+    description: ID of the uploaded project zip archive
+    type: string

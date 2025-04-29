@@ -1,0 +1,9 @@
+.item {
+    margin: 0;
+    min-width: min-content;
+
+    & li {
+        min-width: var(--spectrum-global-dimension-size-6000);
+        width: 100%;
+    }
+}

@@ -1,0 +1,12 @@
+.previewToolbar {
+    padding: var(--spectrum-global-dimension-static-size-100);
+}
+
+.dialog {
+    min-width: 0;
+    width: fit-content;
+
+    & > div {
+        display: block !important;
+    }
+}

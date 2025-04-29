@@ -1,0 +1,39 @@
+.stepButton {
+    border-radius: var(--spectrum-global-dimension-size-600) !important;
+    width: var(--spectrum-global-dimension-size-300) !important;
+    height: var(--spectrum-global-dimension-size-300) !important;
+    min-width: var(--spectrum-global-dimension-size-300) !important;
+    min-height: var(--spectrum-global-dimension-size-300) !important;
+    border: none !important;
+    background-color: var(--spectrum-global-color-gray-200) !important;
+    & > span {
+        padding: 0 !important;
+    }
+}
+
+.selected {
+    @extend .stepButton;
+    width: var(--spectrum-global-dimension-size-400) !important;
+    height: var(--spectrum-global-dimension-size-400) !important;
+    background-color: var(--energy-blue) !important;
+
+    &:hover {
+        @extend .stepButton;
+        width: var(--spectrum-global-dimension-size-400) !important;
+        height: var(--spectrum-global-dimension-size-400) !important;
+        background-color: var(--energy-blue) !important;
+    }
+
+    & > span {
+        color: var(--spectrum-global-color-gray-50) !important;
+    }
+}
+
+.checked {
+    @extend .stepButton;
+    background-color: var(--energy-blue) !important;
+
+    & > svg {
+        fill: var(--spectrum-global-color-gray-50) !important;
+    }
+}

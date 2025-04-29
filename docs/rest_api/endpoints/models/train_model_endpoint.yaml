@@ -1,0 +1,76 @@
+post:
+  tags:
+    - Models
+  summary: Train a model
+  description: Submit a training job.
+  operationId: TrainModel
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/training/requests/train_request.yaml"
+        examples:
+          Simple train request:
+            value:
+              $ref: "../../examples/training/requests/simple_train_request_body.json"
+          Advanced train request with hyper parameters:
+            value:
+              $ref: "../../examples/training/requests/advanced_train_request_body.json"
+    required: true
+  responses:
+    '200':
+      description: Training job submitted
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Successfully submitted a training job:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Task not found:
+              value:
+                $ref: "../../examples/training/error_responses/task_not_found.json"
+            Training algorithm not found:
+              value:
+                $ref: "../../examples/training/error_responses/algorithm_not_found.json"
+    '412':
+      description: Insufficient balance for training job execution.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Insufficient balance:
+              value:
+                $ref: "../../examples/training/error_responses/train_job_insufficient_balance.json"
+    '422':
+      description: Unprocessable Content. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Obsolete training algorithm:
+              value:
+                $ref: "../../examples/training/error_responses/obsolete_algorithm.json"

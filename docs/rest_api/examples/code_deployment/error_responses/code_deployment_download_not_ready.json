@@ -1,0 +1,5 @@
+{
+  "http_status": 503,
+  "message": "Code deployment with ID 60ec6bbfb98caeb87e34305d is not ready for download, it is at state: PREPARING. Please wait a few seconds for the packaging process to finish or start a new code deployment process.",
+  "error_code": "code_deployment_download_not_ready"
+}

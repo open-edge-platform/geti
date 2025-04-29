@@ -1,0 +1,61 @@
+{
+    "aggregates": [
+        {
+            "group": [
+                {
+                    "key": "project",
+                    "value": "66aa8abff93bad108c06ec0a"
+                },
+                {
+                    "key": "service_name",
+                    "value": "training"
+                }
+            ],
+            "result": {
+                "credits": 12,
+                "resources": {
+                    "images": 12,
+                    "frames": 0
+                }
+            }
+        },
+        {
+            "group": [
+                {
+                    "key": "project",
+                    "value": "66aa882df93bad108c06eb0d"
+                },
+                {
+                    "key": "service_name",
+                    "value": "training"
+                }
+            ],
+            "result": {
+                "credits": 59,
+                "resources": {
+                    "images": 59,
+                    "frames": 0
+                }
+            }
+        },
+        {
+            "group": [
+                {
+                    "key": "project",
+                    "value": "66aa8abff93bad108c06ec0a"
+                },
+                {
+                    "key": "service_name",
+                    "value": "optimization"
+                }
+            ],
+            "result": {
+                "credits": 12,
+                "resources": {
+                    "images": 12,
+                    "frames": 0
+                }
+            }
+        }
+    ]
+}

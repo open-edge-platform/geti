@@ -1,0 +1,17 @@
+type: array
+description: Array of scores
+items:
+  type: object
+  properties:
+    name:
+      type: string
+      description: Name of the metric
+    value:
+      type: number
+      format: float
+      description: Value of the score
+    label_id:
+      type: 
+      - "string"
+      - "null"
+      description: ID of the label corresponding to the score. If  null, the score is for all labels

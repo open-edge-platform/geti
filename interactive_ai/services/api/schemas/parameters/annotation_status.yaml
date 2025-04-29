@@ -1,0 +1,5 @@
+type: string
+enum:
+  - annotated
+  - partially_annotated
+  - none

@@ -1,0 +1,146 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package personal_access_token;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+
+message PersonalAccessTokenCreateRequest {
+  string organization_id = 1;
+  string user_id = 2;
+  string created_by = 3;
+  string name = 4;
+  string description = 5;
+  google.protobuf.Timestamp expires_at = 6;
+}
+
+message PersonalAccessTokenCreateResponse {
+  string id = 1;
+  string partial = 2;
+  string name = 3;
+  string description = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+  string personal_access_token = 9;
+}
+
+message GetByHashRequest {
+  string hash = 1;
+}
+
+message GetOrgFromTokenRequest {
+  string token = 1;
+}
+
+message GetOrganizationByTokenResponse {
+  string organization_id = 1;
+}
+
+message PersonalAccessTokenExtendRequest {
+  string organization_id = 1;
+  string user_id = 2;
+  string id = 3;
+  google.protobuf.Timestamp expires_at = 4;
+
+}
+
+message PersonalAccessTokenRevokeRequest {
+  string organization_id = 1;
+  string user_id = 2;
+  string id = 3;
+}
+
+message PersonalAccessTokenFindRequest {
+  string organization_id = 1;
+  string user_id = 2;
+  string name = 3;
+  string description = 4;
+  string partial = 5;
+  google.protobuf.Timestamp expires_at_from = 6;
+  google.protobuf.Timestamp expires_at_to = 7;
+  google.protobuf.Timestamp created_at_from = 8;
+  google.protobuf.Timestamp created_at_to = 9;
+  string sort_by = 10;
+  string sort_direction = 11;
+}
+
+message ListPersonalAccessTokensResponse {
+  repeated PersonalAccessTokenResponse personal_access_tokens = 1;
+}
+
+message PersonalAccessTokenResponse {
+  string id = 1;
+  string partial = 2;
+  string name = 3;
+  string description = 4;
+  google.protobuf.Timestamp expires_at = 5;
+  string organization_id = 6;
+  string user_id = 7;
+  google.protobuf.Timestamp created_at = 8;
+}
+
+service PersonalAccessToken {
+  // POST /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens
+  rpc create (PersonalAccessTokenCreateRequest) returns (PersonalAccessTokenCreateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens"
+      body: "*"
+      additional_bindings {
+         post: "/api/v1/personal_access_tokens"
+         body: "*"
+      }
+    };
+  }
+
+  // GET /api/v1/personal_access_tokens/{hash}
+  rpc get_by_hash (GetByHashRequest) returns (PersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/personal_access_tokens/{hash}"
+    };
+  }
+
+  // GET /api/v1/personal_access_tokens/organization
+  rpc get_org_from_token (GetOrgFromTokenRequest) returns (GetOrganizationByTokenResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/personal_access_tokens/organization"
+    };
+  }
+
+  // PATCH /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}
+  rpc extend (PersonalAccessTokenExtendRequest) returns (PersonalAccessTokenResponse) {
+    option (google.api.http) = {
+      patch: "/api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}"
+      body: "*"
+      additional_bindings {
+         patch: "/api/v1/personal_access_tokens/{id}"
+         body: "*"
+      }
+    };
+  }
+
+  // DELETE /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}
+  rpc revoke (PersonalAccessTokenRevokeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens/{id}"
+      additional_bindings {
+         delete: "/api/v1/personal_access_tokens/{id}"
+      }
+    };
+  }
+
+  // GET /api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens
+  rpc find (PersonalAccessTokenFindRequest) returns (ListPersonalAccessTokensResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/users/{user_id}/personal_access_tokens"
+    };
+  }
+}

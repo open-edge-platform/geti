@@ -1,0 +1,331 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package user;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+import "user_common.proto";
+
+
+message UserIdRequest {
+  string user_id = 1;
+  string organization_id = 2;
+}
+
+message UserExtIdRequest {
+  string id = 1;
+}
+
+message FindUserRequest {
+  string first_name = 1;
+  string second_name = 2;
+  string email = 3;
+  string external_id = 4;
+  string country = 5;
+  string status = 6;
+  google.protobuf.Timestamp last_successful_login_from = 7;
+  google.protobuf.Timestamp last_successful_login_to = 8;
+  string role = 9;
+  repeated string resource_type = 10;
+  string resource_id = 11;
+  string workspace_id = 12;
+  string organization_id = 13;
+  google.protobuf.Timestamp created_at_from = 14;
+  google.protobuf.Timestamp created_at_to = 15;
+  string created_by = 16;
+  google.protobuf.Timestamp modified_at_from = 17;
+  google.protobuf.Timestamp modified_at_to = 18;
+  string modified_by = 19;
+  int32 skip = 20;
+  int32 limit = 21;
+  string sort_by = 22;  //attribute name
+  string sort_direction = 23;  //asc/desc
+  string name = 24;  // user to search for first name OR second name OR email
+}
+
+message ListUsersResponse {
+  message NextPage{
+    int32 skip=1;
+    int32 limit=2;
+  }
+
+  repeated user_common.UserData users = 1;
+  int32 total_count = 2;
+  int32 total_matched_count = 3;
+  optional NextPage next_page = 4;
+}
+
+message UserPhotoRequest {
+  oneof request {
+    UserIdRequest user_data = 1;
+    bytes photo = 2;
+  }
+}
+
+message UserRolesRequest {
+  repeated user_common.UserRoleOperation roles = 1;
+  string user_id = 2;
+  string organization_id = 3;
+}
+
+message UserGetRolesRequest {
+  string user_id = 1;
+  string organization_id = 2;
+  string resource_type = 3;
+}
+
+message UserRolesResponse {
+  repeated user_common.UserRole roles = 1;
+}
+
+message OrganizationExtended {
+  string organization_name = 1;
+  string user_status = 2;
+  string organization_status = 3;
+  string organization_id = 4;
+  google.protobuf.Timestamp organization_created_at = 5;
+}
+
+message UserProfileData {
+  optional string status = 1;
+  optional string organization_id = 2;
+  optional string organization_status = 3;
+  repeated OrganizationExtended organizations = 8;
+
+  optional string telemetry_consent = 4;
+  google.protobuf.Timestamp telemetry_consent_at = 5;
+  optional string user_consent = 6;
+  google.protobuf.Timestamp user_consent_at = 7;
+}
+
+message ActiveUserData {
+  string id = 1;
+  string first_name = 2;
+  string second_name = 3;
+  string email = 4;
+  string status = 5;
+  string organization_id = 6;
+  string organization_status = 7;
+  repeated user_common.UserRole roles = 8;
+  google.protobuf.Timestamp last_successful_login = 9;
+  google.protobuf.Timestamp current_successful_login = 10;
+  optional string telemetry_consent = 11;
+  optional string user_consent = 12;
+}
+
+message UserInvitationResponse {
+  string user_id = 1;
+}
+
+message UserPayload {
+  string organization_id = 1;
+  string user_id = 2;
+}
+
+message RolePayload {
+  string role = 1;
+  string resource_id = 2;
+}
+
+message RolesResponse {
+  repeated RolePayload roles = 1;
+}
+
+message UserRolePayload {
+  UserPayload user = 1;
+  string role = 2;
+  string resource_id = 3;
+}
+
+message GetUsersRequest {
+  string first_name = 1;
+  string second_name = 2;
+  string email = 3;
+  string external_id = 4;
+  string country = 5;
+  google.protobuf.Timestamp last_successful_login = 6;
+  google.protobuf.Timestamp current_successful_login = 7;
+  google.protobuf.Timestamp created_at_from = 8;
+  google.protobuf.Timestamp created_at_to = 9;
+  google.protobuf.Timestamp modified_at_from = 10;
+  google.protobuf.Timestamp modified_at_to = 11;
+  google.protobuf.Timestamp user_consent_from = 12;
+  google.protobuf.Timestamp user_consent_to = 13;
+  int32 skip = 14;
+  int32 limit = 15;
+  string sort_by = 16;  //attribute name
+  string sort_direction = 17;  //asc/desc
+  string name = 18;  // user to search for first name OR second name OR email
+}
+
+message UserResponse {
+  string id = 1;
+  string first_name = 2;
+  string second_name = 3;
+  string email = 4;
+  string external_id = 5;
+  string country = 6;
+  string photo_location = 7;
+  string registration_token = 8;
+  google.protobuf.Timestamp last_successful_login = 9;
+  google.protobuf.Timestamp current_successful_login = 10;
+  google.protobuf.Timestamp created_at = 11;
+  string created_by = 12;
+  google.protobuf.Timestamp modified_at = 13;
+  string modified_by = 14;
+  optional string telemetry_consent = 15;
+  google.protobuf.Timestamp telemetry_consent_at = 16;
+  optional string user_consent = 17;
+  google.protobuf.Timestamp user_consent_at = 18;
+}
+
+message ListGetUsersResponse {
+  message NextPage{
+    int32 skip=1;
+    int32 limit=2;
+  }
+
+  repeated UserResponse users = 1;
+  int32 total_count = 2;
+  int32 total_matched_count = 3;
+  optional NextPage next_page = 4;
+}
+
+service User {
+  // POST /organizations/{organization_id}/users
+  rpc create (user_common.UserData) returns (user_common.UserData) {
+    option (google.api.http) = {
+      post: "/api/v1/organizations/{organization_id}/users"
+      body: "*"
+    };
+  }
+
+  // PUT /organizations/{organization_id}/users/{id}
+  rpc modify (user_common.UserData) returns (user_common.UserData) {
+    option (google.api.http) = {
+      put: "/api/v1/organizations/{organization_id}/users/{id}"
+      body: "*"
+    };
+  }
+
+  // GET /organizations/{organization_id}/users/activeUser
+  rpc get_active_user (UserIdRequest) returns (ActiveUserData) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/activeUser"
+    };
+  }
+
+  // GET /api/v1/profile
+  rpc get_user_profile(google.protobuf.Empty) returns (UserProfileData) {
+    option (google.api.http) = {
+      get: "/api/v1/profile"
+    };
+  }
+
+  // GET /organizations/{organization_id}/users/{id}
+  rpc get_by_id (UserIdRequest) returns (user_common.UserData) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/users/{user_id}"
+    };
+  }
+
+  // GET /organizations/users/{external_id}
+  rpc get_by_external_id (UserExtIdRequest) returns (user_common.UserData) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/users/external"
+    };
+  }
+
+  // GET /organizations/{organization_id}/users  - conditions passed in the query string
+  rpc find (FindUserRequest) returns (ListUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/users"
+    };
+  }
+
+  rpc logout (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  }
+
+  // DELETE /organizations/{organization_id}/users/{id}
+  rpc delete (UserIdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/organizations/{organization_id}/users/{user_id}"
+    };
+  }
+
+  // POST /organizations/{organization_id}/users/invitations
+  rpc send_invitation (user_common.UserInvitationRequest) returns (UserInvitationResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/organizations/{user.organization_id}/users/invitations"
+      body: "*"
+    };
+  }
+
+  // PUT /organization/{organization_id}/users/{id}/photos
+  rpc add_photo (stream UserPhotoRequest) returns (google.protobuf.Empty) {}
+
+  // DELETE /organization/{organization_id}/users/{id}/photos
+  rpc delete_photo (UserIdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/organizations/{organization_id}/users/{user_id}/photos"
+    };
+  }
+
+  // GET /organizations/{organization_id}/users/{id}/photos
+  rpc get_photo (UserIdRequest) returns (common.PreUrlResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/users/{user_id}/photos"
+    };
+  }
+
+  // GET /organizations/{organization_id}/users/{id}/roles/{resource_type}
+  rpc get_roles (UserGetRolesRequest) returns (UserRolesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/users/{user_id}/roles/{resource_type}"
+    };
+  }
+
+  // PUT /organizations/{organization_id}/users/{id}/roles
+  rpc set_roles (UserRolesRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/api/v1/organizations/{organization_id}/users/{user_id}/roles"
+      body: "*"
+    };
+  }
+
+  // GET /organizations/{org_id}/membership/{usr_id}/roles
+  rpc get_user_roles(UserPayload) returns (RolesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{organization_id}/membership/{user_id}/roles"
+    };
+  }
+
+  // POST /organizations/{organization_id}/membership/{user_id}/roles
+  rpc assign_role(UserRolePayload) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/organizations/{user.organization_id}/membership/{user.user_id}/roles"
+      body: "*"
+    };
+  }
+
+  // DELETE /organizations/{user.organization_id}/membership/{user.user_id}/roles
+  rpc remove_role(UserRolePayload) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/organizations/{user.organization_id}/membership/{user.user_id}/roles"
+    };
+  }
+
+  // GET /users
+  rpc get_users (GetUsersRequest) returns (ListGetUsersResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/users"
+    };
+  }
+}

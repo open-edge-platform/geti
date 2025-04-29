@@ -1,0 +1,22 @@
+{
+    "datasets": [
+        {
+            "creation_time": "2022-06-16T09:09:33.260000+00:00",
+            "id": "62aaf34d260a2d4cc3011908",
+            "name": "Dataset",
+            "use_for_training": true
+        },
+        {
+            "creation_time": "2022-06-16T09:59:09.635000+00:00",
+            "id": "62aafeed23967484a61caa0a",
+            "name": "testing dataset storage",
+            "use_for_training": false
+        },
+        {
+            "creation_time": "2022-06-16T10:00:57.171000+00:00",
+            "id": "62aaff595f3aa95fe9a787dd",
+            "name": "testing dataset storage - updated",
+            "use_for_training": false
+        }
+    ]
+}

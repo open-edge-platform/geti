@@ -1,0 +1,41 @@
+title: Metadata of optimize job
+type: object
+description: Additional information associated with the optimize job
+properties:
+  task:
+    type: object
+    description: Information about the task associated with the job, if any
+    properties:
+      name:
+        type: string
+        description: Name of the task
+      model_template_id:
+        type: string
+        description: Identifier of the model template used by the task
+      model_architecture:
+        type: string
+        description: Neural network architecture used for the model
+      dataset_storage_id:
+        $ref: "../../mongo_id.yaml"
+      task_id:
+        $ref: "../../mongo_id.yaml"
+  project:
+    type: object
+    description: Information about the project associated with the job
+    properties:
+      id:
+        $ref: "../../mongo_id.yaml"
+      name:
+        type: string
+        description: Name of the project
+  model_storage_id:
+    $ref: "../../mongo_id.yaml"
+  optimization_type:
+    type: string
+    description: Type of optimization
+    enum:
+      - POT
+  base_model_id:
+    $ref: "../../mongo_id.yaml"
+  optimized_model_id:
+    $ref: "../../mongo_id.yaml"

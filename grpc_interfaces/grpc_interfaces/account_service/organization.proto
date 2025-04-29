@@ -1,0 +1,174 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package organization;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "common.proto";
+import "user_common.proto";
+
+service Organization {
+
+  // POST /organizations
+  rpc create (OrganizationData) returns (OrganizationData) {
+    option (google.api.http) = {
+      post: "/api/v1/organizations"
+      body: "*"
+    };
+  }
+
+  // PUT /organizations/{id}
+  rpc modify (OrganizationData) returns (OrganizationData) {
+    option (google.api.http) = {
+      put: "/api/v1/organizations/{id}"
+      body: "*"
+    };
+  }
+
+  // GET /organizations/{id}
+  rpc get_by_id (OrganizationIdRequest) returns (OrganizationDataWithAdmins) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{id}"
+    };
+  }
+
+  // GET /organizations  - conditions passed in the query string
+  rpc find (FindOrganizationRequest) returns (ListOrganizationsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations"
+    };
+  }
+
+  // DELETE /organizations/{id}
+  rpc delete (OrganizationIdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/organizations/{id}"
+    };
+  }
+
+  // PUT /organizations/{organization_id}/photos
+  rpc add_photo (stream OrganizationLogoRequest) returns (google.protobuf.Empty) {}
+
+  // DELETE /organizations/{organization_id}/photos
+  rpc delete_photo (OrganizationIdRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/v1/organizations/{id}/photos"
+    };
+  }
+
+  // GET /organizations/{organization_id}/photos
+  rpc get_photo (OrganizationIdRequest) returns (common.PreUrlResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/organizations/{id}/photos"
+    };
+  }
+
+  // POST /organizations/invitations
+  rpc send_invitation (OrganizationInvitiationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/organizations/invitations"
+      body: "*"
+    };
+  }
+
+  // POST /organizations/invitations - simple url
+  rpc send_invitation_simple (OrganizationInvitiationRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/api/v1/invitations"
+      body: "*"
+    };
+  }
+}
+
+message OrganizationData {
+  string id = 1;
+  string name = 2;
+  string country = 3;
+  string location = 4;
+  string type = 5;
+  string cell_id = 6;
+  string status = 7;
+  google.protobuf.Timestamp created_at = 8;
+  string created_by = 9;
+  google.protobuf.Timestamp modified_at = 10;
+  string modified_by = 11;
+  string request_access_reason = 12;
+}
+
+message OrganizationDataWithAdmins {
+  string id = 1;
+  string name = 2;
+  string country = 3;
+  string location = 4;
+  string type = 5;
+  string cell_id = 6;
+  string status = 7;
+  google.protobuf.Timestamp created_at = 8;
+  string created_by = 9;
+  google.protobuf.Timestamp modified_at = 10;
+  string modified_by = 11;
+  string request_access_reason = 13;
+
+
+  message AdminSimpleData {
+    string first_name = 1;
+    string last_name = 2;
+    string email = 3;
+  }
+
+  repeated AdminSimpleData admins = 12;
+}
+
+message OrganizationIdRequest {
+  string id = 1;
+}
+
+message FindOrganizationRequest {
+  string id = 17;
+  string name = 1;
+  string country = 2;
+  string location = 3;
+  string type = 4;
+  string cell_id = 5;
+  string status = 6;
+  google.protobuf.Timestamp created_at_from = 7;
+  google.protobuf.Timestamp created_at_to = 8;
+  string created_by = 9;
+  google.protobuf.Timestamp modified_at_from = 10;
+  google.protobuf.Timestamp modified_at_to = 11;
+  string modified_by = 12;
+  string request_access_reason = 18;
+  int32 skip = 13;
+  int32 limit = 14;
+  string sort_by = 15;  //attribute name
+  string sort_direction = 16;  //asc/desc
+}
+
+message ListOrganizationsResponse {
+  message NextPage {
+    int32 skip = 1;
+    int32 limit = 2;
+  }
+  repeated OrganizationDataWithAdmins organizations = 1;
+  int32 total_count = 2;
+  int32 total_matched_count = 3;
+  optional NextPage next_page = 4;
+}
+
+message OrganizationLogoRequest {
+  oneof request {
+    OrganizationIdRequest user_data = 1;
+    bytes photo = 2;
+  }
+}
+
+message OrganizationInvitiationRequest {
+  OrganizationData organizationData = 1;
+  user_common.UserData adminData = 2;
+}

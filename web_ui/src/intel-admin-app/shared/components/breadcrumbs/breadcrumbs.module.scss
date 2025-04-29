@@ -1,0 +1,23 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+.breadcrumbsContainer {
+    position: relative;
+    padding: var(--spectrum-global-dimension-size-100) var(--spectrum-global-dimension-size-1000);
+    padding-left: var(--spectrum-global-dimension-size-300);
+    color: var(--spectrum-global-color-gray-900);
+
+    @media (max-width: 1023px) {
+        padding: var(--spectrum-global-dimension-size-250) var(--spectrum-global-dimension-size-500);
+    }
+}
+
+.intelAdminBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+}

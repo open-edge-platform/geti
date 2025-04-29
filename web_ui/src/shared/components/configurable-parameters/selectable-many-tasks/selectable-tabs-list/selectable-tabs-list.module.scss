@@ -1,0 +1,21 @@
+.selectableTabAccordion {
+    overflow-wrap: anywhere;
+
+    & + .selectableTabAccordion {
+        margin-top: var(--spectrum-global-dimension-size-125);
+    }
+
+    header {
+        width: 100%;
+        align-items: center;
+        display: flex;
+    }
+
+    header + div {
+        margin-top: var(--spectrum-global-dimension-size-100);
+    }
+
+    header > div {
+        width: 100%;
+    }
+}

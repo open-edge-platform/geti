@@ -1,0 +1,37 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package organization_status;
+
+import "google/protobuf/timestamp.proto";
+import "organization.proto";
+
+service OrganizationStatus {
+  // PUT /organizations/{id}/statuses
+  rpc change (OrganizationStatusRequest) returns (OrganizationStatusResponse) {}
+
+  // GET /organizations/{id}/statuses
+  rpc get_statuses (organization.OrganizationIdRequest) returns (ListOrganizationStatusesResponse) {}
+}
+
+message OrganizationStatusRequest {
+  string status = 1;
+  string organization_id = 2;
+  string created_by = 3;
+}
+
+message OrganizationStatusResponse {
+  string id = 1;
+  string status = 2;
+  string organization_id = 3;
+  google.protobuf.Timestamp created_at = 4;
+  string created_by = 5;
+}
+
+message ListOrganizationStatusesResponse {
+  repeated OrganizationStatusResponse statuses = 1;
+}

@@ -1,0 +1,43 @@
+get:
+  tags:
+    - Tests
+  summary: Get a prediction from a test in project
+  description: Get a prediction from a test in the project.
+  operationId: GetPredictionFromTestInAProject
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+    - $ref: "../../parameters/path/model_test_id.yaml"
+    - $ref: "../../parameters/path/prediction_id.yaml"
+  responses:
+    '200':
+      description: Prediction successfully retrieved
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/predictions/responses/model_test_image_prediction.yaml"
+          examples:
+            Image prediction response:
+              value:
+                $ref: "../../examples/predictions/responses/model_test_image_prediction_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Test not found response:
+              value:
+                $ref: "../../examples/model_test_results/error_responses/model_test_not_found.json"
+            Prediction not found response:
+              description: "The prediction could not be found."
+              value:
+                $ref: "../../examples/predictions/error_responses/prediction_not_found.json"

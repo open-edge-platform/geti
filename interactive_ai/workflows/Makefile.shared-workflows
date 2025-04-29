@@ -1,0 +1,13 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+# Assumptions: all workflows are written in Python, use uv and do not have charts
+
+CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
+include $(CWD)/../../Makefile.shared-python
+
+lint-chart:
+	@echo "Nothing to do - ${COMPONENT_NAME} does not have charts"
+
+publish-chart:
+	@echo "Nothing to do - ${COMPONENT_NAME} does not have charts"

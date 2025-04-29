@@ -1,0 +1,67 @@
+post:
+  tags:
+    - Dataset Import/Export
+  summary: Prepare a dataset to be imported into an already existing project
+  description: |-
+    Analyze an uploaded dataset archive file and prepare it to be imported into an existing project.
+
+    This endpoint submits a job to prepare the dataset for import. Specifically, the job scans the dataset
+    to assess the compatibility with the target project and to identify potential issues in the data.
+    The status of this operation can be monitored in real-time through the [job status endpoint](#Jobs/GetJob);
+    once the job is finished, the list of parsed labels and warnings can be found in the job metadata.
+  operationId: PrepareDatasetForImportToProject
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/query/file_id.yaml'
+  responses:
+    '200':
+      description: Success
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/jobs/responses/job_id.yaml"
+          examples:
+            Job submitted successfully:
+              value:
+                $ref: "../../examples/jobs/responses/single_job_id_response.json"
+    '400':
+      description: Bad request
+      content:
+        application/json:
+          examples:
+            File ID in wrong format:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_file_id.json'
+            An export dataset is used to import:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/import_from_export_dataset_error.json"
+            Project ID in wrong format:
+              value:
+                $ref: '../../examples/dataset_import_export/error_responses/invalid_project_id.json'
+    '404':
+      description: File not found
+      content:
+        application/json:
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Dataset file not found:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/no_dataset_file_found.json"
+            Project not found:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/project_not_found.json"
+    '412':
+      description: Precondition failed
+      content:
+        application/json:
+          examples:
+            File not fully uploaded:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/file_not_fully_uploaded.json"

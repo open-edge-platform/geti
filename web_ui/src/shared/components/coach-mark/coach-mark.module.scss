@@ -1,0 +1,112 @@
+.dialogWrapper {
+    background: linear-gradient(90deg, #1db0e2 0%, #4ca286 52.6%, #89ad4e 100%);
+    box-shadow: 0px 2px 4px 0px #00000026;
+    color: var(--spectrum-global-color-gray-900);
+    padding: var(--spectrum-global-dimension-size-200);
+    display: flex;
+    flex-wrap: wrap;
+    max-width: var(--spectrum-global-dimension-size-4600);
+    max-width: var(--spectrum-global-dimension-size-4600);
+    height: auto;
+    border-radius: var(--spectrum-alias-border-radius-small) !important;
+    align-items: center;
+
+    .close {
+        color: var(--spectrum-toast-neutral-text-color) !important;
+
+        &:hover,
+        &:focus,
+        &[class*='is-active'] {
+            background-color: var(--brand-opacity-white-12) !important;
+            border-color: var(--spectrum-toast-neutral-text-color) !important;
+        }
+    }
+
+    .coachMarkDivider {
+        background-color: var(--brand-opacity-white-12);
+        margin: 0 var(--spectrum-global-dimension-size-150);
+    }
+}
+
+.tip {
+    content: '';
+    position: absolute;
+    transform-origin: 0 0;
+    border: 5px solid;
+}
+
+.tipTopRight::after {
+    @extend .tip;
+    top: 0;
+    right: 2.5%;
+    border-color: transparent transparent #89ad4e #89ad4e;
+    transform: rotate(135deg);
+}
+
+.tipBottomRight::after {
+    @extend .tip;
+    bottom: -10px;
+    right: 5%;
+    border-color: transparent transparent #89ad4e #89ad4e;
+    transform: rotate(-45deg);
+}
+
+.tipRightTop::after {
+    @extend .tip;
+    top: 30px;
+    right: -2.5%;
+    border-color: transparent transparent #89ad4e #89ad4e;
+    transform: rotate(225deg);
+}
+
+.coachMarkHeader {
+    margin-block-end: var(--spectrum-global-dimension-size-100);
+    width: 100%;
+    justify-content: space-between;
+    align-items: start;
+
+    .header {
+        font-size: var(--spectrum-global-dimension-font-size-400);
+        font-weight: 500;
+        width: 85%;
+    }
+
+    .steps {
+        font-size: var(--spectrum-global-dimension-font-size-50);
+    }
+}
+
+.dialogButtonGroup {
+    margin-top: var(--spectrum-global-dimension-size-200) !important;
+    margin-bottom: var(--spectrum-global-dimension-size-0) !important;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    button {
+        border: var(--spectrum-alias-border-size-thin) solid !important;
+        margin-inline-start: 0 !important;
+    }
+
+    .moreMenu {
+        color: var(--spectrum-toast-neutral-text-color) !important;
+        border: none !important;
+
+        &:hover,
+        &:focus,
+        &[class*='is-active'] {
+            background-color: var(--brand-opacity-white-12) !important;
+        }
+    }
+
+    .backButton {
+        border: none !important;
+        min-inline-size: 32px !important;
+        padding-left: var(--spectrum-global-dimension-size-50) !important;
+        padding-right: var(--spectrum-global-dimension-size-50) !important;
+    }
+}
+
+.dialogDescription {
+    white-space: pre-line;
+}

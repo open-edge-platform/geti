@@ -1,0 +1,23 @@
+type: object
+properties:
+  model_statistics:
+    type: array
+    items:
+      type: object
+      properties:
+        header:
+          type: string
+          description: Header describing the chart
+        key:
+          type: string
+          description: Unique key for the chart
+        type:
+          type: string
+          description: Type of chart. Current implementation allows 'line', 'text', 'bar', 'radial_bar' and 'matrix'.
+          enum: [text, line, bar, radial_bar, matrix]
+        value:
+          oneOf:
+            - $ref: 'text_chart.yaml'
+            - $ref: 'bar_chart.yaml'
+            - $ref: 'line_chart.yaml'
+            - $ref: 'matrix_chart.yaml'

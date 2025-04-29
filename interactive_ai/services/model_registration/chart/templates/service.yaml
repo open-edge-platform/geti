@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "modelregistration.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: tcp-modelreg
+      port: {{ .Values.service.ports.modelregistration.port }}
+      protocol: TCP
+  selector:
+    {{- include "modelregistration.selectorLabels" . | nindent 4 }}

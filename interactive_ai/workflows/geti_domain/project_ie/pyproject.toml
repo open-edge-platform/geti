@@ -1,0 +1,88 @@
+[project]
+name = "project-ie-workflow"
+version = "1.0.0"
+description = "Project import/export workflow"
+requires-python = ">=3.10, <3.11"
+
+dependencies = [
+    "Pillow==10.3.0",
+    "defusedxml==0.7.1",
+    "geti-kafka-tools",
+    "geti-spicedb-tools",
+    "geti-telemetry-tools[telemetry,grpc,kafka,logger]",
+    "geti-types",
+    "geti-k8s-tools",
+    "migration",
+    "workflows_common",
+]
+
+[tool.uv.sources]
+geti-kafka-tools = { path = "../../../../libs/kafka_tools", editable = true }
+geti-spicedb-tools = { path = "../../../../libs/spicedb_tools", editable = true }
+geti-telemetry-tools = { path = "../../../../libs/telemetry_tools", editable = true }
+geti-types = { path = "../../../../libs/types", editable = true }
+geti-k8s-tools = { path = "../../../../libs/k8s_tools", editable = true }
+migration = { path = "../../../data_migration", editable = true }
+workflows_common = { path = "../common", editable = true }
+
+[dependency-groups]
+dev = [
+    "mypy==1.10.0",
+    "pytest~=7.3.2",
+    "pytest-cov==2.11.1",
+    "click==8.1.7",
+    "pre-commit==2.15.0",
+    "pytest-html~=4.0.0",
+    "ruff==0.9.5",
+    "testfixtures==8.3.0",
+    "testcontainers[mongodb]~=4.10.0",
+    # FIXME: The version of "requests" is pinned
+    # to avoid the bug described in https://github.com/docker/docker-py/issues/3256
+    # We should upgrade to "docker~=7.1.0" to fix the issue but it is not compatible
+    # with the version of Flytekit that we use. In the meantime, we downgrade
+    # the "requests" package.
+    "requests==2.31",
+]
+
+[build-system]
+requires = [
+    "numpy~=1.26.0",
+    "hatchling"
+]
+
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["job"]
+
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012", "RUF046", "PLW1508"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "ARG", "SIM", "RUF", "TC", "PL", "C90", "D103", "RET504"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

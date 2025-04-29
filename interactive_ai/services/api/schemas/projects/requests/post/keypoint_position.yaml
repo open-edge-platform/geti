@@ -1,0 +1,14 @@
+type: object
+required:
+  - label
+  - x
+  - y
+properties:
+  label:
+    type: string
+  x:
+    type: number
+    format: float
+  y:
+    type: number
+    format: float

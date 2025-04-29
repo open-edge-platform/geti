@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Annotation scene with id 60ec6bbfb98caeb87e34306f could not be found.",
+  "error_code": "annotation_not_found"
+}

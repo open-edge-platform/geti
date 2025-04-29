@@ -1,0 +1,246 @@
+replicas: 1
+image: account-service
+imagePullPolicy: IfNotPresent
+
+fullnameOverride: impt-account-service
+
+id_pattern: "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+
+service:
+  ports:
+    grpc: "5001"
+    http: "5002"
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 400Mi
+  limits:
+    memory: 512Mi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  capabilities:
+    drop:
+      - ALL
+        
+securityContext_init:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+postgresql:
+  port: "5432"
+  host: "impt-postgresql"
+  image: 
+    registry: docker.io
+    repository: 
+    name: postgres:14.13
+  sslmode: "disable"
+
+spicedb:
+  log_file_path: "/audit_logs/spicedb.log"
+  grpc_port: "50051"
+
+kafka:
+  topic: project_notifications
+  port: 9092
+
+invitation:
+  from_address: "no-reply@geti.intel.com"
+  from_name: "Intel Geti"
+  link: "geti.com/invitation_link"
+
+global:
+  docker_namespace: geti
+  manage_users: false
+  manage_users_roles: false
+  acc_svc_mod: false
+  running_on_vm: false
+  security_headers: ""
+  stripped_headers: ""
+  enable_object_storage: true
+  acc_svc_settings_enabled: false
+  s3_endpoint: "impt-seaweed-fs:8333"
+  istio_ingress_namespace: 'istio-system'
+  istio_gateway_name: 'istio-gateway'
+  debian:
+    registry: docker.io
+    repository: bitnami
+    name: bitnami-shell:11-debian-11-r136
+  kubectl: 
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  account_service_mode: "setup"
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+
+ingress:
+  endpoints_admin:
+  - matches:
+    - /api/v(.*)/organizations/
+    - /api/v(.*)/organizations
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/
+    methods:
+      - PUT
+  - matches:
+    - /api/v(.*)/organizations/invitations/
+    - /api/v(.*)/organizations/invitations
+    methods:
+      - POST
+
+  endpoints_memberships:
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/memberships/{{ .Values.id_pattern }}
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/memberships/{{ .Values.id_pattern }}/
+    methods:
+      - PUT
+      - DELETE
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.id_pattern }}/memberships
+      - /api/v(.*)/organizations/{{ .Values.id_pattern }}/memberships/
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/users
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/users/{{ .Values.id_pattern }}/memberships
+      - /api/v(.*)/users/{{ .Values.id_pattern }}/memberships/
+    methods:
+      - GET
+
+  endpoints_admin_manage_users:
+  - matches:
+    - /api/v(.*)/organizations/
+    - /api/v(.*)/organizations
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/
+    methods:
+      - PUT
+  - matches:
+    - /api/v(.*)/invitations/
+    - /api/v(.*)/invitations
+    methods:
+      - POST
+
+  endpoints_platform:
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/workspaces/
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/workspaces
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/logout/
+    - /api/v(.*)/logout
+    methods:
+      - POST
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/roles/
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/roles
+    methods:
+      - PUT  # TODO: remove later when manager user roles FF is enabled?
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/roles/[a-zA-z]*
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/activeUser
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/profile/
+    - /api/v(.*)/profile
+    methods:
+      - GET
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/photos
+    methods:
+      - POST
+      - GET
+      - DELETE
+
+  endpoints_platform_access_token:
+  - matches:
+      - /api/v(.*)/personal_access_tokens/organization/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/personal_access_tokens/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/personal_access_tokens/?
+    methods:
+      - POST
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/personal_access_tokens/{{ .Values.id_pattern }}/?
+    methods:
+      - DELETE
+      - PATCH
+
+  endpoints_platform_access_token_manage_users:
+  - matches:
+      - /api/v(.*)/personal_access_tokens/organization/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/personal_access_tokens/?
+    methods:
+      - GET
+  - matches:
+      - /api/v([0-9.]*)/personal_access_tokens
+    methods:
+      - POST
+  - matches:
+      - /api/v([0-9.]*)/personal_access_tokens/{{ .Values.id_pattern }}/?
+    methods:
+      - DELETE
+      - PATCH

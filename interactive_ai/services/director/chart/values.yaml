@@ -1,0 +1,89 @@
+image: director
+
+imagePullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+  limits:
+    memory: 1Gi
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+service:
+  type: ClusterIP
+  ports:
+    director:
+      port: 4999
+
+ingress:
+  endpoints:
+  - /api/v([^/]*)/organizations/([^/]*)/status$
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/(predictions|train|optimize|settings|datasets/active|configuration)(/|$)(.*)
+  - /api/v([^/]*)/(organizations/([^/]*)/workspaces/([^/]*)/projects/([^/]*)/)?status$
+  - /api/v([^/]*)/(organizations/([^/]*)/workspaces/([^/]*)/projects/([^/]*)/)?incremental_learning_status$
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/tests($|/([^/]*)$)
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/predict
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/predict/status
+  - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*)/optimize
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*):train
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*):optimize
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/supported_algorithms
+
+serviceAccount:
+  create: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+podAnnotations:
+  proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+mountPath: "/binary_data"
+audit_logs_mount_path: "audit_logs"
+
+global:
+  security_headers: ''
+  stripped_headers: ''
+  logs_dir: ''
+  logging_config_dir: ''
+  storage_volume_claim_name_director: ''
+  docker_namespace: geti
+  enable_master_node_selector: true
+  min_free_disk_space_gib: 20
+  running_on_vm: false
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0

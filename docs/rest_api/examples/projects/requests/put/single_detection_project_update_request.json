@@ -1,0 +1,33 @@
+{
+    "id": "60e447c8d2ed2ae8c7dd0da5",
+    "name": "Example detection project demo",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "60e447c8d2ed2ae8c7dd0da7",
+                "to": "60e447c8d2ed2ae8c7dd0da0"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "60e447c8d2ed2ae8c7dd0da7",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "60e447c8d2ed2ae8c7dd0da0",
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_detection",
+                        "hotkey": "ctrl+5",
+                        "id": "60e447c8d2ed2ae8c7dd0da3",
+                        "name": "object"
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Sample detection task"
+            }
+        ]
+    }
+}

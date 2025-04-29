@@ -1,0 +1,8 @@
+in: query
+name: sort_by
+style: form
+description: Field to sort by, only 'score' available
+schema:
+  type: string
+  enum:
+    - score

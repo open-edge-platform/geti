@@ -1,0 +1,42 @@
+type: object
+title: Selectable string
+properties:
+  header:
+    type: string
+    description: User friendly title for the selectable string.
+  description:
+    type: string
+    description: User friendly description for what the selectable string parameter does.
+  warning:
+    description: Warning message (if any) that explains the user to use caution when changing this parameter, and why.
+  value:
+    type: string
+    description: Value that this selectable string currently takes.
+  default_value:
+    type: string
+    description: Default value that should be set for this selectable string.
+  name:
+    type: string
+    description: Name to identify the selectable string parameter by in the system.
+  template_type:
+    type: string
+    enum: [selectable]
+    description: "Describes the template type of the parameter. 'selectable' is used for parameters with a fixed set of
+    possible values. 'input' is used for parameters that allow free input, possibly restricted to a certain range.
+    Template_type is always 'selectable' for a selectable string parameter."
+  data_type:
+    type: string
+    enum: [string]
+    description: "Describes the type of parameter. Parameters can be integers, floats, boolean or string. Data_type is
+    always 'string' for a selectable string parameter."
+  options:
+    type: array
+    description: List of values that this selectable string can take.
+    items:
+      type: string
+  ui_rules:
+    type: object
+    description: Not implemented at this moment
+  editable:
+    type: boolean
+    description: Not implemented at this moment.

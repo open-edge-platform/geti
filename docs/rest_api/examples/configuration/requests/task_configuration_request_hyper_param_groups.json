@@ -1,0 +1,79 @@
+{
+    "components": [
+        {
+            "entity_identifier": {
+                "model_storage_id": "60e7f858191ae547c0a701e3",
+                "type": "HYPER_PARAMETER_GROUP",
+                "group_name": "learning_parameters"
+            },
+            "parameters": [
+                {
+                    "value": 5,
+                    "name": "batch_size"
+                },
+                {
+                    "value": 30,
+                    "name": "early_stopping_patience"
+                },
+                {
+                    "value": 0.001,
+                    "name": "learning_rate"
+                },
+                {
+                    "value": 0,
+                    "name": "max_train_size"
+                },
+                {
+                    "value": 40,
+                    "name": "num_epochs"
+                },
+                {
+                    "value": 0,
+                    "name": "num_workers"
+                }
+            ]
+        },
+        {
+            "entity_identifier": {
+                "model_storage_id": "60e7f858191ae547c0a701e3",
+                "type": "HYPER_PARAMETER_GROUP",
+                "group_name": "data_augmentation"
+            },
+            "parameters": [
+                {
+                    "value": "None",
+                    "name": "auto_augment"
+                },
+                {
+                    "value": 90,
+                    "name": "rotation_range"
+                },
+                {
+                    "value": 0.2,
+                    "name": "scaling_range"
+                }
+            ]
+        },
+        {
+            "entity_identifier": {
+                "model_storage_id": "60e7f858191ae547c0a701e3",
+                "type": "HYPER_PARAMETER_GROUP",
+                "group_name": "postprocessing"
+            },
+            "parameters": [
+                {
+                    "value": 5,
+                    "name": "blur_strength"
+                },
+                {
+                    "value": true,
+                    "name": "full_size_predictions"
+                },
+                {
+                    "value": 0.5,
+                    "name": "soft_threshold"
+                }
+            ]
+        }
+    ]
+}

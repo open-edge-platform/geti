@@ -1,0 +1,5 @@
+{
+  "http_status": 204,
+  "message": "No user settings were found.",
+  "error_code": "user_settings_not_found"
+}

@@ -1,0 +1,16 @@
+required:
+  - entity_identifier
+type: object
+title: Configurable parameters object
+description: The new values for the component parameters, hyper parameters or hyper parameter group to set
+properties:
+  entity_identifier:
+     $ref: "../entity_identifiers/entity_identifier.yaml"
+  groups:
+    type: array
+    items:
+      $ref: "../parameter_group/group.yaml"
+  parameters:
+    type: array
+    items:
+      $ref: "../configurable_parameters/parameter.yaml"

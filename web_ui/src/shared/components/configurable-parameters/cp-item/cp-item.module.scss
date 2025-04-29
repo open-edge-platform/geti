@@ -1,0 +1,24 @@
+.configParameterTooltipButton {
+    cursor: default !important;
+    background-color: var(--spectrum-global-color-gray-50) !important;
+    border: 0 !important;
+    outline: none !important;
+
+    & svg[aria-label='Notification Alert'] {
+        fill: var(--spectrum-semantic-notice-color-icon) !important;
+    }
+}
+
+.configParameterTitle {
+    font-size: var(--spectrum-global-dimension-font-size-100);
+    line-height: var(--spectrum-global-dimension-font-size-400);
+}
+
+.configParameterContent {
+    font-size: var(--spectrum-global-dimension-font-size-200);
+    line-height: var(--spectrum-global-dimension-font-size-600);
+}
+
+.configParameterDivider {
+    background-color: var(--spectrum-global-color-gray-100);
+}

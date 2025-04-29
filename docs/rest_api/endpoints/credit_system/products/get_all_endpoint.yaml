@@ -1,0 +1,42 @@
+get:
+  tags:
+    - Credit Products
+  summary: "[SaaS] Get all credits products"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Returns information about all available Geti SaaS subscription products.
+  operationId: get_all_products_api_v1_products_get
+  parameters:
+    - name: skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 0
+        title: Skip
+    - name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 50
+        minimum: 0
+        default: 10
+        title: Limit
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/products.yaml#/ListProductResponse'
+          example:
+            $ref: '../../../examples/credit_system/products/products_page_response.json'
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

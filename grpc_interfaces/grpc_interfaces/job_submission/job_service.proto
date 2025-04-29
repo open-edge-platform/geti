@@ -1,0 +1,144 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+service JobService {
+  // Submit a new job to the job service.
+  rpc submit(SubmitJobRequest) returns (JobIdResponse) {}
+
+  // Returns the job given its id.
+  rpc get_by_id(GetJobByIdRequest) returns (JobResponse) {}
+
+  // Cancel a job by its ID.
+  rpc cancel(CancelJobRequest) returns (EmptyResponse) {}
+
+  //  Retrieves the number of jobs that match the filter criteria.
+  rpc get_count(GetJobsCountRequest) returns (GetJobsCountResponse) {}
+
+  // Find jobs based on the filters and return a stream of JobResponse.
+  rpc find(FindJobsRequest) returns (ListJobsResponse) {}
+}
+
+message SubmitJobRequest {
+  message Telemetry { string context = 1; }
+  message CostRequest {
+    string unit = 1;
+    int32 amount = 2;
+  }
+  string type = 1;
+  int32 priority = 2;
+  string job_name = 3;
+  string workspace_id = 4;
+  string project_id = 5;
+  string key = 6;
+  string payload = 7;
+  string duplicate_policy = 8;
+  string author = 9;
+  string metadata = 10;
+  Telemetry telemetry = 11;
+  optional int32 gpu_num_required = 12;
+  repeated CostRequest cost = 13;
+  bool cancellable = 14;
+}
+
+message GetJobByIdRequest {
+  string workspace_id = 1;
+  string id = 2;
+}
+
+message CancelJobRequest {
+  string workspace_id = 1;
+  string id = 2;
+  string user_uid = 3;
+}
+
+message GetJobsCountRequest {
+  string type = 1;
+  string state = 2;
+  string workspace_id = 3;
+  string project_id = 4;
+  string key = 5;
+  string author_uid = 6;
+  string start_time_from = 7;
+  string start_time_to = 8;
+  bool all_permitted_jobs = 9;
+}
+
+message FindJobsRequest {
+  string type = 1;
+  string state = 2;
+  string workspace_id = 3;
+  string project_id = 4;
+  string key = 5;
+  string author_uid = 6;
+  string start_time_from = 7;
+  string start_time_to = 8;
+  int32 skip = 9;
+  int32 limit = 10;
+  string sort_by = 11;
+  string sort_direction = 12;
+  bool all_permitted_jobs = 13;
+}
+
+message JobIdResponse { string id = 1; }
+
+message JobResponse {
+  message StepDetails {
+    string message = 1;
+    int32 index = 2;
+    double progress = 3;
+    string state = 4;
+    string task_id = 5;
+    string step_name = 6;
+    string warning = 7;
+  }
+  message CancellationInfo {
+    bool is_cancelled = 1;
+    string user_uid = 2;
+    string cancel_time = 3;
+    string request_time = 4;
+    bool delete_job = 5;
+  }
+  message JobResource {
+    string unit = 1;
+    int32 amount = 2;
+  }
+  message JobCost {
+    repeated JobResource requests = 1;
+    repeated JobResource consumed = 2;
+  }
+  string id = 1;
+  string type = 2;
+  int32 priority = 3;
+  string creation_time = 4;
+  string start_time = 6;
+  string end_time = 7;
+  string job_name = 9;
+  string author = 10;
+  string workspace_id = 11;
+  string project_id = 12;
+  string state = 13;
+  string state_group = 14;
+  repeated StepDetails step_details = 15;
+  string key = 16;
+  string payload = 17;
+  CancellationInfo cancellation_info = 18;
+  string metadata = 19;
+  optional JobCost cost = 20;
+}
+
+message ListJobsResponse {
+  message NextPage {
+    int32 skip = 1;
+    int32 limit = 2;
+  }
+  repeated JobResponse jobs = 1;
+  int32 total_count = 2;
+  bool has_next_page = 3;
+  optional NextPage next_page = 4;
+}
+
+message EmptyResponse {}
+
+message GetJobsCountResponse { int32 count = 1; }

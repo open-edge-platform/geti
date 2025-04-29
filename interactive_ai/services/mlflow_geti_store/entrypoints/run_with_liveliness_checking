@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+# Primary container's process ID file
+PRIMARY_PID_FILE=$1
+
+# Sidecar container's process ID file
+SIDECAR_PID_FILE=$2
+
+mlflow server -h 0.0.0.0 --backend-store-uri geti:// --artifacts-destination geti:// -w 2 --gunicorn-opts="--pid=$SIDECAR_PID_FILE" &
+PID=$!
+
+for i in $(seq 0 10); do
+  if [ -f "$SIDECAR_PID_FILE" ]; then
+    SIDECAR_PID=$(cat "$SIDECAR_PID_FILE")
+    break
+  fi
+  sleep 1
+done
+
+check_liveliness $PRIMARY_PID_FILE $SIDECAR_PID &
+wait $PID

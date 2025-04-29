@@ -1,0 +1,19 @@
+.collapsedItemsPicker {
+    padding-right: var(--spectrum-global-dimension-size-125);
+    position: relative;
+
+    &.selected::after {
+        content: '';
+        position: absolute;
+        height: var(--spectrum-global-dimension-size-25);
+        left: 0;
+        bottom: -15px;
+        right: var(--spectrum-global-dimension-size-400);
+        background-color: white;
+    }
+
+    span[class*='spectrum-Dropdown-label'] {
+        font-size: var(--spectrum-global-dimension-font-size-100) !important;
+        font-style: normal !important;
+    }
+}

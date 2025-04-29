@@ -1,0 +1,55 @@
+{
+  "annotations": [
+    {
+      "id": "6138bca43b7b11505c43f2c1",
+      "labels": [
+        {
+          "color": "#00c3ffff",
+          "id": "610a9065a0d4fbb541cac729",
+          "name": "test1",
+          "probability": 0.81,
+          "source": {
+              "user_id": null,
+              "model_id": "61387685df33ae8280c347b2",
+              "model_storage_id": "62387685df33ae8280c63a34"
+          }
+        }
+      ],
+      "modified": "2021-08-04T13:06:47.056000+00:00",
+      "shape": {
+        "height": 55,
+        "type": "ELLIPSE",
+        "width": 31,
+        "x": 23,
+        "y": 9
+      }
+    }
+  ],
+  "id": "610a90e7a0d4fbb541cac7b0",
+  "kind": "prediction",
+  "media_identifier": {
+    "frame_index": 420,
+    "type": "video_frame",
+    "video_id": "610a908ea0d4fbb541cac741"
+  },
+  "modified": "2021-08-04T13:06:47.056000+00:00",
+  "maps": [
+    {
+      "id": "6138bca43b7b11505c43f2c1",
+      "labels_id": "6138bca43b7b11505c43f2c1",
+      "name": "Result media name",
+      "type": "Result media type",
+      "url": "/api/v1/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/{media_url}/predictions/{prediction.id}/maps/{combined_map_id}",
+      "roi": {
+        "id": "61387685df33ae8280c33d9d",
+        "shape": {
+          "type": "RECTANGLE",
+          "height": 45,
+          "width": 32,
+          "x": 19,
+          "y": 38
+        }
+      }
+    }
+  ]
+}

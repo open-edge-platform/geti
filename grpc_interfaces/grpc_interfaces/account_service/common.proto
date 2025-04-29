@@ -1,0 +1,12 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package common;
+
+message PreUrlResponse {
+  string presigned_url = 1;
+}

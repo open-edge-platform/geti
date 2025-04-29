@@ -1,0 +1,31 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Values.ui_app_name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Namespace }}-{{ .Values.ui_app_name }}
+  minReplicas: 1
+  {{- if .Values.global.running_on_vm }}
+  maxReplicas: 1
+  {{- else }}
+  maxReplicas: 20
+  {{- end }}
+  metrics:
+    - type: ContainerResource
+      containerResource:
+        name: cpu
+        container: {{ .Values.ui_app_name }}
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: ContainerResource
+      containerResource:
+        name: memory
+        container: {{ .Values.ui_app_name }}
+        target:
+          type: Utilization
+          averageUtilization: 70

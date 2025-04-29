@@ -1,0 +1,11 @@
+type: object
+required:
+  - range_labels
+properties:
+  video_id:
+    $ref: "../uuid.yaml"
+  range_labels:
+    description: List of range labels
+    type: array
+    items:
+      $ref: "range_labels.yaml"

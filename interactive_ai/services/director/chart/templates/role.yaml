@@ -1,0 +1,15 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Release.Namespace }}-director
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+    - "batch"
+  resources:
+    - jobs
+  verbs:
+    - watch
+    - get
+    - list

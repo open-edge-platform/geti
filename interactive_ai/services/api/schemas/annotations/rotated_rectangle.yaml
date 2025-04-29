@@ -1,0 +1,36 @@
+type: object
+title: Rotated Rectangle
+properties:
+  type:
+    type: string
+    enum: [ "ROTATED_RECTANGLE" ]
+    description: Type of the shape.
+  x:
+    type: number
+    description: Center x-coordinate of the rotated rectangle. Coordinates are pixel values.
+  y:
+    type: number
+    description: Center y-coordinate of the rotated rectangle. Coordinates are pixel values.
+  width:
+    type: number
+    description: Width of the rotated rectangle (not the encapsulating box of the rectangle). Coordinates are pixel values.
+  height:
+    type: number
+    description: Height of the rotated rectangle (not the encapsulating box of the rectangle). Coordinates are pixel values.
+  angle:
+    type: number
+    description: Clockwise angle in degrees for the rectangle.
+required:
+  - type
+  - x
+  - y
+  - width
+  - height
+  - angle
+example:
+  type: ROTATED_RECTANGLE
+  x: 320
+  y: 240
+  width: 50
+  height: 25
+  angle: 45

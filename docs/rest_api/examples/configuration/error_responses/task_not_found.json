@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Could not find task with id `123`",
+  "error_code": "task_not_found"
+}

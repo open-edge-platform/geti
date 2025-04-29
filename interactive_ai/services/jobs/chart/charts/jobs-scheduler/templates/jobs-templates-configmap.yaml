@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-jobs-templates
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "jobs-scheduler.labels" . | nindent 4 }}
+data:
+  jobs_templates.yaml: |-
+    - job_type: train
+      steps:
+        - name: Prepare training data
+          task_id: job.tasks.prepare_and_train.prepare_data_and_train.prepare_training_data_model_and_start_training
+        - name: Model training
+          task_id: train
+          start_message: Starting model training
+          finish_message: Model is trained
+          failure_message: Model training has failed
+        - name: Model evaluation and inference
+          task_id: job.tasks.evaluate_and_infer.evaluate_and_infer.evaluate_and_infer
+    - job_type: optimize_pot
+      steps:
+        - name: Shard dataset and prepare model for optimization
+          task_id: job.tasks.optimization_task.shard_dataset_prepare_models_and_start_optimization
+        - name: Optimizing model
+          task_id: optimize
+          start_message: Starting model optimization
+          finish_message: Model optimized
+          failure_message: Model optimization has failed    
+        - name: Evaluating optimized model
+          task_id: job.tasks.evaluation_task.evaluate_optimized_model_pot
+    - job_type: test
+      steps:
+      - name: Running model test
+        task_id: job.tasks.model_testing.run_model_test
+    - job_type: export_dataset
+      steps:
+        - name: Create export dataset
+          task_id: job.tasks.export_tasks.export_dataset_task.export_dataset_task
+    - job_type: prepare_import_to_new_project
+      steps:
+        - name: Prepare dataset import to new project
+          task_id: job.tasks.import_tasks.parse_dataset_new_project.parse_dataset_for_import_to_new_project
+    - job_type: perform_import_to_new_project
+      steps:
+        - name: Create project from import dataset
+          task_id: job.tasks.import_tasks.create_project_from_dataset.create_project_from_dataset
+    - job_type: prepare_import_to_existing_project
+      steps:
+        - name: Prepare dataset import to existing project
+          task_id: job.tasks.import_tasks.parse_dataset_existing_project.parse_dataset_for_import_to_existing_project
+    - job_type: perform_import_to_existing_project
+      steps:
+        - name: Import dataset to project
+          task_id: job.tasks.import_tasks.import_dataset_to_project.import_dataset_to_project
+    - job_type: export_project
+      steps:
+        - name: Exporting project
+          task_id: job.tasks.export_project.export_project
+    - job_type: import_project
+      steps:
+        - name: Importing project
+          task_id: job.tasks.import_project.import_project

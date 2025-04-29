@@ -1,0 +1,39 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: {{ include "account-service.fullname" . }}-error-handler
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  workloadSelector:
+    labels: {{- include "account-service.selectorLabels" . | nindent 6 }}
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: envoy.filters.network.http_connection_manager
+    patch:
+      operation: INSERT_BEFORE
+      value:
+        name: envoy.lua
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          inlineCode: |
+            function envoy_on_response(response_handle)
+              if response_handle:headers():get(":status") == "400" then
+                local body_search = response_handle:body()
+                if string.find(body_search:getBytes(0, body_search:length()), "invalid google.protobuf.Timestamp") then
+                  local new_body = '{"error": "Expiration date is invalid"}'
+                  response_handle:body():setBytes(new_body)
+                  response_handle:headers():replace("content-length", tostring(#new_body))
+                end
+              end
+            end
+{{- end }}

@@ -1,0 +1,32 @@
+type: object
+properties:
+  id:
+    type: number
+    format: int32
+    description: The video frame index
+  media_information:
+    $ref: "../../media/responses/video_information.yaml"
+  name:
+    type: string
+    description: Name of the image
+  annotation_state_per_task:
+    $ref: "../../media/responses/annotation_state_per_task.yaml"
+  thumbnail:
+    type: string
+    description: Relative URL to the video frame thumbnail
+  type:
+    type: string
+    description: Type of media. 'image' for images, 'video' for video and 'video_frame' for video frames.
+    enum: [ video_frame ]
+  upload_time:
+    type: string
+    description: Upload time of the media file
+  annotation_scene_id:
+    description: Optional ID of the annotation scene if filtering in a specific training revision
+    type: string
+  roi_id:
+    description: Optional ID of the roi id if filtering in a specific training revision
+    type: string
+  last_annotator_id:
+    description: Optional ID of the user that last edited the annotation.
+    type: string

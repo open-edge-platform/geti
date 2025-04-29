@@ -1,0 +1,8 @@
+type: object
+properties:
+  score:
+    type: 
+      - "number"
+      - "null"
+    format: float
+    description: Accuracy score for the model. Only applicable for non-anomaly projects.

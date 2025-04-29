@@ -1,0 +1,8 @@
+in: query
+name: roi_id
+description: "The ID of the ROI to predict on. Can only be an ID of a user annotated ROI. Note that if you pass an ID
+for an ROI you should in most cases also pass a task_id. For example, in a detection -> classification chain if a user 
+annotates a ROI (box for first task) and requests a prediction for this ROI you don't want the detection task to have to
+find the same object again that the user annotated but immediately skip to the classification task."
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/uuid.yaml"

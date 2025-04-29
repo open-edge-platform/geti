@@ -1,0 +1,14 @@
+in: path
+name: prediction_type
+style: simple
+description: Type of predictions available. Auto will fetch prediction from the database if it is up to date, otherwise
+  an inference request is sent. Online will always send an inference request and latest will not send an inference request
+  but grabs the latest result from the database.
+schema:
+  type: string
+  enum: [
+    "latest",
+    "auto",
+    "online",
+  ]
+required: true

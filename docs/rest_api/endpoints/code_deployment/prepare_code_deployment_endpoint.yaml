@@ -1,0 +1,63 @@
+post:
+  tags:
+    - Code Deployment
+  summary: Prepare code deployment for project
+  description: "This endpoint triggers preparation for code deployment for a specific project.
+  For single-task projects (Detection, Segmentation, etc), it will export the only model used.
+  For task-chain projects, it will export all the models.
+  Only models in OpenVINO IR format are supported.
+  
+  This endpoint is deprecated. Use the [deployment package endpoint](../deployment_package/download_deployment_package_endpoint.yaml) to prepare and download code deployment."
+  operationId: PrepareCodeDeployment
+  deprecated: true
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: '../../parameters/path/project_id.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/code_deployment/requests/model_identifier_list.yaml'
+        examples:
+          Request code deployment for a task chain:
+            value:
+              $ref: "../../examples/code_deployment/requests/create_model_identifier_list_request.json"
+    required: true
+  responses:
+    '200':
+      description: Code deployment started successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/code_deployment/responses/deployment_response.yaml"
+          examples:
+            Successfully created:
+              value:
+                $ref: "../../examples/code_deployment/responses/deployment_response.json"
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid code deployment:
+              value:
+                $ref: "../../examples/code_deployment/error_responses/invalid_code_deployment.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"

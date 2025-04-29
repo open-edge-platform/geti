@@ -1,0 +1,50 @@
+get:
+  tags:
+    - Code Deployment
+  summary: Download the deployed code as a zip file
+  description: "Download the deployed code as a zip file.
+  This endpoint is deprecated. Use the [deployment package endpoint](../deployment_package/download_deployment_package_endpoint.yaml) to prepare and download code deployment."
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/deployment_id.yaml'
+  operationId: DownloadCodeDeployment
+  deprecated: true
+  responses:
+    '200':
+      description: Retrieved code deployment zipfile
+      content:
+        zip file:
+          schema:
+            type: string
+            format: binary
+    '404':
+      description: Object not found. See the examples for detail.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Code level deployment not found response:
+              value:
+                $ref: "../../examples/code_deployment/error_responses/code_deployment_not_found.json"
+    '503':
+      description: Deployment is not ready. See the examples for detail.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Code level deployment download is not ready:
+              value:
+                $ref: "../../examples/code_deployment/error_responses/code_deployment_download_not_ready.json"

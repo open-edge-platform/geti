@@ -1,0 +1,4 @@
+{
+  "script": "remove_empty_annotation_scene.py",
+  "metadata": "remove_empty_annotation_scene.json"
+}

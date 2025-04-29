@@ -1,0 +1,6 @@
+in: query
+name: annotation_status
+style: form
+description: Annotation status for the image
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/annotation_status.yaml"

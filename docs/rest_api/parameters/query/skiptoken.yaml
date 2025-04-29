@@ -1,0 +1,6 @@
+in: query
+name: skiptoken
+style: form
+description: Id for pagination. Only retrieve media with id greater than skiptoken
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"

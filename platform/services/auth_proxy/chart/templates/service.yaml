@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "auth-proxy.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "auth-proxy.labels" . | nindent 4 }}
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "false"
+    {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.ports.grpc }}
+      protocol: TCP
+      name: grpc
+      appProtocol: grpc
+    - port: {{ .Values.service.ports.http }}
+      protocol: TCP
+      name: http
+      appProtocol: http
+  selector:
+    {{- include "auth-proxy.selectorLabels" . | nindent 4 }}

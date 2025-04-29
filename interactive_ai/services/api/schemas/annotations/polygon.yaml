@@ -1,0 +1,25 @@
+type: object
+title: Polygon
+properties:
+  type:
+    type: string
+    enum: [ "POLYGON" ]
+    description: Type of the shape.
+  points:
+    type: array
+    maxItems: 5000
+    description: Array of points that define the polygon.
+    items:
+      $ref: 'point.yaml'
+required:
+  - type
+  - points
+example:
+  type: POLYGON
+  point:
+    - x: 10
+      y: 10
+    - x: 20
+      y: 20
+    - x: 10
+      y: 20

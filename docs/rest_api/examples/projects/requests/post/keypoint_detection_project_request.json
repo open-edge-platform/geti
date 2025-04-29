@@ -1,0 +1,96 @@
+{
+    "name":"Example keypoint project",
+    "pipeline":{
+        "connections":[
+            {
+                "from":"Dataset",
+                "to":"Sample keypoint detection task"
+            }
+        ],
+        "tasks":[
+            {
+                "task_type":"dataset",
+                "title":"Dataset"
+            },
+            {
+                "task_type":"keypoint_detection",
+                "title":"Sample keypoint detection task",
+                "labels":[
+                    {
+                        "color":"#0009FF27",
+                        "group":"default_keypoint_detection",
+                        "hotkey":"ctrl+1",
+                        "name":"head"
+                    },
+                    {
+                        "color":"#00FF7809",
+                        "group":"default_keypoint_detection",
+                        "hotkey":"ctrl+2",
+                        "name":"neck"
+                    },
+                    {
+                        "color":"#000919FF",
+                        "group":"default_keypoint_detection",
+                        "hotkey":"ctrl+3",
+                        "name":"back"
+                    },
+                    {
+                        "color":"#00FF09BD",
+                        "group":"default_keypoint_detection",
+                        "hotkey":"ctrl+4",
+                        "name":"left_shoulder"
+                    },
+                    {
+                        "color":"#00FF0909",
+                        "group":"default_keypoint_detection",
+                        "hotkey":"ctrl+5",
+                        "name":"right_shoulder"
+                    }
+                ],
+                "keypoint_structure":{
+                    "edges":[
+                        {
+                            "nodes":["head", "neck"]
+                        },
+                        {
+                            "nodes":["neck", "back"]
+                        },
+                        {
+                            "nodes":["neck", "left_shoulder"]
+                        },
+                        {
+                            "nodes":["neck", "right_shoulder"]
+                        }
+                    ],
+                    "positions":[
+                        {
+                            "label":"head",
+                            "x":0.1,
+                            "y":0.2
+                        },
+                        {
+                            "label":"neck",
+                            "x":0.3,
+                            "y":0.4
+                        },
+                        {
+                            "label":"back",
+                            "x":0.5,
+                            "y":0.6
+                        },
+                        {
+                            "label":"left_shoulder",
+                            "x":0.7,
+                            "y":0.8
+                        },
+                        {
+                            "label":"right_shoulder",
+                            "x":0.9,
+                            "y":0.1
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}

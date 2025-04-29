@@ -1,0 +1,27 @@
+get:
+  tags:
+    - Workspaces
+  summary: Get information about all workspaces
+  description: "List all workspaces in an organization."
+  operationId: GetAllWorkspaces
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+  responses:
+    '200':
+      description: The requested workspaces info
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/workspaces/responses/workspace_list.yaml"
+          example:
+            $ref: "../../examples/workspaces/responses/workspace_list_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"

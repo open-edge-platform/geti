@@ -1,0 +1,5 @@
+.storageUsageMeter {
+    & div[class*='spectrum-BarLoader-fill'] {
+        background-color: var(--meter-color) !important;
+    }
+}

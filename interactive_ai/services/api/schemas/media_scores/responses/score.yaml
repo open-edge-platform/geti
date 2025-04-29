@@ -1,0 +1,14 @@
+type: object
+properties:
+  label_id:
+    type: 
+    - "string"
+    - "null"
+    example: "60d31793d5f1fb7e6e3c1a4c"
+    description: Mongo ID of the object
+  name:
+    type: string
+    description: The name of the metric of this score
+  value:
+    type: number
+    description: The score in percentage (0-100)

@@ -1,0 +1,5 @@
+{
+  "http_status": 412,
+  "message": "File with given id is not fully uploaded to the server"
+}
+

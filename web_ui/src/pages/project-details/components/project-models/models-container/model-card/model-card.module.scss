@@ -1,0 +1,106 @@
+.modelInfo {
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    color: var(--spectrum-global-color-gray-800);
+}
+
+.modelCard {
+    width: 100%;
+    cursor: pointer;
+    background-color: var(--spectrum-global-color-gray-75);
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-200);
+    }
+}
+
+.labelsOutOfDateTag {
+    background-color: var(--brand-daisy-tint) !important;
+    color: var(--text-dark-default) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.modelCardDetails {
+    & div[aria-label='model-tooltip'] {
+        // formula: padding + border used in the model performance component
+        padding-top: calc(var(--spectrum-global-dimension-size-185) + var(--spectrum-alias-border-radius-small));
+        padding-bottom: calc(var(--spectrum-global-dimension-size-185) + var(--spectrum-alias-border-radius-small));
+    }
+}
+
+.activateDialogMessage {
+    color: var(--spectrum-global-color-gray-700) !important;
+}
+
+.modelTag {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    width: max-content;
+    border-radius: var(--spectrum-global-dimension-size-50);
+    color: var(--text-dark-default);
+    font-size: var(--spectrum-global-dimension-static-font-size-50);
+}
+
+.activeModelTag {
+    @extend .modelTag;
+    background-color: var(--energy-blue) !important;
+}
+
+.recommendedModelTag,
+.templateNameTag {
+    @extend .modelTag;
+    color: var(--spectrum-global-color-gray-900) !important;
+    background-color: var(--spectrum-global-color-gray-400) !important;
+}
+
+.obsoleteModel {
+    @extend .modelTag;
+    background: var(--spectrum-global-color-gray-200);
+    color: var(--spectrum-global-color-gray-900);
+    padding: 0 var(--spectrum-global-dimension-static-size-50);
+}
+
+.modelDeleted {
+    color: var(--spectrum-global-color-gray-500);
+
+    a,
+    span {
+        color: var(--spectrum-global-color-gray-500) !important;
+    }
+
+    path {
+        fill: var(--spectrum-global-color-gray-500) !important;
+    }
+}
+
+.deletedModelTag {
+    @extend .modelTag;
+
+    span {
+        color: var(--spectrum-global-color-gray-800) !important;
+    }
+}
+
+.countWithIcon {
+    color: var(--spectrum-global-color-gray-800);
+    font-size: var(--spectrum-global-dimension-font-size-75);
+}
+
+.obsoleteModelTag {
+    @extend .modelTag;
+
+    background-color: var(--spectrum-global-color-red-400) !important;
+    color: var(--spectrum-global-color-gray-900) !important;
+}
+
+.deprecatedModelTag {
+    @extend .modelTag;
+
+    background-color: var(--spectrum-global-color-orange-400) !important;
+    color: var(--spectrum-global-color-gray-900) !important;
+}
+
+.creditDeductionInfo {
+    display: block;
+    margin-top: var(--spectrum-global-dimension-size-125);
+}

@@ -1,0 +1,26 @@
+type: object
+title: Hyper parameters
+properties:
+  id:
+    $ref: "../../../mongo_id.yaml"
+  entity_identifier:
+    $ref: "../entity_identifiers/entity_identifier.yaml"
+  type:
+    type: string
+    description: "Type of the configurable parameters. For hyper parameters the type is always
+    'CONFIGURABLE_PARAMETERS'."
+    enum: ["CONFIGURABLE_PARAMETERS", "PARAMETER_GROUP"]
+  header:
+    type: string
+    description: The name of the configuration
+    example: Hyper parameters for a segmentation task
+  description:
+    type: string
+    description: Description of model to which this configuration belongs
+    example: Hyper parameters for a segmentation task
+  groups:
+    type: array
+    items:
+      $ref: "../parameter_group/generic_group.yaml"
+  parameters:
+    $ref: "../configurable_parameters/parameters.yaml"

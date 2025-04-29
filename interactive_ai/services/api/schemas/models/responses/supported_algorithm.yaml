@@ -1,0 +1,44 @@
+type: object
+properties:
+  supported_algorithms:
+    type: array
+    description: List of supported algorithms
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the algorithm
+        task_type:
+          type: string
+          enum: [detection, rotated_detection, anomaly, segmentation, instance_segmentation, classification, keypoint_detection]
+          description: Task type of the algorithm.
+        model_size:
+          type: number
+          format: float
+          description: Storage size of the model, in MB
+        model_template_id:
+          type: string
+          description: Unique identifier for the algorithm
+        gigaflops:
+          type: number
+          format: float
+          description: Theoretical complexity of the model, in billions of operations
+        summary:
+          type: string
+          description: A short summary that gives information about the algorithm
+        supports_auto_hpo:
+          type: boolean
+          description: |-
+            Boolean that indicates whether the algorithm supports automatic hyper parameter optimization.
+            This field is deprecated and should not be used, it will be removed in the future.
+          deprecated: true
+        default_algorithm:
+          type: boolean
+          description: Boolean that indicates whether the model template is the default selection for the task
+        performance_category:
+          type: string
+          enum: [balance, speed, accuracy, other]
+          description: The category of the model template. Some algorithms focus more on accuracy, others on inference speed.
+        lifecycle_stage:
+          $ref: "model_template_lifecycle_stage.yaml"

@@ -1,0 +1,99 @@
+.checkmark {
+    & > svg {
+        fill: var(--spectrum-global-color-informative);
+    }
+}
+
+.alert {
+    & > svg {
+        fill: var(--spectrum-global-color-negative);
+    }
+}
+
+.discardActionLink:not(:disabled) {
+    color: var(--spectrum-global-color-negative) !important;
+}
+
+.discardAction {
+    span {
+        color: var(--spectrum-global-color-negative) !important;
+    }
+}
+.jobName {
+    font-size: var(--spectrum-global-dimension-font-size-200) !important;
+}
+
+.jobMeta {
+    font-size: var(--spectrum-global-dimension-font-size-75) !important;
+}
+
+.jobsListItemWrapper {
+    background-color: var(--spectrum-global-color-gray-75);
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-100);
+    }
+}
+
+.iconFinished {
+    path {
+        fill: var(--spectrum-global-color-positive);
+    }
+}
+
+.iconFailed {
+    path {
+        fill: var(--spectrum-global-color-negative);
+    }
+}
+
+.iconCanceled {
+    path {
+        fill: var(--spectrum-global-color-gray-600);
+    }
+}
+
+.iconSkipped {
+    path {
+        fill: var(--spectrum-global-color-warning);
+    }
+}
+
+.iconWaiting {
+    path {
+        fill: var(--spectrum-global-color-gray-600);
+    }
+}
+
+.stepMessage {
+    font-size: var(--spectrum-global-dimension-font-size-75) !important;
+    line-height: var(--spectrum-global-dimension-size-250) !important;
+}
+
+.failed {
+    color: var(--spectrum-global-color-static-white) !important;
+    background-color: var(--spectrum-global-color-negative) !important;
+}
+
+.skipped {
+    color: var(--spectrum-global-color-gray-50) !important;
+    background-color: var(--spectrum-global-color-warning) !important;
+}
+
+.meta {
+    > div {
+        white-space: nowrap;
+        max-width: var(--spectrum-global-dimension-size-2400);
+    }
+}
+
+.warningSectionIcon {
+    margin-right: var(--spectrum-global-dimension-size-50);
+}
+
+.costWarningContainer {
+    color: var(--text-dark-default);
+    font-size: var(--spectrum-global-dimension-size-225);
+    padding: var(--spectrum-global-dimension-size-275) var(--spectrum-global-dimension-size-175);
+    background: var(--brand-daisy);
+}

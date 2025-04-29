@@ -1,0 +1,10 @@
+title: Metadata of `import_project` job
+type: object
+description: Information about the project import operation
+properties:
+  project:
+    description: Information about the imported project
+    $ref: 'project.yaml'
+  parameters:
+    description: Parameters of the import request
+    $ref: 'import_parameters.yaml'

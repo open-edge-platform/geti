@@ -1,0 +1,26 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  media_information:
+    $ref: "../../media/responses/video_information.yaml"
+  name:
+    type: string
+    description: Name of the image
+  annotation_state_per_task:
+    $ref: "../../media/responses/annotation_state_per_task.yaml"
+  thumbnail:
+    type: string
+    description: Relative URL to the video thumbnail
+  type:
+    type: string
+    description: Type of media. 'image' for images, 'video' for video and 'video_frame' for video frames.
+    enum: [ video ]
+  upload_time:
+    type: string
+    description: Upload time of the media file
+  matched_frames:
+    type: 
+    - "number"
+    - "null"
+    description: Number of frames in the video that match the filter. Only returned when filtering by annotation properties.

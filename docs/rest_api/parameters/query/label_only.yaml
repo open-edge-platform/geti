@@ -1,0 +1,6 @@
+in: query
+name:  label_only
+style: form
+description: Set to `true` to return the annotations without the geometric shapes. Default is `false`. 
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/label_only.yaml"

@@ -1,0 +1,14 @@
+required:
+  - http_status
+  - message
+  - error_code
+properties:
+  http_status:
+    type: integer
+    enum: [400, 404, 405, 409, 412, 413, 415, 422, 423, 500, 501, 503]
+  message:
+    type: string
+    description: "Message from server"
+  error_code:
+    type: string
+    description: "Error code from server"

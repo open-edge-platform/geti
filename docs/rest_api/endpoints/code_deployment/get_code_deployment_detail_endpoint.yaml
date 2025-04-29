@@ -1,0 +1,42 @@
+get:
+  tags:
+    - Code Deployment
+  summary: Get details of a code deployment process
+  description: "Get details for the code deployment process, which includes the state, the progress,
+  models, the creator id and creation time."
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/deployment_id.yaml'
+  operationId: GetCodeDeployment
+  responses:
+    '200':
+      description: Retrieved details for deployment on code level
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/code_deployment/responses/deployment_response.yaml"
+          examples:
+            Details successfully retrieved:
+              value:
+                $ref: "../../examples/code_deployment/responses/deployment_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Code level deployment not found response:
+              value:
+                $ref: "../../examples/code_deployment/error_responses/code_deployment_not_found.json"

@@ -1,0 +1,32 @@
+.gridWrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+
+.emptyMediaContentBucket {
+    user-select: none;
+    box-sizing: border-box;
+    background: var(--spectrum-global-color-gray-75);
+}
+
+.mediaContentBucket {
+    @extend .emptyMediaContentBucket;
+    padding: var(--spectrum-global-dimension-size-200);
+}
+
+.emptyMediaContentBody {
+    box-sizing: border-box;
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: var(--spectrum-global-dimension-size-65);
+}
+
+.mediaContentBody {
+    @extend .emptyMediaContentBody;
+    padding: var(--spectrum-global-dimension-size-200);
+    background-color: var(--spectrum-global-color-gray-50);
+}
+
+.footerAnomalousInfo {
+    text-align: center;
+}

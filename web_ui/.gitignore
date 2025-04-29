@@ -1,0 +1,40 @@
+/public/env-config.js
+.env
+
+#code editor configs
+.idea
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+/main-app
+/admin-app
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.eslintcache
+/dev-feature-flags.json
+
+npm-debug.log*
+debug.log*
+/test-results/
+/playwright-report/
+/dist-pw/
+playwright-report.*
+
+!tests/datasets/
+tests/datasets/*
+!tests/datasets/videos/
+
+tests/e2e/.auth
+
+public/openapi-spec.json

@@ -1,0 +1,1127 @@
+{
+    "openapi": "3.0.2",
+    "info": { "title": "FastAPI", "version": "0.1.0" },
+    "paths": {
+        "/users/active": {
+            "get": {
+                "tags": ["users", "users"],
+                "summary": "Active User",
+                "operationId": "active_user_users_active_get",
+                "parameters": [
+                    {
+                        "required": false,
+                        "schema": { "title": "X-Auth-Request-User", "type": "string" },
+                        "name": "x-auth-request-user",
+                        "in": "header"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserModel" } } }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "tags": ["users"],
+                "summary": "List Users",
+                "description": "Get the list of users\n\n:param access_resource_type: Access resource type to filter the users by.\n:param access_resource_id: Access resource id to filter the users by.",
+                "operationId": "list_users_users__get",
+                "parameters": [
+                    {
+                        "required": false,
+                        "schema": { "$ref": "#/components/schemas/AccessResourceType" },
+                        "name": "access_resource_type",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "Access Resource Id", "type": "string" },
+                        "name": "access_resource_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response List Users Users  Get",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "array",
+                                        "items": { "$ref": "#/components/schemas/UserModel" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["users"],
+                "summary": "Create User",
+                "operationId": "create_user_users__post",
+                "requestBody": {
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateUserData" } } },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "User successfully created",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "409": { "description": "This email address is already being used." },
+                    "422": { "description": "Invalid email." }
+                }
+            }
+        },
+        "/users/{user_id}": {
+            "get": {
+                "tags": ["users"],
+                "summary": "Get User By Id",
+                "description": "Endpoint for getting user's data.",
+                "operationId": "get_user_by_id_users__user_id__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserModel" } } }
+                    },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["users"],
+                "summary": "Edit User",
+                "description": "Endpoint for updating user's data.",
+                "operationId": "edit_user_users__user_id__put",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserModel" } } },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UserModel" } } }
+                    },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "409": { "description": "Request conflict" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["users"],
+                "summary": "Delete User",
+                "description": "/delete/{user_id} handler",
+                "operationId": "delete_user_users__user_id__delete",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User was successfully deleted.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "500": { "description": "Server got itself in trouble" },
+                    "HTTPSTATUS.UNPROCESSABLE_ENTITY": {
+                        "description": "User is the last global admin so they cant be deleted"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/photo": {
+            "get": {
+                "tags": ["users"],
+                "summary": "Get User Photo",
+                "operationId": "get_user_photo_users__user_id__photo_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo of requested user.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "404": { "description": "User not found or no photo uploaded." },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["users"],
+                "summary": "Upload User Photo",
+                "operationId": "upload_user_photo_users__user_id__photo_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_upload_user_photo_users__user_id__photo_post"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "413": { "description": "Entity is too large" },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["users"],
+                "summary": "Delete User Photo",
+                "description": "DELETE /users/{user_id}/photo handler",
+                "operationId": "delete_user_photo_users__user_id__photo_delete",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User photo was successfully deleted.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "500": { "description": "Server got itself in trouble" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/sessions": {
+            "delete": {
+                "tags": ["users"],
+                "summary": "Delete User Sessions",
+                "description": "DELETE /{user_id}/sessions handler",
+                "operationId": "delete_user_sessions_users__user_id__sessions_delete",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User sessions were successfully deleted.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/invite": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Invite",
+                "operationId": "invite_users_invite_post",
+                "requestBody": {
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/InviteData" } } },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "User has been successfully invited.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/login": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Login User",
+                "description": "/users/login handler",
+                "operationId": "login_user_users_login_post",
+                "requestBody": {
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginData" } } },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correct username and password provided, auth cookies set",
+                        "content": { "text/plain": { "schema": { "type": "string" } } }
+                    },
+                    "400": { "description": "Password not base64 encoded" },
+                    "500": { "description": "Internal call to login service has missing required data" },
+                    "401": { "description": "Invalid username or password provided" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/request_password_reset": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Request Password Reset",
+                "description": "Request password endpoint on /users/request_password_reset\"\n:param user_data: data payload containing user's email address.\n:param background_tasks: background tasks to be run after returning a response.",
+                "operationId": "request_password_reset_users_request_password_reset_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/PasswordRequestResetData" } }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "202": {
+                        "description": "Password reset request sent.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "400": { "description": "SMTP Server not configured." },
+                    "404": { "description": "User does not exist." },
+                    "422": { "description": "Invalid email." }
+                }
+            }
+        },
+        "/users/reset_password": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Reset Password",
+                "description": "/users/reset_password handler",
+                "operationId": "reset_password_users_reset_password_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/PasswordResetData" } }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "content": { "text/plain": { "schema": { "type": "string" } } }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "401": { "description": "No permission -- see authorization schemes" },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/confirm_registration": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Confirm Registration",
+                "description": "/users/confirm_registration handler",
+                "operationId": "confirm_registration_users_confirm_registration_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/ConfirmRegistrationData" } }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "401": { "description": "No permission -- see authorization schemes" },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/registration/reset-password": {
+            "get": {
+                "tags": ["users"],
+                "summary": "Check Token Validity For Registration",
+                "operationId": "check_token_validity_for_registration_users_registration_reset_password_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "Token", "type": "string" },
+                        "name": "token",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "307": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "410": { "description": "URI no longer exists and has been permanently removed" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/registration/sign-up": {
+            "get": {
+                "tags": ["users"],
+                "summary": "Check Token Validity For Registration",
+                "operationId": "check_token_validity_for_registration_users_registration_sign_up_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "Token", "type": "string" },
+                        "name": "token",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "307": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "410": { "description": "URI no longer exists and has been permanently removed" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/roles": {
+            "get": {
+                "tags": ["users"],
+                "summary": "Get User Roles By Id",
+                "description": "Returns user's roles for given specific resource, or all resources of given type.\nIf both resource_type and resource_id parameters are passed, roles for that specific resource will be returned.\nIf only resource_type is passed, roles for all resources of given type will be returned.",
+                "operationId": "get_user_roles_by_id_users__user_id__roles_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": true,
+                        "schema": { "$ref": "#/components/schemas/AccessResourceType" },
+                        "name": "resource_type",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "Resource Id", "type": "string" },
+                        "name": "resource_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/RolesOutputModel" } }
+                        }
+                    },
+                    "HTTPSTATUS.OK": { "description": "Roles of requested User." },
+                    "404": { "description": "Nothing matches the given URI" },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["users"],
+                "summary": "Patch User Roles By Id",
+                "description": "Endpoint for getting user's data.",
+                "operationId": "patch_user_roles_by_id_users__user_id__roles_patch",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "maxLength": 200, "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "X-Auth-Request-User", "type": "string" },
+                        "name": "x-auth-request-user",
+                        "in": "header"
+                    }
+                ],
+                "requestBody": {
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RolesPatchModel" } } },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "204": { "description": "User roles were updated" },
+                    "404": { "description": "Requested user not found" },
+                    "403": { "description": "Lack of permissions for resources present in the request" },
+                    "400": { "description": "Invalid resource id" },
+                    "401": { "description": "Invalid authentication header" },
+                    "HTTPSTATUS.UNPROCESSABLE_ENTITY": {
+                        "description": "User is the last global admin so he cant be deleted"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}/update_password": {
+            "post": {
+                "tags": ["users"],
+                "summary": "Update User Password",
+                "description": "/users/[user_id]/update_password handler",
+                "operationId": "update_user_password_users__user_id__update_password_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": { "title": "User Id", "type": "string" },
+                        "name": "user_id",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/PasswordUpdateData" } }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "content": { "text/plain": { "schema": { "type": "string" } } }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "401": { "description": "No permission -- see authorization schemes" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/get_user_id": {
+            "get": {
+                "tags": ["users", "users"],
+                "summary": "Get User Id From Protobuf",
+                "description": "Returns user id calculated based on the protobuf content from the HTTP request.",
+                "operationId": "get_user_id_from_protobuf_users_get_user_id_get",
+                "parameters": [
+                    { "required": true, "schema": { "title": "Id", "type": "string" }, "name": "id", "in": "query" }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Calculated user id.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Get User Id From Protobuf Users Get User Id Get",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": { "description": "Bad request syntax or unsupported method" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/service_accounts/access_token": {
+            "post": {
+                "tags": ["service_accounts"],
+                "summary": "Get Access Token",
+                "operationId": "get_access_token_service_accounts_access_token_post",
+                "requestBody": {
+                    "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ServiceIdData" } } },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correct service id provided, access_token provided.",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/AccessTokenOutputModel" } }
+                        }
+                    },
+                    "401": { "description": "Invalid or expired service id." },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/service_accounts": {
+            "get": {
+                "tags": ["service_accounts"],
+                "summary": "Get Service Account",
+                "operationId": "get_service_account_service_accounts__get",
+                "responses": {
+                    "200": {
+                        "description": "Returns Service Account connected to the current user with expiration date.",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/ServiceAccountOutputModel" }
+                            }
+                        }
+                    },
+                    "204": { "description": "Service account doesn't exist." },
+                    "401": { "description": "No permission -- see authorization schemes" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["service_accounts"],
+                "summary": "Refresh Service Account",
+                "operationId": "refresh_service_account_service_accounts__put",
+                "requestBody": {
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/RefreshServiceUserData" } }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Service account was refreshed.",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/ServiceAccountWithPasswordOutputModel" }
+                            }
+                        }
+                    },
+                    "400": { "description": "Expiration date is invalid." },
+                    "404": { "description": "Service account doesn't exist." },
+                    "401": { "description": "User doesn't exist." },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["service_accounts"],
+                "summary": "Create Service Account",
+                "operationId": "create_service_account_service_accounts__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": { "schema": { "$ref": "#/components/schemas/CreateServiceUserData" } }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Service account was created.",
+                        "content": {
+                            "application/json": {
+                                "schema": { "$ref": "#/components/schemas/ServiceAccountWithPasswordOutputModel" }
+                            }
+                        }
+                    },
+                    "400": { "description": "Expiration date is invalid." },
+                    "409": { "description": "Service account already exists." },
+                    "401": { "description": "User doesn't exist." },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["service_accounts"],
+                "summary": "Delete Service Account",
+                "operationId": "delete_service_account_service_accounts__delete",
+                "responses": {
+                    "200": {
+                        "description": "Service account removed.",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "401": { "description": "No permission -- see authorization schemes" },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        },
+        "/feature_flags": {
+            "get": {
+                "tags": ["feature_flags"],
+                "summary": "List Feature Flags",
+                "description": "Get map of feature flags to their corresponding enablement status.",
+                "operationId": "list_feature_flags_feature_flags__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": { "application/json": { "schema": {} } }
+                    },
+                    "HTTPSTATUS.OK": { "description": "Returns feature flags list" }
+                }
+            }
+        },
+        "/logs": {
+            "get": {
+                "summary": "Logs Endpoint",
+                "description": "Request logs endpoint on /logs\"",
+                "operationId": "logs_endpoint_logs__get",
+                "parameters": [
+                    {
+                        "required": false,
+                        "schema": { "title": "Type", "maxLength": 7, "type": "string", "default": "logs" },
+                        "name": "type",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "Operation-Id", "type": "string" },
+                        "name": "operation-id",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "Start-Date", "type": "string" },
+                        "name": "start-date",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "End-Date", "type": "string" },
+                        "name": "end-date",
+                        "in": "query"
+                    },
+                    {
+                        "required": false,
+                        "schema": { "title": "Log-Level", "type": "string" },
+                        "name": "log-level",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Return the tar.gz file with logs",
+                        "content": { "application/json": { "schema": {} }, "application/octet-stream": {} }
+                    },
+                    "403": {
+                        "description": "Access denied - user is not an administrator.",
+                        "content": { "text/plain": {} }
+                    },
+                    "400": {
+                        "description": "Unknown log type. Please make sure specified value parameter is either \"cluster\" or \"logs\".",
+                        "content": { "text/plain": {} }
+                    },
+                    "404": {
+                        "description": "Error when preparing a zipped folder with logs",
+                        "content": { "text/plain": {} }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "AccessResourceType": {
+                "title": "AccessResourceType",
+                "enum": ["project", "workspace", "user_directory"],
+                "type": "string",
+                "description": "Available resources for SpiceDB relations"
+            },
+            "AccessTokenOutputModel": {
+                "title": "AccessTokenOutputModel",
+                "required": ["access_token", "expires_at", "token_type"],
+                "type": "object",
+                "properties": {
+                    "access_token": { "title": "Access Token", "type": "string" },
+                    "expires_at": { "title": "Expires At", "type": "integer" },
+                    "token_type": { "title": "Token Type", "type": "string" }
+                },
+                "example": { "access_token": "JSON Web Token value", "token_type": "bearer", "expires_in": 899 }
+            },
+            "Body_upload_user_photo_users__user_id__photo_post": {
+                "title": "Body_upload_user_photo_users__user_id__photo_post",
+                "required": ["photo_file"],
+                "type": "object",
+                "properties": { "photo_file": { "title": "Photo File", "type": "string", "format": "binary" } }
+            },
+            "ConfirmRegistrationData": {
+                "title": "ConfirmRegistrationData",
+                "required": ["token", "password"],
+                "type": "object",
+                "properties": {
+                    "token": { "title": "Token", "type": "string" },
+                    "password": { "title": "Password", "type": "string" }
+                },
+                "description": "Stores data for confirmation of the user registration"
+            },
+            "CreateServiceUserData": {
+                "title": "CreateServiceUserData",
+                "required": ["expiration_date"],
+                "type": "object",
+                "properties": { "expiration_date": { "title": "Expiration Date", "type": "string" } },
+                "example": { "expiration_date": "2044-12-31T21:22:23" }
+            },
+            "CreateUserData": {
+                "title": "CreateUserData",
+                "required": ["uid", "name", "mail", "password", "roles"],
+                "type": "object",
+                "properties": {
+                    "uid": { "title": "Uid", "type": "string" },
+                    "name": { "title": "Name", "type": "string" },
+                    "mail": { "title": "Mail", "type": "string" },
+                    "password": { "title": "Password", "type": "string" },
+                    "roles": {
+                        "title": "Roles",
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/RoleModel" }
+                    }
+                }
+            },
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "msg": { "title": "Error message", "type": "string" },
+                    "code": { "title": "Error code", "type": "integer", "default": 422 }
+                }
+            },
+            "InviteData": {
+                "title": "InviteData",
+                "required": ["mail", "roles"],
+                "type": "object",
+                "properties": {
+                    "mail": { "title": "Mail", "type": "string" },
+                    "roles": {
+                        "title": "Roles",
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/RoleModel" }
+                    }
+                }
+            },
+            "LoginData": {
+                "title": "LoginData",
+                "required": ["login", "password"],
+                "type": "object",
+                "properties": {
+                    "login": { "title": "Login", "maxLength": 200, "type": "string" },
+                    "password": { "title": "Password", "type": "string" }
+                },
+                "description": "Stores data about user login credentials"
+            },
+            "PasswordRequestResetData": {
+                "title": "PasswordRequestResetData",
+                "required": ["email"],
+                "type": "object",
+                "properties": { "email": { "title": "Email", "maxLength": 200, "type": "string" } },
+                "description": "Stores email on which new password will be sent"
+            },
+            "PasswordResetData": {
+                "title": "PasswordResetData",
+                "required": ["new_password", "token"],
+                "type": "object",
+                "properties": {
+                    "new_password": { "title": "New Password", "type": "string" },
+                    "token": { "title": "Token", "type": "string" }
+                },
+                "description": "Stores user's new password and token"
+            },
+            "PasswordUpdateData": {
+                "title": "PasswordUpdateData",
+                "required": ["new_password", "old_password"],
+                "type": "object",
+                "properties": {
+                    "new_password": { "title": "New Password", "type": "string" },
+                    "old_password": { "title": "Old Password", "type": "string" }
+                }
+            },
+            "RefreshServiceUserData": {
+                "title": "RefreshServiceUserData",
+                "required": ["expiration_date"],
+                "type": "object",
+                "properties": { "expiration_date": { "title": "Expiration Date", "type": "string" } },
+                "example": { "expiration_date": "2044-12-31T21:22:23" }
+            },
+            "RoleMapping": {
+                "title": "RoleMapping",
+                "required": ["role", "resource_type", "resource_id"],
+                "type": "object",
+                "properties": {
+                    "role": { "title": "Role", "type": "string" },
+                    "resource_type": { "$ref": "#/components/schemas/AccessResourceType" },
+                    "resource_id": { "title": "Resource Id", "type": "string" }
+                },
+                "example": { "role": "admin", "resource_type": "workspace", "resource_id": "fooBarBaz" }
+            },
+            "RoleModel": {
+                "title": "RoleModel",
+                "required": ["resource_id", "resource_type", "role"],
+                "type": "object",
+                "properties": {
+                    "resource_id": { "title": "Resource Id", "type": "string" },
+                    "resource_type": { "$ref": "#/components/schemas/AccessResourceType" },
+                    "role": { "$ref": "#/components/schemas/UserRoles" }
+                },
+                "description": "Represents user role model."
+            },
+            "RolePatch": {
+                "title": "RolePatch",
+                "required": ["role", "resource_type", "resource_id", "operation"],
+                "type": "object",
+                "properties": {
+                    "role": { "$ref": "#/components/schemas/SpiceDBResourceUserRoles" },
+                    "resource_type": { "$ref": "#/components/schemas/AccessResourceType" },
+                    "resource_id": { "title": "Resource Id", "type": "string" },
+                    "operation": { "title": "Operation", "enum": ["TOUCH", "DELETE"], "type": "string" }
+                }
+            },
+            "RolesOutputModel": {
+                "title": "RolesOutputModel",
+                "required": ["roles"],
+                "type": "object",
+                "properties": {
+                    "roles": {
+                        "title": "Roles",
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/RoleMapping" }
+                    }
+                }
+            },
+            "RolesPatchModel": {
+                "title": "RolesPatchModel",
+                "required": ["roles"],
+                "type": "object",
+                "properties": {
+                    "roles": {
+                        "title": "Roles",
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/RolePatch" }
+                    }
+                }
+            },
+            "ServiceAccountOutputModel": {
+                "title": "ServiceAccountOutputModel",
+                "required": ["expiration_date"],
+                "type": "object",
+                "properties": { "expiration_date": { "title": "Expiration Date", "type": "string" } },
+                "example": { "expiration_date": "2044-12-31T21:22:23" }
+            },
+            "ServiceAccountWithPasswordOutputModel": {
+                "title": "ServiceAccountWithPasswordOutputModel",
+                "required": ["service_id", "expiration_date"],
+                "type": "object",
+                "properties": {
+                    "service_id": { "title": "Service Id", "type": "string" },
+                    "expiration_date": { "title": "Expiration Date", "type": "string" }
+                },
+                "example": {
+                    "expiration_date": "2044-12-31T21:22:23",
+                    "service_id": "32-alpha-numeric-characters:32-alpha-numeric-characters"
+                }
+            },
+            "ServiceIdData": {
+                "title": "ServiceIdData",
+                "required": ["service_id"],
+                "type": "object",
+                "properties": { "service_id": { "title": "Service Id", "type": "string" } },
+                "example": { "service_id": "32-alpha-numeric-characters:32-alpha-numeric-characters" }
+            },
+            "SpiceDBResourceUserRoles": {
+                "title": "SpiceDBResourceUserRoles",
+                "enum": ["admin", "contributor"],
+                "type": "string",
+                "description": "Available resources user roles for use in SpiceDB"
+            },
+            "UserModel": {
+                "title": "UserModel",
+                "required": ["uid", "name", "mail", "registered"],
+                "type": "object",
+                "properties": {
+                    "uid": { "title": "Uid", "maxLength": 200, "type": "string" },
+                    "name": { "title": "Name", "maxLength": 200, "type": "string" },
+                    "mail": { "title": "Mail", "maxLength": 200, "type": "string" },
+                    "registered": { "title": "Registered", "type": "boolean" },
+                    "roles": {
+                        "title": "Roles",
+                        "type": "array",
+                        "items": { "$ref": "#/components/schemas/UserRole" }
+                    },
+                    "user_photo": { "title": "User Photo", "type": "string" }
+                }
+            },
+            "UserRole": {
+                "title": "UserRole",
+                "required": ["role", "resource_type", "resource_id"],
+                "type": "object",
+                "properties": {
+                    "role": { "title": "Role", "type": "string" },
+                    "resource_type": { "$ref": "#/components/schemas/AccessResourceType" },
+                    "resource_id": { "title": "Resource Id", "type": "string" }
+                }
+            },
+            "UserRoles": {
+                "title": "UserRoles",
+                "enum": ["ADMIN", "CONTRIBUTOR"],
+                "type": "string",
+                "description": "Enum with roles that can be assigned to a user."
+            },
+            "ValidationError": {
+                "title": "ValidationError",
+                "required": ["loc", "msg", "type"],
+                "type": "object",
+                "properties": {
+                    "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] }
+                    },
+                    "msg": { "title": "Message", "type": "string" },
+                    "type": { "title": "Error Type", "type": "string" }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,58 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+option go_package = "geti.com/account_service_grpc/pb";
+
+package user_settings;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+message UserSettings {
+  string id = 1;
+  string user_id = 2;
+  string organization_id = 3;
+  string project_id = 4;
+  string settings = 5;
+  google.protobuf.Timestamp created_at = 6;
+  string created_by = 7;
+  google.protobuf.Timestamp modified_at = 8;
+  string modified_by = 9;
+}
+
+message UserSettingsRequest {
+  string project_id = 1;
+}
+
+message UserSettingsResponse {
+  string message = 1;
+}
+
+message UserSettingsPayload {
+  string settings = 1;
+}
+
+message UserSettingsCreateRequest {
+  UserSettingsPayload settings = 1;
+  string project_id = 2;
+}
+
+service UserSettingsService {
+
+  // POST /user_settings
+  rpc create (UserSettingsCreateRequest) returns (UserSettingsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/user_settings"
+      body: "settings"
+    };
+  }
+
+  // GET /user_settings
+  rpc get (UserSettingsRequest) returns (UserSettings) {
+    option (google.api.http) = {
+      get: "/api/v1/user_settings"
+    };
+  }
+}

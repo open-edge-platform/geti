@@ -1,0 +1,19 @@
+{
+  "aggregates": [
+    {
+      "group": [
+        {
+          "key": "date",
+          "value": 1722470400000
+        }
+      ],
+      "result": {
+        "credits": 83,
+        "resources": {
+          "images": 83,
+          "frames": 0
+        }
+      }
+    }
+  ]
+}

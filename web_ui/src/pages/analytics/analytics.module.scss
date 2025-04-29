@@ -1,0 +1,51 @@
+.header {
+    color: var(--spectrum-global-color-gray-900) !important;
+}
+
+.description {
+    color: var(--spectrum-global-color-gray-700) !important;
+    font-size: var(--spectrum-global-dimension-font-size-75) !important;
+}
+
+.analyticsCard {
+    width: 64rem;
+    height: var(--spectrum-global-dimension-size-2400);
+    margin-bottom: var(--spectrum-global-dimension-size-300);
+}
+
+.analyticsCardHeader {
+    color: var(--spectrum-global-color-gray-900) !important;
+}
+
+.analyticsImage {
+    box-sizing: border-box !important;
+}
+
+.analyticsDivider {
+    background-color: var(--spectrum-global-color-gray-200);
+}
+
+.analyticsCardDescription {
+    color: var(--spectrum-global-color-gray-800) !important;
+    font-size: var(--spectrum-global-dimension-font-size-75) !important;
+}
+
+.exportAnalyticsData {
+    & span,
+    svg {
+        display: block;
+        color: var(--energy-blue) !important;
+        width: max-content !important;
+        text-decoration: none;
+        padding: 0 !important;
+    }
+
+    &,
+    &[class*='is-hovered'],
+    &[class*='is-active'],
+    &[class*='is-selected'] {
+        border: none !important;
+        outline: none !important;
+        background-color: transparent !important;
+    }
+}

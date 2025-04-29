@@ -1,0 +1,13 @@
+{
+    "id": "6138afea3b7b11505c43f2f1",
+    "progress": 1.0,
+    "state": "DONE",
+    "models": [
+        {
+            "model_id": "60dc38807c9ed62cf35b9255",
+            "model_group_id": "0d31793d5f1fb7e6e3c1a4f"
+        }
+    ],
+    "creator_id": "Example user",
+    "creation_time": "2021-06-30T09:25:20.472000+00:00"
+}

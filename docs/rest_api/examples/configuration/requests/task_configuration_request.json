@@ -1,0 +1,134 @@
+{
+  "components": [
+    {
+      "entity_identifier": {
+        "type": "HYPER_PARAMETER_GROUP",
+        "model_storage_id": "62b2d9408fd8d1af66e5af0b",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "group_name": "learning_parameters"
+      },
+      "parameters": [
+        {
+          "value": 32,
+          "name": "batch_size"
+        },
+        {
+          "value": false,
+          "name": "enable_lr_finder"
+        },
+        {
+          "value": 0.007,
+          "name": "learning_rate"
+        },
+        {
+          "value": 200,
+          "name": "max_num_epochs"
+        }
+      ]
+    },
+    {
+      "entity_identifier": {
+        "task_id": "62b2d9408fd8d1af66e5af06",
+        "type": "COMPONENT_PARAMETERS",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "component": "SUBSET_MANAGER"
+      },
+      "groups": [
+        {
+          "type": "PARAMETER_GROUP",
+          "name": "subset_parameters",
+          "parameters": [
+            {
+              "value": 0.3,
+              "name": "test_proportion"
+            },
+            {
+              "value": 0.5,
+              "name": "train_proportion"
+            },
+            {
+              "value": 0.2,
+              "name": "validation_proportion"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "value": true,
+          "name": "auto_subset_fractions"
+        }
+      ]
+    },
+    {
+      "entity_identifier": {
+        "task_id": "62b2d9408fd8d1af66e5af06",
+        "type": "COMPONENT_PARAMETERS",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "component": "DATASET_COUNTER"
+      },
+      "parameters": [
+        {
+          "value": true,
+          "name": "label_constraint_first_training"
+        },
+        {
+          "value": 6,
+          "name": "required_images_auto_training"
+        },
+        {
+          "value": true,
+          "name": "use_dynamic_required_annotations"
+        }
+      ]
+    },
+    {
+      "entity_identifier": {
+        "task_id": "62b2d9408fd8d1af66e5af06",
+        "type": "COMPONENT_PARAMETERS",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "component": "TASK_ACTIVE_LEARNING"
+      },
+      "groups": [
+        {
+          "type": "PARAMETER_GROUP",
+          "name": "preprocessing",
+          "parameters": [
+            {
+              "value": true,
+              "name": "feature_vector_extractor"
+            },
+            {
+              "value": true,
+              "name": "uncertainty_extractor"
+            }
+          ]
+        }
+      ],
+      "parameters": [
+        {
+          "value": "mean",
+          "name": "intra_task_reduce_fn"
+        }
+      ]
+    },
+    {
+      "entity_identifier": {
+        "task_id": "62b2d9408fd8d1af66e5af06",
+        "type": "COMPONENT_PARAMETERS",
+        "project_id": "62b2d9408fd8d1af66e5af07",
+        "workspace_id": "62a9d380e287f1fcd1eed0ab",
+        "component": "TASK_NODE"
+      },
+      "parameters": [
+        {
+          "value": true,
+          "name": "auto_training"
+        }
+      ]
+    }
+  ]
+}

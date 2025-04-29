@@ -1,0 +1,335 @@
+@view-transition {
+    navigation: auto;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    font-size: 62.5%;
+    -webkit-font-smoothing: antialiased;
+}
+
+input:-internal-autofill-selected {
+    background-color: var(--spectrum-global-color-gray-50);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--spectrum-global-color-gray-50) inset !important;
+}
+
+input:-webkit-autofill {
+    -webkit-text-fill-color: #fff !important;
+}
+
+.spectrum {
+    --spectrum-global-font-family-base:
+        adobe-clean, 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, 'Trebuchet MS',
+        'Lucida Grande', sans-serif;
+    --spectrum-global-font-family-serif: adobe-clean-serif, 'Source Serif Pro', Georgia, serif;
+    --spectrum-global-font-family-code: 'Source Code Pro', Monaco, monospace;
+    --spectrum-global-font-weight-bold: 700;
+}
+.spectrum--medium {
+    --spectrum-global-dimension-size-100: 8px;
+    --spectrum-global-dimension-size-115: 9px;
+    --spectrum-global-dimension-size-150: 12px;
+    --spectrum-global-dimension-size-250: 20px;
+    --spectrum-global-dimension-size-400: 32px;
+    --spectrum-global-dimension-size-450: 36px;
+    --spectrum-global-dimension-size-700: 56px;
+    --spectrum-global-dimension-size-1700: 136px;
+    --spectrum-global-dimension-font-size-700: 28px;
+    --spectrum-alias-item-rounded-border-radius-l: var(--spectrum-global-dimension-size-250);
+    --spectrum-alias-item-text-padding-top-l: var(--spectrum-global-dimension-size-115);
+    --spectrum-button-cta-l-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-l-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-l-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-l-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-m-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-m-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-m-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-cta-m-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-m-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-m-textonly-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-cta-s-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-s-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-s-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-s-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-xl-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-xl-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-xl-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-cta-xl-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-l-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-l-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-l-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-l-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-m-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-m-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-m-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-over-background-m-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-m-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-m-textonly-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-over-background-s-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-s-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-s-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-s-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-xl-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-xl-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-xl-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-over-background-xl-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-l-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-l-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-l-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-l-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-m-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-m-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-m-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-quiet-over-background-m-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-m-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-m-textonly-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-quiet-over-background-s-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-s-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-s-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-s-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-xl-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-xl-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-xl-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-quiet-over-background-xl-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-l-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-l-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-l-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-l-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-m-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-m-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-m-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-primary-m-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-m-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-m-textonly-min-width: var(--spectrum-global-dimension-size-900);
+    --spectrum-button-primary-s-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-s-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-s-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-s-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-xl-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-xl-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-xl-textonly-touch-hit-x: var(--spectrum-global-dimension-static-size-100);
+    --spectrum-button-primary-xl-textonly-touch-hit-y: var(--spectrum-global-dimension-static-size-100);
+
+    --energy-blue: #00c7fd;
+    --energy-blue-shade: #0095ca;
+    --energy-blue-shade-darker: #005b85;
+
+    --spectrum-global-color-static-blue-600: #1473e6;
+
+    --spectrum-button-cta-background-color: var(--energy-blue);
+    --spectrum-button-cta-background-color-disabled: var(--spectrum-global-color-gray-200);
+    --spectrum-button-cta-border-color: var(--energy-blue);
+    --spectrum-button-cta-text-color: var(--spectrum-global-color-gray-50);
+
+    --spectrum-button-cta-background-color-hover: var(--energy-blue-shade);
+    --spectrum-button-cta-border-color-hover: var(--energy-blue-shade);
+    --spectrum-button-cta-text-color-hover: var(--spectrum-global-color-gray-50);
+
+    --spectrum-button-cta-background-color-down: var(--energy-blue-shade-darker);
+    --spectrum-button-cta-border-color-down: var(--energy-blue-shade-darker);
+    --spectrum-button-cta-text-color-down: var(--spectrum-global-color-gray-50);
+
+    --spectrum-alias-background-color-hover-overlay: var(--spectrum-global-color-gray-75);
+    --spectrum-alias-icon-color: var(--spectrum-global-color-gray-900);
+    --spectrum-body-text-color: var(--spectrum-global-color-gray-900);
+
+    --spectrum-global-color-gray-50: #242528;
+    --spectrum-global-color-gray-75: #2e2f32;
+    --spectrum-global-color-gray-100: #313236;
+    --spectrum-global-color-gray-200: #3c3e42;
+    --spectrum-global-color-gray-300: #484a50;
+    --spectrum-global-color-gray-400: #585a62;
+    --spectrum-global-color-gray-500: #6b6e76;
+    --spectrum-global-color-gray-600: #8e9099;
+    --spectrum-global-color-gray-700: #b7b9be;
+    --spectrum-global-color-gray-800: #e3e3e5;
+    --spectrum-global-color-gray-900: #ffffff;
+    --spectrum-well-background-color: var(--spectrum-global-color-gray-100);
+}
+
+@font-face {
+    font-family: intelOne;
+    src: url(intelone-text-regular.woff);
+}
+
+.container {
+    background-image: url(../static/img/login_background.webp);
+    background-position: top center;
+    background-size: cover;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+}
+
+.box {
+    position: relative;
+    box-shadow: 0px 4px 8px rgba(43, 44, 48, 0.05);
+    background-color: var(--spectrum-global-color-gray-50);
+}
+
+.boxHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--spectrum-global-color-gray-300);
+    height: 10rem;
+}
+
+.boxHeader::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    content: '';
+    height: 10rem;
+    width: 1.6rem;
+    background-color: var(--spectrum-global-color-gray-400);
+}
+
+.boxHeader-logo {
+    background-image: url(../static/img/logo.svg);
+    background-repeat: no-repeat;
+    height: 3.2rem;
+    width: 5.7rem;
+}
+
+.boxHeaderSquare-medium {
+    background-color: var(--spectrum-global-color-gray-300);
+    width: 1.6rem;
+    height: 1.6rem;
+}
+.boxHeaderSquare-small {
+    background-color: var(--spectrum-global-color-gray-300);
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-left: 1.6rem;
+}
+
+.loginBox {
+    width: 48rem;
+    min-height: 55rem;
+}
+
+.loginBox__content {
+    padding: 2rem 4.5rem;
+    color: #fff;
+    font-family: intelOne;
+}
+
+.loginBox__signIn {
+    font-size: 2.4rem;
+    font-family: intelOne;
+    letter-spacing: 0.2rem;
+    margin-bottom: 2.5rem;
+}
+
+.loginBox__form-field {
+    background-color: var(--spectrum-global-color-gray-50);
+    outline: none;
+    border: none;
+    border-bottom: 1px solid var(--spectrum-global-color-gray-400);
+    color: #fff;
+    width: 100%;
+    padding: 1rem 0.5rem !important;
+}
+
+.loginBox__btn {
+    font-family: intelOne;
+    font-size: 1.4rem;
+    letter-spacing: 0.1rem;
+    line-height: 1.6rem;
+    margin-top: 2.4rem;
+    margin-bottom: 3rem;
+    padding: 1.2rem;
+    outline: none !important;
+    border: 0 !important;
+}
+
+.loginBox__footer {
+    text-align: center;
+    font-size: 1.4rem;
+    margin-bottom: 2.5rem;
+}
+
+.loginBox__label {
+    font-family: intelOne;
+    font-size: 1.2rem;
+    line-height: 1.4rem;
+    color: var(--spectrum-global-color-gray-800);
+}
+
+.loginBox__alert {
+    fill: #fff;
+}
+
+.loginBox__error {
+    display: flex;
+    padding: 1.8rem 1.5rem;
+    background-color: #c81326;
+    font-family: intelOne;
+    font-size: 1.4rem;
+    color: #fff;
+    line-height: 2rem;
+    margin: 0 4.5rem;
+}
+
+.loginBox__error svg {
+    margin-right: 1.5rem;
+}
+
+.loginBox__forgotPassword {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 3rem;
+}
+
+.loginBox__link {
+    font-size: 1.4rem;
+    color: var(--energy-blue) !important;
+    text-decoration: none !important;
+}
+
+.spectrum-Switch-input:checked + .spectrum-Switch-switch::before {
+    transform: translateX(calc(var(--spectrum-switch-track-width) - 100%));
+}
+
+.errorBox {
+    width: 90%;
+    height: 70%;
+}
+
+.errorContent {
+    margin-top: var(--spectrum-global-dimension-size-700);
+    display: flex;
+    justify-content: center;
+    padding: var(--spectrum-global-dimension-size-100) var(--spectrum-global-dimension-size-400);
+}
+
+.errorImg {
+    background-image: url(../static/img/error.svg);
+    background-position: center;
+    background-repeat: no-repeat;
+    height: var(--spectrum-global-dimension-size-1700);
+}
+
+.errorMsg {
+    color: #fff;
+    font-family: intelOne;
+    font-size: var(--spectrum-global-dimension-font-size-700);
+    margin-top: var(--spectrum-global-dimension-size-150);
+}

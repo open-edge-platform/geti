@@ -1,0 +1,31 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+input_stream: "HTTP_REQUEST_PAYLOAD:input"
+output_stream: "HTTP_RESPONSE_PAYLOAD:output"
+node {
+    calculator: "ModelInferHttpRequestCalculator"
+    input_stream: "HTTP_REQUEST_PAYLOAD:input"
+    output_stream: "IMAGE:input_image"
+}
+node {
+  calculator: "OpenVINOModelServerSessionCalculator"
+  output_side_packet: "SESSION:session"
+  node_options: {
+    [type.googleapis.com / mediapipe.OpenVINOModelServerSessionCalculatorOptions]: {
+      servable_name: "MODEL_NAME_0"
+      servable_version: "1"
+    }
+  }
+}
+node {
+  calculator: "AnomalyCalculator"
+  input_side_packet: "INFERENCE_ADAPTER:session"
+  input_stream: "IMAGE:input_image"
+  output_stream: "INFERENCE_RESULT:result"
+}
+node {
+  calculator: "HttpSerializationCalculator"
+  input_stream: "INFERENCE_RESULT:result"
+  input_stream: "HTTP_REQUEST_PAYLOAD:input"
+  output_stream: "HTTP_RESPONSE_PAYLOAD:output"
+}

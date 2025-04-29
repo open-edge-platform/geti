@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+# Primary container's process ID file
+PRIMARY_PID_FILE=$1
+
+# Sidecar container's process ID
+SIDECAR_PID=$2
+
+# Counter for consecutive liveness check failures
+failure_count=0
+
+# Maximum allowed consecutive failures
+max_failures=12
+
+# Check interval in seconds
+check_interval=5
+
+while true; do
+  if [ -f "$PRIMARY_PID_FILE" ]; then
+    PRIMARY_PID=$(cat "$PRIMARY_PID_FILE")
+    if kill -0 "$PRIMARY_PID" > /dev/null 2>&1; then
+      echo "Primary process with PID $PRIMARY_PID is running."
+      failure_count=0
+    else
+      echo "Primary process with PID $PRIMARY_PID is not running."
+      failure_count=$((failure_count + 1))
+    fi
+  else
+    echo "Primary PID file '$PRIMARY_PID_FILE' not found."
+  fi
+
+  if [ "$failure_count" -ge "$max_failures" ]; then
+    echo "Primary process has been down for $((max_failures * check_interval)) seconds. Killing sidecar process '$SIDECAR_PID'."
+    kill -SIGINT "$SIDECAR_PID"
+    exit 1
+  fi
+
+  if ! kill -0 "$SIDECAR_PID" > /dev/null 2>&1; then
+    echo "Sidecar process '$SIDECAR_PID' has been down. Terminate this script as well."
+    exit 0
+  fi
+
+  sleep "$check_interval"
+done

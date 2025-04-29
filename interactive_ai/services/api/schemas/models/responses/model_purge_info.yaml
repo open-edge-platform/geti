@@ -1,0 +1,20 @@
+type: object
+description: |-
+  Purging state of the model. A model is purged when all its binary files are removed from the server. 
+  This is performed through the [purge model](#Models/ArchiveModel) endpoint.
+properties:
+  is_purged:
+    type:
+      - boolean
+    description: Boolean indicating if the model is purged.
+  user_uid:
+    type:
+      - string
+      - 'null'
+    description: The user ID who requested the cancellation.
+  purge_time:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: The time when the model was purged.

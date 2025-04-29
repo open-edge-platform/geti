@@ -1,0 +1,4 @@
+{
+  "http_status": 409,
+  "message":  "You have hit the limit of number of projects in your organization (1000). Please delete some projects before making new ones."
+}

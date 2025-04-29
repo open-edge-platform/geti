@@ -1,0 +1,14 @@
+package utils
+
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
+
+var exampleToken = "eyJhbGciOiJSUzUxMiIsImtpZCI6IjIyNTgyNmZiMjk4NTQyNTJlZjJiYjZkNmVlNDQ2OTI1ZGQyNDZmZTI0OGQ4NTc5NTFjM2Y5YzgwZDEyMzhiMmMxNjc4NDM1MDM1ZTM3NTdjZWQ5MjMzY2E1NWY0NGQ0ZGZiMTU1MWJiODUwNzUzNDM0ZjVjMzFlYTlmYmYyNzJkIiwidHlwIjoiSldUIn0.eyJyb2xlcyI6IiIsInRpZCI6IiIsInByZWZlcnJlZF91c2VybmFtZSI6ImFkbWluQHRlc3QuZ2V0aS5jb20iLCJvcmdhbml6YXRpb25faWQiOiIiLCJpc3MiOiJJbnRlbCBHZXRpIiwic3ViIjoiYWRtaW5AdGVzdC5nZXRpLmNvbSIsImF1ZCI6WyJGR1pkcmJHbGVBR3c0SlhwTzZsciJdLCJleHAiOjE2OTQ1NjU0OTYsIm5iZiI6MTY5NDU2NTQzNiwiaWF0IjoxNjk0NTY1NDM2fQ.H6UQep9EoYOj6-adGZpZ-tlRUccbTmDd3z27Ep35aFWOy_h-0rhNMABpt4StlAciS2W9cRD0NyxS29cm3V4QEUDAVhQy38Aa9cWuahbs3TByGqzs0YWwmEicvVlM6jvffGI2jxLB9qxJntgeZZWvgPQmE2xG2uVJ8Q-izkOjnHpI0mXWzbW3voOxWWN5WGaiMtTwcfgtJWGh-jsnHis4YzgD2zcWN0a_gNnIWI26A7yCZo-ePN-B33G3UGPjUYcWUe6_CobUMJDnF07kFKKS5Pd9j6u6Po_8KRGMtxRgSEqMTusqfzn5sTPizC_lVQ6mf9dmWoKUdc6rmKTc_gQAoA"
+
+func TestParseJwtString(t *testing.T) {
+	_, claim, _ := parseJwtString(exampleToken)
+	assert.Equal(t, "admin@test.geti.com", claim["preferred_username"].(string))
+	assert.Equal(t, "", claim["organization_id"].(string))
+}

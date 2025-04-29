@@ -1,0 +1,6 @@
+in: query
+name: job_key
+style: form
+description: Select jobs with matching key.
+schema:
+  type: string

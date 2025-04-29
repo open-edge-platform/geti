@@ -1,0 +1,41 @@
+type: object
+properties:
+  name:
+    type: string
+    description: 'Label name, must be unique'
+  id:
+    $ref: '../../mongo_id.yaml'
+  color:
+    type: string
+    pattern: ^#([a-fA-F0-9]{6}|[a-fA-F0-9]{8})$
+    description: 'Label color, picked at random if not specified'
+  group:
+    type: string
+    description: 'Name of label group'
+  parent_id:
+    oneOf:
+      - $ref: '../../mongo_id.yaml'
+      - type: "null"
+    description: 'Name of parent label'
+  is_empty:
+    type: boolean
+    description: Indicates whether the label is an empty label
+  is_anomalous:
+    type: boolean
+    description: 'Indicates whether the label is anomalous or not'
+  is_deleted:
+    type: boolean
+    description: 'Indicates whether the label is deleted'
+  hotkey:
+    type: string
+    description: 'Key or combination of key to select this label. Can be empty (no key).'
+    minLength: 0
+required:
+  - id
+  - name
+  - color
+  - group
+  - parent_id
+  - hotkey
+  - is_empty
+  - is_anomalous

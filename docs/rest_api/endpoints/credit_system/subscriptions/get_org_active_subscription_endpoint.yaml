@@ -1,0 +1,33 @@
+get:
+  tags:
+    - Subscriptions
+  summary: "[SaaS] Get the active subscription"
+  description: >-
+    <i>Not available on on-premises environments.</i><br><br>
+    Information about the organization's active subscription.
+  operationId: >-
+    get_active_subscription_api_v1_organizations__organization_id__subscriptions_active_get
+  parameters:
+    - name: organization_id
+      in: path
+      required: true
+      schema:
+        type: string
+        title: Organization Id
+  responses:
+    '200':
+      description: Successful Response
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/subscriptions.yaml#/SubscriptionResponse'
+          example:
+            $ref: '../../../examples/credit_system/subscriptions/active_subscription_response.json'
+    '404':
+      description: Organization doesn't have any active subscriptions
+    '422':
+      description: Validation Error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../examples/error_responses/validation_error.yaml#/HTTPValidationError'

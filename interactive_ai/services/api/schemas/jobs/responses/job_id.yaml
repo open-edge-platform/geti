@@ -1,0 +1,4 @@
+type: object
+properties:
+  job_id:
+    $ref: "../../mongo_id.yaml"

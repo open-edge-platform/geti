@@ -1,0 +1,250 @@
+openapi: "3.1.0"
+info:
+  version: 2.9.0
+  title: Intel® Geti™ REST API
+  description: REST API documentation for Intel® Geti™.
+
+servers:
+- url: "{Server address}/api/{API version}"
+  description: The base URL of the Intel® Geti™ API. Set the `Server address` to the address of your Intel® Geti™ instance.  
+  variables:
+    Server address:
+      default: https://app.geti.intel.com
+    API version:
+      enum:
+        - v1
+      default: v1
+
+paths:
+#organization endpoints
+  /personal_access_tokens/organization:
+    $ref: "./endpoints/personal_access_tokens/organization_endpoint.yaml"
+#workspace endpoints
+  /organizations/{organization_id}/workspaces:
+    $ref: "./endpoints/workspaces/workspaces_endpoint.yaml"
+#project endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects:
+    $ref: "./endpoints/projects/projects_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects_names:
+    $ref: "./endpoints/projects/projects_names_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}:
+    $ref: "./endpoints/projects/project_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/thumbnail:
+    $ref: "./endpoints/projects/project_thumbnail_endpoint.yaml"
+#dataset endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets:
+    $ref: "./endpoints/datasets/datasets_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}:
+    $ref: "./endpoints/datasets/dataset_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/statistics:
+    $ref: "./endpoints/datasets/dataset_statistics_endpoint.yaml"
+#media endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media:query:
+    $ref: "./endpoints/media/media_filtering_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/images:
+    $ref: "./endpoints/media/images_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/images/{image_id}:
+    $ref: "./endpoints/media/image_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/images/{image_id}/display/full:
+    $ref: "./endpoints/media/download_full_image_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/images/{image_id}/display/thumb:
+    $ref: "./endpoints/media/download_image_thumbnail_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos:
+    $ref: "./endpoints/media/videos_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}:
+    $ref: "./endpoints/media/video_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}:query:
+    $ref: "./endpoints/media/video_filtering_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/display/stream:
+    $ref: "./endpoints/media/download_video_stream_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/display/thumb:
+    $ref: "./endpoints/media/download_video_thumbnail_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/frames/{frame_index}/display/full:
+    $ref: "./endpoints/media/download_video_frame_full_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/frames/{frame_index}/display/thumb:
+    $ref: "./endpoints/media/download_video_frame_thumbnail_endpoint.yaml"
+#annotation endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/images/{image_id}/annotations:
+    $ref: "./endpoints/annotations/image_annotations_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/images/{image_id}/annotations/{annotation_id}:
+    $ref: "./endpoints/annotations/get_image_annotation_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/frames/{frame_index}/annotations:
+    $ref: "./endpoints/annotations/video_frame_annotation_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/frames/{frame_index}/annotations/{annotation_id}:
+    $ref: "./endpoints/annotations/get_video_frame_annotation_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/range_annotation:
+    $ref: "./endpoints/annotations/video_range_annotation_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/media/videos/{video_id}/annotations/latest:
+    $ref: "./endpoints/annotations/latest_video_annotation_endpoint.yaml"
+#model endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/supported_algorithms:
+    $ref: "./endpoints/models/supported_algorithms_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}:train:
+    $ref: "./endpoints/models/train_model_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/train:
+    $ref: "./endpoints/models/train_model_endpoint_deprecated.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups:
+    $ref: "./endpoints/models/model_groups_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}:
+    $ref: "./endpoints/models/model_group_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}:activate:
+    $ref: "./endpoints/models/model_group_activation_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}:
+    $ref: "./endpoints/models/model_detail_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}/statistics:
+    $ref: "./endpoints/models/model_statistics_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}/export:
+    $ref: "./endpoints/models/export_model_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}/optimized_models/{optimized_model_id}/export:
+    $ref: "./endpoints/models/export_optimized_model_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}:optimize:
+    $ref: "./endpoints/models/optimize_model_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}/optimize:
+    $ref: "./endpoints/models/optimize_model_endpoint_deprecated.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}:purge:
+    $ref: "./endpoints/models/model_purge_endpoint.yaml"
+#prediction endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/pipelines/{pipeline_id}:predict:
+    $ref: "./endpoints/pipelines/pipeline_predict_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/pipelines/{pipeline_id}:explain:
+    $ref: "./endpoints/pipelines/pipeline_explain_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/pipelines/{pipeline_id}:batch_predict:
+    $ref: "./endpoints/pipelines/pipeline_batch_predict_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/pipelines/{pipeline_id}:batch_explain:
+    $ref: "./endpoints/pipelines/pipeline_batch_explain_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/pipelines/{task_id}:prompt:
+    $ref: "./endpoints/pipelines/pipeline_prompt_predict_endpoint.yaml"
+# dataset revision endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/training_revisions/{dataset_revision_id}:
+    $ref: "./endpoints/datasets/training_revision_statistics_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/training_revisions/{dataset_revision_id}/media:
+    $ref: "./endpoints/media/get_media_for_dataset.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/training_revisions/{dataset_revision_id}/media:query:
+    $ref: "./endpoints/media/filter_media_for_dataset.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/training_revisions/{dataset_revision_id}/media/videos/{video_id}:query:
+    $ref: "./endpoints/media/dataset_video_filtering_endpoint.yaml"
+#active learning endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/active:
+    $ref: "./endpoints/datasets/active_set_endpoint.yaml"
+#model test result endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/tests:
+    $ref: "./endpoints/model_test_results/model_test_results_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/tests/{test_id}:
+    $ref: "./endpoints/model_test_results/model_test_result_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/tests/{test_id}/results:query:
+    $ref: "./endpoints/media_scores/filter_media_scores_endpoint.yaml"
+#job endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/jobs:
+    $ref: "./endpoints/jobs/jobs_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/jobs/{job_id}:
+    $ref: "./endpoints/jobs/job_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/jobs/{job_id}:cancel:
+    $ref: "./endpoints/jobs/job_cancel_endpoint.yaml"
+#configuration endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/configuration:
+    $ref: "./endpoints/configuration/full_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/configuration/global:
+    $ref: "./endpoints/configuration/global_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/configuration/task_chain:
+    $ref: "./endpoints/configuration/task_chain_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/configuration/task_chain/{task_id}:
+    $ref: "./endpoints/configuration/task_endpoint.yaml"
+#product info endpoints
+  /product_info:
+    $ref: "./endpoints/product_info/product_info_endpoint.yaml"
+#dataset import/export endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/datasets/uploads:
+    $ref: "./endpoints/dataset_import_export/simple_upload_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/datasets/uploads/resumable:
+    $ref: "./endpoints/dataset_import_export/tus_post_options_endpoints.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/datasets/uploads/resumable/{file_id}:
+    $ref: "./endpoints/dataset_import_export/tus_head_patch_endpoints.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/datasets:prepare-for-import:
+    $ref: "./endpoints/dataset_import_export/prepare_import_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects:import-from-dataset:
+    $ref: "./endpoints/dataset_import_export/import_project_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets:prepare-for-import:
+    $ref: "./endpoints/dataset_import_export/prepare_import_to_project_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}:import-from-dataset:
+    $ref: "./endpoints/dataset_import_export/import_to_project_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}:prepare-for-export:
+    $ref: "./endpoints/dataset_import_export/prepare_export_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}/exports/{export_dataset_id}/download:
+    $ref: "./endpoints/dataset_import_export/download_dataset_endpoint.yaml"
+#project import/export endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/uploads/resumable:
+    $ref: "./endpoints/project_import_export/tus_post_options_endpoints.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/uploads/resumable/{file_id}:
+    $ref: "./endpoints/project_import_export/tus_head_patch_endpoints.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}:export:
+    $ref: "./endpoints/project_import_export/project_export_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects:import:
+    $ref: "./endpoints/project_import_export/project_import_endpoint.yaml"
+#code deployment endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/code_deployments:prepare:
+    $ref: "./endpoints/code_deployment/prepare_code_deployment_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/code_deployments/{deployment_id}:
+    $ref: "./endpoints/code_deployment/get_code_deployment_detail_endpoint.yaml"
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/code_deployments/{deployment_id}/download:
+    $ref: "./endpoints/code_deployment/download_code_deployment_endpoint.yaml"
+#deployment package endpoints
+  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/deployment_package:download:
+    $ref: "./endpoints/deployment_package/download_deployment_package_endpoint.yaml"
+#credit system endpoints
+  # credits products
+#  /products:
+#    $ref: "./endpoints/credit_system/products/get_all_endpoint.yaml"
+#  /products/{product_id}:
+#    $ref: "./endpoints/credit_system/products/get_by_id_endpoint.yaml"
+  # credits balance
+  /organizations/{organization_id}/balance:
+    $ref: "./endpoints/credit_system/balance/get_org_balance_endpoint.yaml"
+  # credit accounts
+  /organizations/{organization_id}/credit_accounts:
+    $ref: "./endpoints/credit_system/credit_accounts/get_org_credit_accounts_endpoint.yaml"
+  # credits subscriptions
+#  /organizations/{organization_id}/workspaces/{workspace_id}/subscriptions:
+#    $ref: "./endpoints/credit_system/subscriptions/create_org_subscription_endpoint.yaml"
+  /organizations/{organization_id}/subscriptions:
+    $ref: "./endpoints/credit_system/subscriptions/get_org_subscriptions_endpoint.yaml"
+  /organizations/{organization_id}/subscriptions/active:
+    $ref: "./endpoints/credit_system/subscriptions/get_org_active_subscription_endpoint.yaml"
+  # credits transactions
+  /organizations/{organization_id}/transactions:
+    $ref: "./endpoints/credit_system/transactions/get_org_transactions_endpoint.yaml"
+  /organizations/{organization_id}/transactions/aggregates:
+    $ref: "./endpoints/credit_system/transactions/get_org_transactions_aggregates_endpoint.yaml"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Organizations
+  - name: Workspaces
+  - name: Projects
+  - name: Datasets
+  - name: Media
+  - name: Annotations
+  - name: Models
+  - name: Predictions
+  - name: Training dataset versions
+  - name: Active Learning
+  - name: Tests
+  - name: Jobs
+  - name: Configuration
+  - name: Product Info
+  - name: Dataset Import/Export
+  - name: Project Import/Export
+  - name: Code Deployment
+#  - name: Credit Products
+  - name: Balance
+  - name: Credit Accounts
+  - name: Subscriptions
+  - name: Transactions

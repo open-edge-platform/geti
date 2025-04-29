@@ -1,0 +1,35 @@
+.statusContainer {
+    position: relative;
+    box-sizing: border-box;
+    margin: var(--spectrum-global-dimension-size-250) 0;
+    padding: var(--spectrum-global-dimension-size-200);
+    background: var(--spectrum-global-color-gray-75);
+    height: 12rem;
+}
+
+.statusTitle {
+    width: 100%;
+    margin: 0px;
+    font-size: var(--spectrum-global-dimension-size-200);
+}
+
+.progressBar {
+    left: 0px !important;
+    width: 100% !important;
+    bottom: 0px !important;
+    position: absolute !important;
+
+    & > div {
+        background: var(--spectrum-global-color-gray-75) !important;
+    }
+}
+
+.remaining {
+    text-align: right;
+    min-width: var(--spectrum-global-dimension-size-1600);
+}
+
+.minWidth {
+    text-align: right;
+    min-width: var(--spectrum-global-dimension-size-1250);
+}

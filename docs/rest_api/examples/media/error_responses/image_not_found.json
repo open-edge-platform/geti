@@ -1,0 +1,5 @@
+{
+  "http_status": 404,
+  "message": "Image with id 60ec6bbfb98caeb87e34306e not found",
+  "error_code": "image_not_found"
+}

@@ -1,0 +1,8 @@
+task_family: "FLOW_CONTROL"
+task_type: "CROP"
+name: "Crop"
+model_template_id: "crop"
+is_trainable: false
+instantiation: "CLASS"
+entrypoints:
+  base: "sc_sdk.algorithms.crop.task.CropTask"

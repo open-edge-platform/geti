@@ -1,0 +1,17 @@
+.projectModelTitle {
+    font-size: var(--spectrum-breadcrumb-multiline-item-text-size);
+    font-weight: var(--spectrum-breadcrumb-multiline-item-text-font-weight);
+    line-height: var(--spectrum-breadcrumb-multiline-item-text-line-height);
+    margin: 0;
+}
+
+.projectModelDropDownVersionBtn {
+    min-width: var(--spectrum-global-dimension-size-200);
+    height: var(--spectrum-global-dimension-size-200);
+    background-color: transparent !important;
+    border-color: transparent !important;
+}
+
+.projectModelView {
+    overflow-y: hidden;
+}

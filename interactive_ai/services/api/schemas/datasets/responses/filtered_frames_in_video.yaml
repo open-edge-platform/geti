@@ -1,0 +1,21 @@
+type: object
+properties:
+  video_frame_indices:
+    type: array
+    description: List of video frame indices
+    items:
+      type: integer
+  video_frames:
+    type: array
+    description: List of video frame items
+    items:
+      oneOf:
+        - $ref: 'filtered_video_frame.yaml'
+  video_information:
+    $ref: "../../media/responses/video_information.yaml"
+  next_page:
+    type: string
+    description: URL to the next page of results, if the same parameters are used.
+  total_matched_video_frames:
+    type: integer
+    description: Total video frames that match the query.

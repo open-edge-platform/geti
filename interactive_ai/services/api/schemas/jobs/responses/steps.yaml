@@ -1,0 +1,35 @@
+type: array
+description: Progress details for each step of the job
+items:
+  type: object
+  description: Progress for the step
+  properties:
+    message:
+      type:
+        - string
+        - 'null'
+      description: Status message
+    index:
+      type: integer
+      description: The index of the step within the job
+    progress:
+      type: number
+      format: float
+      description: Step progress from 0 to 100
+    state:
+      type: string
+      description: Step state
+    step_name:
+      type: string
+      description: Step name
+    duration:
+      type:
+        - number
+        - 'null'
+      format: float
+      description: Step duration in seconds
+    warning:
+      type:
+        - string
+        - 'null'
+      description: Step warning message

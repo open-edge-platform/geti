@@ -1,0 +1,121 @@
+post:
+  tags:
+    - Dataset Import/Export
+  summary: Start uploading a dataset archive using TUS
+  description: |-
+    Initiate a new TUS session to upload a dataset archive.
+    
+    This endpoint creates a new upload resource on the server according to the TUS protocol (https://tus.io/protocols/resumable-upload.html).
+    The client provides metadata such as file size and name in the request headers, and the server responds with a location URL for the newly created resource.
+    This URL is used for subsequent upload operations (e.g., PATCH, HEAD).
+  operationId: CreateTusDatasetUpload
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - required: false
+      schema:
+        title: Tus-Resumable
+        type: string
+      name: tus-resumable
+      description: version of TUS used by the client
+      in: header
+    - required: false
+      schema:
+        title: Upload-Length
+        type: integer
+      name: upload-length
+      description: size in bytes of the file to be created
+      in: header
+  responses:
+    '201':
+      description: Successfully created TUS upload
+      headers:
+        location:
+          schema:
+            type: string
+          description: URL for data upload
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          examples:
+            Could not upload a file with zero size:
+              value:
+                $ref: "../../examples/dataset_import_export/error_responses/upload_zero_size.json"
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+    '412':
+      description: Unsupported TUS version
+      headers:
+        tus-version:
+          schema:
+            type: string
+          description: list of supported TUS versions
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Unsupported TUS version:
+              value:
+                $ref: "../../examples/upload/error_responses/unsupported_tus_version.json"
+    '413':
+      description: Request Entity Too Large
+      content:
+        application/json:
+          examples:
+            Too large to upload:
+              value:
+                $ref: "../../examples/upload/error_responses/request_entity_too_large.json"
+
+options:
+  tags:
+    - Dataset Import/Export
+  summary: Retrieve server capabilities for TUS uploads
+  description: |-
+    Get information about the TUS protocol versions and extensions supported by the server.
+    This endpoint allows clients to dynamically adapt their behavior based on server capabilities.
+  operationId: TusDatasetUploadOptions
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+  responses:
+    '204':
+      description: Success
+      headers:
+        tus-resumable:
+          schema:
+            type: string
+          description: version of TUS used by the server
+        tus-version:
+          schema:
+            type: string
+          description: list of supported TUS versions
+        tus-extension:
+          schema:
+            type: string
+          description: list of supported TUS extensions
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"

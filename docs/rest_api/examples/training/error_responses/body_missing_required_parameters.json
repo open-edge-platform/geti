@@ -1,0 +1,5 @@
+{
+    "http_status": 500,
+    "message": "model_template_id is missing in the body.",
+    "error_code": "bad_request"
+}

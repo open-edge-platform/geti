@@ -1,0 +1,4 @@
+{
+  "http_status": 413,
+  "message":  "Request too large: exceeding 10240 MB is not allowed."
+}

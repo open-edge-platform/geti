@@ -1,0 +1,10 @@
+in: query
+name: roi
+description: |-
+  The Region of Interest (ROI) of the image or video frame to use for inference.
+  The ROI is a rectangle defined by four zero-index pixel coordinates, separated by comma,
+  with the format: `left,top,width,height`.
+schema:
+  type: string
+  example: "10,20,40,60"
+required: false

@@ -1,0 +1,9 @@
+definitions: {}
+title: TestingObject
+type: object
+properties:
+  annotations:
+    title: test1
+    type: array
+    items:
+      $ref: "test_schema_2.yaml"

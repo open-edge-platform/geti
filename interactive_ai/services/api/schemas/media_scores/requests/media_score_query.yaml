@@ -1,0 +1,29 @@
+type: object
+required:
+  - condition
+  - rules
+properties:
+  condition:
+    type: string
+    enum: ["and"]
+    description: Connection between the rules of the query
+  rules:
+    type: array
+    description: list of rules used to filter test media results
+    maxItems: 2
+    items:
+      type: object
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+        operator:
+          type: string
+        value:
+          type: 
+          - "string" 
+          - "number"
+          - "null"

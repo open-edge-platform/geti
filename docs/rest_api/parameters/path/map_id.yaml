@@ -1,0 +1,7 @@
+in: path
+name: map_id
+style: simple
+description: The ID of the map of interest
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "onboarding-service.name" . }}-configuration
+  namespace: {{ .Release.Namespace }}
+data:
+  marketing_platform_url: "{{ .Values.marketing_platform_url }}"
+  marketing_platform_form_name: "{{ .Values.marketing_platform_form_name }}"
+  marketing_platform_site_id: "{{ .Values.marketing_platform_site_id }}"

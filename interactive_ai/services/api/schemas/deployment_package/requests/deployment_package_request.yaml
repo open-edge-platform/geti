@@ -1,0 +1,13 @@
+type: object
+required:
+  - models
+  - package_type
+properties:
+  models:
+    type: array
+    description: Array of model identifiers
+    minItems: 1
+    items:
+      $ref: "model_identifier.yaml"
+  package_type:
+    enum: ["ovms", "geti_sdk"]

@@ -1,0 +1,30 @@
+required:
+  - name
+  - pipeline
+  - id
+type: object
+properties:
+  name:
+    type: string
+    description: 'Project name'
+    minLength: 1
+  pipeline:
+    $ref: "pipeline.yaml"
+  id:
+    $ref: '../../../mongo_id.yaml'
+  creation_time:
+    type: string
+    description: Creation time of the project
+  creator_id:
+    type: string
+    description: The username of the creator of the project
+  performance:
+    $ref: "../../../performance/responses/project_performance.yaml"
+  thumbnail:
+    type: string
+    description: 'Thumbnail url'
+  datasets:
+    type: array
+    description: List of datasets in the project
+    items:
+      $ref: "dataset_identifier.yaml"

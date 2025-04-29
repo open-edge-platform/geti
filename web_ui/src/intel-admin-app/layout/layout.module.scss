@@ -1,0 +1,37 @@
+.layoutContainer {
+    background-color: var(--spectrum-global-color-gray-75);
+}
+
+.header {
+    background-color: var(--spectrum-global-color-gray-50);
+    color: #fff;
+}
+
+.navbarContainer {
+    height: 100%;
+}
+
+.navbarList {
+    height: 100%;
+    display: flex;
+    gap: var(--spectrum-global-dimension-size-300);
+}
+
+.navbarItem {
+    height: 100%;
+}
+
+.navbarLinkItem {
+    color: #fff;
+    font-size: var(--spectrum-global-dimension-size-200);
+    font-weight: 500;
+    text-decoration: none;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.navbarLinkItemActive {
+    border-bottom: var(--spectrum-global-dimension-size-40) solid var(--energy-blue);
+}

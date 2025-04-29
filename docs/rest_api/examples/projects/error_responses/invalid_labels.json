@@ -1,0 +1,5 @@
+{
+  "http_status": 400,
+  "error_code": "invalid_labels",
+  "message": "The provided labels are not valid"
+}

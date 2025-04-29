@@ -1,0 +1,18 @@
+.annotationListContainer {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.annotationsWithThumbnails {
+    @extend .annotationListContainer;
+
+    height: calc(100% - var(--spectrum-global-dimension-size-400)) !important; // height of the annotations' toolbar
+}
+
+.annotationsWithoutThumbnails {
+    @extend .annotationListContainer;
+
+    height: 100% !important;
+}

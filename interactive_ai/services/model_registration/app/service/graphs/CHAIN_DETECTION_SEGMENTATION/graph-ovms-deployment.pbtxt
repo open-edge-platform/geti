@@ -1,0 +1,107 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+input_stream: "HTTP_REQUEST_PAYLOAD:input"
+output_stream: "HTTP_RESPONSE_PAYLOAD:output"
+node {
+    calculator: "ModelInferHttpRequestCalculator"
+    input_stream: "HTTP_REQUEST_PAYLOAD:input"
+    output_stream: "IMAGE:input_image"
+}
+node {
+  calculator: "OpenVINOModelServerSessionCalculator"
+  output_side_packet: "SESSION:session_det"
+  node_options: {
+    [type.googleapis.com/mediapipe.OpenVINOModelServerSessionCalculatorOptions]: {
+      servable_name: "MODEL_NAME_0"
+      servable_version: "1"
+    }
+  }
+}
+node {
+  calculator: "OpenVINOModelServerSessionCalculator"
+  output_side_packet: "SESSION:session_segm"
+  node_options: {
+    [type.googleapis.com/mediapipe.OpenVINOModelServerSessionCalculatorOptions]: {
+      servable_name: "MODEL_NAME_1"
+      servable_version: "1"
+    }
+  }
+}
+node {
+     calculator: "DetectionCalculator"
+     input_side_packet: "INFERENCE_ADAPTER:session_det"
+     input_stream: "IMAGE:input_image"
+     output_stream: "INFERENCE_RESULT:detections"
+}
+node {
+     calculator: "DetectionExtractionCalculator"
+     input_stream: "INFERENCE_RESULT:detections"
+     output_stream: "RECTANGLE_PREDICTION:detected_objects"
+}
+node {
+     calculator: "CropCalculator"
+     input_stream: "IMAGE:gated_input_image"
+     input_stream: "DETECTION:input_detection_element"
+     output_stream: "IMAGE:cropped_image"
+}
+node {
+     calculator: "SegmentationCalculator"
+     input_side_packet: "INFERENCE_ADAPTER:session_segm"
+     input_stream: "IMAGE:cropped_image"
+     output_stream: "INFERENCE_RESULT:segmentationresult"
+}
+node {
+  calculator: "EmptyLabelCalculator"
+  input_stream: "PREDICTION:segmentationresult"
+  output_stream: "PREDICTION:segmentation"
+  node_options: {
+    [type.googleapis.com/mediapipe.EmptyLabelOptions] {
+      id: "EMPTY_LABEL_ID_1"
+      label: "EMPTY_LABEL_NAME_1"
+    }
+  }
+}
+node {
+     calculator: "DetectionSegmentationCombinerCalculator"
+     input_stream: "DETECTION:input_detection_element"
+     input_stream: "SEGMENTATION:segmentation"
+     output_stream: "DETECTION_SEGMENTATIONS:output_of_loop_body"
+}
+
+node {
+     calculator: "BeginLoopRectanglePredictionCalculator"
+     input_stream: "ITERABLE:detected_objects"
+     input_stream: "CLONE:input_image"
+     output_stream: "ITEM:input_detection_element"
+     output_stream: "CLONE:gated_input_image"
+     output_stream: "BATCH_END:ext_ts"
+}
+node {
+     calculator: "EndLoopPolygonPredictionsCalculator"
+     input_stream: "ITEM:output_of_loop_body"
+     input_stream: "BATCH_END:ext_ts"
+     output_stream: "ITERABLE:output_segmentations"
+}
+node {
+  calculator: "EmptyLabelCalculator"
+  input_stream: "PREDICTION:detections"
+  output_stream: "PREDICTION:detectionswithempty"
+  node_options: {
+    [type.googleapis.com/mediapipe.EmptyLabelOptions] {
+      id: "EMPTY_LABEL_ID_0"
+      label: "EMPTY_LABEL_NAME_0"
+    }
+  }
+}
+node {
+     calculator: "DetectionSegmentationResultCalculator"
+     input_stream: "DETECTION:detectionswithempty"
+     input_stream: "DETECTION_SEGMENTATIONS:output_segmentations"
+     output_stream: "DETECTION_SEGMENTATION_RESULT:result"
+}
+node {
+  calculator: "HttpSerializationCalculator"
+  input_stream: "INFERENCE_RESULT:result"
+  input_stream: "HTTP_REQUEST_PAYLOAD:input"
+  output_stream: "HTTP_RESPONSE_PAYLOAD:output"
+}

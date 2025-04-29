@@ -1,0 +1,110 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+package service;
+
+option go_package = "./modelregistration";
+
+enum ErrorCode {
+  MODEL_ALREADY_REGISTERED = 0;
+  UNSUPPORTED_MODEL_TYPE = 1;
+  INVALID_MODEL_ZIP_PACKAGE = 2;
+  INTERNAL_ERROR = 3;
+  NOT_IMPLEMENTED = 4;
+}
+
+message Error {
+  ErrorCode code = 1;
+  string message = 2;
+}
+
+service ModelRegistration {
+  rpc register_new_pipelines(RegisterRequest) returns (StatusResponse) {}
+  rpc register_active_pipeline(ActiveRequest) returns (StatusResponse) {}
+  rpc deregister_pipeline(DeregisterRequest) returns (StatusResponse) {}
+  rpc list_pipelines(ListRequest) returns (ListResponse) {}
+  rpc recover_pipeline(RecoverRequest) returns (RecoverResponse) {}
+  rpc delete_project_pipelines(PurgeProjectRequest)
+      returns (PurgeProjectResponse) {}
+  rpc download_graph(DownloadGraphRequest) returns (stream Chunk) {}
+}
+
+message Model {
+  string organization_id = 1;
+  string workspace_id = 2;
+  string project_id = 3;
+  string model_group_id = 4;
+  string model_id = 5;
+  string optimized_model_id = 6;
+  string task_id = 7;
+  bool use_ellipse = 8;
+}
+
+message Connection {
+  string from_id = 1;
+  string to_id = 2;
+}
+
+message Label {
+  string id = 1;
+  string name = 2;
+  bool is_anomalous = 3;
+  bool is_empty = 4;
+  string group = 5;
+  string parent_id = 6;
+}
+
+message Task {
+  string id = 1;
+  string title = 2;
+  string task_type = 3;
+  repeated Label labels = 4;
+}
+
+message Pipeline {
+  repeated Task tasks = 1;
+  repeated Connection connections = 2;
+}
+
+message Project {
+  string id = 1;
+  string name = 2;
+  Pipeline pipeline = 3;
+}
+
+message RegisterRequest {
+  string name = 1;
+  Project project = 2;
+  repeated Model model = 3;
+  bool override = 4;
+}
+
+message ActiveRequest { string name = 1; }
+
+message DeregisterRequest { string name = 1; }
+
+message StatusResponse {
+  string status = 1;
+  optional Error error = 2;
+}
+
+message ListRequest {}
+
+message ListResponse { repeated string pipelines = 1; }
+
+message RecoverRequest { string name = 1; }
+
+message RecoverResponse { bool success = 1; }
+
+message PurgeProjectRequest { string project_id = 1; }
+
+message PurgeProjectResponse { bool success = 1; }
+
+message Chunk { bytes buffer = 1; }
+
+message DownloadGraphRequest {
+  Project project = 1;
+  repeated Model models = 2;
+}

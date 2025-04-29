@@ -1,0 +1,68 @@
+[project]
+name = "users-handler"
+version = "1.0.0"
+description = "Configuration for common loggers and telemetry in the Geti platform"
+requires-python = ">=3.10, <3.13"
+dependencies = [
+    "cryptography==43.0.1",
+    "Pillow==11.1.0",
+    "pyjwt==2.4.0",
+    "python-ldap==3.4.4",
+    "geti-spicedb-tools"
+]
+
+[tool.uv.sources]
+geti-spicedb-tools = { path = "../../../libs/spicedb_tools", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "mypy~=1.15",
+    "protobuf~=4.23.0",
+    "types-protobuf==4.24.0.20240129",
+    "mypy-protobuf~=3.5.0",
+    "pytest-mock~=3.14",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["users_handler"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [
+    ".venv*",
+    "users_handler/subject_pb2.*",
+]
+[tool.ruff.lint]
+select = [
+    "ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"
+]
+ignore = [
+    "N801", "N805", "N806", "N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001", "RUF012"
+]
+fixable = ["ALL"]
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ARG001", "ARG002", "ANN001", "ANN201", "D103"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args = 7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true
+exclude = "^.*/tests/.*\\.py$"

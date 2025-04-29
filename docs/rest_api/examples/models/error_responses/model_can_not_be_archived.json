@@ -1,0 +1,5 @@
+{
+  "http_status": 422,
+  "message": "Archiving an optimized model is not allowed. The archive operation is only allowed on base models.",
+  "error_code": "model_purging_not_possible"
+}

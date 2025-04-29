@@ -1,0 +1,63 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
+include $(CWD)/Makefile.shared
+
+.PHONY: build deps clean tests test-unit-default test-integration-default coverage static-code-analysis-default lint lint-install
+
+GOPATH ?= $(HOME)/go
+GOBIN ?= $(GOPATH)/bin
+GOLANGCI_LINT_VERSION = v1.64.2
+TIMEOUT = 15m
+
+# Go commands
+GOCMD   := go
+GOBUILD := $(GOCMD) build
+GOTEST  := $(GOCMD) test
+
+GOOS           ?= linux
+CGO_ENABLED    ?= 0
+GO_BUILD_FLAGS ?= -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a
+OUTPUT_BINARY  ?= service
+
+deps: ## Clean up and verify modules
+	$(GOCMD) mod tidy
+
+build-default: ## Build the Go binary
+	GOOS=$(GOOS) CGO_ENABLED=$(CGO_ENABLED) $(GOBUILD) $(GO_BUILD_FLAGS) -o $(OUTPUT_BINARY) .
+
+clean: ## Remove binary and coverage artifacts
+	rm -f $(OUTPUT_BINARY) coverage.out
+
+tests: test-unit test-integration
+
+test-unit-default: ## Run unit tests
+	$(GOTEST) -v -race -short ./...
+
+test-integration-default: ## Run integration tests (requires -tags=integration in code)
+	$(GOTEST) -v -race -tags=integration ./...
+
+coverage: ## Run tests and generate a coverage profile
+	$(GOTEST) -coverprofile=coverage.out ./...
+	@echo "Coverage report generated at coverage.out"
+
+## Run static analysis/linters in read-only mode (e.g., for CI checks).
+## This will fail on lint errors but won't modify any files.
+static-code-analysis-default: lint-install
+	$(GOBIN)/golangci-lint run --timeout $(TIMEOUT)
+
+## Run linter in "fix" mode to automatically correct code where possible.
+## Generally used locally to clean up code before committing.
+lint: lint-install
+	$(GOBIN)/golangci-lint run --fix --timeout $(TIMEOUT)
+
+lint-install:
+	@echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..."
+	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "$$($(GOBIN)/golangci-lint --version | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+		GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
+		echo "golangci-lint $(GOLANGCI_LINT_VERSION) installed at $(GOBIN)/golangci-lint"; \
+	else \
+		echo "golangci-lint $(GOLANGCI_LINT_VERSION) already installed"; \
+	fi
+

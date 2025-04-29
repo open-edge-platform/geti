@@ -1,0 +1,38 @@
+{
+    "id": "65e6b9c86c95f8c683685d6c",
+    "type": "prepare_import_to_existing_project",
+    "creation_time": "2024-03-05T06:20:56.733000+00:00",
+    "start_time": "2024-03-05T06:21:02.840000+00:00",
+    "end_time": "2024-03-05T06:21:14.634000+00:00",
+    "name": "Prepare Import to Existing Project",
+    "author": "3bc89128-bf30-40c2-a3ad-dcd46e5c5ddf",
+    "state": "finished",
+    "steps": [
+        {
+            "message": "Dataset is parsed successfully",
+            "index": 1,
+            "progress": 100,
+            "state": "finished",
+            "step_name": "Prepare dataset import to existing project",
+            "duration": 6.022
+        }
+    ],
+    "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+    },
+    "metadata": {
+        "file_id": "65e6bcf4c6ada55c64630357",
+        "project": {
+            "id": "65e6c01185ff89c56c11c5dc",
+            "name": "cat dog segmentation",
+            "type": "segmentation"
+        },
+        "labels": [
+            "dog",
+            "cat"
+        ],
+        "warnings": []
+    }
+}

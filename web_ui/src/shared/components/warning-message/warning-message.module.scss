@@ -1,0 +1,21 @@
+.warning {
+    display: flex;
+
+    svg {
+        fill: var(--spectrum-semantic-notice-color-icon);
+        margin-right: var(--spectrum-global-dimension-size-150);
+    }
+}
+
+.warningIcon {
+    color: var(--brand-daisy) !important;
+}
+
+.warningText {
+    font-size: var(--spectrum-global-dimension-font-size-75) !important;
+    color: var(--spectrum-global-color-gray-700) !important;
+
+    & a {
+        color: var(--energy-blue) !important;
+    }
+}

@@ -1,0 +1,9 @@
+type: object
+properties:
+  test_results:
+    type: array
+    description: Array of tests
+    items:
+      $ref: "model_test_result.yaml"
+required:
+  - test_results

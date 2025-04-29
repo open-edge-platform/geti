@@ -1,0 +1,25 @@
+.skeletonContainer {
+    margin-top: var(--spectrum-global-dimension-size-400);
+
+    div {
+        --skeleton-background-color: var(--spectrum-global-color-gray-75);
+    }
+}
+
+.wrapper {
+    height: var(--spectrum-global-dimension-size-1700);
+    width: 100%;
+}
+
+.wrapper + .wrapper {
+    margin-top: var(--spectrum-global-dimension-size-200);
+}
+
+.jobInfo {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.divider {
+    background-color: var(--spectrum-global-color-gray-75) !important;
+}

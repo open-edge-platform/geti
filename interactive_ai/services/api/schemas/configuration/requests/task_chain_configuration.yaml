@@ -1,0 +1,9 @@
+type: object
+required:
+  - task_chain
+properties:
+  task_chain:
+    type: array
+    description: Array of task configurations
+    items:
+      $ref: "task_configuration.yaml"

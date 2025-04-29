@@ -1,0 +1,27 @@
+.backgroundLayout {
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    padding: 20px;
+}
+
+.layoutContainer {
+    box-shadow: 0 var(--spectrum-global-dimension-size-50) var(--spectrum-global-dimension-size-100)
+        var(--spectrum-global-color-gray-50);
+}
+
+.title {
+    font-family: intelOne;
+    color: var(--spectrum-global-color-gray-900);
+}
+
+.submitBtn {
+    padding-top: var(--spectrum-global-dimension-size-150) !important;
+    padding-bottom: var(--spectrum-global-dimension-size-150) !important;
+    border-radius: var(--spectrum-global-dimension-size-250) !important;
+}
+
+.signInLink {
+    color: var(--energy-blue);
+    text-decoration: none;
+}

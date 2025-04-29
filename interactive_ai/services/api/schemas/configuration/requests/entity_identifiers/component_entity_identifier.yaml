@@ -1,0 +1,23 @@
+required:
+  - type
+  - component
+type: object
+title: Component entity identifier
+properties:
+  workspace_id:
+    oneOf:
+    - $ref: "../../../mongo_id.yaml"
+    - $ref: "../../../uuid.yaml"
+  project_id:
+    $ref: "../../../mongo_id.yaml"
+  task_id:
+    $ref: "task_id.yaml"
+  component:
+    type: string
+    description: If the configuration is a component configuration, describes the component.
+    enum: ["NULL_COMPONENT", "SUBSET_MANAGER","DATASET_COUNTER","PROJECT_ACTIVE_LEARNING","TASK_ACTIVE_LEARNING","TASK_NODE","PIPELINE_DATASET_MANAGER"]
+  type:
+    type: string
+    description: "Describes the type of the configuration. Set to COMPONENT_PARAMETERS for a configuration that
+      relates to a component."
+    enum: ["COMPONENT_PARAMETERS"]

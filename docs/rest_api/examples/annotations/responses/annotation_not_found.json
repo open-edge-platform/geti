@@ -1,0 +1,5 @@
+{
+  "http_status": 204,
+  "message": "Annotations for image with id {media_id} could not be found.",
+  "error_code": "annotation_not_found"
+}

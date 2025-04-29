@@ -1,0 +1,24 @@
+type: object
+properties:
+  models:
+    type: array
+    description: |-
+      Array of models. The models at this level represent the successfully trained models. Note that these are not 
+      the (OpenVINO or ONNX) optimized models; 
+      the list of optimized models can be found through the [model detail](#Models/GetModelDetail) endpoint.  
+    items:
+      $ref: "model.yaml"
+  task_id:
+    $ref: '../../mongo_id.yaml'
+  id:
+    $ref: '../../mongo_id.yaml'
+  name:
+    type: string
+    description: Name of the model group, typically the name of the architecture.
+  model_template_id:
+    type: string
+    description: The ID of the model architecture.
+  learning_approach:
+    $ref: "learning_approach.yaml"
+  lifecycle_stage:
+    $ref: "model_template_lifecycle_stage.yaml"

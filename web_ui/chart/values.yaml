@@ -1,0 +1,44 @@
+image: web
+
+ui_port: 3000
+ui_app_name: "web"
+ui_endpoint: "/api/graphql/"
+
+ui_resources:
+  requests:
+    cpu: 250m
+    memory: 250Mi
+  limits:
+    memory: 250Mi
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - all
+
+initialDelaySeconds: 5
+periodSeconds: 45
+
+ui:
+  paths:
+  - /
+  - /personal-access-token
+
+api_path: /api/graphql(/|$)(.*)
+
+global:
+  security_headers: ''
+  stripped_headers: ''
+  docker_namespace: geti
+  enable_master_node_selector: true
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false

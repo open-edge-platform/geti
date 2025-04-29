@@ -1,0 +1,5 @@
+{
+    "http_status": 409,
+    "message": "Dataset with name 'testing dataset storage' already exists.",
+    "error_code": "dataset_already_exists"
+}

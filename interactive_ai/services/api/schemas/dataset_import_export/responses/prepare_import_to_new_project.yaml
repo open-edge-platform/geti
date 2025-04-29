@@ -1,0 +1,76 @@
+title: Metadata of `prepare_import_to_new_project` job
+type: object
+description: Supported project types and warnings
+properties:
+  file_id:
+    $ref: 'file_id.yaml'
+  warnings:
+    $ref: 'warnings.yaml'
+  supported_project_types:
+    type: array
+    description: Supported project types and corresponding labels
+    items:
+      type: object
+      required:
+        - project_type
+        - pipeline
+      properties:
+        project_type:
+          type: string
+          description: Project type name
+          $ref: "../project_types.yaml"
+        pipeline:
+          type: object
+          required:
+            - connections
+            - tasks
+          properties:
+            connections:
+              type: array
+              items:
+                type: object
+                required:
+                  - from
+                  - to
+                properties:
+                  from:
+                    type: string
+                    description: Source task name
+                  to:
+                    type: string
+                    description: Target task name
+            tasks:
+              type: array
+              items:
+                type: object
+                required:
+                  - title
+                  - task_type
+                  - labels
+                properties:
+                  title:
+                    type: string
+                    description: Task name
+                  task_type:
+                    type: string
+                    description: OTX Task type name in lowercase
+                    enum: [
+                      dataset, classification, segmentation, detection, crop, instance_segmentation, keypoint_detection,
+                      anomaly, rotated_detection,
+                    ]
+                  labels:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - name
+                      properties:
+                        name:
+                          type: string
+                          description: Label name
+                        group:
+                          type: string
+                          description: Label group name
+                        parent:
+                          type: string
+                          description: Label parent name

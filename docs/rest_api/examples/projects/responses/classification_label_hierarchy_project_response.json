@@ -1,0 +1,111 @@
+{
+    "creation_time": "2021-07-28T10:09:31.764000+00:00",
+    "creator_id": "Example user",
+    "datasets": [
+        {
+            "id": "6101254defba22ca453f11cc",
+            "name": "Example classification project",
+            "creation_time": "2022-10-24T11:21:50.030000+00:00",
+            "use_for_training": true
+        }
+    ],
+    "id": "61012cdb1d38a5e71ef3baf9",
+    "storage_info": {},
+    "name": "Example classification project - label hierarchy",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "61012cdb1d38a5e71ef3bafa",
+                "to": "61012cdb1d38a5e71ef3bafd"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "61012cdb1d38a5e71ef3bafa",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "61012cdb1d38a5e71ef3bafd",
+                "label_schema_id": "61012cdb1d38a5e71ef3bae1",
+                "labels": [
+                    {
+                        "color": "#0015ddff",
+                        "group": "default - Sample classification task",
+                        "hotkey": "",
+                        "id": "61012cdb1d38a5e71ef3baf1",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "animal"
+                    },
+                    {
+                        "color": "#0015ffff",
+                        "group": "species",
+                        "hotkey": "ctrl+5",
+                        "id": "61012cdb1d38a5e71ef3baf2",
+                        "parent_id": "61012cdb1d38a5e71ef3baf1",
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "horse"
+                    },
+                    {
+                        "color": "#00ffffff",
+                        "group": "species",
+                        "hotkey": "ctrl+6",
+                        "id": "61012cdb1d38a5e71ef3baf3",
+                        "parent_id": "61012cdb1d38a5e71ef3baf1",
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "donkey"
+                    },
+                    {
+                        "color": "#00aaaaff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+7",
+                        "id": "61012cdb1d38a5e71ef3baf4",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "saddled"
+                    },
+                    {
+                        "color": "#00aaffff",
+                        "group": "saddle_state",
+                        "hotkey": "ctrl+8",
+                        "id": "61012cdb1d38a5e71ef3baf5",
+                        "parent_id": null,
+                        "is_empty": false,
+                        "is_anomalous": false,
+                        "name": "unsaddled"
+                    },
+                    {
+                        "color": "#9ee8d3ff",
+                        "group": "No class",
+                        "hotkey": "ctrl+0",
+                        "id": "61012cdb1d38a5e71ef3baf6",
+                        "parent_id": null,
+                        "is_empty": true,
+                        "is_anomalous": false,
+                        "name": "No class"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    },
+    "performance": {
+        "score": 0.7,
+        "task_performances": [
+            {
+                "task_id": "61012cdb1d38a5e71ef3bafd",
+                "score": {
+                    "value": 0.7,
+                    "metric_type": "accuracy"
+                }
+            }
+        ]
+    },
+    "thumbnail": "/api/v1/organizations/61b3a664-822d-45c5-beb1-8b10187e301d/workspaces/db99fa0c-46a2-427f-aba6-fd76f1b86d7f/projects/61012cdb1d38a5e71ef3baf9/thumbnail"
+}

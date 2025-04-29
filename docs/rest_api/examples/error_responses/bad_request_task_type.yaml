@@ -1,0 +1,3 @@
+http_status: 400
+message: "NOT_A_TASK_TYPE is not a supported task type, only the following task types are supported: { 'anomaly', 'classification', 'detection', 'segmentation' }"
+error_code: bad_request

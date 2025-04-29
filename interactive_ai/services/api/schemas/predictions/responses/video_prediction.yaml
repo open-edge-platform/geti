@@ -1,0 +1,36 @@
+type: object
+properties:
+  video_predictions:
+    type: array
+    description: Array of video frame predictions
+    items:
+      $ref: "video_frame_prediction.yaml"
+  next_page:
+    type: string
+    description: "Url to get next page with prediction results. Only appears if number of predictions exceeds
+    maximum allowed predictions defined in backend."
+  video_prediction_properties:
+    type: object
+    properties:
+      total_count:
+        type: integer
+        description: Total number of frames returned
+        minimum: 0
+      start_frame:
+        type: integer
+        description: Integer representing the index of the first returned frame
+      end_frame:
+        type: integer
+        description: Integer representing the index of the last returned frame
+      total_requested_count:
+        type: integer
+        description: Total number of frames requested by the user
+        minimum: 0
+      requested_start_frame:
+        type: integer
+        description: Index of the start frame requested by the user (inclusive)
+        minimum: 0
+      requested_end_frame:
+        type: integer
+        description: Index of the end frame requested by the user (inclusive)
+        minimum: 0

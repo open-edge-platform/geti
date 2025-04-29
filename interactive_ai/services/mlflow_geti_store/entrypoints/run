@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+mlflow server -h 0.0.0.0 --backend-store-uri geti:// --artifacts-destination geti:// -w 2 --gunicorn-opts="--pid=/shard_files/sidecar.pid"

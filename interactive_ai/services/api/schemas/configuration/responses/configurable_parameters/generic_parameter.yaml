@@ -1,0 +1,57 @@
+type: object
+title: Configurable parameter
+properties:
+  header:
+    type: string
+    description: User friendly title for the parameter.
+  description:
+    type: string
+    description: User friendly description for what the parameter does.
+  warning:
+    description: Warning message (if any) that explains the user to use caution when changing this parameter, and why.
+  value:
+    oneOf:
+      - type: string
+      - type: number
+      - type: boolean
+    description: Value that this parameter currently takes.
+  default_value:
+    oneOf:
+      - type: string
+      - type: number
+      - type: boolean
+    description: Default value that should be set for this parameter.
+  name:
+    type: string
+    description: Name to identify the parameter by in the system.
+  template_type:
+    type: string
+    enum: [selectable, input]
+    description: "Describes the template type of the parameter. 'selectable' is used for parameters with a fixed set of
+    possible values. 'input' is used for parameters that allow free input, possibly restricted to a certain range."
+  data_type:
+    type: string
+    enum: [float, integer, boolean, string]
+    description: "Describes the type of parameter. Parameters can be integers, floats, boolean or string."
+  options:
+    type: array
+    description: "List of values that this parameter can take. Only used for selectable string and selectable float
+    parameters"
+    items:
+      oneOf:
+        - type: number
+        - type: string
+  min_value:
+    type: number
+    format: float
+    description: Minimum value that can be set for this parameter. Only used for numeric parameters.
+  max_value:
+    type: number
+    format: float
+    description: Minimum value that can be set for this parameter. Only used for numeric parameters.
+  ui_rules:
+    type: object
+    description: Not implemented at this moment
+  editable:
+    type: boolean
+    description: Not implemented at this moment.

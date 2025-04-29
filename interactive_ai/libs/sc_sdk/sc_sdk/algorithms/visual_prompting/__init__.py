@@ -1,0 +1,4 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+VISUAL_PROMPTING_MODEL_TEMPLATE_ID = "visual_prompting_model"

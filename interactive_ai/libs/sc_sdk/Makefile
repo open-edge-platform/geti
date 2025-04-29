@@ -1,0 +1,1 @@
+include ../../../libs/Makefile.shared-python-libs

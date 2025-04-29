@@ -1,0 +1,145 @@
+head:
+  tags:
+    - Project Import/Export
+  summary: Get the status of a project archive TUS upload
+  description: |-
+    Retrieve the current status of the TUS upload of a project archive.
+    
+    This endpoint provides information such as the current offset of uploaded data through the `Upload-Offset` header,
+    allowing the client to resume uploads from the correct position.
+    It is useful for verifying progress or ensuring consistency before appending further data.
+  operationId: TusProjectUploadHead
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/file_id.yaml'
+    - required: false
+      schema:
+        title: Tus-Resumable
+        type: string
+      name: tus-resumable
+      description: version of TUS used by the client
+      in: header
+  responses:
+    '200':
+      description: Success
+      headers:
+        upload-length:
+          schema:
+            type: integer
+          description: total size in bytes of the file
+        upload-offset:
+          schema:
+            type: integer
+          description: size in bytes of data uploaded so far
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            File not found:
+              value:
+                $ref: "../../examples/project_import_export/error_responses/file_not_found.json"
+    '412':
+      description: Unsupported TUS version
+      headers:
+        tus-version:
+          schema:
+            type: string
+          description: list of supported TUS versions
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Unsupported TUS version:
+              value:
+                $ref: "../../examples/upload/error_responses/unsupported_tus_version.json"
+
+patch:
+  tags:
+    - Project Import/Export
+  summary: Append data to a running TUS upload of a project archive
+  description: |-
+    Upload a chunk of the project archive data to the server, appending it to the TUS upload at the specified offset.
+    
+    This endpoint allows the client to resume uploading data with TUS by sending the remaining data from the last known offset.
+    It is recommended to choose a large chunk size (based on server limitations) to speed up the overall upload operation.
+  operationId: TusProjectUploadPatch
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/file_id.yaml'
+    - required: false
+      schema:
+        title: Tus-Resumable
+        type: string
+      name: tus-resumable
+      description: version of TUS used by the client
+      in: header
+    - required: false
+      schema:
+        title: Content-Type
+        type: string
+      name: content-type
+      in: header
+    - required: false
+      schema:
+        title: Upload-Offset
+        type: integer
+      name: upload-offset
+      description: size in bytes of data uploaded so far
+      in: header
+  requestBody:
+    content:
+      application/offset+octet-stream:
+        schema:
+          type: string
+          format: binary
+  responses:
+    '204':
+      description: Success
+      headers:
+        upload-offset:
+          schema:
+            type: integer
+          description: size in bytes of data uploaded so far
+    '404':
+      description: Object not found
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            File not found:
+              value:
+                $ref: "../../examples/project_import_export/error_responses/file_not_found.json"
+    '412':
+      description: Unsupported TUS version
+      headers:
+        tus-version:
+          schema:
+            type: string
+          description: list of supported TUS versions
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Unsupported TUS version:
+              value:
+                $ref: "../../examples/upload/error_responses/unsupported_tus_version.json"

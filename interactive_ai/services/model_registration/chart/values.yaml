@@ -1,0 +1,43 @@
+image: modelregistration
+
+imagePullPolicy: IfNotPresent
+
+modelMeshNamespace: null
+
+service:
+  type: ClusterIP
+  ports:
+    modelregistration:
+      port: 5555
+    healthz:
+      port: 8080
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - all
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 256Mi
+  limits:
+    memory: 4Gi
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+global:
+  overwrite_resources: false
+  logging_config_dir: ''
+  enable_master_node_selector: true
+  docker_namespace: geti
+  use_dynamic_helm_chart_tag: false

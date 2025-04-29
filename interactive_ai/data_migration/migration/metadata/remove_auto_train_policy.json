@@ -1,0 +1,9 @@
+{
+  "description": "Drop the 'auto_train_policy' MongoDB collection",
+  "supports_downgrade": true,
+  "skip_on_project_import": true,
+  "new_collections": [],
+  "updated_collections": [],
+  "deprecated_collections": ["auto_train_policy"],
+  "affects_binary_data": false
+}

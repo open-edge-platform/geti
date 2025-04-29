@@ -1,0 +1,9 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  probability:
+    title: Probability
+    type: number
+    format: float
+    description: Estimated probability of a prediction. For annotations, this is set to 1.

@@ -1,0 +1,91 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+.wizard {
+    height: var(--spectrum-global-dimension-size-350);
+    margin: var(--spectrum-global-dimension-size-200) var(--spectrum-global-dimension-size-600);
+    color: var(--spectrum-global-color-gray-700);
+    user-select: none;
+}
+
+.stepNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--spectrum-global-dimension-size-350);
+    height: var(--spectrum-global-dimension-size-350);
+    border-radius: 50%;
+    background-color: var(--spectrum-global-color-gray-300);
+
+    &.active {
+        background-color: var(--spectrum-global-color-gray-50);
+    }
+}
+
+.active {
+    font-weight: 600;
+    color: var(--spectrum-global-color-gray-900);
+}
+
+.stepDivider {
+    flex: 1;
+    width: 100%;
+    height: 1px;
+    background-color: var(--spectrum-global-color-gray-500);
+}
+
+.modalContent {
+    width: 100%;
+    height: calc(
+        100% -
+            (
+                var(--spectrum-global-dimension-size-200) + var(--spectrum-global-dimension-size-400) +
+                    var(--spectrum-global-dimension-size-350)
+            )
+    );
+    background-color: var(--spectrum-global-color-gray-50);
+}
+
+.contentWrapper {
+    width: calc(100% - var(--spectrum-global-dimension-size-250) * 2);
+    height: calc(100% - var(--spectrum-global-dimension-size-250) * 2);
+    padding: var(--spectrum-global-dimension-size-250) var(--spectrum-global-dimension-size-250);
+}
+
+.illustration {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+// Dataset Import Labels
+
+.labelsWrapper {
+    user-select: none;
+    height: 100%;
+
+    span[class*='spectrum-Checkbox-box']:before {
+        border-color: var(--spectrum-global-color-gray-700) !important;
+    }
+}
+
+.treeGroup {
+    margin-left: var(--spectrum-global-dimension-size-400);
+}
+
+.treeItem {
+    height: var(--spectrum-global-dimension-size-600);
+    background-color: var(--spectrum-global-color-gray-100);
+}
+
+.toggleExpandButton {
+    svg {
+        transform: rotate(0deg);
+        transition: transform 100ms;
+    }
+
+    &[aria-expanded='true'] svg {
+        transform: rotate(90deg);
+    }
+}

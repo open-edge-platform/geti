@@ -1,0 +1,7 @@
+type: object
+properties:
+  batch_predictions:
+    description: List of predictions. Each entry corresponds to the prediction for a single media item in the batch.
+    type: array
+    items:
+      $ref: "single_prediction.yaml"

@@ -1,0 +1,85 @@
+[project]
+name = "resource"
+version = "1.0.0"
+description = "Resource service for Geti"
+requires-python = ">=3.10, <3.13"
+
+dependencies = [
+    "fastapi==0.115.2",
+    "jsonschema>=4.18.0a10",
+    "python-multipart~=0.0.18",
+    "uvicorn~=0.27",
+    "geti-feature-tools",
+    "geti-fastapi-tools",
+    "geti-kafka-tools",
+    "geti_spicedb_tools",
+    "geti-telemetry-tools[telemetry,fastapi,logger,kafka,grpc]",
+    "geti-types",
+    "sc_sdk",
+    "media_utils",
+    "grpc_interfaces"
+]
+
+[tool.uv.sources]
+geti-feature-tools = { path = "../../../libs/feature_tools", editable = true }
+geti-fastapi-tools = { path = "../../../libs/fastapi_tools", editable = true }
+geti-kafka-tools = { path = "../../../libs/kafka_tools", editable = true }
+geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
+geti-types = { path = "../../../libs/types", editable = true }
+geti_spicedb_tools = { path = "../../../libs/spicedb_tools", editable = true }
+sc_sdk = { path = "../../libs/sc_sdk", editable = true }
+media_utils = { path = "../../libs/media_utils", editable = true }
+grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "pytest-freezegun~=0.4",
+    "testfixtures~=8.0",
+    "pytest-freezegun==0.4.2",
+    "types-protobuf",
+    "grpc-stubs",
+    "httpx~=0.26",
+    "pillow==11.1.0",
+    "retry~=0.9.2",
+    "mypy~=1.15",
+    "mypy-protobuf==3.5",
+    "flaky==3.8.1",
+    "testcontainers[mongodb]~=4.9",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+src = ["app"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "D", "ARG", "PLR"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+known-local-folder = ["geti_types", "geti_kafka_tools",  "geti_feature_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "sc_sdk", "media_utils"]
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

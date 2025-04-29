@@ -1,0 +1,48 @@
+get:
+  tags:
+    - Models
+  summary: Get statistics for a model
+  description: |-
+    Get statistics for a model. The statistics includes training and evaluation statistics.  
+    The response will be a list of charts; each chart will be one of the following types: `text`, `bar`, `radial_bar`, `line` or `matrix`. For each type of chart, the response body has a different
+    format. See the schemas for information on the format of the response.
+  operationId: GetModelStatistics
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/model_group_id.yaml'
+    - $ref: '../../parameters/path/model_id.yaml'
+  responses:
+    '200':
+      description: Training statistics for a model
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/models/responses/model_statistics.yaml"
+          examples:
+            Model statistics response:
+              value:
+                $ref: "../../examples/models/responses/model_statistics_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Model not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_not_found.json"
+            Resultset not found response:
+              value:
+                $ref: "../../examples/models/error_responses/resultset_not_found.json"

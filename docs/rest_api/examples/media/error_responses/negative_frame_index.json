@@ -1,0 +1,5 @@
+{
+  "http_status": 500,
+  "message": "The requested frame index `-1` is out of bounds.",
+  "error_code": "internal_server_error"
+}

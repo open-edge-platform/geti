@@ -1,0 +1,20 @@
+{
+  "id": "fafa904e-4ae9-4a5c-a4a7-ea22eee73c03",
+  "name": "Geti Free Tier",
+  "product_policies": [
+    {
+      "account_name": "Welcoming Credits",
+      "init_amount": 3000,
+      "renewable_amount": 0,
+      "expires_in": 2678400000
+    },
+    {
+      "account_name": "Freemium Credits",
+      "init_amount": 0,
+      "renewable_amount": 1000,
+      "expires_in": null
+    }
+  ],
+  "created": 1722439214733,
+  "updated": 1722439214733
+}

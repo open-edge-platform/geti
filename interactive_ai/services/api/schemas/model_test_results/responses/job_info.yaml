@@ -1,0 +1,8 @@
+type: object
+description: Info of job related to the model test result. This attribute is only present after job is created for the model test.
+properties:
+  id:
+    $ref: '../../mongo_id.yaml'
+  status:
+    type: string
+    description: 'Status of the testing operation; should be one of: [ PENDING, CREATING_DATASET, INFERRING, EVALUATING, DONE ]'

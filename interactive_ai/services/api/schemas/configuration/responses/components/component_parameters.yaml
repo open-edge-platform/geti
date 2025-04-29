@@ -1,0 +1,26 @@
+type: object
+title: Component parameters
+properties:
+  id:
+    $ref: "../../../mongo_id.yaml"
+  type:
+    type: string
+    description: "Type of the configurable parameters. For component parameters the type is always
+    'CONFIGURABLE_PARAMETERS'."
+    enum: ["CONFIGURABLE_PARAMETERS", "PARAMETER_GROUP"]
+  entity_identifier:
+    $ref: "../entity_identifiers/entity_identifier.yaml"
+  header:
+    type: string
+    description: Name of the configuration
+    example: Subset splitting
+  description:
+    type: string
+    description: Description of the configuration, indicating which part of the system it controls.
+    example: These parameters control the splitting of the dataset into training, validation and test set.
+  groups:
+    type: array
+    items:
+      $ref: "../parameter_group/generic_group.yaml"
+  parameters:
+    $ref: "../configurable_parameters/parameters.yaml"

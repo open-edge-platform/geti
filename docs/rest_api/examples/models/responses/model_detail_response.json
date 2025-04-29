@@ -1,0 +1,142 @@
+{
+  "name": "U-Net",
+  "architecture": "U-Net",
+  "creation_date": "2021-06-30T09:25:20.472000+00:00",
+  "id": "60dc38807c9ed62cf35b9255",
+  "size": 12813101,
+  "performance": {
+    "score": 0.48453322601318
+  },
+  "label_schema_in_sync": true,
+  "score_up_to_date": false,
+  "fps_throughput": 40,
+  "latency": 25,
+  "precision": [
+    "FP32"
+  ],
+  "total_disk_size": 25813101,
+  "target_device": "CPU",
+  "target_device_type": "Intel(R) Core(TM) i9-10980XE CPU @ 3.00GHz",
+  "version": 2,
+  "previous_revision_id": "60dd7ab4083bce31e1f3876c",
+  "previous_trained_revision_id": "60dd7ab4083bce31e1f3876c",
+  "optimized_models": [
+    {
+      "id": "60dc38807c9ed62cf35b9255",
+      "size": 12813101,
+      "total_disk_size": 15813101,
+      "fps_throughput": 100,
+      "has_xai_head": true,
+      "latency": 10,
+      "name": "Detection model OpenVINO",
+      "optimization_objectives": {
+      },
+      "optimization_methods": [
+      ],
+      "optimization_type": "MO",
+      "precision": [
+        "FP16"
+      ],
+      "version": 2,
+      "previous_revision_id": "60dd7ab4083bce31e1f3876c",
+      "previous_trained_revision_id": "60dd7ab4083bce31e1f3876c",
+      "performance": {
+        "score": 0.48453322601318
+      },
+      "model_format": "OpenVINO",
+      "model_status": "SUCCESS",
+      "target_device": "CPU",
+      "target_device_type": "Intel(R) Core(TM) i9-10980XE CPU @ 3.00GHz",
+      "configurations": []
+    },
+    {
+      "id": "60dc38807c9ed62cf35b9255",
+      "size": 12813101,
+      "fps_throughput": 200,
+      "has_xai_head": false,
+      "latency": 5,
+      "name": "Detection model OpenVINO",
+      "optimization_objectives": {
+      },
+      "optimization_methods": [
+      ],
+      "optimization_type": "MO",
+      "precision": [
+        "INT8"
+      ],
+      "version": 2,
+      "previous_revision_id": "60dd7ab4083bce31e1f3876c",
+      "previous_trained_revision_id": "60dd7ab4083bce31e1f3876c",
+      "performance": {
+        "score": 0.34953322601318
+      },
+      "model_format": "OpenVINO",
+      "model_status": "SUCCESS",
+      "target_device": "CPU",
+      "target_device_type": "Intel(R) Core(TM) i9-10980XE CPU @ 3.00GHz",
+      "configurations": []
+    },
+    {
+      "id": "60dc38807c9ed62cf35b9789",
+      "size": 12813101,
+      "total_disk_size": 15813101,
+      "fps_throughput": 200,
+      "has_xai_head": false,
+      "latency": 5,
+      "name": "Detection model OpenVINO",
+      "optimization_objectives": {
+      },
+      "optimization_methods": [
+      ],
+      "optimization_type": "POT",
+      "precision": [
+        "INT8"
+      ],
+      "version": 2,
+      "previous_revision_id": "60dd7ab4083bce31e1f3876c",
+      "previous_trained_revision_id": "60dd7ab4083bce31e1f3876c",
+      "performance": {
+        "score": 0.34953322601318
+      },
+      "model_format": "OpenVINO",
+      "model_status": "SUCCESS",
+      "target_device": "CPU",
+      "target_device_type": "Intel(R) Core(TM) i9-10980XE CPU @ 3.00GHz",
+      "configurations": [
+        {
+          "name": "sample_size",
+          "value": 300
+        }
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "color": "#ff0000ff",
+      "group": "from_label_list",
+      "hotkey": "ctrl+V",
+      "id": "60d31793d5f1fb7e6e3c1a50",
+      "is_empty": false,
+      "is_anomalous": false,
+      "name": "dog",
+      "parent_id": null
+    }
+  ],
+  "training_dataset_info": {
+    "dataset_storage_id": "60d31793d5f1fb7e6e3c1a4f",
+    "dataset_revision_id": "60d31793d5f1fb7e6e3c1a50",
+    "n_samples": 0,
+    "n_images": 0,
+    "n_frames": 0
+  },
+  "training_framework": {
+    "type": "otx",
+    "version": "1.6.4"
+  },
+  "purge_info": {
+    "is_purged": false,
+    "purge_time": null,
+    "user_uid": null
+  },
+  "learning_approach": "fully_supervised"
+}

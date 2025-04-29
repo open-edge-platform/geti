@@ -1,0 +1,421 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svc_name := printf "%s-%s.%s" .Release.Namespace .Chart.Name .Release.Namespace -}}
+{{- $svc_port := .Values.service.ports.http -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "account-service.fullname" . }}-admin
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  {{- $endpoints_admin := .Values.ingress.endpoints_admin }}
+  {{- if .Values.global.manage_users }}
+    {{- $endpoints_admin = concat .Values.ingress.endpoints_admin_manage_users .Values.ingress.endpoints_memberships }}
+  {{- end }}
+
+  {{- range $section := $endpoints_admin }}
+    {{- range $url := $section.matches }}
+      {{- $methods := $section.methods }}
+      {{- if $.Values.global.cors_policy.enabled }}
+        {{- $methods = append $methods "OPTIONS" }}
+      {{- end }}
+      {{- range $method := $methods }}
+  - match:
+    - uri:
+        regex: {{ tpl $url $ | quote }}
+      method:
+        exact: {{ $method }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    route:
+    - destination:
+        host: {{ $svc_name }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+      {{- end }}
+    {{- end }}
+  {{- end }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "account-service.fullname" . }}-platform
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  {{- $endpoints_platform := .Values.ingress.endpoints_platform }}
+  {{- if .Values.global.manage_users }}
+    {{- $endpoints_platform = concat $endpoints_platform .Values.ingress.endpoints_memberships }}
+  {{- end }}
+  {{- range $section := $endpoints_platform }}
+    {{- range $url := $section.matches }}
+      {{- $methods := $section.methods }}
+      {{- if $.Values.global.cors_policy.enabled }}
+        {{- $methods = append $methods "OPTIONS" }}
+      {{- end }}
+      {{- range $method := $methods }}
+  - match:
+    - uri:
+        regex: {{ tpl $url $ | quote }}
+      method:
+        exact: {{ $method }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+      {{- end }}
+    {{- end }}
+  {{- end }}
+
+  {{- $pat_endpoints := .Values.ingress.endpoints_platform_access_token }}
+
+  {{- if .Values.global.acc_svc_mod | default false }}
+    {{- $pat_endpoints = $.Values.ingress.endpoints_platform_access_token_manage_users }}
+  {{- end }}
+
+  {{- range $section := $pat_endpoints }}
+    {{- range $url := $section.matches }}
+      {{- $methods := $section.methods }}
+      {{- if $.Values.global.cors_policy.enabled }}
+        {{- $methods = append $methods "OPTIONS" }}
+      {{- end }}
+      {{- range $method := $methods }}
+  - match:
+    - uri:
+        regex: {{ tpl $url $ | quote }}
+      method:
+        exact: {{ $method }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+      {{- end }}
+    {{- end }}
+  {{- end }}
+
+
+{{- if .Values.global.oidc_cidaas }}
+  - match:
+    - uri:
+        regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/invitations/
+      method:
+        exact: POST
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+  - match:
+    - uri:
+        regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/statuses
+      method:
+        exact: PUT
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+{{- end }}
+
+{{- if not .Values.global.oidc_cidaas }}
+  - match:
+    - uri:
+        regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/{{ .Values.id_pattern }}/?
+      method:
+        exact: PUT
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+{{- end }}
+
+{{- if .Values.global.acc_svc_settings_enabled }}
+  - match:
+      - uri:
+          regex: /api/v(.*)/user_settings/?
+        method:
+          exact: GET
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+      - destination:
+          host: {{ $svc_name }}.svc.cluster.local
+          port:
+            number: {{ $svc_port }}
+  - match:
+      - uri:
+          regex: /api/v(.*)/user_settings/?
+        method:
+          exact: POST
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+      - destination:
+          host: {{ $svc_name }}.svc.cluster.local
+          port:
+            number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+{{- end }}
+
+{{- if .Values.global.manage_users_roles }}
+  - match:
+      - uri:
+          regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/membership/{{ .Values.id_pattern }}/roles/?
+        method:
+          exact: GET
+      - method:
+          exact: GET
+        uri:
+          regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/membership/me/roles/?
+  {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+      - destination:
+          host: {{ $svc_name }}.svc.cluster.local
+          port:
+            number: {{ $svc_port }}
+  - match:
+      - uri:
+          regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/membership/{{ .Values.id_pattern }}/roles/?
+        method:
+          exact: POST
+      - uri:
+          regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/membership/me/roles/?
+        method:
+          exact: POST
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+      - destination:
+          host: {{ $svc_name }}.svc.cluster.local
+          port:
+            number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+  - match:
+      - uri:
+          regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/membership/{{ .Values.id_pattern }}/roles(/|\?.*)?
+        method:
+          exact: DELETE
+      - uri:
+          regex: /api/v(.*)/organizations/{{ .Values.id_pattern }}/membership/me/roles(/|\?.*)?
+        method:
+          exact: DELETE
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    timeout: 360s
+    route:
+      - destination:
+          host: {{ $svc_name }}.svc.cluster.local
+          port:
+            number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+{{- end }}
+{{- end }}

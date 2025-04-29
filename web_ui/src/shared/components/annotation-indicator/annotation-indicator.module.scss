@@ -1,0 +1,37 @@
+.annotationIndicator {
+    box-sizing: border-box;
+    min-width: var(--spectrum-global-dimension-static-size-250) !important;
+    max-width: var(--spectrum-global-dimension-static-size-250) !important;
+    height: var(--spectrum-global-dimension-static-size-250) !important;
+    padding: var(--spectrum-global-dimension-static-size-25) !important;
+    cursor: auto !important;
+
+    &[class*='is-hovered'] {
+        border: none !important;
+        background-color: transparent !important;
+    }
+}
+
+.annotated {
+    background-color: var(--brand-moss-tint) !important;
+
+    svg,
+    * {
+        fill: black !important;
+    }
+}
+
+.partially_annotated {
+    background-color: var(--brand-rust) !important;
+}
+
+.both {
+    background:
+        linear-gradient(var(--spectrum-global-color-gray-50), var(--spectrum-global-color-gray-50)) padding-box,
+        linear-gradient(to right, var(--brand-moss-tint) 50%, var(--brand-rust) 50%) border-box;
+    border: 1px solid transparent;
+}
+
+.to_revisit {
+    background-color: var(--blue-classic) !important;
+}

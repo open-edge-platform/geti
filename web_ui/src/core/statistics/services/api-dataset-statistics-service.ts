@@ -1,0 +1,45 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+import { instance as defaultAxiosInstance } from '../../services/axios-instance';
+import { CreateApiService } from '../../services/create-api-service.interface';
+import { API_URLS } from '../../services/urls';
+import {
+    AllTaskDatasetStatisticsDTO,
+    DatasetStatisticsDTO,
+    TaskIdentifier,
+} from '../dtos/dataset-statistics.interface';
+import { AllTasksDatasetStatistics, DatasetStatistics, DatasetStatisticsService } from './dataset-statistics.interface';
+import { getAllTaskDatasetStatisticsDTO, getDatasetStatisticsEntity } from './utils';
+
+export const createApiDatasetStatisticsService: CreateApiService<DatasetStatisticsService> = (
+    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+) => {
+    const getAllTasksDatasetStatistics = async ({
+        organizationId,
+        workspaceId,
+        projectId,
+        datasetId,
+    }: TaskIdentifier): Promise<AllTasksDatasetStatistics> => {
+        const { data } = await instance.get<AllTaskDatasetStatisticsDTO>(
+            router.ANNOTATIONS_STATISTICS({ organizationId, workspaceId, projectId, datasetId, taskId: null })
+        );
+
+        return getAllTaskDatasetStatisticsDTO(data);
+    };
+
+    const getDatasetStatistics = async ({
+        organizationId,
+        workspaceId,
+        projectId,
+        datasetId,
+        taskId,
+    }: TaskIdentifier): Promise<DatasetStatistics> => {
+        const { data } = await instance.get<DatasetStatisticsDTO>(
+            router.ANNOTATIONS_STATISTICS({ organizationId, workspaceId, projectId, datasetId, taskId })
+        );
+
+        return getDatasetStatisticsEntity(data);
+    };
+    return { getDatasetStatistics, getAllTasksDatasetStatistics };
+};

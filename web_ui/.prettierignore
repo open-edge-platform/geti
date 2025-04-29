@@ -1,0 +1,6 @@
+*.json
+*.md
+*.html
+src/core/server/generated/*
+config/jest/*
+public/assets/opencv/*

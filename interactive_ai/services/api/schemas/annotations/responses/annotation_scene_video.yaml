@@ -1,0 +1,32 @@
+type: object
+properties:
+  video_annotations:
+    type: array
+    description: Array of video frame predictions
+    items:
+      $ref: "annotation_scene_video_frame.yaml"
+  video_annotation_properties:
+    type: object
+    properties:
+      total_count:
+        type: integer
+        description: Total number of frames returned
+        minimum: 0
+      start_frame:
+        type: integer
+        description: Integer representing the index of the first returned frame
+      end_frame:
+        type: integer
+        description: Integer representing the index of the last returned frame
+      total_requested_count:
+        type: integer
+        description: Total number of frames requested by the user
+        minimum: 0
+      requested_start_frame:
+        type: integer
+        description: Index of the start frame requested by the user (inclusive)
+        minimum: 0
+      requested_end_frame:
+        type: integer
+        description: Index of the end frame requested by the user (inclusive)
+        minimum: 0

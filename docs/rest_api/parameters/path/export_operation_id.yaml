@@ -1,0 +1,7 @@
+in: path
+name: export_operation_id
+style: simple
+description: Identifier of the project export operation
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

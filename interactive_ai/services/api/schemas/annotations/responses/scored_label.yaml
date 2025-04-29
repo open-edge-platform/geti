@@ -1,0 +1,27 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  probability:
+    title: Probability
+    type: number
+    format: float
+    description: Estimated probability of a prediction. For annotations, this is set to 1.
+  source:
+    type: object
+    properties:
+      user_id:
+        type: 
+        - "string"
+        - "null"
+        description: User name of the user that added the label or accepted the prediction
+      model_id:
+        type: 
+        - "string"
+        - "null"
+        description: Model id of the model that predicted the label
+      model_storage_id:
+        type: 
+        - "string"
+        - "null"
+        description: Model storage id of model that predicted the label

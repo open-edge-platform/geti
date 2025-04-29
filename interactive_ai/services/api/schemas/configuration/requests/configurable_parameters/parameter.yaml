@@ -1,0 +1,14 @@
+required:
+  - value
+  - name
+type: object
+properties:
+  value:
+    oneOf:
+      - type: string
+      - type: number
+      - type: boolean
+    description: Value to set the parameter to.
+  name:
+    type: string
+    description: Name to identify the parameter by in the system.

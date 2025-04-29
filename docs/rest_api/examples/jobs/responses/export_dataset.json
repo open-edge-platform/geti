@@ -1,0 +1,39 @@
+{
+    "id": "65e6c11ab4cf636589777700",
+    "type": "export_dataset",
+    "creation_time": "2024-03-05T06:52:10.257000+00:00",
+    "start_time": "2024-03-05T06:52:16.473000+00:00",
+    "end_time": "2024-03-05T06:52:30.860000+00:00",
+    "name": "Dataset Export",
+    "author": "f18674a7-a206-4166-9564-0888d5a3236e",
+    "state": "finished",
+    "steps": [
+        {
+            "message": "Export dataset is created",
+            "index": 1,
+            "progress": 100,
+            "state": "finished",
+            "step_name": "Create export dataset",
+            "duration": 8.024
+        }
+    ],
+    "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+    },
+    "metadata": {
+        "project": {
+            "id": "65e6bcf4c6ada55c64630357",
+            "name": "Project",
+            "type": "detection"
+        },
+        "dataset": {
+            "id": "65e6bcf8c6ada55c6463035f",
+            "name": "Dataset"
+        },
+        "export_format": "datumaro",
+        "download_url": "api/v1/organizations/181fc31b-1ed7-41fe-afe1-936439541357/workspaces/f322799c-f376-4917-9618-df1109fa8268/projects/65e6bcf4c6ada55c64630357/datasets/65e6bcf8c6ada55c6463035f/exports/65e6c128464a3a1ab34b8472/download",
+        "size": 986988
+    }
+}

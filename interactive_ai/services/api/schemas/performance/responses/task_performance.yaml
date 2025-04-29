@@ -1,0 +1,12 @@
+type: object
+properties:
+  task_id:
+    $ref: "../../mongo_id.yaml"
+  score:
+    anyOf:
+      - type: "null" 
+      - $ref: "task_performance_score.yaml"
+    description: Model score for the task, null if no model is trained.
+required:
+  - score
+  - task_id

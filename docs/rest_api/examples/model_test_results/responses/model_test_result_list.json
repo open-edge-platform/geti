@@ -1,0 +1,172 @@
+{
+  "test_results": [
+    {
+      "creation_time": "2022-07-29T07:27:49.631000+00:00",
+      "datasets_info": [
+        {
+          "id": "62df95bfc7e3b80a6732bbf5",
+          "is_deleted": false,
+          "name": "Dataset",
+          "n_frames": 0,
+          "n_images": 0,
+          "n_samples": 0
+        }
+      ],
+      "id": "62e38bf55d3d950c738e5615",
+      "job_info": {
+        "id": "62e38bf55d3d950c738e5613",
+        "status": "INFERRING"
+      },
+      "model_info": {
+        "group_id": "62df95bfc7e3b80a6732bbf8",
+        "id": "62df9720412a32f247f9853b",
+        "n_labels": 2,
+        "task_type": "DETECTION",
+        "template_id": "Custom_Object_Detection_Gen3_ATSS",
+        "optimization_type": "NONE",
+        "precision": ["FP32"],
+        "version": 1
+      },
+      "name": "Sample model test",
+      "scores": []
+    },
+    {
+      "creation_time": "2022-07-28T15:53:02.690000+00:00",
+      "datasets_info": [
+        {
+          "id": "62df95bfc7e3b80a6732bbf5",
+          "is_deleted": false,
+          "n_frames": 0,
+          "n_images": 250,
+          "n_samples": 250,
+          "name": "Dataset"
+        }
+      ],
+      "id": "62e2b0deddb0eebbcb1c1a0c",
+      "job_info": {
+        "id": "62e2b0deddb0eebbcb1c1a0a",
+        "status": "DONE"
+      },
+      "model_info": {
+        "group_id": "62df95bfc7e3b80a6732bbf8",
+        "id": "62df9720412a32f247f9853b",
+        "n_labels": 2,
+        "task_type": "DETECTION",
+        "template_id": "Custom_Object_Detection_Gen3_ATSS",
+        "optimization_type": "MO",
+        "precision": ["FP32"],
+        "version": 1
+      },
+      "name": "Sample model test",
+      "scores": [
+        {
+          "label_id": "62df95bfc7e3b80a6732bbfd",
+          "name": "F_measure",
+          "value": 0.054545454545454536
+        },
+        {
+          "label_id": null,
+          "name": "F_measure",
+          "value": 0.05357142857142856
+        },
+        {
+          "label_id": "62df95bfc7e3b80a6732bbfb",
+          "name": "F_measure",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "creation_time": "2022-07-26T16:18:48.316000+00:00",
+      "datasets_info": [
+        {
+          "id": "62df95bfc7e3b80a6732bbf5",
+          "is_deleted": false,
+          "n_frames": 0,
+          "n_images": 250,
+          "n_samples": 250,
+          "name": "Dataset"
+        }
+      ],
+      "id": "62e013e856febca4609706c6",
+      "job_info": {
+        "id": "62e013e756febca4609706c4",
+        "status": "DONE"
+      },
+      "model_info": {
+        "group_id": "62df95bfc7e3b80a6732bbf8",
+        "id": "62df9720412a32f247f9853b",
+        "n_labels": 2,
+        "task_type": "DETECTION",
+        "template_id": "Custom_Object_Detection_Gen3_ATSS",
+        "optimization_type": "POT",
+        "precision": ["FP32"],
+        "version": 1
+      },
+      "name": "test",
+      "scores": [
+        {
+          "label_id": null,
+          "name": "F_measure",
+          "value": 0.05357142857142856
+        },
+        {
+          "label_id": "62df95bfc7e3b80a6732bbfd",
+          "name": "F_measure",
+          "value": 0.054545454545454536
+        },
+        {
+          "label_id": "62df95bfc7e3b80a6732bbfb",
+          "name": "F_measure",
+          "value": 0
+        }
+      ]
+    },
+    {
+      "creation_time": "2022-07-26T14:40:22.778000+00:00",
+      "datasets_info": [
+        {
+          "id": "62dffcd67dcbc16c629a3e65",
+          "is_deleted": true,
+          "n_frames": 0,
+          "n_images": 0,
+          "n_samples": 0,
+          "name": "Old Dataset"
+        }
+      ],
+      "id": "62dffcd67dcbc16c629a3e64",
+      "job_info": {
+        "id": "62dffcd67dcbc16c629a3e62",
+        "status": "DONE"
+      },
+      "model_info": {
+        "group_id": "62df95bfc7e3b80a6732bbf8",
+        "id": "62df9720412a32f247f9853b",
+        "n_labels": 2,
+        "task_type": "DETECTION",
+        "template_id": "Custom_Object_Detection_Gen3_ATSS",
+        "optimization_type": "POT",
+        "precision": ["FP32"],
+        "version": 1
+      },
+      "name": "test",
+      "scores": [
+        {
+          "label_id": null,
+          "name": "F_measure",
+          "value": 0.04921700223713645
+        },
+        {
+          "label_id": "62df95bfc7e3b80a6732bbfd",
+          "name": "F_measure",
+          "value": 0.0501138952164009
+        },
+        {
+          "label_id": "62df95bfc7e3b80a6732bbfb",
+          "name": "F_measure",
+          "value": 0
+        }
+      ]
+    }
+  ]
+}

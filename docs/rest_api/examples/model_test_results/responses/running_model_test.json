@@ -1,0 +1,30 @@
+{
+    "creation_time": "2022-07-28T15:53:02.690000+00:00",
+    "datasets_info": [
+        {
+            "id": "62df95bfc7e3b80a6732bbf5",
+            "name": "Dataset",
+            "is_deleted": false,
+            "n_frames": 0,
+            "n_images": 0,
+            "n_samples": 0
+        }
+    ],
+    "id": "62e2b0deddb0eebbcb1c1a0c",
+    "job_info": {
+        "id": "62e2b0deddb0eebbcb1c1a0a",
+        "status": "INFERRING"
+    },
+    "model_info": {
+        "group_id": "62df95bfc7e3b80a6732bbf8",
+        "id": "62df9720412a32f247f9853b",
+        "n_labels": 2,
+        "task_type": "DETECTION",
+        "template_id": "Custom_Object_Detection_Gen3_ATSS",
+        "optimization_type": "MO",
+        "precision": ["FP32"],
+        "version": 1
+    },
+    "name": "Sample model test",
+    "scores": []
+}

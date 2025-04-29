@@ -1,0 +1,5 @@
+{
+    "http_status": 204,
+    "message": "Can not instantiate inference server with NullModel. Most likely no model has been trained yet for task with ID 630615784f3f41872e7f0444",
+    "error_code": "no_model_trained_error"
+}

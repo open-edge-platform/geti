@@ -1,0 +1,81 @@
+post:
+  tags:
+    - Media
+  summary: Retrieve media items with query
+  description: |-
+    Retrieves media in the dataset that fulfill the filter condition. 
+    The list of filter fields and their possible operators are shown below.  
+    If a field-operation combination is not supported then the endpoint will respond with the possible operators that are allowed for the filter.
+    Note that this endpoint returns images and videos. To retrieve the video frames, use the video id returned by this endpoint and pass it to the 
+    [video filtering](#Media/FilterVideoFrames) endpoint.
+
+    | Filter fields | Supported operations | Value |
+    |--------------|----------------------|-------|
+    |`media_upload_date`, `annotation_creation_date` | `greater`, `less` | Isodate. Example: `2024-09-26T00:00:00+02:00` |
+    |`media_height`, `media_width`, `shape_area_percentage`, `shape_area_pixel`, `media_size`, `video_duration`, `video_frame_rate`, `video_frame_count` | `greater`, `greater_or_equal`, `less`, `less_or_equal`, `equal`, `not_equal` | integer |
+    |`media_name` | `equal`, `not_equal`, `contains` | string |
+    |`label_id`, `shape_type`, `user_name` | `equal`, `not_equal`, `in`, `not_in` | string (id format) |
+    |`annotation_scene_state` | `equal`, `not_equal`, `in` | string (enum: `annotated`, `partially_annotated`, `unannotated`) |
+    |`media_type` | `equal`, `not_equal` | string |
+
+  operationId: FilterMedia
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/query/limit.yaml'
+    - $ref: '../../parameters/query/skip.yaml'
+    - $ref: '../../parameters/query/sort_direction.yaml'
+    - $ref: '../../parameters/query/filter_sort_by.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../interactive_ai/services/api/schemas/datasets/requests/dataset_filter.yaml'
+        examples:
+          Filtering a dataset:
+            value:
+              $ref: "../../examples/datasets/requests/filter_dataset_request.json"
+    required: true
+  responses:
+    '200':
+      description: Media items matching the filter
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../interactive_ai/services/api/schemas/datasets/responses/filtered_dataset.yaml'
+          examples:
+            Combined media list response:
+              value:
+                $ref: '../../examples/datasets/responses/filtered_dataset_response.json'
+    '400':
+      description: Bad request. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid filter exception:
+              value:
+                $ref: "../../examples/datasets/error_responses/invalid_filter_exception.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+

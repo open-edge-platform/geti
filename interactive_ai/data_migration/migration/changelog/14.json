@@ -1,0 +1,4 @@
+{
+  "script": "add_model_purge_info.py",
+  "metadata": "add_model_purge_info.json"
+}

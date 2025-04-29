@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "observability.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "observability.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "observability.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+      labels:
+        {{- include "observability.labels" . | nindent 8 }}
+        authorization: public_api
+        opa_envoy_filter: enabled
+    spec:
+      serviceAccountName: {{ include "observability.name" . }}
+      containers:
+        - name: &containerName "{{ .Chart.Name }}"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+{{ toYaml .Values.resources | indent 11 }}
+          ports:
+            - containerPort: {{ .Values.port }}
+          volumeMounts:
+            - mountPath: {{ .Values.gtw_tmp_dir }}
+              name: tmp
+              readOnly: false
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: "{{ .Values.logs_mount_path }}"
+              name: data-storage
+              subPath: logs
+              readOnly: true
+          env:
+            - name: LOGGING_CONFIG_DIR
+              value: {{ .Values.global.logging_config_dir }}
+            - name: K8S_SECRETS_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: K8S_CR_NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: GETI_JWT_KEYS_SECRETS_NAMESPACE
+              value: {{ .Values.global.istio_ingress_namespace }}
+            - name: IMPT_CONFIGURATION_CM
+              value: {{ .Values.configuration_cm_name }}
+            - name: LOGS_DIR
+              value: {{ .Values.logs_mount_path }}
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.port }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.port }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        {{- if .Values.global.storage_volume_claim_name_gtw }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_gtw }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config

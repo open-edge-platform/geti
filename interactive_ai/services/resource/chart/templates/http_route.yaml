@@ -1,0 +1,98 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+#  hostnames:
+#    - "*.intel.com"  # only for SaaS
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects/.*/thumbnail
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/videos/.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/videos
+        - path:
+            type: RegularExpression
+            value: /api/v1/healthz
+        - path:
+            type: RegularExpression
+            value: /api/v1/product_info
+        - path:
+            type: RegularExpression
+            value: /api/.*/tests/.*/results:query
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects_names
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          port: {{ .Values.service.ports.resource.port }}
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects/[0-9a-fA-F]+
+        - path:
+            type: RegularExpression
+            value: /api/.*/projects/.*/settings/annotation_templates
+        - path:
+            type: RegularExpression
+            value: /api/.*/media:query
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)
+        - path:
+            type: RegularExpression
+            value: /api/.*/models
+        - path:
+            type: RegularExpression
+            value: /api/.*/datasets
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          port: {{ .Values.service.ports.resource.port }}
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/.*/datasets/[0-9a-fA-F]+
+        - path:
+            type: RegularExpression
+            value: /api/.*/datasets/.*/statistics
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/images
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/images/[0-9a-fA-F]+
+        - path:
+            type: RegularExpression
+            value: /api/.*/media/images/.*/annotations.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/code_deployments.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/deployment_package.*
+        - path:
+            type: RegularExpression
+            value: /api/.*/training_revisions.*
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          port: {{ .Values.service.ports.resource.port }}
+{{- end}}

@@ -1,0 +1,24 @@
+type: object
+description: Identifier for a range of video frames.
+properties:
+  dataset_id:
+    $ref: '../../mongo_id.yaml'
+  video_id:
+    $ref: '../../mongo_id.yaml'
+  start_frame:
+    type: integer
+    description: Index of the first frame in the range.
+    minimum: 0
+    default: 0
+  end_frame:
+    type: integer
+    description: Index of the last frame in the range.
+  frame_skip:
+    type: integer
+    minimum: 1
+    description: |-
+      Stride (step size), that is the interval between two consecutive frames in the range.
+      If `frame_skip` is 1, all frames are considered to be part of the range.
+required:
+  - end_frame
+  - frame_skip

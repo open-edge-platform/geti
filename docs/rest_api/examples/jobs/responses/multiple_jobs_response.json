@@ -1,0 +1,239 @@
+{
+  "jobs": [
+    {
+      "id": "64944c10b45e0dbb68efabb0",
+      "type": "train",
+      "creation_time": "2023-06-22T13:26:40.802000+00:00",
+      "start_time": "2023-06-22T13:26:49.568000+00:00",
+      "end_time": "2023-06-22T13:33:02.317000+00:00",
+      "name": "Training",
+      "author": "fdd733a6-a55f-473f-9dc7-e34fe40a3242",
+      "state": "finished",
+      "steps": [
+        {
+          "message": "Train data retrieved",
+          "index": 1,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Retrieve train data",
+          "duration": 11.2
+        },
+        {
+          "message": "Train dataset is created",
+          "index": 2,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Create train dataset",
+          "duration": 20.12
+        },
+        {
+          "message": "Training from sharded dataset is disabled",
+          "index": 3,
+          "progress": -1,
+          "state": "skipped",
+          "step_name": "Shard dataset"
+        },
+        {
+          "message": "Training from sharded dataset is disabled",
+          "index": 4,
+          "progress": -1,
+          "state": "skipped",
+          "step_name": "Create and upload dataset shards"
+        },
+        {
+          "message": "Training from sharded dataset is disabled",
+          "index": 5,
+          "progress": -1,
+          "state": "skipped",
+          "step_name": "Create and save compiled dataset shard entity"
+        },
+        {
+          "message": "No previous model found for the project. Skipping pre-evaluation.",
+          "index": 6,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Pre-evaluate model if exists",
+          "duration": 1.52
+        },
+        {
+          "message": "Model is trained",
+          "index": 7,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Model training",
+          "duration": 42.52
+        },
+        {
+          "message": "Model improvement is checked",
+          "index": 8,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Trained model evaluation",
+          "duration": 15.52
+        },
+        {
+          "message": "Trained model is activated, inference server is initialized",
+          "index": 9,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Activate trained model",
+          "duration": 0.52
+        },
+        {
+          "message": "Inference on unannotated dataset is finished",
+          "index": 10,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Infer on unannotated dataset for task",
+          "duration": 22.52
+        },
+        {
+          "message": "Only one trainable task for project, skipping the pipeline inference",
+          "index": 11,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Inference on unannotated dataset with all models chained",
+          "duration": 10.52
+        }
+      ],
+      "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+      },
+      "metadata": {
+        "project": {
+          "id": "64944b9a874d7d4da2719de2",
+          "name": "Project"
+        },
+        "task": {
+          "task_id": "64944b9d874d7d4da2719de6",
+          "name": "Classification task",
+          "model_template_id": "Custom_Image_Classification_EfficinetNet-B0",
+          "model_architecture": "EfficientNet-B0",
+          "dataset_storage_id": "64944b9d874d7d4da2719dee"
+        }
+      }
+    },
+    {
+      "id": "6499548fb45e0dbb68efabbe",
+      "type": "optimize_pot",
+      "creation_time": "2023-06-26T09:04:15.184000+00:00",
+      "start_time": "2023-06-26T09:04:22.998000+00:00",
+      "end_time": null,
+      "name": "Optimization",
+      "author": "fdd733a6-a55f-473f-9dc7-e34fe40a3242",
+      "state": "running",
+      "steps": [
+        {
+          "message": "Model optimized",
+          "index": 1,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Optimizing model",
+          "duration": 39.52
+        },
+        {
+          "message": null,
+          "index": 2,
+          "progress": -1,
+          "state": "waiting",
+          "step_name": "Evaluating optimized model"
+        }
+      ],
+      "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+      },
+      "metadata": {
+        "project": {
+          "id": "64958de6874d7d4da271a079",
+          "name": "Project - 500Mb - (500m - 1)"
+        },
+        "task": {
+          "task_id": "64958de6874d7d4da271a07d",
+          "model_template_id": "Custom_Image_Classification_EfficinetNet-B0",
+          "model_architecture": "EfficientNet-B0"
+        },
+        "model_storage_id": "64958de6874d7d4da271a07e",
+        "base_model_id": "64994a079ba742adb3adbbfe",
+        "optimization_type": "POT"
+      }
+    },
+    {
+      "id": "649954adb45e0dbb68efabbf",
+      "type": "test",
+      "creation_time": "2023-06-26T09:04:45.059000+00:00",
+      "start_time": "2023-06-26T09:04:50.309000+00:00",
+      "end_time": null,
+      "name": "Model testing",
+      "author": "fdd733a6-a55f-473f-9dc7-e34fe40a3242",
+      "state": "running",
+      "steps": [
+        {
+          "message": "Testing dataset created",
+          "index": 1,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Creating testing dataset",
+          "duration": 13.52
+        },
+        {
+          "message": "Inferring on testing dataset completed",
+          "index": 2,
+          "progress": 100,
+          "state": "finished",
+          "step_name": "Inferring on testing dataset",
+          "duration": 20.52
+        },
+        {
+          "message": null,
+          "index": 3,
+          "progress": -1,
+          "state": "running",
+          "step_name": "Evaluating results"
+        }
+      ],
+      "cancellation_info": {
+        "is_cancelled": false,
+        "user_uid": null,
+        "cancel_time": null
+      },
+      "metadata": {
+        "project": {
+          "id": "64958de6874d7d4da271a079",
+          "name": "Project - 500Mb - (500m - 1)"
+        },
+        "task": {
+          "task_id": "64958de6874d7d4da271a07d"
+        },
+        "test": {
+          "model_template_id": "Custom_Image_Classification_EfficinetNet-B0",
+          "model_architecture": "EfficientNet-B0",
+          "model": {
+            "architecture": "EfficientNet-B0",
+            "template_id": "Custom_Image_Classification_EfficinetNet-B0",
+            "id": "6602a850708b66c5b03376b3",
+            "optimization_type": "MO",
+            "precision": ["FP16"],
+            "has_xai_head": false
+          },
+          "datasets": [
+            {
+              "id": "64958de6874d7d4da271a082",
+              "name": "Dataset"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "jobs_count": {
+    "n_scheduled_jobs": 0,
+    "n_running_jobs": 2,
+    "n_finished_jobs": 2,
+    "n_failed_jobs": 0,
+    "n_cancelled_jobs": 0
+  }
+}

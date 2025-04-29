@@ -1,0 +1,6 @@
+in: query
+name: sort_by
+style: form
+description: Field to sort by, could be name or creation_date
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/sort_by.yaml"

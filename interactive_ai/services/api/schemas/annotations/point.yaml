@@ -1,0 +1,17 @@
+title: Point
+type: object
+properties:
+  x:
+    type: number
+    description: x-coordinate of the point. Coordinates are pixel values.
+    minimum: 0
+  y:
+    type: number
+    description: y-coordinate of the point. Coordinates are pixel values.
+    minimum: 0
+required:
+- x
+- y
+example:
+  x: 10
+  y: 10

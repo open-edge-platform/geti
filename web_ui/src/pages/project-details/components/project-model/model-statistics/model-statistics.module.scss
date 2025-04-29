@@ -1,0 +1,16 @@
+.downloadAllGraphsContainer {
+    width: fit-content;
+    margin-left: auto;
+}
+
+.gridStatistics {
+    grid-template-columns: repeat(3, minmax(20rem, 1fr));
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+@media (max-width: 1200px) {
+    .gridStatistics {
+        grid-template-columns: repeat(2, minmax(20rem, 1fr));
+    }
+}

@@ -1,0 +1,50 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+enum ErrorCode {
+  EXECUTION_NOT_FOUND = 0;
+  INVALID_METADATA_UPDATE = 1;
+}
+
+message Error {
+  ErrorCode code = 1;
+  string message = 2;
+}
+
+service JobUpdateService {
+  // Sends a job update.
+  rpc job_update(JobUpdateRequest) returns (JobUpdateResponse) {}
+}
+
+message JobUpdateRequest {
+  message Cost {
+    message Consumed {
+      string unit = 1;
+      int32 amount = 2;
+      int64 consuming_date = 3;
+      string service = 4;
+    }
+    repeated Consumed consumed = 1;
+  }
+  message Gpu {
+    enum Action {
+      RELEASE = 0;
+    }
+    Action action = 1;
+  }
+  optional string execution_id = 1;
+  optional string metadata = 2;
+  optional Cost cost = 3;
+  optional Gpu gpu = 4;
+}
+
+message Empty {}
+
+message JobUpdateResponse {
+  oneof result {
+    Empty empty = 1;
+    Error error = 2;
+  }
+}

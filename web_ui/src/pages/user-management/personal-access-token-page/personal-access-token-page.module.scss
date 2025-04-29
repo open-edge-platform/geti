@@ -1,0 +1,26 @@
+.personalAccessTokenDialogBody {
+    -webkit-overflow-scrolling: touch !important;
+    word-break: break-all;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-200);
+}
+
+.copyKey {
+    background-color: var(--spectrum-global-color-gray-50);
+    padding: var(--spectrum-global-dimension-size-300);
+    flex-direction: column;
+}
+
+.copyButton {
+    width: fit-content;
+
+    svg {
+        margin-right: var(--spectrum-global-dimension-size-75);
+    }
+}
+
+.dialogHeading {
+    font-size: var(--spectrum-global-dimension-font-size-400);
+    font-weight: 400;
+}

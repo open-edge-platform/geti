@@ -1,0 +1,49 @@
+{
+    "is_training": false,
+    "n_required_annotations": 8,
+    "n_new_annotations": 0,
+    "project_performance": {
+        "score": 0.6,
+        "task_performances": [
+            {
+                "task_id": "60e710798cc17243dd2c2af4",
+                "score": {
+                    "value": 0.6,
+                    "metric_type": "accuracy"
+                }
+            }
+        ]
+    },
+    "status": {
+        "progress": -1
+    },
+    "tasks": [
+        {
+            "id": "60e710798cc17243dd2c2af4",
+            "is_training": false,
+            "ready_to_train": false,
+            "required_annotations": {
+                "details": [
+                    {
+                        "id": "60e710798cc17243dd2c2af7",
+                        "label_name": "rectangle",
+                        "label_color": "#ff007bff",
+                        "value": 4
+                    },
+                    {
+                        "id": "60e710798cc17243dd2c2af8",
+                        "label_name": "circle",
+                        "label_color": "#2a2b2eff",
+                        "value": 4
+                    }
+                ],
+                "value": 8
+            },
+            "status": {
+                "progress": -1
+            },
+            "title": "classification",
+            "n_new_annotations": 0
+        }
+    ]
+}

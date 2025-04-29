@@ -1,0 +1,14 @@
+type: object
+required:
+  - rules
+properties:
+  condition:
+    description: Condition to apply to group of rules.
+    type: string
+    enum: ['and']
+  rules:
+    type: array
+    description: All the rules to filter a dataset with.
+    items:
+      oneOf:
+        - $ref: "dataset_filter_rule.yaml"

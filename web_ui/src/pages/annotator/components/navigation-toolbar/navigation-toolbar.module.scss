@@ -1,0 +1,71 @@
+.annotationsDetails {
+    min-width: calc(var(--spectrum-global-dimension-size-4600) - var(--spectrum-global-dimension-size-85));
+}
+
+.previewModal {
+    place-self: end !important;
+}
+
+.projectName {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.noWrap {
+    white-space: nowrap;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.anomalyPerformanceActiveModel {
+    font-size: var(--spectrum-global-dimension-font-size-100);
+    color: var(--spectrum-global-color-gray-800);
+}
+
+.anomalyPerformanceIcon path {
+    fill: currentColor !important;
+}
+
+.anomalyPerformanceChart {
+    cursor: pointer;
+
+    & svg {
+        cursor: pointer;
+    }
+}
+
+.anomalyPerformanceChartText {
+    font-size: var(--spectrum-global-dimension-font-size-600);
+}
+
+.toggleMode {
+    background-color: transparent !important;
+    padding: 0px var(--spectrum-global-dimension-size-75) !important;
+    min-width: var(--spectrum-global-dimension-size-350) !important;
+    border-width: var(--spectrum-global-dimension-size-10) !important;
+    border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-400) !important;
+    border-radius: 0 var(--spectrum-alias-border-radius-small) var(--spectrum-alias-border-radius-small) 0 !important;
+
+    &[class*='is-disabled'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-400) !important;
+    }
+
+    &[class*='is-hovered'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-300) !important;
+        background-color: var(--spectrum-global-color-gray-75) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+    }
+
+    &[class*='is-selected'],
+    &[class*='is-active'] {
+        color: var(--energy-blue) !important;
+        background-color: var(--spectrum-global-color-gray-50) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-400) !important;
+        border-bottom-color: var(--energy-blue) !important;
+    }
+}

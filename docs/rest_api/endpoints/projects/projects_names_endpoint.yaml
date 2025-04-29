@@ -1,0 +1,31 @@
+get:
+  tags:
+    - Projects
+  summary: Get the names of all projects in a workspace.
+  description: "Get names of all projects in a workspace"
+  operationId: GetAllProjectsNamesInAWorkspace
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+  responses:
+    '200':
+      description: The requested projects names
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/projects/responses/projects_names_list.yaml"
+          example:
+            $ref: "../../examples/projects/responses/projects_names_list_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"

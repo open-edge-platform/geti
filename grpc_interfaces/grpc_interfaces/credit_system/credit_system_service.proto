@@ -1,0 +1,155 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+
+package credit_system;
+option go_package = "credit_system/pb";
+
+
+enum ErrorCode {
+  SUBSCRIPTION_ALREADY_EXISTS = 0;
+  SUBSCRIPTION_NOT_FOUND = 1;
+  INSUFFICIENT_BALANCE = 2;
+  INVALID_ARGUMENT = 3;
+}
+
+message Error {
+  ErrorCode code = 1;
+  string message = 2;
+}
+
+//////////////// PRODUCT SERVICE ////////////////
+service ProductService {
+  rpc get_all_products(EmptyRequest) returns (ProductResponse) {
+  }
+}
+
+message ProductResponse {
+  oneof result {
+    ProductsList products = 1;
+    Error error = 2;
+  }
+}
+
+message ProductsList {
+  repeated Product products = 1;
+}
+
+message Product {
+  string id = 1;
+  string name = 2;
+  int64 created = 3;
+  int64 updated = 4;
+  repeated ProductPolicy product_policies = 5;
+}
+
+message ProductPolicy {
+  string account_name = 1;
+  int64 init_amount = 2;
+  optional int64 renewable_amount = 3;
+  optional int64 expires_in = 4;
+}
+
+message EmptyRequest {
+}
+
+
+//////////////// SUBSCRIPTION SERVICE ////////////////
+service SubscriptionService {
+  rpc activate(SubscriptionRequest) returns (SubscriptionIdResponse) {
+  }
+
+  rpc find_active_subscription(SubscriptionRequest) returns (SubscriptionIdResponse) {
+  }
+
+  rpc fail_subscription(SubscriptionRequest) returns (SubscriptionIdResponse) {
+  }
+
+  rpc cancel_subscription(SubscriptionRequest) returns (SubscriptionIdResponse) {
+  }
+}
+
+message SubscriptionRequest {
+  string organization_id = 1;
+  string workspace_id = 2;
+  string product_id = 3;
+}
+
+message SubscriptionIdResponse {
+  oneof result {
+    string id = 1;
+    Error error = 2;
+  }
+}
+
+enum Status {
+  NEW = 0;
+  ACTIVE = 1;
+  CANCELLED = 2;
+}
+
+
+//////////////// QUOTA SERVICE ////////////////
+service QuotaService {
+  rpc get(QuotaGetRequest) returns (QuotaGetResponse) {
+  }
+}
+
+message QuotaGetRequest {
+  string organization_id = 1;
+  string quota_type = 2;
+}
+
+message QuotaInfo {
+  optional string id = 1;
+  string organization_id = 2;
+  string service_name = 3;
+  string quota_name = 4;
+  string quota_type = 5;
+  int64 limit = 6;
+}
+
+message QuotaGetResponse {
+  oneof result {
+    QuotaInfo quota_info = 1;
+    Error error = 2;
+  }
+}
+
+
+//////////////// LEASE SERVICE ////////////////
+service LeaseService {
+
+  rpc acquire(LeaseRequest) returns (LeaseIdResponse) {
+  }
+  rpc cancel (CancelLeaseRequest) returns (EmptyResponse) {
+  }
+}
+
+message LeaseRequest {
+  message ResourceRequest {
+    string unit = 1;
+    int32 amount = 2;
+  }
+  string organization_id = 1;
+  string workspace_id = 2;
+  optional string project_id = 3;
+  string service_name = 4;
+  repeated ResourceRequest requests = 5;
+}
+
+message LeaseIdResponse {
+  oneof result {
+    string id = 1;
+    Error error = 2;
+  }
+}
+
+message CancelLeaseRequest {
+  string id = 1;
+}
+
+message EmptyResponse {
+  optional Error error = 1;
+}

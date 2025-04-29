@@ -1,0 +1,27 @@
+# Refer to golangci-lint's example config file for more options and information:
+# https://github.com/golangci/golangci-lint/blob/master/.golangci.reference.yml
+
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+
+linters-settings:
+  goimports:
+    # A comma-separated list of prefixes, which, if set, checks import paths
+    # with the given prefixes are grouped after 3rd-party packages.
+    # Default: ""
+    local-prefixes: inference_gateway
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck
+    - bodyclose
+    - goimports
+    - revive
+    - govet
+    - staticcheck
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

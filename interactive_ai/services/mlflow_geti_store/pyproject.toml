@@ -1,0 +1,82 @@
+[project]
+name = "mlflow-geti-store"
+version = "1.0.0"
+description = "MLFLow Geti store service for Geti"
+requires-python = ">=3.10, <3.14"
+dependencies = [
+    "mlflow==2.16.0",
+    "minio~=7.1.0",
+    "numpy==1.26.4",
+    "pyarrow==14.0.2",
+    "pydantic==2.5.3",
+    "s3fs==2025.3.0",
+]
+
+[project.entry-points."mlflow.tracking_store"]
+geti = "mlflow_geti_store.tracking_store:GetiTrackingStore"
+
+[project.entry-points."mlflow.artifact_repository"]
+geti = "mlflow_geti_store.artifact_store:GetiArtifactRepository"
+
+[build-system]
+requires = ["hatchling", "mlflow==2.16.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mlflow_geti_store"]
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "mypy~=1.15",
+    "pdbpp~=0.10",
+    "flaky~=3.8",
+    "testfixtures~=8.2",
+    "pytest-freezegun~=0.4",
+    "httpx~=0.24",
+    "retry~=0.9",
+    "requests~=2.32",
+    "types-cachetools",
+    "grpcio_tools~=1.60",
+    "mypy-protobuf~=3.0",
+    "types-PyYAML",
+    "types-protobuf",
+    "grpc-stubs",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+src = ["mlflow_geti_store"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004", "RUF010", "TC001",  "RUF012"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "D", "ARG", "PLR"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["requests.*"]
+follow_untyped_imports = true

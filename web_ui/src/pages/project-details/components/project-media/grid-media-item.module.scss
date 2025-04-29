@@ -1,0 +1,50 @@
+.itemDetailsColumn {
+    flex-direction: row;
+
+    & > .nameField {
+        max-width: 100%;
+    }
+
+    & > .filteredVideo {
+        max-width: calc(100% - 150px);
+    }
+
+    & > .video {
+        max-width: calc(100% - 75px);
+    }
+}
+
+.mediaItem {
+    position: relative;
+    cursor: pointer;
+    width: 100%;
+
+    @container gridList (max-width: 750px) {
+        .itemDetailsColumn {
+            flex-direction: column;
+
+            & > .nameField {
+                max-width: 100%;
+            }
+        }
+    }
+}
+
+.mediaItemSelected {
+    cursor: pointer !important;
+}
+
+.mediaItemDetails {
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-75);
+    }
+}
+
+.mediaItemActionsWrapper {
+    box-sizing: border-box;
+    padding: var(--spectrum-global-dimension-size-50) var(--spectrum-global-dimension-size-50) 0;
+}
+
+.textCenter {
+    text-align: center;
+}

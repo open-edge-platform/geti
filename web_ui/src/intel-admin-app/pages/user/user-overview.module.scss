@@ -1,0 +1,16 @@
+.emailFieldReadOnly input {
+    border: none;
+
+    &:hover {
+        cursor: default;
+    }
+
+    &:active {
+        color: currentColor;
+    }
+}
+
+.deleteButton {
+    gap: var(--spectrum-global-dimension-size-100);
+    padding-left: var(--spectrum-global-dimension-size-100);
+}

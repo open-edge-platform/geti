@@ -1,0 +1,6 @@
+oneOf:
+  - $ref: "rectangle.yaml"
+  - $ref: "polygon.yaml"
+  - $ref: "ellipse.yaml"
+  - $ref: "rotated_rectangle.yaml"
+  - $ref: "keypoint.yaml"

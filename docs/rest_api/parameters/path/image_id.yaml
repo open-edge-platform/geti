@@ -1,0 +1,7 @@
+in: path
+name: image_id
+style: simple
+description: The ID of the image.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

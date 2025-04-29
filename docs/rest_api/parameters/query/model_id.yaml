@@ -1,0 +1,5 @@
+in: query
+name: model_id
+description: The ID of the model of interest
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"

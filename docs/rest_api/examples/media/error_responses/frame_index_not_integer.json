@@ -1,0 +1,5 @@
+{
+  "http_status": 500,
+  "message": "Invalid literal for int() with base 10 'abc'",
+  "error_code": "internal_server_error"
+}

@@ -1,0 +1,103 @@
+name: Components workflow
+
+on:
+  workflow_call:
+    inputs:
+      component-dir:
+        description: 'Dir in root directory'
+        type: string
+        required: true
+      image-tag:
+        description: 'Docker image tag'
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to checkout'
+        required: true
+        default: 'main'
+      component-dir:
+        description: 'Path to the component (relative to the root of the repository)'
+        required: true
+
+env:
+  COMPONENT_DIR: ${{ inputs.component-dir }}
+
+jobs:
+  component-check:
+    name: Component workflow
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 30
+    env:
+      TAG: ${{ inputs.image-tag || github.sha }}
+      REGISTRY: ${{ secrets.REGISTRY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.branch || '' }}
+
+      - name: Setup Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: '3.10'
+
+      - name: Install missing dependencies
+        run: |
+          sudo -E apt update
+          sudo -E apt install -y libldap2-dev libsasl2-dev ffmpeg rsync
+
+      - name: Setup GO
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Static code analysis
+        run: make -C ${COMPONENT_DIR} static-code-analysis
+
+      - name: Unit testing
+        run: make -C ${COMPONENT_DIR} test-unit
+
+      - name: Integration testing
+        run: make -C ${COMPONENT_DIR} test-integration
+
+      - name: Configure AWS Credentials
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: Github
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+      
+      - name: Build image
+        id: build-image
+        run: |
+          OUTPUT=$(make -C ${COMPONENT_DIR} build-image)
+          if echo "$OUTPUT" | grep -q "Skipping"; then
+            echo "SKIP_IMAGE=true" >> $GITHUB_OUTPUT
+          fi
+        
+      - name: Push image
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        run: make -C ${COMPONENT_DIR} push-image
+
+      - name: Lint chart
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        run: make -C ${COMPONENT_DIR} lint-chart
+
+      - name: Publish chart
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        run: make -C ${COMPONENT_DIR} publish-chart

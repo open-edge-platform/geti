@@ -1,0 +1,17 @@
+type: object
+properties:
+  n_running_jobs:
+    type: integer
+    description: Number of running jobs
+  warning:
+    type: string
+    description: Displays a warning message if the server is running low on memory
+  storage:
+    type: object
+    properties:
+      total_space:
+        type: number
+        description: Total disk space in bytes
+      free_space:
+        type: number
+        description: Total disk space in bytes

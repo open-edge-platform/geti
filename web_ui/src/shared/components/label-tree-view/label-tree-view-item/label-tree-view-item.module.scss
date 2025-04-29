@@ -1,0 +1,53 @@
+.lightMode {
+    .spectrum-TreeView-itemLink:before {
+        border: 0 !important;
+        height: 0 !important;
+    }
+}
+
+.background {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+    background-color: var(--spectrum-global-color-gray-75) !important;
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-100) !important;
+    }
+}
+
+.viewCursor {
+    cursor: default !important;
+}
+
+.treeViewItemLi {
+    min-height: 4.4rem !important;
+    padding: var(--spectrum-global-dimension-size-100) !important;
+    padding-left: 0 !important;
+    height: auto !important;
+}
+
+.treeItem {
+    display: flex;
+    flex-direction: row;
+    gap: var(--spectrum-global-dimension-size-100);
+    align-items: center;
+}
+
+.indent {
+    margin-left: var(--spectrum-global-dimension-size-200);
+    @extend .treeItem;
+}
+
+.smallIndent {
+    margin-left: var(--spectrum-global-dimension-size-100);
+}
+
+.isClosed {
+    & > ul {
+        display: none;
+    }
+
+    & li {
+        display: none;
+    }
+}

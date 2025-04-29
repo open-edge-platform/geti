@@ -1,0 +1,9 @@
+in: path
+name: file_id
+style: simple
+description: |-
+  The ID of the file uploaded using the TUS protocol.
+  This can be found in the `Location` response header of [TUS upload initialization](#Project%20Import%2FExport/CreateTUSUpload).
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/mongo_id.yaml"
+required: true

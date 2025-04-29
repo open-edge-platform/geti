@@ -1,0 +1,40 @@
+.dialogWrapper {
+    background: linear-gradient(90deg, #1db0e2 0%, #4ca286 52.6%, #89ad4e 100%);
+    box-shadow: 0px 2px 4px 0px #00000026;
+    color: var(--spectrum-global-color-gray-900);
+    padding: var(--spectrum-global-dimension-size-300);
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    max-height: var(--spectrum-global-dimension-size-2400) !important;
+    height: auto;
+    border-radius: var(--spectrum-alias-border-radius-small) !important;
+}
+
+.tutorialCardHeader {
+    margin-block-start: 0;
+    margin-block-end: var(--spectrum-global-dimension-size-100);
+}
+
+.dialogDescription {
+    width: 100%;
+}
+
+.dialogButtonGroup {
+    margin-top: var(--spectrum-global-dimension-size-200) !important;
+    margin-bottom: var(--spectrum-global-dimension-size-0) !important;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    .moreMenu {
+        color: var(--spectrum-toast-neutral-text-color) !important;
+        border-color: var(--spectrum-toast-neutral-text-color) !important;
+
+        &:hover,
+        &:focus,
+        &[class*='is-active'] {
+            background-color: var(--brand-opacity-white-12) !important;
+        }
+    }
+}

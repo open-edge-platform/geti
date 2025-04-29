@@ -1,0 +1,23 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  media_information:
+    $ref: "../../media/responses/media_information.yaml"
+  dataset_id:
+    $ref: "../../mongo_id.yaml"
+  name:
+    type: string
+    description: Name of the image
+  annotation_state_per_task:
+    $ref: "../../media/responses/annotation_state_per_task.yaml"
+  thumbnail:
+    type: string
+    description: Relative URL to the image thumbnail
+  type:
+    type: string
+    description: Type of media. 'image' for images, 'video' for video.
+    enum: [ image ]
+  upload_time:
+    description: Upload time of the media file
+    type: string

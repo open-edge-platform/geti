@@ -1,0 +1,7 @@
+type: object
+properties:
+  explanations:
+    description: List of explanations. Each entry corresponds to the explanations for a single media item in the batch.
+    type: array
+    items:
+      $ref: "single_explanation.yaml"

@@ -1,0 +1,11 @@
+.emailCellTitle {
+    flex-basis: calc(100% - var(--spectrum-global-dimension-size-225) - var(--spectrum-global-dimension-size-300));
+}
+
+.orgAdminIndicator {
+    width: var(--spectrum-global-dimension-size-175);
+    height: var(--spectrum-global-dimension-size-175);
+    position: absolute;
+    left: var(--spectrum-global-dimension-size-400);
+    top: var(--spectrum-global-dimension-size-175);
+}

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+# TODO: This can be enhanced by introducing K8S native sidecar container feature
+# CVS-149031
+SIDECAR_PID_FPATH=/shard_files/sidecar.pid
+
+# Step 1. Running script
+set -o pipefail;
+python -X faulthandler /otx_v2/scripts/run.py;
+retVal=$?;
+echo "Finished running script. Returned exit code status: $retVal"
+
+# Step 2. Clean up container
+until curl -XPOST 127.0.0.1:15020/quitquitquit;  # TODO?
+  echo "Returned exit code status: $?"
+  do sleep 3;
+done;
+
+if [ -e $SIDECAR_PID_FPATH ]; then kill -SIGINT $(cat $SIDECAR_PID_FPATH); fi;
+if [ -f /tmp/training_completed ]; then exit 0; else exit $retVal; fi;

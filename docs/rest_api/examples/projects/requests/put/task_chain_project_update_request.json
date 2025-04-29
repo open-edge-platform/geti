@@ -1,0 +1,74 @@
+{
+    "id": "60e447c8d2ed2ae8c7dd0da6",
+    "name": "Example chain project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "60e447c8d2ed2ae8c7dd0da0",
+                "to": "60e447c8d2ed2ae8c7dd0da8"
+            },
+            {
+                "from": "60e447c8d2ed2ae8c7dd0da8",
+                "to": "60e447c8d2ed2ae8c7dd0dc1"
+            },
+            {
+                "from": "60e447c8d2ed2ae8c7dd0dc1",
+                "to": "60e447c8d2ed2ae8c7dd0da1"
+            }
+        ],
+        "tasks": [
+            {
+                "id": "60e447c8d2ed2ae8c7dd0da0",
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "id": "60e447c8d2ed2ae8c7dd0da8",
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_detection",
+                        "hotkey": "ctrl+5",
+                        "id": "60e447c8d2ed2ae8c7dd0da1",
+                        "name": "object"
+                    }
+                ],
+                "task_type": "detection",
+                "title": "Sample detection task"
+            },
+            {
+                "id": "60e447c8d2ed2ae8c7dd0dc1",
+                "task_type": "crop",
+                "title": "crop task"
+            },
+            {
+                "id": "60e447c8d2ed2ae8c7dd0da1",
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+6",
+                        "id": "60e447c8d2ed2ae8c7dd0da2",
+                        "name": "rectangle"
+                    },
+                    {
+                        "color": "#7F000AFF",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+7",
+                        "id": "60e447c8d2ed2ae8c7dd0da3",
+                        "name": "circle"
+                    },
+                    {
+                        "color": "#15FF00FF",
+                        "group": "default_classification",
+                        "hotkey": "ctrl+8",
+                        "id": "60e447c8d2ed2ae8c7dd0da4",
+                        "name": "triangle"
+                    }
+                ],
+                "task_type": "classification",
+                "title": "Sample classification task"
+            }
+        ]
+    }
+}

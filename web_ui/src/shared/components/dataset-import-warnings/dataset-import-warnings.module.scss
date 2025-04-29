@@ -1,0 +1,26 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+.warnings {
+    height: 100%;
+    overflow: auto;
+}
+
+.warningName {
+    color: var(--spectrum-global-color-gray-900);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.warningDescription {
+    font-size: 0.8em;
+    margin-left: var(--spectrum-global-dimension-size-500);
+}
+
+.warning {
+    color: var(--spectrum-global-color-yellow-600) !important;
+}
+
+.negative {
+    color: var(--spectrum-global-color-red-600) !important;
+}

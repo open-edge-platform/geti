@@ -1,0 +1,36 @@
+type: object
+description: Matrix chart, containing multiple matrices. Typically used for confusion matrices in classification projects.
+properties:
+  row_header:
+    type: string
+    description: The header for all the rows in the matrix
+  column_header:
+    type: string
+    description: The header for all the columns in the matrix
+  matrix_data:
+    type: array
+    description: Array of matrices
+    items:
+      type: object
+      properties:
+        row_names:
+          type: array
+          description: Array containing the names of the matrix rows
+          items:
+            type: string
+        column_names:
+          type: array
+          description: Array containing the names of the matrix columns
+          items:
+            type: string
+        matrix_values:
+          type: array
+          description: Array of matrix values
+          items:
+            type: array
+            items:
+              type: number
+required:
+  - row_header
+  - column_header
+  - matrix_data

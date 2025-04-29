@@ -1,0 +1,96 @@
+get:
+  tags:
+    - Configuration
+  summary: Get the current configuration for all components in the project.
+  description: "This endpoint gets the configuration for all components in the project that are acting project-wide.
+  The configuration is subdivided into components. Examples of configuration components are the active learning
+  parameters or dataset management related parameters. Some components are further divided into parameter groups."
+  operationId: GetGlobalConfiguration
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  responses:
+    '200':
+      description: Get global configuration response
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/configuration/responses/global_configuration.yaml"
+          examples:
+            Global configuration:
+              value:
+                $ref: "../../examples/configuration/responses/global_configuration_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+
+post:
+  tags:
+    - Configuration
+  summary: Set the configuration for all components in the project.
+  description: "This endpoint sets the configuration for all components in the project that are acting globally,
+   i.e. project-wide. The configuration is subdivided into components, and every component is divided into parameter
+   groups."
+  operationId: SetGlobalConfiguration
+  parameters:
+    - $ref: "../../parameters/path/organization_id.yaml"
+    - $ref: "../../parameters/path/workspace_id.yaml"
+    - $ref: "../../parameters/path/project_id.yaml"
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../../../../interactive_ai/services/api/schemas/configuration/requests/global_configuration.yaml"
+        examples:
+          Global configuration:
+            value:
+              $ref: "../../examples/configuration/requests/global_configuration_request.json"
+    required: true
+  responses:
+    '200':
+      description: Configuration updated successfully
+      content:
+        application/json:
+          examples:
+            Succesfully updated response:
+              value: success
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+    '500':
+      description: Configuration cannot be saved to the server
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Unable to save configuration:
+              value:
+                $ref: "../../examples/configuration/error_responses/cannot_set_configuration.json"

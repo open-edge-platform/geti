@@ -1,0 +1,6 @@
+in: query
+name: project_id
+style: form
+description: Select only items related to the given project.
+schema:
+  $ref: '../../../../interactive_ai/services/api/schemas/mongo_id.yaml'

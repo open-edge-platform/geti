@@ -1,0 +1,162 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svc_name := printf "%s-%s" .Release.Namespace .Chart.Name -}}
+{{- $svc_port := .Values.service.ports.resource.port -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+    - uri:
+        regex: "/api/.*/projects/.*/thumbnail"
+    - uri:
+        regex: "/api/.*/media/videos/.*/display/.*"
+    - uri:
+        regex: "/api/.*/media/videos/.*/frames/.*/display/.*"
+    timeout: 900s
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "geti-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        add:
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      retryOn: connect-failure,refused-stream,503
+  - match:
+    - uri:
+        regex: "/api/.*/media/videos"
+    timeout: 3600s
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "geti-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        add:
+          Cache-Control: "private, max-age=3600"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      retryOn: connect-failure,refused-stream,503
+  - match:
+    - uri:
+        regex: "/api/v1/healthz"
+    - uri:
+        regex: "/api/v1/product_info"
+{{- if not .Values.global.acc_svc_settings_enabled }}
+    - uri:
+        regex: "/api/v1/user_settings"
+{{- end }}
+    - uri:
+        regex: "/api/.*/projects"
+    - uri:
+        regex: "/api/.*/projects_names"
+    - uri:
+        regex: "/api/.*/projects/[0-9a-fA-F]+"
+    - uri:
+        regex: "/api/.*/projects/.*/settings/annotation_templates"
+    - uri:
+        regex: "/api/.*/media:query"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/[A-Za-z0-9-]+"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*):activate"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*)/statistics"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/[A-Za-z0-9-]+"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*)/export"
+    - uri:
+        regex: "/api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*):purge"
+    - uri:
+        regex: "/api/.*/models"
+    - uri:
+        regex: "/api/.*/datasets"
+    - uri:
+        regex: "/api/.*/datasets/[0-9a-fA-F]+"
+    - uri:
+        regex: "/api/.*/datasets/.*/statistics"
+    - uri:
+        regex: "/api/.*/media/images"
+    - uri:
+        regex: "/api/.*/media/images/[0-9a-fA-F]+"
+    - uri:
+        regex: "/api/.*/media/videos/[0-9a-fA-F]+"
+    - uri:
+        regex: "/api/.*/media/images/.*/annotations.*"
+    - uri:
+        regex: "/api/.*/media/videos/.*/annotations.*"
+    - uri:
+        regex: "/api/.*/media/videos/.*:query"
+    - uri:
+        regex: "/api/.*/media/videos/.*/range_annotation"
+    - uri:
+        regex: "/api/.*/code_deployments.*"
+    - uri:
+        regex: "/api/.*/deployment_package.*"
+    - uri:
+        regex: "/api/.*/training_revisions.*"
+    - uri:
+        regex: "/api/.*/tests/.*/results:query"
+    timeout: 900s
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "geti-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "geti-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      retryOn: connect-failure,refused-stream,503
+{{- end }}

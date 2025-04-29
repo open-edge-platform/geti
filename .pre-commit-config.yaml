@@ -1,0 +1,37 @@
+default_language_version:
+    python: python3.10
+
+repos:
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.11.2
+  hooks:
+  - id: ruff
+    name: Ruff linter on all Python files
+    args: ["--fix"]
+  - id: ruff-format
+    name: Ruff formatter on all Python files
+
+- repo: local
+  hooks:
+  - id: uv-lock-check
+    name: uv lock check
+    entry: .pre-commit-hooks/check_uv_lock.sh
+    language: script
+    always_run: true
+    pass_filenames: false
+
+- repo: local
+  hooks:
+  - id: mypy
+    name: mypy
+    entry: python
+    types: ["python"]
+    args: [".pre-commit-hooks/find_py_projects_and_run_make_target.py", "mypy"]
+    language: python
+
+- repo: https://github.com/APIDevTools/swagger-cli
+  rev: v4.0.4
+  hooks:
+  - id: swagger-validation
+    args: ["validate", "docs/rest_api/openapi.yaml"]
+    files: "docs\/rest_api\/.*(json|yaml|yml)|interactive_ai\/services\/api\/schemas\/.*(json|yaml|yml)"

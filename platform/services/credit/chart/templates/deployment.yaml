@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "credit-system.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "credit-system.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "credit-system.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+      labels:
+        {{- include "credit-system.selectorLabels" . | nindent 8 }}
+        opa_envoy_filter: enabled
+    spec:
+      serviceAccountName: {{ include "credit-system.name" . }}
+      initContainers:
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=2400s
+              --for=condition=complete
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ include "credit-system.name" . }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+      containers:
+        - name: &containerName {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: GRPC_SERVICE_PORT
+              value: "{{ .Values.service.ports.grpc }}"
+            - name: POSTGRES_HOST
+              value: "{{ .Release.Namespace }}-postgresql"
+            - name: POSTGRES_RO_HOST
+              value: "{{ .Release.Namespace }}-postgresql"
+            - name: POSTGRES_DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-db"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-password"
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "creditsystem-postgresql-username"
+            - name: POSTGRES_SSLMODE
+              value: "{{ .Values.postgresql.sslmode }}"
+            - name: KAFKA_ADDRESS
+              value: "{{ .Release.Namespace }}-kafka:{{ .Values.kafka.port }}"
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: user
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}
+                  key: password
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "{{ .Values.kafka.security_protocol }}"
+            - name: KAFKA_SASL_MECHANISM
+              value: "{{ .Values.kafka.sasl_mechanism }}"
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: "{{ include "credit-system.name" . }}-microservice"
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.instance.id=$(K8S_POD_NAME),k8s.pod.uid=$(K8S_POD_UID),k8s.container.name=$(K8S_CONTAINER_NAME)
+            - name: ACCOUNT_SERVICE_HOST
+              value: "{{ .Release.Namespace }}-account-service.{{ .Release.Namespace }}.svc.cluster.local"
+            - name: ACCOUNT_SERVICE_PORT
+              value: "5001"
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.ports.https }}
+              protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.service.ports.grpc }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.https }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.service.ports.https }}
+            initialDelaySeconds: {{ .Values.initialDelaySeconds }}
+            periodSeconds: {{ .Values.periodSeconds }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

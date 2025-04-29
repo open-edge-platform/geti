@@ -1,0 +1,29 @@
+{
+    "name": "Example segmentation project",
+    "pipeline": {
+        "connections": [
+            {
+                "from": "Dataset",
+                "to": "Sample segmentation task"
+            }
+        ],
+        "tasks": [
+            {
+                "task_type": "dataset",
+                "title": "Dataset"
+            },
+            {
+                "labels": [
+                    {
+                        "color": "#0015FFFF",
+                        "group": "default_segmentation",
+                        "hotkey": "ctrl+5",
+                        "name": "object"
+                    }
+                ],
+                "task_type": "segmentation",
+                "title": "Sample segmentation task"
+            }
+        ]
+    }
+}

@@ -1,0 +1,25 @@
+type: object
+required:
+  - name
+  - model_group_id
+  - model_id
+  - dataset_ids
+properties:
+  name:
+    type: string
+    description: Name of the test
+  model_group_id:
+    $ref: '../../mongo_id.yaml'
+  model_id:
+    $ref: '../../mongo_id.yaml'
+  dataset_ids:
+    type: array
+    description: Array of dataset ids
+    items:
+      $ref: '../../mongo_id.yaml'
+  metric:
+    type: string
+    enum: [global]
+    description: |
+      Pick global to compute the media-level performance (e.g., accuracy), and pick local to compute localized metrics \
+      (e.g., dice for segmentation and f-measure for detection). If no value is passed, we default to local metric.

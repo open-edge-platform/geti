@@ -1,0 +1,31 @@
+.annotatorPreviewToolbar {
+    padding: var(--spectrum-global-dimension-static-size-100);
+}
+
+.previewContainer {
+    box-sizing: border-box;
+    padding: var(--spectrum-global-dimension-size-300);
+    background-color: var(--spectrum-global-color-gray-50);
+    height: 100%;
+    min-height: 0;
+}
+
+.toggleAnnotatorMode {
+    border-radius: 0 var(--spectrum-alias-border-radius-small) var(--spectrum-alias-border-radius-small) 0 !important;
+    background-color: transparent !important;
+
+    &[class*='is-hovered'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-300) !important;
+        background-color: var(--spectrum-global-color-gray-75) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+    }
+
+    &[class*='is-selected'],
+    &[class*='is-active'] {
+        color: var(--energy-blue) !important;
+        background-color: var(--spectrum-global-color-gray-50) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-400) !important;
+        border-bottom-color: var(--energy-blue) !important;
+    }
+}

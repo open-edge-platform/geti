@@ -1,0 +1,109 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "migration-job.name" . }}
+  namespace: impt
+  labels:
+     {{- include "migration-job.labels" . | nindent 4 }}
+spec:
+# set on purpose so we will launch migration only once
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+         {{- include "migration-job.labels" . | nindent 8 }}
+{{- if not .Values.global.ff_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+{{- end }}
+    spec:
+      serviceAccountName: {{ include "migration-job.name" . }}
+      restartPolicy: Never
+      volumes:
+        - name: data-storage-volume
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim
+      containers:
+      - name: "{{ .Chart.Name }}"
+        image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+        command: ["/bin/sh", "-c"]
+        args:
+          - >-
+            run_migration;
+            retVal=$?;
+            {{- if not .Values.global.ff_ambient_mesh }}
+            curl -XPOST 127.0.0.1:15020/quitquitquit;
+            {{- end }}
+            exit $retVal
+        volumeMounts:
+          - name: data-storage-volume
+            mountPath: "/binary_data"
+            subPath: "binary_data"
+        resources:
+          requests:
+            cpu: 400m
+            memory: 500Mi
+        envFrom:
+          - configMapRef:
+              name: "impt-feature-flags"
+        env:
+          - name: WORKDIR
+            value: "/binary_data"
+          - name: MONGODB_CREDENTIALS_PROVIDER
+            valueFrom:
+              configMapKeyRef:
+                name: "impt-configuration"
+                key: mongodb_credentials_provider
+          - name: DATABASE_ADDRESS
+            value: "mongodb://impt-mongodb:27017/"
+          - name: DATABASE_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: "impt-mongodb"
+                key: mongodb-username
+          - name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "impt-mongodb"
+                key: mongodb-password
+          - name: S3_CREDENTIALS_PROVIDER
+            valueFrom:
+              configMapKeyRef:
+                name: "impt-configuration"
+                key: s3_credentials_provider
+          - name: S3_HOST
+            value: impt-seaweed-fs.impt:8333
+          - name: S3_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "impt-seaweed-fs"
+                key: admin_secret_key
+          - name: S3_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "impt-seaweed-fs"
+                key: admin_access_key
+          - name: MONGODB_DATABASE_NAME
+            valueFrom:
+              configMapKeyRef:
+                name: impt-configuration
+                key: mongodb_database_name
+{{- if  .Values.global.grafana_enabled }}
+          - name: GRAFANA_ENABLED
+            value: "true"
+          - name: GRAFANA_HOST
+            value: impt-grafana.impt
+          - name: GRAFANA_ADMIN_USER
+            valueFrom:
+              secretKeyRef:
+                name: "impt-grafana"
+                key: admin-user
+                optional: true
+          - name: GRAFANA_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "impt-grafana"
+                key: admin-password
+                optional: true
+{{- end }}

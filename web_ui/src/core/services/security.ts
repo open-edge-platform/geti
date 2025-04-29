@@ -1,0 +1,6 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+export const CSRF_HEADERS = {
+    'X-GETI-CSRF-PROTECTION': '1',
+};

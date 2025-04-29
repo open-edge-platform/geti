@@ -1,0 +1,10 @@
+title: Metadata of `export_project` job
+type: object
+description: Information about the project export operation
+properties:
+  project:
+    description: Information about the project being export
+    $ref: 'project.yaml'
+  download_url:
+    type: string
+    description: URL to download the exported project archive

@@ -1,0 +1,25 @@
+title: Metadata of `perform_import_to_existing_project` job
+type: object
+description: Imported dataset information
+properties:
+  file_id:
+    $ref: 'file_id.yaml'
+  project:
+    description: Information about the project where the dataset is imported
+    $ref: 'project.yaml'
+  dataset:
+    type: object
+    description: The dataset information for importing the uploaded dataset file
+    properties:
+      id:
+        $ref: '../../mongo_id.yaml'
+      name:
+        type: string
+        description: Name of the dataset storage
+      use_for_training:
+        type: boolean
+        description: Whether the dataset will be used for training or not
+      creation_time:
+        type: string
+        description: The time at which the dataset was created
+        example: "2024-03-05T06:34:32.332000+00:00"

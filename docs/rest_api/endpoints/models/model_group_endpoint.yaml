@@ -1,0 +1,44 @@
+get:
+  tags:
+    - Models
+  summary: Get information on all models in a model group
+  description: |-
+    Get information about a specific model group, including the models in that group. 
+    Each model group represents one model architecture that has been trained in the project and
+    contains a list of successfully trained models of that architecture.
+  operationId: GetModelGroup
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/model_group_id.yaml'
+  responses:
+    '200':
+      description: Information on all models and their groups belonging to a project
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/models/responses/model_group.yaml"
+          examples:
+            Model group response:
+              value:
+                $ref: "../../examples/models/responses/model_group_response.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Model group not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_group_not_found.json"

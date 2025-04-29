@@ -1,0 +1,6 @@
+in: query
+name: with_size
+style: form
+description: Set to true to return the project size in the response. Default is False.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/with_size.yaml"

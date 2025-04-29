@@ -1,0 +1,35 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+.cellContainer {
+    height: var(--spectrum-global-dimension-size-400);
+    text-align: center;
+}
+
+.cell {
+    padding: var(--spectrum-global-dimension-size-75) var(--spectrum-global-dimension-size-200);
+    border-radius: var(--spectrum-alias-border-radius-large);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--brand-opacity-white-12);
+    }
+}
+
+.selected {
+    background-color: var(--energy-blue);
+    color: var(--spectrum-global-color-gray-50);
+
+    &:hover {
+        background-color: var(--energy-blue-shade);
+    }
+}
+
+.disabled {
+    cursor: default;
+    color: var(--spectrum-global-color-gray-700);
+
+    &:hover {
+        background-color: inherit;
+    }
+}

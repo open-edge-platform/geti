@@ -1,0 +1,24 @@
+type: object
+description: Information detailing the cancellation status of the job
+properties:
+  cancellable:
+    type:
+      - boolean
+      - 'null'
+    description: whether the job can be cancelled after startup
+  is_cancelled:
+    type:
+      - boolean
+      - 'null'
+    description: whether the job is cancelled
+  user_uid:
+    type:
+      - string
+      - 'null'
+    description: The user UID who requested the cancellation
+  cancel_time:
+    type:
+      - string
+      - 'null'
+    format: date-time
+    description: The time of cancellation

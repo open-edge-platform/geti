@@ -1,0 +1,5 @@
+{
+    "model_template_id": "Custom_Image_Classification_EfficinetNet-B0",
+    "task_id": "60dd7ab4083bce31e1f38r768",
+    "train_from_scratch": true
+}

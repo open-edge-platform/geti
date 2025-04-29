@@ -1,0 +1,9 @@
+{
+  "description": "Replace old annotation scene indexes with new ones",
+  "supports_downgrade": true,
+  "skip_on_project_import": true,
+  "new_collections": [],
+  "updated_collections": ["annotation_scene"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

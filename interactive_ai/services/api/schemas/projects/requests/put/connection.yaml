@@ -1,0 +1,9 @@
+required:
+  - from
+  - to
+type: object
+properties:
+  from:
+    $ref: '../../../mongo_id.yaml'
+  to:
+    $ref: '../../../mongo_id.yaml'

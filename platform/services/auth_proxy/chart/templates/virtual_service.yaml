@@ -1,0 +1,58 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svc_port := .Values.service.ports.http -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include "auth-proxy.name" . }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  {{- $endpoints := .Values.ingress.endpoints }}
+
+  {{- range $section := $endpoints }}
+    {{- range $url := $section.matches }}
+      {{- $methods := $section.methods }}
+      {{- if $.Values.global.cors_policy.enabled }}
+        {{- $methods = append $methods "OPTIONS" }}
+      {{- end }}
+      {{- range $method := $methods }}
+  - match:
+    - uri:
+        regex: {{ tpl $url $ | quote }}
+      method:
+        exact: {{ $method }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ $.Values.global.security_headers | indent 10 }}
+        remove:
+{{ $.Values.global.stripped_headers | indent 10 }}
+    route:
+    - destination:
+        host: {{ include "auth-proxy.name" $ }}.{{ $.Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+    retries:
+      attempts: 5
+      perTryTimeout: 60s
+      retryOn: connect-failure,refused-stream,503
+      {{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}

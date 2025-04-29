@@ -1,0 +1,4 @@
+{
+  "script": "set_dynamic_required_annotations_config_params.py",
+  "metadata": "set_dynamic_required_annotations_config_params.json"
+}

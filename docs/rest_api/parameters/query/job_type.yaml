@@ -1,0 +1,7 @@
+in: query
+name: job_type
+style: form
+explode: true
+description: Select only jobs of the given type.
+schema:
+  $ref: '../../../../interactive_ai/services/api/schemas/parameters/job_type.yaml'

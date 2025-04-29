@@ -1,0 +1,10 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+syntax = "proto3";
+// IDTokenSubject represents both the userID and connID which is returned
+// as the "sub" claim in the ID Token.
+message IDTokenSubject {
+  string user_id = 1;
+  string conn_id = 2;
+}

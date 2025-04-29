@@ -1,0 +1,6 @@
+in: query
+name: labels
+style: form
+description: List of label ids used to filter the images/videos
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/labels.yaml"

@@ -1,0 +1,6 @@
+---
+name: user-directory
+version: 0.0.1
+description: user-directory chart
+apiVersion: v2
+appVersion: v0.0.1

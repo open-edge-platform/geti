@@ -1,0 +1,30 @@
+type: object
+properties:
+  id:
+    $ref: "../../mongo_id.yaml"
+  media_information:
+    $ref: "../../media/responses/media_information.yaml"
+  name:
+    type: string
+    description: Name of the image
+  annotation_state_per_task:
+    $ref: "../../media/responses/annotation_state_per_task.yaml"
+  thumbnail:
+    type: string
+    description: Relative URL to the image thumbnail
+  type:
+    type: string
+    description: Type of media. 'image' for images, 'video' for video and 'video_frame' for video frames.
+    enum: [ image ]
+  upload_time:
+    description: Upload time of the media file
+    type: string
+  annotation_scene_id:
+    description: Optional ID of the annotation scene  if filtering in a specific training revision
+    type: string
+  roi_id:
+    description: Optional ID of the roi id if filtering in a specific training revision
+    type: string
+  last_annotator_id:
+    description: Optional ID of the user that last edited the annotation.
+    type: string

@@ -1,0 +1,43 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+.PHONY: tests static-code-analysis ruff mypy style-fix venv-clean pre-venv venv
+
+PYTHONPATH_LOCAL     := tests:app
+
+# Dev environment
+PYTHON_VERSION       := python3.10
+
+# PIP installation command
+PIP_INSTALL_PARAMS   := --trusted-host pypi.org \
+					    --trusted-host pypi.python.org \
+					    --trusted-host files.pythonhosted.org \
+
+pre-venv:
+	@if ! command -v uv; then \
+		curl -LsSf https://astral.sh/uv/install.sh | sh; \
+	fi
+
+venv: pre-venv
+	uv sync ${PIP_INSTALL_PARAMS}
+
+tests: venv
+	@if [ -d "./tests" ]; then \
+		PYTHONPATH=$(PYTHONPATH_LOCAL) \
+		uv run pytest ./tests -v; \
+	else \
+		echo "./tests directory not found - skipping tests"; \
+	fi
+
+static-code-analysis: ruff mypy
+
+ruff: venv
+	uv run ruff check --config pyproject.toml
+	uv run ruff format --check --config pyproject.toml
+
+mypy: venv
+	uv run mypy $(if $(FILES),$(FILES),.) --config-file=pyproject.toml
+
+style-fix: venv
+	uv run ruff check --config pyproject.toml --fix
+	uv run ruff format --config pyproject.toml

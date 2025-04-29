@@ -1,0 +1,17 @@
+type: object
+title: Hyper parameter group entity identifier
+properties:
+  workspace_id:
+    oneOf:
+    - $ref: "../../../mongo_id.yaml"
+    - $ref: "../../../uuid.yaml"
+  model_storage_id:
+    $ref: "../../../mongo_id.yaml"
+  group_name:
+    type: string
+    description: Name of the hyper parameter group
+  type:
+    type: string
+    description: "Describes the type of the component. For hyper parameter groups, type is always set to
+      HYPER_PARAMETER_GROUP"
+    enum: ["HYPER_PARAMETER_GROUP"]

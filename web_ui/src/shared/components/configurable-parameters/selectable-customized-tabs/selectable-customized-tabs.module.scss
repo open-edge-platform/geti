@@ -1,0 +1,51 @@
+.tabItem {
+    display: flex;
+    align-items: center;
+    color: var(--spectrum-global-color-gray-800);
+    margin-left: 0 !important;
+    margin-bottom: var(--spectrum-global-dimension-size-100);
+    margin-right: var(--spectrum-global-dimension-size-125);
+    border: var(--spectrum-alias-border-size-thick) solid var(--spectrum-global-color-gray-400);
+    border-radius: var(--spectrum-global-dimension-size-125);
+    padding: var(--spectrum-global-dimension-size-65) var(--spectrum-global-dimension-size-150);
+    cursor: pointer;
+}
+
+.tabItem:hover {
+    background-color: var(--spectrum-global-color-gray-100);
+}
+
+.tabItemSelected {
+    background-color: var(--spectrum-global-color-gray-200);
+}
+
+.customizedTabs {
+    & > div[class*='spectrum-Tabs--vertical'] {
+        border-left: 0;
+        border-right: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-400);
+    }
+
+    & div[class*='spectrum-Tabs-selectionIndicator'] {
+        display: none;
+    }
+
+    & > div[class*='spectrum-TabsPanel-tabpanel'] {
+        overflow-y: auto;
+    }
+
+    & div[class*='spectrum-Tabs-item'] {
+        @extend .tabItem;
+
+        & > * {
+            cursor: pointer;
+        }
+    }
+
+    & div[class*='is-selected'] {
+        background-color: var(--spectrum-global-color-gray-200);
+    }
+
+    & div[class*='is-hovered'] {
+        background-color: var(--spectrum-global-color-gray-100);
+    }
+}

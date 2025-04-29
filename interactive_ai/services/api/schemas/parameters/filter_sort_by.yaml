@@ -1,0 +1,8 @@
+type: string
+enum:
+    - media_name
+    - media_upload_date
+    - media_width
+    - media_height
+    - media_size
+    - annotation_creation_date

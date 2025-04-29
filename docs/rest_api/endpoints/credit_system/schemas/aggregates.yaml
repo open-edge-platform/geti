@@ -1,0 +1,72 @@
+AggregateItem:
+  properties:
+    group:
+      items:
+        $ref: '#/GroupItem'
+      type: array
+      title: Group
+    result:
+      $ref: '#/AggregatesResult'
+  type: object
+  required:
+    - group
+    - result
+  title: AggregateItem
+AggregatesKey:
+  type: string
+  enum:
+    - project
+    - service_name
+    - date
+  title: AggregatesKey
+  description: Allowed keys for transaction aggregates
+AggregatesResponse:
+  properties:
+    aggregates:
+      items:
+        $ref: '#/AggregateItem'
+      type: array
+      title: Aggregates
+  type: object
+  required:
+    - aggregates
+  title: AggregatesResponse
+AggregatesResult:
+  properties:
+    credits:
+      type: integer
+      title: Credits
+    resources:
+      $ref: '#/ResourcesAmount'
+  type: object
+  required:
+    - credits
+    - resources
+  title: AggregatesResult
+ResourcesAmount:
+  properties:
+    images:
+      type: integer
+      title: Images
+      default: 0
+    frames:
+      type: integer
+      title: Frames
+      default: 0
+  type: object
+  title: ResourcesAmount
+GroupItem:
+  properties:
+    key:
+      type: string
+      title: Key
+    value:
+      anyOf:
+        - type: string
+        - type: integer
+      title: Value
+  type: object
+  required:
+    - key
+    - value
+  title: GroupItem

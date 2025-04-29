@@ -1,0 +1,740 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+/* eslint-disable max-len */
+
+import { Page } from '@playwright/test';
+
+export const autoTrainingCreditSystemNotificationRegex =
+    /the auto-training job has been started, 6 credits deducted. Check your credit balance here./i;
+export const autoTrainingCreditSystemModalRegex = /Accelerate the time-to-model/i;
+export const manualTrainingCreditSystemToastNotificationRegex =
+    /the model training has been started, 6 credits deducted./i;
+export const autoTrainingNotificationRegex =
+    /This auto-training job is scheduled and ready to start when resources are available./i;
+export const autoTrainingCreditSystemToastNotificationRegex =
+    /Auto-training round has been started, 6 credits deducted./i;
+export const autoTrainingToastNotificationRegex = /Auto-training round has been started./i;
+
+export const goToAnnotatorInActiveMode = async (page: Page) => {
+    await page.goto(
+        `http://localhost:3000/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/61011e42d891c82e13ec92da/projects/62946c61003ddb3967f14750/datasets/6101254defba22ca453f11cc/annotator/image/613a23866674c43ae7a777aa?task-id=62946c61003ddb3967f1474f&active=true`
+    );
+};
+
+export const startTaskTraining = async (page: Page) => {
+    await page.getByRole('button', { name: /Active learning configuration/i }).click();
+    await page.getByRole('button', { name: /start training sample detection task/i }).click();
+};
+
+export const detectionProjectAutoTrainingConfig = {
+    global: [
+        {
+            description: 'Specify the project-level configuration for active learning.',
+            entity_identifier: {
+                component: 'PROJECT_ACTIVE_LEARNING',
+                project_id: '66b9e0dab540459b2e7497ef',
+                type: 'COMPONENT_PARAMETERS',
+                workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+            },
+            header: 'Active Learning',
+            id: '66b9e0da9f7fca6d94a8291d',
+            parameters: [
+                {
+                    data_type: 'string',
+                    default_value: 'mean',
+                    description: 'Function to aggregate the active scores of a media across the tasks',
+                    editable: true,
+                    enum_name: 'ActiveScoreReductionFunction',
+                    header: 'Inter-task scores reduction function',
+                    name: 'inter_task_reduce_fn',
+                    options: ['min', 'mean', 'max'],
+                    template_type: 'selectable',
+                    ui_rules: {},
+                    value: 'mean',
+                    warning: null,
+                },
+                {
+                    data_type: 'integer',
+                    default_value: 500,
+                    description: 'Number of images analysed after training for active learning',
+                    editable: true,
+                    header: 'Number of images analysed after training for active learning',
+                    max_value: 10000,
+                    min_value: 10,
+                    name: 'max_unseen_media',
+                    template_type: 'input',
+                    ui_rules: {},
+                    value: 500,
+                    warning: null,
+                },
+            ],
+            type: 'CONFIGURABLE_PARAMETERS',
+        },
+        {
+            description: 'Specify parameters to control how datasets are managed in the system.',
+            entity_identifier: {
+                component: 'PIPELINE_DATASET_MANAGER',
+                project_id: '66b9e0dab540459b2e7497ef',
+                type: 'COMPONENT_PARAMETERS',
+                workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+            },
+            header: 'Dataset management',
+            id: '66b9e0da9f7fca6d94a82920',
+            parameters: [
+                {
+                    data_type: 'integer',
+                    default_value: -1,
+                    description:
+                        'The maximum number of shapes that can be in an annotation. Any annotations with more shapes than this number will be ignored during training. Setting this to -1 disables the setting.',
+                    editable: true,
+                    header: 'Maximum number of shapes per annotation',
+                    max_value: 10000,
+                    min_value: -1,
+                    name: 'maximum_number_of_annotations',
+                    template_type: 'input',
+                    ui_rules: {},
+                    value: -1,
+                    warning: null,
+                },
+                {
+                    data_type: 'integer',
+                    default_value: -1,
+                    description:
+                        'Minimum size of a shape in pixels. Any shape smaller than this will be ignored during         training. Setting this to -1 disables the setting.',
+                    editable: true,
+                    header: 'Minimum annotation size',
+                    max_value: 1000000,
+                    min_value: -1,
+                    name: 'minimum_annotation_size',
+                    template_type: 'input',
+                    ui_rules: {},
+                    value: -1,
+                    warning: null,
+                },
+                {
+                    data_type: 'boolean',
+                    default_value: false,
+                    description:
+                        'Enabling NDR will help to prevent annotating very similar images. Note that this does not remove any data from the project,it is only used in selecting images for active learning.',
+                    editable: true,
+                    header: 'Use Near Duplicate Removal (NDR) for active learning',
+                    name: 'use_ndr',
+                    template_type: 'input',
+                    ui_rules: {},
+                    value: false,
+                    warning: null,
+                },
+            ],
+            type: 'CONFIGURABLE_PARAMETERS',
+        },
+    ],
+    task_chain: [
+        {
+            components: [
+                {
+                    description: 'Learning Parameters',
+                    entity_identifier: {
+                        group_name: 'learning_parameters',
+                        model_storage_id: '66b9e0dab540459b2e7497f3',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        type: 'HYPER_PARAMETER_GROUP',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    header: 'Learning Parameters',
+                    id: '66b9e0db9f7fca6d94a82923-1',
+                    name: 'learning_parameters',
+                    parameters: [
+                        {
+                            data_type: 'string',
+                            default_value: 'None',
+                            description:
+                                'Safe - Prevent GPU from running out of memory. Full - Find a batch size using most of GPU memory.',
+                            editable: true,
+                            enum_name: 'BatchSizeAdaptType',
+                            header: "Decrease batch size if current batch size isn't fit to CUDA memory.",
+                            name: 'auto_adapt_batch_size',
+                            options: ['None', 'Safe', 'Full'],
+                            template_type: 'selectable',
+                            ui_rules: {},
+                            value: 'None',
+                            warning:
+                                'Enabling this could change the actual batch size depending on the current GPU status. The learning rate also could be adjusted according to the adapted batch size. This process might change a model performance and take some extra computation time to try a few batch size candidates.',
+                        },
+                        {
+                            data_type: 'boolean',
+                            default_value: false,
+                            description: 'Adapt num_workers according to current hardware status automatically.',
+                            editable: true,
+                            header: 'Enable auto adaptive num_workers',
+                            name: 'auto_num_workers',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: false,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 8,
+                            description:
+                                'The number of training samples seen in each iteration of training. Increasing this value improves training time and may make the training more stable. A larger batch size has higher memory requirements.',
+                            editable: true,
+                            header: 'Batch size',
+                            max_value: 512,
+                            min_value: 1,
+                            name: 'batch_size',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 8,
+                            warning:
+                                'Increasing this value may cause the system to use more memory than available, potentially causing out of memory errors, please update with caution.',
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 0,
+                            description:
+                                'Training will stop if the model does not improve within the number of iterations of patience. This ensures the model is trained enough with the number of iterations of patience before early stopping.',
+                            editable: true,
+                            header: 'Iteration patience for early stopping',
+                            max_value: 1000,
+                            min_value: 0,
+                            name: 'early_stop_iteration_patience',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 0,
+                            warning: 'This is applied exclusively when early stopping is enabled.',
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 10,
+                            description:
+                                'Training will stop if the model does not improve within the number of epochs of patience.',
+                            editable: true,
+                            header: 'Patience for early stopping',
+                            max_value: 50,
+                            min_value: 0,
+                            name: 'early_stop_patience',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 10,
+                            warning: 'This is applied exclusively when early stopping is enabled.',
+                        },
+                        {
+                            data_type: 'boolean',
+                            default_value: true,
+                            description:
+                                "Early exit from training when validation accuracy isn't changed or decreased for several epochs.",
+                            editable: true,
+                            header: 'Enable early stopping of the training',
+                            name: 'enable_early_stopping',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: true,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 8,
+                            description:
+                                'The number of samples seen in each iteration of inference. Increasing this value improves inference time and may make the inference more stable. A larger batch size has higher memory requirements.',
+                            editable: true,
+                            header: 'Inference batch size',
+                            max_value: 512,
+                            min_value: 1,
+                            name: 'inference_batch_size',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 8,
+                            warning:
+                                'Increasing this value may cause the system to use more memory than available, potentially causing out of memory errors, please update with caution.',
+                        },
+                        {
+                            data_type: 'float',
+                            default_value: 0.004,
+                            description:
+                                'Increasing this value will speed up training convergence but might make it unstable.',
+                            editable: true,
+                            header: 'Learning rate',
+                            max_value: 0.1,
+                            min_value: 1e-7,
+                            name: 'learning_rate',
+                            step_size: null,
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 0.004,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 3,
+                            description:
+                                'In this periods of initial training iterations, the model will be trained in low learning rate, which will be increased incrementally up to the expected learning rate setting. This warm-up phase is known to be helpful to stabilize training, thus result in better performance.',
+                            editable: true,
+                            header: 'Number of iterations for learning rate warmup',
+                            max_value: 10000,
+                            min_value: 0,
+                            name: 'learning_rate_warmup_iters',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 3,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 200,
+                            description:
+                                'Increasing this value causes the results to be more robust but training time will be longer.',
+                            editable: true,
+                            header: 'Number of training iterations',
+                            max_value: 1000,
+                            min_value: 1,
+                            name: 'num_iters',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 200,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 2,
+                            description:
+                                'Increasing this value might improve training speed however it might cause out of memory errors. If the number of workers is set to zero, data loading will happen in the main training thread.',
+                            editable: true,
+                            header: 'Number of cpu threads to use during batch generation',
+                            max_value: 8,
+                            min_value: 0,
+                            name: 'num_workers',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 2,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'boolean',
+                            default_value: true,
+                            description:
+                                'Depending on the size of iteration per epoch, adaptively update the validation interval and related values.',
+                            editable: true,
+                            header: 'Use adaptive validation interval',
+                            name: 'use_adaptive_interval',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: true,
+                            warning:
+                                'This will automatically control the patience and interval when early stopping is enabled.',
+                        },
+                    ],
+                    type: 'PARAMETER_GROUP',
+                },
+                {
+                    description: 'Postprocessing',
+                    entity_identifier: {
+                        group_name: 'postprocessing',
+                        model_storage_id: '66b9e0dab540459b2e7497f3',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        type: 'HYPER_PARAMETER_GROUP',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    header: 'Postprocessing',
+                    id: '66b9e0db9f7fca6d94a82923-3',
+                    name: 'postprocessing',
+                    parameters: [
+                        {
+                            data_type: 'float',
+                            default_value: 0.35,
+                            description:
+                                'This threshold only takes effect if the threshold is not set based on the result.',
+                            editable: true,
+                            header: 'Confidence threshold',
+                            max_value: 1,
+                            min_value: 0,
+                            name: 'confidence_threshold',
+                            step_size: null,
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 0.35,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 0,
+                            description:
+                                'Extra detection outputs will be discared in non-maximum suppression process. Defaults to 0, which means per-model default values.',
+                            editable: true,
+                            header: 'Maximum number of detections per image',
+                            max_value: 10000,
+                            min_value: 0,
+                            name: 'max_num_detections',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 0,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'float',
+                            default_value: 0.5,
+                            description:
+                                'IoU Threshold for NMS Postprocessing. Intersection over Union (IoU) threshold is set to remove overlapping predictions. If the IoU between two predictions is greater than or equal to the IoU threshold, they are considered overlapping and will be discarded.',
+                            editable: true,
+                            header: 'NMS IoU Threshold',
+                            max_value: 1,
+                            min_value: 0,
+                            name: 'nms_iou_threshold',
+                            step_size: null,
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 0.5,
+                            warning:
+                                'If you want to chage the value of IoU Threshold of model, then you need to re-train model with new IoU threshold.',
+                        },
+                        {
+                            data_type: 'boolean',
+                            default_value: true,
+                            description: 'Confidence threshold is derived from the results',
+                            editable: true,
+                            header: 'Result based confidence threshold',
+                            name: 'result_based_confidence_threshold',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: true,
+                            warning: null,
+                        },
+                    ],
+                    type: 'PARAMETER_GROUP',
+                },
+                {
+                    description: 'Crop dataset to tiles',
+                    entity_identifier: {
+                        group_name: 'tiling_parameters',
+                        model_storage_id: '66b9e0dab540459b2e7497f3',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        type: 'HYPER_PARAMETER_GROUP',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    header: 'Tiling',
+                    id: '66b9e0db9f7fca6d94a82923-5',
+                    name: 'tiling_parameters',
+                    parameters: [
+                        {
+                            data_type: 'boolean',
+                            default_value: true,
+                            description:
+                                "Config tile size and tile overlap adaptively based on annotated dataset statistic. Manual settings well be ignored if it's turned on. Please turn off this option in order to tune tiling parameters manually.",
+                            editable: true,
+                            header: 'Enable adaptive tiling parameters',
+                            name: 'enable_adaptive_params',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: true,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'boolean',
+                            default_value: false,
+                            description: 'Set to True to allow tiny objects to be better detected.',
+                            editable: true,
+                            header: 'Enable tiling',
+                            name: 'enable_tiling',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: false,
+                            warning:
+                                "Tiling trades off speed for accuracy as it increases the number of images to be processed. In turn, it's memory efficient as smaller resolution patches are handled at onces so that the possibility of OOM issues could be reduced. Important: In the current version, depending on the dataset size and the available hardware resources, a model may not train successfully when tiling is enabled.",
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 1500,
+                            description:
+                                'Maximum number of objects per tile. If set to 1500, the tile adaptor will automatically determine the value. Otherwise, the manually set value will be used.',
+                            editable: true,
+                            header: 'Max object per tile',
+                            max_value: 5000,
+                            min_value: 1,
+                            name: 'tile_max_number',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 1500,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'float',
+                            default_value: 0.2,
+                            description:
+                                'Overlap ratio between each two neighboring tiles. Recommend to set as large_object_size / tile_size.',
+                            editable: true,
+                            header: 'Tile Overlap',
+                            max_value: 0.9,
+                            min_value: 0.0,
+                            name: 'tile_overlap',
+                            step_size: null,
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 0.2,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'float',
+                            default_value: 1.0,
+                            description:
+                                'Since tiling train and validation to all tile from large image, usually it takes lots of time than normal training. The tile_sampling_ratio is ratio for sampling entire tile dataset. Sampling tile dataset would save lots of time for training and validation time. Note that sampling will be applied to training and validation dataset, not test dataset.',
+                            editable: true,
+                            header: 'Sampling Ratio for entire tiling',
+                            max_value: 1.0,
+                            min_value: 1e-6,
+                            name: 'tile_sampling_ratio',
+                            step_size: null,
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 1.0,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 400,
+                            description:
+                                'Tile image size. (tile_size x tile_size) sub images will be the unit of computation.',
+                            editable: true,
+                            header: 'Tile Image Size',
+                            max_value: 4096,
+                            min_value: 100,
+                            name: 'tile_size',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 400,
+                            warning: null,
+                        },
+                    ],
+                    type: 'PARAMETER_GROUP',
+                },
+                {
+                    description:
+                        'Specify the distribution of annotated samples over the training, validation and test sets. Note: items that have already been trained will stay in the same subset even if these parameters are changed.',
+                    entity_identifier: {
+                        component: 'SUBSET_MANAGER',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        task_id: '60db493fd20945a0046f56d2',
+                        type: 'COMPONENT_PARAMETERS',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    groups: [
+                        {
+                            description:
+                                'Specify the distributions of annotated samples over training, validation and test set. These values must add up to 1, and will be rescaled if they do not add up correctly.',
+                            header: 'Subset distribution',
+                            name: 'subset_parameters',
+                            parameters: [
+                                {
+                                    data_type: 'float',
+                                    default_value: 0.3,
+                                    description: 'Fraction of annotated data that will be assigned to the test set',
+                                    editable: true,
+                                    header: 'Test set proportion',
+                                    max_value: 1.0,
+                                    min_value: 0.1,
+                                    name: 'test_proportion',
+                                    step_size: null,
+                                    template_type: 'input',
+                                    ui_rules: {
+                                        action: 'SHOW',
+                                        operator: 'AND',
+                                        rules: [
+                                            {
+                                                operator: 'EQUAL_TO',
+                                                parameter: ['auto_subset_fractions'],
+                                                type: 'RULE',
+                                                value: false,
+                                            },
+                                        ],
+                                        type: 'UI_RULES',
+                                    },
+                                    value: 0.3,
+                                    warning:
+                                        'When the proportions do not add up to 1, they will be rescaled to add up to 1.',
+                                },
+                                {
+                                    data_type: 'float',
+                                    default_value: 0.5,
+                                    description: 'Fraction of annotated data that will be assigned to the training set',
+                                    editable: true,
+                                    header: 'Training set proportion',
+                                    max_value: 1.0,
+                                    min_value: 0.1,
+                                    name: 'train_proportion',
+                                    step_size: null,
+                                    template_type: 'input',
+                                    ui_rules: {
+                                        action: 'SHOW',
+                                        operator: 'AND',
+                                        rules: [
+                                            {
+                                                operator: 'EQUAL_TO',
+                                                parameter: ['auto_subset_fractions'],
+                                                type: 'RULE',
+                                                value: false,
+                                            },
+                                        ],
+                                        type: 'UI_RULES',
+                                    },
+                                    value: 0.5,
+                                    warning:
+                                        'When the proportions do not add up to 1, they will be rescaled to add up to 1.',
+                                },
+                                {
+                                    data_type: 'float',
+                                    default_value: 0.2,
+                                    description:
+                                        'Fraction of annotated data that will be assigned to the validation set',
+                                    editable: true,
+                                    header: 'Validation set proportion',
+                                    max_value: 1.0,
+                                    min_value: 0.1,
+                                    name: 'validation_proportion',
+                                    step_size: null,
+                                    template_type: 'input',
+                                    ui_rules: {
+                                        action: 'SHOW',
+                                        operator: 'AND',
+                                        rules: [
+                                            {
+                                                operator: 'EQUAL_TO',
+                                                parameter: ['auto_subset_fractions'],
+                                                type: 'RULE',
+                                                value: false,
+                                            },
+                                        ],
+                                        type: 'UI_RULES',
+                                    },
+                                    value: 0.2,
+                                    warning:
+                                        'When the proportions do not add up to 1, they will be rescaled to add up to 1.',
+                                },
+                            ],
+                            type: 'PARAMETER_GROUP',
+                        },
+                    ],
+                    header: 'Subset splitting',
+                    id: '66b9e0da9f7fca6d94a8291b',
+                    parameters: [
+                        {
+                            data_type: 'boolean',
+                            default_value: true,
+                            description:
+                                'If this setting is enabled, the system will automatically determine the most optimal distribution of the annotated samples over training, validation and test set. Disable this setting to manually specify the proportions.',
+                            editable: true,
+                            header: 'Automatically determine subset proportions',
+                            name: 'auto_subset_fractions',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: true,
+                            warning: null,
+                        },
+                    ],
+                    type: 'CONFIGURABLE_PARAMETERS',
+                },
+                {
+                    description: 'Specify the number of required annotations for a task',
+                    entity_identifier: {
+                        component: 'DATASET_COUNTER',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        task_id: '60db493fd20945a0046f56d2',
+                        type: 'COMPONENT_PARAMETERS',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    header: 'Annotation requirements',
+                    id: '66b9e0da9f7fca6d94a8291c',
+                    parameters: [
+                        {
+                            data_type: 'boolean',
+                            default_value: false,
+                            description:
+                                'If this is ON, the first training will only be triggered when each label is present in N images, while N is number of required images for the first training. Otherwise, first training will be triggered when N images have been annotated. If first training has been triggered, this parameter will not take effect.',
+                            editable: true,
+                            header: 'Label constraint for the first training',
+                            name: 'label_constraint_first_training',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: false,
+                            warning: null,
+                        },
+                        {
+                            data_type: 'integer',
+                            default_value: 12,
+                            description:
+                                'The minimum number of new annotations required before auto-train is triggered. Auto-training will start every time that this number of annotations is created.',
+                            editable: true,
+                            header: 'Number of images required for auto-training',
+                            max_value: 10000,
+                            min_value: 3,
+                            name: 'required_images_auto_training',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: 12,
+                            warning: null,
+                        },
+                    ],
+                    type: 'CONFIGURABLE_PARAMETERS',
+                },
+                {
+                    description: 'Specify the task-level configuration for active learning.',
+                    entity_identifier: {
+                        component: 'TASK_ACTIVE_LEARNING',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        task_id: '60db493fd20945a0046f56d2',
+                        type: 'COMPONENT_PARAMETERS',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    header: 'Active Learning',
+                    id: '66b9e0da9f7fca6d94a8291e',
+                    parameters: [
+                        {
+                            data_type: 'string',
+                            default_value: 'mean',
+                            description: 'Function to aggregate the active scores of a media within a task',
+                            editable: true,
+                            enum_name: 'ActiveScoreReductionFunction',
+                            header: 'Intra-task scores reduction function',
+                            name: 'intra_task_reduce_fn',
+                            options: ['min', 'mean', 'max'],
+                            template_type: 'selectable',
+                            ui_rules: {},
+                            value: 'mean',
+                            warning: null,
+                        },
+                    ],
+                    type: 'CONFIGURABLE_PARAMETERS',
+                },
+                {
+                    description: 'General settings for a task.',
+                    entity_identifier: {
+                        component: 'TASK_NODE',
+                        project_id: '66b9e0dab540459b2e7497ef',
+                        task_id: '60db493fd20945a0046f56d2',
+                        type: 'COMPONENT_PARAMETERS',
+                        workspace_id: '02aff546-6a57-417e-af1c-6e4219ee2955',
+                    },
+                    header: 'General',
+                    id: '66b9e0da9f7fca6d94a8291f',
+                    parameters: [
+                        {
+                            data_type: 'boolean',
+                            default_value: true,
+                            description:
+                                'Enable to allow the task to start training automatically when it is ready to train.',
+                            editable: true,
+                            header: 'Auto-training',
+                            name: 'auto_training',
+                            template_type: 'input',
+                            ui_rules: {},
+                            value: true,
+                            warning: null,
+                        },
+                    ],
+                    type: 'CONFIGURABLE_PARAMETERS',
+                },
+            ],
+            task_id: '60db493fd20945a0046f56d2',
+            task_title: 'Detection',
+        },
+    ],
+};

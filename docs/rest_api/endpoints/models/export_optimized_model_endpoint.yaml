@@ -1,0 +1,55 @@
+get:
+  tags:
+    - Models
+  summary: Export an optimized model
+  description: |-
+    Export a zip file with data from an optimized model (OpenVINO or ONNX).
+  operationId: ExportOptimizedModel
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/model_group_id.yaml'
+    - $ref: '../../parameters/path/model_id.yaml'
+    - $ref: '../../parameters/path/optimized_model_id.yaml'
+    - $ref: '../../parameters/query/model_only.yaml'
+  responses:
+    '200':
+      description: Export an optimized model
+      content:
+        zip file:
+          schema:
+            type: string
+            format: binary
+    '400':
+      description: Bad request. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Wrong export format:
+              value:
+                $ref: "../../examples/models/error_responses/wrong_export_format.json"
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Model group not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_group_not_found.json"
+            Model not found response:
+              value:
+                $ref: "../../examples/models/error_responses/model_not_found.json"

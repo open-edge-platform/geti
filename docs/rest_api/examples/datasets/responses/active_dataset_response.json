@@ -1,0 +1,44 @@
+{
+  "active_set": [
+    {
+      "active_frames": [
+          30,
+          0
+      ],
+      "dataset_id": "6139eab61e3343cd22a41a65",
+      "id": "6139ec7555f78343bad38d2b",
+      "media_information": {
+        "display_url": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/videos/6139ec7555f78343bad38d2b/display/stream",
+        "duration": 30,
+        "frame_count": 901,
+        "frame_stride": 30,
+        "frame_rate": 30,
+        "height": 270,
+        "width": 480,
+        "size": 16384,
+        "extension": ".mp4"
+      },
+      "name": "earth",
+      "state": "annotated",
+      "thumbnail": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/videos/6139ec7555f78343bad38d2b/display/thumb",
+      "type": "video",
+      "upload_time": "2021-09-09T11:13:57.407000+00:00"
+    },
+    {
+      "dataset_id": "6139eab61e3343cd22a41a65",
+      "id": "613a23866674c43ae7a777ab",
+      "media_information": {
+        "display_url": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/images/613a23866674c43ae7a777ab/display/full ",
+        "height": 331,
+        "width": 584,
+        "size": 128,
+        "extension": ".png"
+      },
+      "name": "dummy_images",
+      "state": "none",
+      "thumbnail": "/api/v1/workspaces/61376cf8c0e392f0c4efb2bb/projects/6139eab61e3343cd22a41a66/datasets/6139eab61e3343cd22a41a65/media/images/613a23866674c43ae7a777ab/display/thumb",
+      "type": "image",
+      "upload_time": "2021-09-09T15:08:54.118000+00:00"
+    }
+  ]
+}

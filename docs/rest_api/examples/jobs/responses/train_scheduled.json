@@ -1,0 +1,29 @@
+{
+  "id": "66056f0193ae9dd902d2bc75",
+  "type": "train",
+  "creation_time": "2024-03-28T13:22:09.300000+00:00",
+  "start_time": null,
+  "end_time": null,
+  "name": "Training",
+  "author": "bcc5fa82-7b94-4b1b-9c71-0526b793c3e0",
+  "state": "scheduled",
+  "steps": [],
+  "cancellation_info": {
+    "is_cancelled": false,
+    "user_uid": null,
+    "cancel_time": null
+  },
+  "metadata": {
+    "project": {
+      "id": "660287b420d4f3a4595c3133",
+      "name": "MyProject"
+    },
+    "task": {
+      "task_id": "660287bb20d4f3a4595c3137",
+      "name": "Classification",
+      "model_template_id": "Custom_Image_Classification_EfficinetNet-B0",
+      "model_architecture": "EfficientNet-B0",
+      "dataset_storage_id": "660287bc20d4f3a4595c313b"
+    }
+  }
+}

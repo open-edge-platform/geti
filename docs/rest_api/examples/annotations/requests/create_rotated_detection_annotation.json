@@ -1,0 +1,19 @@
+{
+    "annotations":[
+       {
+          "shape":{
+             "type":"ROTATED_RECTANGLE",
+             "angle":288.1729051090551,
+             "x":1694.3405,
+             "y":2036.2685,
+             "width":618.6341,
+             "height":1457.5136
+          },
+          "labels":[
+             {
+                "id":"664e000ac0abcbbabf5e06b5"
+             }
+          ]
+       }
+    ]
+ }

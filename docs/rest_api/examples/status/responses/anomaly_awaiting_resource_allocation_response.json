@@ -1,0 +1,43 @@
+{
+    "is_training": true,
+    "n_required_annotations": 0,
+    "n_new_annotations": 0,
+    "project_performance": {
+        "score": 0.55,
+        "local_score": null,
+        "global_score": 0.55,
+        "task_performances": [
+            {
+                "task_id": "60e829a2436a044be4109593",
+                "score": {
+                    "value": 0.55,
+                    "metric_type": "accuracy"
+                },
+                "global_score": {
+                    "value": 0.55,
+                    "metric_type": "accuracy"
+                },
+                "local_score": null
+            }
+        ]
+    },
+    "status": {
+        "progress": 4.132231404958678
+    },
+    "tasks": [
+        {
+            "id": "60e829a2436a044be4109593",
+            "is_training": true,
+            "ready_to_train": true,
+            "required_annotations": {
+                "details": [],
+                "value": 0
+            },
+            "status": {
+                "progress": 4.132231404958678
+            },
+            "title": "torch_segmentation",
+            "n_new_annotations": 0
+        }
+    ]
+}

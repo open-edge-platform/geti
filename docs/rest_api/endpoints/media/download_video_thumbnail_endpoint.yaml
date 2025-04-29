@@ -1,0 +1,54 @@
+get:
+  tags:
+  - Media
+  summary:  Download the thumbnail for a video
+  description: |-
+    Download the thumbnail of a video. 
+    The video thumbnail is the downscaled version of a frame from the middle of the video.
+  operationId: DownloadVideoThumbnail
+  parameters:
+    - $ref: '../../parameters/path/organization_id.yaml'
+    - $ref: '../../parameters/path/workspace_id.yaml'
+    - $ref: '../../parameters/path/project_id.yaml'
+    - $ref: '../../parameters/path/dataset_id.yaml'
+    - $ref: '../../parameters/path/video_id.yaml'
+  responses:
+    '200':
+      description: The requested video thumbnail
+      content:
+        image/*:
+          schema:
+            type: string
+            format: binary
+    '404':
+      description: Object not found. See the examples for details.
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Organization not found response:
+              value:
+                $ref: "../../examples/organizations/error_responses/organization_not_found.json"
+            Workspace not found response:
+              value:
+                $ref: "../../examples/workspaces/error_responses/workspace_not_found.json"
+            Project not found response:
+              value:
+                $ref: "../../examples/projects/error_responses/project_not_found.json"
+            Dataset not found response:
+              value:
+                $ref: "../../examples/datasets/error_responses/dataset_not_found.json"
+            Video not found response:
+              value:
+                $ref: "../../examples/media/error_responses/video_not_found.json"
+    '500':
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "../../../../interactive_ai/services/api/schemas/generic_responses/error_response.yaml"
+          examples:
+            Invalid scale dimensions:
+              value:
+                $ref: '../../examples/media/error_responses/thumbnail_invalid_scale_dimensions.json'

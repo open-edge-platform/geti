@@ -1,0 +1,7 @@
+in: query
+name: hyper_parameters
+description: Hyper parameters for the inference
+schema:
+  type: string
+  example: '[{"task_id":"660287bb20d4f3a4595c3137", "confidence_treshold":0.35, "use_ellipse_shapes": "true"}]'
+required: false

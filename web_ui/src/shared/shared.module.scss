@@ -1,0 +1,180 @@
+.rotate {
+    animation: rotate 1.5s linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.dialogContent {
+    background-color: var(--spectrum-global-color-gray-50);
+    border: 1px solid var(--spectrum-global-color-gray-50);
+    border-radius: var(--spectrum-alias-border-radius-regular);
+}
+
+.contentDisabled {
+    pointer-events: none;
+    user-select: none;
+    opacity: 0.7;
+}
+
+.actionButtonDark {
+    border: var(--spectrum-alias-border-size-thin) solid transparent !important;
+
+    &[class*='is-hovered'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-300) !important;
+        background-color: var(--spectrum-global-color-gray-100) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+    }
+
+    &[class*='is-selected'],
+    &[class*='is-active'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-400) !important;
+        background-color: var(--spectrum-global-color-gray-50) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+    }
+}
+
+.actionButtonLight {
+    border: var(--spectrum-alias-border-size-thin) solid transparent !important;
+
+    &[class*='is-hovered'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--blue-header-option-hover) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+        background-color: var(--blue-header-option-hover) !important;
+    }
+
+    &[class*='is-active'],
+    &[class*='is-selected'] {
+        border: var(--spectrum-alias-border-size-thin) solid var(--blue-header-option-selected) !important;
+        border-radius: var(--spectrum-alias-border-radius-small) !important;
+        background-color: var(--blue-header-option-selected) !important;
+    }
+}
+
+.actionButtonBlue {
+    border: none !important;
+    background: transparent !important;
+
+    &:not([class*='disabled']) {
+        color: var(--energy-blue) !important;
+    }
+}
+
+.acceptButton {
+    border: none !important;
+    background: var(--spectrum-semantic-cta-color-background-default) !important;
+
+    svg {
+        fill: var(--spectrum-semantic-gray-100-color-background) !important;
+    }
+
+    &:disabled {
+        background: var(
+            --spectrum-button-cta-background-color-disabled,
+            --spectrum-accent-background-color-disabled,
+            --spectrum-global-color-gray-200
+        ) !important;
+    }
+
+    &[class*='is-hovered'],
+    &[class*='is-active'],
+    &[class*='is-selected'] {
+        background: var(
+            --spectrum-semantic-cta-color-background-hover,
+            --spectrum-button-cta-background-color-hover,
+            --spectrum-accent-background-color-hover
+        ) !important;
+    }
+}
+
+// This class adds a scaling effect (on hover) to an image inside an element.
+// Make sure the parent element has `overflow: hidden` set
+.scaling {
+    transform: translate3d(0, 0, 0);
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+
+    img {
+        transition: transform 0.4s cubic-bezier(0.5, 0.6, 0.8, 1);
+        object-fit: cover;
+        will-change: transform;
+    }
+
+    &:hover img {
+        transform: scale(1.08) translate3d(0, 0, 0);
+        -webkit-transform: scale(1.08) translate3d(0, 0, 0);
+    }
+}
+
+.searchField {
+    div[aria-label='Clear search'] {
+        cursor: pointer;
+    }
+
+    input,
+    svg {
+        transition: all 0.4s ease-in-out;
+    }
+
+    &[class*='spectrum-Textfield'] div {
+        cursor: pointer;
+        overflow: hidden;
+        border-bottom-color: transparent;
+        transition: border-bottom-color 0.2s ease-in-out;
+
+        input,
+        svg {
+            transition: all 0.4s ease-in-out;
+        }
+
+        &:hover,
+        &:active,
+        &:focus {
+            border-bottom-color: inherit;
+
+            input,
+            svg {
+                transform: translateX(0);
+            }
+        }
+
+        input:active,
+        input:focus {
+            transform: translateX(0);
+
+            & + svg {
+                transform: translateX(0);
+            }
+        }
+    }
+
+    input {
+        // Hiding the input should go slightly faster
+        transition: transform 0.5s ease-in-out;
+        transform: translateX(200px);
+    }
+
+    svg {
+        // Going out (hiding) the svg should go slightly faster
+        transition: all 0.4s ease-in-out;
+        transform: translateX(176px);
+    }
+}
+
+.searchFieldOpen {
+    &[class*='spectrum-Textfield'] div {
+        border-bottom-color: inherit;
+
+        input,
+        svg {
+            transform: translateX(0);
+        }
+    }
+}
+
+.blueGreenGradient {
+    background: linear-gradient(90deg, #1db0e2 0%, #4ca286 52.6%, #89ad4e 100%);
+}

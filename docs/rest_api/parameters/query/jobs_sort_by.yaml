@@ -1,0 +1,6 @@
+in: query
+name: sort_by
+style: form
+description: Field to sort by, could be [job_name, start_time, end_time, creation_date, priority]
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/jobs_sort_by.yaml"

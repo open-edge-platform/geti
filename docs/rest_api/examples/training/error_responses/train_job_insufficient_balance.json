@@ -1,0 +1,5 @@
+{
+  "http_status": 412,
+  "message": "Insufficient balance for job execution",
+  "error_code": "job_insufficient_balance"
+}

@@ -1,0 +1,16 @@
+quiet: False
+disable-version-string: True
+with-expecter: True
+mockname: "Mock{{.InterfaceName}}"
+filename: "mock_{{.InterfaceName | snakecase}}.go"
+dir: "mock/{{.InterfaceDirRelative}}"
+packages:
+  geti.com/go_sdk/storage:
+    config:
+      all: True
+  geti.com/go_sdk/entities:
+    config:
+      all: True
+  geti.com/go_sdk/frames:
+    config:
+      all: True

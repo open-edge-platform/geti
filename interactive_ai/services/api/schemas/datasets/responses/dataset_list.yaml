@@ -1,0 +1,7 @@
+type: object
+properties:
+  datasets:
+    type: array
+    description: Array of datasets
+    items:
+      $ref: "dataset.yaml"

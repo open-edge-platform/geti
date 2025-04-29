@@ -1,0 +1,7 @@
+include ../../../Makefile.shared-python
+
+DOCKER_BUILD_CONTEXT := --build-context schemas=../api \
+						--build-context libs=../../../libs \
+						--build-context sc_sdk=../../../interactive_ai/libs/sc_sdk \
+						--build-context media_utils=../../../interactive_ai/libs/media_utils \
+						--build-context grpc_interfaces=../../../grpc_interfaces \
