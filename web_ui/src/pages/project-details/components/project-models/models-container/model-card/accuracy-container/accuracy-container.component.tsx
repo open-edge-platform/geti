@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 
-import { ActionElement } from '../../../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../../../shared/components/pressable-element/pressable-element.component';
 import { AccuracyHalfDonutChart } from './accuracy-half-donut-chart';
 
 interface AccuracyContainerProps {
@@ -25,7 +25,7 @@ export const AccuracyContainer = ({
 }: AccuracyContainerProps): JSX.Element => {
     return (
         <TooltipTrigger placement={'bottom'}>
-            <ActionElement>
+            <PressableElement>
                 <Flex
                     direction={'column'}
                     justifyContent={'center'}
@@ -43,7 +43,7 @@ export const AccuracyContainer = ({
                         <AccuracyHalfDonutChart id={id} value={value} title={heading} isDisabled={isDisabled} />
                     )}
                 </Flex>
-            </ActionElement>
+            </PressableElement>
             <Tooltip>{tooltip}</Tooltip>
         </TooltipTrigger>
     );

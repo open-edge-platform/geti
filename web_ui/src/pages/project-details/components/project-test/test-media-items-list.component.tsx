@@ -11,11 +11,11 @@ import { VirtuosoGridHandle } from 'react-virtuoso';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { TestImageMediaItem } from '../../../../core/tests/test-image.interface';
 import { TestMediaAdvancedFilter, TestMediaItem } from '../../../../core/tests/test-media.interface';
-import { ActionElement } from '../../../../shared/components/action-element/action-element.component';
 import { Loading } from '../../../../shared/components/loading/loading.component';
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { NotFound } from '../../../../shared/components/not-found/not-found.component';
+import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { useSelectedMediaItemIndex } from '../../../../shared/hooks/use-selected-media-item-index.hook';
 import { isSelected } from '../../../annotator/components/sidebar/dataset/utils';
 import { MediaItemTooltipMessage } from '../project-media/media-item-tooltip-message/media-item-tooltip-message';
@@ -120,7 +120,7 @@ export const TestMediaItemsList = ({
 
                                 return (
                                     <TooltipTrigger placement={'bottom'}>
-                                        <ActionElement>
+                                        <PressableElement>
                                             {viewMode === ViewModes.DETAILS ? (
                                                 <TestMediaItemDetailsCard
                                                     mediaItem={mediaItem}
@@ -138,7 +138,7 @@ export const TestMediaItemsList = ({
                                                     shouldShowAnnotationIndicator={shouldShowAnnotationIndicator}
                                                 />
                                             )}
-                                        </ActionElement>
+                                        </PressableElement>
                                         <Tooltip>
                                             <MediaItemTooltipMessage {...tooltipProps} />
                                         </Tooltip>
