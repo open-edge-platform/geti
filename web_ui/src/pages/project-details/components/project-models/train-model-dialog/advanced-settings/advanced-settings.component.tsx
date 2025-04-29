@@ -15,7 +15,13 @@ import { Training } from './training/training.component';
 
 const ContentWrapper: FC<{ children: ReactNode }> = ({ children }) => {
     return (
-        <View padding={'size-250'} backgroundColor={'gray-50'}>
+        <View
+            padding={'size-250'}
+            backgroundColor={'gray-50'}
+            overflow={'hidden auto'}
+            height={'100%'}
+            UNSAFE_style={{ boxSizing: 'border-box' }}
+        >
             {children}
         </View>
     );
@@ -96,11 +102,11 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
     ];
 
     return (
-        <Flex direction={'column'} gap={'size-100'}>
+        <Flex direction={'column'} gap={'size-100'} height={'100%'}>
             {isTaskChainProject && (
                 <TaskSelection tasks={tasks} onTaskChange={onTaskChange} selectedTask={selectedTask} />
             )}
-            <Tabs items={TABS}>
+            <Tabs items={TABS} flex={1} UNSAFE_style={{ overflow: 'hidden' }}>
                 <TabList>
                     {(tab: TabProps) => (
                         <Item key={tab.name} textValue={tab.name}>
@@ -108,7 +114,7 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
                         </Item>
                     )}
                 </TabList>
-                <TabPanels marginTop={'size-250'}>
+                <TabPanels marginTop={'size-250'} UNSAFE_style={{ overflow: 'hidden' }}>
                     {(tab: TabProps) => (
                         <Item key={tab.name} textValue={tab.name}>
                             <ContentWrapper>{tab.children}</ContentWrapper>
