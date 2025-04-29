@@ -29,7 +29,7 @@ pre-venv:
 	fi
 
 venv: pre-venv
-	uv lock --check
+	uv lock --check --verbose
 	uv sync --frozen ${PIP_INSTALL_PARAMS}
 
 venv-lock: pre-venv
