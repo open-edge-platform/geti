@@ -1,0 +1,55 @@
+image: platform-cleaner
+
+init:
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      memory: 100Mi
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+      - DAC_READ_SEARCH
+
+workload_removal_delay_minutes: 30
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 1Gi
+global:
+  enable_master_node_selector: true
+  docker_namespace: impp
+  storage_volume_claim_name: data-storage-volume-claim
+  logging_config_dir: ""
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+
+account_service:
+  address: "impt-account-service.impt.svc.cluster.local"
+  port: 5001
+
+replicas: 1
+
+delete_not_activated_users: "delete-not-activated-users"
