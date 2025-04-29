@@ -49,6 +49,7 @@ const TilingOption: FC<{ parameter: NumberGroupParams }> = ({ parameter }) => {
                     onChange={setParameterValue}
                     step={step}
                     isFilled
+                    flex={1}
                 />
                 <NumberField
                     isQuiet

@@ -73,7 +73,7 @@ export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
                 </Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
                 <Grid
-                    columns={['max-content', minmax('size-3400', '1fr'), 'size-400']}
+                    columns={['size-3000', minmax('size-3400', '1fr'), 'size-400']}
                     gap={'size-300'}
                     alignItems={'center'}
                 >
