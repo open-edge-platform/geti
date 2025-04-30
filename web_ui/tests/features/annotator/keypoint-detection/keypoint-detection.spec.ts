@@ -139,4 +139,20 @@ test.describe(`keypoint detection`, () => {
 
         expect(headPosition).not.toEqual(headPositionAfterRotate);
     });
+
+    test('mark annotation as occluded and unselect the item', async ({ page }) => {
+        await page.goto(annotatorUrl);
+        await checkKeypointTools(page);
+
+        const listItemContainer = page.getByRole('listitem').first();
+
+        await listItemContainer.hover();
+        await expect(listItemContainer.getByRole('img', { name: 'occluded icon' })).not.toBeInViewport();
+
+        await listItemContainer.getByRole('button', { name: 'menu trigger' }).click();
+        await page.getByText('Mark as occluded').click();
+
+        await expect(listItemContainer.getByRole('button', { name: 'menu trigger' })).not.toBeInViewport();
+        await expect(listItemContainer.getByRole('img', { name: 'occluded icon' })).toBeVisible();
+    });
 });
