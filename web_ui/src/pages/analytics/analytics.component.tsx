@@ -18,7 +18,7 @@ export const Analytics = (): JSX.Element => {
     const { router } = useApplicationServices();
     const { useProductInfo } = usePlatformUtils();
     const productInfo = useProductInfo();
-    const IS_GRAFANA_ENABLED = productInfo.data?.grafanaEnabled;
+    const isGrafanaEnabled = productInfo.data?.grafanaEnabled;
 
     const ITEMS: ComponentProps<typeof DownloadableItem>[] = useMemo(() => {
         return [
@@ -56,7 +56,7 @@ export const Analytics = (): JSX.Element => {
 
     return (
         <View>
-            {IS_GRAFANA_ENABLED && <AnalyticsDashboardCard />}
+            {isGrafanaEnabled && <AnalyticsDashboardCard />}
             <View marginStart={'size-75'} width={'size-6000'}>
                 <AnimatePresence>
                     {ITEMS.map((item, index) => (
