@@ -135,63 +135,72 @@ describe('ExportDatasetDialog', () => {
             await renderApp({ domains: [DOMAIN.DETECTION_ROTATED_BOUNDING_BOX] });
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
             expect(queryRadioOption(ExportFormats.COCO)).toBeEnabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('segmentation semantic', async () => {
             await renderApp({ domains: [DOMAIN.SEGMENTATION] });
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
             expect(queryRadioOption(ExportFormats.COCO)).toBeEnabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('segmentation instance', async () => {
             await renderApp({ domains: [DOMAIN.SEGMENTATION_INSTANCE] });
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
             expect(queryRadioOption(ExportFormats.COCO)).toBeEnabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('classification', async () => {
             await renderApp({ domains: [DOMAIN.CLASSIFICATION] });
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
-            expect(queryRadioOption(ExportFormats.COCO)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.COCO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('anomaly classification', async () => {
             await renderApp({ domains: [DOMAIN.ANOMALY_CLASSIFICATION] });
-            expect(queryRadioOption(ExportFormats.VOC)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.COCO)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.VOC)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.COCO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('anomaly detection', async () => {
             await renderApp({ domains: [DOMAIN.ANOMALY_DETECTION] });
-            expect(queryRadioOption(ExportFormats.VOC)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.COCO)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.VOC)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.COCO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('anomaly segmentation', async () => {
             await renderApp({ domains: [DOMAIN.ANOMALY_SEGMENTATION] });
-            expect(queryRadioOption(ExportFormats.VOC)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.COCO)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.VOC)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.COCO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('detection classification', async () => {
             await renderApp({ domains: [DOMAIN.DETECTION, DOMAIN.CROP, DOMAIN.CLASSIFICATION] });
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
-            expect(queryRadioOption(ExportFormats.COCO)).toBeDisabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.COCO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it('detection segmentation', async () => {
             await renderApp({ domains: [DOMAIN.DETECTION, DOMAIN.CROP, DOMAIN.SEGMENTATION] });
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
             expect(queryRadioOption(ExportFormats.COCO)).toBeEnabled();
-            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.YOLO)).not.toBeInTheDocument();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
 
         it.each([
@@ -205,16 +214,35 @@ describe('ExportDatasetDialog', () => {
             DOMAIN.SEGMENTATION_INSTANCE,
         ])('should render Datumaro export option when project domain is "%s"', async (domain) => {
             await renderApp({ domains: [domain] });
-            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeVisible();
         });
 
         it('should render Datumaro export option for task chain projects', async () => {
             await renderApp({ domains: [DOMAIN.DETECTION], isTaskChainProject: true });
 
+            expect(queryRadioOption(ExportFormats.VOC)).toBeVisible();
+            expect(queryRadioOption(ExportFormats.COCO)).toBeVisible();
+            expect(queryRadioOption(ExportFormats.YOLO)).toBeVisible();
+
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
+        });
+
+        it('disables all formats except datumaro when using native video export', async () => {
+            await renderApp({ domains: [DOMAIN.DETECTION], isTaskChainProject: true });
+
+            // Confirm that our default dataset contains videos
+            expect(await screen.findByText('2 frames', { exact: false })).toBeVisible();
+
             expect(queryRadioOption(ExportFormats.VOC)).toBeEnabled();
             expect(queryRadioOption(ExportFormats.COCO)).toBeEnabled();
             expect(queryRadioOption(ExportFormats.YOLO)).toBeEnabled();
+            expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
 
+            fireEvent.click(screen.getByRole('radio', { name: `Keep the native video format` }));
+
+            expect(queryRadioOption(ExportFormats.VOC)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.COCO)).toBeDisabled();
+            expect(queryRadioOption(ExportFormats.YOLO)).toBeDisabled();
             expect(queryRadioOption(ExportFormats.DATUMARO)).toBeEnabled();
         });
     });
