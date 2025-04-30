@@ -149,7 +149,6 @@ def export_dataset_task(  # noqa: PLR0915
             media_type=dm_Image if save_video_as_images else dm_MediaElement,
         )
 
-        logger.info(f"@Saving videos as images: {save_video_as_images}")
         progress_reporter.finish_step()
         logger.info(f"Dataset with ID `{str(export_id)}` is built for export.")
 
