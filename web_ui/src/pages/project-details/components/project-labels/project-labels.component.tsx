@@ -6,9 +6,14 @@ import { Fragment, useCallback, useEffect, useState } from 'react';
 import { DialogContainer, Divider, Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import isEmpty from 'lodash/isEmpty';
 
-import { LabelTreeItem, LabelTreeLabelProps } from '../../../../core/labels/label-tree-view.interface';
-import { getFlattenedLabels } from '../../../../core/labels/utils';
+import {
+    LabelItemEditionState,
+    LabelTreeItem,
+    LabelTreeLabelProps,
+} from '../../../../core/labels/label-tree-view.interface';
+import { getFlattenedItems, getFlattenedLabels, getNonEmptyLabelsFromProject } from '../../../../core/labels/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';
+import { isClassificationDomain } from '../../../../core/projects/domains';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
 import { useHistoryBlock } from '../../../../hooks/use-history-block/use-history-block.hook';
@@ -19,6 +24,7 @@ import { isNew } from '../../../../shared/components/label-tree-view/label-tree-
 import { Loading } from '../../../../shared/components/loading/loading.component';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
 import { UnsavedChangesDialog } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { pluralize } from '../../../../shared/utils';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { ProjectTaskLabels } from './project-task-labels/project-task-labels.component';
@@ -29,17 +35,22 @@ export const ProjectLabels = (): JSX.Element => {
     const { editProjectLabelsMutation } = useProjectActions();
     const datasetIdentifier = useDatasetIdentifier();
 
-    const { project, isTaskChainProject, reload } = useProject();
+    const { project, isTaskChainProject, reload, isSingleDomainProject } = useProject();
 
     const [isDirty, setIsDirty] = useState<boolean>(false);
     const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
     const [isEditionEnabled, setEditionEnablement] = useState<boolean>(false);
     const [tasksMetadata, setTasksMetadata] = useState<TaskMetadata[]>(getTasksMetadata(project.tasks));
     const [labelsValid, setLabelsValidity] = useState<boolean>(true);
+    const [saveButtonDisabled, setSaveButtonDisabled] = useState<boolean>(false);
 
     const { addNotification } = useNotification();
 
     const [isOpen, setIsOpen, onUnsavedAction] = useHistoryBlock(isEditionEnabled);
+
+    useEffect(() => {
+        setSaveButtonDisabled(!labelsValid);
+    }, [labelsValid]);
 
     useEffect(() => {
         setTasksMetadata(getTasksMetadata(project.tasks));
@@ -102,7 +113,35 @@ export const ProjectLabels = (): JSX.Element => {
 
     const revisitHandler = (shouldRevisit: boolean) => save(shouldRevisit);
 
+    const ensureMinimumNumberOfLabels = (labels: LabelTreeItem[]) => {
+        const projectLabels = getNonEmptyLabelsFromProject(project.tasks);
+        const minimumNeededLabels = isSingleDomainProject(isClassificationDomain) ? 2 : 1;
+        const labelsToBeRemoved = getFlattenedItems(labels).filter(
+            (label) => label.state === LabelItemEditionState.REMOVED
+        );
+
+        if (labelsToBeRemoved.length === 0) {
+            return;
+        }
+
+        if (projectLabels.length - labelsToBeRemoved.length < minimumNeededLabels) {
+            addNotification({
+                message: `You must have at least ${pluralize(minimumNeededLabels, 'label')} in the project.`,
+                type: NOTIFICATION_TYPE.INFO,
+                dismiss: { duration: 0 },
+            });
+
+            setSaveButtonDisabled(true);
+
+            return;
+        }
+
+        setSaveButtonDisabled(false);
+    };
+
     const editLabels = (labels: LabelTreeItem[], domain: DOMAIN) => {
+        ensureMinimumNumberOfLabels(labels);
+
         setTasksMetadata(
             tasksMetadata.map((task) => {
                 if (domain === task.domain) {
@@ -132,7 +171,7 @@ export const ProjectLabels = (): JSX.Element => {
                         {isEditionEnabled && isDirty && (
                             <>
                                 <TooltipTrigger placement={'bottom'}>
-                                    <Button onPress={saveHandler} variant={'accent'} isDisabled={!labelsValid}>
+                                    <Button onPress={saveHandler} variant={'accent'} isDisabled={saveButtonDisabled}>
                                         Save
                                     </Button>
                                     <Tooltip>Save changes in project labels</Tooltip>
