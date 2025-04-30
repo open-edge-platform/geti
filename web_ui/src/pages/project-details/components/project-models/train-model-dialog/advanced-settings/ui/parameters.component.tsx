@@ -14,6 +14,7 @@ import { ResetButton } from './reset-button.component';
 
 interface ParametersProps {
     parameters: ConfigurableParametersParams[];
+    onChange: () => void;
 }
 
 const ParameterTooltip: FC<{ text: string }> = ({ text }) => {
@@ -28,6 +29,7 @@ const ParameterTooltip: FC<{ text: string }> = ({ text }) => {
 
 interface ParameterProps {
     parameter: ConfigurableParametersParams;
+    onChange: () => void;
 }
 
 interface ParameterLayoutProps {
@@ -50,10 +52,10 @@ const ParameterLayout: FC<ParameterLayoutProps> = ({ header, children, descripti
     );
 };
 
-const ParameterField: FC<ParameterProps> = ({ parameter }) => {
+const ParameterField: FC<ParameterProps> = ({ parameter, onChange }) => {
     if (parameter.dataType === 'string' && parameter.templateType === 'selectable') {
         return (
-            <OptionsButtons options={parameter.options} selectedOption={parameter.value} onOptionChange={() => {}} />
+            <OptionsButtons options={parameter.options} selectedOption={parameter.value} onOptionChange={onChange} />
         );
     }
 
@@ -63,7 +65,7 @@ const ParameterField: FC<ParameterProps> = ({ parameter }) => {
                 value={parameter.value}
                 minValue={parameter.minValue}
                 maxValue={parameter.maxValue}
-                onChange={() => {}}
+                onChange={onChange}
                 type={parameter.dataType}
             />
         );
@@ -74,19 +76,19 @@ const ParameterField: FC<ParameterProps> = ({ parameter }) => {
     }
 };
 
-const Parameter: FC<ParameterProps> = ({ parameter }) => {
+const Parameter: FC<ParameterProps> = ({ parameter, onChange }) => {
     return (
         <ParameterLayout header={parameter.header} description={parameter.description} onReset={() => {}}>
-            <ParameterField parameter={parameter} />
+            <ParameterField parameter={parameter} onChange={onChange} />
         </ParameterLayout>
     );
 };
 
-export const Parameters: FC<ParametersProps> = ({ parameters }) => {
+export const Parameters: FC<ParametersProps> = ({ parameters, onChange }) => {
     return (
         <Grid columns={['size-3000', minmax('size-3400', '1fr'), 'size-400']} gap={'size-300'} alignItems={'center'}>
             {parameters.map((parameter) => (
-                <Parameter key={parameter.name} parameter={parameter} />
+                <Parameter key={parameter.name} parameter={parameter} onChange={onChange} />
             ))}
         </Grid>
     );

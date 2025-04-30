@@ -3,9 +3,11 @@
 
 import { FC } from 'react';
 
-import { ConfigurableParametersParams } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { Accordion } from '../../ui/accordion/accordion.component';
-import { Parameters } from '../../ui/parameters.component';
+import noop from 'lodash/noop';
+
+import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { Accordion } from '../ui/accordion/accordion.component';
+import { Parameters } from '../ui/parameters.component';
 
 interface LearningParametersProps {
     parameters: ConfigurableParametersParams[];
@@ -21,7 +23,7 @@ export const LearningParameters: FC<LearningParametersProps> = ({ parameters }) 
             <Accordion.Content>
                 <Accordion.Description>Specify the details of the learning process</Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
-                <Parameters parameters={parameters} />
+                <Parameters parameters={parameters} onChange={noop} />
             </Accordion.Content>
         </Accordion>
     );

@@ -7,7 +7,7 @@ import { View } from '@adobe/react-spectrum';
 
 import { ConfigurableParametersTaskChain } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { FineTuneParameters } from './fine-tune-parameters.component';
-import { LearningParameters } from './learning-parameters/learning-parameters.component';
+import { LearningParameters } from './learning-parameters.component';
 
 interface TrainingProps {
     trainFromScratch: boolean;
