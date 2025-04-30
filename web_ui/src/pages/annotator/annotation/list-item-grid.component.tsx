@@ -1,9 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { createContext, ReactNode, useContext, useState } from 'react';
+import { createContext, ReactNode, RefObject, useContext, useRef, useState } from 'react';
 
 import { Flex, FlexProps, Grid } from '@adobe/react-spectrum';
+import { useInteractOutside } from '@react-aria/interactions';
+import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import clsx from 'clsx';
 
 import classes from './list-item-grid.module.scss';
@@ -19,9 +21,34 @@ interface ListItemGridProps {
     onHoverStart: () => void;
 }
 
-const ListItemGridContext = createContext({ isHovered: false });
+interface ListItemGridContextProps {
+    isHovered: boolean;
+    setIsHovered: (isHovered: boolean) => void;
+}
+
+interface InteractOutsideProps {
+    containerRef: RefObject<HTMLElement | null>;
+    onClickOutside: () => void;
+}
+
+const ListItemGridContext = createContext<ListItemGridContextProps>({ isHovered: false, setIsHovered: () => {} });
 
 const useListItemGridContext = () => useContext(ListItemGridContext);
+
+const InteractOutside = ({ containerRef, onClickOutside }: InteractOutsideProps) => {
+    useInteractOutside({
+        ref: containerRef,
+        onInteractOutside: (event) => {
+            const target = event.target as Element;
+            if (containerRef.current?.contains(target)) {
+                return;
+            }
+            // add a timeout to ensure this executes after menu-related events are processed
+            setTimeout(onClickOutside, 0);
+        },
+    });
+    return <></>;
+};
 
 export const ListItemGrid = ({
     id,
@@ -58,7 +85,7 @@ export const ListItemGrid = ({
                 [classes.selectedAnnotation]: isSelected || isHovered || isDragging,
             })}
         >
-            <ListItemGridContext.Provider value={{ isHovered }}>
+            <ListItemGridContext.Provider value={{ isHovered, setIsHovered }}>
                 <Grid
                     justifyContent={'left'}
                     alignItems={'center'}
@@ -98,16 +125,21 @@ const Labels = ({ children, ...otherProps }: FlexProps) => {
 };
 
 const ListMenu = ({ children, ...otherProps }: FlexProps) => {
-    const { isHovered } = useListItemGridContext();
+    const containerRef = useRef<null>(null);
+    const unwrapContainerRef = useUnwrapDOMRef(containerRef);
+    const { isHovered, setIsHovered } = useListItemGridContext();
 
     if (!isHovered) {
         return <></>;
     }
 
     return (
-        <Flex {...otherProps} gridArea={'list-menu'}>
-            {children}
-        </Flex>
+        <>
+            <Flex {...otherProps} gridArea={'list-menu'} ref={containerRef}>
+                {children}
+            </Flex>
+            <InteractOutside containerRef={unwrapContainerRef} onClickOutside={() => setIsHovered(false)} />
+        </>
     );
 };
 

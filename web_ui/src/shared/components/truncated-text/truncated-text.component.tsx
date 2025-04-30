@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties } from 'react';
 
 import { SpectrumActionButtonProps, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { useStyleProps } from '@react-spectrum/utils';
@@ -9,7 +9,7 @@ import { StyleProps } from '@react-types/shared';
 import { PositionProps } from 'react-aria';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { ActionElement } from '../action-element/action-element.component';
+import { PressableElement } from '../pressable-element/pressable-element.component';
 
 const TruncatedTextStyles: CSSProperties = {
     display: 'block',
@@ -45,7 +45,7 @@ export const TruncatedText = ({ id, children, ...otherProps }: TruncatedTextProp
 type TruncatedTextWithTooltipProps = StyleProps &
     PositionProps &
     Omit<TruncatedTextProps, 'classes' | 'children'> &
-    Omit<SpectrumActionButtonProps, 'isQuiet'> & { children: ReactNode };
+    Omit<SpectrumActionButtonProps, 'isQuiet'>;
 
 //ActionElement stops event propagation https://github.com/adobe/react-spectrum/issues/2100
 export const TruncatedTextWithTooltip = ({
@@ -55,9 +55,9 @@ export const TruncatedTextWithTooltip = ({
 }: TruncatedTextWithTooltipProps): JSX.Element => {
     return (
         <TooltipTrigger placement={placement}>
-            <ActionElement {...others} isTruncated>
+            <PressableElement {...others} isTruncated>
                 {children}
-            </ActionElement>
+            </PressableElement>
             <Tooltip>{children}</Tooltip>
         </TooltipTrigger>
     );

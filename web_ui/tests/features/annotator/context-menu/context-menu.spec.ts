@@ -127,7 +127,10 @@ test.describe('Annotations context menu', () => {
 
         await openContextMenuAtTheCenterOfTheAnnotation(page, secondAnnotation.shape);
 
-        expect(await page.getByLabel('Annotation context menu').all()).toHaveLength(1);
+        const contextMenu = page.getByLabel('Annotation context menu');
+        await expect(contextMenu).toBeVisible();
+
+        expect(await contextMenu.all()).toHaveLength(1);
     });
 
     test.describe('Context menu actions', () => {

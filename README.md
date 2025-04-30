@@ -112,7 +112,6 @@ Intel® Geti™ can be installed:
 
 - [Using the Intel® Geti™ Installer](https://docs.geti.intel.com/docs/user-guide/getting-started/installation/using-geti-installer)
 - [Using Helm Charts](https://docs.geti.intel.com/docs/user-guide/getting-started/installation/using-helm-charts)
-- [Advanced Installation](https://docs.geti.intel.com/docs/user-guide/getting-started/installation/advanced-installation)
 
 ## 🏗️ High-level architecture
 

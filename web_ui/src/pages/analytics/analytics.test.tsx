@@ -3,6 +3,8 @@
 
 import { fireEvent, screen } from '@testing-library/react';
 
+import { Environment, GPUProvider } from '../../core/platform-utils/dto/utils.interface';
+import { createInMemoryPlatformUtilsService } from '../../core/platform-utils/services/create-in-memory-platform-utils-service';
 import { providersRender as render } from '../../test-utils/required-providers-render';
 import { Analytics } from './analytics.component';
 import { ExportServerType } from './downloadable-item.component';
@@ -17,7 +19,20 @@ describe('Analytics', () => {
     const SERVER_ITEM = { header: ExportServerType.SERVER_INFO };
 
     it('should display card for external analytics dashboard', async () => {
-        render(<Analytics />, { featureFlags: { IS_GRAFANA_ENABLED: true } });
+        const platformUtilsService = createInMemoryPlatformUtilsService();
+        platformUtilsService.getProductInfo = async () => {
+            return {
+                productVersion: '1.6.0',
+                grafanaEnabled: true,
+                gpuProvider: GPUProvider.INTEL,
+                buildVersion: '1.6.0.test.123123',
+                isSmtpDefined: true,
+                intelEmail: 'support@geti.com',
+                environment: Environment.ON_PREM,
+            };
+        };
+
+        render(<Analytics />, { services: { platformUtilsService } });
 
         expect(await screen.findByRole('button', { name: /go to analytics/i })).toBeInTheDocument();
     });

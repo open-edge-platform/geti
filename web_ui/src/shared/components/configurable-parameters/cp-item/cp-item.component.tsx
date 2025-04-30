@@ -5,8 +5,8 @@ import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react
 
 import { Alert } from '../../../../assets/icons';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { ActionElement } from '../../action-element/action-element.component';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
+import { PressableElement } from '../../pressable-element/pressable-element.component';
 import { ConfigParameterItemProp, ConfigurableParametersParams } from '../configurable-parameters.interface';
 import { CPEditableItem } from './cp-editable-item/cp-editable-item.component';
 import { CPStaticItem } from './cp-static-item/cp-static-item.component';
@@ -39,14 +39,14 @@ export const CPParamItem = ({ parameter, updateParameter }: CPParamItemProps): J
                 <Flex alignItems={'center'} gap={'size-100'}>
                     {warning && !isReadOnly ? (
                         <TooltipTrigger placement={'bottom'}>
-                            <ActionElement
+                            <PressableElement
                                 width={16}
                                 height={16}
                                 id={`${headerId}-warning-id`}
                                 UNSAFE_className={classes.configParameterTooltipButton}
                             >
                                 <Alert aria-label='Notification Alert' color='notice' />
-                            </ActionElement>
+                            </PressableElement>
                             <Tooltip>{warning}</Tooltip>
                         </TooltipTrigger>
                     ) : (

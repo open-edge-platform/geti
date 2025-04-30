@@ -6,9 +6,9 @@ import isNil from 'lodash/isNil';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { formatJobsCreationTime, isNonEmptyString, pluralize } from '../../../utils';
-import { ActionElement } from '../../action-element/action-element.component';
 import { DomainName } from '../../domain-name/domain-name.component';
-import { TruncatedTextWithTooltip } from '../../truncated-text/truncated-text.component';
+import { PressableElement } from '../../pressable-element/pressable-element.component';
+import { TruncatedText, TruncatedTextWithTooltip } from '../../truncated-text/truncated-text.component';
 import { getNameFromJob } from './utils';
 
 import classes from './jobs.module.scss';
@@ -91,9 +91,9 @@ export const JobsListItemMetadata = ({
             {cost && (
                 <View flex={1}>
                     <TooltipTrigger placement='bottom'>
-                        <ActionElement id={`job-scheduler-${jobId}-meta-cost`} isTruncated>
-                            {`Cost: ${pluralize(cost.requested, 'credit')} `}
-                        </ActionElement>
+                        <PressableElement id={`job-scheduler-${jobId}-meta-cost`}>
+                            <TruncatedText>{`Cost: ${pluralize(cost.requested, 'credit')} `}</TruncatedText>
+                        </PressableElement>
                         <Tooltip>
                             {`Credits requested: ${cost.requested}`}
                             <br />

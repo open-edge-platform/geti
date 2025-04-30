@@ -36,12 +36,6 @@ export const DEV_FEATURE_FLAGS = {
     FEATURE_FLAG_REQ_ACCESS: false,
     FEATURE_FLAG_TRAINING_FLOW_REVAMP: false,
 
-    // Grafana: User has a choice: either to install platform with grafana stack or no, if platform has grafana stack
-    // installed, we want to display button that redirects user to grafana page.
-    // TODO: I (@Dawid) proposed platform team to expose a new endpoint for flags that can be declared while platform
-    // installation, once they do it we can remove IS_GRAFANA_ENABLED from the feature flags.
-    IS_GRAFANA_ENABLED: true,
-
     // Only used for unit testing
     DEBUG: false,
 };

@@ -4,7 +4,7 @@
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
 import { Performance, PerformanceType, Score } from '../../../../../../../core/projects/task.interface';
-import { ActionElement } from '../../../../../../../shared/components/action-element/action-element.component';
+import { PressableElement } from '../../../../../../../shared/components/pressable-element/pressable-element.component';
 import { AccuracyHalfDonutChart } from '../../../../../../project-details/components/project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';
 
 interface ProjectPerformanceProps {
@@ -24,9 +24,9 @@ const ProjectPerformanceDetails = ({ score, title, id }: ProjectPerformanceDetai
 
     return (
         <TooltipTrigger placement={'bottom'}>
-            <ActionElement width={'100%'} height={'100%'}>
+            <PressableElement width={'100%'} height={'100%'}>
                 <AccuracyHalfDonutChart id={id} value={score.value} size={'S'} ariaLabel={title} />
-            </ActionElement>
+            </PressableElement>
             <Tooltip>{title}</Tooltip>
         </TooltipTrigger>
     );

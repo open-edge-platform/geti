@@ -108,9 +108,7 @@ export const ExportDatasetDialog = ({ triggerState, datasetName }: ExportDataset
     const { prepareExportDatasetJob } = useExportDataset(datasetName);
     const hasVideos = totalVideos > 0;
 
-    const matchFormats: ExportFormatDetails[] = AVAILABLE_FORMATS.filter(
-        ({ name }) => saveVideoFormat === SaveVideoFormat.IMAGES || isDatumaroFormat(name)
-    ).filter(({ domain }) => {
+    const availableDatasetFormats = AVAILABLE_FORMATS.filter(({ domain }) => {
         const filteredDomains = [...domain];
 
         return project.domains
@@ -118,7 +116,12 @@ export const ExportDatasetDialog = ({ triggerState, datasetName }: ExportDataset
             .every((currentDomain: DOMAIN) => filteredDomains.includes(currentDomain));
     });
 
-    const [exportFormat, setExportFormat] = useState<ExportFormats | undefined>(matchFormats.at(0)?.name);
+    // Only Datumaro supports exporting with native videos
+    const allowedFormats: ExportFormatDetails[] = availableDatasetFormats.filter(
+        ({ name }) => saveVideoFormat === SaveVideoFormat.IMAGES || isDatumaroFormat(name)
+    );
+
+    const [exportFormat, setExportFormat] = useState<ExportFormats | undefined>(allowedFormats.at(0)?.name);
 
     const handleClose = (): void => {
         if (prepareExportDatasetJob.isPending) {
@@ -127,7 +130,7 @@ export const ExportDatasetDialog = ({ triggerState, datasetName }: ExportDataset
 
         triggerState.close();
 
-        setExportFormat(matchFormats[0]?.name);
+        setExportFormat(allowedFormats.at(0)?.name);
     };
 
     const handleExport = () => {
@@ -190,14 +193,12 @@ export const ExportDatasetDialog = ({ triggerState, datasetName }: ExportDataset
                                 value={exportFormat}
                                 onChange={(format: string) => setExportFormat(format as ExportFormats)}
                             >
-                                {AVAILABLE_FORMATS.map(({ name, description }: ExportFormatDetails) => {
+                                {availableDatasetFormats.map(({ name, description }: ExportFormatDetails) => {
+                                    const isDisabled = !allowedFormats.some((format) => format.name === name);
+
                                     return (
                                         <TooltipTrigger key={name}>
-                                            <Radio
-                                                value={name}
-                                                aria-label={name}
-                                                isDisabled={!matchFormats.some((format) => format.name === name)}
-                                            >
+                                            <Radio value={name} aria-label={name} isDisabled={isDisabled}>
                                                 {formatToLabel(name)}
                                             </Radio>
                                             <Tooltip>{description}</Tooltip>
