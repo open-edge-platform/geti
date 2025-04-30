@@ -32,7 +32,7 @@ export const AnomalyProjectsNotification = () => {
                 addNotification({
                     message: 'Training has started',
                     type: NOTIFICATION_TYPE.DEFAULT,
-                    dismiss: { duration: 0 }, //0 will act as infinite duration
+                    dismiss: { duration: 0 }, // We dont want the notification to be dismissed automatically
                     actionButtons: [
                         <QuietToggleButton
                             key={'open-train-model'}

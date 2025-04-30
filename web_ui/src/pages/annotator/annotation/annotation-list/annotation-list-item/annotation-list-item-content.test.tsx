@@ -241,8 +241,8 @@ describe('Annotations list item content', () => {
 
         const labelText = screen.getByText(mockedLongLabels[0].name);
 
-        expect(labelText.parentNode).toHaveStyle('text-overflow: ellipsis');
-        expect(labelText.parentNode).toHaveStyle('max-width: 200px');
+        expect(labelText).toHaveStyle('text-overflow: ellipsis');
+        expect(labelText).toHaveStyle('max-width: 200px');
     });
 
     it('displays a thumbnail for task chain classification tasks', async () => {

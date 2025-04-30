@@ -7,7 +7,7 @@ import { View } from '@adobe/react-spectrum';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { DatabaseIcon, LogsIcon, MetricsIcon, TracesIcon } from '../../assets/icons';
-import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
+import { usePlatformUtils } from '../../core/platform-utils/hooks/use-platform-utils.hook';
 import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';
 import { AnalyticsDashboardCard } from './analytics-dashboard-card.component';
@@ -16,7 +16,9 @@ import { ExportAnalyticsType } from './export-logs.component';
 
 export const Analytics = (): JSX.Element => {
     const { router } = useApplicationServices();
-    const { IS_GRAFANA_ENABLED } = useFeatureFlags();
+    const { useProductInfo } = usePlatformUtils();
+    const productInfo = useProductInfo();
+    const isGrafanaEnabled = productInfo.data?.grafanaEnabled;
 
     const ITEMS: ComponentProps<typeof DownloadableItem>[] = useMemo(() => {
         return [
@@ -54,7 +56,7 @@ export const Analytics = (): JSX.Element => {
 
     return (
         <View>
-            {IS_GRAFANA_ENABLED && <AnalyticsDashboardCard />}
+            {isGrafanaEnabled && <AnalyticsDashboardCard />}
             <View marginStart={'size-75'} width={'size-6000'}>
                 <AnimatePresence>
                     {ITEMS.map((item, index) => (

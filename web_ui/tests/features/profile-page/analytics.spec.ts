@@ -8,7 +8,20 @@ test.describe('Account page - analytics tab', () => {
     const accountAnalyticsUrl = ACCOUNT_URL('5b1f89f3-aba5-4a5f-84ab-de9abb8e0633', 'analytics');
     const tabs = ['metrics', 'traces', 'logs'];
 
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ page, registerApiResponse }) => {
+        registerApiResponse('GetProductInfo', (_, res, ctx) => {
+            return res(
+                ctx.json({
+                    'product-version': '2.9.0',
+                    'build-version': '2.9.0-test-20250428191218',
+                    'smtp-defined': 'True',
+                    'intel-email': 'Geti.Team@intel.com',
+                    grafana_enabled: true,
+                    environment: 'on-prem',
+                    'gpu-provider': 'intel',
+                })
+            );
+        });
         await page.goto(accountAnalyticsUrl);
     });
 

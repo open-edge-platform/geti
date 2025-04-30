@@ -17,9 +17,9 @@ import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { filterGroups } from '../../../../../core/labels/utils';
 import { newLabelNameSchema } from '../../../../../pages/create-project/components/utils';
 import { isYupValidationError } from '../../../../../pages/user-management/profile-page/utils';
-import { ActionElement } from '../../../action-element/action-element.component';
 import { Button } from '../../../button/button.component';
 import { LimitedTextField } from '../../../limited-text-field/limited-text-field.component';
+import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { ValidationErrorMsg } from '../../../validation-error-msg/validation-error-msg.component';
 import { getNewGroup } from '../../utils';
 import { MULTIPLE_SELECTION_SWITCH_TOOLTIP, NEW_GROUP_FIELD_TOOLTIP } from './utils';
@@ -117,11 +117,11 @@ export const GroupCreation = ({
                             </TooltipTrigger>
                         </Flex>
                         <TooltipTrigger placement={'top'}>
-                            <ActionElement>
+                            <PressableElement>
                                 <Text UNSAFE_style={{ whiteSpace: 'nowrap' }} key={'multiple-selection-text'}>
                                     Multiple selection
                                 </Text>
-                            </ActionElement>
+                            </PressableElement>
                             <Tooltip>{MULTIPLE_SELECTION_SWITCH_TOOLTIP}</Tooltip>
                         </TooltipTrigger>
                         <TooltipTrigger placement={'top'}>

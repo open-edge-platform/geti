@@ -143,3 +143,4 @@ export { ReactComponent as LeftClick } from './left-click.svg';
 export { ReactComponent as RightClick } from './right-click.svg';
 export { ReactComponent as JointConnection } from './joint-connection.svg';
 export { ReactComponent as LineMappingLight } from './line-mapping-light.svg';
+export { ReactComponent as AlertOutlined } from './alert-outlined.svg';

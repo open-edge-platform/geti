@@ -1,0 +1,24 @@
+.optionButton {
+    border-radius: 0;
+}
+
+.offMode {
+    border-right-color: transparent !important;
+}
+
+.adaptiveMode {
+    border-right-color: transparent !important;
+    border-left-color: transparent !important;
+}
+
+.manualMode {
+    border-left-color: transparent !important;
+}
+
+.title {
+    white-space: nowrap;
+}
+
+.tilingModeDescription {
+    color: var(--spectrum-global-color-gray-700);
+}

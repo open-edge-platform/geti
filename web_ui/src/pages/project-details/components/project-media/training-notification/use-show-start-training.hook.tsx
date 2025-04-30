@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 
 import { OverlayTriggerState } from '@react-stately/overlays';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { CREDIT_COST_PER_IMAGE_OR_VIDEO } from '../../../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../../../core/credits/hooks/use-credits-api.hook';
@@ -11,8 +12,10 @@ import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-fea
 import { Label } from '../../../../../core/labels/label.interface';
 import { isAnomalous, isExclusive } from '../../../../../core/labels/utils';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
+import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
+import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { MEDIA_CONTENT_BUCKET } from '../../../../../providers/media-upload-provider/media-upload.interface';
@@ -65,7 +68,9 @@ export const useShowStartTraining = (trainModelDialogState: OverlayTriggerState)
     const startTrainingRef = useRef('');
     const { useGetOrganizationBalanceQuery } = useCreditsQueries();
     const { organizationId } = useOrganizationIdentifier();
+    const projectIdentifier = useProjectIdentifier();
     const { addNotification, removeNotification } = useNotification();
+    const queryClient = useQueryClient();
 
     const enabled = isSingleDomainProject(isAnomalyDomain);
     const anomalousLabelQuery = useMediaQueryForLabel(enabled, labels.find(isAnomalous));
@@ -125,9 +130,14 @@ export const useShowStartTraining = (trainModelDialogState: OverlayTriggerState)
                 ],
             });
         }
+
+        // After uploading media, we need to verify if the project is ready to be trained
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.PROJECT_STATUS_KEY(projectIdentifier) });
     }, [
         addNotification,
         moreImagesNeeded,
+        projectIdentifier,
+        queryClient,
         removeNotification,
         showNotification,
         showStartTraining,
