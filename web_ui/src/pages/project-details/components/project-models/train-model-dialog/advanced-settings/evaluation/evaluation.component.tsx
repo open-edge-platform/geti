@@ -12,8 +12,8 @@ import {
 } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { Accordion } from '../ui/accordion/accordion.component';
 import { NumberParameter } from '../ui/number-parameter.component';
-import { OptionsButtons } from '../ui/options-buttons/options-buttons.component';
 import { ResetButton } from '../ui/reset-button.component';
+import { ToggleButtons } from '../ui/toggle-buttons/toggle-buttons.component';
 import { Tooltip } from '../ui/tooltip.component';
 
 import styles from './evaluation.module.scss';
@@ -58,7 +58,7 @@ const ConfidenceThreshold: FC<ConfidenceThresholdProps> = ({
                 Confidence threshold <ConfidenceThresholdTooltip />
             </Text>
             <View>
-                <OptionsButtons
+                <ToggleButtons
                     options={[CONFIDENCE_THRESHOLD_MODE.RESULT_BASED, CONFIDENCE_THRESHOLD_MODE.MANUAL]}
                     selectedOption={confidenceThresholdMode}
                     onOptionChange={onConfidenceThresholdModeChange}
