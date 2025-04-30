@@ -7,7 +7,6 @@
 
 import logging
 from os import path as osp
-from typing import TYPE_CHECKING
 
 from sc_sdk.entities.image import Image
 from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
@@ -17,9 +16,6 @@ from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperBackward, IMapp
 from .id_mapper import IDToMongo
 from .primitive_mapper import DatetimeToMongo
 from geti_types import ImageIdentifier, MediaIdentifierEntity, MediaType, VideoFrameIdentifier, VideoIdentifier
-
-if TYPE_CHECKING:
-    from bson import ObjectId
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +32,7 @@ class ImageIdentifierToMongo(IMapperSimple[ImageIdentifier, dict]):
 
     @staticmethod
     def backward(instance: dict) -> ImageIdentifier:
-        media_id: ObjectId | str = instance.get("media_id", "")
+        media_id = instance.get("media_id", "")
         return ImageIdentifier(image_id=IDToMongo.backward(media_id))
 
 
