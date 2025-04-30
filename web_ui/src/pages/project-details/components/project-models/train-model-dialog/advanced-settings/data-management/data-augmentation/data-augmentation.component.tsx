@@ -3,7 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 import { DataAugmentationOption, DataAugmentationOptions } from './data-augmentation-options.component';
 
 const OPTIONS: DataAugmentationOption[] = [
