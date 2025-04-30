@@ -6,7 +6,7 @@ import { FC, useState } from 'react';
 import { Content, ContextualHelp, Flex, Text } from '@adobe/react-spectrum';
 
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 
 const RemovingDuplicatesTooltip: FC = () => {
     return (

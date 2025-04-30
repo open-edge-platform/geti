@@ -3,10 +3,9 @@
 
 import { FC } from 'react';
 
-import { Content, ContextualHelp, Flex, Text } from '@adobe/react-spectrum';
-import clsx from 'clsx';
+import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
 
-import { Button } from '../../../../../../../../shared/components/button/button.component';
+import { OptionsButtons } from '../../ui/options-buttons/options-buttons.component';
 
 import styles from './tiling.module.scss';
 
@@ -29,32 +28,6 @@ const TilingModeTooltip: FC = () => {
     );
 };
 
-interface TilingModeButtonProps {
-    tilingMode: TILING_MODES;
-    selectedTilingMode: TILING_MODES;
-    onTilingModeChange: (mode: TILING_MODES) => void;
-    className: string | undefined;
-}
-
-const TilingModeButton: FC<TilingModeButtonProps> = ({
-    tilingMode,
-    selectedTilingMode,
-    onTilingModeChange,
-    className,
-}) => {
-    return (
-        <Button
-            variant={selectedTilingMode === tilingMode ? 'accent' : 'secondary'}
-            UNSAFE_className={clsx(styles.optionButton, className)}
-            onPress={() => {
-                onTilingModeChange(tilingMode);
-            }}
-        >
-            {tilingMode}
-        </Button>
-    );
-};
-
 interface TilingModesProps {
     selectedTilingMode: TILING_MODES;
     onTilingModeChange: (tilingMode: TILING_MODES) => void;
@@ -63,29 +36,14 @@ interface TilingModesProps {
 export const TilingModes: FC<TilingModesProps> = ({ selectedTilingMode, onTilingModeChange }) => {
     return (
         <>
-            <Text UNSAFE_className={styles.title} gridColumn={'1/2'}>
+            <Text UNSAFE_className={styles.title} width={'size-3000'}>
                 Tiling mode <TilingModeTooltip />
             </Text>
-            <Flex gridColumn={'2/3'}>
-                <TilingModeButton
-                    tilingMode={TILING_MODES.OFF}
-                    selectedTilingMode={selectedTilingMode}
-                    onTilingModeChange={onTilingModeChange}
-                    className={selectedTilingMode === TILING_MODES.Adaptive ? styles.offMode : undefined}
-                />
-                <TilingModeButton
-                    tilingMode={TILING_MODES.Adaptive}
-                    selectedTilingMode={selectedTilingMode}
-                    onTilingModeChange={onTilingModeChange}
-                    className={selectedTilingMode !== TILING_MODES.Adaptive ? styles.adaptiveMode : undefined}
-                />
-                <TilingModeButton
-                    tilingMode={TILING_MODES.Manual}
-                    selectedTilingMode={selectedTilingMode}
-                    onTilingModeChange={onTilingModeChange}
-                    className={selectedTilingMode === TILING_MODES.Adaptive ? styles.manualMode : undefined}
-                />
-            </Flex>
+            <OptionsButtons
+                options={[TILING_MODES.OFF, TILING_MODES.Adaptive, TILING_MODES.Manual]}
+                selectedOption={selectedTilingMode}
+                onOptionChange={onTilingModeChange}
+            />
         </>
     );
 };

@@ -4,14 +4,12 @@
 import { FC, ReactNode, useState } from 'react';
 
 import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import noop from 'lodash/noop';
 
-import {
-    ConfigurableParametersComponents,
-    NumberGroupParams,
-} from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { Accordion } from '../../accordion/accordion.component';
+import { ConfigurableParametersComponents } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { Accordion } from '../../ui/accordion/accordion.component';
+import { Parameters } from '../../ui/parameters.component';
 import { TILING_MODES, TilingModes } from './tiling-modes.component';
-import { TilingOptions } from './tiling-options.component';
 
 import styles from './tiling.module.scss';
 
@@ -37,11 +35,10 @@ const getTilingMode = (tilingParameters: ConfigurableParametersComponents): TILI
 export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
     const [selectedTilingMode, setSelectedTilingMode] = useState<TILING_MODES>(() => getTilingMode(tilingParameters));
 
-    const manualTilingParameters = (tilingParameters.parameters?.filter(
-        (parameter) =>
-            !['enable_adaptive_params', 'enable_tiling'].includes(parameter.name) &&
-            ['integer', 'float'].includes(parameter.dataType)
-    ) ?? []) as NumberGroupParams[];
+    const manualTilingParameters =
+        tilingParameters.parameters?.filter(
+            (parameter) => !['enable_adaptive_params', 'enable_tiling'].includes(parameter.name)
+        ) ?? [];
 
     const TILING_MODE_COMPONENTS: Record<TILING_MODES, ReactNode> = {
         [TILING_MODES.OFF]: (
@@ -58,7 +55,11 @@ export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
                 annotations size.
             </View>
         ),
-        [TILING_MODES.Manual]: <TilingOptions parameters={manualTilingParameters} />,
+        [TILING_MODES.Manual]: (
+            <View gridColumn={'1/-1'}>
+                <Parameters parameters={manualTilingParameters} onChange={noop} />
+            </View>
+        ),
     };
 
     return (
@@ -73,7 +74,7 @@ export const Tiling: FC<TilingProps> = ({ tilingParameters }) => {
                 </Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
                 <Grid
-                    columns={['max-content', minmax('size-3400', '1fr'), 'size-400']}
+                    columns={['size-3000', minmax('size-3400', '1fr'), 'size-400']}
                     gap={'size-300'}
                     alignItems={'center'}
                 >
