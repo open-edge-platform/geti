@@ -16,6 +16,10 @@
     .accordionTag {
         margin-left: var(--spectrum-global-dimension-size-100);
     }
+
+    .warning {
+        margin-left: auto;
+    }
 }
 
 .accordionContent {
@@ -27,4 +31,13 @@
     color: var(--spectrum-global-color-static-black);
     background-color: var(--energy-blue);
     font-size: var(--spectrum-global-dimension-static-font-size-75);
+}
+
+.accordionDescription {
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.warning {
+    font-size: var(--spectrum-global-dimension-static-font-size-75);
+    color: var(--spectrum-global-color-gray-600);
 }
