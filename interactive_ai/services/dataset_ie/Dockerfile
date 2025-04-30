@@ -28,7 +28,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 FROM base AS runtime
 
-RUN useradd -l -u 10001 non-root && \
+# Install ffmpeg
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 && \
+    rm -rf /var/lib/apt/lists/* && \
+    useradd -l -u 10001 non-root && \
 	pip3 uninstall -y setuptools pip wheel && \
     rm -rf /root/.cache/pip
 
