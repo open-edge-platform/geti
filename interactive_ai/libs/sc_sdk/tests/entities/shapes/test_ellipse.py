@@ -19,7 +19,6 @@ from sc_sdk.entities.shapes import Ellipse, Rectangle
 from sc_sdk.utils.time_utils import now
 
 
-@pytest.mark.ScSdkComponent
 class TestEllipse:
     modification_date = now()
 

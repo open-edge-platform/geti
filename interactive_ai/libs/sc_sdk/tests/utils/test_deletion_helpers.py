@@ -49,7 +49,6 @@ from tests.test_helpers import TestProject
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestDeletionHelpers:
     def test_delete_image_entity(self, project_with_data: TestProject) -> None:
         """

@@ -2,15 +2,12 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import copy
 
-import pytest
-
 from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
 from sc_sdk.repos import AnnotationSceneStateRepo
 
 from geti_types import ID, ImageIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotationSceneStateRepo:
     def test_annotation_scene_state_repo(self, fxt_mongo_id, request, fxt_dataset_storage_identifier) -> None:
         """

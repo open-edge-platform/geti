@@ -46,7 +46,6 @@ def test_natural_sort_label_id(id_val: str, target_class):
         assert natural_sort_label_id(target) == [id_val]
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelSchemaEntity:
     def test_label_tree(self, label_schema_example):
         """
@@ -140,7 +139,6 @@ class Labels:
 labels = Labels()
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelGroup:
     def test_label_group_initialization(self):
         """
@@ -246,7 +244,6 @@ class Edges:
 edges = Edges()
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelTree:
     @staticmethod
     def label_tree_no_children() -> LabelTree:
@@ -836,7 +833,6 @@ class TestLabelTree:
         assert not isinstance(label_tree, str)
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelSchemaGroupEntity:
     @staticmethod
     def label_groups() -> list:
@@ -1247,7 +1243,6 @@ class TestLabelSchemaGroupEntity:
         assert not label_schema_entity.get_group_containing_label(labels.label_0_1_3)
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelSchema:
     def test_labelschema_equality(self, fxt_label_schema_example) -> None:
         """
@@ -1404,7 +1399,6 @@ class TestLabelSchema:
         assert edges == expected_edges
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelSchemaView:
     def test_label_schema_view_creation(self, fxt_label_schema_example) -> None:
         """

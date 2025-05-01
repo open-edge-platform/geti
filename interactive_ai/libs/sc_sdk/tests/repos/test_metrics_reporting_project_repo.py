@@ -1,14 +1,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
 from sc_sdk.utils.deletion_helpers import DeletionHelpers
 from sc_sdk.utils.project_factory import ProjectFactory
 
 
-@pytest.mark.ScSdkComponent
 class TestMetricsReportingProjectRepo:
     def test_count_all_projects(
         self,

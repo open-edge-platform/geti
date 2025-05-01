@@ -19,7 +19,6 @@ def fxt_video_cache():
     VideoCache._instance = None
 
 
-@pytest.mark.ScSdkComponent
 class TestVideoCache:
     def test_get_or_load(self, fxt_video_cache, fxt_dataset_storage_identifier, fxt_ote_id) -> None:
         load_fn_call_count = 0
@@ -102,7 +101,6 @@ class TestVideoCache:
         assert load_fn_call_count == 2
 
 
-@pytest.mark.ScSdkComponent
 class TestVideoRepo:
     def test_get_by_id(self, request, fxt_dataset_storage_identifier) -> None:
         video_repo = VideoRepo(fxt_dataset_storage_identifier)

@@ -114,9 +114,11 @@ const AppProviders = (): JSX.Element => {
                         <LastLoginNotification />
                         <TusUploadProvider>
                             <MediaUploadProvider>
-                                <Outlet />
-                                {FEATURE_FLAG_CREDIT_SYSTEM && isSaaS && <WelcomeTrialModal />}
-                                {!isSaaS && <LicenseModal />}
+                                <ProjectsImportProvider>
+                                    <Outlet />
+                                    {FEATURE_FLAG_CREDIT_SYSTEM && isSaaS && <WelcomeTrialModal />}
+                                    {!isSaaS && <LicenseModal />}
+                                </ProjectsImportProvider>
                             </MediaUploadProvider>
                         </TusUploadProvider>
                     </OrganizationsContext>
@@ -263,14 +265,7 @@ export const appRoutes = () => {
 
                     {/* Landing page */}
                     <Route path={paths.root.pattern} element={<LandingPageLayout />}>
-                        <Route
-                            path={paths.workspace.pattern}
-                            element={
-                                <ProjectsImportProvider>
-                                    <IndexRoute />
-                                </ProjectsImportProvider>
-                            }
-                        />
+                        <Route path={paths.workspace.pattern} element={<IndexRoute />} />
                         <Route path={paths.account.index.pattern}>
                             <Route element={<RedirectToUsersProfile />} index />
                             <Route path={paths.account.profile.pattern} element={<UserManagementRoute />} />

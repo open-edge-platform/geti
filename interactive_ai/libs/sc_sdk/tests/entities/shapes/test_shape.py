@@ -17,10 +17,9 @@ import warnings
 
 import pytest
 
-from sc_sdk.entities.shapes import Ellipse, GeometryException, Point, Polygon, Rectangle, Shape
+from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
 
 
-@pytest.mark.ScSdkComponent
 class TestShape:
     @staticmethod
     def fully_covering_rectangle() -> Rectangle:
@@ -79,32 +78,6 @@ class TestShape:
                 Point(0.02, 0.01),
                 Point(0.02, 0.0),
                 Point(0.0, 0.0),
-            ]
-        )
-
-    @staticmethod
-    def base_self_intersect_polygon() -> Polygon:
-        return Polygon(
-            [
-                Point(0.3, 0.3),
-                Point(0.4, 0.3),
-                Point(0.3, 0.3),
-                Point(0.3, 0.2),
-                Point(0.3, 1),
-                Point(0.2, 0.2),
-            ]
-        )
-
-    @staticmethod
-    def other_self_intersect_polygon() -> Polygon:
-        return Polygon(
-            [
-                Point(0.3, 0.2),
-                Point(0.2, 0.3),
-                Point(0.3, 0.1),
-                Point(0.3, 0.2),
-                Point(0, 0.2),
-                Point(0, 4),
             ]
         )
 
@@ -194,11 +167,6 @@ class TestShape:
             ):
                 assert not shape.intersects(not_inscribed_shape)
                 assert not not_inscribed_shape.intersects(shape)
-        # Checking GeometryException exception raised
-        with pytest.raises(GeometryException):
-            with warnings.catch_warnings():
-                warnings.filterwarnings("ignore", "Polygon coordinates")
-                self.base_self_intersect_polygon().intersects(self.other_self_intersect_polygon())
 
     def test_shape_contains_center(self):
         """

@@ -20,6 +20,7 @@ class FeatureFlag(Enum):
     FEATURE_FLAG_RETAIN_TRAINING_ARTIFACTS = auto()
     FEATURE_FLAG_STORAGE_SIZE_COMPUTATION = auto()
     FEATURE_FLAG_CREDIT_SYSTEM = auto()
+    FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS = auto()
 
 
 class FeatureFlagProvider:

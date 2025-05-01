@@ -53,7 +53,6 @@ def do_nothing(self, *args, **kwargs) -> None:
     return None
 
 
-@pytest.mark.ScSdkComponent
 class TestS3Connector:
     def test_get_clients_on_prem(self, fxt_s3_env_vars_on_prem, fxt_clear_s3_connector_cache) -> None:
         with (
@@ -118,10 +117,16 @@ class TestS3Connector:
             patch.object(Minio, "__init__", return_value=None),
             patch.object(Minio, "__del__", return_value=None),
             patch.object(IamAwsProvider, "__init__", return_value=None),
-            patch("os.getpid", side_effect=[PID_1, PID_1, PID_2]),
+            patch("os.getpid", return_value=PID_1),
         ):
             client_1_1, _ = S3Connector.get_clients()
             client_1_2, _ = S3Connector.get_clients()
+        with (
+            patch.object(Minio, "__init__", return_value=None),
+            patch.object(Minio, "__del__", return_value=None),
+            patch.object(IamAwsProvider, "__init__", return_value=None),
+            patch("os.getpid", return_value=PID_2),
+        ):
             client_2, _ = S3Connector.get_clients()
 
         assert client_1_1 == client_1_2

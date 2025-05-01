@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions
 # and limitations under the License.
 
-import pytest
 
 from sc_sdk.entities.label import Domain, Label
 from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
@@ -20,7 +19,6 @@ from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestScoredLabel:
     def test_scored_label(self):
         """

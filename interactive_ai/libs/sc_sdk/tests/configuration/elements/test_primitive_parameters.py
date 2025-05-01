@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 from attr import _make, validators
 
 from sc_sdk.configuration.elements.configurable_enum import ConfigurableEnum
@@ -20,7 +19,6 @@ from sc_sdk.configuration.ui_rules import NullUIRules, Rule, UIRules
 from tests.configuration.dummy_config import SomeEnumSelectable
 
 
-@pytest.mark.ScSdkComponent
 class TestPrimitiveParameters:
     ui_rules = UIRules(rules=[Rule(parameter="rule parameter", value=1)])
 

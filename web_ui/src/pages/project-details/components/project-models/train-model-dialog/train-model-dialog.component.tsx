@@ -50,6 +50,9 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
         isTaskChainProject,
         isReshufflingSubsetsEnabled,
         changeReshufflingSubsetsEnabled,
+        configParameters,
+        changeTrainFromScratch,
+        trainFromScratch,
     } = useTrainModelState();
 
     const { canTrainModel, numberOfRequiredAnnotations } = isAllowedToTrainModel(selectedTask);
@@ -80,7 +83,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
             <Heading>Train Model</Heading>
             <Divider />
             <Content>
-                {isBasicMode ? (
+                {isBasicMode || configParameters === undefined ? (
                     <TrainModelBasic
                         selectedTask={selectedTask}
                         tasks={tasks}
@@ -93,6 +96,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                     />
                 ) : (
                     <AdvancedSettings
+                        configParameters={configParameters}
                         selectedTask={selectedTask}
                         tasks={tasks}
                         onTaskChange={changeTask}
@@ -103,6 +107,8 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                         activeModelTemplateId={activeModelTemplateId}
                         isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
                         onReshufflingSubsetsEnabledChange={changeReshufflingSubsetsEnabled}
+                        trainFromScratch={trainFromScratch}
+                        onTrainFromScratchChange={changeTrainFromScratch}
                     />
                 )}
             </Content>

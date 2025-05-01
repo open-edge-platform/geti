@@ -1,12 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
 
 
-@pytest.mark.ScSdkComponent
 class TestModelConfiguration:
     def test_model_configuration(self):
         mc = DefaultModelParameters()

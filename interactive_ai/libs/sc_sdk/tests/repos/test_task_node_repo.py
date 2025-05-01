@@ -4,8 +4,6 @@
 #
 
 
-import pytest
-
 from sc_sdk.entities.task_node import NullTaskNode
 from sc_sdk.repos import TaskNodeRepo
 from sc_sdk.repos.mappers.mongodb_mappers.task_node_mapper import TaskNodeToMongo
@@ -13,7 +11,6 @@ from sc_sdk.repos.mappers.mongodb_mappers.task_node_mapper import TaskNodeToMong
 from geti_types import ProjectIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestTaskNodeRepo:
     def test_task_node_repo(self, fxt_ote_id) -> None:
         project_identifier = ProjectIdentifier(workspace_id=fxt_ote_id(1), project_id=fxt_ote_id(2))

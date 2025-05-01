@@ -12,7 +12,6 @@ from sc_sdk.configuration.enums.model_lifecycle import ModelLifecycle
 from tests.configuration.dummy_config import DatasetManagerConfig, SomeEnumSelectable
 
 
-@pytest.mark.ScSdkComponent
 class TestConfigurationHelper:
     @staticmethod
     def __get_path_to_file(filename: str):

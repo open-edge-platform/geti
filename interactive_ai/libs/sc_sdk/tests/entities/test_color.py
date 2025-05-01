@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.entities.color import Color
 
@@ -18,7 +17,6 @@ color_hex = f"{red_hex}{green_hex}{blue_hex}"
 color = Color.from_hex_str(color_hex)
 
 
-@pytest.mark.ScSdkComponent
 class TestColor:
     def test_color(self):
         """

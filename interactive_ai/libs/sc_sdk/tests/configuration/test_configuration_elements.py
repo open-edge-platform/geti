@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
 from sc_sdk.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
@@ -10,7 +9,6 @@ from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestConfigurationElements:
     def test_configurations_entity_identifier(self) -> None:
         """

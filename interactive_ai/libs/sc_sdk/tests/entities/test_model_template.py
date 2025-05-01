@@ -96,7 +96,6 @@ class CommonMethods:
         assert model.is_default_for_task == expected_values.get("is_default_for_task", False)
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetRequirements:
     def test_datasetrequirements(self):
         """
@@ -115,7 +114,6 @@ class TestDatasetRequirements:
         assert test_dataset_requirements != other_test_dataset_requirements
 
 
-@pytest.mark.ScSdkComponent
 class TestExportableCodePaths:
     def test_exportablecodepaths(self):
         """
@@ -133,7 +131,6 @@ class TestExportableCodePaths:
         assert exportable_code_paths != unequal_exportable_code_paths
 
 
-@pytest.mark.ScSdkComponent
 class TestTaskType:
     def test_tasktype_to_label_domain(self):
         """
@@ -166,7 +163,6 @@ class TestTaskType:
                 task_type_to_label_domain(not_mapped_task)
 
 
-@pytest.mark.ScSdkComponent
 class TestHyperParameterData:
     @staticmethod
     def get_path_to_file(filename: str) -> str:
@@ -428,7 +424,6 @@ class TestHyperParameterData:
         remove(model_template_path)
 
 
-@pytest.mark.ScSdkComponent
 class TestDependency:
     @staticmethod
     def dependency_parameters() -> dict:
@@ -497,7 +492,6 @@ class TestDependency:
                 )
 
 
-@pytest.mark.ScSdkComponent
 class TestEntryPoints:
     def test_entrypoints(self):
         """
@@ -549,7 +543,6 @@ class TestEntryPoints:
                 )
 
 
-@pytest.mark.ScSdkComponent
 class TestModelCategory:
     def test_model_category(self):
         """
@@ -573,7 +566,6 @@ class TestModelCategory:
         assert str(ModelCategory.OTHER) == "OTHER"
 
 
-@pytest.mark.ScSdkComponent
 class TestModelTemplate:
     @staticmethod
     def default_model_parameters() -> dict:
@@ -857,7 +849,6 @@ class TestModelTemplate:
             )
 
 
-@pytest.mark.ScSdkComponent
 class TestNullModelTemplate:
     def test_null_mode_attributes(self):
         """
@@ -878,7 +869,6 @@ class TestNullModelTemplate:
         CommonMethods.check_model_attributes(null_model_template, expected_null_model_parameters)
 
 
-@pytest.mark.ScSdkComponent
 class TestTaskTypesConstants:
     def test_task_type_constants(self):
         """
@@ -908,7 +898,6 @@ class TestTaskTypesConstants:
         )
 
 
-@pytest.mark.ScSdkComponent
 class TestParseModelTemplate:
     def test_parse_model_template_from_omegaconf(self):
         """

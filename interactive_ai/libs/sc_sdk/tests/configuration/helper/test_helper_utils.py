@@ -19,7 +19,6 @@ from sc_sdk.configuration.helper.utils import (
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestUtilsFunctions:
     def test_utils_search_in_config_dict_inner(self):
         """

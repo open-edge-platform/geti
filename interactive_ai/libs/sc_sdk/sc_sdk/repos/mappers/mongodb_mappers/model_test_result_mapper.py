@@ -10,7 +10,7 @@ from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 from sc_sdk.repos.mappers.mongodb_mappers.metrics_mapper import PerformanceToMongo
 from sc_sdk.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
 
-from geti_types import ProjectIdentifier
+from geti_types import ID, ProjectIdentifier
 
 
 class ModelTestResultToMongo(IMapperSimple[ModelTestResult, dict]):
@@ -43,12 +43,12 @@ class ModelTestResultToMongo(IMapperSimple[ModelTestResult, dict]):
 
         ground_truth_dataset_id_ = instance.get("ground_truth_dataset_id", None)
         ground_truth_dataset_id = (
-            IDToMongo.backward(ground_truth_dataset_id_) if ground_truth_dataset_id_ is not None else None
+            IDToMongo.backward(ground_truth_dataset_id_) if ground_truth_dataset_id_ is not None else ID()
         )
 
         prediction_dataset_id_ = instance.get("prediction_dataset_id", None)
         prediction_dataset_id = (
-            IDToMongo.backward(prediction_dataset_id_) if prediction_dataset_id_ is not None else None
+            IDToMongo.backward(prediction_dataset_id_) if prediction_dataset_id_ is not None else ID()
         )
 
         return ModelTestResult(

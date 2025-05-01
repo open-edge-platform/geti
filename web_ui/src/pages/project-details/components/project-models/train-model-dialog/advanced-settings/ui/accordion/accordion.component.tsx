@@ -3,8 +3,10 @@
 
 import { ComponentProps, FC, ReactNode } from 'react';
 
-import { Disclosure, DisclosurePanel, DisclosureTitle, Divider, View } from '@adobe/react-spectrum';
+import { Disclosure, DisclosurePanel, DisclosureTitle, Divider, Flex, Text, View } from '@adobe/react-spectrum';
 import clsx from 'clsx';
+
+import { AlertOutlined } from '../../../../../../../../assets/icons';
 
 import styles from './accordion.module.scss';
 
@@ -36,6 +38,19 @@ const AccordionDivider: FC<Omit<ComponentProps<typeof Divider>, 'size'>> = (prop
     return <Divider size={'S'} {...props} />;
 };
 
+const AccordionDescription: FC<{ children: ReactNode }> = ({ children }) => {
+    return <Text UNSAFE_className={styles.accordionDescription}>{children}</Text>;
+};
+
+const AccordionWarning: FC<{ children: ReactNode }> = ({ children }) => {
+    return (
+        <Flex alignItems={'center'} gap={'size-100'} UNSAFE_className={styles.warning}>
+            <AlertOutlined />
+            {children}
+        </Flex>
+    );
+};
+
 export const Accordion = ({ UNSAFE_className, ...props }: DisclosureProps) => {
     return <Disclosure isQuiet {...props} UNSAFE_className={clsx(UNSAFE_className, styles.accordion)} />;
 };
@@ -44,3 +59,5 @@ Accordion.Title = AccordionTitle;
 Accordion.Content = AccordionContent;
 Accordion.Tag = AccordionTag;
 Accordion.Divider = AccordionDivider;
+Accordion.Description = AccordionDescription;
+Accordion.Warning = AccordionWarning;

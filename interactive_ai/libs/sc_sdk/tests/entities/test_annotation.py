@@ -2,8 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-import pytest
-
 from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
 from sc_sdk.entities.color import Color
 from sc_sdk.entities.label import Domain, Label
@@ -14,7 +12,6 @@ from sc_sdk.utils.time_utils import now
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotation:
     rectangle = Rectangle(x1=0.5, x2=1.0, y1=0.0, y2=0.5)
     labels: list[ScoredLabel] = []

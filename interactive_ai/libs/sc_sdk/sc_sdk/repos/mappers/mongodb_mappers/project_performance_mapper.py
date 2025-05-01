@@ -5,6 +5,8 @@
 
 """This module contains the MongoDB mapper for project performance entities"""
 
+from typing import Any
+
 from sc_sdk.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
@@ -38,7 +40,7 @@ class TaskPerformanceToMongo(IMapperSimple[TaskPerformance, dict]):
 
     @staticmethod
     def forward(instance: TaskPerformance) -> dict:
-        result_dict = {"task_node_id": IDToMongo.forward(instance.task_node_id)}
+        result_dict: dict[str, Any] = {"task_node_id": IDToMongo.forward(instance.task_node_id)}
 
         score_dict: dict | None = None
         if instance.score is not None:

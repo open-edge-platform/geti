@@ -18,7 +18,6 @@ from sc_sdk.utils.project_builder import ProjectBuilder
 from tests.tools.custom_project_parser import CustomTestProjectParser
 
 
-@pytest.mark.ScSdkComponent
 class TestProjectBuilder:
     @pytest.mark.parametrize(
         "domain, default_name",

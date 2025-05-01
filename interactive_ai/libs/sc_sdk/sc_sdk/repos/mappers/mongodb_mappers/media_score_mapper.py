@@ -3,6 +3,8 @@
 
 """This module contains the MongoDB mapper for media score related entities"""
 
+from typing import Any
+
 from sc_sdk.entities.media_score import MediaScore
 from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
@@ -15,7 +17,7 @@ class MediaScoreToMongo(IMapperSimple[MediaScore, dict]):
 
     @staticmethod
     def forward(instance: MediaScore) -> dict:
-        doc = {
+        doc: dict[str, Any] = {
             "_id": IDToMongo.forward(instance.id_),
             "model_test_result_id": IDToMongo.forward(instance.model_test_result_id),
             "media_identifier": MediaIdentifierToMongo.forward(instance.media_identifier),

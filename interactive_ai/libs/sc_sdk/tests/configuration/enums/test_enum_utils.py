@@ -1,13 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.configuration.enums.config_element_type import ConfigElementType
 from sc_sdk.configuration.enums.utils import get_enum_names
 
 
-@pytest.mark.ScSdkComponent
 class TestMetadataKeys:
     def test_get_enum_names(self):
         """

@@ -1,12 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.utils.naming_helpers import camel_to_snake_case, slugify, snake_to_camel_case
 
 
-@pytest.mark.ScSdkComponent
 class TestNamingHelpers:
     def test_camel_to_snake_case(self) -> None:
         """

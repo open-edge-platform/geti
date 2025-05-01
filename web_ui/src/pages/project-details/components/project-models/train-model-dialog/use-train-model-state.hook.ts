@@ -64,7 +64,7 @@ export const useTrainModelState = () => {
     const isAdvancedSettingsMode = mode === TrainModelMode.ADVANCED_SETTINGS;
 
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
-    const { data: _configParameters } = useGetModelConfigParameters(
+    const { data: configParameters } = useGetModelConfigParameters(
         {
             taskId: selectedTask.id,
             modelTemplateId: selectedModelTemplateId,
@@ -72,7 +72,9 @@ export const useTrainModelState = () => {
         },
         { enabled: isAdvancedSettingsMode }
     );
+
     const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
+    const [trainFromScratch, setTrainFromScratch] = useState<boolean>(false);
 
     if (selectedModelTemplateId === null) {
         setSelectedModelTemplateId(activeModelTemplateId);
@@ -83,7 +85,6 @@ export const useTrainModelState = () => {
     };
 
     const constructTrainingBodyDTO = (): TrainingBodyDTO => {
-        const trainFromScratch = false;
         const configParam = undefined;
 
         const { totalMedias } = getCreditPrice(selectedTask.id);
@@ -118,5 +119,8 @@ export const useTrainModelState = () => {
         isTaskChainProject,
         isReshufflingSubsetsEnabled,
         changeReshufflingSubsetsEnabled: setIsReshufflingSubsetsEnabled,
+        configParameters,
+        trainFromScratch,
+        changeTrainFromScratch: setTrainFromScratch,
     } as const;
 };

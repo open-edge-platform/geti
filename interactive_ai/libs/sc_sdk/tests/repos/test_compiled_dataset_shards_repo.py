@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 from testfixtures import compare
 
 from sc_sdk.entities.compiled_dataset_shards import (
@@ -14,7 +13,6 @@ from sc_sdk.repos import CompiledDatasetShardsRepo
 from geti_types import ID, DatasetStorageIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestCompiledDatasetShardsRepo:
     idx = 0
 

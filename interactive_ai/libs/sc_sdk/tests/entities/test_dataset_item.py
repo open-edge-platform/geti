@@ -5,7 +5,6 @@ import datetime
 from copy import deepcopy
 
 import numpy as np
-import pytest
 
 from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
 from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
@@ -155,7 +154,6 @@ class DatasetItemParameters:
         )
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetItem:
     def test_get_next_task_rois(self, fxt_classification_labels, fxt_detection_labels, fxt_empty_image) -> None:
         # Arrange

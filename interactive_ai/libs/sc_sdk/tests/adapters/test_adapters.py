@@ -15,7 +15,6 @@ class DummyDataSource(DataSource):
         return self._data
 
 
-@pytest.mark.ScSdkComponent
 class TestModelAdapter:
     def test_model_adapter_initialization(self):
         """
@@ -98,7 +97,6 @@ class TestModelAdapter:
         assert model_adapter.from_file_storage
 
 
-@pytest.mark.ScSdkComponent
 class TestExportableCodeAdapter:
     def test_exportable_code_adapter_initialization(self):
         """

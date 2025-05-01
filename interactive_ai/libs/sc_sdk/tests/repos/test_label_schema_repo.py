@@ -32,7 +32,6 @@ def assert_schemas_have_same_id_and_labels(ls1: LabelSchema, ls2: LabelSchema):
     assert labels_ids_1 == labels_ids_2
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelSchemaRepo:
     def test_indexes(self, fxt_project_identifier) -> None:
         label_schema_repo = LabelSchemaRepo(fxt_project_identifier)

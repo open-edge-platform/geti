@@ -19,7 +19,6 @@ import pytest
 from sc_sdk.entities.metadata import FloatMetadata, FloatType
 
 
-@pytest.mark.ScSdkComponent
 class TestFloatType:
     def test_float_type_members(self):
         """
@@ -87,7 +86,6 @@ class TestFloatType:
             str(test_instance(6))
 
 
-@pytest.mark.ScSdkComponent
 class TestFloatMetadata:
     def test_float_metadata(self):
         """

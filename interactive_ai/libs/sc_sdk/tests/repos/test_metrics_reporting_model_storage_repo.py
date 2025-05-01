@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.adapters.model_adapter import ExportableCodeAdapter
 from sc_sdk.entities.datasets import NullDataset
@@ -14,7 +13,6 @@ from sc_sdk.utils.project_factory import ProjectFactory
 from tests.test_helpers import empty_model_configuration
 
 
-@pytest.mark.ScSdkComponent
 class TestMetricsReportingModelStorageRepo:
     def test_total_models_per_arch_and_type(
         self,

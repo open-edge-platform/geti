@@ -181,7 +181,7 @@ class LabelSchemaToMongo(IMapperSimple[LabelSchema, dict]):
             label_schema = LabelSchemaRepo(project_identifier).get_by_id(
                 IDToMongo.backward(instance["parent_schema_id"])
             )
-            task_node_id = IDToMongo.backward(instance.get("task_node_id"))
+            task_node_id = IDToMongo.backward(instance.get("task_node_id", ""))
             output = LabelSchemaView(
                 id_=id_,
                 label_schema=label_schema,
@@ -192,7 +192,7 @@ class LabelSchemaToMongo(IMapperSimple[LabelSchema, dict]):
                 deleted_label_ids=deleted_label_ids,
             )
         else:
-            project_id = IDToMongo.backward(instance.get("project_id"))
+            project_id = IDToMongo.backward(instance.get("project_id", ""))
             output = LabelSchema(  # type: ignore
                 id_=id_,
                 label_tree=label_tree,

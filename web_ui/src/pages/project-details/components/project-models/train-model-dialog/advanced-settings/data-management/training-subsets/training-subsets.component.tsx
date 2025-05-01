@@ -9,7 +9,7 @@ import noop from 'lodash/noop';
 import { Refresh } from '../../../../../../../../assets/icons';
 import { ActionButton } from '../../../../../../../../shared/components/button/button.component';
 import { Checkbox } from '../../../../../../../../shared/components/checkbox/checkbox.component';
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 import { SubsetsDistributionSlider } from './subsets-distribution-slider/subsets-distribution-slider.component';
 
 import styles from './training-subsets.module.scss';
@@ -162,11 +162,11 @@ export const TrainingSubsets: FC<TrainingSubsetsProps> = ({
                 </Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
-                <Text>
+                <Accordion.Description>
                     Specify the distribution of annotated samples over the training, validation and test subsets. Note:
                     items that have already been used for training will stay in the same subset even if these parameters
                     are changed.
-                </Text>
+                </Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
                 <SubsetsDistribution
                     subsetsDistribution={subsetsDistribution}

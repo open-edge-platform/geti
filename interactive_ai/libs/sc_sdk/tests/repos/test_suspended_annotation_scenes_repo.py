@@ -32,7 +32,6 @@ def fxt_suspended_annotation_scenes_descriptor_2(fxt_mongo_id):
     )
 
 
-@pytest.mark.ScSdkComponent
 class TestSuspendedAnnotationScenesRepo:
     def test_suspended_annotation_scenes_repo(
         self,
