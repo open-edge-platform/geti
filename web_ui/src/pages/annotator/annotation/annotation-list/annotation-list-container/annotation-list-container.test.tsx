@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { FocusScope } from 'react-aria';
 import { VirtuosoMockContext } from 'react-virtuoso';
 
@@ -97,7 +97,7 @@ describe('Annotation list container', () => {
             }));
         }
 
-        const response = render(
+        return render(
             <VirtuosoMockContext.Provider value={{ viewportHeight: 300, itemHeight: 100 }}>
                 <FocusScope>
                     <ZoomProvider>
@@ -111,9 +111,6 @@ describe('Annotation list container', () => {
             </VirtuosoMockContext.Provider>,
             { services: { projectService } }
         );
-
-        await waitForElementToBeRemoved(screen.getByRole('progressbar'));
-        return response;
     };
 
     it('classification project does not have annotation actions', async () => {
@@ -127,6 +124,9 @@ describe('Annotation list container', () => {
     });
 
     it('render list of annotations', async () => {
+        const [, classificationTask] = detectionClassificationTasks;
+        jest.mocked(useSelectedTask).mockReturnValue([classificationTask, jest.fn()]);
+
         await renderAnnotationListContainer();
 
         const firstAnnotation = await screen.findByText(/dog/);
@@ -192,13 +192,16 @@ describe('Annotation list container', () => {
         // Each annotation list item can have other list items per label, so we try to filter based on
         // it's aria label
         expect(
-            within(screen.getByRole('list', { name: 'Annotations list' })).getAllByRole('listitem', {
+            within(screen.getByRole('listbox', { name: 'Annotations list' })).getAllByRole('listitem', {
                 name: /Annotation with id/i,
             })
         ).toHaveLength(1);
     });
 
     it('Shows all output annotations of a detection -> classification task when classification is selected', async () => {
+        const [, classificationTask] = detectionClassificationTasks;
+        jest.mocked(useSelectedTask).mockReturnValue([classificationTask, jest.fn()]);
+
         const EMPTY_SHAPE = { shapeType: ShapeType.Rect as const, x: 0, y: 0, width: 200, height: 200 };
 
         const annotations = [
@@ -243,7 +246,7 @@ describe('Annotation list container', () => {
         // Each annotation list item can have other list items per label, so we try to filter based on
         // it's aria label
         expect(
-            within(screen.getByRole('list', { name: 'Annotations list' })).getAllByRole('listitem', {
+            within(screen.getByRole('listbox', { name: 'Annotations list' })).getAllByRole('listitem', {
                 name: /Annotation with id/i,
             })
         ).toHaveLength(3);

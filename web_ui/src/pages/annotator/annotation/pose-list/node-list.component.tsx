@@ -36,12 +36,7 @@ export const NodeList = ({ keypointAnnotation }: NodeListProps) => {
 
     return (
         <Virtualizer layout={ListLayout}>
-            <ListBox
-                aria-label='Virtualized ListBox'
-                selectionMode='multiple'
-                items={points}
-                className={styles.container}
-            >
+            <ListBox aria-label='Virtualized ListBox' items={points} className={styles.container}>
                 {(point) => (
                     <ListBoxItem textValue={point.label.name}>
                         <NodeContent
