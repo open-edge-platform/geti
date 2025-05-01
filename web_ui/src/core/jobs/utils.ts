@@ -215,7 +215,7 @@ const getJobProjectImportMetadata = (
     };
 };
 
-export const getJobCost = (job: JobDTO): JobCostProps | undefined => {
+const getJobCost = (job: JobDTO): JobCostProps | undefined => {
     if (isNil(job.cost)) {
         return undefined;
     }
@@ -303,7 +303,7 @@ export const isJobProjectExport = <T extends JobProjectExportStatus | JobProject
     type: JobType;
 }): job is T => job.type === JobType.EXPORT_PROJECT;
 
-export const isJobProjectImport = <T extends JobProjectImportStatus | JobProjectImportStatusDTO>(job: {
+const isJobProjectImport = <T extends JobProjectImportStatus | JobProjectImportStatusDTO>(job: {
     type: JobType;
 }): job is T => job.type === JobType.IMPORT_PROJECT;
 

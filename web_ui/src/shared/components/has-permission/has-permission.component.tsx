@@ -22,7 +22,7 @@ const useResource = (selectedResources?: Resource[]): Record<RESOURCE_TYPE, stri
     };
 };
 
-export const usePermission = (): UsePermissionType => {
+const usePermission = (): UsePermissionType => {
     const { useActiveUser } = useUsers();
     const { organizationId } = useOrganizationIdentifier();
     const { data: activeUser } = useActiveUser(organizationId);

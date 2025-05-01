@@ -68,7 +68,7 @@ export const sanitiseSpecialCharacters = (str: string) => {
 
 export const sanitiseDoublequotes = (str: string) => str.replace(/"/g, '""');
 
-export const sanitiseString = (str: string) => {
+const sanitiseString = (str: string) => {
     // Rules taken from issue with CSV injection:
     // - Wrap all strings in double quotes
     // - Prepend with single-quote if needed

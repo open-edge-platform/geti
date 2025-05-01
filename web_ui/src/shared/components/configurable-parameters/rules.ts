@@ -5,7 +5,7 @@ export enum ACTION_TYPES {
     ENABLEMENT,
 }
 
-export interface CPRule {
+interface CPRule {
     groupTitle: string;
     action: ACTION_TYPES.ENABLEMENT;
     switchFieldName: string;
