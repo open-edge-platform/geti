@@ -22,7 +22,6 @@ def fxt_task_node_numeric(fxt_mongo_id, fxt_model_template_classification):
     yield _build_task
 
 
-@pytest.mark.ScSdkComponent
 class TestTaskGraph:
     def test_task_graph_dummy(self, fxt_task_node_numeric) -> None:
         """

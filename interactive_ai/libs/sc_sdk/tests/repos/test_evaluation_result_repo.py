@@ -39,7 +39,6 @@ def fxt_evaluation_result(fxt_empty_project, fxt_mongo_id, fxt_dataset) -> Evalu
     )
 
 
-@pytest.mark.ScSdkComponent
 class TestEvaluationResultRepo:
     def test_evaluation_result_repo(self, request, project_empty, fxt_mongo_id, fxt_training_framework) -> None:
         """

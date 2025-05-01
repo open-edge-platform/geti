@@ -10,7 +10,6 @@ from sc_sdk.repos import DatasetRepo, TaskNodeRepo
 from sc_sdk.repos.dataset_entity_repo import DuplicatePipelineDatasetException, PipelineDatasetRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestPipelineDatasetRepo:
     def test_get_or_create(self, request, fxt_dataset_storage_identifier, fxt_ote_id) -> None:
         request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())  # type: ignore[attr-defined]

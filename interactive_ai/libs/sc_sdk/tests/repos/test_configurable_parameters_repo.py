@@ -4,7 +4,6 @@
 import copy
 from pathlib import Path
 
-import pytest
 from _pytest.fixtures import FixtureRequest
 
 import sc_sdk.configuration.helper as otx_config_helper
@@ -20,7 +19,6 @@ from tests.configuration.dummy_config import DatasetManagerConfig
 from tests.test_helpers import generate_random_annotated_project, register_model_template
 
 
-@pytest.mark.ScSdkComponent
 class TestConfigurationRepos:
     @staticmethod
     def __get_path_to_file(filename: str):

@@ -40,7 +40,6 @@ def fxt_annotation_with_model_id(fxt_rectangle_annotation, fxt_ote_id):
     yield _build_annotation
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotationSceneRepo:
     @staticmethod
     def __annotation_list_mapped_per_media_id(

@@ -3,8 +3,6 @@
 
 import copy
 
-import pytest
-
 import sc_sdk.configuration.elements.metadata_keys as metadata_keys
 from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
 from sc_sdk.configuration.enums.config_element_type import ConfigElementType
@@ -13,7 +11,6 @@ from tests.configuration.dummy_config import DatasetManagerConfig
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestConfigurableParameters:
     def test_configurable_parameters(self):
         """

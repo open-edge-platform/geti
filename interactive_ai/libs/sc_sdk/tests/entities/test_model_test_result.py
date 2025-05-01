@@ -4,12 +4,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from copy import deepcopy
 
-import pytest
-
 from sc_sdk.entities.model_test_result import NullModelTestResult
 
 
-@pytest.mark.ScSdkComponent
 class TestModelTestResult:
     def test_model_test_result_equality(self, fxt_model_test_result, fxt_mongo_id) -> None:
         """

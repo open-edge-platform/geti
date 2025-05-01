@@ -1,9 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import math
+import warnings
 from unittest.mock import patch
 
-import pytest
 from shapely.geometry import Polygon as ShapelyPolgon
 
 from sc_sdk.entities.annotation import Annotation, AnnotationSceneKind
@@ -16,7 +16,6 @@ from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo
 from sc_sdk.utils.post_process_predictions import PostProcessPredictionsUtils
 
 
-@pytest.mark.ScSdkComponent
 class TestPostProcessPredictions:
     def test_post_process_predictions_with_annotations(
         self, project_with_data, fxt_single_random_classification_row, fxt_model
@@ -90,39 +89,45 @@ class TestPostProcessPredictions:
         """
         This tests if a prediction annotation with more than 5000 points is optimized.
         """
-        # Arrange
-        project: Project = project_with_data.project
-        label_schema_repo = LabelSchemaRepo(project.identifier)
-        project_label_schema = label_schema_repo.get_latest()
-        labels = project_label_schema.get_labels(include_empty=False)
-        # Create annotation with 5001 points
-        points = [Point(x=math.sin(2 * math.pi * p / 5001), y=math.cos(2 * math.pi * p / 5001)) for p in range(5001)]
-        annotations = [Annotation(Polygon(points), [ScoredLabel(label_id=labels[0].id_, is_empty=labels[0].is_empty)])]
-        _, dataset = fxt_single_crate_image_dataset_for_project(project=project, annotations=annotations)
-        task_node = project.get_trainable_task_nodes()[0]
-        task_label_schema = label_schema_repo.get_latest_view_by_task(task_node_id=task_node.id_)
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", "Polygon coordinates")
+            # Arrange
+            project: Project = project_with_data.project
+            label_schema_repo = LabelSchemaRepo(project.identifier)
+            project_label_schema = label_schema_repo.get_latest()
+            labels = project_label_schema.get_labels(include_empty=False)
+            # Create annotation with 5001 points
+            points = [
+                Point(x=math.sin(2 * math.pi * p / 5001), y=math.cos(2 * math.pi * p / 5001)) for p in range(5001)
+            ]
+            annotations = [
+                Annotation(Polygon(points), [ScoredLabel(label_id=labels[0].id_, is_empty=labels[0].is_empty)])
+            ]
+            _, dataset = fxt_single_crate_image_dataset_for_project(project=project, annotations=annotations)
+            task_node = project.get_trainable_task_nodes()[0]
+            task_label_schema = label_schema_repo.get_latest_view_by_task(task_node_id=task_node.id_)
 
-        # Assert that we have an annotation with 5001 points
-        assert len(dataset[0].annotation_scene.annotations[0].shape.points) == 5001
-        with (
-            patch.object(DatasetRepo, "save", return_value=None),
-            patch.object(AnnotationSceneRepo, "save", return_value=None),
-            patch.object(Model, "get_label_schema", return_value=task_label_schema) as patched_get_label_schema,
-        ):
-            # Act
-            dataset_storage = project.get_training_dataset_storage()
-            PostProcessPredictionsUtils.post_process_prediction_dataset(
-                dataset_storage=dataset_storage,
-                dataset=dataset,
-                model=fxt_model,
-                task_node=task_node,
-                reload_from_db=False,
-                save_to_db=False,
-            )
-        # Assert that the resolve was successful by checking that the annotation
-        # has fewer than 5000 points
-        assert len(dataset[0].annotation_scene.annotations[0].shape.points) < 5000
-        patched_get_label_schema.assert_called_once_with()
+            # Assert that we have an annotation with 5001 points
+            assert len(dataset[0].annotation_scene.annotations[0].shape.points) == 5001
+            with (
+                patch.object(DatasetRepo, "save", return_value=None),
+                patch.object(AnnotationSceneRepo, "save", return_value=None),
+                patch.object(Model, "get_label_schema", return_value=task_label_schema) as patched_get_label_schema,
+            ):
+                # Act
+                dataset_storage = project.get_training_dataset_storage()
+                PostProcessPredictionsUtils.post_process_prediction_dataset(
+                    dataset_storage=dataset_storage,
+                    dataset=dataset,
+                    model=fxt_model,
+                    task_node=task_node,
+                    reload_from_db=False,
+                    save_to_db=False,
+                )
+            # Assert that the resolve was successful by checking that the annotation
+            # has fewer than 5000 points
+            assert len(dataset[0].annotation_scene.annotations[0].shape.points) < 5000
+            patched_get_label_schema.assert_called_once_with()
 
     def test_optimize_polygon(
         self,

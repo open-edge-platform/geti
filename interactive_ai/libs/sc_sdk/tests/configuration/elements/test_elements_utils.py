@@ -27,7 +27,6 @@ from tests.configuration.dummy_config import SomeEnumSelectable
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestUtilsFunctions:
     parameter_group = ParameterGroup(header="test header")
     attribute = fields(ConfigurableParameters)

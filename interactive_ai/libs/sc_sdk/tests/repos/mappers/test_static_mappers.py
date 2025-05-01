@@ -152,7 +152,6 @@ def fxt_video_project(request):
     yield project
 
 
-@pytest.mark.ScSdkComponent
 class TestStaticMongoDBMappers:
     @pytest.mark.parametrize("enable_keypoint_detection", [True, False])
     def test_project_mapper(self, request, fxt_enable_feature_flag_name, enable_keypoint_detection) -> None:
@@ -514,11 +513,6 @@ class TestStaticMongoDBMappers:
 
         # Check that all adapter members are equal before and after mapping
         with (
-            patch.object(
-                ModelStorageRepo,
-                "get_by_id",
-                return_value=fxt_model.model_storage,
-            ) as patched_get_model_storage,
             patch.object(ModelRepo, "get_by_id", return_value=fxt_model) as patched_get_model,
             patch.object(
                 DatasetStorageRepo,
@@ -535,8 +529,11 @@ class TestStaticMongoDBMappers:
                 call(fxt_model_test_result.dataset_storage_ids[0]),
             ]
         )
-        assert patched_get_model_storage.called_once_with(fxt_model_test_result.model_storage_id)
-        assert patched_get_model.called_once_with(fxt_model_test_result.model_id)
+        patched_get_model.assert_has_calls(
+            [
+                call(fxt_model_test_result.model_id),
+            ]
+        )
 
     def test_media_score_mapper(self, fxt_media_score_2) -> None:
         serialized_entity = MediaScoreToMongo.forward(instance=fxt_media_score_2)

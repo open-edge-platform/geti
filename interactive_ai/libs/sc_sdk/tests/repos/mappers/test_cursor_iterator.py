@@ -7,7 +7,6 @@ from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
 from sc_sdk.repos import ImageRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestCursorIterator:
     def test_is_cursor_alive_check(self, request, fxt_image_entity, fxt_dataset_storage_persisted) -> None:
         """

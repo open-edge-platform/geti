@@ -26,7 +26,6 @@ from sc_sdk.configuration.ui_rules.types import Action, Operator
 from tests.configuration.dummy_config import SomeEnumSelectable
 
 
-@pytest.mark.ScSdkComponent
 class TestCreateFunctions:
     @staticmethod
     def int_rule_dict():

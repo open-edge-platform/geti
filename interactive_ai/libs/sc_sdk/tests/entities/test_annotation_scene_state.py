@@ -104,7 +104,6 @@ def fxt_video_annotation_scene_state_list_persisted(fxt_dataset_storage_identifi
     yield [ann_scene_state1, ann_scene_state2]
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotationSceneState:
     # fmt: off
     @pytest.mark.parametrize(

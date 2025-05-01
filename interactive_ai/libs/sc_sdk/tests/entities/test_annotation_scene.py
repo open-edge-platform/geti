@@ -3,13 +3,10 @@
 
 from copy import deepcopy
 
-import pytest
-
 from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
 from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotationScene:
     def test_get_model_ids(
         self,

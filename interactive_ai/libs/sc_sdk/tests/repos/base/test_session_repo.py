@@ -41,7 +41,6 @@ class FakeCursor:
         return self.__next__()
 
 
-@pytest.mark.ScSdkComponent
 class TestSessionBasedRepo:
     def test_preliminary_query_match_filter(self, fxt_session_repo) -> None:
         session_on_prem = make_session()

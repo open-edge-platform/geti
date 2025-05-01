@@ -3,7 +3,6 @@
 
 from unittest.mock import patch
 
-import pytest
 from bson import ObjectId
 
 from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
@@ -12,7 +11,6 @@ from sc_sdk.repos import VideoAnnotationRangeRepo
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestVideoAnnotationRangeRepo:
     def test_get_latest_by_video_id(self, fxt_dataset_storage_identifier, fxt_ote_id) -> None:
         # Arrange

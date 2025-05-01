@@ -21,7 +21,6 @@ from geti_types import ID, ProjectIdentifier
 WORKSPACE_ID = ID("workspace_id")
 
 
-@pytest.mark.ScSdkComponent
 class TestProjectRepo:
     def test_project_repo(self, request) -> None:
         """

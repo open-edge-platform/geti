@@ -19,7 +19,6 @@ from sc_sdk.entities.shapes import Point, Polygon, Rectangle
 from sc_sdk.utils.time_utils import now
 
 
-@pytest.mark.ScSdkComponent
 class TestPoint:
     def coordinates(self):
         return [0.5, 0.4]

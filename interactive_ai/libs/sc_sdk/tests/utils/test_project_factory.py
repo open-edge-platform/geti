@@ -3,8 +3,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
-
 from sc_sdk.algorithms import ModelTemplateList
 from sc_sdk.entities.project import Project
 from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
@@ -16,7 +14,6 @@ from tests.test_helpers import register_model_template
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestProjectFactory:
     def test_create_project_single_task_with_model_template_id(self, request) -> None:
         """

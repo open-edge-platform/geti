@@ -2,7 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from unittest.mock import patch
 
-import pytest
 from bson import ObjectId
 
 from sc_sdk.entities.model_storage import ModelStorageIdentifier
@@ -12,7 +11,6 @@ from sc_sdk.repos.base.session_repo import QueryAccessMode
 from geti_types import make_session
 
 
-@pytest.mark.ScSdkComponent
 class TestModelStorageBasedSessionRepo:
     def test_preliminary_query_match_filter(self, fxt_ote_id, fxt_model_storage_based_session_repo) -> None:
         session = make_session()

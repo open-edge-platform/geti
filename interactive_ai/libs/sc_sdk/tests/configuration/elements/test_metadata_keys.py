@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.configuration.elements.metadata_keys import (
     AFFECTS_OUTCOME_OF,
@@ -22,7 +21,6 @@ from sc_sdk.configuration.elements.metadata_keys import (
 )
 
 
-@pytest.mark.ScSdkComponent
 class TestMetadataKeys:
     def test_allows_model_template_override(self):
         """

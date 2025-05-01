@@ -21,7 +21,6 @@ from sc_sdk.repos.dataset_repo import _DatasetItemRepo
 from geti_types import ProjectIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetItemRepo:
     def test_indexes(self, fxt_dataset_identifier) -> None:
         dataset_item_repo = _DatasetItemRepo(fxt_dataset_identifier)
@@ -487,7 +486,6 @@ class TestDatasetItemRepo:
         assert loaded_dataset_item.ignored_label_ids == {label_id}
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetRepo:
     def test_indexes(self, fxt_dataset_storage_identifier) -> None:
         # Arrange
