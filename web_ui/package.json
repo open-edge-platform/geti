@@ -22,7 +22,7 @@
     "@opentelemetry/semantic-conventions": "^1.27.0",
     "@react-hook/resize-observer": "^2.0.2",
     "@rsbuild/plugin-node-polyfill": "^1.3.0",
-    "@scalar/api-reference-react": "^0.6.27",
+    "@scalar/api-reference-react": "^0.3.166",
     "@spectrum-icons/illustrations": "^3.6.17",
     "@spectrum-icons/workflow": "^4.2.16",
     "@tanstack/react-query": "^5.74.11",

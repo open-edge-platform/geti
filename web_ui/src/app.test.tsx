@@ -5,6 +5,10 @@ import { render, screen, waitForElementToBeRemoved } from '@testing-library/reac
 
 import { App } from './app.component';
 
+jest.mock('@scalar/api-reference-react', () => ({
+    ApiReferenceReact: () => <div>ApiReference</div>,
+}));
+
 jest.mock('react-oidc-context', () => ({
     ...jest.requireActual('react-oidc-context'),
     useAuth: () => ({
