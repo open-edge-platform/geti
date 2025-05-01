@@ -5,7 +5,6 @@ import { MEDIA_TYPE } from '../../core/media/base-media.interface';
 import {
     ErrorListItem,
     MEDIA_CONTENT_BUCKET,
-    ProgressListItem,
     QueuedListItem,
     SuccessListItem,
 } from '../../providers/media-upload-provider/media-upload.interface';
@@ -43,12 +42,6 @@ export const mockedListItem = (fileName: string): QueuedListItem => {
 export const getMockedSuccessListItem = (fileName: string, uploadId = '123'): SuccessListItem => ({
     ...mockedListItem(fileName),
     uploadId,
-});
-
-export const getMockedProgressListItem = (fileName: string, uploadId = '123', progress = 0): ProgressListItem => ({
-    ...mockedListItem(fileName),
-    uploadId,
-    progress,
 });
 
 export const getMockedErrorListItem = (fileName: string): ErrorListItem => ({

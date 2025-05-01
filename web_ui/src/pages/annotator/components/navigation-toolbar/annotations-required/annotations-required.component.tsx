@@ -27,7 +27,7 @@ interface AnnotationsRequiredProps {
     selectedTask: Task | null;
 }
 
-export const getAnnotationsDetails = (isAutoTrainingOn: boolean, requiredAnnotations: TaskRequiredAnnotations[]) => {
+const getAnnotationsDetails = (isAutoTrainingOn: boolean, requiredAnnotations: TaskRequiredAnnotations[]) => {
     if (isAutoTrainingOn) {
         return {
             text: 'Annotations required',

@@ -19,7 +19,7 @@ import { ModelDTO, ModelPerformanceDTO, ModelsDTO } from '../dtos/models.interfa
 import { ModelPerformance, ModelsGroups, ModelVersion } from '../models.interface';
 import { ModelDetails, OptimizationTypes, OptimizedModel, TrainedModel } from '../optimized-models.interface';
 
-export const getPerformance = (performanceDTO: ModelPerformanceDTO): ModelPerformance => {
+const getPerformance = (performanceDTO: ModelPerformanceDTO): ModelPerformance => {
     if ('local_score' in performanceDTO) {
         return {
             type: PerformanceType.ANOMALY,
