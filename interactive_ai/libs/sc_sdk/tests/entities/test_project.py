@@ -11,7 +11,6 @@ from sc_sdk.entities.project import Project
 from sc_sdk.entities.task_graph import NullTaskGraph
 
 
-@pytest.mark.ScSdkComponent
 class TestProject:
     def test_project_construction(self, fxt_ote_id) -> None:
         """

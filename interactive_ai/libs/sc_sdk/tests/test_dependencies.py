@@ -8,8 +8,6 @@ import os
 import shutil
 import tempfile
 
-import pytest
-
 
 def get_module_usages_in_file(path):
     with open(path) as fh:
@@ -23,7 +21,6 @@ def get_module_usages_in_file(path):
     return result
 
 
-@pytest.mark.ScSdkComponent
 class TestDependencies:
     def test_module_function(self, request) -> None:
         scratch_file = tempfile.mktemp(prefix="sc_imports", suffix=".py")

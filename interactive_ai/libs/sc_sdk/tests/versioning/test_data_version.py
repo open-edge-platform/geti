@@ -1,12 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.versioning.data_version import DataVersion, SchemaChangeType
 
 
-@pytest.mark.ScSdkComponent
 class TestDataVersion:
     def test_properties(self) -> None:
         data_version = DataVersion("5.8")

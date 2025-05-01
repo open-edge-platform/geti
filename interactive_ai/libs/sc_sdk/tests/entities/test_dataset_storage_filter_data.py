@@ -3,8 +3,6 @@
 
 import datetime
 
-import pytest
-
 from sc_sdk.entities.annotation_scene_state import AnnotationState
 from sc_sdk.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
@@ -17,7 +15,6 @@ from sc_sdk.entities.media import ImageExtensions, MediaPreprocessingStatus
 from sc_sdk.entities.shapes import ShapeType
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetStorageFilterData:
     def test_media_filter_data_from_image(
         self,

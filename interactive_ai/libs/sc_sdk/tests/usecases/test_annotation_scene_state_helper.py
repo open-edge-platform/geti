@@ -233,7 +233,6 @@ def fxt_node_to_schema(
     yield task_node_to_schema
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotationSceneStateHelper:
     def test_compute_annotation_state_local_to_local_unannotated(
         self,

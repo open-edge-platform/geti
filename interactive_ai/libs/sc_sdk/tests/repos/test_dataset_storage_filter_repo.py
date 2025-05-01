@@ -3,7 +3,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 #
 
-import pytest
 
 from sc_sdk.entities.annotation_scene_state import AnnotationState
 from sc_sdk.entities.dataset_storage_filter_data import DatasetStorageFilterData, NullDatasetStorageFilterData
@@ -18,7 +17,6 @@ from sc_sdk.repos.mappers import IDToMongo
 from geti_types import ID, ImageIdentifier, MediaIdentifierEntity
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetStorageFilterRepo:
     def test_save_dataset_storage_filter_data(
         self, request, fxt_dataset_storage_persisted, fxt_dataset_storage_filter_data

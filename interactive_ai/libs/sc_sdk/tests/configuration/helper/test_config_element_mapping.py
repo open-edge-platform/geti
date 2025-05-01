@@ -3,8 +3,6 @@
 
 from functools import partial
 
-import pytest
-
 from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
 from sc_sdk.configuration.elements.parameter_group import ParameterGroup
 from sc_sdk.configuration.elements.primitive_parameters import (
@@ -22,7 +20,6 @@ from sc_sdk.configuration.helper.config_element_mapping import (
 from sc_sdk.configuration.ui_rules.rules import Rule, UIRules
 
 
-@pytest.mark.ScSdkComponent
 class TestPrimitiveElementMapping:
     @staticmethod
     def check_primitive_element(
@@ -80,7 +77,6 @@ def check_mapping_element(mapping_element, expected_name, expected_value):
     assert str(mapping_element) == expected_name
 
 
-@pytest.mark.ScSdkComponent
 class TestGroupElementMapping:
     def test_group_element_mapping(self):
         """
@@ -104,7 +100,6 @@ class TestGroupElementMapping:
         )
 
 
-@pytest.mark.ScSdkComponent
 class TestRuleElementMapping:
     def test_group_element_mapping(self):
         """

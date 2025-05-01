@@ -8,7 +8,6 @@ import pytest
 from sc_sdk.entities.subset import Subset
 
 
-@pytest.mark.ScSdkComponent
 class TestSubset:
     def test_subset_members(self):
         """

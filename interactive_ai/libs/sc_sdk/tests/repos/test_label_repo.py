@@ -1,13 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from sc_sdk.entities.label import Domain, Label
 from sc_sdk.repos import LabelRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestLabelRepo:
     def test_indexes(self, fxt_project_identifier) -> None:
         label_repo = LabelRepo(fxt_project_identifier)

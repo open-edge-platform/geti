@@ -7,7 +7,6 @@ import pytest
 from sc_sdk.utils.iteration import grouper, multi_map
 
 
-@pytest.mark.ScSdkComponent
 class TestIteration:
     def test_grouper_iterable(self) -> None:
         iterable = "ABCDEFGHIJK"

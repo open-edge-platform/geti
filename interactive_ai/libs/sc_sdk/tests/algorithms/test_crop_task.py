@@ -6,8 +6,6 @@ Implements crop task tests
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from datetime import datetime, timezone
 
-import pytest
-
 from sc_sdk.algorithms.crop.task import CropTask
 from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
 from sc_sdk.entities.annotation import Annotation
@@ -19,7 +17,6 @@ from sc_sdk.entities.subset import Subset
 from sc_sdk.entities.task_environment import TaskEnvironment
 
 
-@pytest.mark.ScSdkComponent
 class TestCropTask:
     def test_crop_infer(
         self,

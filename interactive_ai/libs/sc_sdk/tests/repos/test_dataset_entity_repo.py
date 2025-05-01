@@ -10,10 +10,9 @@ from sc_sdk.repos import DatasetRepo, TaskNodeRepo
 from sc_sdk.repos.dataset_entity_repo import DuplicatePipelineDatasetException, PipelineDatasetRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestPipelineDatasetRepo:
     def test_get_or_create(self, request, fxt_dataset_storage_identifier, fxt_ote_id) -> None:
-        request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())
+        request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())  # type: ignore[attr-defined]
         task_ids = [fxt_ote_id(201), fxt_ote_id(202)]
         with (
             patch.object(TaskNodeRepo, "get_trainable_task_ids", return_value=task_ids) as mock_get_task_ids,
@@ -43,7 +42,7 @@ class TestPipelineDatasetRepo:
         assert id(pde2) == id(pde)
 
     def test_get_or_create_already_existing(self, request, fxt_dataset_storage_identifier) -> None:
-        request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())
+        request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())  # type: ignore[attr-defined]
         pde_mock = MagicMock(spec=PipelineDataset)
         with (
             patch.object(TaskNodeRepo, "get_trainable_task_ids") as mock_get_task_ids,
@@ -61,7 +60,7 @@ class TestPipelineDatasetRepo:
     def test_get_or_create_already_existing_race_cond(
         self, request, fxt_dataset_storage_identifier, fxt_ote_id
     ) -> None:
-        request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())
+        request.addfinalizer(lambda: PipelineDatasetRepo.get_or_create.cache_clear())  # type: ignore[attr-defined]
         task_ids = [fxt_ote_id(201), fxt_ote_id(202)]
         pde_mock = MagicMock(spec=PipelineDataset)
         with (

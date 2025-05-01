@@ -32,7 +32,7 @@ class ImageIdentifierToMongo(IMapperSimple[ImageIdentifier, dict]):
 
     @staticmethod
     def backward(instance: dict) -> ImageIdentifier:
-        media_id = instance.get("media_id")
+        media_id = instance.get("media_id", "")
         return ImageIdentifier(image_id=IDToMongo.backward(media_id))
 
 
@@ -122,6 +122,7 @@ class MediaIdentifierToMongo(IMapperSimple[MediaIdentifierEntity, dict]):
 
     @staticmethod
     def backward(instance: dict) -> MediaIdentifierEntity:
+        media_identifier: MediaIdentifierEntity
         if instance["type"] == MediaType.IMAGE.value:
             media_identifier = ImageIdentifierToMongo.backward(instance)
         elif instance["type"] == MediaType.VIDEO_FRAME.value:

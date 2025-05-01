@@ -6,7 +6,6 @@ import pytest
 from sc_sdk.utils.type_helpers import str2bool
 
 
-@pytest.mark.ScSdkComponent
 class TestStr2Bool:
     def test_converts_common_true_strings_to_true(self):
         true_strings = ["y", "yes", "t", "true", "on", "1", "Y", "YES", "T", "TRUE", "ON", "1"]

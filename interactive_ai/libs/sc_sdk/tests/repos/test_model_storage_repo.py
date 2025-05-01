@@ -11,7 +11,6 @@ from sc_sdk.entities.model_template import NullModelTemplate
 from sc_sdk.repos import ModelStorageRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestModelStorageRepo:
     def test_indexes(self, fxt_project_identifier) -> None:
         model_storage_repo = ModelStorageRepo(fxt_project_identifier)

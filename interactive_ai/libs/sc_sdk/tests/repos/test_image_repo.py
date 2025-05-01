@@ -5,7 +5,6 @@
 from typing import TYPE_CHECKING
 
 import cv2
-import pytest
 
 from sc_sdk.entities.image import Image, NullImage
 from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
@@ -15,7 +14,6 @@ if TYPE_CHECKING:
     from sc_sdk.entities.dataset_storage import DatasetStorage
 
 
-@pytest.mark.ScSdkComponent
 class TestImageRepo:
     def test_save_image(self, fxt_dataset_storage_persisted) -> None:
         """

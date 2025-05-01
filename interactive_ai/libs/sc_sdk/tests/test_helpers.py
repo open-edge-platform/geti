@@ -838,13 +838,13 @@ def verify_mongo_mapper(  # noqa: C901
 
     logger.info("Forward arguments: %s; Backward arguments: %s", forward_kwargs, backward_kwargs)
 
-    serialized_entity = mapper_class.forward(instance=entity_to_map, **forward_kwargs)
+    serialized_entity = mapper_class.forward(instance=entity_to_map, **forward_kwargs)  # type: ignore[union-attr]
     if extend_forward_output is not None:
         serialized_entity |= extend_forward_output
     # make a copy of the dictionary, in case the backward mapper extends it
     serialized_entity_frozen = deepcopy(serialized_entity)
-    deserialized_entity = mapper_class.backward(instance=serialized_entity, **backward_kwargs)
-    reserialized_entity = mapper_class.forward(instance=deserialized_entity, **forward_kwargs)
+    deserialized_entity = mapper_class.backward(instance=serialized_entity, **backward_kwargs)  # type: ignore[union-attr]
+    reserialized_entity = mapper_class.forward(instance=deserialized_entity, **forward_kwargs)  # type: ignore[union-attr]
     if extend_forward_output is not None:
         reserialized_entity |= extend_forward_output
 

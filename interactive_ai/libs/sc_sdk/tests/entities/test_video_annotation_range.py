@@ -71,7 +71,6 @@ inserted_normalized_range_labels_6 = [
 ]
 
 
-@pytest.mark.ScSdkComponent
 class TestRangeLabels:
     def test_invalid_range_labels(self) -> None:
         """
@@ -85,7 +84,6 @@ class TestRangeLabels:
             RangeLabels(start_frame=0, end_frame=43, label_ids=[])
 
 
-@pytest.mark.ScSdkComponent
 class TestVideoAnnotationRange:
     def test_normalization_on_init(self, fxt_mongo_id) -> None:
         """

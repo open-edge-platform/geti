@@ -19,7 +19,6 @@ from networkx.exception import NetworkXError, NetworkXNotImplemented
 from sc_sdk.entities.graph import Graph, MultiDiGraph
 
 
-@pytest.mark.ScSdkComponent
 class TestGraph:
     @staticmethod
     def add_edges_to_graph(graph_to_add_edges: Graph, edges_parameters: list) -> None:
@@ -799,7 +798,6 @@ class TestGraph:
         assert directed_graph.descendants("D") == ["C", "A", "D"]
 
 
-@pytest.mark.ScSdkComponent
 class TestMultiDiGraph:
     @staticmethod
     def multi_di_graph():

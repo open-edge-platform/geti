@@ -43,7 +43,6 @@ from tests.test_helpers import empty_model_configuration, generate_random_single
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestModelConfiguration:
     def test_model_configuration(self):
         """
@@ -66,7 +65,6 @@ class TestModelConfiguration:
         assert model_configuration.get_label_schema() == label_schema
 
 
-@pytest.mark.ScSdkComponent
 class TestModel:
     creation_date = now()
 

@@ -3,13 +3,11 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 #
 
-import pytest
 
 from sc_sdk.entities.model_test_result import NullModelTestResult
 from sc_sdk.repos import ModelTestResultRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestModelTestResultRepo:
     def test_model_test_result_repo(self, request, fxt_model_test_result, fxt_empty_project) -> None:
         """

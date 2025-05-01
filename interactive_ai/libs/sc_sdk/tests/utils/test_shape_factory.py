@@ -10,7 +10,6 @@ from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
 from sc_sdk.utils.shape_factory import ShapeFactory
 
 
-@pytest.mark.ScSdkComponent
 class TestShapeFactory:
     def test_rectangle_shape_conversion(self):
         """

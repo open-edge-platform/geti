@@ -3,8 +3,6 @@
 
 from unittest.mock import patch
 
-import pytest
-
 from geti_types import Singleton
 
 
@@ -18,7 +16,6 @@ class MySingleton2(metaclass=Singleton):
         pass
 
 
-@pytest.mark.ScSdkComponent
 class TestSingleton:
     def test_singleton(self) -> None:
         """

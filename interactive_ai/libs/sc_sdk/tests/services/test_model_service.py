@@ -57,7 +57,6 @@ def model_storage_identifier():
     return ModelStorageIdentifier(workspace_id="workspace_1", project_id="project_1", model_storage_id="storage_1")
 
 
-@pytest.mark.ScSdkComponent
 class TestModelService:
     def test_get_or_create_model_storage(
         self,

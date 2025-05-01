@@ -8,7 +8,6 @@ from sc_sdk.entities.keypoint_structure import KeypointEdge, KeypointPosition, K
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestKeypointStructure:
     def test_edges_and_position(self) -> None:
         """

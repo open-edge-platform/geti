@@ -29,7 +29,6 @@ from sc_sdk.utils.time_utils import now
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestRectangle:
     modification_date = now()
 

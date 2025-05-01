@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from sc_sdk.entities.project import Project
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetHelper:
     def test_create_dataset_from_media_identifiers(
         self, fxt_dataset_storage, fxt_image_identifier, fxt_image_entity, fxt_mongo_id

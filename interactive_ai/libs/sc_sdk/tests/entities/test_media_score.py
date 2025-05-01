@@ -4,12 +4,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from copy import deepcopy
 
-import pytest
-
 from sc_sdk.entities.media_score import NullMediaScore
 
 
-@pytest.mark.ScSdkComponent
 class TestMediaScore:
     def test_media_score_equality(self, fxt_media_score, fxt_ote_id) -> None:
         """
