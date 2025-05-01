@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { MenuItemsKey } from '@shared/components/upload-media/upload-media-button/upload-media-button.interface';
+import { onMenuAction } from '@shared/components/upload-media/utils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { MenuItemsKey } from '../../../../../shared/components/upload-media/upload-media-button/upload-media-button.interface';
-import { onMenuAction } from '../../../../../shared/components/upload-media/utils';
 import {
     getMockedDatasetIdentifier,
     getMockedProjectIdentifier,
@@ -22,8 +22,8 @@ jest.mock('react-router-dom', () => ({
     useNavigate: () => mockedNavigate,
 }));
 
-jest.mock('../../../../../shared/components/upload-media/utils', () => ({
-    ...jest.requireActual('../../../../../shared/components/upload-media/utils'),
+jest.mock('@shared/components/upload-media/utils', () => ({
+    ...jest.requireActual('@shared/components/upload-media/utils'),
     onMenuAction: jest.fn(),
 }));
 

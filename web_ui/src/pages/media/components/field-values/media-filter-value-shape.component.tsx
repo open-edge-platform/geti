@@ -5,12 +5,12 @@ import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
 import { Item, Menu, TextField, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { CustomPopover } from '@shared/components/custom-popover/custom-popover.component';
+import { KeyMap } from '@shared/keyboard-events/keyboard.interface';
+import { trimAndLowerCase } from '@shared/utils';
 import last from 'lodash/last';
 
 import { SearchRuleShapeType, SearchRuleValue, ShapeOption } from '../../../../core/media/media-filter.interface';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
-import { KeyMap } from '../../../../shared/keyboard-events/keyboard.interface';
-import { trimAndLowerCase } from '../../../../shared/utils';
 import {
     concatByProperty,
     deleteEmptySpaceAndLastComa,

@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
-
-import { Button } from '../../../../shared/components/button/button.component';
+import { Button } from '@shared/components/button/button.component';
 
 interface ConfirmationDialogProps {
     onCancel: () => Promise<void>;

@@ -3,14 +3,14 @@
 
 import { createContext, ReactNode, useCallback, useContext } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { isNotCropDomain } from '@shared/utils';
 import isFunction from 'lodash/isFunction';
 import { useErrorHandler } from 'react-error-boundary';
 
 import { DOMAIN, ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
 import { useUserProjectSettings } from '../../../../core/user-settings/hooks/use-project-settings.hook';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
-import { isNotCropDomain } from '../../../../shared/utils';
 import { ProjectContextProps } from './project-provider.interface';
 
 const ProjectContext = createContext<ProjectContextProps | undefined>(undefined);

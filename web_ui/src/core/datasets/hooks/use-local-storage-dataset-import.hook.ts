@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getParsedLocalStorage, hasDifferentId, hasEqualId } from '@shared/utils';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { getParsedLocalStorage, hasDifferentId, hasEqualId } from '../../../shared/utils';
 import { DatasetImport } from '../dataset.interface';
 
 interface useLocalStorageDatasetImportProps<T> {

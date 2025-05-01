@@ -3,9 +3,8 @@
 
 import { ButtonGroup, Content, Dialog, Divider, Text } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
+import { Button } from '@shared/components/button/button.component';
 import { UseMutationResult } from '@tanstack/react-query';
-
-import { Button } from '../../../../../shared/components/button/button.component';
 
 interface PropagateAnnotationsDialogProps {
     propagateAnnotationsMutation: UseMutationResult<void, unknown, boolean, unknown>;

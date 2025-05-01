@@ -4,9 +4,9 @@
 import { ReactNode } from 'react';
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 import { Placement } from 'react-aria';
 
-import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useDrawingToolsKeyboardShortcut } from '../../hot-keys/use-drawing-tools-keyboard-shortcut/use-drawing-tools-keyboard-shortcut';
 import { GrabcutToolType } from '../../tools/grabcut-tool/grabcut-tool.enums';

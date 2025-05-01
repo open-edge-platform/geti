@@ -3,12 +3,12 @@
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { Button } from '@shared/components/button/button.component';
+import { openNewTab } from '@shared/utils';
 import noop from 'lodash/noop';
 
 import { CreditCard } from '../../../../../assets/icons';
 import { CONTACT_SUPPORT } from '../../../../../core/const';
-import { Button } from '../../../../../shared/components/button/button.component';
-import { openNewTab } from '../../../../../shared/utils';
 import { NotEnoughWarning } from '../not-enough-warning/not-enough-warning.component';
 
 import classes from './not-enough-credits-dialog.module.scss';

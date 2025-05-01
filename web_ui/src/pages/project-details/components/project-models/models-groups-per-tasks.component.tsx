@@ -4,11 +4,11 @@
 import { memo, useMemo } from 'react';
 
 import { Divider, View } from '@adobe/react-spectrum';
+import { isNotCropTask } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { isNotCropTask } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { ModelsGroupsSingleTask } from './models-groups-single-task.component';
 import { TrainingProgressChainTask } from './training-progress/training-progress-chain-task.component';

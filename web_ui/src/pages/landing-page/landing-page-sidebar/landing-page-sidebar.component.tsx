@@ -3,17 +3,17 @@
 
 import { Divider, Flex, Link as SpectrumLink, View } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
+import { MenuItemImage } from '@shared/components/menu-item-image/menu-item-image.component';
+import { MenuOption } from '@shared/components/menu-option.interface';
+import { OrganizationsPicker } from '@shared/components/organizations-picker/organizations-picker.component';
+import { ShowForOnPrem } from '@shared/components/show-for-onprem/show-for-onprem.component';
+import { SidebarMenu } from '@shared/components/sidebar-menu/sidebar-menu.component';
 import { Link } from 'react-router-dom';
 
 import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { MenuItemImage } from '../../../shared/components/menu-item-image/menu-item-image.component';
-import { MenuOption } from '../../../shared/components/menu-option.interface';
-import { OrganizationsPicker } from '../../../shared/components/organizations-picker/organizations-picker.component';
-import { ShowForOnPrem } from '../../../shared/components/show-for-onprem/show-for-onprem.component';
-import { SidebarMenu } from '../../../shared/components/sidebar-menu/sidebar-menu.component';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../theme/queries';
 import { StorageUsage } from './storage-usage/storage-usage.component';

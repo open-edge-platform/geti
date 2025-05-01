@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { DateValue, getLocalTimeZone, parseDate, today } from '@internationalized/date';
-
-import { DatePicker } from '../../../../shared/components/date-picker/date-picker.component';
-import { isDateBetween } from '../../../../shared/utils';
+import { DatePicker } from '@shared/components/date-picker/date-picker.component';
+import { isDateBetween } from '@shared/utils';
 
 interface PersonalAccessTokenExpirationDatepickerProps {
     setDate: (newExpirationDate: Date | null) => void;

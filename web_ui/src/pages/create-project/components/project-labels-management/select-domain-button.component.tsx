@@ -3,9 +3,8 @@
 
 import { Flex, Text } from '@adobe/react-spectrum';
 import { SpectrumActionButtonProps } from '@react-types/button';
+import { ActionButton } from '@shared/components/button/button.component';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
-
-import { ActionButton } from '../../../../shared/components/button/button.component';
 
 import classes from './select-domain-button.module.scss';
 

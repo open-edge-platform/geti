@@ -5,11 +5,11 @@ import { useState } from 'react';
 
 import { Divider } from '@adobe/react-spectrum';
 import { View } from '@react-spectrum/view';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 
-import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
 import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import {
     isDeprecatedAlgorithm,

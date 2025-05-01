@@ -3,9 +3,9 @@
 
 import { FC } from 'react';
 
+import { ConfigurableParametersParams } from '@shared/components/configurable-parameters/configurable-parameters.interface';
 import noop from 'lodash/noop';
 
-import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { Accordion } from '../ui/accordion/accordion.component';
 import { Parameters } from '../ui/parameters.component';
 

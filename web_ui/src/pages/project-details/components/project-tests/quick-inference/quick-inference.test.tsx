@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { VALID_IMAGE_TYPES } from '@shared/media-utils';
 import { act, fireEvent, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react';
 
 import { createInMemoryInferenceService } from '../../../../../core/annotations/services/in-memory-inference-service';
@@ -10,7 +11,6 @@ import { createInMemoryProjectService } from '../../../../../core/projects/servi
 import { ProjectService } from '../../../../../core/projects/services/project-service.interface';
 import * as MediaValidators from '../../../../../providers/media-upload-provider/media-upload.validator';
 import { mediaExtensionHandler } from '../../../../../providers/media-upload-provider/media-upload.validator';
-import { VALID_IMAGE_TYPES } from '../../../../../shared/media-utils';
 import { getMockedAnnotation } from '../../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedProjectIdentifier } from '../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedModelsGroup } from '../../../../../test-utils/mocked-items-factory/mocked-model';

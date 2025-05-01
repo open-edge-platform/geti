@@ -3,11 +3,12 @@
 
 import { useRef } from 'react';
 
+import { MouseEvents } from '@shared/mouse-events';
+
 import { Invisible, Visible } from '../../../../../assets/icons';
 import { RegionOfInterest } from '../../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';
-import { MouseEvents } from '../../../../../shared/mouse-events';
 import { ExpandablePointLabel } from '../../../../create-project/components/pose-template/canvas/expandable-point-label.component';
 import { getPointInRoi } from '../../../../utils';
 import { PoseKeypointVisibility } from '../../../annotation/shapes/pose-keypoints.component';

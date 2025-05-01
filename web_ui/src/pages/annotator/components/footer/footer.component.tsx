@@ -3,10 +3,11 @@
 
 import { useMemo } from 'react';
 
+import { getAllJobs } from '@shared/components/header/jobs-management/utils';
+
 import { useGetRunningJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { Job } from '../../../../core/jobs/jobs.interface';
 import { getJobActiveStep } from '../../../../core/jobs/utils';
-import { getAllJobs } from '../../../../shared/components/header/jobs-management/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';

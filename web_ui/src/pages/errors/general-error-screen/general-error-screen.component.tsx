@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Heading, Link } from '@adobe/react-spectrum';
+import { redirectTo } from '@shared/utils';
 import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
 
 import { paths } from '../../../core/services/routes';
-import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';
 

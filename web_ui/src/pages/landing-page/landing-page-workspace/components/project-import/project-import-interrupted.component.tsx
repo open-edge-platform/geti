@@ -4,17 +4,14 @@
 import { useRef } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { MenuTriggerButton } from '@shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
+import { ColorMode, QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { InfoOutline } from '../../../../../assets/icons';
 import { useStatus } from '../../../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../../../core/status/hooks/utils';
 import { ProjectImportBase } from '../../../../../providers/projects-import-provider/project-import.interface';
 import { useProjectsImportProvider } from '../../../../../providers/projects-import-provider/projects-import-provider.component';
-import { MenuTriggerButton } from '../../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ProjectImportFilePicker } from './project-import-file-picker.component';
 import { ProjectStatusHeader } from './project-status-header.component';
 

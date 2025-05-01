@@ -4,10 +4,10 @@
 import { ComponentProps } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { BarHorizontalChart } from '@shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
+import { getFileSize } from '@shared/utils';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
-import { BarHorizontalChart } from '../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
-import { getFileSize } from '../../../../shared/utils';
 
 interface ProjectStorageChartProps {
     projects: ProjectProps[];

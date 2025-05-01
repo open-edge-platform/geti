@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CustomNumberField } from '@shared/components/configurable-parameters/cp-item/custom-number-field/custom-number-field.component';
+
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { useDebouncedCallback } from '../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
-import { CustomNumberField } from '../../../../shared/components/configurable-parameters/cp-item/custom-number-field/custom-number-field.component';
 
 interface MediaFilterValueShapeAreaPercentageProps {
     value?: SearchRuleValue;

@@ -4,9 +4,9 @@
 import { ReactNode } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { MediaItemView } from '@shared/components/media-item-view/media-item-view.component';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
-import { MediaItemView } from '../../../../../shared/components/media-item-view/media-item-view.component';
 import { getMediaId } from '../../../../media/utils';
 
 import classes from './dataset-accordion.module.scss';

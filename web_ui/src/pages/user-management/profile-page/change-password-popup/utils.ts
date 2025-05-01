@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CONFIRM_PASSWORD_ERROR_MESSAGE, passwordValidationRules } from '@shared/utils';
 import * as yup from 'yup';
 
-import { CONFIRM_PASSWORD_ERROR_MESSAGE, passwordValidationRules } from '../../../../shared/utils';
 import { PasswordState } from '../../users/add-member-popup/add-member-popup.interface';
 
 export const passwordSchema = yup.object({

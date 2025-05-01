@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { MenuPosition } from '../../../../shared/components/context-menu/context-menu.component';
+import { MenuPosition } from '@shared/components/context-menu/context-menu.component';
 
 export enum AnnotationContextMenuItemsKeys {
     EDIT_LABELS = 'Edit labels',

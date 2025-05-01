@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
-import { trimText } from '../../../../shared/utils';
+import { PressableElement } from '@shared/components/pressable-element/pressable-element.component';
+import { trimText } from '@shared/utils';
 
 import classes from './annotator-footer.module.scss';
 

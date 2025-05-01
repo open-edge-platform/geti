@@ -4,11 +4,11 @@
 import { useEffect } from 'react';
 
 import { Heading, Text } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { redirectTo } from '@shared/utils';
 
 import { Unauthorized } from '../../../assets/images';
 import { paths } from '../../../core/services/routes';
-import { Button } from '../../../shared/components/button/button.component';
-import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';
 

@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useNumberFormatter, View } from '@adobe/react-spectrum';
+import { IndicatorWrapper } from '@shared/components/indicator-wrapper/indicator-wrapper.component';
+import { MediaItemView } from '@shared/components/media-item-view/media-item-view.component';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../core/media/video.interface';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';
 import { TestScore } from '../../../../core/tests/tests.interface';
-import { IndicatorWrapper } from '../../../../shared/components/indicator-wrapper/indicator-wrapper.component';
-import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
 import { getMediaId } from '../../../media/utils';
 import { SCORE_FORMATTER_OPTIONS } from './utils';
 

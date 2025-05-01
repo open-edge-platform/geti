@@ -3,6 +3,8 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { hasEqualId, runWhen } from '@shared/utils';
 import { UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import isEmpty from 'lodash/isEmpty';
@@ -18,8 +20,6 @@ import { isKeypointTask } from '../../../../core/projects/utils';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
-import { hasEqualId, runWhen } from '../../../../shared/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';

@@ -4,6 +4,11 @@
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
+import { NotFound } from '@shared/components/not-found/not-found.component';
+import { CasualCell } from '@shared/components/table/components/casual-cell/casual-cell.component';
+import { StatusCell } from '@shared/components/table/status-cell/status-cell.component';
+import { TableCellProps } from '@shared/components/table/table.interface';
+import { SpectrumTableLoadingState } from '@shared/utils';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 
@@ -11,11 +16,6 @@ import { isOrganizationAdmin } from '../../../../core/users/user-role-utils';
 import { User, UsersQueryParams } from '../../../../core/users/users.interface';
 import { Workspace } from '../../../../core/workspaces/services/workspaces.interface';
 import { useSortTable } from '../../../../hooks/use-sort-table/use-sort-table.hook';
-import { NotFound } from '../../../../shared/components/not-found/not-found.component';
-import { CasualCell } from '../../../../shared/components/table/components/casual-cell/casual-cell.component';
-import { StatusCell } from '../../../../shared/components/table/status-cell/status-cell.component';
-import { TableCellProps } from '../../../../shared/components/table/table.interface';
-import { SpectrumTableLoadingState } from '../../../../shared/utils';
 import { LastLoginCell } from './last-login-cell.component';
 import { ProjectRoleCell } from './project-role-cell.component';
 import { UserNameCell } from './user-name-cell/user-name-cell.component';

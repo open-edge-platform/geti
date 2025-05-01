@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getFileSize } from '@shared/utils';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
-import { getFileSize } from '../../../../shared/utils';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedAdminUser, getMockedContributorUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';

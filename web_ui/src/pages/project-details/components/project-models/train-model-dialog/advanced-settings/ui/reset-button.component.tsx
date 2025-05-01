@@ -3,8 +3,9 @@
 
 import { ComponentProps, FC } from 'react';
 
+import { ActionButton } from '@shared/components/button/button.component';
+
 import { Refresh } from '../../../../../../../assets/icons';
-import { ActionButton } from '../../../../../../../shared/components/button/button.component';
 
 type ResetButtonProps = Omit<ComponentProps<typeof ActionButton>, 'children' | 'isQuiet'>;
 

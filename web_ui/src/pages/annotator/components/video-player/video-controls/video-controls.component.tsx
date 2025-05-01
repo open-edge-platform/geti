@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup } from '@adobe/react-spectrum';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import isFunction from 'lodash/isFunction';
 
 import { Pause, Play, StepBackward, StepForward } from '../../../../../assets/icons';
-import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useVideoKeyboardShortcuts } from '../../../hot-keys/use-video-keyboard-shortcuts/use-video-keyboard-shortcuts';
 import { VideoControls } from './video-controls.interface';
 

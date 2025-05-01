@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, Heading, Text } from '@adobe/react-spectrum';
+import { CustomerSupportLink } from '@shared/components/customer-support-link/customer-support-link.component';
 
 import { ConnectionLost } from '../../../assets/images';
-import { CustomerSupportLink } from '../../../shared/components/customer-support-link/customer-support-link.component';
 
 import classes from '../error-layout/error-layout.module.scss';
 

@@ -3,6 +3,7 @@
 
 import { PointerEvent, useEffect, useRef } from 'react';
 
+import { runWhen, runWhenTruthy } from '@shared/utils';
 import { useMutation } from '@tanstack/react-query';
 import { Remote } from 'comlink';
 import isEmpty from 'lodash/isEmpty';
@@ -12,7 +13,6 @@ import throttle from 'lodash/throttle';
 import { Point, Polygon } from '../../../core/annotations/shapes.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { runWhen, runWhenTruthy } from '../../../shared/utils';
 import { leftRightMouseButtonHandler } from '../../utils';
 import { usePolygonState } from '../tools/polygon-tool/polygon-state-provider.component';
 import { PolygonMode } from '../tools/polygon-tool/polygon-tool.enum';

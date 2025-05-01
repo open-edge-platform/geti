@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { getIds, hasEqualId, isNonEmptyArray } from '@shared/utils';
 import sortBy from 'lodash/sortBy';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -11,7 +12,6 @@ import { Shape } from '../../../../core/annotations/shapes.interface';
 import { labelFromUser } from '../../../../core/annotations/utils';
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../../core/labels/label-resolver';
 import { Label } from '../../../../core/labels/label.interface';
-import { getIds, hasEqualId, isNonEmptyArray } from '../../../../shared/utils';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
 import useUndoRedoState from '../../tools/undo-redo/use-undo-redo-state';

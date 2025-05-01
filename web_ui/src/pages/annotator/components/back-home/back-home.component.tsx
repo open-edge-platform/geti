@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { BackButton as BackHomeButton } from '@shared/components/back-button/back-button.component';
 import isEmpty from 'lodash/isEmpty';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -12,7 +13,6 @@ import {
     encodeFilterSearchParam,
     getFilterParam,
 } from '../../../../hooks/use-filter-search-param/use-filter-search-param.hook';
-import { BackButton as BackHomeButton } from '../../../../shared/components/back-button/back-button.component';
 import { isMediaFilterOptions } from '../../../media/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useDatasetIdentifier } from '../../hooks/use-dataset-identifier.hook';

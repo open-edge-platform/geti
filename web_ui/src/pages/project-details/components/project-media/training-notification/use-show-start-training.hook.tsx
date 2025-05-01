@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 
 import { OverlayTriggerState } from '@react-stately/overlays';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { CREDIT_COST_PER_IMAGE_OR_VIDEO } from '../../../../../core/credits/credits.interface';
@@ -19,7 +20,6 @@ import { useProjectIdentifier } from '../../../../../hooks/use-project-identifie
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { MEDIA_CONTENT_BUCKET } from '../../../../../providers/media-upload-provider/media-upload.interface';
-import { QuietToggleButton } from '../../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useAdvancedMediaFilter } from '../../../../media/hooks/media-items/advanced-media-filter.hook';
 import { getRequiredAnomalyFilters } from '../../../../media/providers/utils';

@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import countBy from 'lodash/countBy';
 import isEqual from 'lodash/isEqual';
 
 import { Annotation } from '../../../core/annotations/annotation.interface';
-import { hasEqualId } from '../../../shared/utils';
 import { ToolPerAnnotation } from '../providers/analytics-annotation-scene-provider/use-enhanced-analytics-annotation-scene.hook';
 import { areLabelsIdentical } from '../utils';
 

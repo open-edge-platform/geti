@@ -3,12 +3,12 @@
 
 import { ReactNode } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import isNil from 'lodash/isNil';
 
 import { Annotation as AnnotationInterface } from '../../../../core/annotations/annotation.interface';
 import { Explanation } from '../../../../core/annotations/prediction.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { hasEqualId } from '../../../../shared/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { filterForExplanation, hasValidLabels } from '../../utils';
 

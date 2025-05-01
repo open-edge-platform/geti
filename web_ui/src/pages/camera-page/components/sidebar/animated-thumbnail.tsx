@@ -3,13 +3,13 @@
 
 import { DimensionValue } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
+import { AnnotationStateIndicator } from '@shared/components/annotation-indicator/annotation-state-indicator.component';
+import { isNonEmptyArray } from '@shared/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { MEDIA_ANNOTATION_STATUS } from '../../../../core/media/base.interface';
-import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
-import { AnnotationStateIndicator } from '../../../../shared/components/annotation-indicator/annotation-state-indicator.component';
-import { isNonEmptyArray } from '../../../../shared/utils';
 import { DeleteItemButton } from '../delete-item-button.component';
 import { ImageVideoFactory } from '../image-video-factory.component';
 

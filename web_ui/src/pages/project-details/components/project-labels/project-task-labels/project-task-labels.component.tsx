@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { DomainName } from '@shared/components/domain-name/domain-name.component';
 import isEmpty from 'lodash/isEmpty';
 import noop from 'lodash/noop';
 
 import { LabelTreeItem, LabelTreeLabelProps, Readonly } from '../../../../../core/labels/label-tree-view.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../../core/projects/task.interface';
-import { DomainName } from '../../../../../shared/components/domain-name/domain-name.component';
 import { ProjectLabelsManagement } from '../project-labels-management/project-labels-management.component';
 
 import classes from './project-task-labels.module.scss';

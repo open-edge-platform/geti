@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ChartData, Colors } from '@shared/components/charts/chart.interface';
+import { convertColorToFadedColor } from '@shared/components/charts/utils';
 import negate from 'lodash/negate';
 
 import { ObjectsPerLabelInterface } from '../../../../../core/statistics/dtos/dataset-statistics.interface';
-import { ChartData, Colors } from '../../../../../shared/components/charts/chart.interface';
-import { convertColorToFadedColor } from '../../../../../shared/components/charts/utils';
 
 export const getColors = (objectsPerLabel: ObjectsPerLabelInterface[]): Colors[] =>
     objectsPerLabel.reduce<Colors[]>((prev, curr) => {

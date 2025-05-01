@@ -3,10 +3,11 @@
 
 import { RefObject, useRef } from 'react';
 
+import { hasEqualId } from '@shared/utils';
+
 import { Annotation, KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { useOutsideClick } from '../../../../hooks/outside-click/outside-click.hook';
-import { hasEqualId } from '../../../../shared/utils';
 import { isWheelButton } from '../../../buttons-utils';
 import { Labels } from '../../annotation/labels/labels.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';

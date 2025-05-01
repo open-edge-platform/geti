@@ -23,8 +23,8 @@ jest.mock('../../../camera-support/use-camera.hook', () => ({
     })),
 }));
 
-jest.mock('../../../../shared/navigator-utils', () => ({
-    ...jest.requireActual('../../../../shared/navigator-utils'),
+jest.mock('@shared/navigator-utils', () => ({
+    ...jest.requireActual('@shared/navigator-utils'),
     getVideoDevices: jest.fn().mockResolvedValue([]),
 }));
 

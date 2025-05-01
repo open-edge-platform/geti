@@ -3,8 +3,9 @@
 
 import { createContext, ReactNode, useContext } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { UseCanvasSettings, useCanvasSettings } from '../../hooks/use-canvas-settings.hook';
 
 interface AnnotatorCanvasSettingsProviderProps {

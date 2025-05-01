@@ -4,9 +4,9 @@
 import { ReactNode } from 'react';
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
-import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 
 interface ShapeTypeButtonProps {
     label: string;

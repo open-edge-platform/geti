@@ -1,6 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { BooleanGroupParams } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { useAutoTrainingTasksConfig } from '@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { getFuxSetting } from '@shared/components/tutorials/utils';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { JobState } from '../../../../core/jobs/jobs.const';
@@ -8,9 +11,6 @@ import { createInMemoryJobsService } from '../../../../core/jobs/services/in-mem
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserGlobalSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { INITIAL_GLOBAL_SETTINGS } from '../../../../core/user-settings/utils';
-import { BooleanGroupParams } from '../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { useAutoTrainingTasksConfig } from '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
-import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 import { getMockedJob, getMockedJobCount } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
 import {
     getMockedUserGlobalSettings,
@@ -28,17 +28,14 @@ jest.mock('./util', () => ({
         callback(),
 }));
 
-jest.mock(
-    '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook',
-    () => ({
-        ...jest.requireActual(
-            '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook'
-        ),
-        useAutoTrainingTasksConfig: jest.fn(),
-    })
-);
+jest.mock('@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook', () => ({
+    ...jest.requireActual(
+        '@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook'
+    ),
+    useAutoTrainingTasksConfig: jest.fn(),
+}));
 
-jest.mock('../../../../shared/components/tutorials/utils', () => ({
+jest.mock('@shared/components/tutorials/utils', () => ({
     getFuxSetting: jest.fn(),
 }));
 

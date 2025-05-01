@@ -4,8 +4,8 @@
 import { useState } from 'react';
 
 import { DialogContainer, Flex } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
 
-import { Button } from '../../../../shared/components/button/button.component';
 import { AddUserToProjectDialog } from './add-user-to-project.component';
 
 export const Header = () => {

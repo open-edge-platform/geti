@@ -3,8 +3,9 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { Task } from '../../../../core/projects/task.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import {
     AnnotationToolContext as AnnotationToolContextProps,

@@ -4,13 +4,13 @@
 import { useState } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
+import { TaskLabelTreeSearchPopover } from '@shared/components/task-label-tree-search/task-label-tree-search-popover.component';
+import { getIds, hasEqualId, runWhenTruthy } from '@shared/utils';
 
 import { Edit } from '../../../../../assets/icons';
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../../core/labels/label.interface';
-import { QuietToggleButton } from '../../../../../shared/components/quiet-button/quiet-toggle-button.component';
-import { TaskLabelTreeSearchPopover } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search-popover.component';
-import { getIds, hasEqualId, runWhenTruthy } from '../../../../../shared/utils';
 import { SelectionIndicator } from '../../../components/labels/label-search/selection-indicator.component';
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { useTask } from '../../../providers/task-provider/task-provider.component';

@@ -4,6 +4,8 @@
 import { Key, useEffect, useMemo, useState } from 'react';
 
 import { Flex, Item, Picker, Text } from '@adobe/react-spectrum';
+import { WarningMessage } from '@shared/components/warning-message/warning-message.component';
+import { hasEqualId } from '@shared/utils';
 import capitalize from 'lodash/capitalize';
 import isEmpty from 'lodash/isEmpty';
 
@@ -11,8 +13,6 @@ import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { PerformanceCategory } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { useSupportedAlgorithms } from '../../../../core/supported-algorithms/hooks/use-supported-algorithms.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
-import { WarningMessage } from '../../../../shared/components/warning-message/warning-message.component';
-import { hasEqualId } from '../../../../shared/utils';
 import { SelectableOptimizationType } from '../../project-details.interface';
 import { getAvailableOptimizationTypes, isModelDeleted, NO_MODELS_MESSAGE } from '../../utils';
 import { SelectOptimization } from '../common/select-optimization.component';

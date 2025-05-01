@@ -4,8 +4,8 @@
 import { ReactNode } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { SidebarMenu } from '@shared/components/sidebar-menu/sidebar-menu.component';
 
-import { SidebarMenu } from '../../../../shared/components/sidebar-menu/sidebar-menu.component';
 import { SidebarHeader } from './sidebar-header.component';
 
 interface SidebarProps {

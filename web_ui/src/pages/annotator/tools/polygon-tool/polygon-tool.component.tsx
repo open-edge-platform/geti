@@ -3,6 +3,8 @@
 
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { KeyboardEvents } from '@shared/keyboard-events/keyboard.interface';
+import { onEscape } from '@shared/utils';
 import differenceWith from 'lodash/differenceWith';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -13,8 +15,6 @@ import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
 import { AlgorithmType } from '../../../../hooks/use-load-ai-webworker/algorithm.interface';
 import { useLoadAIWebworker } from '../../../../hooks/use-load-ai-webworker/use-load-ai-webworker.hook';
-import { KeyboardEvents } from '../../../../shared/keyboard-events/keyboard.interface';
-import { onEscape } from '../../../../shared/utils';
 import { getRelativePoint } from '../../../utils';
 import { useIntelligentScissors } from '../../hooks/use-intelligent-scissors.hook';
 import { usePolygon } from '../../hooks/use-polygon.hook';

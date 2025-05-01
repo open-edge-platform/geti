@@ -4,9 +4,9 @@
 import { FC, ReactNode, useState } from 'react';
 
 import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import { ConfigurableParametersComponents } from '@shared/components/configurable-parameters/configurable-parameters.interface';
 import noop from 'lodash/noop';
 
-import { ConfigurableParametersComponents } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { Parameters } from '../../ui/parameters.component';
 import { TILING_MODES, TilingModes } from './tiling-modes.component';

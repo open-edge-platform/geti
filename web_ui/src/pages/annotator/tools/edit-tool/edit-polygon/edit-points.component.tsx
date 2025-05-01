@@ -3,14 +3,14 @@
 
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
+import { KeyboardEvents } from '@shared/keyboard-events/keyboard.interface';
+import { MouseEvents } from '@shared/mouse-events/mouse.interface';
 import isEmpty from 'lodash/isEmpty';
 import noop from 'lodash/noop';
 
 import { Delete } from '../../../../../assets/icons';
 import { Point, Polygon } from '../../../../../core/annotations/shapes.interface';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';
-import { KeyboardEvents } from '../../../../../shared/keyboard-events/keyboard.interface';
-import { MouseEvents } from '../../../../../shared/mouse-events/mouse.interface';
 import { isLeftButton } from '../../../../buttons-utils';
 import { isKeyboardDelete } from '../../../../media/utils';
 import { getRelativePoint, projectPointOnLine } from '../../../../utils';

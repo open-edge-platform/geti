@@ -3,6 +3,8 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideoFrame } from '../../../../core/media/video.interface';
@@ -17,7 +19,6 @@ import {
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { HoveredProvider } from '../../../../providers/hovered-provider/hovered-provider.component';
 import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { AskToResetFilterBeforeSubmittingAnnotations } from '../../annotation/annotation-filter/ask-to-reset-filter-before-submitting-annotations.component';
 import { StreamingVideoPlayerProvider } from '../../components/video-player/streaming-video-player/streaming-video-player-provider.component';

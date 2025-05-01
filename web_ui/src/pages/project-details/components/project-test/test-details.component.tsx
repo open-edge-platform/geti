@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import { Flex, Grid, Text } from '@adobe/react-spectrum';
+import { CardContent } from '@shared/components/card-content/card-content.component';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isAnomalyDomain, isDetectionDomain, isSegmentationDomain } from '../../../../core/projects/domains';
@@ -11,7 +12,6 @@ import { TASK_TYPE } from '../../../../core/projects/dtos/task.interface';
 import { getDomain } from '../../../../core/projects/project.interface';
 import { JobInfoStatus } from '../../../../core/tests/dtos/tests.interface';
 import { Test } from '../../../../core/tests/tests.interface';
-import { CardContent } from '../../../../shared/components/card-content/card-content.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { getVersionWithDateText } from '../project-model/utils';
 import { AccuracyHalfDonutChart } from '../project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';

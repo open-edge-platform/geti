@@ -4,6 +4,8 @@
 import { Key, useEffect, useMemo, useState } from 'react';
 
 import { ComboBox, Flex, Item } from '@adobe/react-spectrum';
+import { LimitedTextField } from '@shared/components/limited-text-field/limited-text-field.component';
+import { ValidationErrorMsg } from '@shared/components/validation-error-msg/validation-error-msg.component';
 import isEmpty from 'lodash/isEmpty';
 import { ValidationError } from 'yup';
 
@@ -14,8 +16,6 @@ import {
     DatasetImportTask,
     DatasetImportToNewProjectItem,
 } from '../../../../../core/datasets/dataset.interface';
-import { LimitedTextField } from '../../../../../shared/components/limited-text-field/limited-text-field.component';
-import { ValidationErrorMsg } from '../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { getRandomDistinctColor } from '../../../../create-project/components/distinct-colors';
 import {
     MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME,

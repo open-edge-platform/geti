@@ -3,20 +3,20 @@
 
 import { Flex, Grid, minmax, Text, View } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
+import { CoachMark } from '@shared/components/coach-mark/coach-mark.component';
+import { AutoTrainingCoachMark } from '@shared/components/coach-mark/fux-notifications/auto-training-coach-mark.component';
+import { Divider } from '@shared/components/divider/divider.component';
+import { DomainName } from '@shared/components/domain-name/domain-name.component';
+import { ActiveLearningConfiguration } from '@shared/components/header/active-learning-configuration/active-learning-configuration.component';
+import { CreditBalanceStatus } from '@shared/components/header/credit-balance/credit-balance-status.component';
+import { JobsActionIcon } from '@shared/components/header/jobs-management/jobs-action-icon.component';
+import { useIsCreditAccountEnabled } from '@shared/hooks/use-is-credit-account-enabled';
+import { hasEqualSize } from '@shared/utils';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
 import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
-import { CoachMark } from '../../../../shared/components/coach-mark/coach-mark.component';
-import { AutoTrainingCoachMark } from '../../../../shared/components/coach-mark/fux-notifications/auto-training-coach-mark.component';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';
-import { ActiveLearningConfiguration } from '../../../../shared/components/header/active-learning-configuration/active-learning-configuration.component';
-import { CreditBalanceStatus } from '../../../../shared/components/header/credit-balance/credit-balance-status.component';
-import { JobsActionIcon } from '../../../../shared/components/header/jobs-management/jobs-action-icon.component';
-import { useIsCreditAccountEnabled } from '../../../../shared/hooks/use-is-credit-account-enabled';
-import { hasEqualSize } from '../../../../shared/utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { useSelectedDataset } from '../../../project-details/components/project-dataset/use-selected-dataset/use-selected-dataset.hook';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';

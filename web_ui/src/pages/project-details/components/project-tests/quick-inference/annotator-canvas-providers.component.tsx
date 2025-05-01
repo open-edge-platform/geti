@@ -3,11 +3,11 @@
 
 import { ReactNode, useMemo } from 'react';
 
+import { getImageData, getImageDataUrl } from '@shared/canvas-utils';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
-import { getImageData, getImageDataUrl } from '../../../../../shared/canvas-utils';
 import { AnnotatorProvider } from '../../../../annotator/providers/annotator-provider/annotator-provider.component';
 import { RegionOfInterestProvider } from '../../../../annotator/providers/region-of-interest-provider/region-of-interest-provider.component';
 import { DefaultSelectedMediaItemProvider } from '../../../../annotator/providers/selected-media-item-provider/default-selected-media-item-provider.component';

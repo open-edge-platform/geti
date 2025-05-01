@@ -2,6 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
+import { CustomTooltipWrapper } from '@shared/components/charts/custom-tooltip-wrapper/custom-tooltip-wrapper.component';
+import { SvgLegend } from '@shared/components/download-graph-menu/export-svg-utils';
+import { withDownloadableSvg } from '@shared/components/download-graph-menu/with-downloadable-svg.hoc';
 import {
     CartesianGrid,
     Label,
@@ -15,9 +18,6 @@ import {
 } from 'recharts';
 
 import { ObjectSizeDistribution } from '../../../../../../core/statistics/services/dataset-statistics.interface';
-import { CustomTooltipWrapper } from '../../../../../../shared/components/charts/custom-tooltip-wrapper/custom-tooltip-wrapper.component';
-import { SvgLegend } from '../../../../../../shared/components/download-graph-menu/export-svg-utils';
-import { withDownloadableSvg } from '../../../../../../shared/components/download-graph-menu/with-downloadable-svg.hoc';
 import { DistributionEllipse } from './distribution-ellipse.component';
 import { DistributionTriangle } from './distribution-triangle.component';
 import { calculateHorizontalTrianglePoints, calculateVerticalTrianglePoints, getScatterPoints } from './utils';

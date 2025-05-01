@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { sortDescending } from '../../../shared/utils';
+import { sortDescending } from '@shared/utils';
+
 import { mapSearchRulesToDto } from '../../datasets/services/utils';
 import { JobTestDTO } from '../../jobs/dtos/jobs-dto.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';

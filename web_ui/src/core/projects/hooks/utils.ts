@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isNewState } from '@shared/components/label-tree-view/label-tree-view-item/utils';
 import { UseQueryResult } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
 
-import { isNewState } from '../../../shared/components/label-tree-view/label-tree-view-item/utils';
 import { ExportStatusStateDTO } from '../../configurable-parameters/dtos/configurable-parameters.interface';
 import { JobProjectExportStatus } from '../../jobs/jobs.interface';
 import { LabelItemEditionState, LabelTreeItem } from '../../labels/label-tree-view.interface';

@@ -3,6 +3,7 @@
 
 import { ReactNode } from 'react';
 
+import { getIds } from '@shared/utils';
 import { act, renderHook } from '@testing-library/react';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -11,7 +12,6 @@ import { labelFromUser } from '../../../../core/annotations/utils';
 import { Label, LABEL_BEHAVIOUR } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { getIds } from '../../../../shared/utils';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel, labels as mockedLabels } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';

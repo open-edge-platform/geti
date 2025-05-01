@@ -4,6 +4,10 @@
 import { useCallback, useRef } from 'react';
 
 import { DialogTrigger, Flex, Text, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@shared/components/button/button.component';
+import { useAutoTrainingTasksConfig } from '@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { getAllAutoTrainingValue } from '@shared/components/header/active-learning-configuration/util';
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 import isNil from 'lodash/isNil';
@@ -11,10 +15,6 @@ import isNil from 'lodash/isNil';
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../../core/projects/hooks/use-project-status.hook';
 import { Task } from '../../../../../core/projects/task.interface';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { useAutoTrainingTasksConfig } from '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
-import { getAllAutoTrainingValue } from '../../../../../shared/components/header/active-learning-configuration/util';
-import { hasEqualId } from '../../../../../shared/utils';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { TaskRequiredAnnotations, useRequiredAnnotations } from '../../../hooks/use-required-annotations.hook';
 import { DetailsDialog } from './details-dialog.component';

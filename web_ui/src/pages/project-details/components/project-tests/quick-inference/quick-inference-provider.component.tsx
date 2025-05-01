@@ -3,6 +3,9 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useMemo, useState } from 'react';
 
+import { getImageData, getImageDataFromTiffFile } from '@shared/canvas-utils';
+import { isTiffFormat, isValidFileExtension, loadImageFromFile, VALID_IMAGE_TYPES } from '@shared/media-utils';
+import { MissingProviderError } from '@shared/missing-provider-error';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
@@ -16,14 +19,6 @@ import {
     mediaExtensionHandler,
     validateMedia,
 } from '../../../../../providers/media-upload-provider/media-upload.validator';
-import { getImageData, getImageDataFromTiffFile } from '../../../../../shared/canvas-utils';
-import {
-    isTiffFormat,
-    isValidFileExtension,
-    loadImageFromFile,
-    VALID_IMAGE_TYPES,
-} from '../../../../../shared/media-utils';
-import { MissingProviderError } from '../../../../../shared/missing-provider-error';
 import { sortExplanationsByName } from '../../../../annotator/providers/prediction-provider/utils';
 import { useQuickInferenceMutation } from './use-quick-inference-mutation.hook';
 

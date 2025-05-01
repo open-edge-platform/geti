@@ -4,8 +4,7 @@
 import { ReactNode } from 'react';
 
 import { Divider, Flex, Heading } from '@adobe/react-spectrum';
-
-import { getFileSize } from '../../../../../shared/utils';
+import { getFileSize } from '@shared/utils';
 
 import classes from './project-import.module.scss';
 

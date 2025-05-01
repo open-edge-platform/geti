@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getFuxSetting } from '@shared/components/tutorials/utils';
+
 import { GETI_SYSTEM_AUTHOR_ID, JobState } from '../../../../core/jobs/jobs.const';
 import { Job, JobCount } from '../../../../core/jobs/jobs.interface';
-import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 import { getMockedJob } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
 import { getMockedUserGlobalSettingsObject } from '../../../../test-utils/mocked-items-factory/mocked-settings';
 import { onFirstScheduledAutoTrainingJob } from './util';
@@ -26,7 +27,7 @@ const getJobResponse = (jobCount: Partial<JobCount> = {}, mockedJobs: Job[] = []
     ],
 });
 
-jest.mock('../../../../shared/components/tutorials/utils', () => ({
+jest.mock('@shared/components/tutorials/utils', () => ({
     getFuxSetting: jest.fn(),
 }));
 

@@ -16,13 +16,13 @@ import {
     TextField,
 } from '@adobe/react-spectrum';
 import { TextFieldRef } from '@react-types/textfield';
+import { Button } from '@shared/components/button/button.component';
 
 import { Info } from '../../../../assets/icons';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
 import { WorkspaceIdentifier } from '../../../../core/workspaces/services/workspaces.interface';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { Button } from '../../../../shared/components/button/button.component';
 import { isYupValidationError } from '../../profile-page/utils';
 import { ErrorMessage } from '../add-member-popup/error-message/error-message.component';
 import { RolePicker } from '../old-project-users/role-picker.component';

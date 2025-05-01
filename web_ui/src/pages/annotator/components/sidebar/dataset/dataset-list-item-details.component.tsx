@@ -4,16 +4,16 @@
 import { ComponentProps, useMemo } from 'react';
 
 import { Divider, Flex, Grid, minmax, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { MediaItemView } from '@shared/components/media-item-view/media-item-view.component';
+import { PressableElement } from '@shared/components/pressable-element/pressable-element.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
+import { getFileSize } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../../core/media/video.interface';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { MediaItemView } from '../../../../../shared/components/media-item-view/media-item-view.component';
-import { PressableElement } from '../../../../../shared/components/pressable-element/pressable-element.component';
-import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
-import { getFileSize } from '../../../../../shared/utils';
 import { getMediaId } from '../../../../media/utils';
 import { DatasetListItemVideoDetails } from './dataset-list-item-video-details.component';
 import { DatasetListItem } from './dataset-list-item.component';

@@ -4,8 +4,8 @@
 import { FC } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { ConfigurableParametersTaskChain } from '@shared/components/configurable-parameters/configurable-parameters.interface';
 
-import { ConfigurableParametersTaskChain } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { DataAugmentation } from './data-augmentation/data-augmentation.component';
 import { Filters } from './filters/filters.component';
 import { Tiling } from './tiling/tiling.component';

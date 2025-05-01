@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import isNil from 'lodash/isNil';
 
 import { useProjectStatus } from '../../../core/projects/hooks/use-project-status.hook';
 import { RequiredAnnotationsDetailsEntry } from '../../../core/projects/project-status.interface';
 import { Task } from '../../../core/projects/task.interface';
-import { hasEqualId } from '../../../shared/utils';
 import { useProject } from '../../project-details/providers/project-provider/project-provider.component';
 import { getTaskRequiredAnnotationsDetails } from '../providers/task-provider/utils';
 

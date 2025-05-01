@@ -3,10 +3,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
-import { hasEqualId } from '../../../../shared/utils';
 import { useAnnotationFilters } from './use-annotation-filters.hook';
 
 const getAnnotationsFilter = (filters: string[]) => {

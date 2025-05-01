@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CONFIRM_PASSWORD_ERROR_MESSAGE, PASSWORD_DOES_NOT_MEET_LENGTH_RULE } from '@shared/utils';
 import { fireEvent, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { CONFIRM_PASSWORD_ERROR_MESSAGE, PASSWORD_DOES_NOT_MEET_LENGTH_RULE } from '../../../../shared/utils';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { CORRECT_PASS, PASSWORD_WITH_MORE_THAN_200_CHARS } from '../../users/add-member-popup/test-utils';
 import { ChangePasswordPopup } from './change-password-popup.component';

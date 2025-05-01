@@ -5,6 +5,7 @@ import { ComponentProps, FormEvent, forwardRef, ReactNode, useCallback, useEffec
 
 import { TextField } from '@adobe/react-spectrum';
 import { TextFieldRef } from '@react-types/textfield';
+import { getIds, onEscape } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 import { useFilter } from 'react-aria';
@@ -16,7 +17,6 @@ import {
 } from '../../../../../core/labels/annotator-utils/labels-utils';
 import { LabelTreeLabelProps } from '../../../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../../../core/labels/label.interface';
-import { getIds, onEscape } from '../../../../../shared/utils';
 import { LabelResultPanel } from './label-result-panel.component';
 import { SearchLabelTreeItemSuffix } from './search-label-tree-view-item.component';
 

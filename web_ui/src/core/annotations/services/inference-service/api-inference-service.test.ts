@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { loadImageFromFile } from '@shared/media-utils';
 import partial from 'lodash/partial';
 import { rest } from 'msw';
 
-import { loadImageFromFile } from '../../../../shared/media-utils';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import {
@@ -31,8 +31,8 @@ import { getPredictionCache } from '../utils';
 import { createApiInferenceService } from './api-inference-service';
 import { convertBatchToRecord } from './utils';
 
-jest.mock('../../../../shared/media-utils', () => ({
-    ...jest.requireActual('../../../../shared/media-utils'),
+jest.mock('@shared/media-utils', () => ({
+    ...jest.requireActual('@shared/media-utils'),
     loadImageFromFile: jest.fn(),
 }));
 

@@ -3,6 +3,7 @@
 
 import { PointerEvent, useEffect, useMemo, useRef, useState } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -10,7 +11,6 @@ import { Annotation, Annotation as AnnotationInterface } from '../../../../../co
 import { clampBox, clampPointBetweenImage, isPointInShape, pointsToRect } from '../../../../../core/annotations/math';
 import { Point, Rect } from '../../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../../core/annotations/shapetype.enum';
-import { hasEqualId } from '../../../../../shared/utils';
 import { isRightButton } from '../../../../buttons-utils';
 import { getRelativePoint } from '../../../../utils';
 import { Rectangle } from '../../../annotation/shapes/rectangle.component';

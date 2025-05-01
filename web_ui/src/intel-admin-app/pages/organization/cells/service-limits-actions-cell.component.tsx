@@ -4,12 +4,12 @@
 import { useState } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { MenuTrigger } from '@shared/components/menu-trigger/menu-trigger.component';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { Edit, MoreMenu } from '../../../../assets/icons';
 import { useSubscriptions } from '../../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { Quota } from '../../../../core/credits/subscriptions/quotas.interface';
-import { MenuTrigger } from '../../../../shared/components/menu-trigger/menu-trigger.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { EditServiceLimitDialog } from '../dialogs/edit-service-limit-dialog.component';
 
 interface ActionCellProps {

@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+
 import { Delete } from '../../../../../assets/icons';
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';
 import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { EdgeLine } from '../util';
 import { Edge } from './edge.component';
 

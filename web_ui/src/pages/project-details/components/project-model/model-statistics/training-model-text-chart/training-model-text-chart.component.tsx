@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { withDownloadableHtml } from '@shared/components/download-graph-menu/with-downloadable-svg.hoc';
 
 import { TrainingModelChartConfig } from '../../../../../../core/statistics/model-statistics.interface';
-import { CardContent } from '../../../../../../shared/components/card-content/card-content.component';
-import { withDownloadableHtml } from '../../../../../../shared/components/download-graph-menu/with-downloadable-svg.hoc';
 
 import classes from './training-model-text-chart.module.scss';
 

@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading, Meter, Text, View } from '@adobe/react-spectrum';
+import { Divider } from '@shared/components/divider/divider.component';
+import { isNonEmptyArray } from '@shared/utils';
 import countBy from 'lodash/countBy';
 import identity from 'lodash/identity';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { isNonEmptyArray } from '../../../../shared/utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { DeviceSettings } from './device-settings.component';
 import { SidebarThumbnail } from './sidebar-thumbnail.component';

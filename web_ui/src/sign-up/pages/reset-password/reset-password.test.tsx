@@ -1,6 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import {
+    CONFIRM_PASSWORD_ERROR_MESSAGE,
+    MISSING_REQUIRED_CHARACTERS_MESSAGE,
+    PASSWORD_DOES_NOT_MEET_LENGTH_RULE,
+} from '@shared/utils';
 import { screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import dayjs from 'dayjs';
@@ -11,11 +16,6 @@ import {
     INCORRECT_PASS,
     PASSWORD_WITH_MORE_THAN_200_CHARS,
 } from '../../../pages/user-management/users/add-member-popup/test-utils';
-import {
-    CONFIRM_PASSWORD_ERROR_MESSAGE,
-    MISSING_REQUIRED_CHARACTERS_MESSAGE,
-    PASSWORD_DOES_NOT_MEET_LENGTH_RULE,
-} from '../../../shared/utils';
 import { providersRender as render } from '../../../test-utils/required-providers-render';
 import { ResetPassword } from './reset-password.component';
 

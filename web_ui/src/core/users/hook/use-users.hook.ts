@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo } from 'react';
 
+import { redirectTo } from '@shared/utils';
 import { useInfiniteQuery, useMutation, UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
@@ -10,7 +11,6 @@ import { validate } from 'uuid';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { redirectTo } from '../../../shared/utils';
 import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
 import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';

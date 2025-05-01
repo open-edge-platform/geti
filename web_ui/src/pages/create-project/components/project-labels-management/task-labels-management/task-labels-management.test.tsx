@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getDefaultGroupName } from '@shared/components/label-tree-view/utils';
 import { fireEvent, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
@@ -12,7 +13,6 @@ import {
 import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { GROUP_SEPARATOR } from '../../../../../core/labels/utils';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
-import { getDefaultGroupName } from '../../../../../shared/components/label-tree-view/utils';
 import { getMockedTreeGroup, getMockedTreeLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { getById, MORE_THAN_100_CHARS_NAME } from '../../../../../test-utils/utils';

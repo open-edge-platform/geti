@@ -3,18 +3,15 @@
 
 import { useRef } from 'react';
 
+import { downloadMultiplePages, ERROR_MESSAGE } from '@shared/components/download-graph-menu/export-svg-utils';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import {
-    downloadMultiplePages,
-    ERROR_MESSAGE,
-} from '../../../../../shared/components/download-graph-menu/export-svg-utils';
 import { projectRender as render } from '../../../../../test-utils/project-provider-render';
 import { DownloadSvgButton } from './download-svg-button.component';
 
-jest.mock('../../../../../shared/components/download-graph-menu/export-svg-utils', () => ({
-    ...jest.requireActual('../../../../../shared/components/download-graph-menu/export-svg-utils'),
+jest.mock('@shared/components/download-graph-menu/export-svg-utils', () => ({
+    ...jest.requireActual('@shared/components/download-graph-menu/export-svg-utils'),
     downloadMultiplePages: jest.fn(() => Promise.resolve()),
 }));
 

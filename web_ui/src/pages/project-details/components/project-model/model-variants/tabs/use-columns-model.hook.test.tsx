@@ -4,18 +4,18 @@
 import { ReactNode } from 'react';
 
 import { Column, Row, TableBody, TableHeader, TableView } from '@adobe/react-spectrum';
+import { downloadFile } from '@shared/utils';
 import { fireEvent, renderHook, screen, waitFor } from '@testing-library/react';
 
 import { createInMemoryApiModelConfigParametersService } from '../../../../../../core/configurable-parameters/services/in-memory-api-model-config-parameters-service';
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
 import { mockedOptimizedModels, mockedTrainedModel } from '../../../../../../core/models/services/test-utils';
-import { downloadFile } from '../../../../../../shared/utils';
 import { providersRender, RequiredProviders } from '../../../../../../test-utils/required-providers-render';
 import { ModelTableColumns } from '../model-table/model-table.interface';
 import { useColumnsModel } from './use-columns-model.hook';
 
-jest.mock('../../../../../../shared/utils', () => ({
-    ...jest.requireActual('../../../../../../shared/utils'),
+jest.mock('@shared/utils', () => ({
+    ...jest.requireActual('@shared/utils'),
     downloadFile: jest.fn(),
 }));
 

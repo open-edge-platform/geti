@@ -5,13 +5,13 @@ import { MutableRefObject, useRef, useState } from 'react';
 
 import { View } from '@adobe/react-spectrum';
 import { Overlay } from '@react-spectrum/overlays';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { isVideoFile } from '@shared/media-utils';
 import isNumber from 'lodash/isNumber';
 import { useOverlay } from 'react-aria';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
 import { ChevronLeft, ChevronRight, Close } from '../../../assets/icons';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
-import { isVideoFile } from '../../../shared/media-utils';
 import { Screenshot } from '../../camera-support/camera.interface';
 import { DeleteItemButton } from './delete-item-button.component';
 import { ImageVideoFactory } from './image-video-factory.component';

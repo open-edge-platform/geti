@@ -4,6 +4,9 @@
 import { useRef } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
+import { VALID_IMAGE_TYPES_SINGLE_UPLOAD } from '@shared/media-utils';
+import { onValidFileList } from '@shared/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
@@ -16,9 +19,6 @@ import {
     mediaExtensionHandler,
     validateImage,
 } from '../../../../providers/media-upload-provider/media-upload.validator';
-import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
-import { VALID_IMAGE_TYPES_SINGLE_UPLOAD } from '../../../../shared/media-utils';
-import { onValidFileList } from '../../../../shared/utils';
 import { isSupportedImageFormat } from '../../../utils';
 import { PictureLimits } from './picture-limits.component';
 import { UserPhotoPlaceholder } from './user-photo-placeholder/user-photo-placeholder.component';

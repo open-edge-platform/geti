@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ConfigurableParametersTaskChain } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+
 import { TrainingBodyDTO } from '../../../../../core/models/dtos/train-model.interface';
-import { ConfigurableParametersTaskChain } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { getTrainingConfigParametersDTO } from '../utils';
 
 interface TrainingBody {

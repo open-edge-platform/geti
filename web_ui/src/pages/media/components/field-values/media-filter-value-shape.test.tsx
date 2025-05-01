@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { KeyMap } from '@shared/keyboard-events/keyboard.interface';
 import { fireEvent, screen } from '@testing-library/react';
 
 import { SearchRuleShapeType } from '../../../../core/media/media-filter.interface';
-import { KeyMap } from '../../../../shared/keyboard-events/keyboard.interface';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { SHAPE_OPTIONS } from '../../utils';
 import { MediaFilterValueShape } from './media-filter-value-shape.component';

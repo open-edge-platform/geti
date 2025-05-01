@@ -3,10 +3,10 @@
 
 import { View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { useDurationText } from '@shared/hooks/data-format/use-duration-text.hook';
 
 import { TimeSmall } from '../../../../assets/icons';
 import { isVideoFrame, Video, VideoFrame } from '../../../../core/media/video.interface';
-import { useDurationText } from '../../../../shared/hooks/data-format/use-duration-text.hook';
 
 export const Duration = ({
     mediaItem,

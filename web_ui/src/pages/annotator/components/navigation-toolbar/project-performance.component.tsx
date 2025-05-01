@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { RouterLink } from '@shared/components/router-link/router-link.component';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../core/projects/hooks/use-project-status.hook';
 import { Performance, PerformanceType } from '../../../../core/projects/task.interface';
 import { paths } from '../../../../core/services/routes';
-import { RouterLink } from '../../../../shared/components/router-link/router-link.component';
 import { AccuracyHalfDonutChart } from '../../../project-details/components/project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';
 import { AnomalyProjectPerformance } from './anomaly-project-performance.component';
 import { ProjectPerformanceTooltip } from './project-performance-tooltip.component';

@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { View } from '@adobe/react-spectrum';
+import { ConfigurableParameters } from '@shared/components/configurable-parameters/configurable-parameters.component';
+import { ConfigurableParametersType } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { Loading } from '@shared/components/loading/loading.component';
 
 import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useModelIdentifier } from '../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
-import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
 
 interface ModelConfigurableParametersProps {
     taskId: string;

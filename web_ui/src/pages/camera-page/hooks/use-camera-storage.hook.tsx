@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isVideoFile, loadImageFromFile, loadVideoFromFile } from '@shared/media-utils';
 import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import isNil from 'lodash/isNil';
 import { useParams } from 'react-router-dom';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { isVideoFile, loadImageFromFile, loadVideoFromFile } from '../../../shared/media-utils';
 import { assertIsNotNullable } from '../../../types-utils/utils';
 import { Screenshot } from '../../camera-support/camera.interface';
 import { useCameraParams } from './camera-params.hook';

@@ -1,16 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isJobCancel, isJobDone, isJobFailed, isJobSettled } from '@shared/components/header/jobs-management/utils';
 import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import isFunction from 'lodash/isFunction';
 
-import {
-    isJobCancel,
-    isJobDone,
-    isJobFailed,
-    isJobSettled,
-} from '../../../shared/components/header/jobs-management/utils';
 import { JobGeneralProps } from '../../jobs/jobs.interface';
 import { getFailedJobMessage } from '../../services/utils';
 import { IntervalJobHandlers } from './dataset-import.interface';

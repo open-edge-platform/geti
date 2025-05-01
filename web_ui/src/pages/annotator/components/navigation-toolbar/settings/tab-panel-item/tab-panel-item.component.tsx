@@ -2,14 +2,14 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
+import { Switch } from '@shared/components/switch/switch.component';
 
 import {
     AnnotatorSettingsConfig,
     FEATURES_KEYS,
     SettingsFeature,
 } from '../../../../../../core/user-settings/dtos/user-settings.interface';
-import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';
-import { Switch } from '../../../../../../shared/components/switch/switch.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 
 interface TabPanelItemProps {

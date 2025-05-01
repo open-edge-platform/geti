@@ -3,8 +3,8 @@
 
 import { ButtonGroup, Content, Dialog, Divider, Text } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
+import { Button } from '@shared/components/button/button.component';
 
-import { Button } from '../../../../shared/components/button/button.component';
 import { usePrediction } from '../../providers/prediction-provider/prediction-provider.component';
 
 interface ReplaceOrMergeUserAnnotationsDialogProps {

@@ -3,13 +3,13 @@
 
 import { Key, useState } from 'react';
 
+import { Tabs } from '@shared/components/tabs/tabs.component';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { OnnxLogo, OpenVINOIcon, PyTorchLogo } from '../../../../../assets/images';
 import { paths } from '../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { Tabs } from '../../../../../shared/components/tabs/tabs.component';
-import { TabItem } from '../../../../../shared/components/tabs/tabs.interface';
 import { isModelDeleted } from '../../../utils';
 import { OptimizedModelsProps } from '../hooks/use-optimized-models/use-optimized-models.hook.interface';
 import { OnnxModelsTab } from './tabs/onnx-models-tab.component';

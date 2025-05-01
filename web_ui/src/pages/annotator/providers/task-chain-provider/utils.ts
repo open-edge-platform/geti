@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import intersectionBy from 'lodash/intersectionBy';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
@@ -21,7 +22,6 @@ import {
     isSegmentationDomain,
 } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
-import { hasEqualId } from '../../../../shared/utils';
 import { isInsideBoundingBox } from '../../tools/utils';
 import { hasValidLabels } from '../../utils';
 import { TaskChainContextProps } from './task-chain.interface';

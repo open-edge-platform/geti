@@ -4,6 +4,7 @@
 import { FC, Key } from 'react';
 
 import { Icon, Item, Menu, MenuTrigger, Section, Text } from '@adobe/react-spectrum';
+import { ButtonWithSpectrumTooltip } from '@shared/components/button-with-tooltip/button-with-tooltip.component';
 
 import { SortDown, SortUp, SortUpDown } from '../../../../assets/icons';
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';
@@ -14,7 +15,6 @@ import {
     sortModelsGroupsByModelSize,
     sortModelsGroupsByScore,
 } from '../../../../core/models/utils';
-import { ButtonWithSpectrumTooltip } from '../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
 
 export enum ModelsSortingOptions {
     ACTIVE_MODEL_ASC = 'Active model (asc)',

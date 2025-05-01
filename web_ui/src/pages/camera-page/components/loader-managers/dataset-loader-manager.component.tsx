@@ -3,10 +3,10 @@
 
 import { useEffect } from 'react';
 
+import { getIds, isNonEmptyArray } from '@shared/utils';
 import intersectionWith from 'lodash/intersectionWith';
 
 import { MediaUploadPerDataset } from '../../../../providers/media-upload-provider/media-upload.interface';
-import { getIds, isNonEmptyArray } from '../../../../shared/utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 

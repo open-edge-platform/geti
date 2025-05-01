@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../../../core/services/routes';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { QuietToggleButton } from '../../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { TrainModel } from '../../project-models/train-model-dialog/train-model-dialog.component';
 import { useShowStartTraining } from './use-show-start-training.hook';
 

@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Heading, Text } from '@react-spectrum/text';
+import { Button } from '@shared/components/button/button.component';
+import { redirectTo } from '@shared/utils';
 
 import { paths } from '../../../core/services/routes';
 import { ErrorLayout } from '../../../pages/errors/error-layout/error-layout.component';
-import { Button } from '../../../shared/components/button/button.component';
-import { redirectTo } from '../../../shared/utils';
 
 import classes from '../../../pages/errors/error-layout/error-layout.module.scss';
 

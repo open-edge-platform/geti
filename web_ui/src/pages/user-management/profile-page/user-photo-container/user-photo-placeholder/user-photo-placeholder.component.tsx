@@ -4,14 +4,10 @@
 import { ComponentProps } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { PhotoPlaceholder } from '@shared/components/photo-placeholder/photo-placeholder.component';
+import { ColorMode, QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import isNil from 'lodash/isNil';
 import { usePress } from 'react-aria';
-
-import { PhotoPlaceholder } from '../../../../../shared/components/photo-placeholder/photo-placeholder.component';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './user-photo-placeholder.module.scss';
 

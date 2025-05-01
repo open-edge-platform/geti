@@ -4,9 +4,9 @@
 import { FC, ReactNode } from 'react';
 
 import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import { ConfigurableParametersParams } from '@shared/components/configurable-parameters/configurable-parameters.interface';
 import isFunction from 'lodash/isFunction';
 
-import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { BooleanParameter } from './boolean-parameter.component';
 import { NumberParameter } from './number-parameter.component';
 import { ResetButton } from './reset-button.component';

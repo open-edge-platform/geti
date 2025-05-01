@@ -3,11 +3,10 @@
 
 import { useCallback, useState } from 'react';
 
+import { getImageData } from '@shared/canvas-utils';
+import { loadImage } from '@shared/utils';
 import { useMutation } from '@tanstack/react-query';
 import isFunction from 'lodash/isFunction';
-
-import { getImageData } from '../../../../shared/canvas-utils';
-import { loadImage } from '../../../../shared/utils';
 
 interface ImageSrc {
     src: string;

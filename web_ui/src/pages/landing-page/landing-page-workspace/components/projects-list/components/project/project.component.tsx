@@ -4,6 +4,10 @@
 import { useState } from 'react';
 
 import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { CustomWellClickable } from '@shared/components/custom-well/custom-well-clickable.component';
+import { DomainName } from '@shared/components/domain-name/domain-name.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
+import { isNotCropDomain, openNewTab } from '@shared/utils';
 import dayjs from 'dayjs';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -15,10 +19,6 @@ import { useProjectActions } from '../../../../../../../core/projects/hooks/use-
 import { ProjectProps } from '../../../../../../../core/projects/project.interface';
 import { paths } from '../../../../../../../core/services/routes';
 import { useWorkspaceIdentifier } from '../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { CustomWellClickable } from '../../../../../../../shared/components/custom-well/custom-well-clickable.component';
-import { DomainName } from '../../../../../../../shared/components/domain-name/domain-name.component';
-import { TruncatedTextWithTooltip } from '../../../../../../../shared/components/truncated-text/truncated-text.component';
-import { isNotCropDomain, openNewTab } from '../../../../../../../shared/utils';
 import { idMatchingFormat } from '../../../../../../../test-utils/id-utils';
 import { ProjectListItemSkeletonLoader } from '../project-list-item-skeleton-loader.component';
 import { Label } from './components/label/label.component';
@@ -27,8 +27,8 @@ import { ProjectExportStatus } from './project-export-status.component';
 import { ProjectPerformance } from './project-performance.component';
 import { ProjectThumbnail } from './project-thumbnail.component';
 
-import sharedClasses from '../../../../../../../shared/shared.module.scss';
 import classes from './project.module.scss';
+import sharedClasses from '@shared/shared.module.scss';
 
 export const Project = ({ project }: { project: ProjectProps }): JSX.Element => {
     const navigate = useNavigate();

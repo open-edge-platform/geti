@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
+
 import { RESOURCE_TYPE, RoleResource, WorkspaceRole } from '../../../../../../core/users/users.interface';
 import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
-import { hasEqualId } from '../../../../../../shared/utils';
 
 export const getUpdatedWorkspaceRoles = <T>(editedWorkspaceRole: T, index: number, workspaceRoles: T[]): T[] => {
     const prefixPart = index > 0 ? [...workspaceRoles.slice(0, index)] : [];

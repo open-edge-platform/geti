@@ -4,10 +4,10 @@
 import { FC } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
+import { formatDate } from '@shared/utils';
 
 import { TrainingModelInfoType } from '../../../../../../core/statistics/model-statistics.interface';
-import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';
-import { formatDate } from '../../../../../../shared/utils';
 import { TrainingMetadataKeys } from '../utils';
 import { TrainingModelInfoItem } from './training-model-info-item.component';
 

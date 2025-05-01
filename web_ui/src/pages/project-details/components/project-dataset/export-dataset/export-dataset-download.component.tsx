@@ -2,6 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { downloadFile, getDownloadNotificationMessage, getFileSize } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import isString from 'lodash/isString';
 
@@ -9,8 +11,6 @@ import { ExportDatasetLSData } from '../../../../../core/projects/dataset.interf
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { Button } from '../../../../../shared/components/button/button.component';
-import { downloadFile, getDownloadNotificationMessage, getFileSize } from '../../../../../shared/utils';
 
 import classes from '../project-dataset.module.scss';
 

@@ -4,13 +4,13 @@
 import { Key, useState } from 'react';
 
 import { Divider, Grid, Item, Picker, View } from '@adobe/react-spectrum';
+import { SliderAnimation } from '@shared/components/slider-animation/slider-animation.component';
 import isEmpty from 'lodash/isEmpty';
 import orderBy from 'lodash/orderBy';
 import partition from 'lodash/partition';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';
-import { SliderAnimation } from '../../../../../../../shared/components/slider-animation/slider-animation.component';
 import { ModelTemplate } from '../model-template/model-template.component';
 import { TrainModelTemplatesProps } from './model-templates-list.interface';
 

@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Image, View } from '@adobe/react-spectrum';
+import { AnnotationStateIndicator } from '@shared/components/annotation-indicator/annotation-state-indicator.component';
+import { FrameNumberIndicator } from '@shared/components/frame-number-indicator/frame-number-indicator.component';
+import { useDurationText } from '@shared/hooks/data-format/use-duration-text.hook';
 
 import { getAnnotationStateForTask } from '../../../../../core/annotations/utils';
 import { VideoFrame } from '../../../../../core/media/video.interface';
-import { AnnotationStateIndicator } from '../../../../../shared/components/annotation-indicator/annotation-state-indicator.component';
-import { FrameNumberIndicator } from '../../../../../shared/components/frame-number-indicator/frame-number-indicator.component';
-import { useDurationText } from '../../../../../shared/hooks/data-format/use-duration-text.hook';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { useConstructVideoFrame } from '../hooks/use-construct-video-frame.hook';
 

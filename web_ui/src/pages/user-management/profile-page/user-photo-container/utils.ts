@@ -1,12 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { VALIDATION_RULES } from '@shared/media-utils';
+import { getFileSize } from '@shared/utils';
+
 import {
     ImageValidationMessages,
     ImageValidationRules,
 } from '../../../../providers/media-upload-provider/media-upload.validator';
-import { VALIDATION_RULES } from '../../../../shared/media-utils';
-import { getFileSize } from '../../../../shared/utils';
 
 export const USER_PHOTO_VALIDATION_RULES: ImageValidationRules = {
     MIN_WIDTH: VALIDATION_RULES.MIN_WIDTH,

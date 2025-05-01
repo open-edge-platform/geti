@@ -14,19 +14,19 @@ import {
     Heading,
     Text,
 } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
 import isFunction from 'lodash/isFunction';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { ButtonCreditsToConsume } from '../../project-model/components/button-credits-to-consume/button-credits-to-consume.component';
 import { useCanTrainModel } from '../train-model-dialog/use-can-train-model.hook';
 import { NotEnoughAnnotationsDialog } from './not-enough-annotations-dialog.component';
 import { useTrainStateValue } from './use-training-state-value/use-training-state-value.hook';
 import { TrainingSteps } from './use-training-state-value/use-training-state-value.interface';
 
-import sharedClasses from '../../../../../shared/shared.module.scss';
 import classes from './train-model-dialog.module.scss';
+import sharedClasses from '@shared/shared.module.scss';
 
 interface TrainModelDialogProps {
     isOpen: boolean;

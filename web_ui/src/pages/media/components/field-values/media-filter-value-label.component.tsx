@@ -5,14 +5,14 @@ import { KeyboardEvent, useRef, useState } from 'react';
 
 import { TextArea, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { CustomPopover } from '@shared/components/custom-popover/custom-popover.component';
+import { TaskLabelTreeContainer } from '@shared/components/task-label-tree-search/task-label-tree-container.component';
+import { useFilteredTaskMetadata } from '@shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
+import { getIds, hasDifferentId, isNotCropTask, onEscape } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
-import { TaskLabelTreeContainer } from '../../../../shared/components/task-label-tree-search/task-label-tree-container.component';
-import { useFilteredTaskMetadata } from '../../../../shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
-import { getIds, hasDifferentId, isNotCropTask, onEscape } from '../../../../shared/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import {
     concatByProperty,

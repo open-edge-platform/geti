@@ -3,10 +3,11 @@
 
 import { createContext, MutableRefObject, useCallback, useContext, useEffect, useRef } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { Point, Polygon, Rect } from '../../../../core/annotations/shapes.interface';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useGrabcut } from '../../hooks/use-grabcut.hook';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';

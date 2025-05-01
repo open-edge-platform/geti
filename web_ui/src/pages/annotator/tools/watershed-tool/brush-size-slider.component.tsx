@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { NumberSlider } from '../../../../shared/components/number-slider/number-slider.component';
+import { NumberSlider } from '@shared/components/number-slider/number-slider.component';
+
 import { brushSizeSliderConfig } from './utils';
 import { useWatershedState } from './watershed-state-provider.component';
 

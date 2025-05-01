@@ -3,10 +3,11 @@
 
 import { ComponentProps, Key } from 'react';
 
+import { MediaItemMenuActions } from '@shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
+import { MediaItemMenuWithDeletion } from '@shared/components/media-item-menu-with-deletion/media-item-menu-with-deletion.component';
+import { downloadMediaItem } from '@shared/media-utils';
+
 import { MediaItem } from '../../../../../core/media/media.interface';
-import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
-import { MediaItemMenuWithDeletion } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-with-deletion.component';
-import { downloadMediaItem } from '../../../../../shared/media-utils';
 import { useDeleteDatasetItem } from './use-delete-dataset-item.hook';
 
 const ITEMS = [MediaItemMenuActions.DELETE, MediaItemMenuActions.DOWNLOAD];

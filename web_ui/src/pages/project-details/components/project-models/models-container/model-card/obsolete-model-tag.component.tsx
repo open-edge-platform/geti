@@ -3,7 +3,8 @@
 
 import { FC } from 'react';
 
-import { Tag } from '../../../../../../shared/components/tag/tag.component';
+import { Tag } from '@shared/components/tag/tag.component';
+
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 
 import classes from './model-card.module.scss';

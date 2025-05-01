@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
-
-import { usePreviousSignIn } from '../../../shared/hooks/use-previous-sign-in.hook';
+import { usePreviousSignIn } from '@shared/hooks/use-previous-sign-in.hook';
 
 import classes from './security-page.module.scss';
 

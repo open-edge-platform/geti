@@ -4,9 +4,9 @@
 import { ComponentProps } from 'react';
 
 import { Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
 
 import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { Button } from '../../../../../../shared/components/button/button.component';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
 import { CreditsAvailable } from '../credits-available/credits-available.component';
 

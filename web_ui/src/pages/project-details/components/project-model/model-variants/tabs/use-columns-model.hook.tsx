@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Cell, Text } from '@adobe/react-spectrum';
+import { ThreeDotsFlashing } from '@shared/components/three-dots-flashing/three-dots-flashing.component';
+import { useFormatModelAccuracy } from '@shared/hooks/use-format-model-accuracy.hook';
 import isNil from 'lodash/isNil';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
 import { useApplicationServices } from '../../../../../../core/services/application-services-provider.component';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
-import { useFormatModelAccuracy } from '../../../../../../shared/hooks/use-format-model-accuracy.hook';
 import { PreselectedModel } from '../../../../project-details.interface';
 import { TESTS_OPTIMIZATION_TYPES } from '../../../../utils';
 import { ModelTableNameCell } from '../model-table/model-table-name-cell.component';

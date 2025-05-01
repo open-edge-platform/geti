@@ -3,13 +3,13 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
 import { useMutation } from '@tanstack/react-query';
 
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { isRotatedDetectionDomain } from '../../../../core/projects/domains';
 import { AlgorithmType } from '../../../../hooks/use-load-ai-webworker/algorithm.interface';
 import { useLoadAIWebworker } from '../../../../hooks/use-load-ai-webworker/use-load-ai-webworker.hook';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';
 import { StateProviderProps } from '../tools.interface';

@@ -3,7 +3,8 @@
 
 import { createContext, ReactNode, useContext } from 'react';
 
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
 
 const UndoRedoContext = createContext<UndoRedoActions | undefined>(undefined);

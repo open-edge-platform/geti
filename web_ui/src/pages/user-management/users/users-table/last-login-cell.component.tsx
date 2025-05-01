@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Text } from '@adobe/react-spectrum';
-
-import { DateCell } from '../../../../shared/components/table/date-cell/date-cell.component';
+import { DateCell } from '@shared/components/table/date-cell/date-cell.component';
 
 interface LastLoginCellProps {
     id: string;

@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { CardContent } from '@shared/components/card-content/card-content.component';
 import CountUp from 'react-countup';
 
-import { CardContent } from '../../../../../shared/components/card-content/card-content.component';
 import { ProjectGridArea } from '../project-grid-area.interface';
 
 import classes from './project-annotations-videos.module.scss';

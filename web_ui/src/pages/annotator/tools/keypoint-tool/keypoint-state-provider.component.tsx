@@ -3,11 +3,12 @@
 
 import { createContext, useContext, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { StateProviderProps } from '../tools.interface';
 import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';

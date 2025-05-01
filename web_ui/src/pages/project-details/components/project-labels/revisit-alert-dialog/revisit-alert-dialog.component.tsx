@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { AlertDialog } from '@adobe/react-spectrum';
+import { LinkNewTab } from '@shared/components/link-new-tab/link-new-tab.component';
+import { DocsUrl } from '@shared/components/tutorials/utils';
 
 import { LabelTreeLabelProps } from '../../../../../core/labels/label-tree-view.interface';
 import { useDocsUrl } from '../../../../../hooks/use-docs-url/use-docs-url.hook';
-import { LinkNewTab } from '../../../../../shared/components/link-new-tab/link-new-tab.component';
-import { DocsUrl } from '../../../../../shared/components/tutorials/utils';
 
 interface RevisitAlertDialogProps {
     flattenNewLabels: LabelTreeLabelProps[];

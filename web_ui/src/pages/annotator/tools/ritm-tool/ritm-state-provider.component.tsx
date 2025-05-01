@@ -3,12 +3,13 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useInteractiveSegmentation } from '../../hooks/use-interactive-segmentation.hook';
 import { StateProviderProps } from '../tools.interface';
 import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';

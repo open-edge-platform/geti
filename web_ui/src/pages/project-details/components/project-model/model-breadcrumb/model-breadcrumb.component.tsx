@@ -6,13 +6,13 @@ import { Key, useRef } from 'react';
 import { Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { FocusableRefValue } from '@react-types/shared';
+import { ActionButton } from '@shared/components/button/button.component';
+import { Tag } from '@shared/components/tag/tag.component';
+import { formatDate } from '@shared/utils';
 import { usePress } from 'react-aria';
 
 import { ChevronDownSmallLight } from '../../../../../assets/icons';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { Tag } from '../../../../../shared/components/tag/tag.component';
-import { formatDate } from '../../../../../shared/utils';
 import { isModelDeleted } from '../../../utils';
 import { ActiveModelTag } from '../../project-models/models-container/model-card/active-model-tag.component';
 import { ModelVersion } from '../../project-models/models-container/model-card/model-card.interface';

@@ -4,6 +4,7 @@
 import { ComponentProps, Dispatch, useCallback, useMemo } from 'react';
 
 import { Flex, Heading, View } from '@adobe/react-spectrum';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
 import isEmpty from 'lodash/isEmpty';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +19,6 @@ import {
     MediaUploadPerDataset,
     UploadMedia,
 } from '../../../../providers/media-upload-provider/media-upload.interface';
-import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { MediaProvider, useMedia } from '../../../media/providers/media-provider.component';
 import { getRequiredAnomalyFilters } from '../../../media/providers/utils';

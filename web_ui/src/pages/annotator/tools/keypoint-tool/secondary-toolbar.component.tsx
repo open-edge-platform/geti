@@ -3,13 +3,13 @@
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { Text } from '@react-spectrum/text';
+import { Divider } from '@shared/components/divider/divider.component';
+import { AcceptButton } from '@shared/components/quiet-button/accept-button.component';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { Delete, LineMappingLight, Reject } from '../../../../assets/icons';
 import { isKeypointAnnotation } from '../../../../core/annotations/services/utils';
 import { labelFromUser } from '../../../../core/annotations/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { AcceptButton } from '../../../../shared/components/quiet-button/accept-button.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useVisibleAnnotations } from '../../hooks/use-visible-annotations.hook';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { ToolAnnotationContextProps } from '../tools.interface';

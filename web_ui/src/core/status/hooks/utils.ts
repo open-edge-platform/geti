@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getFileSize } from '../../../shared/utils';
+import { getFileSize } from '@shared/utils';
 
 export const LOW_FREE_DISK_SPACE_IN_BYTES = 2e10;
 export const TOO_LOW_FREE_DISK_SPACE_IN_BYTES = 1.5e10;

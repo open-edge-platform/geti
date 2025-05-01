@@ -3,7 +3,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
+
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 
 export interface SidebarCommonProps {

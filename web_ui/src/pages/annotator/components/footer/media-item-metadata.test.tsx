@@ -10,7 +10,7 @@ import {
 import { MediaItemImageMetadata } from './media-item-image-metadata.component';
 import { MediaItemVideoMetadata } from './media-item-video-metadata.component';
 
-jest.mock('../../../../shared/utils', () => ({
+jest.mock('@shared/utils', () => ({
     ...jest.requireActual('../../utils'),
     trimText: jest.fn((text) => text),
 }));

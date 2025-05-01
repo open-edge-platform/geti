@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@shared/components/button/button.component';
+import { useRenderDelay } from '@shared/hooks/use-render-delay.hook';
+
 import { Unpin } from '../../../../../assets/icons';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { useRenderDelay } from '../../../../../shared/hooks/use-render-delay.hook';
 
 interface UnpinLabelButtonProps {
     unPinLabel: (labelId: string) => void;

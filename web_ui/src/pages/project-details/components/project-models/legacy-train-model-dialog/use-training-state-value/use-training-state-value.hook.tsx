@@ -3,16 +3,16 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
+import { AnimationDirections } from '@shared/animation-parameters/animation-parameters';
+import { ConfigurableParametersTaskChain } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { updateSelectedParameter } from '@shared/components/configurable-parameters/utils';
+import { isNotCropTask } from '@shared/utils';
 import isNumber from 'lodash/isNumber';
 
 import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { TrainingBodyDTO } from '../../../../../../core/models/dtos/train-model.interface';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../../../core/projects/task.interface';
-import { AnimationDirections } from '../../../../../../shared/animation-parameters/animation-parameters';
-import { ConfigurableParametersTaskChain } from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { updateSelectedParameter } from '../../../../../../shared/components/configurable-parameters/utils';
-import { isNotCropTask } from '../../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
 import { useTasksWithSupportedAlgorithms } from '../../../../hooks/use-tasks-with-supported-algorithms';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';

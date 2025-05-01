@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { isIPad, isIPhone } from '@react-aria/utils';
+import { getBrowserConstraints, getVideoUserMedia } from '@shared/navigator-utils';
 
-import { getBrowserConstraints, getVideoUserMedia } from '../../../shared/navigator-utils';
 import { UserCameraPermission, UserCameraPermissionError } from '../../camera-support/camera.interface';
 import {
     applySettings,
@@ -16,8 +16,8 @@ import {
     removeInvalidCapabilities,
 } from './util';
 
-jest.mock('../../../shared/navigator-utils', () => ({
-    ...jest.requireActual('../../../shared/navigator-utils'),
+jest.mock('@shared/navigator-utils', () => ({
+    ...jest.requireActual('@shared/navigator-utils'),
     getVideoUserMedia: jest.fn(),
     getBrowserConstraints: jest.fn(),
 }));

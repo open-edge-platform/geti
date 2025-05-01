@@ -3,11 +3,11 @@
 
 import { Flex, Image, View } from '@adobe/react-spectrum';
 import { Heading, Text } from '@react-spectrum/text';
+import { CustomWellClickable } from '@shared/components/custom-well/custom-well-clickable.component';
+import { openNewTab } from '@shared/utils';
 
 import LearnSectionImage from '../../../../../assets/images/learn-section-image.webp';
 import { useDocsUrl } from '../../../../../hooks/use-docs-url/use-docs-url.hook';
-import { CustomWellClickable } from '../../../../../shared/components/custom-well/custom-well-clickable.component';
-import { openNewTab } from '../../../../../shared/utils';
 
 import classes from './no-project-area.module.scss';
 

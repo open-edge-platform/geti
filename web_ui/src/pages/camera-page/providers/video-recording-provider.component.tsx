@@ -3,8 +3,9 @@
 
 import { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 
-import { MissingProviderError } from '../../../shared/missing-provider-error';
-import { runWhen } from '../../../shared/utils';
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { runWhen } from '@shared/utils';
+
 import { useDeviceSettings } from './device-settings-provider.component';
 
 // webm is the only one format with full support on all browsers

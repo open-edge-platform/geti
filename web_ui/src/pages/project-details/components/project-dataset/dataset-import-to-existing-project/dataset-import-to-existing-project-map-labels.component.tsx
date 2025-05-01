@@ -4,6 +4,8 @@
 import { useMemo } from 'react';
 
 import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { hasEqualId, runWhenTruthy } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import omitBy from 'lodash/omitBy';
 import sortBy from 'lodash/sortBy';
@@ -12,8 +14,6 @@ import { Close } from '../../../../../assets/icons';
 import { DatasetImportToExistingProjectItem } from '../../../../../core/datasets/dataset.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { hasEqualId, runWhenTruthy } from '../../../../../shared/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { LabelSearch } from '../../../../annotator/components/labels/label-search/label-search.component';
 

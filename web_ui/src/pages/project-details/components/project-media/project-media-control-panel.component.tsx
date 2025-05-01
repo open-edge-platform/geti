@@ -5,16 +5,16 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { Checkbox } from '@shared/components/checkbox/checkbox.component';
+import { MediaViewModes } from '@shared/components/media-view-modes/media-view-modes.component';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
+import { MenuTriggerPopup } from '@shared/components/menu-trigger-popup/menu-trigger-popup.component';
+import { UploadMediaButton } from '@shared/components/upload-media/upload-media-button/upload-media-button.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { Delete } from '../../../../assets/icons';
 import { isVideo } from '../../../../core/media/video.interface';
 import { useSortingParams } from '../../../../hooks/use-sorting-params/use-sorting-params.hook';
-import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
-import { MediaViewModes } from '../../../../shared/components/media-view-modes/media-view-modes.component';
-import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
-import { MenuTriggerPopup } from '../../../../shared/components/menu-trigger-popup/menu-trigger-popup.component';
-import { UploadMediaButton } from '../../../../shared/components/upload-media/upload-media-button/upload-media-button.component';
 import { MediaSearch } from '../../../media/media-actions/media-search.component';
 import { MediaSorting } from '../../../media/media-actions/media-sorting.component';
 import { MediaFilter } from '../../../media/media-filter.component';

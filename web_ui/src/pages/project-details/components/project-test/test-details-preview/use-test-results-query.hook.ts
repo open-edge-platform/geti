@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isNonEmptyString } from '@shared/utils';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -13,7 +14,6 @@ import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { TestMediaItem } from '../../../../../core/tests/test-media.interface';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { isNonEmptyString } from '../../../../../shared/utils';
 import { useAnnotationsQuery } from '../../../../annotator/providers/selected-media-item-provider/use-annotations-query.hook';
 import { useLoadImageQuery } from '../../../../annotator/providers/selected-media-item-provider/use-load-image-query.hook';
 import { useProject } from '../../../providers/project-provider/project-provider.component';

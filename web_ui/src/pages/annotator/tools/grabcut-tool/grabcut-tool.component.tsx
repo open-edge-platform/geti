@@ -3,9 +3,10 @@
 
 import { MutableRefObject } from 'react';
 
+import { runWhenTruthy } from '@shared/utils';
+
 import { Point, Polygon, Shape } from '../../../../core/annotations/shapes.interface';
 import { isRect } from '../../../../core/annotations/utils';
-import { runWhenTruthy } from '../../../../shared/utils';
 import { Line } from '../../annotation/shapes/line.component';
 import { Rectangle } from '../../annotation/shapes/rectangle.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';

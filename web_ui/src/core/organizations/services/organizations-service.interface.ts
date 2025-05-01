@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SortDirection } from '../../../shared/components/table/table.interface';
+import { SortDirection } from '@shared/components/table/table.interface';
+
 import { GetOrganizationsQueryOptionsDTO } from '../dtos/organizations.interface';
 import { Organization, OrganizationsResponse } from '../organizations.interface';
 

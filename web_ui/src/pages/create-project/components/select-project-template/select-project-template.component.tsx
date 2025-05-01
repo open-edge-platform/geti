@@ -4,6 +4,9 @@
 import { Key, useEffect } from 'react';
 
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import { SliderAnimation } from '@shared/components/slider-animation/slider-animation.component';
+import { Tabs } from '@shared/components/tabs/tabs.component';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
 import omit from 'lodash/omit';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -11,9 +14,6 @@ import { LabelTreeItem } from '../../../../core/labels/label-tree-view.interface
 import { LabelsRelationType } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
-import { SliderAnimation } from '../../../../shared/components/slider-animation/slider-animation.component';
-import { Tabs } from '../../../../shared/components/tabs/tabs.component';
-import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import {

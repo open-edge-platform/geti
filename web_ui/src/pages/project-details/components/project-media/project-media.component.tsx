@@ -4,13 +4,13 @@
 import { useState } from 'react';
 
 import { AlertDialog, DialogContainer, Flex } from '@adobe/react-spectrum';
+import { CustomerSupportLink } from '@shared/components/customer-support-link/customer-support-link.component';
+import { getIds } from '@shared/utils';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
 import { MediaUploadActionTypes } from '../../../../providers/media-upload-provider/media-upload-reducer-actions';
 import { UploadMedia } from '../../../../providers/media-upload-provider/media-upload.interface';
-import { CustomerSupportLink } from '../../../../shared/components/customer-support-link/customer-support-link.component';
-import { getIds } from '../../../../shared/utils';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { DatasetLoaderManager } from '../../../camera-page/components/loader-managers/dataset-loader-manager.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';

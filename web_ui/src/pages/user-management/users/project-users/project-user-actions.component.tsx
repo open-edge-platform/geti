@@ -4,12 +4,12 @@
 import { useState } from 'react';
 
 import { DialogContainer } from '@adobe/react-spectrum';
+import { useCheckPermission } from '@shared/components/has-permission/has-permission.component';
+import { OPERATION } from '@shared/components/has-permission/has-permission.interface';
+import { MenuTriggerButton } from '@shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';
-import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
-import { MenuTriggerButton } from '../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { EditUserRoleDialog } from './edit-user-role-dialog.component';
 import { RemoveUserFromProjectDialog } from './remove-user-from-project-dialog.component';

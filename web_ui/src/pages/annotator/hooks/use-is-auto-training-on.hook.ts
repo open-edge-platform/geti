@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useAutoTrainingTasksConfig } from '@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+
 import { ProjectIdentifier } from '../../../core/projects/core.interface';
 import { ProjectProps } from '../../../core/projects/project.interface';
-import { useAutoTrainingTasksConfig } from '../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 
 export const useIsAutoTrainingOn = ({
     project,

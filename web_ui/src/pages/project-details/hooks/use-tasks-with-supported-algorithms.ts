@@ -3,10 +3,11 @@
 
 import { useMemo } from 'react';
 
+import { isNotCropDomain } from '@shared/utils';
+
 import { useSupportedAlgorithms } from '../../../core/supported-algorithms/hooks/use-supported-algorithms.hook';
 import { TaskWithSupportedAlgorithms } from '../../../core/supported-algorithms/supported-algorithms.interface';
 import { useProjectIdentifier } from '../../../hooks/use-project-identifier/use-project-identifier';
-import { isNotCropDomain } from '../../../shared/utils';
 import { useProject } from '../providers/project-provider/project-provider.component';
 
 interface UseTasksWithSupportedAlgorithms {

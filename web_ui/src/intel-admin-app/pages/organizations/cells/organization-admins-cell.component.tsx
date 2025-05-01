@@ -4,12 +4,12 @@
 import { Fragment } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { CasualCell } from '@shared/components/table/components/casual-cell/casual-cell.component';
+import { TableCellProps } from '@shared/components/table/table.interface';
 import isEmpty from 'lodash/isEmpty';
 
 import { OrganizationAdmin } from '../../../../core/organizations/dtos/organizations.interface';
 import { Organization } from '../../../../core/organizations/organizations.interface';
-import { CasualCell } from '../../../../shared/components/table/components/casual-cell/casual-cell.component';
-import { TableCellProps } from '../../../../shared/components/table/table.interface';
 import { OrganizationAdminsCopyText } from './organization-admins-copy-text.component';
 
 const getDisplayName = (admin: OrganizationAdmin) => {

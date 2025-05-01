@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getImageData } from '@shared/canvas-utils';
+import { loadImage } from '@shared/utils';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { getImageData } from '../../../../shared/canvas-utils';
-import { loadImage } from '../../../../shared/utils';
 
 export const useLoadImageQuery = (mediaItem: MediaItem | undefined): UseQueryResult<ImageData, AxiosError> => {
     return useQuery({

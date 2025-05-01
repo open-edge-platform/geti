@@ -1,15 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { hasEqualId } from '@shared/utils';
 import Cross from '@spectrum-icons/ui/CrossMedium';
 import { motion } from 'framer-motion';
 
 import { Edit } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
-import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
-import { hasEqualId } from '../../../../shared/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { getGlobalAnnotations } from '../../providers/task-chain-provider/utils';

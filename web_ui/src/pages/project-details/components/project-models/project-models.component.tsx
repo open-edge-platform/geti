@@ -2,16 +2,16 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { EmptyData } from '@shared/components/empty-data/empty-data.component';
+import { Loading } from '@shared/components/loading/loading.component';
+import { PageLayout } from '@shared/components/page-layout/page-layout.component';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
+import { isNonEmptyArray, isNotCropTask } from '@shared/utils';
 
 import { NoTrainedModels } from '../../../../assets/images';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
-import { EmptyData } from '../../../../shared/components/empty-data/empty-data.component';
-import { Loading } from '../../../../shared/components/loading/loading.component';
-import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
-import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
-import { isNonEmptyArray, isNotCropTask } from '../../../../shared/utils';
 import { useTasksWithSupportedAlgorithms } from '../../hooks/use-tasks-with-supported-algorithms';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { EmptyDataTrainingProgress } from './empty-data-training-progress.componen';

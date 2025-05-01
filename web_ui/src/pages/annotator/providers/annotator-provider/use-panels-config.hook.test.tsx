@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getParsedLocalStorage } from '@shared/utils';
 import { renderHook } from '@testing-library/react';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { AnnotatorSettingsConfig, FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { INITIAL_PROJECT_SETTINGS } from '../../../../core/user-settings/utils';
-import { getParsedLocalStorage } from '../../../../shared/utils';
 import { getMockedUserProjectSettingsObject } from '../../../../test-utils/mocked-items-factory/mocked-settings';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { usePanelsConfig } from './use-panels-config';
@@ -17,7 +17,7 @@ const useSettingsMock = getMockedUserProjectSettingsObject({
     config: INITIAL_PROJECT_SETTINGS,
 });
 
-jest.mock('../../../../shared/utils', () => ({
+jest.mock('@shared/utils', () => ({
     getParsedLocalStorage: jest.fn(() => false),
 }));
 

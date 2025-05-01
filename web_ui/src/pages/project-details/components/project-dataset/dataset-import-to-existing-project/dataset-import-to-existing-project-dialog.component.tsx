@@ -5,13 +5,13 @@ import { useMemo } from 'react';
 
 import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
 import { OverlayTriggerState } from '@react-stately/overlays';
+import { DatasetImportDnd } from '@shared/components/dataset-import-dnd/dataset-import-dnd.component';
+import { DatasetImportProgress } from '@shared/components/dataset-import-progress/dataset-import-progress.component';
 
 import { DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.enum';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { matchStatus } from '../../../../../providers/dataset-import-to-existing-project-provider/utils';
-import { DatasetImportDnd } from '../../../../../shared/components/dataset-import-dnd/dataset-import-dnd.component';
-import { DatasetImportProgress } from '../../../../../shared/components/dataset-import-progress/dataset-import-progress.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { DatasetImportToExistingProjectDialogButtons } from './dataset-import-to-existing-project-dialog-buttons.component';
 import { DatasetImportToExistingProjectMapLabels } from './dataset-import-to-existing-project-map-labels.component';

@@ -3,14 +3,14 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import * as yup from 'yup';
-
 import {
     CONFIRM_PASSWORD_ERROR_MESSAGE,
     MAX_NUMBER_OF_PASSWORD_CHARACTERS,
     PASSWORD_DOES_NOT_MEET_LENGTH_RULE,
     passwordValidationRules,
-} from '../../../../shared/utils';
+} from '@shared/utils';
+import * as yup from 'yup';
+
 import { PasswordState } from './add-member-popup.interface';
 
 export const defaultPasswordState: PasswordState = {

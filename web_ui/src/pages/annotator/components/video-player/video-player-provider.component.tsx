@@ -3,8 +3,9 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { isVideoFrame, VideoFrame } from '../../../../core/media/video.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useStep } from './hooks/use-step.hook';
 import { useVideoControls } from './hooks/use-video-controls.hook';
 import { VideoControls } from './video-controls/video-controls.interface';

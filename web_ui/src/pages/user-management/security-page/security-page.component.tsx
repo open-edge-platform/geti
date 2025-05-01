@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { ShowForOnPrem } from '@shared/components/show-for-onprem/show-for-onprem.component';
 
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { ShowForOnPrem } from '../../../shared/components/show-for-onprem/show-for-onprem.component';
 import { ChangePasswordPopup } from '../profile-page/change-password-popup/change-password-popup.component';
 import { PreviousSignIn } from './previous-sign-in.component';
 

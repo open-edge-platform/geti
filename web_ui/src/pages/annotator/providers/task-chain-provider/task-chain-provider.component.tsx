@@ -8,9 +8,10 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { Label } from '../../../../core/labels/label.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import {
     AnnotationSceneContext,
     useAnnotationScene,

@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+import { isNonEmptyArray } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
@@ -10,7 +11,6 @@ import { PredictionMode } from '../../../../../core/annotations/services/predict
 import { VideoPaginationOptions } from '../../../../../core/annotations/services/video-pagination-options.interface';
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { isVideoFrame, Video, VideoFrame } from '../../../../../core/media/video.interface';
-import { isNonEmptyArray } from '../../../../../shared/utils';
 import { ANNOTATOR_MODE } from '../../../core/annotation-tool-context.interface';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';
 import { SelectedMediaItem } from '../../../providers/selected-media-item-provider/selected-media-item.interface';

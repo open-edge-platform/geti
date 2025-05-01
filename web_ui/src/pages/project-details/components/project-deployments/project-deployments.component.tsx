@@ -4,6 +4,11 @@
 import { useMemo, useState } from 'react';
 
 import { DialogContainer, Flex } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+import { PageLayout } from '@shared/components/page-layout/page-layout.component';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
+import { isNotCropTask } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import uniqBy from 'lodash/uniqBy';
 
@@ -11,11 +16,6 @@ import { DeploymentImg } from '../../../../assets/images';
 import { isVisualPromptModelGroup } from '../../../../core/annotations/services/visual-prompt-service';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
-import { Button } from '../../../../shared/components/button/button.component';
-import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
-import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
-import { isNotCropTask } from '../../../../shared/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { NO_MODELS_MESSAGE, NO_MODELS_MESSAGE_TASK_CHAIN } from '../../utils';
 import { DownloadDialogSingleTask } from './download-dialog-single-task.component';

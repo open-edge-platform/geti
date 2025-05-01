@@ -3,8 +3,9 @@
 
 import { useRef, useState } from 'react';
 
+import { runWhen } from '@shared/utils';
+
 import { Circle as CircleInterface, Point } from '../../../../../core/annotations/shapes.interface';
-import { runWhen } from '../../../../../shared/utils';
 import { Circle } from '../../../annotation/shapes/circle.component';
 import { pointsToCircle } from '../../circle-tool/utils';
 import { SvgToolCanvas } from '../../svg-tool-canvas.component';

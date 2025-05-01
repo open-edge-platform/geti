@@ -3,9 +3,9 @@
 
 import { Item, Picker } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
+import { hasEqualId } from '@shared/utils';
 
 import { Task } from '../../../../../core/projects/task.interface';
-import { hasEqualId } from '../../../../../shared/utils';
 import { isLargeSizeQuery } from '../../../../../theme/queries';
 import { useIsSceneBusy } from '../../../hooks/use-annotator-scene-interaction-state.hook';
 import { usePrediction } from '../../../providers/prediction-provider/prediction-provider.component';

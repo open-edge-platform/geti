@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { AxiosError, isAxiosError } from 'axios';
 import isEmpty from 'lodash/isEmpty';
@@ -13,7 +14,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { hasEqualId } from '../../../../../shared/utils';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';
 import { useAnnotationScene } from '../../../providers/annotation-scene-provider/annotation-scene-provider.component';

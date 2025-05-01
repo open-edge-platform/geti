@@ -3,10 +3,11 @@
 
 import { PointerEvent, useRef, useState } from 'react';
 
+import { runWhen } from '@shared/utils';
+
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { clampBox, clampPointBetweenImage, pointsToRect } from '../../../../core/annotations/math';
 import { Point } from '../../../../core/annotations/shapes.interface';
-import { runWhen } from '../../../../shared/utils';
 import { isLeftButton } from '../../../buttons-utils';
 import { getRelativePoint } from '../../../utils';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';

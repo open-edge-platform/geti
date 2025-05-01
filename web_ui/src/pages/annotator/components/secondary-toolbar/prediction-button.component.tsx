@@ -4,8 +4,8 @@
 import { CSSProperties, FunctionComponent, PropsWithChildren } from 'react';
 
 import { DialogTrigger } from '@adobe/react-spectrum';
+import { Button, ButtonProps } from '@shared/components/button/button.component';
 
-import { Button, ButtonProps } from '../../../../shared/components/button/button.component';
 import { ReplaceOrMergeUserAnnotationsDialog } from './replace-or-merge-user-annotations-dialog.component';
 
 interface PredictionButtonProps {

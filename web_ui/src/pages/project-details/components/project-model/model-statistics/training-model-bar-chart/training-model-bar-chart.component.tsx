@@ -1,15 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { BarHorizontalChart } from '@shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
+import { Colors } from '@shared/components/charts/chart.interface';
+import { convertColorToFadedColor } from '@shared/components/charts/utils';
+import { FullscreenAction } from '@shared/components/fullscreen-action/fullscreen-action.component';
+
 import {
     TrainingModelBarRadialChart,
     TrainingModelChartConfig,
 } from '../../../../../../core/statistics/model-statistics.interface';
-import { CardContent } from '../../../../../../shared/components/card-content/card-content.component';
-import { BarHorizontalChart } from '../../../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
-import { Colors } from '../../../../../../shared/components/charts/chart.interface';
-import { convertColorToFadedColor } from '../../../../../../shared/components/charts/utils';
-import { FullscreenAction } from '../../../../../../shared/components/fullscreen-action/fullscreen-action.component';
 import { getDistinctColorBasedOnHash } from '../../../../../create-project/components/distinct-colors';
 
 const TrainingModelBarChart = ({

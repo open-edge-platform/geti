@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Column, Flex, Heading, Row, TableBody, TableHeader, TableView } from '@adobe/react-spectrum';
+import { isNonEmptyString } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
-import { isNonEmptyString } from '../../../../../../shared/utils';
 import { ModelTableProps } from './model-table.interface';
 
 export const ModelTable = ({

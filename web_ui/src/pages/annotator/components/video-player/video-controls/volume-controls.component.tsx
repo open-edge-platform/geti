@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { SoundOff, SoundOn } from '../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface VolumeControlsProps {
     isMuted: boolean;

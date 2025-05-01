@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ButtonWithSpectrumTooltip } from '@shared/components/button-with-tooltip/button-with-tooltip.component';
+
 import { GraphChart, List } from '../../../../assets/icons';
-import { ButtonWithSpectrumTooltip } from '../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
 
 interface ProjectStorageToggleButtonProps {
     onPress: () => void;

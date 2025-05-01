@@ -4,6 +4,12 @@
 import { useEffect } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import {
+    getLabelsWithAddedChild,
+    getLabelWithoutDeleted,
+    getNextColor,
+    getTreeWithUpdatedItem,
+} from '@shared/components/label-tree-view/utils';
 
 import {
     LabelItemEditionState,
@@ -16,12 +22,6 @@ import {
 import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../../core/projects/task.interface';
-import {
-    getLabelsWithAddedChild,
-    getLabelWithoutDeleted,
-    getNextColor,
-    getTreeWithUpdatedItem,
-} from '../../../../../shared/components/label-tree-view/utils';
 import { isYupValidationError } from '../../../../user-management/profile-page/utils';
 import { validateLabelsSchema } from '../../../utils';
 import { getHEXFormat } from '../../distinct-colors';

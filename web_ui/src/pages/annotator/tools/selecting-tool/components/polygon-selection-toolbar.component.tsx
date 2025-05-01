@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Slider, Tooltip } from '@adobe/react-spectrum';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { PointPushPull } from '../../../../../assets/icons';
 import BrushImg from '../../../../../assets/primary-tools/brush.webp';
-import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { QuietToggleButton } from '../../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { DrawingToolsTooltip } from '../../../components/primary-toolbar/drawing-tools-tooltip.component';
 import { ToolType } from '../../../core/annotation-tool-context.interface';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';

@@ -3,9 +3,10 @@
 
 import { ReactNode, useMemo } from 'react';
 
+import { getImageData } from '@shared/canvas-utils';
+
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../../core/media/media.interface';
-import { getImageData } from '../../../../../shared/canvas-utils';
 import { AnnotatorCanvasSettings } from '../../../../annotator/annotator-settings.component';
 import { AnnotatorProvider } from '../../../../annotator/providers/annotator-provider/annotator-provider.component';
 import { RegionOfInterestProvider } from '../../../../annotator/providers/region-of-interest-provider/region-of-interest-provider.component';

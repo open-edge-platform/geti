@@ -4,14 +4,14 @@
 import { useEffect } from 'react';
 
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Divider } from '@shared/components/divider/divider.component';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { PointSelector } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isClassificationDomain, isSegmentationDomain } from '../../../../core/projects/domains';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { useSelectedAnnotations } from '../../hooks/use-selected-annotations.hook';
 import { getOutputFromTask } from '../../providers/task-chain-provider/utils';
 import { useTask } from '../../providers/task-provider/task-provider.component';

@@ -17,11 +17,11 @@ import {
 } from 'react';
 
 import { VisuallyHidden } from '@adobe/react-spectrum';
+import { MissingProviderError } from '@shared/missing-provider-error';
 
 import { mediaIdentifierToString, MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
 import { usePrevious } from '../../../../../hooks/use-previous/use-previous.hook';
-import { MissingProviderError } from '../../../../../shared/missing-provider-error';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';
 import { useSelectedMediaItem } from '../../../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { Video } from '../video.component';

@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { MenuOption } from '@shared/components/menu-option.interface';
+
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
-import { MenuOption } from '../../../shared/components/menu-option.interface';
 import { Sidebar } from '../../shared/components/sidebar/sidebar.component';
 import { useOrganization } from './hooks/organization.hook';
 

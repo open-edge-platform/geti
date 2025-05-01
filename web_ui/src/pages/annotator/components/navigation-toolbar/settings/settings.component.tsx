@@ -17,6 +17,9 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { ColorMode, QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { getPanelSettingsKey } from '@shared/local-storage-keys';
 import isEqual from 'lodash/isEqual';
 import isNil from 'lodash/isNil';
 import { useLocalStorage } from 'usehooks-ts';
@@ -31,12 +34,6 @@ import {
 import { UserProjectSettings, UseSettings } from '../../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { getPanelSettingsKey } from '../../../../../shared/local-storage-keys';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { ActiveLearningSettings } from './active-learning-settings.component';
 import { AnnotatorSectionSettings } from './annotator-section-settings.component';

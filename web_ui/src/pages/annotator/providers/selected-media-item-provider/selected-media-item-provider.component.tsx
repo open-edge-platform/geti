@@ -3,6 +3,8 @@
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { hasEqualId } from '@shared/utils';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import isEmpty from 'lodash/isEmpty';
@@ -24,8 +26,6 @@ import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings
 import { useUserProjectSettings } from '../../../../core/user-settings/hooks/use-project-settings.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
-import { hasEqualId } from '../../../../shared/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import { useDatasetIdentifier } from '../../hooks/use-dataset-identifier.hook';

@@ -16,8 +16,8 @@ import { annotatorRender as render } from '../../test-utils/annotator-render';
 import { ZoomProvider } from '../../zoom/zoom-provider.component';
 import { Footer } from './footer.component';
 
-jest.mock('../../../../shared/utils', () => ({
-    ...jest.requireActual('../../../../shared/utils'),
+jest.mock('@shared/utils', () => ({
+    ...jest.requireActual('@shared/utils'),
     trimText: jest.fn((text) => text),
 }));
 

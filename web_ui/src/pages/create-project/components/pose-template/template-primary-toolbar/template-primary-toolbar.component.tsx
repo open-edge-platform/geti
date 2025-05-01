@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, View } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { CTRL_OR_COMMAND_KEY } from '@shared/hotkeys';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Redo, Undo } from '../../../../../assets/icons';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { CTRL_OR_COMMAND_KEY } from '../../../../../shared/hotkeys';
 import { UndoRedoActions } from '../../../../annotator/core/undo-redo-actions.interface';
 import { EdgeLine } from '../util';
 import { HotKeysButton } from './hot-keys-button.component';

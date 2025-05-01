@@ -5,6 +5,9 @@ import { useState } from 'react';
 
 import { Flex, Grid } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { Checkbox } from '@shared/components/checkbox/checkbox.component';
+import { TaskLabelTreeSearchPopover } from '@shared/components/task-label-tree-search/task-label-tree-search-popover.component';
+import { hasEqualId, runWhenTruthy } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { useFocusManager } from 'react-aria';
 
@@ -13,9 +16,6 @@ import { Label } from '../../../../../core/labels/label.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../../core/media/base.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { useSetHoveredId } from '../../../../../providers/hovered-provider/hovered-provider.component';
-import { Checkbox } from '../../../../../shared/components/checkbox/checkbox.component';
-import { TaskLabelTreeSearchPopover } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search-popover.component';
-import { hasEqualId, runWhenTruthy } from '../../../../../shared/utils';
 import { SelectionIndicator } from '../../../components/labels/label-search/selection-indicator.component';
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';

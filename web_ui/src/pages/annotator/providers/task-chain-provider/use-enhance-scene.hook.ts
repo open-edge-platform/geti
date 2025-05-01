@@ -8,6 +8,7 @@
 
 import { useMemo } from 'react';
 
+import { getIds, hasEqualId, isNonEmptyArray } from '@shared/utils';
 import intersectionBy from 'lodash/intersectionBy';
 import isEmpty from 'lodash/isEmpty';
 import isNil from 'lodash/isNil';
@@ -22,7 +23,6 @@ import { Label } from '../../../../core/labels/label.interface';
 import { isAnomalous, isExclusive, isGlobal } from '../../../../core/labels/utils';
 import { isAnomalyDomain, isClassificationDomain, isDetectionDomain } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
-import { getIds, hasEqualId, isNonEmptyArray } from '../../../../shared/utils';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { useImageROI } from '../../hooks/use-image-roi.hook';
 import { isPointWithinRoi } from '../../tools/utils';

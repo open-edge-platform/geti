@@ -4,9 +4,8 @@
 import { createContext, ReactNode, useContext } from 'react';
 
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { MissingProviderError } from '@shared/missing-provider-error';
 import { OverlayTriggerState } from 'react-stately';
-
-import { MissingProviderError } from '../../../../../shared/missing-provider-error';
 
 interface ExportImportDatasetDialogContextProps {
     exportDialogState: OverlayTriggerState;

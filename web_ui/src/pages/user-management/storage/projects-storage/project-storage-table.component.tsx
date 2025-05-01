@@ -2,6 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Cell, Column, Row, TableBody, TableHeader, TableView, Text } from '@adobe/react-spectrum';
+import { TruncatedText } from '@shared/components/truncated-text/truncated-text.component';
+import { getFileSize, SpectrumTableLoadingState } from '@shared/utils';
 import capitalize from 'lodash/capitalize';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
@@ -11,8 +13,6 @@ import {
 } from '../../../../core/projects/services/project-service.interface';
 import { paths } from '../../../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
-import { getFileSize, SpectrumTableLoadingState } from '../../../../shared/utils';
 import { ProjectActionCell } from './project-action-cell.component';
 
 enum ProjectsColumns {

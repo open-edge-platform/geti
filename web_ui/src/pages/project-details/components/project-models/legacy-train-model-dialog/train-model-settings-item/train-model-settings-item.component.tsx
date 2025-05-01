@@ -4,9 +4,9 @@
 import { FC } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { Checkbox } from '@shared/components/checkbox/checkbox.component';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
 
-import { Checkbox } from '../../../../../../shared/components/checkbox/checkbox.component';
-import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 
 import classes from './train-model-settings-item.module.scss';

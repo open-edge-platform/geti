@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { TruncatedText } from '@shared/components/truncated-text/truncated-text.component';
+import { isNonEmptyString } from '@shared/utils';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
-import { TruncatedText } from '../../../../../../shared/components/truncated-text/truncated-text.component';
-import { isNonEmptyString } from '../../../../../../shared/utils';
 import { isOptimizationType, ModelTableColumnKeys } from '../utils';
 
 interface ModelTableNameCellProps {

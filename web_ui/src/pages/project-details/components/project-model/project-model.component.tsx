@@ -4,6 +4,10 @@
 import { Key, useState } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { Loading } from '@shared/components/loading/loading.component';
+import { PageLayout } from '@shared/components/page-layout/page-layout.component';
+import { Tabs } from '@shared/components/tabs/tabs.component';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { isVisualPromptModelGroup } from '../../../../core/annotations/services/visual-prompt-service';
@@ -13,10 +17,6 @@ import { paths } from '../../../../core/services/routes';
 import { LifecycleStage } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { useSupportedAlgorithms } from '../../../../core/supported-algorithms/hooks/use-supported-algorithms.hook';
 import { useModelIdentifier } from '../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { Loading } from '../../../../shared/components/loading/loading.component';
-import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
-import { Tabs } from '../../../../shared/components/tabs/tabs.component';
-import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { ModelCardMenu } from '../project-models/models-container/model-card/model-card-menu.component';

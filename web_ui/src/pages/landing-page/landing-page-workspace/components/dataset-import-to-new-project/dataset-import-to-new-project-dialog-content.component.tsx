@@ -4,14 +4,14 @@
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 
 import { Item, TabList, TabPanels, Tabs } from '@adobe/react-spectrum';
+import { DatasetImportDnd } from '@shared/components/dataset-import-dnd/dataset-import-dnd.component';
+import { DatasetImportProgress } from '@shared/components/dataset-import-progress/dataset-import-progress.component';
+import { DatasetImportWarnings } from '@shared/components/dataset-import-warnings/dataset-import-warnings.component';
 import isEmpty from 'lodash/isEmpty';
 import isNil from 'lodash/isNil';
 
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportToNewProjectItem } from '../../../../../core/datasets/dataset.interface';
-import { DatasetImportDnd } from '../../../../../shared/components/dataset-import-dnd/dataset-import-dnd.component';
-import { DatasetImportProgress } from '../../../../../shared/components/dataset-import-progress/dataset-import-progress.component';
-import { DatasetImportWarnings } from '../../../../../shared/components/dataset-import-warnings/dataset-import-warnings.component';
 import { DatasetImportToNewProjectDomain } from './dataset-import-to-new-project-domain.component';
 import { DatasetImportToNewProjectLabels } from './dataset-import-to-new-project-labels.component';
 

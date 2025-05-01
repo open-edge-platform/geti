@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Cell, Column, Row, TableBody, TableHeader, TableView, Text, View } from '@adobe/react-spectrum';
+import { TableCellProps } from '@shared/components/table/table.interface';
+import { isNonEmptyArray, SpectrumTableLoadingState } from '@shared/utils';
 import { get } from 'lodash';
 
 import { useSubscriptions } from '../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { Quota } from '../../../core/credits/subscriptions/quotas.interface';
-import { TableCellProps } from '../../../shared/components/table/table.interface';
-import { isNonEmptyArray, SpectrumTableLoadingState } from '../../../shared/utils';
 import { ActionCell } from './cells/service-limits-actions-cell.component';
 import { useOrganization } from './hooks/organization.hook';
 

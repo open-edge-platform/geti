@@ -2,6 +2,15 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { Arrow } from '@shared/components/arrow/arrow.component';
+import { DomainName } from '@shared/components/domain-name/domain-name.component';
+import { useCheckPermission } from '@shared/components/has-permission/has-permission.component';
+import { OPERATION } from '@shared/components/has-permission/has-permission.interface';
+import { MenuItemImage } from '@shared/components/menu-item-image/menu-item-image.component';
+import { MenuOption, MenuOptionTextAndIcon } from '@shared/components/menu-option.interface';
+import { ProjectNameDomain } from '@shared/components/project-name-domain/project-name-domain.component';
+import { SidebarMenu } from '@shared/components/sidebar-menu/sidebar-menu.component';
+import { isNotCropDomain } from '@shared/utils';
 
 import { Datasets, Deployments, Model, Shield, Tag, Users } from '../../../../assets/icons';
 import { DOMAIN } from '../../../../core/projects/core.interface';
@@ -9,15 +18,6 @@ import { ProjectProps } from '../../../../core/projects/project.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { paths } from '../../../../core/services/routes';
 import { RESOURCE_TYPE } from '../../../../core/users/users.interface';
-import { Arrow } from '../../../../shared/components/arrow/arrow.component';
-import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';
-import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
-import { MenuItemImage } from '../../../../shared/components/menu-item-image/menu-item-image.component';
-import { MenuOption, MenuOptionTextAndIcon } from '../../../../shared/components/menu-option.interface';
-import { ProjectNameDomain } from '../../../../shared/components/project-name-domain/project-name-domain.component';
-import { SidebarMenu } from '../../../../shared/components/sidebar-menu/sidebar-menu.component';
-import { isNotCropDomain } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { ProjectThumbnail } from '../../../landing-page/landing-page-workspace/components/projects-list/components/project/project-thumbnail.component';

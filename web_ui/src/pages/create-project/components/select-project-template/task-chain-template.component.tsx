@@ -7,10 +7,10 @@ import { Flex, Radio, RadioGroup, Text } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';
+import { Arrow } from '@shared/components/arrow/arrow.component';
 import isEqual from 'lodash/isEqual';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { Arrow } from '../../../../shared/components/arrow/arrow.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { Card } from '../card.component';

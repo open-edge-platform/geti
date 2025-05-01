@@ -3,18 +3,15 @@
 
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
+import {
+    ConfigurableParametersComponents,
+    ConfigurableParametersTaskChain,
+} from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { getReconfigureParametersDTO, updateSelectedParameter } from '@shared/components/configurable-parameters/utils';
 import isEqual from 'lodash/isEqual';
 
 import { useConfigParameters } from '../../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
-import {
-    ConfigurableParametersComponents,
-    ConfigurableParametersTaskChain,
-} from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import {
-    getReconfigureParametersDTO,
-    updateSelectedParameter,
-} from '../../../../../../shared/components/configurable-parameters/utils';
 import { getSelectedComponent } from '../../utils';
 
 interface UseReconfigureParametersValue {

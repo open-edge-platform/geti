@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { KeyMap } from '@shared/keyboard-events/keyboard.interface';
 import { fireEvent, screen } from '@testing-library/react';
 
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
-import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
 import { getMockedKeypointNode } from '../../../../../test-utils/mocked-items-factory/mocked-keypoint';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { providersRender } from '../../../../../test-utils/required-providers-render';

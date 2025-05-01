@@ -1,25 +1,22 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { BooleanGroupParams } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { useAutoTrainingTasksConfig } from '@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { ProjectStatusTaskDTO } from '../../../../../core/projects/dtos/status.interface';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
 import { PerformanceType, Task } from '../../../../../core/projects/task.interface';
-import { BooleanGroupParams } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { useAutoTrainingTasksConfig } from '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { annotatorRender as render } from '../../../test-utils/annotator-render';
 import { AnnotationsRequired } from './annotations-required.component';
 
-jest.mock(
-    '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook',
-    () => ({
-        useAutoTrainingTasksConfig: jest.fn(() => ({ autoTrainingTasks: [] })),
-    })
-);
+jest.mock('@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook', () => ({
+    useAutoTrainingTasksConfig: jest.fn(() => ({ autoTrainingTasks: [] })),
+}));
 
 describe('Required annotations', () => {
     const fakeTaskOne = {

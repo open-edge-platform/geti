@@ -4,6 +4,10 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
+import { DateCell } from '@shared/components/table/date-cell/date-cell.component';
+import { StatusCell } from '@shared/components/table/status-cell/status-cell.component';
+import { TableCellProps } from '@shared/components/table/table.interface';
+import { SpectrumTableLoadingState } from '@shared/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import get from 'lodash/get';
 
@@ -13,10 +17,6 @@ import { GetOrganizationsQueryOptions } from '../../../core/organizations/servic
 import QUERY_KEYS from '../../../core/requests/query-keys';
 import { paths } from '../../../core/services/routes';
 import { useSortTable } from '../../../hooks/use-sort-table/use-sort-table.hook';
-import { DateCell } from '../../../shared/components/table/date-cell/date-cell.component';
-import { StatusCell } from '../../../shared/components/table/status-cell/status-cell.component';
-import { TableCellProps } from '../../../shared/components/table/table.interface';
-import { SpectrumTableLoadingState } from '../../../shared/utils';
 import { OrganizationAdminsCell } from './cells/organization-admins-cell.component';
 import { OrganizationNameCell } from './cells/organization-name-cell.component';
 import { OrganizationsMenu } from './organizations-menu.component';

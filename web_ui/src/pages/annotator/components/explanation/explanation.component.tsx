@@ -4,10 +4,10 @@
 import { CSSProperties, useEffect } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { Loading } from '@shared/components/loading/loading.component';
+import { useDrawImageOnCanvas } from '@shared/hooks/use-draw-image-on-canvas.hook';
 
 import { Explanation } from '../../../../core/annotations/prediction.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
-import { useDrawImageOnCanvas } from '../../../../shared/hooks/use-draw-image-on-canvas.hook';
 import { useExplanationOpacity } from '../../providers/prediction-provider/prediction-provider.component';
 import { useCachedImages } from './use-cached-images.hook';
 import { useInferenceImage } from './use-inference-image.hook';

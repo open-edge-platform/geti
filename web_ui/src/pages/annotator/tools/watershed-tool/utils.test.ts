@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getImageData } from '../../../../shared/canvas-utils';
+import { getImageData } from '@shared/canvas-utils';
+
 import { getMaxSensitivityForImage } from './utils';
 
 describe('utils', () => {

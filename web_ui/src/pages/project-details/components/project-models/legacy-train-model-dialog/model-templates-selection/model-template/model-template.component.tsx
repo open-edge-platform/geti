@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading, Radio, RadioGroup, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';
-import { InfoTooltip } from '../../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { ModelArchitectureTooltipText } from '../../../model-architecture-tooltip.component';
 import { ActiveModelTag } from '../../../models-container/model-card/active-model-tag.component';
 import { DeprecatedTag } from '../../../models-container/model-card/deprecated-model-tag.component';

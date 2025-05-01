@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { delay } from '@shared/utils';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { CreditsService } from '../../../../../../core/credits/services/credits-service.interface';
@@ -8,7 +9,6 @@ import { createInMemoryCreditsService } from '../../../../../../core/credits/ser
 import { FeatureFlags } from '../../../../../../core/feature-flags/services/feature-flag-service.interface';
 import { createInMemoryModelsService } from '../../../../../../core/models/services/in-memory-models-service';
 import { ModelsService } from '../../../../../../core/models/services/models.interface';
-import { delay } from '../../../../../../shared/utils';
 import { getMockedProjectIdentifier } from '../../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedModelVersion } from '../../../../../../test-utils/mocked-items-factory/mocked-model';
 import { providersRender } from '../../../../../../test-utils/required-providers-render';

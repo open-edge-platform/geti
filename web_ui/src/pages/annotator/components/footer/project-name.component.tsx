@@ -3,8 +3,8 @@
 
 import { View } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 
-import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 
 import classes from './annotator-footer.module.scss';

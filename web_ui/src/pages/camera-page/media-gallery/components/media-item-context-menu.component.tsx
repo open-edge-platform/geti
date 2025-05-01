@@ -5,12 +5,12 @@ import { Key, RefObject, useRef, useState } from 'react';
 
 import { Item, Menu } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { Button } from '@shared/components/button/button.component';
+import { CustomPopover } from '@shared/components/custom-popover/custom-popover.component';
+import { MouseEvents } from '@shared/mouse-events/mouse.interface';
 import isFunction from 'lodash/isFunction';
 
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { Button } from '../../../../shared/components/button/button.component';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
-import { MouseEvents } from '../../../../shared/mouse-events/mouse.interface';
 
 interface MediaItemContextMenuProps {
     options: [string, () => void][];

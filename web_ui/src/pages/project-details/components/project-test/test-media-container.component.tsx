@@ -4,6 +4,9 @@
 import { useMemo, useState } from 'react';
 
 import { Grid, Item, Picker, repeat, Slider, View } from '@adobe/react-spectrum';
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { SortDirection } from '@shared/components/sort-by-attribute/sort-by-attribute.component';
+import { hasEqualDomain, hasEqualId } from '@shared/utils';
 import uniqBy from 'lodash/uniqBy';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,9 +22,6 @@ import { TASK_TYPE } from '../../../../core/projects/dtos/task.interface';
 import { getDomain } from '../../../../core/projects/project.interface';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';
 import { Test } from '../../../../core/tests/tests.interface';
-import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { SortDirection } from '../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
-import { hasEqualDomain, hasEqualId } from '../../../../shared/utils';
 import { TaskProvider } from '../../../annotator/providers/task-provider/task-provider.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { MediaItemsBucket } from './media-items-bucket.component';

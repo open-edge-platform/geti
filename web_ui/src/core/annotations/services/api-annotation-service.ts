@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getIds } from '@shared/utils';
 import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
-import { getIds } from '../../../shared/utils';
 import { Label } from '../../labels/label.interface';
 import { MediaItem } from '../../media/media.interface';
 import { mediaIdentifierToDTO } from '../../media/services/utils';

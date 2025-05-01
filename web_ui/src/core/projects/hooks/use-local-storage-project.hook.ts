@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { LOCAL_STORAGE_KEYS } from '@shared/local-storage-keys';
+import { getParsedLocalStorage } from '@shared/utils';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { LOCAL_STORAGE_KEYS } from '../../../shared/local-storage-keys';
-import { getParsedLocalStorage } from '../../../shared/utils';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { ProjectExportIdentifier } from '../project.interface';
 

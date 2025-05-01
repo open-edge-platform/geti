@@ -6,10 +6,6 @@ import { useState } from 'react';
 import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { SpectrumActionButtonProps } from '@react-types/button';
 import { BackgroundColorValue } from '@react-types/shared';
-
-import { DownloadIcon } from '../../../../../assets/icons';
-import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
-import { useNotification } from '../../../../../notification/notification.component';
 import {
     DOWNLOADABLE_HTML_SELECTOR,
     DOWNLOADABLE_SVG_SELECTOR,
@@ -17,8 +13,12 @@ import {
     ERROR_MESSAGE,
     getContainerElements,
     getVarColorToHex,
-} from '../../../../../shared/components/download-graph-menu/export-svg-utils';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
+} from '@shared/components/download-graph-menu/export-svg-utils';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+
+import { DownloadIcon } from '../../../../../assets/icons';
+import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
+import { useNotification } from '../../../../../notification/notification.component';
 
 import classes from './download-svg-button.module.scss';
 

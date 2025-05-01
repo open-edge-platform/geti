@@ -3,12 +3,12 @@
 
 import { Key, useMemo } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import { useNavigate } from 'react-router-dom';
 
 import { ModelsGroups, ModelVersion } from '../../../../../../core/models/models.interface';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { hasEqualId } from '../../../../../../shared/utils';
 
 export const useSelectedModel = (
     modelGroup: ModelsGroups | undefined

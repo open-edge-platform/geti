@@ -3,7 +3,8 @@
 
 import { useMemo } from 'react';
 
-import { CTRL_OR_COMMAND_KEY } from '../../../shared/hotkeys';
+import { CTRL_OR_COMMAND_KEY } from '@shared/hotkeys';
+
 import { DefaultHotkeys, Hotkeys } from '../providers/annotator-provider/utils';
 import { GrabcutHotKeys } from '../tools/grabcut-tool/grabcut-tool.interface';
 import { PolygonHotKeys } from '../tools/polygon-tool/polygon-tool.interface';

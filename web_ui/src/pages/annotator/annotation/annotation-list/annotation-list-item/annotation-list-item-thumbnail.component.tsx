@@ -4,10 +4,10 @@
 import { memo, useEffect, useRef } from 'react';
 
 import { Flex } from '@react-spectrum/layout';
+import { AnnotationStateIndicator } from '@shared/components/annotation-indicator/annotation-state-indicator.component';
 
 import { Shape } from '../../../../../core/annotations/shapes.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../../core/media/base.interface';
-import { AnnotationStateIndicator } from '../../../../../shared/components/annotation-indicator/annotation-state-indicator.component';
 import { cropCanvasBasedOnShape } from '../utils';
 
 import classes from './annotation-list-thumbnail.module.scss';

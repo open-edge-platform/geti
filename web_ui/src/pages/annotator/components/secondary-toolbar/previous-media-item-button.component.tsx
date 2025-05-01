@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import minBy from 'lodash/minBy';
 
 import { ChevronLeft } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideo } from '../../../../core/media/video.interface';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';
 import { FindMediaItemCriteria, FindVideoFrameCriteria, useNextMediaItem } from '../../hooks/use-next-media-item.hook';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';

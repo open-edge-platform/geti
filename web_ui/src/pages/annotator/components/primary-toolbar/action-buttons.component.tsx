@@ -5,12 +5,12 @@ import { useMemo } from 'react';
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { Flex } from '@react-spectrum/layout';
+import { Divider } from '@shared/components/divider/divider.component';
+import { FitImageToScreenButton } from '@shared/components/fit-image-to-screen-button/fit-image-to-screen-button.component';
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { FitImageToScreenButton } from '../../../../shared/components/fit-image-to-screen-button/fit-image-to-screen-button.component';
-import { hasEqualId } from '../../../../shared/utils';
 import {
     TOGGLE_VISIBILITY_COLOR_MODE,
     ToggleVisibilityButton,

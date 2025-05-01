@@ -4,13 +4,13 @@
 import { useState } from 'react';
 
 import { Tooltip, TooltipTrigger, useNumberFormatter } from '@adobe/react-spectrum';
+import { ActionButton } from '@shared/components/button/button.component';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import clsx from 'clsx';
 import { useControls } from 'react-zoom-pan-pinch';
 
 import { Add, Remove } from '../../../../../assets/icons';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from '../annotator-footer.module.scss';
 

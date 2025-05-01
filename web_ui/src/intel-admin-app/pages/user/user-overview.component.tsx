@@ -4,9 +4,9 @@
 import { FC, useState } from 'react';
 
 import { Divider, Flex, Text, TextField, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@shared/components/button/button.component';
 
 import { Delete } from '../../../assets/icons';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { Header } from '../../shared/components/header/header.component';
 import { MOCKED_USERS, User } from '../users/mocked-user';
 import { DeleteUserDialog } from '../users/user-actions/delete-user-dialog.component';

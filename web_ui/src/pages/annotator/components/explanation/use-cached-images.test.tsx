@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
+import * as utils from '@shared/utils';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
 
 import Antelope from '../../../../assets/tests-assets/antelope.webp';
-import * as utils from '../../../../shared/utils';
 import { useCachedImages } from './use-cached-images.hook';
 
 const loadImage = jest.spyOn(utils, 'loadImage');

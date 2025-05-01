@@ -3,11 +3,11 @@
 
 import { createContext, ReactNode, useContext, useReducer, useState } from 'react';
 
+import { ContextMenu, ContextMenuProps } from '@shared/components/context-menu/context-menu.component';
+import { MissingProviderError } from '@shared/missing-provider-error';
 import isEqual from 'lodash/isEqual';
 import noop from 'lodash/noop';
 
-import { ContextMenu, ContextMenuProps } from '../../../../shared/components/context-menu/context-menu.component';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { getContextMenuPosition } from './utils';
 

@@ -3,9 +3,10 @@
 
 import { createContext, ReactNode, useContext } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../core/labels/label.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import UndoRedoProvider from '../../tools/undo-redo/undo-redo-provider.component';
 import { useAnnotationSceneState } from './use-annotation-scene-state.hook';

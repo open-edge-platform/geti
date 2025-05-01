@@ -3,9 +3,10 @@
 
 import { useState } from 'react';
 
+import { CustomNumberField } from '@shared/components/configurable-parameters/cp-item/custom-number-field/custom-number-field.component';
+
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { useDebouncedCallback } from '../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
-import { CustomNumberField } from '../../../../shared/components/configurable-parameters/cp-item/custom-number-field/custom-number-field.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isValidInteger } from '../../utils';
 

@@ -18,8 +18,8 @@ jest.mock('../../providers/device-settings-provider.component', () => ({
     useDeviceSettings: jest.fn(),
 }));
 
-jest.mock('../../../../shared/navigator-utils', () => ({
-    ...jest.requireActual('../../../../shared/navigator-utils'),
+jest.mock('@shared/navigator-utils', () => ({
+    ...jest.requireActual('@shared/navigator-utils'),
     getVideoDevices: jest.fn().mockResolvedValue([]),
 }));
 

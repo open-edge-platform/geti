@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading, Item, Key, Picker, View } from '@adobe/react-spectrum';
+import { Divider } from '@shared/components/divider/divider.component';
 import orderBy from 'lodash/orderBy';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
 import { applySettings } from '../../providers/util';
 import { SettingOption } from './setting-option.component';

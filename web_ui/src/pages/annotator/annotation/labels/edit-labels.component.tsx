@@ -3,13 +3,13 @@
 
 import { Flex } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { TaskLabelTreeSearchPopover } from '@shared/components/task-label-tree-search/task-label-tree-search-popover.component';
+import { hasEqualId, runWhenTruthy } from '@shared/utils';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { isExclusive } from '../../../../core/labels/utils';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
-import { TaskLabelTreeSearchPopover } from '../../../../shared/components/task-label-tree-search/task-label-tree-search-popover.component';
-import { hasEqualId, runWhenTruthy } from '../../../../shared/utils';
 import { SelectionIndicator } from '../../components/labels/label-search/selection-indicator.component';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';

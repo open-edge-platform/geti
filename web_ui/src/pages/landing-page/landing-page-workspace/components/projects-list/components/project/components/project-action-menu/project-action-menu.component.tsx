@@ -4,6 +4,10 @@
 import { Key, useMemo, useState } from 'react';
 
 import { DialogContainer } from '@adobe/react-spectrum';
+import { ActionMenu } from '@shared/components/action-menu/action-menu.component';
+import { MenuAction } from '@shared/components/action-menu/menu-action.interface';
+import { useCheckPermission } from '@shared/components/has-permission/has-permission.component';
+import { OPERATION } from '@shared/components/has-permission/has-permission.interface';
 import isEmpty from 'lodash/isEmpty';
 import { useOverlayTriggerState } from 'react-stately';
 
@@ -11,10 +15,6 @@ import { ProjectIdentifier } from '../../../../../../../../../core/projects/core
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';
 import { RESOURCE_TYPE } from '../../../../../../../../../core/users/users.interface';
 import { useWorkspaceIdentifier } from '../../../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { ActionMenu } from '../../../../../../../../../shared/components/action-menu/action-menu.component';
-import { MenuAction } from '../../../../../../../../../shared/components/action-menu/menu-action.interface';
-import { useCheckPermission } from '../../../../../../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../../../../../../shared/components/has-permission/has-permission.interface';
 import { DeleteProjectDialog } from './delete-project-dialog.component';
 import { EditProjectNameDialog } from './edit-project-name-dialog.component';
 

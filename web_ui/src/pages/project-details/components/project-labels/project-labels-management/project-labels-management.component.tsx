@@ -2,6 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { LabelTreeView } from '@shared/components/label-tree-view/label-tree-view.component';
+import {
+    getLabelsWithAddedChild,
+    getLabelWithoutDeleted,
+    getTreeWithUpdatedItem,
+} from '@shared/components/label-tree-view/utils';
 
 import {
     LabelItemEditionState,
@@ -15,12 +21,6 @@ import {
 import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
-import { LabelTreeView } from '../../../../../shared/components/label-tree-view/label-tree-view.component';
-import {
-    getLabelsWithAddedChild,
-    getLabelWithoutDeleted,
-    getTreeWithUpdatedItem,
-} from '../../../../../shared/components/label-tree-view/utils';
 import { LABEL_TREE_TYPE } from '../../../../create-project/components/project-labels-management/label-tree-type.enum';
 import { LabelTreeGroup } from '../../../../create-project/components/project-labels-management/task-labels-management/new-label-tree-item/label-tree-group.component';
 import { LabelTreeLabel } from '../../../../create-project/components/project-labels-management/task-labels-management/new-label-tree-item/label-tree-label.component';

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getImageData } from '@shared/canvas-utils';
 import { renderHook, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import * as usehooks from 'usehooks-ts';
@@ -12,7 +13,6 @@ import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { labelFromUser } from '../../../../core/annotations/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
-import { getImageData } from '../../../../shared/canvas-utils';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedKeypointNode } from '../../../../test-utils/mocked-items-factory/mocked-keypoint';

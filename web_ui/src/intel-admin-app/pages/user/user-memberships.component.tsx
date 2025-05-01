@@ -4,8 +4,8 @@
 import { FC, useState } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { SearchField } from '@shared/components/search-field/search-field.component';
 
-import { SearchField } from '../../../shared/components/search-field/search-field.component';
 import { EntitiesCounter } from '../../shared/components/entities-counter/entities-counter.component';
 import { Header } from '../../shared/components/header/header.component';
 import {

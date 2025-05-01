@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ViewModes } from '@shared/components/media-view-modes/utils';
 import { screen, waitFor } from '@testing-library/react';
 
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { createInMemoryMediaService } from '../../../../../core/media/services/in-memory-media-service/in-memory-media-service';
-import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
 import {
     getMockedImageMediaItem,
     getMockedVideoFrameMediaItem,

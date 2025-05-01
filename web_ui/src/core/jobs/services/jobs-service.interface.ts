@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SortDirection } from '../../../shared/components/sort-by-attribute/sort-by-attribute.component';
+import { SortDirection } from '@shared/components/sort-by-attribute/sort-by-attribute.component';
+
 import { NextPageURL } from '../../shared/infinite-query.interface';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { JobState, JobType } from '../jobs.const';

@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { dimensionValue } from '@react-spectrum/utils';
+import { getProgressScoreColor } from '@shared/utils';
 import { Label, Pie, PieChart } from 'recharts';
-
-import { getProgressScoreColor } from '../../../../../../../shared/utils';
 
 type AccuracyHalfDonutChartSize = 'S' | 'M' | 'L' | 'XL';
 

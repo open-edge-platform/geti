@@ -3,11 +3,12 @@
 
 import { Key, useRef, useState } from 'react';
 
+import { hasEqualId } from '@shared/utils';
+
 import { Delete, Edit, Invisible, Lock, Stamp, Unlock } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Point } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
-import { hasEqualId } from '../../../../shared/utils';
 import { getAvailableLabelsForAnnotation } from '../../annotation/labels/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorHotkeys } from '../../hooks/use-hotkeys-configuration.hook';

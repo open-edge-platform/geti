@@ -3,8 +3,9 @@
 
 import { FC } from 'react';
 
+import { MenuOption } from '@shared/components/menu-option.interface';
+
 import { paths } from '../../../core/services/routes';
-import { MenuOption } from '../../../shared/components/menu-option.interface';
 import { Sidebar } from '../../shared/components/sidebar/sidebar.component';
 import { User } from '../users/mocked-user';
 

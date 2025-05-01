@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { formatDate } from '@shared/utils';
 import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import dayjs from 'dayjs';
 
 import { createInMemoryModelsService } from '../../../../../../core/models/services/in-memory-models-service';
 import { ModelsService } from '../../../../../../core/models/services/models.interface';
-import { formatDate } from '../../../../../../shared/utils';
 import { getMockedProjectIdentifier } from '../../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedModelVersion } from '../../../../../../test-utils/mocked-items-factory/mocked-model';
 import { providersRender } from '../../../../../../test-utils/required-providers-render';

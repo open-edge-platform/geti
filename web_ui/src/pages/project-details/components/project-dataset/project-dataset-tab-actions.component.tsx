@@ -5,6 +5,10 @@ import { Key, useCallback, useMemo } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { CustomTabItemWithMenu } from '@shared/components/custom-tab-item/custom-tab-item-with-menu.component';
+import { CustomTabItem } from '@shared/components/custom-tab-item/custom-tab-item.component';
+import { DeleteDialog } from '@shared/components/delete-dialog/delete-dialog.component';
+import { EditNameDialog } from '@shared/components/edit-name-dialog/edit-name-dialog.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -13,10 +17,6 @@ import { isKeypointTask } from '../../../../core/projects/utils';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../../core/status/hooks/utils';
 import { useDataset } from '../../../../providers/dataset-provider/dataset-provider.component';
-import { CustomTabItemWithMenu } from '../../../../shared/components/custom-tab-item/custom-tab-item-with-menu.component';
-import { CustomTabItem } from '../../../../shared/components/custom-tab-item/custom-tab-item.component';
-import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog.component';
-import { EditNameDialog } from '../../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { useMedia } from '../../../media/providers/media-provider.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { ExportDatasetDialog } from './export-dataset/export-dataset-dialog.component';

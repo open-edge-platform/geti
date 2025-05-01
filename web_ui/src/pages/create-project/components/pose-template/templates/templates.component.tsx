@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Item, Key, Menu, MenuTrigger, Section } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { isNonEmptyArray } from '@shared/utils';
 
 import { JointConnection } from '../../../../../assets/icons';
 import { RegionOfInterest } from '../../../../../core/annotations/annotation.interface';
-import { Button } from '../../../../../shared/components/button/button.component';
-import { isNonEmptyArray } from '../../../../../shared/utils';
 import { useGetProjectsTemplates } from '../hooks/use-get-projects-templates.hook';
 import { TemplateState } from '../util';
 import { animalPose } from './animal-pose.template';

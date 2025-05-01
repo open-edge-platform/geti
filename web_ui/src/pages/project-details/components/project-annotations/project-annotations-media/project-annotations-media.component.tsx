@@ -3,9 +3,9 @@
 
 import { Flex } from '@adobe/react-spectrum';
 import { Text } from '@react-spectrum/text';
+import { CardContent } from '@shared/components/card-content/card-content.component';
 import CountUp from 'react-countup';
 
-import { CardContent } from '../../../../../shared/components/card-content/card-content.component';
 import { ProjectGridArea } from '../project-grid-area.interface';
 
 import classes from './project-annotations-media.module.scss';

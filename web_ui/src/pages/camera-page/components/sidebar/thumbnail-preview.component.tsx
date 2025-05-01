@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@shared/components/button/button.component';
 import { useOverlayTriggerState } from 'react-stately';
 
-import { ActionButton } from '../../../../shared/components/button/button.component';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { ImageOverlay } from '../image-overlay.component';

@@ -3,10 +3,11 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
+import { getImageData } from '@shared/canvas-utils';
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { getBoundingBox, roiFromImage } from '../../../../core/annotations/math';
-import { getImageData } from '../../../../shared/canvas-utils';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useSelectedMediaItem } from '../selected-media-item-provider/selected-media-item-provider.component';
 import { useTaskChain } from '../task-chain-provider/task-chain-provider.component';
 

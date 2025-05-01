@@ -13,12 +13,12 @@ import {
     useState,
 } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { getVideoDevices } from '@shared/navigator-utils';
+import { runWhen } from '@shared/utils';
 import Webcam from 'react-webcam';
 import { useIsMounted } from 'usehooks-ts';
 
-import { MissingProviderError } from '../../../shared/missing-provider-error';
-import { getVideoDevices } from '../../../shared/navigator-utils';
-import { runWhen } from '../../../shared/utils';
 import { UserCameraPermission } from '../../camera-support/camera.interface';
 import { DeviceConfiguration, getBrowserPermissions, getValidCapabilities, mergeSettingAndCapabilities } from './util';
 

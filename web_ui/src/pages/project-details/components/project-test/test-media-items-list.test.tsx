@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ViewModes } from '@shared/components/media-view-modes/utils';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { screen, waitFor } from '@testing-library/react';
 
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { TestMediaAdvancedFilter } from '../../../../core/tests/test-media.interface';
-import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { getMockedImageMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { checkTooltip } from '../../../../test-utils/utils';

@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Grid, View } from '@adobe/react-spectrum';
+import { hasEqualId } from '@shared/utils';
 import groupBy from 'lodash/groupBy';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
@@ -11,7 +12,6 @@ import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../../../cor
 import { Label } from '../../../../../core/labels/label.interface';
 import { VideoFrame } from '../../../../../core/media/video.interface';
 import { VideoControls } from '../../../../../pages/annotator/components/video-player/video-controls/video-controls.interface';
-import { hasEqualId } from '../../../../../shared/utils';
 import { RangesList } from './ranges-list.component';
 import { createNewRange } from './utils';
 import { VideoNavigation } from './video-navigation.component';

@@ -3,8 +3,8 @@
 
 import { Flex, Slider } from '@adobe/react-spectrum';
 import { Text } from '@react-spectrum/text';
+import { Divider } from '@shared/components/divider/divider.component';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolAnnotationContextProps } from '../tools.interface';
 import { useCircleState } from './circle-state-provider.component';

@@ -4,9 +4,9 @@
 import { Key } from 'react';
 
 import { Item, Picker, Text, View } from '@adobe/react-spectrum';
+import { LoadingIndicator } from '@shared/components/loading/loading-indicator.component';
+import { hasEqualId } from '@shared/utils';
 
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
-import { hasEqualId } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { SelectableOptimizationType } from '../../project-details.interface';
 

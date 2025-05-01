@@ -4,9 +4,9 @@
 import { ReactNode } from 'react';
 
 import { Flex, Keyboard, Text } from '@adobe/react-spectrum';
+import { getKeyName } from '@shared/hotkeys';
 import isString from 'lodash/isString';
 
-import { getKeyName } from '../../../../../../shared/hotkeys';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 
 import classes from './hot-keys-item.module.scss';

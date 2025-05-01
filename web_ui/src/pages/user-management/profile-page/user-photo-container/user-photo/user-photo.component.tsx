@@ -4,16 +4,13 @@
 import { Key } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { ColorMode, QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import { usePress } from 'react-aria';
 
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { UserPhotoPreview } from './user-photo-preview.component';
 
-import sharedClasses from '../../../../../shared/shared.module.scss';
 import classes from './user-photo.module.scss';
+import sharedClasses from '@shared/shared.module.scss';
 
 interface UserPhotoProps {
     userPhoto: string;

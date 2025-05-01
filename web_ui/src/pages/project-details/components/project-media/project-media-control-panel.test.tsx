@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { INITIAL_VIEW_MODE, VIEW_MODE_LABEL } from '@shared/components/media-view-modes/utils';
 import { UseQueryResult } from '@tanstack/react-query';
 import { screen } from '@testing-library/react';
 import { AxiosError } from 'axios';
@@ -10,7 +11,6 @@ import { ApplicationServicesContextProps } from '../../../../core/services/appli
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { TOO_LOW_FREE_DISK_SPACE_IN_BYTES } from '../../../../core/status/hooks/utils';
 import { StatusProps } from '../../../../core/status/status.interface';
-import { INITIAL_VIEW_MODE, VIEW_MODE_LABEL } from '../../../../shared/components/media-view-modes/utils';
 import {
     getMockedImageMediaItem,
     getMockedVideoMediaItem,

@@ -17,14 +17,14 @@ import {
 } from '@adobe/react-spectrum';
 import { AriaLabelingProps, DOMProps, StyleProps } from '@react-types/shared';
 import { ColumnSize } from '@react-types/table';
+import { TableCellProps } from '@shared/components/table/table.interface';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
+import { SpectrumTableLoadingState } from '@shared/utils';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
 
 import { CreditAccount } from '../../../../core/credits/credits.interface';
 import { getBalanceUsedCredits } from '../../../../core/credits/services/utils';
-import { TableCellProps } from '../../../../shared/components/table/table.interface';
-import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
-import { SpectrumTableLoadingState } from '../../../../shared/utils';
 import { RenewalDayCell } from './renewal-day-cell.component';
 
 interface creditAccountsTableProps extends DOMProps, AriaLabelingProps, StyleProps {

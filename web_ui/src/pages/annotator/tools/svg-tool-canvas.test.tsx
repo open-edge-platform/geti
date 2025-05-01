@@ -3,9 +3,9 @@
 
 import '@wessberg/pointer-events';
 
+import { getImageData } from '@shared/canvas-utils';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { getImageData } from '../../../shared/canvas-utils';
 import { SvgToolCanvas } from './svg-tool-canvas.component';
 
 describe('SvgToolCanvas', () => {

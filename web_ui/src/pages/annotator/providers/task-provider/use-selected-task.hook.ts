@@ -3,10 +3,10 @@
 
 import { useCallback, useMemo } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import { useSearchParams } from 'react-router-dom';
 
 import { Task } from '../../../../core/projects/task.interface';
-import { hasEqualId } from '../../../../shared/utils';
 
 type UseSelectedTask = [null | Task, (task: Task | null) => void];
 

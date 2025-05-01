@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import mergeWith from 'lodash/mergeWith';
 
 import { Annotation, AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { recursivelyAddLabel } from '../../../../core/labels/label-resolver';
 import { isExclusive } from '../../../../core/labels/utils';
-import { hasEqualId } from '../../../../shared/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useImageROI } from '../../hooks/use-image-roi.hook';
 import { getGlobalAnnotations, getLabelConflictPredicate } from '../task-chain-provider/utils';

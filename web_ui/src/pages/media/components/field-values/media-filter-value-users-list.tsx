@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ComboBox, Item } from '@adobe/react-spectrum';
+import { runWhenTruthy } from '@shared/utils';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE } from '../../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { runWhenTruthy } from '../../../../shared/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 
 interface MediaFilterValueUsersListProps {

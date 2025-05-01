@@ -3,6 +3,8 @@
 
 import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
 import { OverlayTriggerState } from '@react-stately/overlays';
+import { DatasetImportDeletionDialog } from '@shared/components/dataset-import-deletion-dialog/dataset-import-deletion-dialog.component';
+import { isNonEmptyString, runWhenTruthy } from '@shared/utils';
 
 import { DatasetImportItem } from '../../../../../core/datasets/dataset.interface';
 import { getCurrentJob } from '../../../../../core/datasets/utils';
@@ -10,8 +12,6 @@ import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-fea
 import { useJobs } from '../../../../../core/jobs/hooks/use-jobs.hook';
 import { useDatasetImportToNewProject } from '../../../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { DatasetImportDeletionDialog } from '../../../../../shared/components/dataset-import-deletion-dialog/dataset-import-deletion-dialog.component';
-import { isNonEmptyString, runWhenTruthy } from '../../../../../shared/utils';
 import { DatasetImportToNewProjectDialogButtons } from './dataset-import-to-new-project-dialog-buttons.component';
 import { DatasetImportToNewProjectDialogContent } from './dataset-import-to-new-project-dialog-content.component';
 import { DatasetImportToNewProjectWizard } from './dataset-import-to-new-project-wizard.component';

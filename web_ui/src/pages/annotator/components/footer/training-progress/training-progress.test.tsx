@@ -7,8 +7,8 @@ import { providersRender as render } from '../../../../../test-utils/required-pr
 import { getById } from '../../../../../test-utils/utils';
 import { TrainingDetails, TrainingProgress } from './training-progress.component';
 
-jest.mock('../../../../../shared/utils', () => ({
-    ...jest.requireActual('../../../../../shared/utils'),
+jest.mock('@shared/utils', () => ({
+    ...jest.requireActual('@shared/utils'),
     trimText: jest.fn((text) => text),
 }));
 

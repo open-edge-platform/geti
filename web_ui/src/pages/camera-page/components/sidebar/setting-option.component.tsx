@@ -4,11 +4,11 @@
 import { Key, useState } from 'react';
 
 import { Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import capitalize from 'lodash/capitalize';
 import words from 'lodash/words';
 
 import { Revisit } from '../../../../assets/icons';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { DeviceConfiguration } from '../../providers/util';
 
 import classes from './sidebar.module.scss';

@@ -4,12 +4,12 @@
 import { PointerEvent, RefObject } from 'react';
 
 import { default as ClipperShape } from '@doodle3d/clipper-js';
+import { hasEqualSize } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation, RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { Point, Shape } from '../../../../core/annotations/shapes.interface';
 import { getTheTopShapeAt, isPolygon } from '../../../../core/annotations/utils';
-import { hasEqualSize } from '../../../../shared/utils';
 import { getRelativePoint } from '../../../utils';
 import { transformToClipperShape } from '../utils';
 

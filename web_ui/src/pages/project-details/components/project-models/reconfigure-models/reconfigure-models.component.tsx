@@ -15,16 +15,16 @@ import {
     TooltipTrigger,
 } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
+import { Button } from '@shared/components/button/button.component';
+import { ConfigurableParameters } from '@shared/components/configurable-parameters/configurable-parameters.component';
+import { ConfigurableParametersType } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { LoadingIndicator } from '@shared/components/loading/loading-indicator.component';
+import { Loading } from '@shared/components/loading/loading.component';
 
-import { Button } from '../../../../../shared/components/button/button.component';
-import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
-import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
 import { useReconfigureParametersValue } from './use-reconfigure-parameters-value/use-reconfigure-parameters-value';
 
-import sharedClasses from '../../../../../shared/shared.module.scss';
 import classes from './reconfigure-models.module.scss';
+import sharedClasses from '@shared/shared.module.scss';
 
 export const ReconfigureModels = (): JSX.Element => {
     const [isOpen, setIsOpen] = useState<boolean>(false);

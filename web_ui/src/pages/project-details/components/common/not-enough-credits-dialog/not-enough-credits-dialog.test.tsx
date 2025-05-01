@@ -1,16 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { openNewTab } from '@shared/utils';
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { CONTACT_SUPPORT } from '../../../../../core/const';
-import { openNewTab } from '../../../../../shared/utils';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { ProjectProvider } from '../../../providers/project-provider/project-provider.component';
 import { NotEnoughCreditsDialog } from './not-enough-credits-dialog.component';
 
-jest.mock('../../../../../shared/utils', () => ({
-    ...jest.requireActual('../../../../../shared/utils'),
+jest.mock('@shared/utils', () => ({
+    ...jest.requireActual('@shared/utils'),
     openNewTab: jest.fn(),
 }));
 

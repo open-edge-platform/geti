@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { formatDate } from '@shared/utils';
+
 import { Test } from '../../../../core/tests/tests.interface';
-import { formatDate } from '../../../../shared/utils';
 import { ColumnCell, TestTableData } from './tests-list.interface';
 
 export const COLUMNS: ColumnCell[] = [

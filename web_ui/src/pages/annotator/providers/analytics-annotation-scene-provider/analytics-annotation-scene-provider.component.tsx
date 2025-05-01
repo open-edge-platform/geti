@@ -3,7 +3,8 @@
 
 import { createContext, ReactNode, useContext } from 'react';
 
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import {
     AnnotationSceneContext,

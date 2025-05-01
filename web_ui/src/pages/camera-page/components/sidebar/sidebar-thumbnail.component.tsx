@@ -3,12 +3,12 @@
 
 import { Flex, Link as SpectrumLink, Text, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { isVideoFile } from '@shared/media-utils';
 import isEmpty from 'lodash/isEmpty';
 import useVirtual from 'react-cool-virtual';
 import { Link } from 'react-router-dom';
 
 import { paths } from '../../../../core/services/routes';
-import { isVideoFile } from '../../../../shared/media-utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';

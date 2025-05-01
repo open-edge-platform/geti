@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { MediaItemMenuActions } from '@shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
 import { ProjectService } from '../../../../../core/projects/services/project-service.interface';
-import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
 import { getMockedVideoMediaItem } from '../../../../../test-utils/mocked-items-factory/mocked-media';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedTask } from '../../../../../test-utils/mocked-items-factory/mocked-tasks';

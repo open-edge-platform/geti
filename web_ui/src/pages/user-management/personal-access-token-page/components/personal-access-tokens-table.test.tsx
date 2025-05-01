@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { formatUtcToLocal } from '@shared/utils';
 import { screen, within } from '@testing-library/react';
 
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
-import { formatUtcToLocal } from '../../../../shared/utils';
 import { providersRender } from '../../../../test-utils/required-providers-render';
 import { PersonalAccessTokensTable } from './personal-access-tokens-table.component';
 

@@ -3,13 +3,13 @@
 
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
 import isFunction from 'lodash/isFunction';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { SubmitDialogs } from '../../components/submit-annotations/submit-dialogs.component';
 import { useAnalyticsAnnotationTools } from '../analytics-annotation-scene-provider/analytics-annotation-scene-provider.component';
 import { SelectedMediaItem } from '../selected-media-item-provider/selected-media-item.interface';

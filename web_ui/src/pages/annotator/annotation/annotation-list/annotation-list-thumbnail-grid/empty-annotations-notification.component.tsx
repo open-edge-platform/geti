@@ -4,13 +4,10 @@
 import { useEffect, useState } from 'react';
 
 import { Flex, Link, Text } from '@adobe/react-spectrum';
+import { ColorMode, QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import { createPortal } from 'react-dom';
 
 import { CloseSmall, Info } from '../../../../../assets/icons';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useShouldShowEmptyAnnotationsWarning } from '../../../hooks/use-should-show-empty-annotations-warning.hook';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { NOTIFICATION_MESSAGE } from '../utils';

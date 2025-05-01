@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { hasEqualId } from '../../../../shared/utils';
+import { hasEqualId } from '@shared/utils';
+
 import { DEFAULT_ANNOTATION_STYLES } from '../../tools/utils';
 import { Annotation } from '../annotation.component';
 import { LayerProps } from './utils';

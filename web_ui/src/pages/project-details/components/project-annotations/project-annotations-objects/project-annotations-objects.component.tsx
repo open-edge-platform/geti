@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { BarHorizontalChart } from '@shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
+import { Colors } from '@shared/components/charts/chart.interface';
+import { FullscreenAction } from '@shared/components/fullscreen-action/fullscreen-action.component';
 import { ResponsiveContainer } from 'recharts';
 
 import { ObjectsPerLabelInterface } from '../../../../../core/statistics/dtos/dataset-statistics.interface';
-import { CardContent } from '../../../../../shared/components/card-content/card-content.component';
-import { BarHorizontalChart } from '../../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
-import { Colors } from '../../../../../shared/components/charts/chart.interface';
-import { FullscreenAction } from '../../../../../shared/components/fullscreen-action/fullscreen-action.component';
 import { ProjectGridArea } from '../project-grid-area.interface';
 import { formatToChartData, getColors, reorderObjectsLabels } from './utils';
 

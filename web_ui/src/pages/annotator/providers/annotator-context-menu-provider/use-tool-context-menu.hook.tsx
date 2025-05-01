@@ -3,13 +3,13 @@
 
 import { Key, useMemo } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { useControls } from 'react-zoom-pan-pinch';
 
 import { FitScreen, Invisible, NoStamp, Redo, Undo, Visible } from '../../../../assets/icons';
 import { Point } from '../../../../core/annotations/shapes.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { hasEqualId } from '../../../../shared/utils';
 import { useDisabledTools } from '../../components/primary-toolbar/utils';
 import { AnnotationToolContext, ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorHotkeys } from '../../hooks/use-hotkeys-configuration.hook';

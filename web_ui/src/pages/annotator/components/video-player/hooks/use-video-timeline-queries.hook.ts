@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getIds } from '@shared/utils';
 import { UseQueryResult } from '@tanstack/react-query';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { PredictionMode } from '../../../../../core/annotations/services/prediction-service.interface';
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { Video } from '../../../../../core/media/video.interface';
-import { getIds } from '../../../../../shared/utils';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';
 import { getVideoOptions } from '../streaming-video-player/utils';
 import { useVideoPlayer } from '../video-player-provider.component';

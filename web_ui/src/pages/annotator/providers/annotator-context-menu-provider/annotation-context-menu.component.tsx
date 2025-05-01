@@ -5,12 +5,12 @@ import { MutableRefObject, RefObject, useRef } from 'react';
 
 import { View } from '@adobe/react-spectrum';
 import { Overlay } from '@react-spectrum/overlays';
+import { MouseEvents } from '@shared/mouse-events/mouse.interface';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { pointInRectangle } from '../../../../core/annotations/math';
 import { getTheTopShapeAt } from '../../../../core/annotations/utils';
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { MouseEvents } from '../../../../shared/mouse-events/mouse.interface';
 import { getRelativePoint } from '../../../utils';
 import { LabelSearch } from '../../components/labels/label-search/label-search.component';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';

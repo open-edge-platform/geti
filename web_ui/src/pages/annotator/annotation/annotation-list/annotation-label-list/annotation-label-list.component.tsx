@@ -4,13 +4,13 @@
 import { Fragment } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { AiIcon, CaretRightIcon } from '../../../../../assets/icons';
 import { Annotation, AnnotationLabel } from '../../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { isPrediction, showLabelScore } from '../../../../../core/labels/utils';
-import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { DEFAULT_LABEL_WIDTH } from '../../labels/label.component';
 

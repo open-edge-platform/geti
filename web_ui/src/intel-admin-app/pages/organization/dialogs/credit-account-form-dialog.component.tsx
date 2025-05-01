@@ -17,11 +17,11 @@ import {
     TextField,
 } from '@adobe/react-spectrum';
 import { DateValue, getLocalTimeZone, parseAbsolute, parseDate, today } from '@internationalized/date';
+import { Button } from '@shared/components/button/button.component';
+import { DatePicker } from '@shared/components/date-picker/date-picker.component';
 import dayjs from 'dayjs';
 
 import { CreditAccount, NewCreditAccount } from '../../../../core/credits/credits.interface';
-import { Button } from '../../../../shared/components/button/button.component';
-import { DatePicker } from '../../../../shared/components/date-picker/date-picker.component';
 import { useOrganization } from '../hooks/organization.hook';
 
 import classes from './dialogs.module.scss';

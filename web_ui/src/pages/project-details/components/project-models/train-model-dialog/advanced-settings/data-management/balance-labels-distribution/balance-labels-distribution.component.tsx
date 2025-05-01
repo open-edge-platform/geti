@@ -4,10 +4,10 @@
 import { FC, useState } from 'react';
 
 import { Flex, Grid, Heading, Text, View } from '@adobe/react-spectrum';
+import { Switch } from '@shared/components/switch/switch.component';
 import isEmpty from 'lodash/isEmpty';
 import { useNumberFormatter } from 'react-aria';
 
-import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { Tooltip } from '../../ui/tooltip.component';
 

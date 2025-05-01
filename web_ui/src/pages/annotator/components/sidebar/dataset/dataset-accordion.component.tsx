@@ -4,17 +4,17 @@
 import { CSSProperties, Dispatch, SetStateAction } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { Accordion } from '@shared/components/accordion/accordion.component';
+import { MediaViewModes } from '@shared/components/media-view-modes/media-view-modes.component';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
+import { RefreshButton } from '@shared/components/refresh-button/refresh-button.component';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { TUTORIAL_CARD_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
 import { useSortingParams } from '../../../../../hooks/use-sorting-params/use-sorting-params.hook';
-import { Accordion } from '../../../../../shared/components/accordion/accordion.component';
-import { MediaViewModes } from '../../../../../shared/components/media-view-modes/media-view-modes.component';
-import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
-import { RefreshButton } from '../../../../../shared/components/refresh-button/refresh-button.component';
-import { TutorialCardBuilder } from '../../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { MediaFilterChips } from '../../../../media/components/media-filter-chips.component';
 import { MediaSearch } from '../../../../media/media-actions/media-search.component';
 import { MediaSorting } from '../../../../media/media-actions/media-sorting.component';

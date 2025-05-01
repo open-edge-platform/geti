@@ -1,16 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { getVideoDevices } from '@shared/navigator-utils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { MissingProviderError } from '../../../shared/missing-provider-error';
-import { getVideoDevices } from '../../../shared/navigator-utils';
 import { providersRender as render } from '../../../test-utils/required-providers-render';
 import { DeviceSettingsProvider, useDeviceSettings } from './device-settings-provider.component';
 import { getBrowserPermissions, getValidCapabilities, mergeSettingAndCapabilities } from './util';
 
-jest.mock('../../../shared/navigator-utils', () => ({
-    ...jest.requireActual('../../../shared/navigator-utils'),
+jest.mock('@shared/navigator-utils', () => ({
+    ...jest.requireActual('@shared/navigator-utils'),
     getVideoDevices: jest.fn().mockResolvedValue([]),
 }));
 

@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { dismissTutorial } from '@shared/components/tutorials/utils';
 
 import { Close, Info } from '../../../../../assets/icons';
 import { TUTORIAL_CARD_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
 import { UserGlobalSettings, UseSettings } from '../../../../../core/user-settings/services/user-settings.interface';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { dismissTutorial } from '../../../../../shared/components/tutorials/utils';
 
 import classes from './quick-inference.module.scss';
 

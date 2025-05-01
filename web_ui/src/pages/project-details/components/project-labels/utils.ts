@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isNotCropTask } from '@shared/utils';
+
 import { fetchLabelsTree, fetchLabelsTreeWithGroups } from '../../../../core/labels/annotator-utils/labels-utils';
 import {
     LabelItemEditionState,
@@ -11,7 +13,6 @@ import { Label, LabelsRelationType } from '../../../../core/labels/label.interfa
 import { getNotEmptyLabelsFromOneTask } from '../../../../core/labels/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Task, TaskMetadata } from '../../../../core/projects/task.interface';
-import { isNotCropTask } from '../../../../shared/utils';
 
 export const getUnremovedLabels = (labelsTree: LabelTreeItem[]): LabelTreeItem[] => {
     return labelsTree.filter(({ state }) => state !== LabelItemEditionState.REMOVED);

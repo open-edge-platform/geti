@@ -3,6 +3,8 @@
 
 import { useEffect } from 'react';
 
+import { ActionButton } from '@shared/components/button/button.component';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import isEmpty from 'lodash/isEmpty';
 import noop from 'lodash/noop';
 import { useNavigate } from 'react-router-dom';
@@ -15,8 +17,6 @@ import { LifecycleStage } from '../../../../../core/supported-algorithms/dtos/su
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import { addAlgorithmDetails } from '../../project-models/utils';
 

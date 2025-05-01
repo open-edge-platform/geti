@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import capitalize from 'lodash/capitalize';
 
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
@@ -8,7 +9,6 @@ import { ProjectSortingOptions } from '../../../../../core/projects/services/pro
 import { KeypointTask } from '../../../../../core/projects/task.interface';
 import { isKeypointTask } from '../../../../../core/projects/utils';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { hasEqualId } from '../../../../../shared/utils';
 import { RawTemplate } from '../templates/utils';
 
 export const useGetProjectsTemplates = () => {

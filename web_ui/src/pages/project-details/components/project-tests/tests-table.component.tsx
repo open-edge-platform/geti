@@ -19,6 +19,9 @@ import {
     useCollator,
 } from '@adobe/react-spectrum';
 import { SortDescriptor } from '@react-types/shared';
+import { ThreeDotsFlashing } from '@shared/components/three-dots-flashing/three-dots-flashing.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
+import { SpectrumTableLoadingState } from '@shared/utils';
 import capitalize from 'lodash/capitalize';
 import isEmpty from 'lodash/isEmpty';
 import { Link } from 'react-router-dom';
@@ -30,9 +33,6 @@ import { JobInfoStatus } from '../../../../core/tests/dtos/tests.interface';
 import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { isTestJobCompleted } from '../../../../core/tests/utils';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
-import { ThreeDotsFlashing } from '../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
-import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
-import { SpectrumTableLoadingState } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { AccuracyTestCell } from './accuracy-test-cell.component';

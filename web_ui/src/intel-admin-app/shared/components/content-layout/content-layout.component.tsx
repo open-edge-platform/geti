@@ -4,8 +4,8 @@
 import { FC, ReactNode } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { BreadcrumbItemProps } from '@shared/components/breadcrumbs/breadcrumb/breadcrumb.interface';
 
-import { BreadcrumbItemProps } from '../../../../shared/components/breadcrumbs/breadcrumb/breadcrumb.interface';
 import { Breadcrumbs } from '../breadcrumbs/breadcrumbs.component';
 
 import classes from './content-layout.module.scss';

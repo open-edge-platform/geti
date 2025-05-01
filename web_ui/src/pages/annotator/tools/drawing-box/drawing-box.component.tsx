@@ -3,14 +3,14 @@
 
 import { PointerEvent, SVGProps, useRef, useState } from 'react';
 
+import { KeyboardEvents } from '@shared/keyboard-events/keyboard.interface';
+import { onEscape } from '@shared/utils';
 import isFunction from 'lodash/isFunction';
 
 import { clampBox, clampPointBetweenImage, pointsToRect } from '../../../../core/annotations/math';
 import { Point, Rect as RectInterface } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { KeyboardEvents } from '../../../../shared/keyboard-events/keyboard.interface';
-import { onEscape } from '../../../../shared/utils';
 import { isEraserButton, isLeftButton } from '../../../buttons-utils';
 import { getRelativePoint } from '../../../utils';
 import { Rectangle } from '../../annotation/shapes/rectangle.component';

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { LabelColorThumb } from '@shared/components/label-color-thumb/label-color-thumb.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 
 import { Label as LabelInterface } from '../../../../../../../../../core/labels/label.interface';
-import { LabelColorThumb } from '../../../../../../../../../shared/components/label-color-thumb/label-color-thumb.component';
-import { TruncatedTextWithTooltip } from '../../../../../../../../../shared/components/truncated-text/truncated-text.component';
 import { idMatchingFormat } from '../../../../../../../../../test-utils/id-utils';
 
 export const Label = ({ label, projectName }: { label: LabelInterface; projectName: string }): JSX.Element => {

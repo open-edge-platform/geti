@@ -4,10 +4,10 @@
 import { useMemo } from 'react';
 
 import { Flex, Grid, View } from '@adobe/react-spectrum';
+import { trimText } from '@shared/utils';
 
 import { filterOutEmptyLabel } from '../../../../../core/labels/utils';
 import { isKeypointTask } from '../../../../../core/projects/utils';
-import { trimText } from '../../../../../shared/utils';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { VideoTimeline } from './video-timeline.component';
 

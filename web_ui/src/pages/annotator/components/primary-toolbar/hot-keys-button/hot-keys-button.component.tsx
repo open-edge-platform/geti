@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, Dialog, DialogTrigger } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { Tabs } from '@shared/components/tabs/tabs.component';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
 
 import { Hotkeys } from '../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { Tabs } from '../../../../../shared/components/tabs/tabs.component';
-import { TabItem } from '../../../../../shared/components/tabs/tabs.interface';
 import { HotKeysList } from './hot-keys-list/hot-keys-list.component';
 
 export const HotKeysButton = (): JSX.Element => {

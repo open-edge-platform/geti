@@ -4,6 +4,8 @@
 import { useState } from 'react';
 
 import { AlertDialog, ButtonGroup, DialogTrigger } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { runWhen } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useIsMounted } from 'usehooks-ts';
@@ -12,8 +14,6 @@ import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
 import { paths } from '../../../../core/services/routes';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { Button } from '../../../../shared/components/button/button.component';
-import { runWhen } from '../../../../shared/utils';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { AcceptButton } from './accept-button.component';

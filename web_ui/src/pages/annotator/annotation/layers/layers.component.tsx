@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
+
 import { isClassificationDomain, isKeypointDetection } from '../../../../core/projects/domains';
-import { hasEqualId } from '../../../../shared/utils';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import {
     useExplanationOpacity,

@@ -3,13 +3,13 @@
 
 import { PointerEventHandler, useRef, useState } from 'react';
 
+import { hasDifferentId, runWhen } from '@shared/utils';
 import flow from 'lodash/flow';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { Point, Polygon } from '../../../../../core/annotations/shapes.interface';
 import { getTheTopShapeAt } from '../../../../../core/annotations/utils';
-import { hasDifferentId, runWhen } from '../../../../../shared/utils';
 import { CircleSizePreview } from '../../../components/circle-size-preview/circle-size-preview.component';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { getOutputFromTask } from '../../../providers/task-chain-provider/utils';

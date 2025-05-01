@@ -3,10 +3,10 @@
 
 import { useMemo } from 'react';
 
+import { hasEqualId } from '@shared/utils';
 import { useParams } from 'react-router-dom';
 
 import { Dataset, DatasetIdentifierParams } from '../../../../../core/projects/dataset.interface';
-import { hasEqualId } from '../../../../../shared/utils';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 
 export const useSelectedDataset = (): Dataset => {

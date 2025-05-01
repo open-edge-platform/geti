@@ -4,11 +4,11 @@
 import { useState } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
 import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { getSortingHandler, SortingOptions } from '../../util';

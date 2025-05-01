@@ -3,8 +3,9 @@
 
 import { FC, Key, useState } from 'react';
 
+import { ActionMenu } from '@shared/components/action-menu/action-menu.component';
+
 import { Delete, Edit } from '../../../../assets/icons';
-import { ActionMenu } from '../../../../shared/components/action-menu/action-menu.component';
 import { User } from '../../users/mocked-user';
 import { Membership } from '../mocked-memberships';
 import { ChangeRoleDialog } from './change-role-dialog.component';

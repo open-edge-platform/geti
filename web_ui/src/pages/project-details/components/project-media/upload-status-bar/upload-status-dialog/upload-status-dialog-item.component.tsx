@@ -5,6 +5,10 @@ import { useMemo } from 'react';
 
 import { DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { IconColorValue } from '@react-types/shared/src/dna';
+import { ActionButton } from '@shared/components/button/button.component';
+import { ThinProgressBar } from '@shared/components/thin-progress-bar/thin-progress-bar.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
+import { getFileSize } from '@shared/utils';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 
 import { AcceptCircle, Alert, Image, Play, Refresh } from '../../../../../../assets/icons';
@@ -16,10 +20,6 @@ import {
     QueuedListItem,
     SuccessListItem,
 } from '../../../../../../providers/media-upload-provider/media-upload.interface';
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
-import { ThinProgressBar } from '../../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
-import { TruncatedTextWithTooltip } from '../../../../../../shared/components/truncated-text/truncated-text.component';
-import { getFileSize } from '../../../../../../shared/utils';
 import { useDatasetMediaUpload } from '../../../project-dataset/hooks/dataset-media-upload';
 import { UploadStatusErrorDialog } from './upload-status-error-dialog.component';
 

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { defaultTheme, Provider } from '@adobe/react-spectrum';
+import { KeyMap } from '@shared/keyboard-events/keyboard.interface';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { KeyMap } from '../../../../shared/keyboard-events/keyboard.interface';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';

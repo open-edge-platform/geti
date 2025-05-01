@@ -4,11 +4,11 @@
 import { Provider } from '@adobe/react-spectrum';
 import { Flex } from '@react-spectrum/layout';
 import { View } from '@react-spectrum/view';
+import { Divider } from '@shared/components/divider/divider.component';
+import { HelpActions } from '@shared/components/header/header-actions/help-actions/help-actions.component';
+import { isNonEmptyArray } from '@shared/utils';
 import partition from 'lodash/partition';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { HelpActions } from '../../../../shared/components/header/header-actions/help-actions/help-actions.component';
-import { isNonEmptyArray } from '../../../../shared/utils';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';

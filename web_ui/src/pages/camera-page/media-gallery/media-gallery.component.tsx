@@ -4,6 +4,8 @@
 import { useEffect, useState } from 'react';
 
 import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { MediaViewModes } from '@shared/components/media-view-modes/media-view-modes.component';
+import { INITIAL_VIEW_MODE, ViewModes } from '@shared/components/media-view-modes/utils';
 import isEmpty from 'lodash/isEmpty';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,8 +13,6 @@ import { DatasetIdentifier } from '../../../core/projects/dataset.interface';
 import { paths } from '../../../core/services/routes';
 import { useViewMode } from '../../../hooks/use-view-mode/use-view-mode.hook';
 import { MEDIA_CONTENT_BUCKET } from '../../../providers/media-upload-provider/media-upload.interface';
-import { MediaViewModes } from '../../../shared/components/media-view-modes/media-view-modes.component';
-import { INITIAL_VIEW_MODE, ViewModes } from '../../../shared/components/media-view-modes/utils';
 import { ActionButtons } from '../components/action-buttons/action-buttons.component';
 import { useCameraParams } from '../hooks/camera-params.hook';
 import { useCameraStorage } from '../hooks/use-camera-storage.hook';

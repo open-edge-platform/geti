@@ -4,6 +4,7 @@
 import { ComponentProps, useState } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
 import { motion } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 
@@ -11,7 +12,6 @@ import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE, User, UsersQueryParams } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
-import { ANIMATION_PARAMETERS } from '../../../shared/animation-parameters/animation-parameters';
 import { UsersHeader } from './users-header.component';
 import { UsersTable } from './users-table/users-table.component';
 

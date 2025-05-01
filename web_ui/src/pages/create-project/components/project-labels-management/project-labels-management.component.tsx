@@ -4,13 +4,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Divider } from '@adobe/react-spectrum';
+import { SliderAnimation } from '@shared/components/slider-animation/slider-animation.component';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
 
 import { LabelTreeItem, SetValidationProps } from '../../../../core/labels/label-tree-view.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
-import { SliderAnimation } from '../../../../shared/components/slider-animation/slider-animation.component';
-import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { ProjectMetadata, STEPS } from '../../new-project-dialog-provider/new-project-dialog-provider.interface';
 import { DomainChainSteps } from './domain-chain-steps.component';
 import { TaskLabelsManagement } from './task-labels-management/task-labels-management.component';

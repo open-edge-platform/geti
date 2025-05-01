@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
+import { formatToHourMinSec } from '@shared/time-utils';
 import Webcam from 'react-webcam';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { formatToHourMinSec } from '../../../../shared/time-utils';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
 import { useVideoRecording } from '../../providers/video-recording-provider.component';

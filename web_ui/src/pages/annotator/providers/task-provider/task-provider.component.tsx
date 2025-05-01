@@ -3,12 +3,13 @@
 
 import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { isNotCropDomain } from '@shared/utils';
+
 import { Label } from '../../../../core/labels/label.interface';
 import { filterOutEmptyLabel, isLocal } from '../../../../core/labels/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
-import { isNotCropDomain } from '../../../../shared/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { getPreviousTask } from '../task-chain-provider/utils';
 import { useSelectedTask } from './use-selected-task.hook';

@@ -5,6 +5,8 @@ import { Fragment } from 'react';
 
 import { View } from '@adobe/react-spectrum';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
+import { DatasetImportPanel } from '@shared/components/dataset-import-panel/dataset-import-panel.component';
+import { isNonEmptyString } from '@shared/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import isEmpty from 'lodash/isEmpty';
@@ -20,8 +22,6 @@ import { useNotification } from '../../../notification/notification.component';
 import { useDatasetImportToNewProject } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { formatDatasetPrepareImportResponse } from '../../../providers/dataset-import-to-new-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { DatasetImportPanel } from '../../../shared/components/dataset-import-panel/dataset-import-panel.component';
-import { isNonEmptyString } from '../../../shared/utils';
 import { DatasetImportToNewProjectDialog } from './components/dataset-import-to-new-project/dataset-import-to-new-project-dialog.component';
 
 import classes from './landing-page-workspace.module.scss';

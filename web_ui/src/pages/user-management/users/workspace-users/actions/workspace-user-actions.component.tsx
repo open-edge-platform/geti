@@ -4,6 +4,10 @@
 import { Key, useState } from 'react';
 
 import { DialogContainer } from '@adobe/react-spectrum';
+import { ActionMenu } from '@shared/components/action-menu/action-menu.component';
+import { MenuAction } from '@shared/components/action-menu/menu-action.interface';
+import { HasPermission } from '@shared/components/has-permission/has-permission.component';
+import { OPERATION } from '@shared/components/has-permission/has-permission.interface';
 import isEmpty from 'lodash/isEmpty';
 
 import { Delete, Edit } from '../../../../../assets/icons';
@@ -12,10 +16,6 @@ import { isOrganizationAdmin, isWorkspaceContributor } from '../../../../../core
 import { User } from '../../../../../core/users/users.interface';
 import { useIsSaasEnv } from '../../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { ActionMenu } from '../../../../../shared/components/action-menu/action-menu.component';
-import { MenuAction } from '../../../../../shared/components/action-menu/menu-action.interface';
-import { HasPermission } from '../../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../../shared/components/has-permission/has-permission.interface';
 import { checkStatusFlowValidity } from '../../utils';
 import { EditUserDialog } from './edit-user-dialog.component';
 import { RemoveUserDialog } from './remove-user-dialog.component';

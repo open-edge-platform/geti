@@ -3,11 +3,12 @@
 
 import { Key } from 'react';
 
+import { MediaItemMenuActions } from '@shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
+import { MediaItemMenuWithDeletion } from '@shared/components/media-item-menu-with-deletion/media-item-menu-with-deletion.component';
+import { downloadMediaItem } from '@shared/media-utils';
+
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { useNavigateToAnnotatorRoute } from '../../../../../core/services/use-navigate-to-annotator-route.hook';
-import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
-import { MediaItemMenuWithDeletion } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-with-deletion.component';
-import { downloadMediaItem } from '../../../../../shared/media-utils';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../../media/providers/media-provider.component';
 import { useSelectedDataset } from '../../project-dataset/use-selected-dataset/use-selected-dataset.hook';

@@ -3,10 +3,10 @@
 
 import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { Button } from '@shared/components/button/button.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { usePersonalAccessToken } from '../../../core/personal-access-tokens/hooks/use-personal-access-token.hook';
-import { Button } from '../../../shared/components/button/button.component';
 import { CreatePersonalAccessTokenDialog } from './components/create-personal-access-token-dialog.component';
 import { PersonalAccessTokensTable } from './components/personal-access-tokens-table.component';
 

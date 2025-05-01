@@ -4,13 +4,13 @@
 import { Key, useState } from 'react';
 
 import { Flex, Item, Picker } from '@adobe/react-spectrum';
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { FullscreenAction } from '@shared/components/fullscreen-action/fullscreen-action.component';
 
 import {
     TrainingModelBarRadialChart,
     TrainingModelStatisticsGroup,
 } from '../../../../../../core/statistics/model-statistics.interface';
-import { CardContent } from '../../../../../../shared/components/card-content/card-content.component';
-import { FullscreenAction } from '../../../../../../shared/components/fullscreen-action/fullscreen-action.component';
 import TrainingModelBarChart from '../training-model-bar-chart/training-model-bar-chart.component';
 
 export const TrainingModelGrouped = ({ header, values }: TrainingModelStatisticsGroup): JSX.Element => {

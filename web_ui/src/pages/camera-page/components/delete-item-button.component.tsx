@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { AlertDialog, DialogContainer, SpectrumActionButtonProps } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import { OverlayTriggerState } from 'react-stately';
 
 import { Delete } from '../../../assets/icons';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface DeleteItemButtonProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
     id: string;

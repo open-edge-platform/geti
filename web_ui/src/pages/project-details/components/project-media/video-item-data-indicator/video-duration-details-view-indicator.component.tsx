@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useDurationText } from '../../../../../shared/hooks/data-format/use-duration-text.hook';
+import { useDurationText } from '@shared/hooks/data-format/use-duration-text.hook';
+
 import { VideoItemDataIndicator } from './video-item-data-indicator.component';
 
 interface VideoDurationDetailsVideIndicatorProps {

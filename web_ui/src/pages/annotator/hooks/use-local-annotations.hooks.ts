@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
+
 import { Annotation } from '../../../core/annotations/annotation.interface';
 import { isClassificationDomain } from '../../../core/projects/domains';
-import { hasEqualId } from '../../../shared/utils';
 import { useIsPredictionRejected } from '../providers/annotation-threshold-provider/annotation-threshold-provider.component';
 import { useROI } from '../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTaskChainOutput } from '../providers/task-chain-provider/use-task-chain-output.hook';

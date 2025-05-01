@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isNonEmptyString } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import {
@@ -12,7 +13,6 @@ import { degreesToRadians, getBoundingBox } from '../../../../core/annotations/m
 import { KeypointNode, Point } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { KeypointStructure } from '../../../../core/projects/task.interface';
-import { isNonEmptyString } from '../../../../shared/utils';
 import { KEYPOINT_RADIUS } from '../../../utils';
 import { createAnnotation } from '../../utils';
 

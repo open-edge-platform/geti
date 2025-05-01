@@ -5,8 +5,7 @@ import { forwardRef } from 'react';
 
 import { SpectrumActionButtonProps } from '@react-types/button';
 import { FocusableRef } from '@react-types/shared';
-
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
+import { ActionButton } from '@shared/components/button/button.component';
 
 import classes from './label-shortcut-button.module.scss';
 

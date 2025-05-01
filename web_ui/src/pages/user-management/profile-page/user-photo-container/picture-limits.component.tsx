@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, ContextualHelp, Flex, Text, View } from '@adobe/react-spectrum';
+import { getFileSize } from '@shared/utils';
 import { useNumberFormatter } from 'react-aria';
 
-import { getFileSize } from '../../../../shared/utils';
 import { USER_PHOTO_VALIDATION_RULES } from './utils';
 
 const PictureLimitTooltip = (): JSX.Element => {

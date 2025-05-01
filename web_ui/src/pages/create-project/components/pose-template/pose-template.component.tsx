@@ -4,12 +4,12 @@
 import { useEffect } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { SliderAnimation } from '@shared/components/slider-animation/slider-animation.component';
+import { isNonEmptyString } from '@shared/utils';
 
 import { Alert } from '../../../../assets/icons';
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
-import { SliderAnimation } from '../../../../shared/components/slider-animation/slider-animation.component';
-import { isNonEmptyString } from '../../../../shared/utils';
 import { ProjectMetadata } from '../../new-project-dialog-provider/new-project-dialog-provider.interface';
 import { getLabelsNamesErrors } from '../../utils';
 import { InfoSection } from '../info-section/info-section.component';

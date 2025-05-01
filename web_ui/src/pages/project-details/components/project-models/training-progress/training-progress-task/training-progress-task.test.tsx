@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { formatJobsCreationTime } from '@shared/utils';
 import { screen } from '@testing-library/react';
 import dayjs from 'dayjs';
 
-import { formatJobsCreationTime } from '../../../../../../shared/utils';
 import { providersRender as render } from '../../../../../../test-utils/required-providers-render';
 import { TrainingProgressTask } from './training-progress-task.component';
 

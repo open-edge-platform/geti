@@ -3,8 +3,7 @@
 
 import { Flex } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-
-import { Tag } from '../../../../shared/components/tag/tag.component';
+import { Tag } from '@shared/components/tag/tag.component';
 
 export const VisualPromptModelBetaWarning = () => {
     return (

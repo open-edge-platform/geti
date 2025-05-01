@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Text, View } from '@adobe/react-spectrum';
+import { getKeyName } from '@shared/hotkeys';
 
 import { isVideo, isVideoFrame } from '../../../../../../core/media/video.interface';
-import { getKeyName } from '../../../../../../shared/hotkeys';
 import { ToolType } from '../../../../core/annotation-tool-context.interface';
 import { useAnnotatorHotkeys } from '../../../../hooks/use-hotkeys-configuration.hook';
 import { useSelectedMediaItem } from '../../../../providers/selected-media-item-provider/selected-media-item-provider.component';

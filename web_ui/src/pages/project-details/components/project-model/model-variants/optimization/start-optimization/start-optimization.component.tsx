@@ -3,8 +3,9 @@
 
 import { FC } from 'react';
 
-import { Button } from '../../../../../../../shared/components/button/button.component';
-import { TooltipWithDisableButton } from '../../../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
+import { Button } from '@shared/components/button/button.component';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+
 import { usePOTModel } from '../../../hooks/use-pot-model/use-pot-model.hook';
 
 interface StartOptimizationProps {

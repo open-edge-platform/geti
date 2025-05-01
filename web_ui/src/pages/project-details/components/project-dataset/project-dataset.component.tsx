@@ -4,13 +4,13 @@
 import { Key, useMemo } from 'react';
 
 import { Flex, Item, TabPanels, Tabs } from '@adobe/react-spectrum';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
+import { hasEqualId } from '@shared/utils';
 
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useDataset } from '../../../../providers/dataset-provider/dataset-provider.component';
-import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
-import { hasEqualId } from '../../../../shared/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { DatasetTabList } from './dataset-tab-list.component';
 import { DatasetTabPanel } from './dataset-tab-panel.component';

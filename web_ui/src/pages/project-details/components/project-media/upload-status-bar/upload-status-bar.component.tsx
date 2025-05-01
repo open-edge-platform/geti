@@ -5,6 +5,10 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { Flex, ProgressCircle, Text } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { ThinProgressBar } from '@shared/components/thin-progress-bar/thin-progress-bar.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
+import { getPlural } from '@shared/utils';
 
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
@@ -13,10 +17,6 @@ import {
     UploadMedia,
 } from '../../../../../providers/media-upload-provider/media-upload.interface';
 import { getElapsedTimeText, getTotalProgress } from '../../../../../providers/media-upload-provider/utils';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { ThinProgressBar } from '../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
-import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
-import { getPlural } from '../../../../../shared/utils';
 import { UploadStatusDialog } from './upload-status-dialog/upload-status-dialog.component';
 
 import classes from './upload-status-bar.module.scss';

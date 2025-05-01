@@ -4,11 +4,11 @@
 import { FC, ReactNode } from 'react';
 
 import { Flex, Grid, Heading, Radio, RadioGroup, repeat, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
 import clsx from 'clsx';
 import isFunction from 'lodash/isFunction';
 
 import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';
-import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { isDeprecatedAlgorithm } from '../../legacy-train-model-dialog/model-templates-selection/utils';
 import { ModelArchitectureTooltipText } from '../../model-architecture-tooltip.component';
 import { ActiveModelTag } from '../../models-container/model-card/active-model-tag.component';

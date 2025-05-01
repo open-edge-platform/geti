@@ -12,11 +12,11 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@adobe/react-spectrum';
+import { ColorMode, QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { ScoreMetric } from '../../../../assets/icons';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { AnomalyTaskPerformance } from '../../../../core/projects/task.interface';
-import { ColorMode, QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { AnomalyProjectPerformanceChart } from './anomaly-project-performance-chart.component';
 import { ProjectPerformanceTooltip } from './project-performance-tooltip.component';
 

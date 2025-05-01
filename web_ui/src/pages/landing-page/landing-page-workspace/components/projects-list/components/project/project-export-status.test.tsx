@@ -3,6 +3,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import * as sharedUtils from '@shared/utils';
+import { getDownloadNotificationMessage } from '@shared/utils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { JobState, JobStepState } from '../../../../../../../core/jobs/jobs.const';
@@ -10,8 +12,6 @@ import { JobProjectExportStatus } from '../../../../../../../core/jobs/jobs.inte
 import { createInMemoryJobsService } from '../../../../../../../core/jobs/services/in-memory-jobs-service';
 import { createInMemoryProjectService } from '../../../../../../../core/projects/services/in-memory-project-service';
 import { WorkspaceIdentifier } from '../../../../../../../core/workspaces/services/workspaces.interface';
-import * as sharedUtils from '../../../../../../../shared/utils';
-import { getDownloadNotificationMessage } from '../../../../../../../shared/utils';
 import { getMockedProjectExportJob } from '../../../../../../../test-utils/mocked-items-factory/mocked-jobs';
 import { providersRender } from '../../../../../../../test-utils/required-providers-render';
 import { ProjectExportStatus } from './project-export-status.component';

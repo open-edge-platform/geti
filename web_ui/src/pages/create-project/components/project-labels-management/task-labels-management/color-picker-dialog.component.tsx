@@ -4,10 +4,10 @@
 import { useState } from 'react';
 
 import { Content, Dialog, DialogTrigger, Flex } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { ChangeColorButton } from '@shared/components/change-color-button/change-color-button.component';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 
-import { Button } from '../../../../../shared/components/button/button.component';
-import { ChangeColorButton } from '../../../../../shared/components/change-color-button/change-color-button.component';
 import { validateColor } from '../utils';
 
 import classes from './color-picker-dialog.module.scss';

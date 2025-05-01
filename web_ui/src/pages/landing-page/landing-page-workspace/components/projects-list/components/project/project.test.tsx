@@ -17,8 +17,8 @@ import { getById } from '../../../../../../../test-utils/utils';
 import { GETI_CAMERA_INDEXEDDB_INSTANCE_NAME } from '../../../../../../camera-support/camera.interface';
 import { Project } from './project.component';
 
-jest.mock('../../../../../../../shared/components/has-permission/has-permission.component', () => ({
-    ...jest.requireActual('../../../../../../../shared/components/has-permission/has-permission.component'),
+jest.mock('@shared/components/has-permission/has-permission.component', () => ({
+    ...jest.requireActual('@shared/components/has-permission/has-permission.component'),
     useCheckPermission: () => true,
 }));
 

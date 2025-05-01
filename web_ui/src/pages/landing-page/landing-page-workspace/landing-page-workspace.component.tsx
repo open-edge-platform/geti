@@ -5,13 +5,13 @@ import { useMemo, useState } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { NotFound } from '@shared/components/not-found/not-found.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { useProjectActions } from '../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectSortingOptions, ProjectsQueryOptions } from '../../../core/projects/services/project-service.interface';
 import { useProjectsImportProvider } from '../../../providers/projects-import-provider/projects-import-provider.component';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { NotFound } from '../../../shared/components/not-found/not-found.component';
 import { NoProjectArea } from './components/no-projects-area/no-projects-area.component';
 import { ProjectImportStatusList } from './components/project-import/project-import-status-list.component';
 import { ProjectListItemSkeletonLoader } from './components/projects-list/components/project-list-item-skeleton-loader.component';

@@ -4,6 +4,7 @@
 import { useMemo } from 'react';
 
 import { Content } from '@adobe/react-spectrum';
+import { Loading } from '@shared/components/loading/loading.component';
 import {
     DragDropContext,
     Draggable,
@@ -16,7 +17,6 @@ import {
 import { Virtuoso } from 'react-virtuoso';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { ThemeProvider } from '../../../../theme/theme-provider.component';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';

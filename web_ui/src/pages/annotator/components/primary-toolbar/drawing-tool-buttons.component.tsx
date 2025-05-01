@@ -5,8 +5,8 @@ import { ReactNode } from 'react';
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { Flex } from '@react-spectrum/layout';
+import { QuietToggleButton } from '@shared/components/quiet-button/quiet-toggle-button.component';
 
-import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorHotkeys } from '../../hooks/use-hotkeys-configuration.hook';
 import { useDrawingToolsKeyboardShortcut } from '../../hot-keys/use-drawing-tools-keyboard-shortcut/use-drawing-tools-keyboard-shortcut';

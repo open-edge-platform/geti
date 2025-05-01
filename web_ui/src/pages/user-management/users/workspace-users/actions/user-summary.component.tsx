@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { StatusCell } from '@shared/components/table/status-cell/status-cell.component';
 
 import { Email } from '../../../../../assets/icons';
 import { User } from '../../../../../core/users/users.interface';
-import { StatusCell } from '../../../../../shared/components/table/status-cell/status-cell.component';
 import { LastLoginCell } from '../../users-table/last-login-cell.component';
 
 import classes from './user-summary.module.scss';

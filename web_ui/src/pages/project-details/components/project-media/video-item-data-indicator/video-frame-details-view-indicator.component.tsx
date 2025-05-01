@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useFramesText } from '../../../../../shared/hooks/data-format/use-frames-text.hook';
+import { useFramesText } from '@shared/hooks/data-format/use-frames-text.hook';
+
 import { VideoItemDataIndicator } from './video-item-data-indicator.component';
 
 interface VideoFrameDetailsVideIndicatorProps {

@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { NotFound } from '@shared/components/not-found/not-found.component';
 import isEmpty from 'lodash/isEmpty';
 
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
@@ -11,7 +12,6 @@ import {
     ProjectsQueryOptions,
 } from '../../../../core/projects/services/project-service.interface';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { NotFound } from '../../../../shared/components/not-found/not-found.component';
 import { ProjectStorageChart } from './project-storage-chart.component';
 import { ProjectStorageTable } from './project-storage-table.component';
 

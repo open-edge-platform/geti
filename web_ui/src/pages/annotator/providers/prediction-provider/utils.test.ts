@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasDifferentId, hasEqualId } from '@shared/utils';
 import sortBy from 'lodash/sortBy';
 
 import { labelFromModel } from '../../../../core/annotations/utils';
-import { hasDifferentId, hasEqualId } from '../../../../shared/utils';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { minimalThresholdPercentage, selectFirstOrNoneFromList, sortExplanationsByName } from './utils';

@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading, IllustratedMessage, Text, View } from '@adobe/react-spectrum';
+import { Divider } from '@shared/components/divider/divider.component';
+import { Hotkey } from '@shared/components/hotkey/hotkey.component';
 import { Link } from 'react-router-dom';
 
 import { useDocsUrl } from '../../../../hooks/use-docs-url/use-docs-url.hook';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { Hotkey } from '../../../../shared/components/hotkey/hotkey.component';
 import { ToolTooltipProps } from '../../tools/tools.interface';
 
 import classes from './primaryToolBar.module.scss';

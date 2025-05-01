@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { MenuTriggerPopup } from '../../../../shared/components/menu-trigger-popup/menu-trigger-popup.component';
+import { MenuTriggerPopup } from '@shared/components/menu-trigger-popup/menu-trigger-popup.component';
 
 interface TestItemSubmenuProps {
     id: string;

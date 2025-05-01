@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
 import capitalize from 'lodash/capitalize';
 
 import { GraphChart, Image } from '../../../../assets/icons';
-import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
 import { ProjectAnnotationsStatistics } from '../project-annotations/project-annotations-statistics.component';
 import { ProjectMedia } from '../project-media/project-media.component';
 import { DatasetChapters } from './utils';

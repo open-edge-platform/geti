@@ -3,7 +3,8 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useMemo, useState } from 'react';
 
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';

@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isNonEmptyString } from '@shared/utils';
+
 import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../../core/datasets/dataset.interface';
 import { paths } from '../../../../core/services/routes';
-import { isNonEmptyString } from '../../../../shared/utils';
 
 export enum DatasetChapters {
     DEFAULT = '',

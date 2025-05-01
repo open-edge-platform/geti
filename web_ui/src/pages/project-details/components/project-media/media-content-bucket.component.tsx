@@ -7,6 +7,12 @@ import { Divider, Flex, IllustratedMessage, View } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
+import { MediaDropBoxHeader } from '@shared/components/media-drop/media-drop-box-header.component';
+import { MediaDropBox } from '@shared/components/media-drop/media-drop-box.component';
+import { MediaItemsList } from '@shared/components/media-items-list/media-items-list.component';
+import { INITIAL_VIEW_MODE } from '@shared/components/media-view-modes/utils';
+import { TutorialCardBuilder } from '@shared/components/tutorial-card/tutorial-card-builder.component';
+import { VALID_MEDIA_TYPES_DISPLAY } from '@shared/media-utils';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import isEmpty from 'lodash/isEmpty';
 
@@ -19,12 +25,6 @@ import {
     MEDIA_CONTENT_BUCKET,
     MediaUploadPerDataset,
 } from '../../../../providers/media-upload-provider/media-upload.interface';
-import { MediaDropBoxHeader } from '../../../../shared/components/media-drop/media-drop-box-header.component';
-import { MediaDropBox } from '../../../../shared/components/media-drop/media-drop-box.component';
-import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
-import { INITIAL_VIEW_MODE } from '../../../../shared/components/media-view-modes/utils';
-import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
-import { VALID_MEDIA_TYPES_DISPLAY } from '../../../../shared/media-utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { MediaFilterChips } from '../../../media/components/media-filter-chips.component';

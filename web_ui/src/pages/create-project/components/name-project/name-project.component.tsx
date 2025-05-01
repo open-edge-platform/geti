@@ -4,10 +4,10 @@
 import { FormEvent, useMemo, useState } from 'react';
 
 import { Form } from '@adobe/react-spectrum';
+import { LimitedTextField } from '@shared/components/limited-text-field/limited-text-field.component';
 import isEmpty from 'lodash/isEmpty';
 import isFunction from 'lodash/isFunction';
 
-import { LimitedTextField } from '../../../../shared/components/limited-text-field/limited-text-field.component';
 import { ProjectMetadata } from '../../new-project-dialog-provider/new-project-dialog-provider.interface';
 import { MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME, REQUIRED_PROJECT_NAME_VALIDATION_MESSAGE } from '../utils';
 

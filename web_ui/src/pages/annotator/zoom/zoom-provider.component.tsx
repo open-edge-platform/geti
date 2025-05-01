@@ -12,13 +12,13 @@ import {
     useState,
 } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { runWhenTruthy } from '@shared/utils';
 import { TransformWrapper, useTransformContext } from 'react-zoom-pan-pinch';
 
 import { RegionOfInterest } from '../../../core/annotations/annotation.interface';
 import { Rect } from '../../../core/annotations/shapes.interface';
 import { usePrevious } from '../../../hooks/use-previous/use-previous.hook';
-import { MissingProviderError } from '../../../shared/missing-provider-error';
-import { runWhenTruthy } from '../../../shared/utils';
 import { getCenterCoordinates } from './utils';
 
 export type ZoomTarget = Omit<Rect, 'shapeType'> | undefined;

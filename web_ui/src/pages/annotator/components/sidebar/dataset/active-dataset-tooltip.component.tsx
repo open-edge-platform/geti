@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton } from '@shared/components/button/button.component';
 
 import { InfoOutline } from '../../../../../assets/icons';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 
 import classes from './dataset-accordion.module.scss';
 

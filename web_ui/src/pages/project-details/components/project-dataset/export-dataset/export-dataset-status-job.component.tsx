@@ -4,15 +4,15 @@
 import { FC, ReactNode, useState } from 'react';
 
 import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { JobProgress } from '@shared/components/header/jobs-management/job-progress.component';
+import { LoadingIndicator } from '@shared/components/loading/loading-indicator.component';
+import { ThinProgressBar } from '@shared/components/thin-progress-bar/thin-progress-bar.component';
+import { formatDownloadUrl } from '@shared/utils';
 
 import { getJobActiveStep } from '../../../../../core/jobs/utils';
 import { DatasetIdentifier, ExportDatasetLSData, ExportFormats } from '../../../../../core/projects/dataset.interface';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { JobProgress } from '../../../../../shared/components/header/jobs-management/job-progress.component';
-import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
-import { ThinProgressBar } from '../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
-import { formatDownloadUrl } from '../../../../../shared/utils';
 import { useExportDataset } from '../../../hooks/use-export-dataset.hook';
 
 import classes from '../project-dataset.module.scss';

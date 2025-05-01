@@ -5,10 +5,10 @@ import { ReactNode } from 'react';
 
 import { Grid, repeat, Text } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { DomainName } from '@shared/components/domain-name/domain-name.component';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';
 import { formatTestDate, formatTestTime } from '../project-tests/utils';
 
 import classes from './project-test.module.scss';

@@ -4,6 +4,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Content, DialogContainer, Flex, Header, Heading, Text, View } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { Divider } from '@shared/components/divider/divider.component';
+import { CreditsToConsume } from '@shared/components/header/credit-balance/credits-to-consume.component';
+import { getFuxSetting } from '@shared/components/tutorials/utils';
 import { InfiniteData } from '@tanstack/react-query';
 import isNil from 'lodash/isNil';
 import { useParams } from 'react-router-dom';
@@ -17,10 +21,6 @@ import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { UserGlobalSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
-import { Button } from '../../../../shared/components/button/button.component';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { CreditsToConsume } from '../../../../shared/components/header/credit-balance/credits-to-consume.component';
-import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useIsAutoTrainingOn } from '../../hooks/use-is-auto-training-on.hook';
 import { onFirstScheduledAutoTrainingJob } from './util';

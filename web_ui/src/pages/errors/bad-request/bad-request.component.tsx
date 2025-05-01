@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, Heading, Text } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { CustomerSupportLink } from '@shared/components/customer-support-link/customer-support-link.component';
+import { redirectTo } from '@shared/utils';
 
 import { LinkExpiredImage } from '../../../assets/images';
 import { paths } from '../../../core/services/routes';
-import { Button } from '../../../shared/components/button/button.component';
-import { CustomerSupportLink } from '../../../shared/components/customer-support-link/customer-support-link.component';
-import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';
 

@@ -4,6 +4,8 @@
 import { FC, Key, useState } from 'react';
 
 import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { MediaItemMenuActions } from '@shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { Scope } from '../../../../../assets/icons';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -12,8 +14,6 @@ import { MediaIdentifier, MediaItem } from '../../../../../core/media/media.inte
 import { isVideo, isVideoFrame } from '../../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../../core/projects/dataset.interface';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../../core/projects/domains';
-import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { VideoPlayerDialog } from '../../../../annotator/components/range-based-video-player/video-player-dialog.component';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMediaItemQuery } from '../../../../annotator/providers/selected-media-item-provider/use-media-item-query.hook';

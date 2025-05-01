@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CardContent } from '@shared/components/card-content/card-content.component';
+import { NotFound } from '@shared/components/not-found/not-found.component';
+
 import { Test } from '../../../../core/tests/tests.interface';
-import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { NotFound } from '../../../../shared/components/not-found/not-found.component';
 
 interface TestDetailsProps {
     test: Test;

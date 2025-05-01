@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 import { useNumberFormatter } from 'react-aria';
 
 import { AiIcon } from '../../../../assets/icons';
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { isPrediction } from '../../../../core/labels/utils';
-import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
 
 interface NodeLabelProps {
     point: KeypointNode;

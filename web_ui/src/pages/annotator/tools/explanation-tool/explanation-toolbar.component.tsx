@@ -4,6 +4,11 @@
 import { Key } from 'react';
 
 import { Flex, Item, Picker } from '@adobe/react-spectrum';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+import { Divider } from '@shared/components/divider/divider.component';
+import { NumberSlider } from '@shared/components/number-slider/number-slider.component';
+import { Switch } from '@shared/components/switch/switch.component';
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -11,11 +16,6 @@ import { Explanation } from '../../../../core/annotations/prediction.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { getNonEmptyLabelsFromProject } from '../../../../core/labels/utils';
 import { CANVAS_ADJUSTMENTS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
-import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { NumberSlider } from '../../../../shared/components/number-slider/number-slider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
-import { hasEqualId } from '../../../../shared/utils';
 import { isEmptyLabelAnnotation } from '../../../utils';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
 import { useAnnotatorCanvasSettings } from '../../providers/annotator-canvas-settings-provider/annotator-canvas-settings-provider.component';

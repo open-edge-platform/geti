@@ -3,14 +3,15 @@
 
 import { useEffect } from 'react';
 
+import { getPanelSettingsKey } from '@shared/local-storage-keys';
+import { getParsedLocalStorage } from '@shared/utils';
+
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isClassificationDomain } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
-import { getPanelSettingsKey } from '../../../../shared/local-storage-keys';
-import { getParsedLocalStorage } from '../../../../shared/utils';
 import { containsFeatureConfig } from '../../components/navigation-toolbar/settings/utils';
 
 export const usePanelsConfig = (

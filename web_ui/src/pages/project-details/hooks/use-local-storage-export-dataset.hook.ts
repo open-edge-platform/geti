@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { LOCAL_STORAGE_KEYS } from '@shared/local-storage-keys';
+import { getParsedLocalStorage } from '@shared/utils';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { ProjectIdentifier } from '../../../core/projects/core.interface';
 import { ExportDatasetLSData } from '../../../core/projects/dataset.interface';
 import { useProjectIdentifier } from '../../../hooks/use-project-identifier/use-project-identifier';
-import { LOCAL_STORAGE_KEYS } from '../../../shared/local-storage-keys';
-import { getParsedLocalStorage } from '../../../shared/utils';
 
 const isDatasetDifferentTo =
     (value: string) =>

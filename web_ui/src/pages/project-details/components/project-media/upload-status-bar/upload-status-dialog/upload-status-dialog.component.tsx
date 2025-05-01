@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, View } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { UploadMediaButton } from '@shared/components/upload-media/upload-media-button/upload-media-button.component';
 import { useNavigate } from 'react-router-dom';
 
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { UploadMedia } from '../../../../../../providers/media-upload-provider/media-upload.interface';
-import { Button } from '../../../../../../shared/components/button/button.component';
-import { UploadMediaButton } from '../../../../../../shared/components/upload-media/upload-media-button/upload-media-button.component';
 import { useDatasetIdentifier } from '../../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { UploadStatusDialogContent } from './upload-status-dialog-content.component';

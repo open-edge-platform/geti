@@ -6,8 +6,7 @@ import { ComponentProps, useEffect, useRef } from 'react';
 import { View } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { DOMRefValue } from '@react-types/shared';
-
-import { loadImage } from '../../../../../shared/utils';
+import { loadImage } from '@shared/utils';
 
 import classes from './user-photo.module.scss';
 

@@ -2,6 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { ButtonWithSpectrumTooltip } from '@shared/components/button-with-tooltip/button-with-tooltip.component';
+import { KeyMap } from '@shared/keyboard-events/keyboard.interface';
+import { hasDifferentId } from '@shared/utils';
 import isNil from 'lodash/isNil';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -10,9 +13,6 @@ import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { useIsPressed } from '../../../../../hooks/use-is-pressed/use-is-pressed.hook';
 import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
-import { ButtonWithSpectrumTooltip } from '../../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
-import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
-import { hasDifferentId } from '../../../../../shared/utils';
 import {
     EdgeLine,
     isDifferentLabel,

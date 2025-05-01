@@ -3,12 +3,13 @@
 
 import { ChangeEvent, forwardRef } from 'react';
 
+import { isValidFileExtension } from '@shared/media-utils';
+
 import { ImportOptions } from '../../../../../core/projects/services/project-service.interface';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { mediaExtensionHandler } from '../../../../../providers/media-upload-provider/media-upload.validator';
 import { useProjectsImportProvider } from '../../../../../providers/projects-import-provider/projects-import-provider.component';
-import { isValidFileExtension } from '../../../../../shared/media-utils';
 
 const VALID_EXTENSIONS = ['zip'];
 

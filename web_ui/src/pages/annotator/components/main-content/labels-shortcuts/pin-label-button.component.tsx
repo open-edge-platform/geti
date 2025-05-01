@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@shared/components/button/button.component';
+
 import { Pin } from '../../../../../assets/icons';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 
 interface PinLabelButtonProps {
     pinLabel: (labelId: string) => void;

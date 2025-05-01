@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { isNotCropTask } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import isNumber from 'lodash/isNumber';
 
@@ -15,7 +16,6 @@ import { isActiveModel } from '../../../../../core/models/utils';
 import { Task } from '../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { isNotCropTask } from '../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../hooks/use-credits-to-consume.hook';
 import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import { useProject } from '../../../providers/project-provider/project-provider.component';

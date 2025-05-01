@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Text, View } from '@adobe/react-spectrum';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
+import { JobsListItemStatus } from '@shared/components/header/jobs-management/jobs-list-item-status.component';
+import { formatJobsCreationTime } from '@shared/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { JobsListItemStatus } from '../../../../../shared/components/header/jobs-management/jobs-list-item-status.component';
-import { formatJobsCreationTime } from '../../../../../shared/utils';
 import { TrainingProgressTask } from './training-progress-task/training-progress-task.component';
 import { useTrainingProgress } from './use-training-progress/use-training-progress.hook';
 

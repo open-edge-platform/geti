@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -8,7 +9,6 @@ import { Explanation } from '../../../../core/annotations/prediction.interface';
 import { isGlobal } from '../../../../core/labels/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isDetectionDomain, isRotatedDetectionDomain, isSegmentationDomain } from '../../../../core/projects/domains';
-import { hasEqualId } from '../../../../shared/utils';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { GrabcutToolType } from '../../tools/grabcut-tool/grabcut-tool.enums';
 import { PolygonMode } from '../../tools/polygon-tool/polygon-tool.enum';

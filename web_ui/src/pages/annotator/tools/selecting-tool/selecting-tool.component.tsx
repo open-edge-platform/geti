@@ -3,11 +3,12 @@
 
 import { RefObject, useCallback, useMemo, useRef, useState } from 'react';
 
+import { hasEqualId } from '@shared/utils';
+
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { clampPointBetweenImage } from '../../../../core/annotations/math';
 import { isNotKeypointTask } from '../../../../core/projects/utils';
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { hasEqualId } from '../../../../shared/utils';
 import { isRightButton } from '../../../buttons-utils';
 import { getRelativePoint } from '../../../utils';
 import { useVisibleAnnotations } from '../../hooks/use-visible-annotations.hook';

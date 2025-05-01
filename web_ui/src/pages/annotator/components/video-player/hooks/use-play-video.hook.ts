@@ -3,6 +3,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
+import { loadImage } from '@shared/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
@@ -14,7 +15,6 @@ import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interf
 import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { useInterval } from '../../../../../hooks/use-interval/use-interval.hook';
-import { loadImage } from '../../../../../shared/utils';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { useDataset } from '../../../providers/dataset-provider/dataset-provider.component';
 import { useTask } from '../../../providers/task-provider/task-provider.component';

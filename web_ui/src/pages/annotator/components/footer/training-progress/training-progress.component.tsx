@@ -3,8 +3,8 @@
 
 import { Flex, Text, useNumberFormatter, View } from '@adobe/react-spectrum';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import { trimText } from '@shared/utils';
 
-import { trimText } from '../../../../../shared/utils';
 import { isLargeSizeQuery, isMediumLargeSizeQuery } from '../../../../../theme/queries';
 import { ProgressBar } from './progress-bar.component';
 

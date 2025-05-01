@@ -4,6 +4,8 @@
 import { useCallback, useMemo } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { LOCAL_STORAGE_KEYS } from '@shared/local-storage-keys';
+import { getId, getIds, hasEqualId } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -12,8 +14,6 @@ import { Label } from '../../../../../core/labels/label.interface';
 import { isAnomalous, isEmptyLabel, isExclusive, isGlobal, isLocal } from '../../../../../core/labels/utils';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { LOCAL_STORAGE_KEYS } from '../../../../../shared/local-storage-keys';
-import { getId, getIds, hasEqualId } from '../../../../../shared/utils';
 import { AnnotationToolContext, ToolSettings, ToolType } from '../../../core/annotation-tool-context.interface';
 import { getOutputFromTask } from '../../../providers/task-chain-provider/utils';
 import { useTask } from '../../../providers/task-provider/task-provider.component';

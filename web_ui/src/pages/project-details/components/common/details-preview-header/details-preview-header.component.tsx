@@ -14,6 +14,10 @@ import {
     useNumberFormatter,
     View,
 } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { TaskLabelTreeContainer } from '@shared/components/task-label-tree-search/task-label-tree-container.component';
+import { useFilteredTaskMetadata } from '@shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
+import { hasEqualDomain } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { ChevronDownLight } from '../../../../../assets/icons';
@@ -23,10 +27,6 @@ import { getAverageScore } from '../../../../../core/tests/services/utils';
 import { TestImageMediaResult } from '../../../../../core/tests/test-image.interface';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { TaskLabelTreeContainer } from '../../../../../shared/components/task-label-tree-search/task-label-tree-container.component';
-import { useFilteredTaskMetadata } from '../../../../../shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
-import { hasEqualDomain } from '../../../../../shared/utils';
 import { ToggleMode } from '../../../../annotator/components/annotator-preview/toggle-mode.component';
 import { ANNOTATOR_MODE } from '../../../../annotator/core/annotation-tool-context.interface';
 import { selectFirstOrNoneFromList } from '../../../../annotator/providers/prediction-provider/utils';

@@ -5,6 +5,24 @@ import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useSta
 
 import { Flex, Form } from '@adobe/react-spectrum';
 import { TextFieldRef } from '@react-types/textfield';
+import { Button } from '@shared/components/button/button.component';
+import { LabelEditionFieldsWrapper } from '@shared/components/label-tree-view/label-tree-view-item/label-edition-mode/label-edition-fields-wrapper.component';
+import { HotkeyNameField } from '@shared/components/label-tree-view/label-tree-view-item/label-presentation-mode/hotkey-name-field/hotkey-name-field.component';
+import {
+    DEFAULT_LABEL_INPUT_DIRTY,
+    DEFAULT_LABEL_INPUT_ERRORS,
+    LabelFieldsDirty,
+    LabelFieldsErrors,
+} from '@shared/components/label-tree-view/label-tree-view-item/utils';
+import {
+    DEFAULT_LABEL,
+    getDefaultGroupName,
+    getGroupBasedOnRelationType,
+    getNextColor,
+} from '@shared/components/label-tree-view/utils';
+import { Label } from '@shared/components/label/label.component';
+import { LimitedTextField } from '@shared/components/limited-text-field/limited-text-field.component';
+import { ValidationErrorMsg } from '@shared/components/validation-error-msg/validation-error-msg.component';
 import isEmpty from 'lodash/isEmpty';
 
 import {
@@ -16,24 +34,6 @@ import {
 import { getFlattenedLabels } from '../../../../../../core/labels/utils';
 import { DOMAIN } from '../../../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../../../core/projects/task.interface';
-import { Button } from '../../../../../../shared/components/button/button.component';
-import { LabelEditionFieldsWrapper } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/label-edition-mode/label-edition-fields-wrapper.component';
-import { HotkeyNameField } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/label-presentation-mode/hotkey-name-field/hotkey-name-field.component';
-import {
-    DEFAULT_LABEL_INPUT_DIRTY,
-    DEFAULT_LABEL_INPUT_ERRORS,
-    LabelFieldsDirty,
-    LabelFieldsErrors,
-} from '../../../../../../shared/components/label-tree-view/label-tree-view-item/utils';
-import {
-    DEFAULT_LABEL,
-    getDefaultGroupName,
-    getGroupBasedOnRelationType,
-    getNextColor,
-} from '../../../../../../shared/components/label-tree-view/utils';
-import { Label } from '../../../../../../shared/components/label/label.component';
-import { LimitedTextField } from '../../../../../../shared/components/limited-text-field/limited-text-field.component';
-import { ValidationErrorMsg } from '../../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { isYupValidationError } from '../../../../../user-management/profile-page/utils';
 import { useUsedAnnotatorHotkeys } from '../../../use-used-annotator-hotkeys.hook';
 import { newLabelHotkeySchema, newLabelNameSchema } from '../../../utils';

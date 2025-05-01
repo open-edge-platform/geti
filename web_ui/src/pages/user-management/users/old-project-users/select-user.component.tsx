@@ -4,9 +4,9 @@
 import { Key, useMemo, useState } from 'react';
 
 import { ComboBox, Item, useFilter } from '@adobe/react-spectrum';
+import { hasEqualId } from '@shared/utils';
 
 import { User } from '../../../../core/users/users.interface';
-import { hasEqualId } from '../../../../shared/utils';
 import { getFullNameFromUser } from '../users-table/utils';
 
 interface SelectUserProps<T> {

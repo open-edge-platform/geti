@@ -3,11 +3,11 @@
 
 import { RefObject } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+import { delay } from '@shared/utils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import Webcam from 'react-webcam';
 
-import { MissingProviderError } from '../../../shared/missing-provider-error';
-import { delay } from '../../../shared/utils';
 import { providersRender as render } from '../../../test-utils/required-providers-render';
 import { getUseCameraSettings } from '../test-utils/camera-setting';
 import { useDeviceSettings } from './device-settings-provider.component';

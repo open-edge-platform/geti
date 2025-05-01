@@ -4,11 +4,11 @@
 import { FC } from 'react';
 
 import { Flex, Item, Picker, Link as SpectrumLink, Text } from '@adobe/react-spectrum';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
+import { DocsUrl } from '@shared/components/tutorials/utils';
 import { Link } from 'react-router-dom';
 
 import { useDocsUrl } from '../../../../hooks/use-docs-url/use-docs-url.hook';
-import { InfoTooltip } from '../../../../shared/components/info-tooltip/info-tooltip.component';
-import { DocsUrl } from '../../../../shared/components/tutorials/utils';
 
 export enum DEPLOYMENT_PACKAGE_TYPES {
     CODE_DEPLOYMENT = 'Code deployment',

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { LoadingIndicator } from '@shared/components/loading/loading-indicator.component';
 import { act, fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { createInMemoryAnnotationService } from '../../../../core/annotations/services/in-memory-annotation-service';
@@ -13,7 +14,6 @@ import { DOMAIN } from '../../../../core/projects/core.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { API_URLS } from '../../../../core/services/urls';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { getMockedDatasetIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedVideoFrameMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';

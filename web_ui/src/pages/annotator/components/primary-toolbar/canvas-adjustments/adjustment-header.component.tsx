@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useHover, useNumberFormatter } from 'react-aria';
 
 import { Revisit } from '../../../../../assets/icons';
-import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 export interface AdjustmentHeaderProps {
     headerText: string;

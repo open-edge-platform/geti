@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { BooleanGroupParams } from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { useAutoTrainingTasksConfig } from '@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { createInMemoryJobsService } from '../../../../core/jobs/services/in-memory-jobs-service';
@@ -9,8 +11,6 @@ import { DOMAIN } from '../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../core/projects/hooks/use-project-status.hook';
 import { Performance, PerformanceType, Task } from '../../../../core/projects/task.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
-import { BooleanGroupParams } from '../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { useAutoTrainingTasksConfig } from '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedProjectIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedJob } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
@@ -59,12 +59,9 @@ jest.mock('../../providers/task-provider/task-provider.component', () => ({
     })),
 }));
 
-jest.mock(
-    '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook',
-    () => ({
-        useAutoTrainingTasksConfig: jest.fn(() => ({ autoTrainingTasks: [] })),
-    })
-);
+jest.mock('@shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook', () => ({
+    useAutoTrainingTasksConfig: jest.fn(() => ({ autoTrainingTasks: [] })),
+}));
 
 const projectIdentifier = getMockedProjectIdentifier();
 const fakeJobsService = createInMemoryJobsService();

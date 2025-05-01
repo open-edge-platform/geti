@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isDifferent } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import negate from 'lodash/negate';
 
 import { Point } from '../../../../core/annotations/shapes.interface';
-import { isDifferent } from '../../../../shared/utils';
 import { PolygonMode } from './polygon-tool.enum';
 
 export const ERASER_FIELD_DEFAULT_RADIUS = 5;

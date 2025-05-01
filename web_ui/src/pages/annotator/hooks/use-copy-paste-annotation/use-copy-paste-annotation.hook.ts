@@ -3,6 +3,8 @@
 
 import { useEffect, useRef } from 'react';
 
+import { LOCAL_STORAGE_KEYS } from '@shared/local-storage-keys';
+import { isNonEmptyArray } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useLocalStorage } from 'usehooks-ts';
@@ -18,8 +20,6 @@ import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { LOCAL_STORAGE_KEYS } from '../../../../shared/local-storage-keys';
-import { isNonEmptyArray } from '../../../../shared/utils';
 import { getMediaId } from '../../../media/utils';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { HOTKEY_OPTIONS } from '../../hot-keys/utils';

@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text } from '@adobe/react-spectrum';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
 import { AnimatePresence, motion } from 'framer-motion';
-
-import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
 
 interface MediaCountProps {
     selectedItems: number;

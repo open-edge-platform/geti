@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getImageDataFromTiffFile } from '@shared/canvas-utils';
+import { isTiffFormat, loadImageFromFile } from '@shared/media-utils';
 import isNil from 'lodash/isNil';
 import { v4 as uuidv4 } from 'uuid';
 
-import { getImageDataFromTiffFile } from '../../../../shared/canvas-utils';
-import { isTiffFormat, loadImageFromFile } from '../../../../shared/media-utils';
 import { Label } from '../../../labels/label.interface';
 import { MediaItem } from '../../../media/media.interface';
 import { mediaIdentifierToDTO } from '../../../media/services/utils';

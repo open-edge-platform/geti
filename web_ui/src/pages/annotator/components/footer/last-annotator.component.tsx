@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { View } from '@adobe/react-spectrum';
-
-import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 
 import classes from './annotator-footer.module.scss';
 

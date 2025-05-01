@@ -7,9 +7,9 @@ import { TextField } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 import { TextFieldRef } from '@react-types/textfield';
+import { CustomPopover } from '@shared/components/custom-popover/custom-popover.component';
 
 import { Label } from '../../../../../core/labels/label.interface';
-import { CustomPopover } from '../../../../../shared/components/custom-popover/custom-popover.component';
 import { BaseLabelSearch } from './base-label-search.component';
 import { SearchLabelTreeItemSuffix } from './search-label-tree-view-item.component';
 

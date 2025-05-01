@@ -14,14 +14,14 @@ import {
     Text,
     View,
 } from '@adobe/react-spectrum';
+import { TableCellProps } from '@shared/components/table/table.interface';
+import { SpectrumTableLoadingState } from '@shared/utils';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import dayjs from 'dayjs';
 import get from 'lodash/get';
 
 import { CreditAccount } from '../../../core/credits/credits.interface';
 import { getBalanceUsedCredits } from '../../../core/credits/services/utils';
-import { TableCellProps } from '../../../shared/components/table/table.interface';
-import { SpectrumTableLoadingState } from '../../../shared/utils';
 import { ActionsCell } from './cells/credit-accounts-actions-cell.component';
 import { RenewalDayCell } from './cells/renewal-day-cell.component';
 

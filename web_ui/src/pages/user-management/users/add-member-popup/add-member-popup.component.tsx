@@ -5,6 +5,9 @@ import { FormEvent, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, TextField } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
+import { Button } from '@shared/components/button/button.component';
+import { PasswordField } from '@shared/components/password-field/password-field.component';
+import { CONFIRM_PASSWORD_ERROR_MESSAGE, encodeToBase64 } from '@shared/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { ValidationError } from 'yup';
 
@@ -14,9 +17,6 @@ import { getRoleDTO } from '../../../../core/users/services/utils';
 import { RESOURCE_TYPE, USER_ROLE, UserCreationDTO } from '../../../../core/users/users.interface';
 import { WorkspaceIdentifier } from '../../../../core/workspaces/services/workspaces.interface';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { Button } from '../../../../shared/components/button/button.component';
-import { PasswordField } from '../../../../shared/components/password-field/password-field.component';
-import { CONFIRM_PASSWORD_ERROR_MESSAGE, encodeToBase64 } from '../../../../shared/utils';
 import { EditFullName } from '../../profile-page/edit-full-name.component';
 import { isYupValidationError } from '../../profile-page/utils';
 import { RolePicker } from '../old-project-users/role-picker.component';

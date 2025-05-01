@@ -3,10 +3,10 @@
 
 import '@wessberg/pointer-events';
 
+import { delay } from '@shared/utils';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useSearchParams } from 'react-router-dom';
 
-import { delay } from '../../../../shared/utils';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
 import { CaptureButtonAnimation, MOUSE_HOLD_TIMER } from './capture-button-animation.component';
 

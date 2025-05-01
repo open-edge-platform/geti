@@ -3,6 +3,7 @@
 
 import { createContext, ReactNode, useContext } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 
 import { AdvancedFilterOptions } from '../../../../core/media/media-filter.interface';
@@ -11,7 +12,6 @@ import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
 import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { useFilterSearchParam } from '../../../../hooks/use-filter-search-param/use-filter-search-param.hook';
 import { useSortingParams } from '../../../../hooks/use-sorting-params/use-sorting-params.hook';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useActiveMediaQuery } from '../../../media/hooks/media-items/active-media-query.hook';
 import { useAdvancedFilterQuery } from '../../../media/hooks/media-items/advanced-filter-query.hook';
 import { useDatasetIdentifier } from '../../hooks/use-dataset-identifier.hook';

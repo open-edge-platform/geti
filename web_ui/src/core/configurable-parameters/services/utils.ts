@@ -1,15 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { v4 as uuidV4 } from 'uuid';
-
 import {
     ConfigurableParametersComponents,
     ConfigurableParametersGroups,
     ConfigurableParametersParams,
     ConfigurableParametersTaskChain,
     EntityIdentifier,
-} from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
+} from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { v4 as uuidV4 } from 'uuid';
+
 import {
     ConfigurableParametersDTO,
     ConfigurableParametersGroupsDTO,

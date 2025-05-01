@@ -3,6 +3,9 @@
 
 import { View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { DatasetImportDeletionDialog } from '@shared/components/dataset-import-deletion-dialog/dataset-import-deletion-dialog.component';
+import { DatasetImportPanel } from '@shared/components/dataset-import-panel/dataset-import-panel.component';
+import { isNonEmptyArray, isNonEmptyString } from '@shared/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -18,9 +21,6 @@ import { useNotification } from '../../../../notification/notification.component
 import { useDatasetImportToExistingProject } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { getLabelsMap } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { DatasetImportDeletionDialog } from '../../../../shared/components/dataset-import-deletion-dialog/dataset-import-deletion-dialog.component';
-import { DatasetImportPanel } from '../../../../shared/components/dataset-import-panel/dataset-import-panel.component';
-import { isNonEmptyArray, isNonEmptyString } from '../../../../shared/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { DatasetImportToExistingProjectDialog } from './dataset-import-to-existing-project/dataset-import-to-existing-project-dialog.component';
 import { useExportImportDatasetDialogStates } from './export-dataset/export-import-dataset-dialog-provider.component';

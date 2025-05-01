@@ -4,10 +4,10 @@
 import { FC } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';
-import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { ClassificationRanges } from './classification-ranges.component';
 import { CreateRange } from './create-range.component';

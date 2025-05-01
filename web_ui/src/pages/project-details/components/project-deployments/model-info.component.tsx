@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
+import { useFormatModelAccuracy } from '@shared/hooks/use-format-model-accuracy.hook';
 
 import { OptimizedModel } from '../../../../core/models/optimized-models.interface';
-import { useFormatModelAccuracy } from '../../../../shared/hooks/use-format-model-accuracy.hook';
 
 import classes from './project-deployments.module.scss';
 

@@ -4,6 +4,9 @@
 import { ReactNode, useState } from 'react';
 
 import { Flex, Grid, Text, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@shared/components/button/button.component';
+import { LabelColorThumb } from '@shared/components/label-color-thumb/label-color-thumb.component';
+import { TruncatedTextWithTooltip } from '@shared/components/truncated-text/truncated-text.component';
 import isEmpty from 'lodash/isEmpty';
 import { useHover, usePress } from 'react-aria';
 
@@ -11,9 +14,6 @@ import { Expanded } from '../../../../../assets/icons';
 import { LabelTreeLabelProps } from '../../../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { getLabelId } from '../../../../../core/labels/utils';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { LabelColorThumb } from '../../../../../shared/components/label-color-thumb/label-color-thumb.component';
-import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 
 import classes from './search-label-tree-view-item.module.scss';
 

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading } from '@adobe/react-spectrum';
+import { RouterLink } from '@shared/components/router-link/router-link.component';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { paths } from '../../../../core/services/routes';
-import { RouterLink } from '../../../../shared/components/router-link/router-link.component';
 import { AccuracyHalfDonutChart } from '../../../project-details/components/project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';
 
 import classes from './navigation-toolbar.module.scss';

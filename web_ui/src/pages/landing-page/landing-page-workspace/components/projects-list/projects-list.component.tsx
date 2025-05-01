@@ -4,12 +4,12 @@
 import { ComponentType, forwardRef, LegacyRef, useEffect } from 'react';
 
 import { View } from '@adobe/react-spectrum';
+import { NotFound } from '@shared/components/not-found/not-found.component';
 import isEmpty from 'lodash/isEmpty';
 import { Components, Virtuoso } from 'react-virtuoso';
 
 import { ProjectsQueryResult } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
-import { NotFound } from '../../../../../shared/components/not-found/not-found.component';
 import { UnwrapProps } from '../../../../../types-utils/types';
 import { LoadingOverlay } from '../../../../project-details/components/project-media/loading-overlay.component';
 import { ProjectListItemSkeletonLoader } from './components/project-list-item-skeleton-loader.component';

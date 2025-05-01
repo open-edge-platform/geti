@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import differenceBy from 'lodash/differenceBy';
 import omit from 'lodash/omit';
 
-import { hasEqualId } from '../../../shared/utils';
 import { fetchLabelsTree } from '../../labels/annotator-utils/labels-utils';
 import {
     DeletedLabelDTO,

@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+
 import { Lock, Unlock } from '../../../../assets/icons';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { TOGGLE_VISIBILITY_COLOR_MODE } from '../toggle-visibility-button/toggle-visibility-button.component';
 
 import classes from '../annotation-list/annotation-list-item/annotation-list-item.module.scss';

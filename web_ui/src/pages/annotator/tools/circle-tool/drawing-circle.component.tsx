@@ -3,12 +3,13 @@
 
 import { PointerEvent, SVGProps, useCallback, useRef, useState } from 'react';
 
+import { KeyboardEvents } from '@shared/keyboard-events/keyboard.interface';
+import { onEscape } from '@shared/utils';
+
 import { calculateDistance } from '../../../../core/annotations/math';
 import { Circle as CircleInterface, Point } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { KeyboardEvents } from '../../../../shared/keyboard-events/keyboard.interface';
-import { onEscape } from '../../../../shared/utils';
 import { isEraserButton, isLeftButton, isRightButton } from '../../../buttons-utils';
 import { getRelativePoint } from '../../../utils';
 import { Circle } from '../../annotation/shapes/circle.component';

@@ -4,6 +4,8 @@
 import { Dispatch, Key, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { Flex, Radio, RadioGroup, View } from '@adobe/react-spectrum';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
+import { isNotCropTask } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
 import { ModelsGroups } from '../../../../../../core/models/models.interface';
@@ -13,8 +15,6 @@ import {
     SupportedAlgorithm,
     TaskWithSupportedAlgorithms,
 } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';
-import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';
-import { isNotCropTask } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { ModelTemplatesList } from './model-templates-list/model-templates-list.component';
 import { TaskSelection } from './task-selection.component';

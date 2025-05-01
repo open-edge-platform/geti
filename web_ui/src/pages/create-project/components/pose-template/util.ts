@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { DEFAULT_LABEL, getNextColor } from '@shared/components/label-tree-view/utils';
 import negate from 'lodash/negate';
 
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
@@ -9,7 +10,6 @@ import { LabelItemEditionState, LabelItemType, LabelTreeItem } from '../../../..
 import { LabelsRelationType } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
-import { DEFAULT_LABEL, getNextColor } from '../../../../shared/components/label-tree-view/utils';
 
 export interface EdgeLine {
     id: string;

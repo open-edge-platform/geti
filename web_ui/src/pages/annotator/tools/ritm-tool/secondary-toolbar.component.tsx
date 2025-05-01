@@ -3,13 +3,13 @@
 
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider } from '@shared/components/divider/divider.component';
+import { Switch } from '@shared/components/switch/switch.component';
 import isNil from 'lodash/isNil';
 
 import { RightClick } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolSettings, ToolType } from '../../core/annotation-tool-context.interface';

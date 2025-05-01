@@ -3,23 +3,20 @@
 
 import { ReactNode } from 'react';
 
-import { renderHook, waitFor } from '@testing-library/react';
-
 import {
     ConfigurableParametersParams,
     ConfigurableParametersTaskChain,
-} from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import {
-    getReconfigureParametersDTO,
-    updateSelectedParameter,
-} from '../../../shared/components/configurable-parameters/utils';
+} from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { getReconfigureParametersDTO, updateSelectedParameter } from '@shared/components/configurable-parameters/utils';
+import { renderHook, waitFor } from '@testing-library/react';
+
 import { RequiredProviders } from '../../../test-utils/required-providers-render';
 import QUERY_KEYS from '../../requests/query-keys';
 import { createInMemoryApiModelConfigParametersService } from '../services/in-memory-api-model-config-parameters-service';
 import { findAutoTrainingConfig } from '../utils';
 import { useReconfigAutoTraining } from './use-reconfig-auto-training.hook';
 
-jest.mock('../../../shared/components/configurable-parameters/utils', () => ({
+jest.mock('@shared/components/configurable-parameters/utils', () => ({
     getReconfigureParametersDTO: jest.fn(() => ({})),
     updateSelectedParameter: jest.fn(() => ({})),
 }));

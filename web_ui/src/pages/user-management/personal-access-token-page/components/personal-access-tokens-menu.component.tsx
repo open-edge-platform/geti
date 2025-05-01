@@ -5,6 +5,9 @@ import { Key } from 'react';
 
 import { Flex, Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { DeleteDialog } from '@shared/components/delete-dialog/delete-dialog.component';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { getDateTimeInISOAndUTCOffsetFormat } from '@shared/utils';
 import dayjs from 'dayjs';
 
 import { Delete, Edit, MoreMenu } from '../../../../assets/icons';
@@ -12,9 +15,6 @@ import { usePersonalAccessToken } from '../../../../core/personal-access-tokens/
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
-import { getDateTimeInISOAndUTCOffsetFormat } from '../../../../shared/utils';
 import { UpdatePersonalAccessTokenDialog } from './update-personal-access-token-dialog.component';
 import { checkIfTokenOwner } from './utils';
 

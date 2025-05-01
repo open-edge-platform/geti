@@ -4,13 +4,13 @@
 import { useEffect } from 'react';
 
 import { ButtonGroup, Flex, View } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { StepBackward, StepForward } from '../../../../../assets/icons';
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
 import { TestMediaItem } from '../../../../../core/tests/test-media.interface';
 import { usePrevious } from '../../../../../hooks/use-previous/use-previous.hook';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useConstructVideoFrame } from '../../../../annotator/components/video-player/hooks/use-construct-video-frame.hook';
 import { VideoPlayerSlider } from '../../../../annotator/components/video-player/video-player-slider/video-player-slider.component';
 import { useVideoControls } from './video-controls.hook';

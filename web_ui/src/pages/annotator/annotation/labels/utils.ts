@@ -16,6 +16,7 @@
 // otherwise. Any license under such intellectual property rights must be express
 // and approved by Intel in writing.
 
+import { hasEqualId } from '@shared/utils';
 import intersectionBy from 'lodash/intersectionBy';
 
 import { Annotation, AnnotationLabel } from '../../../../core/annotations/annotation.interface';
@@ -26,7 +27,6 @@ import { Label } from '../../../../core/labels/label.interface';
 import { isExclusive } from '../../../../core/labels/utils';
 import { isAnomalyDomain, isClassificationDomain, isDetectionDomain } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
-import { hasEqualId } from '../../../../shared/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { getGlobalAnnotations } from '../../providers/task-chain-provider/utils';
 

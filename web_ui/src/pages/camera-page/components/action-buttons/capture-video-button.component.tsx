@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Button } from '@shared/components/button/button.component';
+import { getIds } from '@shared/utils';
 import { v4 as uuid } from 'uuid';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { Button } from '../../../../shared/components/button/button.component';
-import { getIds } from '../../../../shared/utils';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { validateVideoDimensions } from '../../media-validation-utils';
 import { useVideoRecording, VideoFormat } from '../../providers/video-recording-provider.component';

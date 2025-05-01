@@ -6,12 +6,12 @@ import { useRef } from 'react';
 import { View } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
+import { isVideoFile } from '@shared/media-utils';
 import isEmpty from 'lodash/isEmpty';
 import { usePress } from 'react-aria';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
-import { isVideoFile } from '../../../../shared/media-utils';
 import { useTask } from '../../../annotator/providers/task-provider/task-provider.component';
 import { ConsensedLabelSelector } from '../../components/condensed-label-selector.component';
 import { DeleteItemButton } from '../../components/delete-item-button.component';

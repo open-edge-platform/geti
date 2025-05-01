@@ -5,6 +5,7 @@ import '@wessberg/pointer-events';
 
 import { useRef } from 'react';
 
+import { getImageData } from '@shared/canvas-utils';
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -12,7 +13,6 @@ import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { labelFromUser } from '../../../../core/annotations/utils';
 import { LABEL_BEHAVIOUR } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { getImageData } from '../../../../shared/canvas-utils';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedProjectIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';

@@ -28,8 +28,8 @@ jest.mock('./action-buttons/capture-button-animation.component', () => ({
     CaptureButtonAnimation: (props: { onPress: () => void }) => <button onClick={props.onPress}>capture photo</button>,
 }));
 
-jest.mock('../../../shared/navigator-utils', () => ({
-    ...jest.requireActual('../../../shared/navigator-utils'),
+jest.mock('@shared/navigator-utils', () => ({
+    ...jest.requireActual('@shared/navigator-utils'),
     getVideoDevices: jest.fn().mockResolvedValue([]),
 }));
 

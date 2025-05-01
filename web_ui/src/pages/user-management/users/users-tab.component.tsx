@@ -4,16 +4,16 @@
 import { Key, useState } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { HasPermission } from '@shared/components/has-permission/has-permission.component';
+import { OPERATION } from '@shared/components/has-permission/has-permission.interface';
+import { PageLayoutWithTabs } from '@shared/components/page-layout/page-layout-with-tabs.component';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
 import capitalize from 'lodash/capitalize';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../core/services/routes';
 import { User } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
-import { PageLayoutWithTabs } from '../../../shared/components/page-layout/page-layout-with-tabs.component';
-import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { Header } from './header.component';
 import { WorkspaceUsersPanel } from './workspace-users-panel.component';
 import { WorkspaceUsers } from './workspace-users/workspace-users.component';

@@ -14,11 +14,11 @@ import {
     Item,
     Picker,
 } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { PhotoPlaceholder } from '@shared/components/photo-placeholder/photo-placeholder.component';
+import { TruncatedText } from '@shared/components/truncated-text/truncated-text.component';
 
 import { RESOURCE_TYPE, RoleResource, USER_ROLE } from '../../../../core/users/users.interface';
-import { Button } from '../../../../shared/components/button/button.component';
-import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
-import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { Membership } from '../mocked-memberships';
 
 interface ChangeRoleDialogInnerProps {

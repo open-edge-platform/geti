@@ -4,10 +4,10 @@
 import { RefObject, useState } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { Loading } from '@shared/components/loading/loading.component';
 import { useSpinDelay } from 'spin-delay';
 
 import { VideoFrame } from '../../../../core/media/video.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { useRequestVideoFrameCallback } from '../../hooks/use-request-video-frame-callback.hook';
 import { Video } from '../video-player/video.component';
 import { TransformZoom } from './transform-zoom.component';

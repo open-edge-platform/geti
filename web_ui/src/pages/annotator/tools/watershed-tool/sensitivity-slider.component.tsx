@@ -3,8 +3,9 @@
 
 import { useEffect, useMemo } from 'react';
 
-import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+import { NumberSliderWithLocalHandler } from '@shared/components/number-slider/number-slider-with-local-handler.component';
+
 import { SENSITIVITY_SLIDER_TOOLTIP } from '../utils';
 import { SENSITIVITY_SLIDER_CONFIG } from './utils';
 

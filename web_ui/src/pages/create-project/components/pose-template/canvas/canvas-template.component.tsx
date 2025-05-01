@@ -3,6 +3,9 @@
 
 import { useState } from 'react';
 
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { KeyMap } from '@shared/keyboard-events/keyboard.interface';
+import { getIds, hasDifferentId } from '@shared/utils';
 import isEqual from 'lodash/isEqual';
 import isNil from 'lodash/isNil';
 import { v4 as uuidv4 } from 'uuid';
@@ -12,9 +15,6 @@ import { RegionOfInterest } from '../../../../../core/annotations/annotation.int
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';
 import { useIsPressed } from '../../../../../hooks/use-is-pressed/use-is-pressed.hook';
 import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
-import { getIds, hasDifferentId } from '../../../../../shared/utils';
 import { ClosestKeypoint } from '../../../../annotator/tools/edit-tool/edit-keypoint/closest-keypoint.component';
 import { useZoom } from '../../../../annotator/zoom/zoom-provider.component';
 import { getPointInRoi } from '../../../../utils';

@@ -3,8 +3,9 @@
 
 import { createContext, Dispatch, SetStateAction, useCallback, useContext, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
+
 import { Point } from '../../../../core/annotations/shapes.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';

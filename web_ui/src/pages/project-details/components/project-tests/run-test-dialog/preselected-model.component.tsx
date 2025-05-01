@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex } from '@adobe/react-spectrum';
+import { Tag } from '@shared/components/tag/tag.component';
 
-import { Tag } from '../../../../../shared/components/tag/tag.component';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 
 interface PreselectedModelProps {

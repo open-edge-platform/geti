@@ -3,6 +3,7 @@
 
 import { createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
 import { UseMutateFunction, useMutation } from '@tanstack/react-query';
 
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
@@ -10,7 +11,6 @@ import { AlgorithmType } from '../../../../hooks/use-load-ai-webworker/algorithm
 import { useLoadAIWebworker } from '../../../../hooks/use-load-ai-webworker/use-load-ai-webworker.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';

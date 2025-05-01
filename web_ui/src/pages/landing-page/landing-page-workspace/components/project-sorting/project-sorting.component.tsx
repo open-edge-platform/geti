@@ -4,9 +4,9 @@
 import { Key } from 'react';
 
 import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
 
 import { SortUpDown } from '../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface SortingOptions<T, K> {
     sortBy: T | K;

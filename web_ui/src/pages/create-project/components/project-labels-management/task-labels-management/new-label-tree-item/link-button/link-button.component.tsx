@@ -3,8 +3,8 @@
 
 import { Flex, Link } from '@adobe/react-spectrum';
 import { FlexStyleProps } from '@react-types/shared';
+import { InfoTooltip } from '@shared/components/info-tooltip/info-tooltip.component';
 
-import { InfoTooltip } from '../../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { idMatchingFormat } from '../../../../../../../test-utils/id-utils';
 
 interface LinkButtonProps extends FlexStyleProps {

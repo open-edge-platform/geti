@@ -3,6 +3,7 @@
 
 import { DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
+import { Button } from '@shared/components/button/button.component';
 import sum from 'lodash/sum';
 
 import { FireWorks } from '../../../assets/images';
@@ -16,7 +17,6 @@ import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';
 import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { isOrganizationAdmin } from '../../../core/users/user-role-utils';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { Button } from '../../../shared/components/button/button.component';
 import { WelcomingCreditsDetails } from './welcoming-credits-details.component';
 
 import classes from './welcome-trial-modal.module.scss';

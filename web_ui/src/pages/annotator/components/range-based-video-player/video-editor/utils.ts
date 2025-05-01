@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getIds } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { GROUP_SEPARATOR, isAnomalous } from '../../../../../core/labels/utils';
-import { getIds } from '../../../../../shared/utils';
 
 export const joinRanges = (ranges: LabeledVideoRange[], range: LabeledVideoRange, idx: number) => {
     const lastRange = ranges.at(-1);

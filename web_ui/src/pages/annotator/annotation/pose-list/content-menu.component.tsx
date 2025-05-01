@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { MenuTrigger } from '@shared/components/menu-trigger/menu-trigger.component';
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+
 import { MoreMenu } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
-import { MenuTrigger } from '../../../../shared/components/menu-trigger/menu-trigger.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface ContentMenuProps {
     point: KeypointNode;

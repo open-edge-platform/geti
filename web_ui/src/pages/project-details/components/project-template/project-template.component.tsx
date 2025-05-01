@@ -4,6 +4,10 @@
 import { useState } from 'react';
 
 import { ButtonGroup, View } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { PageLayout } from '@shared/components/page-layout/page-layout.component';
+import { UnsavedChangesDialog } from '@shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { isNonEmptyString } from '@shared/utils';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Alert } from '../../../../assets/icons';
@@ -16,10 +20,6 @@ import { useHistoryBlock } from '../../../../hooks/use-history-block/use-history
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { Button } from '../../../../shared/components/button/button.component';
-import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
-import { UnsavedChangesDialog } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
-import { isNonEmptyString } from '../../../../shared/utils';
 import { InfoSection } from '../../../create-project/components/info-section/info-section.component';
 import { TemplateManager } from '../../../create-project/components/pose-template/template-manager.component';
 import { EdgeLine, getProjectTypeMetadata, TemplateState } from '../../../create-project/components/pose-template/util';

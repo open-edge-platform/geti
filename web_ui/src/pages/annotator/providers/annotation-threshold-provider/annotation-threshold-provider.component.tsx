@@ -3,12 +3,12 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
+import { MissingProviderError } from '@shared/missing-provider-error';
 import isNil from 'lodash/isNil';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isPrediction } from '../../../../core/labels/utils';
 import { Task } from '../../../../core/projects/task.interface';
-import { MissingProviderError } from '../../../../shared/missing-provider-error';
 
 interface AnnotationThresholdContextProps {
     scoreThreshold: number;

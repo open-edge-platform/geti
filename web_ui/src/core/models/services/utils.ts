@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getFileSize, isNonEmptyString, sortDescending } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 
-import { getFileSize, isNonEmptyString, sortDescending } from '../../../shared/utils';
 import { TrainingDatasetInfoDTO } from '../../datasets/dtos/training-dataset.interface';
 import { TrainingDatasetInfo } from '../../datasets/services/training-dataset.interface';
 import { getRawNewLabel } from '../../projects/services/utils';

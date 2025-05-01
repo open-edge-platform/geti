@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { dimensionValue } from '@react-spectrum/utils';
+import { getIds } from '@shared/utils';
 import Webcam from 'react-webcam';
 import { v4 as uuid } from 'uuid';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { getIds } from '../../../../shared/utils';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { CaptureButtonAnimation } from './capture-button-animation.component';

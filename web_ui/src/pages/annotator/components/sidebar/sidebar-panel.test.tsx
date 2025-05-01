@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getImageData } from '@shared/canvas-utils';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
 import { fireEvent, screen } from '@testing-library/react';
 
-import { getImageData } from '../../../../shared/canvas-utils';
-import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedImageMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { getMockedUserProjectSettingsObject } from '../../../../test-utils/mocked-items-factory/mocked-settings';

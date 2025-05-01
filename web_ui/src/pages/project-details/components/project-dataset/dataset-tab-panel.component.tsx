@@ -4,6 +4,12 @@
 import { Key } from 'react';
 
 import { Flex, Item, TabList, TabPanels, Tabs, View } from '@adobe/react-spectrum';
+import { Button } from '@shared/components/button/button.component';
+import { CoachMark } from '@shared/components/coach-mark/coach-mark.component';
+import { TooltipWithDisableButton } from '@shared/components/custom-tooltip/tooltip-with-disable-button';
+import { TabItem } from '@shared/components/tabs/tabs.interface';
+import { TruncatedText } from '@shared/components/truncated-text/truncated-text.component';
+import { useActiveTab } from '@shared/hooks/use-active-tab.hook';
 import isEmpty from 'lodash/isEmpty';
 import { useNavigate } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
@@ -12,12 +18,6 @@ import { Dataset } from '../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
 import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
 import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
-import { Button } from '../../../../shared/components/button/button.component';
-import { CoachMark } from '../../../../shared/components/coach-mark/coach-mark.component';
-import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
-import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
-import { useActiveTab } from '../../../../shared/hooks/use-active-tab.hook';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../media/providers/media-provider.component';
 import { useLocalStorageExportDataset } from '../../hooks/use-local-storage-export-dataset.hook';

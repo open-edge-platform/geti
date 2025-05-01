@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Grid, minmax, Text, useNumberFormatter } from '@adobe/react-spectrum';
+import { MediaItemView } from '@shared/components/media-item-view/media-item-view.component';
+import { TruncatedText } from '@shared/components/truncated-text/truncated-text.component';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../core/media/video.interface';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';
 import { TestScore } from '../../../../core/tests/tests.interface';
-import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
-import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { getMediaId } from '../../../media/utils';
 import { SCORE_FORMATTER_OPTIONS } from './utils';
 

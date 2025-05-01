@@ -4,11 +4,11 @@
 import { MouseEventHandler, MutableRefObject, useRef, useState } from 'react';
 
 import { Overlay } from '@react-spectrum/overlays';
+import { hasEqualId } from '@shared/utils';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { isAnomalous } from '../../../../../core/labels/utils';
-import { hasEqualId } from '../../../../../shared/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { LabelSearch } from '../../labels/label-search/label-search.component';
 import { SelectionIndicator } from '../../labels/label-search/selection-indicator.component';

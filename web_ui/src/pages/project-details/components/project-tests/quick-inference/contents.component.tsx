@@ -4,16 +4,16 @@
 import { useEffect } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { EmptyData } from '@shared/components/empty-data/empty-data.component';
+import { Loading } from '@shared/components/loading/loading.component';
+import { MediaDropBoxHeader } from '@shared/components/media-drop/media-drop-box-header.component';
+import { MediaDropBox } from '@shared/components/media-drop/media-drop-box.component';
+import { VALID_IMAGE_TYPES } from '@shared/media-utils';
 import { useNavigate } from 'react-router-dom';
 
 import { NoTrainedModels } from '../../../../../assets/images';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { paths } from '../../../../../core/services/routes';
-import { EmptyData } from '../../../../../shared/components/empty-data/empty-data.component';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
-import { MediaDropBoxHeader } from '../../../../../shared/components/media-drop/media-drop-box-header.component';
-import { MediaDropBox } from '../../../../../shared/components/media-drop/media-drop-box.component';
-import { VALID_IMAGE_TYPES } from '../../../../../shared/media-utils';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useCameraStorage } from '../../../../camera-page/hooks/use-camera-storage.hook';
 import { ImageSection } from './image-section.component';

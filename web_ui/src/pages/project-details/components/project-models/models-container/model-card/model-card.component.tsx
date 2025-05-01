@@ -3,6 +3,9 @@
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
+import { UnClickableLink as Link } from '@shared/components/link/unclickable-link.component';
+import { Tag } from '@shared/components/tag/tag.component';
+import { formatDate, isNonEmptyString } from '@shared/utils';
 import { clsx } from 'clsx';
 import { usePress } from 'react-aria';
 import { useNavigate } from 'react-router-dom';
@@ -14,9 +17,6 @@ import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { UnClickableLink as Link } from '../../../../../../shared/components/link/unclickable-link.component';
-import { Tag } from '../../../../../../shared/components/tag/tag.component';
-import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { isModelDeleted } from '../../../../utils';
 import { ActiveModelTag } from './active-model-tag.component';

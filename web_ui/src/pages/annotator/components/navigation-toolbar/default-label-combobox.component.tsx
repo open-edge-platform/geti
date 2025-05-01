@@ -5,11 +5,11 @@ import { useRef, useState } from 'react';
 
 import { TextField, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { CustomPopover } from '@shared/components/custom-popover/custom-popover.component';
+import { TaskLabelTreeContainer } from '@shared/components/task-label-tree-search/task-label-tree-container.component';
+import { useFilteredTaskMetadata } from '@shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
-import { TaskLabelTreeContainer } from '../../../../shared/components/task-label-tree-search/task-label-tree-container.component';
-import { useFilteredTaskMetadata } from '../../../../shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
 import { getAvailableLabelsWithoutEmpty } from '../../annotation/labels/utils';
 import { useTask } from '../../providers/task-provider/task-provider.component';
 import { blurActiveInput } from '../../tools/utils';

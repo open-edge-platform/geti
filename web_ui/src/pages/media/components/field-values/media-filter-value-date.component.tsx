@@ -5,10 +5,10 @@ import { useEffect, useState } from 'react';
 
 import { DateValue, getLocalTimeZone, parseAbsolute, parseDateTime, today } from '@internationalized/date';
 import { View } from '@react-spectrum/view';
+import { DatePicker } from '@shared/components/date-picker/date-picker.component';
+import { formatLocalToUtc, isDateBetween } from '@shared/utils';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
-import { DatePicker } from '../../../../shared/components/date-picker/date-picker.component';
-import { formatLocalToUtc, isDateBetween } from '../../../../shared/utils';
 
 import classes from './media-filter-value-date.module.scss';
 

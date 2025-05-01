@@ -3,14 +3,14 @@
 
 import { useState } from 'react';
 
+import { MediaItemsList as MediaListVirtuoso } from '@shared/components/media-items-list/media-items-list.component';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
+import { getIds } from '@shared/utils';
 import isEmpty from 'lodash/isEmpty';
 import isNil from 'lodash/isNil';
 import noop from 'lodash/noop';
 import { useOverlayTriggerState } from 'react-stately';
 
-import { MediaItemsList as MediaListVirtuoso } from '../../../../shared/components/media-items-list/media-items-list.component';
-import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
-import { getIds } from '../../../../shared/utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { ImageOverlay } from '../../components/image-overlay.component';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';

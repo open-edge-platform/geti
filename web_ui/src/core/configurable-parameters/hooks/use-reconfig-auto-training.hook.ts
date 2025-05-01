@@ -1,6 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import {
+    ConfigurableParametersParams,
+    ConfigurableParametersTaskChain,
+} from '@shared/components/configurable-parameters/configurable-parameters.interface';
+import { getReconfigureParametersDTO, updateSelectedParameter } from '@shared/components/configurable-parameters/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import cloneDeep from 'lodash/cloneDeep';
@@ -8,14 +13,6 @@ import isNil from 'lodash/isNil';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import {
-    ConfigurableParametersParams,
-    ConfigurableParametersTaskChain,
-} from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import {
-    getReconfigureParametersDTO,
-    updateSelectedParameter,
-} from '../../../shared/components/configurable-parameters/utils';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';

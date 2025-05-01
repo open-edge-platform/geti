@@ -4,6 +4,8 @@
 import { ReactNode } from 'react';
 
 import { Flex, Heading, View } from '@adobe/react-spectrum';
+import { ANIMATION_PARAMETERS } from '@shared/animation-parameters/animation-parameters';
+import { FullscreenAction } from '@shared/components/fullscreen-action/fullscreen-action.component';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
@@ -11,8 +13,6 @@ import { isKeypointDetection } from '../../../../../core/projects/domains';
 import { TUTORIAL_CARD_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
-import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { FullscreenAction } from '../../../../../shared/components/fullscreen-action/fullscreen-action.component';
 import { useTaskLabels } from '../../../../annotator/annotation/annotation-filter/use-task-labels.hook';
 import { PreviewCanvasSettingsProvider } from '../../../../annotator/providers/preview-canvas-settings-provider/preview-canvas-settings-provider.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';

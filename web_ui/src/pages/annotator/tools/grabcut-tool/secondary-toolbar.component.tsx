@@ -3,11 +3,11 @@
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { Text } from '@react-spectrum/text';
+import { Divider } from '@shared/components/divider/divider.component';
+import { NumberSliderWithLocalHandler } from '@shared/components/number-slider/number-slider-with-local-handler.component';
 
 import { Combine, New, Subtract } from '../../../../assets/icons';
 import { Label } from '../../../../core/labels/label.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolToggleButton } from '../../components/primary-toolbar/tool-toggle-button.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';

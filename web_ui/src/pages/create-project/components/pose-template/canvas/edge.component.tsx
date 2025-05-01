@@ -6,10 +6,10 @@ import { ReactNode, RefObject, useRef, useState } from 'react';
 import { useHover, useInteractOutside } from '@react-aria/interactions';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { DOMRefValue } from '@react-types/shared';
+import { CursorContextMenu } from '@shared/components/cursor-context-menu/cursor-context-menu.component';
 import clsx from 'clsx';
 
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';
-import { CursorContextMenu } from '../../../../../shared/components/cursor-context-menu/cursor-context-menu.component';
 import { HiddenEdge } from './hidden-edge.component';
 
 import classes from './edge.module.scss';

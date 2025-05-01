@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Text, View } from '@adobe/react-spectrum';
+import { ordinalSuffixOf } from '@shared/utils';
 
 import { CreditAccount } from '../../../../core/credits/credits.interface';
-import { ordinalSuffixOf } from '../../../../shared/utils';
 
 import classes from '../organization.module.scss';
 

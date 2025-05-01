@@ -4,6 +4,8 @@
 import { CSSProperties, useMemo, useState } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
+import { MediaViewModes } from '@shared/components/media-view-modes/media-view-modes.component';
+import { ViewModes } from '@shared/components/media-view-modes/utils';
 import capitalize from 'lodash/capitalize';
 
 import { BulbIcon, DocumentIcon, ShieldFilled } from '../../../../../../assets/icons';
@@ -17,8 +19,6 @@ import { MediaItem } from '../../../../../../core/media/media.interface';
 import { ProjectIdentifier } from '../../../../../../core/projects/core.interface';
 import { useFilterSearchParam } from '../../../../../../hooks/use-filter-search-param/use-filter-search-param.hook';
 import { useViewMode } from '../../../../../../hooks/use-view-mode/use-view-mode.hook';
-import { MediaViewModes } from '../../../../../../shared/components/media-view-modes/media-view-modes.component';
-import { ViewModes } from '../../../../../../shared/components/media-view-modes/utils';
 import { DatasetList } from '../../../../../annotator/components/sidebar/dataset/dataset-list.component';
 import { useMediaFilterEmpty } from '../../../../../annotator/hooks/use-media-filter-empty.hook';
 import { TaskProvider } from '../../../../../annotator/providers/task-provider/task-provider.component';

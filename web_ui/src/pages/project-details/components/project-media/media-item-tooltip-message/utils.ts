@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getFileSize } from '@shared/utils';
+
 import { isImage } from '../../../../../core/media/image.interface';
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideo, isVideoFrame } from '../../../../../core/media/video.interface';
-import { getFileSize } from '../../../../../shared/utils';
 import { MediaItemTooltipMessageProps } from './media-item-tooltip-message';
 
 export const DELETE_ANOMALY_VIDEO_WARNING = 'Selected frames will be deleted from both anomaly and normal bucket.';

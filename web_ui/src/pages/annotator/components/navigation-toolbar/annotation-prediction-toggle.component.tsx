@@ -4,6 +4,8 @@
 import { useEffect } from 'react';
 
 import { ButtonGroup } from '@adobe/react-spectrum';
+import { ButtonWithSpectrumTooltip } from '@shared/components/button-with-tooltip/button-with-tooltip.component';
+import { runWhen } from '@shared/utils';
 import isNil from 'lodash/isNil';
 import { useSearchParams } from 'react-router-dom';
 
@@ -11,8 +13,6 @@ import { AICPUIcon, Human } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { useFuxNotifications } from '../../../../hooks/use-fux-notifications/use-fux-notifications.hook';
-import { ButtonWithSpectrumTooltip } from '../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
-import { runWhen } from '../../../../shared/utils';
 import { ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import {

@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { hasEqualId } from '@shared/utils';
 import isObject from 'lodash/isObject';
 import sortBy from 'lodash/sortBy';
 import { v4 as uuidv4 } from 'uuid';
 
-import { hasEqualId } from '../../../shared/utils';
 import { Label } from '../../labels/label.interface';
 import { isPrediction } from '../../labels/utils';
 import { isImage } from '../../media/image.interface';

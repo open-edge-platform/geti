@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { runWhen } from '@shared/utils';
 import partial from 'lodash/partial';
 
 import { rectToRotatedRect } from '../../../../core/annotations/rotated-rect-math';
 import { Rect } from '../../../../core/annotations/shapes.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { runWhen } from '../../../../shared/utils';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';
 import { useZoom } from '../../zoom/zoom-provider.component';

@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { isIPad, isIPhone } from '@react-aria/utils';
+import { getBrowserConstraints, getVideoUserMedia } from '@shared/navigator-utils';
+import { isNonEmptyArray } from '@shared/utils';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 
-import { getBrowserConstraints, getVideoUserMedia } from '../../../shared/navigator-utils';
-import { isNonEmptyArray } from '../../../shared/utils';
 import { UserCameraPermission, UserCameraPermissionError } from '../../camera-support/camera.interface';
 
 const INVALID_CAPABILITIES: CapabilitiesKeys[] = ['groupId', 'deviceId', 'aspectRatio'];

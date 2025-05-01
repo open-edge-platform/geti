@@ -3,6 +3,8 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
+import { QuietActionButton } from '@shared/components/quiet-button/quiet-action-button.component';
+import { getUniqueNameFromArray, hasEqualId, isNotCropTask } from '@shared/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
 import noop from 'lodash/noop';
@@ -19,8 +21,6 @@ import { MetricType, Test } from '../../../../../core/tests/tests.interface';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { getUniqueNameFromArray, hasEqualId, isNotCropTask } from '../../../../../shared/utils';
 import { SelectableOptimizationType } from '../../../project-details.interface';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { formatModelName, getModels, getOptimizationTypes, TESTS_OPTIMIZATION_TYPES } from '../../../utils';
