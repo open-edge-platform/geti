@@ -6,22 +6,10 @@
 
 ### Install requirements
 
-1. Move to the BDD folder `cd tests/e2e`
-2. Install requirements: `uv sync`
-3. Install nvm https://github.com/nvm-sh/nvm
-4. Make sure you use nvm 16 `nvm install 16` then `nvm use 16`
-5. Install swagger CLI: `npm install -g @apidevtools/swagger-cli`
-6. Install OpenAPI Generator CLI: `npm install @openapitools/openapi-generator-cli -g` (requires Java 11 or higher `sudo apt install default-jre` then `java -version`)
-
-### Generate the API client for the first time
-
-Generate and install the client with:
-
-1. `make generate_client`
-2. `uv pip install -e rest_client`
-
-If you modify the OpenAPI spec, the client will automatically regenerate (if needed) when you run `make test`.
-Alternatively, you can manually rebuild it with `make generate_client_if_needed`.
+1. Install nvm https://github.com/nvm-sh/nvm
+2. Make sure you use nvm 16 `nvm install 16` then `nvm use 16`
+3. Install swagger CLI: `npm install -g @apidevtools/swagger-cli`
+4. Install OpenAPI Generator CLI: `npm install @openapitools/openapi-generator-cli -g` (requires Java 11 or higher `sudo apt install default-jre` then `java -version`)
 
 ### Obtain a Personal Access Token
 
@@ -39,22 +27,22 @@ If you don't know the credentials, ask the team.
 
 ## Run the tests
 
-To run all the tests: `make test`
+To run all the tests: `make tests`
 
 To only run smoke tests: `make test_smoke`
 
 To only run tests tagged `@wip`: `make test_wip`
 
-To run tests for a specific feature (e.g. `label_addition`): `make test FEATURE=label_addition`
+To run tests for a specific feature (e.g. `label_addition`): `make tests FEATURE=label_addition`
 
-To run tests for a specific feature and a specific tag (e.g. `@smoke`): `make test BDD_TAG=@smoke FEATURE=label_addition`
+To run tests for a specific feature and a specific tag (e.g. `@smoke`): `make tests BDD_TAG=@smoke FEATURE=label_addition`
 (or equivalently `make test_smoke FEATURE=label_addition`)
 
-To run tests with a complex [tag expression](https://behave.readthedocs.io/en/latest/tag_expressions/): `python -m behave --tags=<tag_expression>`
+To run tests with a complex [tag expression](https://behave.readthedocs.io/en/latest/tag_expressions/): `uv run behave --tags=<tag_expression>`
 
 For more details about the usage of behave, check its [official documentation](https://behave.readthedocs.io/en/latest/).
 
 ## Generate reports
 
-`make test` will generate a JUnit report for each feature in the `bdd/reports` folder.
+`make tests` will generate a JUnit report for each feature in the `bdd/reports` folder.
 You can convert these reports to HTML with `make report` and open them in your browser.

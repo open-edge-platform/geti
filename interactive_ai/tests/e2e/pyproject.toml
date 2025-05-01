@@ -6,7 +6,7 @@ requires-python = ">=3.10, <3.14"
 
 dependencies = [
     "behave~=1.2.7.dev6",
-    "boto3~=1.35.97",
+    "requests~=2.32",
     "junit2html~=31.0.2",
     "numpy==1.26.4",
     "opencv-python-headless~=4.11",
@@ -14,6 +14,13 @@ dependencies = [
     "urllib3~=2.3.0",
 ]
 
+[dependency-groups]
+dev = [
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "mypy~=1.15",
+    "types-requests"
+]
 
 [tool.ruff]
 target-version = "py310"

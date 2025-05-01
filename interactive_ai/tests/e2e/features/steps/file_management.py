@@ -13,15 +13,11 @@
 # in the License.
 
 import logging
-import os
 from pathlib import Path
 
-import boto3
-from botocore.exceptions import ClientError
+import requests
 
-REMOTE_S3_SERVER_ADDR = os.environ.get("REMOTE_S3_SERVER_ADDR", "https://storage.geti.infra-host.com/")
-REMOTE_S3_TEST_BUCKET = os.environ.get("REMOTE_S3_TEST_BUCKET", "test")
-REMOTE_S3_TEST_DATA_PREFIX = os.environ.get("REMOTE_S3_TEST_PATH_PREFIX", "data/iai-e2e")
+DATA_URL_PREFIX = "https://storage.geti.infra-host.com/test-data/e2e-bdd"
 
 logger = logging.getLogger(__name__)
 
@@ -34,27 +30,9 @@ class RemoteFileNotAccessible(RuntimeError):
     """Exception raised when the requested file is not accessible in the remote archive due to permissions"""
 
 
-def list_files_in_remote_archive(remote_dir_path: Path) -> list[str]:
-    """
-    List files in the remote S3 archive.
-
-    :param remote_dir_path: Path to the directory in the remote archive, relative to the testing base directory
-    :return: List of file names in the remote directory
-    """
-    s3_client = boto3.client("s3", endpoint_url=REMOTE_S3_SERVER_ADDR)
-
-    # List files in the remote directory
-    dir_key = str(REMOTE_S3_TEST_DATA_PREFIX / remote_dir_path) + "/"
-
-    logger.info(f"Listing objects in '{dir_key}'")
-    response = s3_client.list_objects_v2(Bucket=REMOTE_S3_TEST_BUCKET, Prefix=dir_key)
-
-    return [obj["Key"] for obj in response.get("Contents", [])]
-
-
 def download_file_from_remote_archive(remote_file_path: Path, local_file_path: Path) -> None:
     """
-    Download the requested file from the remote S3 archive.
+    Download the requested file from the remote archive.
 
     :param remote_file_path: Path to the file in the remote archive, relative to the testing base directory
     :param local_file_path: Path to save the file locally
@@ -62,16 +40,18 @@ def download_file_from_remote_archive(remote_file_path: Path, local_file_path: P
     :raises RemoteFileNotAccessible: If the requested file is not accessible in the remote archive due to permissions
     :raises RuntimeError: If the file download fails for any other reason
     """
-    s3_client = boto3.client("s3", endpoint_url=REMOTE_S3_SERVER_ADDR)
+    file_url = f"{DATA_URL_PREFIX}/{remote_file_path}"
 
     # Download the file
-    file_key = REMOTE_S3_TEST_DATA_PREFIX / remote_file_path
+    response = requests.get(file_url, stream=True, timeout=300)
 
-    try:
-        s3_client.download_file(REMOTE_S3_TEST_BUCKET, str(file_key), str(local_file_path))
-    except ClientError as exc:
-        if exc.response["Error"]["Code"] == "404":
-            raise RemoteFileNotFound(f"File not found in remote archive: {file_key}") from exc
-        if exc.response["Error"]["Code"] == "403":
-            raise RemoteFileNotAccessible(f"File not accessible in remote archive: {file_key}") from exc
-        raise RuntimeError(f"Failed to download file from remote archive: {file_key}") from exc
+    if response.status_code == 404:
+        raise RemoteFileNotFound(f"File not found: {file_url}")
+
+    response.raise_for_status()  # Handle other HTTP errors
+
+    local_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with open(local_file_path, "wb") as f:
+        for chunk in response.iter_content(chunk_size=8192):
+            f.write(chunk)

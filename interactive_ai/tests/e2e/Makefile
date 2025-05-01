@@ -6,11 +6,15 @@ OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
 CLIENT_NAME := geti_client
 CLIENT_PATH := rest_client
 SPEC_HASH_FILE := .openapi_spec_hash
-VIRTUALENV_DIR = .venv-bdd
 
-.PHONY: all clean check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke
+.PHONY: all check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke
 
 all: test
+
+bdd-venv:
+	uv sync
+	$(MAKE) generate_client_if_needed;
+	uv pip install -e $(CLIENT_PATH)
 
 check_yaml_spec:
 	@if [ ! -f $(OPENAPI_YAML_SPEC) ]; then \
@@ -22,7 +26,7 @@ generate_json_spec: check_yaml_spec
 	@command -v swagger-cli >/dev/null 2>&1 || { echo >&2 "swagger-cli is not installed. Aborting."; exit 1; }
 	swagger-cli bundle $(OPENAPI_YAML_SPEC) -o $(OPENAPI_JSON_SPEC) --dereference
 
-generate_client: clean generate_json_spec
+generate_client: generate_json_spec
 	@command -v openapi-generator-cli >/dev/null 2>&1 || { echo >&2 "openapi-generator-cli is not installed. Aborting."; exit 1; }
 	openapi-generator-cli generate -i $(OPENAPI_JSON_SPEC) -g python -o $(CLIENT_PATH) --package-name $(CLIENT_NAME)
 
@@ -36,7 +40,7 @@ generate_client_if_needed: generate_json_spec
 	fi; \
 	echo $$SHA > $(SPEC_HASH_FILE)
 
-test: venv
+tests: bdd-venv
 	@if [ -z "$(FEATURE)" ]; then \
 	  echo "Selected features: all"; \
 	  TARGET="features"; \
@@ -50,16 +54,16 @@ test: venv
 		echo "Selected tags: $(BDD_TAG)"; \
 		TAG_OPTION='--tags=$(BDD_TAG)'; \
 	fi; \
-	. $(ACTIVATE); python -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
+	uv run -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
-test_wip: venv
+test_wip: bdd-venv
 	@echo "Running WIP tests..."
-	@. $(ACTIVATE); python -m behave --wip features
+	uv run behave --wip features
 
-test_smoke: venv
-	@$(MAKE) test BDD_TAG=@smoke
+test_smoke: bdd-venv
+	@$(MAKE) tests BDD_TAG=@smoke
 
-report: venv
+report: bdd-venv
 	@echo "Generating HTML report..."
 	@mkdir -p $(MAKEFILE_DIR)/reports/html
 	@. $(ACTIVATE); for file in reports/junit/*.xml; do \
