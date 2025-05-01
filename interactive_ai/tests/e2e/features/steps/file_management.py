@@ -19,13 +19,9 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import ClientError
 
-REMOTE_S3_SERVER_ADDR = os.environ.get(
-    "REMOTE_S3_SERVER_ADDR", "http://s3.toolbox.iotg.sclab.intel.com"
-)
+REMOTE_S3_SERVER_ADDR = os.environ.get("REMOTE_S3_SERVER_ADDR", "https://storage.geti.infra-host.com/")
 REMOTE_S3_TEST_BUCKET = os.environ.get("REMOTE_S3_TEST_BUCKET", "test")
-REMOTE_S3_TEST_DATA_PREFIX = os.environ.get(
-    "REMOTE_S3_TEST_PATH_PREFIX", "data/iai-e2e"
-)
+REMOTE_S3_TEST_DATA_PREFIX = os.environ.get("REMOTE_S3_TEST_PATH_PREFIX", "data/iai-e2e")
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +52,7 @@ def list_files_in_remote_archive(remote_dir_path: Path) -> list[str]:
     return [obj["Key"] for obj in response.get("Contents", [])]
 
 
-def download_file_from_remote_archive(
-    remote_file_path: Path, local_file_path: Path
-) -> None:
+def download_file_from_remote_archive(remote_file_path: Path, local_file_path: Path) -> None:
     """
     Download the requested file from the remote S3 archive.
 
@@ -74,18 +68,10 @@ def download_file_from_remote_archive(
     file_key = REMOTE_S3_TEST_DATA_PREFIX / remote_file_path
 
     try:
-        s3_client.download_file(
-            REMOTE_S3_TEST_BUCKET, str(file_key), str(local_file_path)
-        )
+        s3_client.download_file(REMOTE_S3_TEST_BUCKET, str(file_key), str(local_file_path))
     except ClientError as exc:
         if exc.response["Error"]["Code"] == "404":
-            raise RemoteFileNotFound(
-                f"File not found in remote archive: {file_key}"
-            ) from exc
+            raise RemoteFileNotFound(f"File not found in remote archive: {file_key}") from exc
         if exc.response["Error"]["Code"] == "403":
-            raise RemoteFileNotAccessible(
-                f"File not accessible in remote archive: {file_key}"
-            ) from exc
-        raise RuntimeError(
-            f"Failed to download file from remote archive: {file_key}"
-        ) from exc
+            raise RemoteFileNotAccessible(f"File not accessible in remote archive: {file_key}") from exc
+        raise RuntimeError(f"Failed to download file from remote archive: {file_key}") from exc

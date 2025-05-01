@@ -6,8 +6,8 @@
 
 ### Install requirements
 
-1. Move to the BDD folder `cd tests/bdd`
-2. Install requirements (optionally use a venv): `pip install -r requirements.txt`
+1. Move to the BDD folder `cd tests/e2e`
+2. Install requirements: `uv sync`
 3. Install nvm https://github.com/nvm-sh/nvm
 4. Make sure you use nvm 16 `nvm install 16` then `nvm use 16`
 5. Install swagger CLI: `npm install -g @apidevtools/swagger-cli`
@@ -18,14 +18,14 @@
 Generate and install the client with:
 
 1. `make generate_client`
-2. `pip install -e rest_client`
+2. `uv pip install -e rest_client`
 
 If you modify the OpenAPI spec, the client will automatically regenerate (if needed) when you run `make test`.
 Alternatively, you can manually rebuild it with `make generate_client_if_needed`.
 
 ### Obtain a Personal Access Token
 
-In the UI, go the the 'Account' section, select the 'Token' tab and click on 'Create' to generate an access token.
+In the UI, go to the 'Account' section, select the 'Token' tab and click on 'Create' to generate an access token.
 
 ### Setup the environment
 
@@ -33,8 +33,6 @@ Set the following environment variables:
 
 - `GETI_SERVER_URL` -> address of the Geti server
 - `GETI_API_KEY` -> your personal access token
-- `AWS_ACCESS_KEY_ID` -> Access key for the [S3 server](https://s3.toolbox.iotg.sclab.intel.com/minio/login)
-- `AWS_SECRET_ACCESS_KEY` -> Secret key for the [S3 server](https://s3.toolbox.iotg.sclab.intel.com/minio/login)
 
 The S3 credentials are required to download the test data; if you already have the data cached locally, you can skip setting these variables.
 If you don't know the credentials, ask the team.

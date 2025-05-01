@@ -1,7 +1,7 @@
-include ../../Makefile.common
+include ../../../Makefile.shared-python
 
 MAKEFILE_DIR := $(shell pwd)
-OPENAPI_YAML_SPEC := ../../docs/rest/openapi_internal.yaml
+OPENAPI_YAML_SPEC := ../../../docs/rest_api/openapi_internal.yaml
 OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
 CLIENT_NAME := geti_client
 CLIENT_PATH := rest_client
@@ -11,44 +11,6 @@ VIRTUALENV_DIR = .venv-bdd
 .PHONY: all clean check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke
 
 all: test
-
-venv: generate_client_if_needed $(ACTIVATE)
-$(ACTIVATE):
-	@$(PYTHON_VERSION) -m venv $(VIRTUALENV_DIR)
-	@. $(ACTIVATE); python -m $(PIP_INSTALL) -U pip==${PIP_VERSION} setuptools==${SETUPTOOLS_VERSION} wheel==${WHEEL_VERSION}
-	@. $(ACTIVATE); $(PIP_INSTALL) -r requirements.txt
-	@. $(ACTIVATE); $(PIP_INSTALL) -e rest_client
-
-venv-dev: venv $(DEV_VIRTUALENV_MARK)
-$(DEV_VIRTUALENV_MARK):
-	@touch $(DEV_VIRTUALENV_MARK)
-	@. $(ACTIVATE); $(PIP_INSTALL) -r ../../src/common/requirements-dev-common.txt
-
-style-fix: venv-dev
-	@echo $(ECHO_RUFF_START)
-	@. $(ACTIVATE); ruff check . --config $(PYPROJECT_TOML_CONFIG) --fix --exit-non-zero-on-fix
-	@echo $(ECHO_RUFF_STOP)
-
-	@echo $(ECHO_RUFF_FORMAT_START)
-	@. $(ACTIVATE); ruff format . --config $(PYPROJECT_TOML_CONFIG)
-	@echo $(ECHO_RUFF_FORMAT_STOP)
-
-style: venv-dev
-	@echo $(ECHO_RUFF_START)
-	@. $(ACTIVATE); ruff check . --config $(PYPROJECT_TOML_CONFIG)
-	@echo $(ECHO_RUFF_STOP)
-
-	@echo $(ECHO_RUFF_FORMAT_START)
-	@. $(ACTIVATE); ruff format --check --config $(PYPROJECT_TOML_CONFIG)
-	@echo $(ECHO_RUFF_FORMAT_STOP)
-
-	@echo $(ECHO_MYPY_START)
-	@. $(ACTIVATE); mypy features --config-file=$(MYPY_CONFIG)
-	@echo $(ECHO_MYPY_STOP)
-
-clean:
-	@rm -rf $(CLIENT_PATH)
-	@rm -rf __pycache__ .cache .pytest_cache $(VIRTUALENV_DIR) .coverage .mypy_cache .registry_port.txt
 
 check_yaml_spec:
 	@if [ ! -f $(OPENAPI_YAML_SPEC) ]; then \
