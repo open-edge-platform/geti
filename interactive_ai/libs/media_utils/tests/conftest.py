@@ -14,7 +14,7 @@ os.environ["DEFAULT_TRAINER_VERSION"] = "2.2"
 
 
 @pytest.fixture(scope="session", autouse=True)
-def mongodb_testcontainer() -> None:
+def mongodb_testcontainer():
     with MongoDbContainer("mongo:7.0.7") as mongo:
         db_url = mongo.get_connection_url()
         with patch.object(MongoConnector, "get_connection_string", return_value=db_url):
