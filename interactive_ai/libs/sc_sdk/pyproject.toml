@@ -19,6 +19,8 @@ dependencies = [
     "urllib3>=1.26",
     "geti-types",
     "geti-feature-tools",
+    "pydantic==2.5.3",
+    "hiyapyco==0.7.0",
 ]
 
 [tool.uv.sources]

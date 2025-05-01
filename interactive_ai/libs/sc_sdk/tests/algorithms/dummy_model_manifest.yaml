@@ -1,0 +1,17 @@
+id: dummy_algorithm
+name: "Dummy Algorithm"
+description: "Dummy manifest for test purposes only"
+task: classification
+stats:
+  gigaflops: 0.39
+  trainable_parameters: 5288548
+supported_gpus:
+  intel: true
+  nvidia: true
+support_status: obsolete
+
+hyperparameters:
+  training:
+    early_stopping_epochs: 4
+    learning_rate: 0.05
+    learning_rate_warmup_epochs: 4

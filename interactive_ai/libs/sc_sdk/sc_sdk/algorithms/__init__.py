@@ -20,6 +20,24 @@ from sc_sdk.entities.model_template import (
 
 from geti_types import Singleton
 
+from .models.algorithm import Algorithm, AlgorithmStats, SupportedStatus, NullAlgorithm
+from .models.hyperparameters import Hyperparameters, AugmentationParameters, DatasetPreparationParameters, EvaluationParameters, TrainingHyperParameters
+
+
+__all__ = [
+    "Algorithm",
+    "NullAlgorithm",
+    "AlgorithmStats",
+    "SupportedStatus",
+    "Hyperparameters",
+    "AugmentationParameters",
+    "DatasetPreparationParameters",
+    "EvaluationParameters",
+    "TrainingHyperParameters",
+]
+
+from .utils import parse_manifest
+
 
 class ModelTemplateList(metaclass=Singleton):
     """
@@ -196,3 +214,64 @@ class ModelTemplateList(metaclass=Singleton):
         """
         self._model_template_list.pop(model_template_id, None)
         self._obsolete_model_template_ids.discard(model_template_id)
+
+
+class AlgorithmsList(metaclass=Singleton):
+    """
+    Singleton class containing the list of algorithms available to train.
+    """
+
+    def __init__(self) -> None:
+        self._algorithms_list: dict[str, Algorithm] = {}
+        base_dirs: list = __path__  # type: ignore[name-defined]
+        # 'algorithms_dir' is assumed to point to one directory only
+        algorithms_dir: str | None = os.getenv("ALGORITHMS_DIR")
+        if algorithms_dir:
+            base_dirs.append(algorithms_dir)
+
+        self._base_dirs = base_dirs
+        self._update_lock = Lock()
+        self._update_algorithms_list()
+
+    @property
+    def obsolete_model_template_ids(self) -> set[str]:
+        """
+        Get the ids of the obsolete model templates
+
+        :return: A set of model template ids that are obsolete
+        """
+        return self._obsolete_model_template_ids
+
+    def _update_algorithms_list(self) -> None:
+        """
+        Update the list of all available algorithms.
+
+        This function scans the base directories for algorithm manifest files,
+        loads them into Algorithm objects, and updates the internal algorithm list.
+        """
+        # TODO: implement when model manifest are populated
+        raise NotImplementedError
+
+    def get_by_id(self, algorithm_id: str) -> Algorithm:
+        """
+        Get a specific algorithm by ID. If the algorithm_id is not valid or empty, return a NullAlgorithm.
+        """
+        self._update_algorithms_list()
+        algorithm = self._algorithms_list.get(algorithm_id)
+        if algorithm is None:
+            return NullAlgorithm()
+        return algorithm
+
+    def get_all_ids(self) -> list[str]:
+        """
+        Get a list of the IDs of all the algorithms available.
+        """
+        self._update_algorithms_list()
+        return list(self._algorithms_list.keys())
+
+    def get_all(self) -> list[Algorithm]:
+        """
+        Get a list of all the algorithms available.
+        """
+        self._update_algorithms_list()
+        return list(self._algorithms_list.values())
