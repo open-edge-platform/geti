@@ -4,22 +4,22 @@
 import { RESOURCE_TYPE, USER_ROLE } from '../../../core/users/users.interface';
 import { OPERATION, OperationPermission } from './has-permission.interface';
 
-export const ORGANIZATION_ADMIN_PERMISSION = {
+const ORGANIZATION_ADMIN_PERMISSION = {
     role: USER_ROLE.ORGANIZATION_ADMIN,
     resourceType: RESOURCE_TYPE.ORGANIZATION,
 };
 
-export const WORKSPACE_ADMIN_PERMISSION = {
+const WORKSPACE_ADMIN_PERMISSION = {
     role: USER_ROLE.WORKSPACE_ADMIN,
     resourceType: RESOURCE_TYPE.WORKSPACE,
 };
 
-export const WORKSPACE_CONTRIBUTOR_PERMISSION = {
+const WORKSPACE_CONTRIBUTOR_PERMISSION = {
     role: USER_ROLE.WORKSPACE_CONTRIBUTOR,
     resourceType: RESOURCE_TYPE.WORKSPACE,
 };
 
-export const PROJECT_MANAGER_PERMISSION = {
+const PROJECT_MANAGER_PERMISSION = {
     role: USER_ROLE.PROJECT_MANAGER,
     resourceType: RESOURCE_TYPE.PROJECT,
 };

@@ -9,7 +9,7 @@ import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';
 import { FeatureFlags, FeatureFlagService } from '../services/feature-flag-service.interface';
 
-export const featureFlagQueryOptions = (
+const featureFlagQueryOptions = (
     featureFlagService: FeatureFlagService
 ): UseSuspenseQueryOptions<FeatureFlags, AxiosError> => {
     return {

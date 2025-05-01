@@ -7,7 +7,7 @@ import QUERY_KEYS from '../../../core/requests/query-keys';
 import { useApplicationServices } from '../../../core/services/application-services-provider.component';
 import { OnboardingService } from '../services/onboarding-service.interface';
 
-export const profileQueryOptions = (onboardingService: OnboardingService) => {
+const profileQueryOptions = (onboardingService: OnboardingService) => {
     return queryOptions({
         queryKey: QUERY_KEYS.USER_ONBOARDING_PROFILE,
         queryFn: () => {
