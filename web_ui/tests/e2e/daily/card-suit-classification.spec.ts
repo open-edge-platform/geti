@@ -89,7 +89,7 @@ test(
 
             const timeout = TIMEOUTS.importDataset;
 
-            await page.getByRole('button', { name: /import/i }).click();
+            await page.getByRole('button', { name: /import/i }).click({ timeout });
 
             // Wait for the progress to start
             await expect(page.getByText(/Import dataset to project/)).toBeVisible({ timeout });
