@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "esnext",
     "lib": [
       "dom",
@@ -21,7 +22,8 @@
     "jsx": "react-jsx",
     "types": ["jest"],
     "paths": {
-      "opencv": ["./public/assets/opencv/4.9.0/opencv.js"]
+      "opencv": ["./public/assets/opencv/4.9.0/opencv.js"],
+      "@shared/*": ["./src/shared/*"]
     }
   },
   "include": [

@@ -16,6 +16,7 @@ module.exports = {
     transformIgnorePatterns: ['node_modules/?!(pretty-bytes)'],
     moduleNameMapper: {
         '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
+        '^@shared/(.*)$': '<rootDir>/src/shared/$1',
     },
     moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node'],
     resetMocks: false,
