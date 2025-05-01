@@ -51,7 +51,7 @@ export const ProjectLabels = (): JSX.Element => {
         setTasksMetadata(getTasksMetadata(project.tasks));
     }, [project]);
 
-    const ensureMinimumNumberOfLabels = (): boolean => {
+    const hasMinimumNumberOfLabels = (): boolean => {
         const labelsToBeRemoved = getFlattenedItems(tasksMetadata.flatMap((task) => task.labels)).filter(
             (label) => label.state === LabelItemEditionState.REMOVED
         );
@@ -76,7 +76,7 @@ export const ProjectLabels = (): JSX.Element => {
         return true;
     };
 
-    const saveButtonDisabled = !labelsValid || !ensureMinimumNumberOfLabels();
+    const saveButtonDisabled = !labelsValid || !hasMinimumNumberOfLabels();
 
     const editToggle = () => {
         setEditionEnablement(!isEditionEnabled);
