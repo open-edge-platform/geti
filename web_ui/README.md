@@ -3,12 +3,26 @@
 Welcome to Intel Geti Web UI. This document aims to explain the high level architecture of our application, starting with our core stack: React, Typescript and Rsbuild.
 For a full deep dive visit our developer documentation [`here`](https://docs.geti.intel.com/developer-guide/interactive-ai/frontend/).
 
+## Application structure
+
+The web UI of Geti is a Single Page Application utilizing [react router](https://reactrouter.com/) for client side routing. [Rsbuild](https://rsbuild.dev) is our build tool.
+Below is a diagram of our route structure,
+
+![geti-route-structure](https://github.com/user-attachments/assets/baaae7a0-af5b-4d1c-8fa1-4ae8a71a8a38)
+
+The `intel-admin` routes are used to manage organizations and users as well as assigning credits. These routese are used by the [admin environment](https://github.com/open-edge-platform/geti/blob/7e46430b7afeca6288f7e751d49adacac61fd7f3/web_ui/rsbuild.config.ts#L66-L77) while the other routes are used by the [geti environment](https://github.com/open-edge-platform/geti/blob/7e46430b7afeca6288f7e751d49adacac61fd7f3/web_ui/rsbuild.config.ts#L53-L65).
+The admin environment isn't available via our installer or helm chart instructions, this will likely change in the future.
+
+Keep reading to get an overview of our core architecture, our stack, testing strategies and how we use client side computer vision algorithms to speed up annotation time.
+
 ## Architecture 
 
 - **Core stack**: Our UI is a React application build using Rsbuild & npm. Typescript is language of choice.
 - **Application**: React Router and TanStack Query are critical for managing navigation and data fetching efficiently in our application.
 - **Testing**: we aim to have a high code coverage where we use jest for unit tests and Playwright for our component and end-to-end tests.
 - **Algorithms & AI**: Our UI contains smart annotation tools that speed up annotation efforts. We use [OpenCV](https://opencv.org/), [OnnxRUntime](https://onnxruntime.ai) compiled to [WebAssembly](https://webassembly.org/) and use [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) to make sure heavy computions don't block the UI thread.
+
+---
 
 ### Core stack
 
