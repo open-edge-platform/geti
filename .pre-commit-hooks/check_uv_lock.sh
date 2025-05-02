@@ -14,7 +14,7 @@ EXIT_CODE=0
 for dir in "${PYPROJECT_DIRS[@]}"; do
   if [ -f "$dir/uv.lock" ]; then
     echo "Checking $dir"
-    if ! (cd "$dir" && uv lock); then
+    if ! (cd "$dir" && uv lock --check); then
       echo "❌ uv lock --check failed in $dir"
       EXIT_CODE=1
     fi
