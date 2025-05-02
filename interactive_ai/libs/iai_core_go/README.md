@@ -1,4 +1,4 @@
-# go_sdk
+# iai_core
 
 ## Frame extraction benchmarks
 
