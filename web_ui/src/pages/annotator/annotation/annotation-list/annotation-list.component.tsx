@@ -70,6 +70,7 @@ export const AnnotationList = ({ annotations, isLoading, isDragDisabled }: Annot
     }
 
     return (
+        // "rowHeight" is necessary for testing purposes, or the container will render empty
         <Virtualizer layout={ListLayout} layoutOptions={{ rowHeight: 50 }}>
             <AriaComponentsListBox
                 id='annotation-list'

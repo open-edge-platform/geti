@@ -3,7 +3,6 @@
 
 import { screen, within } from '@testing-library/react';
 import { FocusScope } from 'react-aria';
-import { VirtuosoMockContext } from 'react-virtuoso';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../../core/annotations/shapetype.enum';
@@ -98,17 +97,15 @@ describe('Annotation list container', () => {
         }
 
         return render(
-            <VirtuosoMockContext.Provider value={{ viewportHeight: 300, itemHeight: 100 }}>
-                <FocusScope>
-                    <ZoomProvider>
-                        <TransformZoomAnnotation>
-                            <AnnotationToolProvider>
-                                <AnnotationListContainer />
-                            </AnnotationToolProvider>
-                        </TransformZoomAnnotation>
-                    </ZoomProvider>
-                </FocusScope>
-            </VirtuosoMockContext.Provider>,
+            <FocusScope>
+                <ZoomProvider>
+                    <TransformZoomAnnotation>
+                        <AnnotationToolProvider>
+                            <AnnotationListContainer />
+                        </AnnotationToolProvider>
+                    </TransformZoomAnnotation>
+                </ZoomProvider>
+            </FocusScope>,
             { services: { projectService } }
         );
     };
