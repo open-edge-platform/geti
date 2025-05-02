@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import requests
 
-URL_IAI_UNITTESTS = "http://s3.toolbox.iotg.sclab.intel.com/test/data/iai-unittests/"
+URL_IAI_UNITTESTS = ""
 URL_VIDEO = URL_IAI_UNITTESTS + "video_repair_test/"
 REPAIRED_VIDEO = "repaired_video.mp4"
 UNREPAIRABLE_VIDEO = "unrepairable_video.mp4"

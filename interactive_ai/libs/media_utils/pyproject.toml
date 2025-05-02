@@ -31,6 +31,7 @@ dev = [
     "pytest-html~=4.1",
     "ruff~=0.11",
     "testcontainers[mongodb]~=4.9",
+    "types-requests~=2.32",
 ]
 
 [build-system]

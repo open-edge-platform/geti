@@ -1328,6 +1328,7 @@ dev = [
     { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
     { name = "testfixtures", specifier = "~=8.3" },
     { name = "types-cachetools" },
+    { name = "types-requests", specifier = "~=2.32" },
 ]
 
 [[package]]

@@ -3,11 +3,13 @@
 
 from unittest.mock import patch
 
-from iai_core_py.repos.storage.binary_repos import VideoBinaryRepo
+import pytest
 
+from iai_core_py.repos.storage.binary_repos import VideoBinaryRepo
 from media_utils import VideoDecoder, VideoFileRepair
 
 
+@pytest.mark.skip("Video files have to be transfered to public bucket")
 class TestVideoRepair:
     def test_valid(self, request, fxt_dataset_storage_identifier, fxt_repaired_video):
         """
