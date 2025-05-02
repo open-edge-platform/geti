@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from geti_types import ID
-from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core.entities.scored_label import ScoredLabel
 
 COLOR = "color"
 ID_ = "id"

@@ -14,8 +14,8 @@ from model.job_state import JobGpuRequestState, JobState, JobStateGroup, JobTask
 from model.telemetry import Telemetry
 
 from geti_types import ID, Session, make_session
-from iai_core_py.entities.persistent_entity import PersistentEntity
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.persistent_entity import PersistentEntity
+from iai_core.utils.time_utils import now
 
 
 @dataclass

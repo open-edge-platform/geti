@@ -6,10 +6,10 @@
 import logging
 
 from geti_types import ID
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset, NullDataset
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import DatasetRepo
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetRepo
 from jobs_common.commands.create_dataset_command import CreateDatasetCommand
 from jobs_common.exceptions import DatasetCreationFailedException
 from jobs_common.utils.annotation_filter import AnnotationFilter

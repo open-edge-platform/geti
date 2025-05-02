@@ -4,7 +4,7 @@ from collections.abc import Iterator
 
 import pytest
 
-from iai_core_py.utils.iteration import grouper, multi_map
+from iai_core.utils.iteration import grouper, multi_map
 
 
 class TestIteration:

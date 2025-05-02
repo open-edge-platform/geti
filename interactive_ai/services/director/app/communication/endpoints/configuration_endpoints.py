@@ -18,13 +18,15 @@ from geti_fastapi_tools.dependencies import (
     setup_session_fastapi,
 )
 from geti_types import ID
-from iai_core_py.utils.filesystem import check_free_space_for_operation
+from iai_core.utils.filesystem import check_free_space_for_operation
 
 logger = logging.getLogger(__name__)
 
 configuration_prefix_url = "/api/v1/organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}"
 configuration_router = APIRouter(
-    prefix=configuration_prefix_url, tags=["Configuration"], dependencies=[Depends(setup_session_fastapi)]
+    prefix=configuration_prefix_url,
+    tags=["Configuration"],
+    dependencies=[Depends(setup_session_fastapi)],
 )
 
 

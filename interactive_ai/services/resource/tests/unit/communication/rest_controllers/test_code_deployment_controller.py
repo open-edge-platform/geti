@@ -11,7 +11,7 @@ from managers.project_manager import ProjectManager
 from resource_management.code_deployment_manager import DEPLOYMENT_FILENAME_TEMPLATE, CodeDeploymentManager
 
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.utils.naming_helpers import slugify
+from iai_core.utils.naming_helpers import slugify
 
 
 class TestCodeDeploymentRESTController:
@@ -82,7 +82,10 @@ class TestCodeDeploymentRESTController:
     ) -> None:
         test_file_path = "path/testing"
         fxt_project.name = f'"{fxt_project.name}"'
-        file_path_response = (test_file_path, f"Deployment-{slugify(fxt_project.name)}.zip")
+        file_path_response = (
+            test_file_path,
+            f"Deployment-{slugify(fxt_project.name)}.zip",
+        )
         project_identifier = ProjectIdentifier(
             workspace_id=fxt_project.workspace_id,
             project_id=fxt_project.id_,

@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.utils.naming_helpers import camel_to_snake_case, slugify, snake_to_camel_case
+from iai_core.utils.naming_helpers import camel_to_snake_case, slugify, snake_to_camel_case
 
 
 class TestNamingHelpers:

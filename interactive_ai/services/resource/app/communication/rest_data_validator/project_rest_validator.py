@@ -49,10 +49,10 @@ from features.feature_flags import FeatureFlag
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.factories.project_parser import DOMAIN_TO_EMPTY_LABEL_NAME
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain
+from iai_core.entities.model_template import TaskType
+from iai_core.factories.project_parser import DOMAIN_TO_EMPTY_LABEL_NAME
 
 CONNECTIONS = "connections"
 EDGES = "edges"
@@ -655,7 +655,7 @@ class ProjectRestValidator(RestApiValidator):
                 raise ReservedLabelNameException(label_name=empty_label_name)
 
     @staticmethod
-    def _validate_keypoint_structure(data: dict[str, Any], labels: list[LabelProperties]) -> None:  # noqa: C901
+    def _validate_keypoint_structure(data: dict[str, Any], labels: list[LabelProperties]) -> None:
         """
         Validates that a user defined keypoint structure has exactly 2 nodes, node names match with existing labels,
         has no duplicate edges, and position values are in the range [0.0 1.0]]

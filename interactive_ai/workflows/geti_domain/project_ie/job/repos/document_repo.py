@@ -7,12 +7,12 @@ import logging
 from collections.abc import Callable, Iterable, Iterator
 
 from geti_types import ProjectIdentifier, Session
-from iai_core_py.repos import ProjectRepo
-from iai_core_py.repos.base import ProjectBasedSessionRepo
-from iai_core_py.repos.base.mongo_connector import MongoConnector
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.mappers import CursorIterator
-from iai_core_py.utils.iteration import grouper
+from iai_core.repos import ProjectRepo
+from iai_core.repos.base import ProjectBasedSessionRepo
+from iai_core.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.mappers import CursorIterator
+from iai_core.utils.iteration import grouper
 from pymongo import IndexModel
 from pymongo.collection import Collection
 from pymongo.command_cursor import CommandCursor
@@ -49,7 +49,11 @@ class DocumentRepo(ProjectBasedSessionRepo[None]):  # type: ignore[type-var]
         session: Session | None = None,
     ) -> None:
         # Note: this special repo interacts with multiple collections instead of a single one
-        super().__init__(collection_name="NONE", session=session, project_identifier=project_identifier)
+        super().__init__(
+            collection_name="NONE",
+            session=session,
+            project_identifier=project_identifier,
+        )
 
     @property
     def _collection(self) -> Collection:

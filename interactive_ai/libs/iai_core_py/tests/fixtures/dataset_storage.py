@@ -3,13 +3,13 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetStorageRepo, ImageRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetStorageRepo, ImageRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 from .values import DummyValues, IDOffsets
 from geti_types import DatasetStorageIdentifier, ImageIdentifier, ProjectIdentifier

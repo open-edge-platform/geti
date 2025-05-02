@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.versioning.data_version import DataVersion, SchemaChangeType
+from iai_core.versioning.data_version import DataVersion, SchemaChangeType
 
 
 class TestDataVersion:

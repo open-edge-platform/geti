@@ -3,7 +3,7 @@
 from unittest.mock import patch
 
 import pytest
-from iai_core_py.services.model_service import ModelService
+from iai_core.services.model_service import ModelService
 from testfixtures import compare
 
 from job.commands.update_active_model_command import UpdateActiveModelCommand

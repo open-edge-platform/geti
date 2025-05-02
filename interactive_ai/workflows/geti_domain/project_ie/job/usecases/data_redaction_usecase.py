@@ -18,8 +18,8 @@ from zipfile import ZipFile
 from bson import ObjectId, UuidRepresentation
 from bson.json_util import JSONOptions, dumps
 from defusedxml import ElementTree
-from iai_core_py.repos.mappers import DatetimeToMongo, MediaIdentifierToMongo
-from iai_core_py.utils.time_utils import now
+from iai_core.repos.mappers import DatetimeToMongo, MediaIdentifierToMongo
+from iai_core.utils.time_utils import now
 
 from job.entities.exceptions import ExportDataRedactionFailedException, ImportDataRedactionFailedException
 
@@ -171,7 +171,10 @@ class ExportDataRedactionUseCase(BaseDataRedactionUseCase):
         :return: Document after the replacement
         """
         if "media_identifier" not in doc:
-            logger.error("Document does not have required key 'media_identifier'. Available keys: %s", list(doc.keys()))
+            logger.error(
+                "Document does not have required key 'media_identifier'. Available keys: %s",
+                list(doc.keys()),
+            )
             raise ExportDataRedactionFailedException
         doc["_id"] = ObjectId()
         return doc
@@ -213,7 +216,11 @@ class ExportDataRedactionUseCase(BaseDataRedactionUseCase):
             return f"{shifted_value_hex}{trailing_char}"
 
         # use lookbehind to not eat the leading slash; the suffix may be a slash, extension, thumbnail or nothing
-        return re.sub(r"(?<=/)([0-9a-fA-F]{24})(/|$|(?:_thumbnail)?\.[0-9a-zA-Z]{2,4}$)", objectid_replacer, url)
+        return re.sub(
+            r"(?<=/)([0-9a-fA-F]{24})(/|$|(?:_thumbnail)?\.[0-9a-zA-Z]{2,4}$)",
+            objectid_replacer,
+            url,
+        )
 
     def replace_objectid_based_binary_filename_in_mongodb_doc(self, bson_doc: str) -> str:
         """
@@ -232,7 +239,11 @@ class ExportDataRedactionUseCase(BaseDataRedactionUseCase):
             # Return the transformed filename, preserving the extension
             return f'"binary_filename": "{objectid_hex_shifted}.{extension}"'
 
-        return re.sub(r"\"binary_filename\": \"([0-9a-fA-F]{24})\.([0-9a-zA-Z]{3,4})\"", objectid_replacer, bson_doc)
+        return re.sub(
+            r"\"binary_filename\": \"([0-9a-fA-F]{24})\.([0-9a-zA-Z]{3,4})\"",
+            objectid_replacer,
+            bson_doc,
+        )
 
     def replace_objectid_in_config_json(self, config_data: str) -> str:
         """
@@ -287,7 +298,10 @@ class ExportDataRedactionUseCase(BaseDataRedactionUseCase):
         :param wheel_file_path: Path to the .whl file to modify (in-place)
         """
         tmp_out_path = wheel_file_path + ".tmp"
-        with ZipFile(wheel_file_path, mode="r") as zip_in, ZipFile(tmp_out_path, mode="w") as zip_out:
+        with (
+            ZipFile(wheel_file_path, mode="r") as zip_in,
+            ZipFile(tmp_out_path, mode="w") as zip_out,
+        ):
             for item in zip_in.infolist():
                 out_data: str | bytes
                 match item.filename:
@@ -419,7 +433,10 @@ class ImportDataRedactionUseCase(BaseDataRedactionUseCase):
         self.objectid_replacement_seed_int = int(str(self._generate_random_seed_oid()), 16)
         self.user_replacement_new_id = user_replacement_new_id
         self.user_replacement_new_id_encoded = (
-            dumps(user_replacement_new_id, json_options=JSONOptions(uuid_representation=UuidRepresentation.STANDARD))
+            dumps(
+                user_replacement_new_id,
+                json_options=JSONOptions(uuid_representation=UuidRepresentation.STANDARD),
+            )
             if user_replacement_new_id
             else None
         )
@@ -484,7 +501,10 @@ class ImportDataRedactionUseCase(BaseDataRedactionUseCase):
         :return: Document after the replacement
         """
         if "media_identifier" not in doc:
-            logger.error("Cannot reconstruct id without key 'media_identifier'. Available keys: %s", list(doc.keys()))
+            logger.error(
+                "Cannot reconstruct id without key 'media_identifier'. Available keys: %s",
+                list(doc.keys()),
+            )
             raise ImportDataRedactionFailedException
         doc["_id"] = ObjectId(str(MediaIdentifierToMongo.backward(doc["media_identifier"]).as_id()))
         return doc
@@ -517,7 +537,11 @@ class ImportDataRedactionUseCase(BaseDataRedactionUseCase):
             raise ImportDataRedactionFailedException
 
         # use lookbehind to not eat the leading slash; the suffix may be a slash, extension, thumbnail or nothing
-        return re.sub(r"(?<=/)([0-9a-fA-F]{24})(/|$|(?:_thumbnail)?\.[0-9a-zA-Z]{2,4}$)", objectid_maker, url)
+        return re.sub(
+            r"(?<=/)([0-9a-fA-F]{24})(/|$|(?:_thumbnail)?\.[0-9a-zA-Z]{2,4}$)",
+            objectid_maker,
+            url,
+        )
 
     def recreate_objectid_based_binary_filename_in_mongodb_doc(self, bson_doc: str) -> str:
         """
@@ -540,7 +564,11 @@ class ImportDataRedactionUseCase(BaseDataRedactionUseCase):
             logger.error("Cannot reconstruct ObjectIds for imported docs if the minimum transformed id is not provided")
             raise ImportDataRedactionFailedException
 
-        return re.sub(r"\"binary_filename\": \"([0-9a-fA-F]{24})\.([0-9a-zA-Z]{3,4})\"", objectid_maker, bson_doc)
+        return re.sub(
+            r"\"binary_filename\": \"([0-9a-fA-F]{24})\.([0-9a-zA-Z]{3,4})\"",
+            objectid_maker,
+            bson_doc,
+        )
 
     def recreate_objectid_in_config_json(self, config_data: str) -> str:
         """
@@ -595,7 +623,10 @@ class ImportDataRedactionUseCase(BaseDataRedactionUseCase):
         :param wheel_file_path: Path to the .whl file to modify (in-place)
         """
         tmp_out_path = wheel_file_path + ".tmp"
-        with ZipFile(wheel_file_path, mode="r") as zip_in, ZipFile(tmp_out_path, mode="w") as zip_out:
+        with (
+            ZipFile(wheel_file_path, mode="r") as zip_in,
+            ZipFile(tmp_out_path, mode="w") as zip_out,
+        ):
             for item in zip_in.infolist():
                 out_data: str | bytes
                 match item.filename:
@@ -663,10 +694,14 @@ class ImportDataRedactionUseCase(BaseDataRedactionUseCase):
             raise ImportDataRedactionFailedException
         keys_to_match = "|".join(re.escape(k) for k in self.USER_RELATED_KEYS)
         out_doc = re.sub(
-            r"\"((?:" + keys_to_match + r")(?:_id|_name)?)\": \"\$user_id_str\"", user_id_updater_str, bson_doc
+            r"\"((?:" + keys_to_match + r")(?:_id|_name)?)\": \"\$user_id_str\"",
+            user_id_updater_str,
+            bson_doc,
         )
         return re.sub(
-            r"\"((?:" + keys_to_match + r")(?:_id|_name)?)\": \"\$user_id_uuid4\"", user_id_updater_uuid4, out_doc
+            r"\"((?:" + keys_to_match + r")(?:_id|_name)?)\": \"\$user_id_uuid4\"",
+            user_id_updater_uuid4,
+            out_doc,
         )
 
     def update_creation_time_in_mongodb_doc(self, doc: dict) -> dict:

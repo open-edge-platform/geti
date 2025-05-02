@@ -7,11 +7,11 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 
-from iai_core_py.entities.datasets import NullDataset
-from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel
-from iai_core_py.repos import ModelRepo, ProjectRepo
-from iai_core_py.repos.model_repo import ModelStatusFilter
-from iai_core_py.repos.storage.binary_repos import ModelBinaryRepo
+from iai_core.entities.datasets import NullDataset
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel
+from iai_core.repos import ModelRepo, ProjectRepo
+from iai_core.repos.model_repo import ModelStatusFilter
+from iai_core.repos.storage.binary_repos import ModelBinaryRepo
 from tests.test_helpers import empty_model_configuration
 
 

@@ -10,18 +10,18 @@ from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.entities.compiled_dataset_shards import CompiledDatasetShards, NullCompiledDatasetShards
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.label_schema import LabelSchema, LabelSchemaView
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
-from iai_core_py.repos.compiled_dataset_shards_repo import CompiledDatasetShardsRepo
-from iai_core_py.repos.configurable_parameters_repo import ConfigurableParametersRepo
-from iai_core_py.repos.dataset_repo import DatasetRepo
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.entities.compiled_dataset_shards import CompiledDatasetShards, NullCompiledDatasetShards
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label_schema import LabelSchema, LabelSchemaView
+from iai_core.entities.model import Model
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
+from iai_core.repos.compiled_dataset_shards_repo import CompiledDatasetShardsRepo
+from iai_core.repos.configurable_parameters_repo import ConfigurableParametersRepo
+from iai_core.repos.dataset_repo import DatasetRepo
 from jobs_common_extras.mlflow.utils.train_output_models import TrainOutputModelIds
 
 

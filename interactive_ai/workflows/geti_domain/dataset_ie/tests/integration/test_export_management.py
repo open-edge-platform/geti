@@ -7,9 +7,9 @@ from unittest.mock import patch
 import datumaro as dm
 import pytest
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.video import Video, VideoFrame
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.image import Image
+from iai_core.entities.video import Video, VideoFrame
 from jobs_common_extras.datumaro_conversion.mappers.id_mapper import MediaNameIDMapper, VideoNameIDMapper
 from jobs_common_extras.datumaro_conversion.sc_extractor import ScExtractor
 
@@ -88,7 +88,10 @@ class TestExportManager:
         data_repo = ExportDataRepo(root_path=fxt_temp_directory)
 
         with (
-            patch("job.tasks.export_tasks.export_dataset_task.ExportDataRepo", return_value=data_repo),
+            patch(
+                "job.tasks.export_tasks.export_dataset_task.ExportDataRepo",
+                return_value=data_repo,
+            ),
             patch("job.tasks.export_tasks.export_dataset_task.publish_metadata_update") as mocked_publish,
             patch.dict(
                 os.environ,
@@ -144,7 +147,10 @@ class TestExportManager:
         dataset_storage: DatasetStorage = project.get_training_dataset_storage()
         data_repo = ExportDataRepo(root_path=fxt_temp_directory)
         with (
-            patch("job.tasks.export_tasks.export_dataset_task.ExportDataRepo", return_value=data_repo),
+            patch(
+                "job.tasks.export_tasks.export_dataset_task.ExportDataRepo",
+                return_value=data_repo,
+            ),
             patch("job.tasks.export_tasks.export_dataset_task.publish_metadata_update"),
             patch.dict(
                 os.environ,
@@ -213,7 +219,11 @@ class TestExportManager:
         return dataset, dataset_path
 
     @staticmethod
-    def _assert_dm_label_map(dataset_storage: DatasetStorage, sc_dataset: list[ScDatasetItem], dm_dataset: dm.Dataset):
+    def _assert_dm_label_map(
+        dataset_storage: DatasetStorage,
+        sc_dataset: list[ScDatasetItem],
+        dm_dataset: dm.Dataset,
+    ):
         """
         Check whether Datumaro label map is correctly exported.
         """
@@ -357,7 +367,11 @@ class TestExportManager:
 
     @staticmethod
     def _assert_detection_yolo_export_valid(
-        dataset_storage: DatasetStorage, file_repo: ExportDataRepo, dataset_id: ID, *args, **kwargs
+        dataset_storage: DatasetStorage,
+        file_repo: ExportDataRepo,
+        dataset_id: ID,
+        *args,
+        **kwargs,
     ):
         sc_dataset, dataset_path = TestExportManager._assert_media_files(
             dataset_storage,
@@ -380,7 +394,11 @@ class TestExportManager:
 
     @staticmethod
     def _assert_datumaro_export_valid(
-        dataset_storage: DatasetStorage, file_repo: ExportDataRepo, dataset_id: ID, *args, **kwargs
+        dataset_storage: DatasetStorage,
+        file_repo: ExportDataRepo,
+        dataset_id: ID,
+        *args,
+        **kwargs,
     ):
         save_video_as_images = kwargs.get("save_video_as_images", True)
 

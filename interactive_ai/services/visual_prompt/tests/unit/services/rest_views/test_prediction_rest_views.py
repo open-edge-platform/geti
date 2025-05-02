@@ -5,7 +5,7 @@ from services.rest_views.prediction_rest_views import PredictionRESTViews, RestS
 from services.visual_prompt_service import VPSPredictionResults
 
 from geti_types import ID, ImageIdentifier
-from iai_core_py.entities.shapes import Point, Polygon, Rectangle
+from iai_core.entities.shapes import Point, Polygon, Rectangle
 
 
 class TestPredictionRESTViews(unittest.TestCase):
@@ -30,7 +30,9 @@ class TestPredictionRESTViews(unittest.TestCase):
         }
         self.assertEqual(result, expected)
 
-    def test_rotated_rectangle_shape_to_rest_raises_value_error_for_invalid_polygon(self):
+    def test_rotated_rectangle_shape_to_rest_raises_value_error_for_invalid_polygon(
+        self,
+    ):
         polygon = Polygon(points=[Point(0, 0), Point(1, 0), Point(1, 1)])
         with self.assertRaises(ValueError):
             PredictionRESTViews.rotated_rectangle_shape_to_rest(polygon, media_height=1000, media_width=2000)
@@ -50,7 +52,12 @@ class TestPredictionRESTViews(unittest.TestCase):
 
     def test_predictions_results_to_rest_returns_correct_representation(self):
         prediction_results = VPSPredictionResults(
-            bboxes=[Mock(shape=Rectangle(x1=0.1, y1=0.2, x2=0.3, y2=0.4), get_labels=Mock(return_value=[]))],
+            bboxes=[
+                Mock(
+                    shape=Rectangle(x1=0.1, y1=0.2, x2=0.3, y2=0.4),
+                    get_labels=Mock(return_value=[]),
+                )
+            ],
             rotated_bboxes=[
                 Mock(
                     shape=Polygon(points=[Point(0, 0), Point(1, 0), Point(1, 1), Point(0, 1)]),

@@ -11,10 +11,10 @@ from uuid import UUID
 from bson import ObjectId
 
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, Session
-from iai_core_py.repos.base.constants import DATASET_STORAGE_ID_FIELD_NAME
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.repos.mappers import IDToMongo
+from iai_core.repos.base.constants import DATASET_STORAGE_ID_FIELD_NAME
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.repos.mappers import IDToMongo
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class VPSSamplingResult:
 
 class VPSDatasetFilterRepo(DatasetStorageFilterRepo):
     """
-    Project-based version of :class:`~iai_core_py.repos.data_storage_filter_repo.DataStorageFilterRepo`.
+    Project-based version of :class:`~iai_core.repos.data_storage_filter_repo.DataStorageFilterRepo`.
     It is used by the visual prompt service to sample annotation scenes for one-shot learning.
 
     :param session: Session object; if not provided, it is loaded through the context variable CTX_SESSION_VAR
@@ -70,7 +70,10 @@ class VPSDatasetFilterRepo(DatasetStorageFilterRepo):
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> None:  # noqa: ARG001
-            logger.warning("VPSDatesetFilterRepo does not support write operation: `%s`", func.__name__)
+            logger.warning(
+                "VPSDatesetFilterRepo does not support write operation: `%s`",
+                func.__name__,
+            )
             raise NotImplementedError("This repository is read-only and does not permit any write operations.")
 
         return wrapper

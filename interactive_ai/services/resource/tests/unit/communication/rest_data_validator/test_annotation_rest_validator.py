@@ -20,9 +20,9 @@ from tests.fixtures.values import DummyValues
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView, LabelTree
-from iai_core_py.entities.project import Project
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView, LabelTree
+from iai_core.entities.project import Project
 
 
 @pytest.fixture
@@ -524,7 +524,11 @@ class TestAnnotationRestValidator:
         )
 
     def test_validate_annotation_scene_video_identifier(
-        self, fxt_annotation_scene_rest_request, fxt_project, fxt_video_identifier, fxt_label_schema
+        self,
+        fxt_annotation_scene_rest_request,
+        fxt_project,
+        fxt_video_identifier,
+        fxt_label_schema,
     ) -> None:
         """Test validate_annotation_scene with an identifier of a video"""
         label_schema_by_task = label_schema_by_task_for_single_task_project(fxt_project, fxt_label_schema)
@@ -580,7 +584,11 @@ class TestAnnotationRestValidator:
             )
 
     def test_validate_annotation_scene_invalid_shape_type(
-        self, fxt_annotation_scene_rest_invalid_shape_type, fxt_project, fxt_image_identifier_1, fxt_label_schema
+        self,
+        fxt_annotation_scene_rest_invalid_shape_type,
+        fxt_project,
+        fxt_image_identifier_1,
+        fxt_label_schema,
     ) -> None:
         """Test validate_annotation_scene with a scene containing invalid shape types"""
         label_schema_by_task = label_schema_by_task_for_single_task_project(fxt_project, fxt_label_schema)
@@ -595,7 +603,11 @@ class TestAnnotationRestValidator:
             )
 
     def test_validate_annotation_scene_invalid_shape(
-        self, fxt_annotation_scene_rest_invalid_shape, fxt_project, fxt_image_identifier_1, fxt_label_schema
+        self,
+        fxt_annotation_scene_rest_invalid_shape,
+        fxt_project,
+        fxt_image_identifier_1,
+        fxt_label_schema,
     ) -> None:
         """Test validate_annotation_scene with a scene containing invalid shapes"""
         label_schema_by_task = label_schema_by_task_for_single_task_project(fxt_project, fxt_label_schema)
@@ -1020,7 +1032,8 @@ class TestAnnotationRestValidator:
         annotations with the same ID.
         """
         label_schema_by_task = label_schema_by_task_for_single_task_project(
-            fxt_project_with_anomaly_detection_task, fxt_anomaly_segmentation_label_schema
+            fxt_project_with_anomaly_detection_task,
+            fxt_anomaly_segmentation_label_schema,
         )
         with pytest.raises(
             BadRequestException,
@@ -1050,7 +1063,8 @@ class TestAnnotationRestValidator:
         """
         fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         label_schema_by_task = label_schema_by_task_for_single_task_project(
-            fxt_project_with_anomaly_detection_task, fxt_anomaly_segmentation_label_schema
+            fxt_project_with_anomaly_detection_task,
+            fxt_anomaly_segmentation_label_schema,
         )
 
         AnnotationRestValidator().validate_annotation_scene(
@@ -1079,7 +1093,11 @@ class TestAnnotationRestValidator:
         Test validate_annotation_scene on empty annotation_scene data.
         """
         with (
-            patch.object(LabelSchemaService, "get_latest_label_schema_for_task", return_value=fxt_label_schema),
+            patch.object(
+                LabelSchemaService,
+                "get_latest_label_schema_for_task",
+                return_value=fxt_label_schema,
+            ),
             pytest.raises(BadRequestException),
         ):
             AnnotationRestValidator().validate_annotation_scene(
@@ -1132,7 +1150,10 @@ class TestAnnotationRestValidator:
                 [
                     {"name": "class", "labels": ["fish", "bird", "mammal"]},
                     {"name": "legs", "labels": ["quadruped", "biped"]},
-                    {"name": "mammal_reproduction", "labels": ["placental", "marsupial", "monotreme"]},
+                    {
+                        "name": "mammal_reproduction",
+                        "labels": ["placental", "marsupial", "monotreme"],
+                    },
                     {"name": "flight_capability", "labels": ["flightless", "flying"]},
                 ],
                 {
@@ -1145,7 +1166,10 @@ class TestAnnotationRestValidator:
                     "flying": "bird",
                 },
                 {
-                    "media_identifier": {"type": "image", "image_id": "67769ac3f51672e7347fc720"},
+                    "media_identifier": {
+                        "type": "image",
+                        "image_id": "67769ac3f51672e7347fc720",
+                    },
                     "annotations": [
                         {
                             "id": "d797b928-ea59-4c82-8255-fcbe0e03bf18",
@@ -1178,7 +1202,10 @@ class TestAnnotationRestValidator:
     ):
         labels = [Label(name=name, id_=ID(name), domain=Domain.CLASSIFICATION) for name in label_names]
         label_groups = [
-            LabelGroup(name=group["name"], labels=[label for label in labels if label.name in group["labels"]])
+            LabelGroup(
+                name=group["name"],
+                labels=[label for label in labels if label.name in group["labels"]],
+            )
             for group in label_groups_str
         ]
         label_map = {label.name: label for label in labels}

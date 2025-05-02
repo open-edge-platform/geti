@@ -25,7 +25,7 @@ from geti_fastapi_tools.dependencies import (
 )
 from geti_feature_tools import FeatureFlagProvider
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from iai_core_py.repos.project_repo_helpers import ProjectQueryData
+from iai_core.repos.project_repo_helpers import ProjectQueryData
 
 DEFAULT_THUMBNAIL_JPG_QUALITY = 85
 
@@ -34,7 +34,9 @@ logger = logging.getLogger(__name__)
 project_api_prefix_url = "/api/v1/organizations/{organization_id}/workspaces/{workspace_id}"
 
 project_router = APIRouter(
-    prefix=project_api_prefix_url, tags=["Project"], dependencies=[Depends(setup_session_fastapi)]
+    prefix=project_api_prefix_url,
+    tags=["Project"],
+    dependencies=[Depends(setup_session_fastapi)],
 )
 
 

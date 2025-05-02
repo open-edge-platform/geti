@@ -4,11 +4,11 @@
 import numpy as np
 import pytest
 
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.metadata import FloatMetadata, IMetadata, MetadataItem
-from iai_core_py.entities.model import NullModel
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.repos import MetadataRepo
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.metadata import FloatMetadata, IMetadata, MetadataItem
+from iai_core.entities.model import NullModel
+from iai_core.entities.tensor import Tensor
+from iai_core.repos import MetadataRepo
 
 from geti_types import ID, MediaIdentifierEntity
 

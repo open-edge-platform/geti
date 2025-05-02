@@ -7,10 +7,10 @@ Dummy configurable parameter class to test configuration functionality
 
 import attr
 
-from iai_core_py.configuration.elements.configurable_enum import ConfigurableEnum
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from iai_core_py.configuration.elements.primitive_parameters import (
+from iai_core.configuration.elements.configurable_enum import ConfigurableEnum
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_float,
     configurable_integer,
@@ -18,9 +18,9 @@ from iai_core_py.configuration.elements.primitive_parameters import (
     selectable,
     string_attribute,
 )
-from iai_core_py.configuration.enums.model_lifecycle import ModelLifecycle
-from iai_core_py.configuration.ui_rules import Action
-from iai_core_py.configuration.ui_rules.rules import Operator, Rule, UIRules
+from iai_core.configuration.enums.model_lifecycle import ModelLifecycle
+from iai_core.configuration.ui_rules import Action
+from iai_core.configuration.ui_rules.rules import Operator, Rule, UIRules
 
 
 class SomeEnumSelectable(ConfigurableEnum):

@@ -26,15 +26,15 @@ from usecases.statistics import StatisticsUseCase
 
 from geti_fastapi_tools.exceptions import BadRequestException, ModelNotFoundException
 from geti_telemetry_tools import unified_tracing
-from iai_core_py.entities.model import ModelFormat, NullModel
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.video import Video, VideoFrame
-from iai_core_py.repos import ModelRepo
+from iai_core.entities.model import ModelFormat, NullModel
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.project import Project
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos import ModelRepo
 from media_utils import get_media_numpy
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.image import Image
+    from iai_core.entities.image import Image
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,9 @@ class DeploymentPackageManager:
     @staticmethod
     @unified_tracing
     def prepare_geti_sdk_package(
-        project: Project, project_rest_view: dict, model_identifiers: list[ModelIdentifier]
+        project: Project,
+        project_rest_view: dict,
+        model_identifiers: list[ModelIdentifier],
     ) -> Path:
         """
         Prepare the code deployment zip file including models and code_deployment.

@@ -10,9 +10,9 @@ from active_learning.entities.active_manager.base_active_manager import BaseActi
 from active_learning.storage.repos import ActiveScoreRepo, ActiveSuggestionRepo
 
 from geti_types import ID, MediaIdentifierEntity, VideoIdentifier
-from iai_core_py.entities.video import Video
-from iai_core_py.repos import DatasetStorageRepo, ProjectRepo, VideoRepo
-from iai_core_py.services import ModelService
+from iai_core.entities.video import Video
+from iai_core.repos import DatasetStorageRepo, ProjectRepo, VideoRepo
+from iai_core.services import ModelService
 
 
 def do_nothing(*args, **kwargs):

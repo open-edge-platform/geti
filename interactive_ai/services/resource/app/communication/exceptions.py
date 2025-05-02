@@ -6,10 +6,10 @@ from collections.abc import Mapping
 
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import ID, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.datasets import DatasetPurpose
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.project import Project
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.datasets import DatasetPurpose
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
 
 
 class NodePositionIsOutOfBoundsException(GetiBaseException):

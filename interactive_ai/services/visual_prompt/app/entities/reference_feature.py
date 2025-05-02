@@ -8,7 +8,7 @@ import numpy as np
 from entities.reference_feature_adapter import ReferenceFeatureAdapter
 
 from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier
-from iai_core_py.entities.persistent_entity import PersistentEntity
+from iai_core.entities.persistent_entity import PersistentEntity
 
 
 @dataclass(frozen=True)

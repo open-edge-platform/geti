@@ -4,11 +4,11 @@ from service.job_submission.base import JobParams, ModelJobSubmitter
 from service.job_submission.job_creation_helpers import MODEL_TEST_JOB_PRIORITY, JobDuplicatePolicy, ModelTestJobData
 
 from geti_types import ID
-from iai_core_py.configuration.elements.component_parameters import ComponentType
-from iai_core_py.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
-from iai_core_py.entities.model_test_result import ModelTestResult
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import ConfigurableParametersRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core.entities.model_test_result import ModelTestResult
+from iai_core.entities.project import Project
+from iai_core.repos import ConfigurableParametersRepo
 
 
 class ModelTestingJobSubmitter(ModelJobSubmitter):

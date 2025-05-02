@@ -6,8 +6,8 @@
 from dataclasses import dataclass
 
 from geti_types import ID
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.persistent_entity import PersistentEntity
+from iai_core.entities.label import Label
+from iai_core.entities.persistent_entity import PersistentEntity
 
 
 @dataclass

@@ -3,10 +3,10 @@
 
 from tests.fixtures.database import DETECTION_CLASSIFICATION_PIPELINE_DATA  # type: ignore[attr-defined]
 
-from iai_core_py.entities.datasets import DatasetPurpose
-from iai_core_py.entities.label import Domain
-from iai_core_py.repos import DatasetRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.datasets import DatasetPurpose
+from iai_core.entities.label import Domain
+from iai_core.repos import DatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 
 class TestDatasetCreation:

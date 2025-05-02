@@ -4,7 +4,7 @@
 from unittest.mock import patch
 
 import pytest
-from iai_core_py.repos.storage.binary_repos import VideoBinaryRepo
+from iai_core.repos.storage.binary_repos import VideoBinaryRepo
 
 from media_utils import VideoDecoder, VideoFileRepair
 
@@ -66,7 +66,8 @@ class TestVideoRepair:
         """
         video_binary_repo = VideoBinaryRepo(fxt_dataset_storage_identifier)
         repairable_video_filename = video_binary_repo.save(
-            dst_file_name=str(fxt_repairable_video), data_source=str(fxt_repairable_video)
+            dst_file_name=str(fxt_repairable_video),
+            data_source=str(fxt_repairable_video),
         )
         request.addfinalizer(lambda: video_binary_repo.delete_by_filename(filename=repairable_video_filename))
         video_info = VideoDecoder.get_video_information(str(fxt_repairable_video))
@@ -101,7 +102,8 @@ class TestVideoRepair:
         """
         video_binary_repo = VideoBinaryRepo(fxt_dataset_storage_identifier)
         unrepairable_video_filename = video_binary_repo.save(
-            dst_file_name=str(fxt_unrepairable_video), data_source=str(fxt_unrepairable_video)
+            dst_file_name=str(fxt_unrepairable_video),
+            data_source=str(fxt_unrepairable_video),
         )
         request.addfinalizer(lambda: video_binary_repo.delete_by_filename(unrepairable_video_filename))
         video_info = VideoDecoder.get_video_information(str(fxt_unrepairable_video))

@@ -4,8 +4,8 @@ import logging
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.repos import EvaluationResultRepo, ProjectRepo
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.repos import EvaluationResultRepo, ProjectRepo
 
 logger = logging.getLogger(__name__)
 

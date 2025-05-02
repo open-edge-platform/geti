@@ -5,10 +5,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.video import NullVideo, Video
-from iai_core_py.repos import VideoRepo
-from iai_core_py.repos.video_repo import VideoCache
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.video import NullVideo, Video
+from iai_core.repos import VideoRepo
+from iai_core.repos.video_repo import VideoCache
 
 from geti_types import DatasetStorageIdentifier, VideoFrameIdentifier
 

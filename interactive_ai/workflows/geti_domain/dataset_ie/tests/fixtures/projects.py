@@ -7,23 +7,17 @@ This module implements project fixtures
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView
-from iai_core_py.entities.model_template import (
-    HyperParameterData,
-    InstantiationType,
-    ModelTemplate,
-    TaskFamily,
-    TaskType,
-)
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
-from iai_core_py.repos import LabelRepo, LabelSchemaRepo, TaskNodeRepo
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView
+from iai_core.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.repos import LabelRepo, LabelSchemaRepo, TaskNodeRepo
+from iai_core.utils.project_factory import ProjectFactory
 
 from tests.test_helpers import (
     generate_ellipse_shape,
@@ -475,7 +469,13 @@ def _create_chained_project(request: FixtureRequest, is_det_cls: bool = True) ->
 
     if is_det_cls:
         model_templates.append(
-            register_model_template(request, type(None), "classification", trainable=True, task_type="CLASSIFICATION")
+            register_model_template(
+                request,
+                type(None),
+                "classification",
+                trainable=True,
+                task_type="CLASSIFICATION",
+            )
         )
         name = "chained_det_cls_project"
         seconed_domain = Domain.CLASSIFICATION
@@ -483,7 +483,13 @@ def _create_chained_project(request: FixtureRequest, is_det_cls: bool = True) ->
         shape_generators = None
     else:  # det_seg
         model_templates.append(
-            register_model_template(request, type(None), "segmentation", trainable=True, task_type="SEGMENTATION")
+            register_model_template(
+                request,
+                type(None),
+                "segmentation",
+                trainable=True,
+                task_type="SEGMENTATION",
+            )
         )
         name = "chained_det_seg_project"
         seconed_domain = Domain.SEGMENTATION
@@ -519,12 +525,30 @@ def _create_chained_project(request: FixtureRequest, is_det_cls: bool = True) ->
     )
 
     # Create labels
-    object_label = Label(name="object", domain=Domain.DETECTION, color=Color(255, 255, 0), id_=LabelRepo.generate_id())
-    triangle_label = Label(name="triangle", domain=seconed_domain, color=Color(255, 0, 0), id_=LabelRepo.generate_id())
-    rectangle_label = Label(
-        name="rectangle", domain=seconed_domain, color=Color(0, 255, 0), id_=LabelRepo.generate_id()
+    object_label = Label(
+        name="object",
+        domain=Domain.DETECTION,
+        color=Color(255, 255, 0),
+        id_=LabelRepo.generate_id(),
     )
-    circle_label = Label(name="circle", domain=seconed_domain, color=Color(0, 0, 255), id_=LabelRepo.generate_id())
+    triangle_label = Label(
+        name="triangle",
+        domain=seconed_domain,
+        color=Color(255, 0, 0),
+        id_=LabelRepo.generate_id(),
+    )
+    rectangle_label = Label(
+        name="rectangle",
+        domain=seconed_domain,
+        color=Color(0, 255, 0),
+        id_=LabelRepo.generate_id(),
+    )
+    circle_label = Label(
+        name="circle",
+        domain=seconed_domain,
+        color=Color(0, 0, 255),
+        id_=LabelRepo.generate_id(),
+    )
     detection_labels = [object_label]
     second_task_labels = [triangle_label, rectangle_label, circle_label]
 
@@ -532,7 +556,9 @@ def _create_chained_project(request: FixtureRequest, is_det_cls: bool = True) ->
     det_group = LabelGroup("Detection", detection_labels, LabelGroupType.EXCLUSIVE)
     cls_group = LabelGroup(seconed_domain.name, second_task_labels, LabelGroupType.EXCLUSIVE)
     label_schema = LabelSchema(
-        id_=LabelSchemaRepo.generate_id(), label_groups=[det_group, cls_group], project_id=project.id_
+        id_=LabelSchemaRepo.generate_id(),
+        label_groups=[det_group, cls_group],
+        project_id=project.id_,
     )
     for label in second_task_labels:
         label_schema.add_child(object_label, label)
@@ -658,15 +684,31 @@ def fxt_label_schema_hierarchical() -> LabelSchema:
             LabelGroup(
                 name="rectangle default",
                 labels=[
-                    Label(id_=LabelRepo.generate_id(), name="square", domain=Domain.CLASSIFICATION),
-                    Label(id_=LabelRepo.generate_id(), name="non_square", domain=Domain.CLASSIFICATION),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="square",
+                        domain=Domain.CLASSIFICATION,
+                    ),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="non_square",
+                        domain=Domain.CLASSIFICATION,
+                    ),
                 ],
             ),
             LabelGroup(
                 name="triangle default",
                 labels=[
-                    Label(id_=LabelRepo.generate_id(), name="right", domain=Domain.CLASSIFICATION),
-                    Label(id_=LabelRepo.generate_id(), name="equilateral", domain=Domain.CLASSIFICATION),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="right",
+                        domain=Domain.CLASSIFICATION,
+                    ),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="equilateral",
+                        domain=Domain.CLASSIFICATION,
+                    ),
                 ],
             ),
             LabelGroup(name="labels", labels=[]),
@@ -682,9 +724,21 @@ def fxt_label_schema_classification() -> LabelSchema:
             LabelGroup(
                 name="labels",
                 labels=[
-                    Label(id_=LabelRepo.generate_id(), name="rectangle", domain=Domain.CLASSIFICATION),
-                    Label(id_=LabelRepo.generate_id(), name="ellipse", domain=Domain.CLASSIFICATION),
-                    Label(id_=LabelRepo.generate_id(), name="triangle", domain=Domain.CLASSIFICATION),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="rectangle",
+                        domain=Domain.CLASSIFICATION,
+                    ),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="ellipse",
+                        domain=Domain.CLASSIFICATION,
+                    ),
+                    Label(
+                        id_=LabelRepo.generate_id(),
+                        name="triangle",
+                        domain=Domain.CLASSIFICATION,
+                    ),
                 ],
             ),
         ],

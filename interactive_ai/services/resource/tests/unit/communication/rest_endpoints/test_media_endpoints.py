@@ -21,7 +21,7 @@ from usecases.dataset_filter import DatasetFilter, DatasetFilterField, DatasetFi
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID, DatasetStorageIdentifier
-from iai_core_py.repos import BinaryRepo
+from iai_core.repos import BinaryRepo
 
 DUMMY_DATA = {"dummy_key": "dummy_value"}
 DUMMY_DATASET_ID = "012345678901234567890000"

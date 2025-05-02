@@ -18,9 +18,9 @@ from domain.entities.geti_project_type import GetiProjectType
 
 from geti_types import CTX_SESSION_VAR, ID
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from iai_core_py.entities.label import NullLabel
-from iai_core_py.entities.project import NullProject
-from iai_core_py.repos import LabelRepo, ProjectRepo
+from iai_core.entities.label import NullLabel
+from iai_core.entities.project import NullProject
+from iai_core.repos import LabelRepo, ProjectRepo
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,8 @@ class ImportManager:
         """Initialize and/or get the gRPC client to submit jobs"""
         if self._jobs_client is None:
             self._jobs_client = GRPCJobsClient(
-                grpc_address=JOB_SERVICE_GRPC_ADDRESS, metadata_getter=lambda: CTX_SESSION_VAR.get().as_tuple()
+                grpc_address=JOB_SERVICE_GRPC_ADDRESS,
+                metadata_getter=lambda: CTX_SESSION_VAR.get().as_tuple(),
             )
         return self._jobs_client
 

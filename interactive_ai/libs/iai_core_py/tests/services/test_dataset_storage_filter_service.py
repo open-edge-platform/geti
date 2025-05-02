@@ -5,17 +5,17 @@ from unittest.mock import patch
 
 import pytest
 
-from iai_core_py.entities.dataset_storage_filter_data import (
+from iai_core.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
     ShapeFilterData,
     VideoFilterData,
 )
-from iai_core_py.entities.media import MediaPreprocessingStatus
-from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, ImageRepo, VideoRepo
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.entities.media import MediaPreprocessingStatus
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, ImageRepo, VideoRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
 
 from geti_types import ImageIdentifier, MediaIdentifierEntity, MediaType, VideoFrameIdentifier
 

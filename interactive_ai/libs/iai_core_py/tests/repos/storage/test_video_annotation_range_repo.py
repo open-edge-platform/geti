@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 from bson import ObjectId
 
-from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from iai_core_py.repos import VideoAnnotationRangeRepo
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.repos import VideoAnnotationRangeRepo
 
 from geti_types import ID
 

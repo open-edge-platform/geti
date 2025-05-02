@@ -10,12 +10,12 @@ from coordination.dataset_manager.dynamic_required_num_annotations import Dynami
 from coordination.dataset_manager.missing_annotations_helper import MissingAnnotationsHelper
 
 from geti_types import DatasetStorageIdentifier
-from iai_core_py.configuration.elements.component_parameters import ComponentType
-from iai_core_py.entities.metrics import NullPerformance, Performance, ScoreMetric
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import ConfigurableParametersRepo, DatasetRepo, EvaluationResultRepo, LabelSchemaRepo, ModelRepo
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.entities.metrics import NullPerformance, Performance, ScoreMetric
+from iai_core.entities.model import Model
+from iai_core.entities.subset import Subset
+from iai_core.repos import ConfigurableParametersRepo, DatasetRepo, EvaluationResultRepo, LabelSchemaRepo, ModelRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
 
 
 class TestDatasetCounter:

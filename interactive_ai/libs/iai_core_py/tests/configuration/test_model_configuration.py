@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
 
 
 class TestModelConfiguration:

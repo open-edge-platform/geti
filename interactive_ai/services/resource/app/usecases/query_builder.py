@@ -18,24 +18,17 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from iai_core_py.entities.datasets import DatasetIdentifier
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from iai_core_py.entities.video import Video
-from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
-from iai_core_py.repos import (
-    AnnotationSceneRepo,
-    DatasetRepo,
-    ImageRepo,
-    MediaScoreRepo,
-    ModelTestResultRepo,
-    VideoRepo,
-)
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.repos.mappers import DatetimeToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
-from iai_core_py.repos.training_revision_filter_repo import _TrainingRevisionFilterRepo
+from iai_core.entities.datasets import DatasetIdentifier
+from iai_core.entities.image import Image
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.video import Video
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, MediaScoreRepo, ModelTestResultRepo, VideoRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.repos.mappers import DatetimeToMongo
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
+from iai_core.repos.training_revision_filter_repo import _TrainingRevisionFilterRepo
 
 logger = logging.getLogger(__name__)
 
@@ -367,7 +360,14 @@ class QueryBuilder:
             # All media in a training revision are ANNOTATED and its preprocessing is therefore FINISHED,
             # but we need to add this info to the docs to ensure annotation_scene_id, roi_id, last_annotator_id and
             # preprocessing are handled.
-            query.append({"$addFields": {"media_annotation_state": "ANNOTATED", "preprocessing": "FINISHED"}})
+            query.append(
+                {
+                    "$addFields": {
+                        "media_annotation_state": "ANNOTATED",
+                        "preprocessing": "FINISHED",
+                    }
+                }
+            )
         else:
             # Results of all media are filtered, but video frames are grouped by video_id.
             # For media related fields, all video frames have the same info, except media_identifier.frame_index,

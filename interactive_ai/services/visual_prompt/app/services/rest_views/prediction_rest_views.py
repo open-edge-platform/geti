@@ -11,8 +11,8 @@ from services.rest_views.scored_label_rest_views import ScoredLabelRESTViews
 from services.visual_prompt_service import VPSPredictionResults
 
 from geti_types import MediaIdentifierEntity
-from iai_core_py.entities.shapes import Point, Polygon, Rectangle
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.shapes import Point, Polygon, Rectangle
+from iai_core.utils.time_utils import now
 
 logger = logging.getLogger(__name__)
 TYPE = "type"
@@ -163,7 +163,9 @@ class PredictionRESTViews:
                 logger.warning(f"Skipping annotation with shape `{annotation.shape}` as it is not a rectangle.")
                 continue
             rectangle_rest = PredictionRESTViews.rectangle_shape_to_rest(
-                rectangle_shape=shape, media_height=media_height, media_width=media_width
+                rectangle_shape=shape,
+                media_height=media_height,
+                media_width=media_width,
             )
             labels_rest = [
                 ScoredLabelRESTViews.scored_label_to_rest(label) for label in annotation.get_labels(include_empty=True)
@@ -181,7 +183,9 @@ class PredictionRESTViews:
                 logger.warning(f"Skipping annotation with shape `{annotation.shape}` as it is not a rotated rectangle.")
                 continue
             rot_rectangle_rest = PredictionRESTViews.rotated_rectangle_shape_to_rest(
-                rotated_rectangle=shape, media_height=media_height, media_width=media_width
+                rotated_rectangle=shape,
+                media_height=media_height,
+                media_width=media_width,
             )
             labels_rest = [
                 ScoredLabelRESTViews.scored_label_to_rest(label) for label in annotation.get_labels(include_empty=True)

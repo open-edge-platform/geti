@@ -7,8 +7,8 @@ This module defines custom project parser to test project builder
 
 from typing import Any
 
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.factories.project_parser import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
+from iai_core.entities.model_template import TaskType
+from iai_core.factories.project_parser import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
 
 from geti_types import ID
 

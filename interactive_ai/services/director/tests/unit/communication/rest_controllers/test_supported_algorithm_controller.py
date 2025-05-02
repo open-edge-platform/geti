@@ -7,24 +7,32 @@ import pytest
 from communication.controllers.supported_algorithm_controller import SupportedAlgorithmRESTController
 from communication.views.model_template_rest_views import ModelTemplateRESTViews
 
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.model_template import TaskType
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.model_template import TaskType
 
 
 class TestSupportedAlgorithmRESTController:
     @pytest.mark.parametrize("include_obsolete", [True, False])
     def test_get_supported_algorithms(
-        self, fxt_model_template_segmentation, fxt_model_template_obsolete, include_obsolete
+        self,
+        fxt_model_template_segmentation,
+        fxt_model_template_obsolete,
+        include_obsolete,
     ) -> None:
         supported_algorithm_rest = {"key": "value"}
         with (
             patch.object(
                 ModelTemplateList,
                 "get_all",
-                return_value=[fxt_model_template_segmentation, fxt_model_template_obsolete],
+                return_value=[
+                    fxt_model_template_segmentation,
+                    fxt_model_template_obsolete,
+                ],
             ) as mock_get_templates,
             patch.object(
-                ModelTemplateRESTViews, "model_template_to_rest", return_value=supported_algorithm_rest
+                ModelTemplateRESTViews,
+                "model_template_to_rest",
+                return_value=supported_algorithm_rest,
             ) as mock_to_rest,
         ):
             result = SupportedAlgorithmRESTController.get_supported_algorithms(

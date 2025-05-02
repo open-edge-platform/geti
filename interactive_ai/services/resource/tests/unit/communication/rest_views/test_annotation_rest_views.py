@@ -13,8 +13,8 @@ from entities.video_annotation_properties import VideoAnnotationProperties
 from tests.fixtures.values import DummyValues
 
 from geti_types import ID
-from iai_core_py.entities.shapes import Point, Polygon
-from iai_core_py.utils import time_utils
+from iai_core.entities.shapes import Point, Polygon
+from iai_core.utils import time_utils
 
 
 class TestAnnotationRESTViews:

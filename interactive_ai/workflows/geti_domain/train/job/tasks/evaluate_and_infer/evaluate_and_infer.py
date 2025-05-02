@@ -8,8 +8,8 @@ Prepare training data task
 import logging
 
 from geti_types import ID
-from iai_core_py.entities.model import NullModel
-from iai_core_py.repos import ModelRepo
+from iai_core.entities.model import NullModel
+from iai_core.repos import ModelRepo
 from jobs_common.exceptions import CommandDeliberateFailureException, TaskErrorMessage
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
@@ -46,7 +46,10 @@ def report_pre_evaluate_progress(progress: float, message: str) -> None:
     Function to report pre-evaluation progress
     """
     report_task_step_progress(
-        step_index=IDX_STEP_PRE_EVALUATE, steps_count=STEPS_COUNT, step_progress=progress, step_message=message
+        step_index=IDX_STEP_PRE_EVALUATE,
+        steps_count=STEPS_COUNT,
+        step_progress=progress,
+        step_message=message,
     )
 
 
@@ -55,7 +58,10 @@ def report_evaluate_progress(progress: float, message: str) -> None:
     Function to report evaluation step progress
     """
     report_task_step_progress(
-        step_index=IDX_STEP_EVALUATE, steps_count=STEPS_COUNT, step_progress=progress, step_message=message
+        step_index=IDX_STEP_EVALUATE,
+        steps_count=STEPS_COUNT,
+        step_progress=progress,
+        step_message=message,
     )
 
 
@@ -64,7 +70,10 @@ def report_post_model_acceptance_progress(progress: float, message: str) -> None
     Function to report post model acceptance progress
     """
     report_task_step_progress(
-        step_index=IDX_STEP_POST_MODEL_ACCEPTANCE, steps_count=STEPS_COUNT, step_progress=progress, step_message=message
+        step_index=IDX_STEP_POST_MODEL_ACCEPTANCE,
+        steps_count=STEPS_COUNT,
+        step_progress=progress,
+        step_message=message,
     )
 
 
@@ -73,7 +82,10 @@ def report_task_infer_progress(progress: float, message: str) -> None:
     Function to report task inference progress
     """
     report_task_step_progress(
-        step_index=IDX_STEP_TASK_INFER, steps_count=STEPS_COUNT, step_progress=progress, step_message=message
+        step_index=IDX_STEP_TASK_INFER,
+        steps_count=STEPS_COUNT,
+        step_progress=progress,
+        step_message=message,
     )
 
 
@@ -82,7 +94,10 @@ def report_pipeline_infer_progress(progress: float, message: str) -> None:
     Function to report pipeline inference progress
     """
     report_task_step_progress(
-        step_index=IDX_STEP_PIPELINE_INFER, steps_count=STEPS_COUNT, step_progress=progress, step_message=message
+        step_index=IDX_STEP_PIPELINE_INFER,
+        steps_count=STEPS_COUNT,
+        step_progress=progress,
+        step_message=message,
     )
 
 
@@ -167,7 +182,10 @@ def pre_evaluate_model(train_data: TrainWorkflowData, base_model_id: ID, dataset
     :param from_scratch: bool indicating whether the model was trained from scratch
     """
     if from_scratch:
-        report_pre_evaluate_progress(progress=100, message="Pre-evaluation skipped because training from scratch.")
+        report_pre_evaluate_progress(
+            progress=100,
+            message="Pre-evaluation skipped because training from scratch.",
+        )
         return
 
     model_repo = ModelRepo(train_data.get_model_storage_identifier())
@@ -177,7 +195,8 @@ def pre_evaluate_model(train_data: TrainWorkflowData, base_model_id: ID, dataset
     )
     if isinstance(model_to_preevaluate, NullModel):
         report_pre_evaluate_progress(
-            progress=100, message="No previous model found for this model architecture in the project."
+            progress=100,
+            message="No previous model found for this model architecture in the project.",
         )
     else:
         report_pre_evaluate_progress(progress=0, message="Starting model pre-evaluating")
@@ -319,7 +338,8 @@ def evaluate_and_infer(
             "Task inference on unannotated data failed; model is accepted but batch predictions won't be available"
         )
         report_task_infer_progress(
-            progress=100, message="Failed to generate task-level predictions on unannotated media"
+            progress=100,
+            message="Failed to generate task-level predictions on unannotated media",
         )
         # if task inference doesn't work, skip pipeline inference because it would likely fail too
         infer_on_pipeline = False
@@ -332,12 +352,14 @@ def evaluate_and_infer(
     report_pipeline_infer_progress(0, "Generating task-chain predictions on unannotated media")
     try:
         pipeline_infer_on_unannotated(
-            train_data=train_data.train_data, progress_callback=report_pipeline_infer_progress
+            train_data=train_data.train_data,
+            progress_callback=report_pipeline_infer_progress,
         )
     except Exception:
         logger.exception(
             "Pipeline inference on unannotated data failed; model is accepted but batch predictions won't be available"
         )
         report_pipeline_infer_progress(
-            progress=100, message="Failed to generate task-chain predictions on unannotated media"
+            progress=100,
+            message="Failed to generate task-chain predictions on unannotated media",
         )

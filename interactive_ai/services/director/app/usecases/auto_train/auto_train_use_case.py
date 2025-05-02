@@ -30,10 +30,10 @@ from geti_types import (
     Session,
     session_context,
 )
-from iai_core_py.configuration.elements.component_parameters import ComponentType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import ConfigurableParametersRepo, ProjectRepo, TaskNodeRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ConfigurableParametersRepo, ProjectRepo, TaskNodeRepo
 
 if TYPE_CHECKING:
     from geti_types import ID
@@ -140,7 +140,9 @@ class AutoTrainUseCase:
         if project_identifier.project_id not in self.__debouncer_schedulers:
             scheduler = EventLoopScheduler(
                 lambda target: Thread(
-                    target=target, daemon=True, name=f"Debounce scheduler for project {project_identifier.project_id}"
+                    target=target,
+                    daemon=True,
+                    name=f"Debounce scheduler for project {project_identifier.project_id}",
                 )
             )
             subject = Subject()
@@ -160,7 +162,9 @@ class AutoTrainUseCase:
     @staticmethod
     @unified_tracing
     def _check_conditions_and_set_auto_train_readiness(
-        project_identifier: ProjectIdentifier, bypass_debouncer: bool = True, session: Session | None = None
+        project_identifier: ProjectIdentifier,
+        bypass_debouncer: bool = True,
+        session: Session | None = None,
     ) -> None:
         """
         Check whether auto-training is enabled and if any task is ready for it, then update
@@ -257,7 +261,9 @@ class AutoTrainUseCase:
 
     @staticmethod
     @unified_tracing
-    def upsert_auto_train_request_timestamps_for_tasks(project_identifier: ProjectIdentifier) -> None:
+    def upsert_auto_train_request_timestamps_for_tasks(
+        project_identifier: ProjectIdentifier,
+    ) -> None:
         """
         When the dataset counter is updated, upsert an AutoTrainActivation for each trainable task in the project.
 

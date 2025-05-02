@@ -6,10 +6,10 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView, LabelTree
-from iai_core_py.repos import LabelRepo, LabelSchemaRepo
-from iai_core_py.repos.base import SessionBasedRepo
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView, LabelTree
+from iai_core.repos import LabelRepo, LabelSchemaRepo
+from iai_core.repos.base import SessionBasedRepo
 
 
 def make_tree_from_labels(labels: Sequence[Label]) -> LabelTree:

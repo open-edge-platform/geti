@@ -15,10 +15,10 @@ from entities.ui_settings import NullUISettings, UISettings
 from repos.ui_settings_mapper import UISettingsToMongo
 
 from geti_types import ID, Session
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.repos.base.session_repo import MissingSessionPolicy
-from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
-from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.base.session_repo import MissingSessionPolicy
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 
 class UISettingsRepo(SessionBasedRepo[UISettings]):
@@ -30,7 +30,9 @@ class UISettingsRepo(SessionBasedRepo[UISettings]):
 
     def __init__(self, session: Session | None = None) -> None:
         super().__init__(
-            collection_name="ui_settings", session=session, missing_session_policy=MissingSessionPolicy.USE_DEFAULT
+            collection_name="ui_settings",
+            session=session,
+            missing_session_policy=MissingSessionPolicy.USE_DEFAULT,
         )
 
     @property

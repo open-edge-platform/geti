@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import pytest
 
-from iai_core_py.entities.media_score import MediaScore
-from iai_core_py.entities.metrics import ScoreMetric
+from iai_core.entities.media_score import MediaScore
+from iai_core.entities.metrics import ScoreMetric
 
 from .values import IDOffsets
 

@@ -6,10 +6,10 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from iai_core_py.entities.model import Model, NullModel
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelStorageRepo, ProjectRepo
-from iai_core_py.services import ModelService
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.project import Project
+from iai_core.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelStorageRepo, ProjectRepo
+from iai_core.services import ModelService
 
 from job.tasks.prepare_and_train.get_train_data import get_train_data
 from tests.unit.tasks.utils import TEST_ENV_VARS, return_none

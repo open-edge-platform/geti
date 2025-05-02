@@ -8,7 +8,7 @@ import pytest
 from minio import Minio
 from minio.credentials import IamAwsProvider
 
-from iai_core_py.repos.storage.s3_connector import S3_ADDRESS, S3Connector
+from iai_core.repos.storage.s3_connector import S3_ADDRESS, S3Connector
 
 
 @pytest.fixture

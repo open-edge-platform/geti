@@ -7,16 +7,16 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.video import Video
-from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from iai_core_py.repos import AnnotationSceneRepo, VideoAnnotationRangeRepo
-from iai_core_py.utils.identifier_factory import IdentifierFactory
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
+from iai_core.entities.label import Label
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.video import Video
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.repos import AnnotationSceneRepo, VideoAnnotationRangeRepo
+from iai_core.utils.identifier_factory import IdentifierFactory
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,10 @@ class VideoRangeAnnotationManager:
         frame_identifiers = IdentifierFactory.generate_frame_identifiers_for_video(video)
         scored_labels = [
             ScoredLabel(
-                label_id=label.id_, is_empty=label.is_empty, probability=1.0, label_source=LabelSource(user_id=user_id)
+                label_id=label.id_,
+                is_empty=label.is_empty,
+                probability=1.0,
+                label_source=LabelSource(user_id=user_id),
             )
             for label in labels
         ]

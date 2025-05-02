@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.configuration.enums.config_element_type import ConfigElementType
-from iai_core_py.configuration.enums.utils import get_enum_names
+from iai_core.configuration.enums.config_element_type import ConfigElementType
+from iai_core.configuration.enums.utils import get_enum_names
 
 
 class TestMetadataKeys:

@@ -7,23 +7,23 @@ from unittest.mock import call, patch
 import numpy as np
 import pytest
 
-from iai_core_py.configuration.enums import ComponentType
-from iai_core_py.entities.active_model_state import NullActiveModelState
-from iai_core_py.entities.annotation import NullAnnotationScene
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState
-from iai_core_py.entities.dataset_entities import PipelineDataset
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.dataset_storage import NullDatasetStorage
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.image import Image, NullImage
-from iai_core_py.entities.media_score import NullMediaScore
-from iai_core_py.entities.metadata import MetadataItem
-from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType
-from iai_core_py.entities.model_test_result import ModelTestResult, NullModelTestResult
-from iai_core_py.entities.project import NullProject, Project
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.entities.video import NullVideo
-from iai_core_py.repos import (
+from iai_core.configuration.enums import ComponentType
+from iai_core.entities.active_model_state import NullActiveModelState
+from iai_core.entities.annotation import NullAnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationSceneState
+from iai_core.entities.dataset_entities import PipelineDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image, NullImage
+from iai_core.entities.media_score import NullMediaScore
+from iai_core.entities.metadata import MetadataItem
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType
+from iai_core.entities.model_test_result import ModelTestResult, NullModelTestResult
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.tensor import Tensor
+from iai_core.entities.video import NullVideo
+from iai_core.repos import (
     ActiveModelStateRepo,
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
@@ -41,8 +41,8 @@ from iai_core_py.repos import (
     TaskNodeRepo,
     VideoRepo,
 )
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
 from tests.configuration.dummy_config import DatasetManagerConfig
 from tests.test_helpers import TestProject
 

@@ -8,13 +8,13 @@ import cv2
 import numpy as np
 from bson import ObjectId
 from geti_types import ID
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon
-from iai_core_py.utils.shape_factory import ShapeFactory
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.label import Label
+from iai_core.entities.model import Model
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Point, Polygon
+from iai_core.utils.shape_factory import ShapeFactory
 
 from jobs_common_extras.evaluation.utils.helpers import is_model_legacy_otx_version
 
@@ -169,7 +169,9 @@ def create_annotation_from_segmentation_map(
                                     shape=polygon,
                                     labels=[
                                         ScoredLabel(
-                                            label_id=label.id_, is_empty=label.is_empty, probability=probability
+                                            label_id=label.id_,
+                                            is_empty=label.is_empty,
+                                            probability=probability,
                                         )
                                     ],
                                     id_=ID(ObjectId()),
@@ -243,7 +245,10 @@ def mask_from_annotation(annotations: list[Annotation], labels: list[Label], wid
         for point in shape.points:
             contour.append([int(point.x * width), int(point.y * height)])
 
-        mask = cast("Mask", cv2.drawContours(mask, [np.asarray([contour])], 0, (class_idx, class_idx, class_idx), -1))
+        mask = cast(
+            "Mask",
+            cv2.drawContours(mask, [np.asarray([contour])], 0, (class_idx, class_idx, class_idx), -1),
+        )
 
     return np.expand_dims(mask, axis=2)
 

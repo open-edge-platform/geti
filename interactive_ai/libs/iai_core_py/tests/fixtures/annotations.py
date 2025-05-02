@@ -3,10 +3,10 @@
 
 import pytest
 
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.repos import AnnotationSceneStateRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState
+from iai_core.entities.shapes import Rectangle
+from iai_core.repos import AnnotationSceneStateRepo
 
 from .values import DummyValues
 

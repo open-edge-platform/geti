@@ -5,7 +5,7 @@ import pytest
 
 from microservice.grpc_api.mappers.proto_mapper import JobToProto
 
-from iai_core_py.utils.time_utils import now
+from iai_core.utils.time_utils import now
 
 
 class TestProtoMapper:

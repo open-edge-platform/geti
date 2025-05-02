@@ -15,17 +15,17 @@ from active_learning.storage.repos import ActiveScoreRepo
 from active_learning.utils.exceptions import NoActiveLearningAlgorithmSupported
 from communication.exceptions import TaskNotFoundInProjectException, TaskNotTrainableException
 
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 if TYPE_CHECKING:
     from _pytest.python_api import RaisesContext
 
     from active_learning.entities.active_manager.task_active_manager import TaskActiveManager
 
-    from iai_core_py.entities.datasets import Dataset
-    from iai_core_py.entities.label_schema import LabelSchemaView
-    from iai_core_py.entities.model_template import ModelTemplate
+    from iai_core.entities.datasets import Dataset
+    from iai_core.entities.label_schema import LabelSchemaView
+    from iai_core.entities.model_template import ModelTemplate
 
 
 def do_nothing(*args, **kwargs):

@@ -23,20 +23,20 @@ from coordination.configuration_manager.task_node_config import TaskNodeConfig
 
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ImageIdentifier, MediaType, ProjectIdentifier
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from iai_core_py.entities.metrics import Performance, ScoreMetric
-from iai_core_py.entities.model import (
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.metrics import Performance, ScoreMetric
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -44,22 +44,16 @@ from iai_core_py.entities.model import (
     ModelStatus,
     TrainingFramework,
 )
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.model_template import (
-    HyperParameterData,
-    InstantiationType,
-    ModelTemplate,
-    TaskFamily,
-    TaskType,
-)
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.entities.video import Video
-from iai_core_py.factories import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
-from iai_core_py.repos import (
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.entities.video import Video
+from iai_core.factories import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -69,13 +63,13 @@ from iai_core_py.repos import (
     ModelRepo,
     VideoRepo,
 )
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo
-from iai_core_py.services import ModelService
-from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_builder import PersistedProjectBuilder, ProjectBuilder
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.services import ModelService
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_builder import PersistedProjectBuilder, ProjectBuilder
 
 __all__ = [
     "DETECTION_CLASSIFICATION_PIPELINE_DATA",
@@ -767,7 +761,9 @@ class DBProjectService:
         return project
 
     def _generate_randomly_annotated_images(
-        self, detection_labels: list[Label], classification_labels: list[Label] | None = None
+        self,
+        detection_labels: list[Label],
+        classification_labels: list[Label] | None = None,
     ):
         if classification_labels is None:
             classification_labels = []

@@ -10,11 +10,11 @@ from communication.rest_controllers.model_controller import ModelRESTController
 from communication.rest_views.model_rest_views import ModelRESTViews
 
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.metrics import Performance, ScoreMetric
-from iai_core_py.entities.model import (
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.metrics import Performance, ScoreMetric
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -22,9 +22,9 @@ from iai_core_py.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from iai_core_py.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo
-from iai_core_py.services import ModelService
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo
+from iai_core.services import ModelService
 
 
 class TestModelRESTEndpoint:
@@ -198,7 +198,10 @@ class TestModelRESTEndpoint:
             patch.object(
                 LabelSchemaRepo,
                 "get_latest_view_by_task",
-                side_effect=[fxt_db_project_service.label_schema_1, fxt_db_project_service.label_schema_2],
+                side_effect=[
+                    fxt_db_project_service.label_schema_1,
+                    fxt_db_project_service.label_schema_2,
+                ],
             ),
             patch.object(
                 LabelSchemaRepo,
@@ -231,7 +234,9 @@ class TestModelRESTEndpoint:
         model_storage = fxt_db_project_service.model_storage_1
         base_model = fxt_db_project_service.create_and_save_model()
         model_storage_identifier = ModelStorageIdentifier(
-            workspace_id=workspace_id, project_id=project.id_, model_storage_id=model_storage.id_
+            workspace_id=workspace_id,
+            project_id=project.id_,
+            model_storage_id=model_storage.id_,
         )
         binary_repo = ModelRepo(model_storage_identifier).binary_repo
         assert binary_repo.exists(base_model.weight_paths["dummy.file"])
@@ -291,7 +296,9 @@ class TestModelRESTEndpoint:
         model_storage = fxt_db_project_service.model_storage_1
         base_model = fxt_db_project_service.create_and_save_model()
         model_storage_identifier = ModelStorageIdentifier(
-            workspace_id=workspace_id, project_id=project.id_, model_storage_id=model_storage.id_
+            workspace_id=workspace_id,
+            project_id=project.id_,
+            model_storage_id=model_storage.id_,
         )
         base_model.purge_info.is_purged = True
         ModelRepo(model_storage_identifier).save(base_model)

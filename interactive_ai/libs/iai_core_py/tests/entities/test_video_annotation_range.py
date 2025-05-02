@@ -5,7 +5,7 @@ import copy
 import pytest
 from testfixtures import compare
 
-from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
 
 from geti_types import ID
 

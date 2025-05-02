@@ -16,7 +16,7 @@
 
 import pytest
 
-from iai_core_py.entities.metadata import FloatMetadata, FloatType
+from iai_core.entities.metadata import FloatMetadata, FloatType
 
 
 class TestFloatType:

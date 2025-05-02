@@ -13,10 +13,10 @@ from typing import overload
 from dataclasses_json import dataclass_json
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.model import Model, ModelStatus, ModelStorageIdentifier
-from iai_core_py.repos import ModelRepo
-from iai_core_py.services import ModelService
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.model import Model, ModelStatus, ModelStorageIdentifier
+from iai_core.repos import ModelRepo
+from iai_core.services import ModelService
+from iai_core.utils.time_utils import now
 
 from jobs_common.tasks.utils.secrets import JobMetadata
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter

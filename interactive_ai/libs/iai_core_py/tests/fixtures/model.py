@@ -3,17 +3,11 @@
 
 import pytest
 
-from iai_core_py.adapters.model_adapter import ExportableCodeAdapter
-from iai_core_py.entities.datasets import NullDataset
-from iai_core_py.entities.model import (
-    Model,
-    ModelOptimizationType,
-    ModelStatus,
-    TrainingFramework,
-    TrainingFrameworkType,
-)
-from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from iai_core_py.repos import ModelRepo
+from iai_core.adapters.model_adapter import ExportableCodeAdapter
+from iai_core.entities.datasets import NullDataset
+from iai_core.entities.model import Model, ModelOptimizationType, ModelStatus, TrainingFramework, TrainingFrameworkType
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.repos import ModelRepo
 from tests.test_helpers import empty_model_configuration
 
 

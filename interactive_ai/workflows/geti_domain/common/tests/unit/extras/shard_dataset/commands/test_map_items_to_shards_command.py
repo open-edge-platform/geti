@@ -3,8 +3,8 @@
 """This module tests commands to map dataset items to shards"""
 
 import pytest
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.video import VideoFrame
+from iai_core.entities.image import Image
+from iai_core.entities.video import VideoFrame
 
 from jobs_common_extras.shard_dataset.commands.map_items_to_shards_command import MapItemsToShardsCommand
 

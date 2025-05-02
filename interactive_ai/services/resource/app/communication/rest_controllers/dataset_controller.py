@@ -18,10 +18,10 @@ from geti_fastapi_tools.exceptions import BadRequestException, DatasetStorageNot
 from geti_fastapi_tools.responses import success_response_rest
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, Singleton
-from iai_core_py.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from iai_core_py.entities.datasets import NullDataset
-from iai_core_py.repos import DatasetRepo, DatasetStorageRepo, ProjectRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core.entities.datasets import NullDataset
+from iai_core.repos import DatasetRepo, DatasetStorageRepo, ProjectRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 
 class DatasetRESTController(metaclass=Singleton):

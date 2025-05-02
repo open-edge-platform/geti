@@ -4,10 +4,10 @@ import logging
 from dataclasses import dataclass, field
 
 from geti_telemetry_tools import unified_tracing
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.video import VideoFrame
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.video import VideoFrame
 
 from jobs_common.commands.interfaces.command import ICommand
 from jobs_common.exceptions import DataShardCreationFailedException

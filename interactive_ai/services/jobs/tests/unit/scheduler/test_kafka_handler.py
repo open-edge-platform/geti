@@ -16,7 +16,7 @@ from scheduler.state_machine import StateMachine
 
 from geti_kafka_tools import KafkaRawMessage
 from geti_types import ID, RequestSource
-from iai_core_py.utils.time_utils import now
+from iai_core.utils.time_utils import now
 
 ORG = ID(ObjectId())
 
@@ -264,7 +264,9 @@ def test_on_flyte_event_no_job(
 
     # Assert
     mock_make_session.assert_called_once_with(
-        organization_id=ORG, workspace_id=ID("workspace_id"), source=RequestSource.INTERNAL
+        organization_id=ORG,
+        workspace_id=ID("workspace_id"),
+        source=RequestSource.INTERNAL,
     )
     mock_flyte_fetch_workflow_execution.assert_called_once_with(execution_name="ex-workspace-job")
     mock_sm_get_by_id.assert_called_once_with(job_id=ID("job_id"))
@@ -327,7 +329,9 @@ def test_on_flyte_workflow_event(
 
     # Assert
     mock_make_session.assert_called_once_with(
-        organization_id=ORG, workspace_id=ID("workspace_id"), source=RequestSource.INTERNAL
+        organization_id=ORG,
+        workspace_id=ID("workspace_id"),
+        source=RequestSource.INTERNAL,
     )
     mock_flyte_fetch_workflow_execution.assert_called_once_with(execution_name="ex-workspace-job")
     mock_sm_get_by_id.assert_called_once_with(job_id=ID("job_id"))
@@ -385,7 +389,9 @@ def test_on_flyte_node_event(
 
     # Assert
     mock_make_session.assert_called_once_with(
-        organization_id=ORG, workspace_id=ID("workspace_id"), source=RequestSource.INTERNAL
+        organization_id=ORG,
+        workspace_id=ID("workspace_id"),
+        source=RequestSource.INTERNAL,
     )
     mock_flyte_fetch_workflow_execution.assert_called_once_with(execution_name="ex-workspace-job")
     mock_sm_get_by_id.assert_called_once_with(job_id=ID("job_id"))
@@ -443,7 +449,9 @@ def test_on_flyte_task_event(
 
     # Assert
     mock_make_session.assert_called_once_with(
-        organization_id=ORG, workspace_id=ID("workspace_id"), source=RequestSource.INTERNAL
+        organization_id=ORG,
+        workspace_id=ID("workspace_id"),
+        source=RequestSource.INTERNAL,
     )
     mock_flyte_fetch_workflow_execution.assert_called_once_with(execution_name="ex-workspace-job")
     mock_sm_get_by_id.assert_called_once_with(job_id=ID("job_id"))
@@ -500,7 +508,9 @@ def test_handle_workflow_event_no_phase(
 
     # Act
     ProgressHandler().handle_workflow_event(
-        event={"executionId": {"name": "ex-workspace-job"}}, execution=execution, job=job
+        event={"executionId": {"name": "ex-workspace-job"}},
+        execution=execution,
+        job=job,
     )
 
     # Assert
@@ -534,7 +544,9 @@ def test_handle_workflow_event_main_execution(
 
     # Act
     ProgressHandler().handle_workflow_event(
-        event={"executionId": {"name": "ex-workspace-job"}, "phase": phase}, execution=execution, job=job
+        event={"executionId": {"name": "ex-workspace-job"}, "phase": phase},
+        execution=execution,
+        job=job,
     )
 
     # Assert
@@ -567,7 +579,9 @@ def test_handle_workflow_event_revert_execution(
 
     # Act
     ProgressHandler().handle_workflow_event(
-        event={"executionId": {"name": "ex-workspace-job"}, "phase": phase}, execution=execution, job=job
+        event={"executionId": {"name": "ex-workspace-job"}, "phase": phase},
+        execution=execution,
+        job=job,
     )
 
     # Assert
@@ -1031,7 +1045,14 @@ def test_handle_task_event_main_task_not_initiated(
     job = MagicMock()
     job.workspace_id = ID("workspace_id")
     job.id = ID("job_id")
-    job.step_details = (JobStepDetails(index=0, task_id="task_id", step_name="Test step", state=JobTaskState.WAITING),)
+    job.step_details = (
+        JobStepDetails(
+            index=0,
+            task_id="task_id",
+            step_name="Test step",
+            state=JobTaskState.WAITING,
+        ),
+    )
 
     mock_jt_get_job_steps.return_value = [JobTemplateStep(name="Test task", task_id="task_id")]
 
@@ -1190,7 +1211,13 @@ def test_handle_node_event_main_set_step_details(
         JobTemplateStep(
             name="Test task",
             task_id="test_task",
-            branches=[{"condition": "condition", "branch": "branch1", "skip_message": "Skipped"}],
+            branches=[
+                {
+                    "condition": "condition",
+                    "branch": "branch1",
+                    "skip_message": "Skipped",
+                }
+            ],
         )
     ]
 
@@ -1460,7 +1487,12 @@ def test_on_job_update_consumed_cost(
             "execution_id": "execution",
             "cost": {
                 "consumed": [
-                    {"amount": 100, "unit": "images", "consuming_date": "2024-01-01T00:00:01", "service": "training"}
+                    {
+                        "amount": 100,
+                        "unit": "images",
+                        "consuming_date": "2024-01-01T00:00:01",
+                        "service": "training",
+                    }
                 ]
             },
         },
@@ -1487,7 +1519,10 @@ def test_on_job_update_consumed_cost(
         job_id=ID("job_id"),
         consumed_resources=[
             JobConsumedResource(
-                amount=100, unit="images", consuming_date=datetime(2024, 1, 1, 0, 0, 1), service="training"
+                amount=100,
+                unit="images",
+                consuming_date=datetime(2024, 1, 1, 0, 0, 1),
+                service="training",
             )
         ],
     )
@@ -1889,7 +1924,11 @@ def test_on_job_finished_consumed_resources(
 @patch.object(ProgressHandler, "__init__", new=mock_progress_handler)
 @patch("scheduler.kafka_handler.CreditSystemClient", autospec=True)
 def test_on_job_cancelled_no_job_found(
-    mock_credits_service_client, mock_ph_send_metering_event, mock_sm_get_by_id, mock_sm_set_cost_reported, request
+    mock_credits_service_client,
+    mock_ph_send_metering_event,
+    mock_sm_get_by_id,
+    mock_sm_set_cost_reported,
+    request,
 ) -> None:
     request.addfinalizer(lambda: reset_singletons())
 
@@ -1931,7 +1970,11 @@ def test_on_job_cancelled_no_job_found(
 @patch.object(ProgressHandler, "__init__", new=mock_progress_handler)
 @patch("scheduler.kafka_handler.CreditSystemClient", autospec=True)
 def test_on_job_cancelled_no_cost(
-    mock_credits_service_client, mock_ph_send_metering_event, mock_sm_get_by_id, mock_sm_set_cost_reported, request
+    mock_credits_service_client,
+    mock_ph_send_metering_event,
+    mock_sm_get_by_id,
+    mock_sm_set_cost_reported,
+    request,
 ) -> None:
     request.addfinalizer(lambda: reset_singletons())
 
@@ -1974,7 +2017,11 @@ def test_on_job_cancelled_no_cost(
 @patch.object(ProgressHandler, "__init__", new=mock_progress_handler)
 @patch("scheduler.kafka_handler.CreditSystemClient", autospec=True)
 def test_on_job_cancelled_no_consumed_resources(
-    mock_credits_service_client, mock_ph_send_metering_event, mock_sm_get_by_id, mock_sm_set_cost_reported, request
+    mock_credits_service_client,
+    mock_ph_send_metering_event,
+    mock_sm_get_by_id,
+    mock_sm_set_cost_reported,
+    request,
 ) -> None:
     request.addfinalizer(lambda: reset_singletons())
 
@@ -2022,7 +2069,11 @@ def test_on_job_cancelled_no_consumed_resources(
 @patch.object(ProgressHandler, "__init__", new=mock_progress_handler)
 @patch("scheduler.kafka_handler.CreditSystemClient", autospec=True)
 def test_on_job_cancelled_consumed_resources(
-    mock_credits_service_client, mock_ph_send_metering_event, mock_sm_get_by_id, mock_sm_set_cost_reported, request
+    mock_credits_service_client,
+    mock_ph_send_metering_event,
+    mock_sm_get_by_id,
+    mock_sm_set_cost_reported,
+    request,
 ) -> None:
     request.addfinalizer(lambda: reset_singletons())
 

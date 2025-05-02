@@ -1,9 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.repos import LabelRepo
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.repos import LabelRepo
 
 COLOR = "color"
 DOMAIN = "domain"
@@ -69,5 +69,11 @@ class LabelRESTViews:
             id_ = LabelRepo.generate_id()
             ephemeral = True
         return Label(
-            name=name, domain=domain, color=color, hotkey=hotkey, is_empty=is_empty, id_=id_, ephemeral=ephemeral
+            name=name,
+            domain=domain,
+            color=color,
+            hotkey=hotkey,
+            is_empty=is_empty,
+            id_=id_,
+            ephemeral=ephemeral,
         )

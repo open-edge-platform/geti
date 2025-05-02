@@ -10,9 +10,9 @@ import numpy as np
 from active_learning.entities.active_manager import PipelineActiveManager
 from active_learning.interactors import ActiveMapper
 
-from iai_core_py.entities.metadata import FloatMetadata
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.repos import MetadataRepo
+from iai_core.entities.metadata import FloatMetadata
+from iai_core.entities.tensor import Tensor
+from iai_core.repos import MetadataRepo
 
 
 def do_nothing(*args, **kwargs):

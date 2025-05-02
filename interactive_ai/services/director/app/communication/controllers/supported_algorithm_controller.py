@@ -6,8 +6,8 @@ from typing import Any
 from communication.views.model_template_rest_views import ModelTemplateRESTViews
 
 from geti_telemetry_tools import unified_tracing
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.model_template import ModelTemplateDeprecationStatus, TaskType
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.model_template import ModelTemplateDeprecationStatus, TaskType
 
 logger = logging.getLogger(__name__)
 

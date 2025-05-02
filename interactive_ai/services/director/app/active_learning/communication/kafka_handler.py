@@ -7,8 +7,8 @@ from active_learning.usecases import ActiveScoresUpdateUseCase
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, MediaType, Singleton
-from iai_core_py.session.session_propagation import setup_session_kafka
-from iai_core_py.utils.identifier_factory import IdentifierFactory
+from iai_core.session.session_propagation import setup_session_kafka
+from iai_core.utils.identifier_factory import IdentifierFactory
 
 
 class ActiveLearningKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
@@ -22,7 +22,10 @@ class ActiveLearningKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         return [
             TopicSubscription(topic="media_deletions", callback=self.on_media_deleted),
             TopicSubscription(topic="media_uploads", callback=self.on_media_uploaded),
-            TopicSubscription(topic="predictions_and_metadata_created", callback=self.on_new_predictions_and_metadata),
+            TopicSubscription(
+                topic="predictions_and_metadata_created",
+                callback=self.on_new_predictions_and_metadata,
+            ),
             TopicSubscription(topic="project_deletions", callback=self.on_project_deleted),
         ]
 

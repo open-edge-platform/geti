@@ -6,7 +6,7 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core.repos.storage.storage_client import BinaryObjectType
 from minio import Minio
 from minio.datatypes import Object
 
@@ -64,7 +64,9 @@ class TestBinaryStorageRepo:
         ):
             # Act
             storage_repo = BinaryStorageRepo(
-                organization_id=organization_id, workspace_id=workspace_id, project_id=project_id
+                organization_id=organization_id,
+                workspace_id=workspace_id,
+                project_id=project_id,
             )
 
             # Assert
@@ -131,7 +133,12 @@ class TestBinaryStorageRepo:
         object_basename = "dummy.name"
         object_name_from_project_root = os.path.join("dataset_storages", str(dataset_storage_id), object_basename)
         project_root = os.path.join(
-            "organizations", str(organization_id), "workspaces", str(workspace_id), "projects", str(project_id)
+            "organizations",
+            str(organization_id),
+            "workspaces",
+            str(workspace_id),
+            "projects",
+            str(project_id),
         )
         object_name = os.path.join(project_root, object_name_from_project_root)
 
@@ -159,17 +166,22 @@ class TestBinaryStorageRepo:
 
             # Act
             storage_repo = BinaryStorageRepo(
-                organization_id=organization_id, workspace_id=workspace_id, project_id=project_id
+                organization_id=organization_id,
+                workspace_id=workspace_id,
+                project_id=project_id,
             )
-            for local_path_iter, object_name_iter in storage_repo.get_all_objects_by_type(
-                object_type=BinaryObjectType.IMAGES, target_folder=temp_folder
-            ):
+            for (
+                local_path_iter,
+                object_name_iter,
+            ) in storage_repo.get_all_objects_by_type(object_type=BinaryObjectType.IMAGES, target_folder=temp_folder):
                 assert local_path_iter == local_path
                 assert object_name_iter == object_name_from_project_root
 
             # Assert
             mock_list_objects.assert_called_once_with(
-                bucket_name=object_type.bucket_name(), prefix=project_root + "/", recursive=True
+                bucket_name=object_type.bucket_name(),
+                prefix=project_root + "/",
+                recursive=True,
             )
             mock_bucket_exists.assert_called_once_with(bucket_name=object_type.bucket_name())
             mock_fget_object.assert_called_once_with(
@@ -201,7 +213,12 @@ class TestBinaryStorageRepo:
         object_type = BinaryObjectType.IMAGES
         object_basename = "dummy.name"
         project_root = os.path.join(
-            "organizations", str(organization_id), "workspaces", str(workspace_id), "projects", str(project_id)
+            "organizations",
+            str(organization_id),
+            "workspaces",
+            str(workspace_id),
+            "projects",
+            str(project_id),
         )
         object_name_from_project_root = os.path.join("dataset_storages", str(dataset_storage_id), object_basename)
         object_name = os.path.join(project_root, object_name_from_project_root)
@@ -220,7 +237,9 @@ class TestBinaryStorageRepo:
         ):
             # Act
             storage_repo = BinaryStorageRepo(
-                organization_id=organization_id, workspace_id=workspace_id, project_id=project_id
+                organization_id=organization_id,
+                workspace_id=workspace_id,
+                project_id=project_id,
             )
             storage_repo.store_objects_by_type(object_type=object_type, local_and_remote_paths=local_and_remote_paths)
 
@@ -241,10 +260,12 @@ class TestBinaryStorageRepo:
         project_root = f"organizations/{str(organization_id)}/workspaces/{str(workspace_id)}/projects/{str(project_id)}"
         objects = [
             Object(
-                bucket_name="images", object_name=f"{project_root}/dataset_storages/{str(dataset_storage_id)}/foo.jpg"
+                bucket_name="images",
+                object_name=f"{project_root}/dataset_storages/{str(dataset_storage_id)}/foo.jpg",
             ),
             Object(
-                bucket_name="images", object_name=f"{project_root}/dataset_storages/{str(dataset_storage_id)}/bar.png"
+                bucket_name="images",
+                object_name=f"{project_root}/dataset_storages/{str(dataset_storage_id)}/bar.png",
             ),
         ]
         with (
@@ -255,7 +276,9 @@ class TestBinaryStorageRepo:
         ):
             # Act
             storage_repo = BinaryStorageRepo(
-                organization_id=organization_id, workspace_id=workspace_id, project_id=project_id
+                organization_id=organization_id,
+                workspace_id=workspace_id,
+                project_id=project_id,
             )
             storage_repo.delete_all_objects_by_type(object_type=BinaryObjectType.IMAGES)
 

@@ -7,17 +7,17 @@ from typing import cast
 import numpy as np
 import pytest
 from geti_types import ID, ImageIdentifier
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView, LabelTree
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.metrics import BarMetricsGroup, MatrixMetric, MatrixMetricsGroup, ScoreMetric
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.repos import LabelRepo, LabelSchemaRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView, LabelTree
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metrics import BarMetricsGroup, MatrixMetric, MatrixMetricsGroup, ScoreMetric
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.repos import LabelRepo, LabelSchemaRepo
 
 from jobs_common_extras.evaluation.entities.accuracy_metric import AccuracyMetric
 
@@ -92,7 +92,10 @@ def decode_label_schema(label_schema_str: str, project_id: ID | None) -> LabelSc
 
     # create label schema
     return LabelSchema(
-        id_=LabelSchemaRepo.generate_id(), label_tree=label_tree, label_groups=groups, project_id=project_id
+        id_=LabelSchemaRepo.generate_id(),
+        label_tree=label_tree,
+        label_groups=groups,
+        project_id=project_id,
     )
 
 
@@ -163,18 +166,29 @@ def fxt_classification_gt_pred_datasets_factory(fxt_ote_id, fxt_image_entity_fac
                 pred_scene_by_media_name[media_name] = pred_scene
 
             gt_labels = [
-                ScoredLabel(label_id=label_by_name[name].id_, is_empty=label_by_name[name].is_empty, probability=1.0)
+                ScoredLabel(
+                    label_id=label_by_name[name].id_,
+                    is_empty=label_by_name[name].is_empty,
+                    probability=1.0,
+                )
                 for name in gt_labels_names
             ]
             gt_annotation = Annotation(shape=full_box, labels=gt_labels)
             gt_scene.append_annotation(gt_annotation)
             gt_dataset_item = DatasetItem(
-                id_=fxt_ote_id(hash(media_name + "_gt_item")), media=media, annotation_scene=gt_scene, roi=gt_annotation
+                id_=fxt_ote_id(hash(media_name + "_gt_item")),
+                media=media,
+                annotation_scene=gt_scene,
+                roi=gt_annotation,
             )
             gt_dataset_items.append(gt_dataset_item)
 
             pred_labels = [
-                ScoredLabel(label_id=label_by_name[name].id_, is_empty=label_by_name[name].is_empty, probability=1.0)
+                ScoredLabel(
+                    label_id=label_by_name[name].id_,
+                    is_empty=label_by_name[name].is_empty,
+                    probability=1.0,
+                )
                 for name in pred_labels_names
             ]
             pred_annotation = Annotation(shape=full_box, labels=pred_labels)
@@ -199,7 +213,12 @@ def fxt_labels():
     yield [
         Label(name="label_a", domain=Domain.CLASSIFICATION, id_=ID("label_a_id")),
         Label(name="label_b", domain=Domain.CLASSIFICATION, id_=ID("label_b_id")),
-        Label(name="label_empty", domain=Domain.CLASSIFICATION, is_empty=True, id_=ID("label_empty_id")),
+        Label(
+            name="label_empty",
+            domain=Domain.CLASSIFICATION,
+            is_empty=True,
+            id_=ID("label_empty_id"),
+        ),
     ]
 
 
@@ -210,7 +229,9 @@ def fxt_label_schema(fxt_labels):
     label_group = LabelGroup(labels=[label_a, label_b], name="dummy classification label group")
     label_schema.add_group(label_group)
     empty_label_group = LabelGroup(
-        labels=[empty_label], name="dummy classification empty group", group_type=LabelGroupType.EMPTY_LABEL
+        labels=[empty_label],
+        name="dummy classification empty group",
+        group_type=LabelGroupType.EMPTY_LABEL,
     )
     label_schema.add_group(empty_label_group)
     yield label_schema
@@ -312,7 +333,11 @@ class TestAccuracyMetric:
         assert metric.accuracy.score == 0.7
 
     def test_get_performance(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_labels, fxt_label_schema
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_labels,
+        fxt_label_schema,
     ) -> None:
         # Arrange
         label_a, label_b, empty_label = fxt_labels
@@ -352,7 +377,10 @@ class TestAccuracyMetric:
         assert matrix_metric.name == normalized_confusion_matrix.name
         assert matrix_metric.row_labels == normalized_confusion_matrix.row_labels
         assert matrix_metric.column_labels == normalized_confusion_matrix.column_labels
-        for v1, v2 in zip(matrix_metric.matrix_values.flatten(), normalized_confusion_matrix.matrix_values.flatten()):
+        for v1, v2 in zip(
+            matrix_metric.matrix_values.flatten(),
+            normalized_confusion_matrix.matrix_values.flatten(),
+        ):
             assert v1 == pytest.approx(v2)
         assert isinstance(performance.dashboard_metrics[1], BarMetricsGroup)
         precision_per_class_metrics = performance.dashboard_metrics[1].metrics
@@ -366,7 +394,11 @@ class TestAccuracyMetric:
             assert actual.value == pytest.approx(expected.value)
 
     def test_get_per_media_scores(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_labels
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_labels,
     ) -> None:
         # Arrange
         label_a, label_b, empty_label = fxt_labels
@@ -400,7 +432,11 @@ class TestAccuracyMetric:
                 assert label_score.value == expected_scores[label_score.label_id]
 
     def test_get_per_label_scores(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_labels
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_labels,
     ) -> None:
         # Arrange
         label_a, label_b, empty_label = fxt_labels
@@ -580,7 +616,17 @@ class TestAccuracyMetric:
                     ("m4", ["a", "e", "c", "i"], ["a", "e", "c", "i"]),
                 ),
                 {"m1": 1.0, "m2": 1.0, "m3": 1.0, "m4": 1.0},
-                {"a": 1.0, "b": 1.0, "c": 1.0, "d": 1.0, "e": 1.0, "f": 1.0, "g": 1.0, "h": 1.0, "i": 1.0},
+                {
+                    "a": 1.0,
+                    "b": 1.0,
+                    "c": 1.0,
+                    "d": 1.0,
+                    "e": 1.0,
+                    "f": 1.0,
+                    "g": 1.0,
+                    "h": 1.0,
+                    "i": 1.0,
+                },
                 1.0,
             ),
             (
@@ -598,7 +644,17 @@ class TestAccuracyMetric:
                     ("m3", ["b", "c", "h", "i"], ["b"]),
                 ),
                 {"m1": 0.25, "m2": 0.78, "m3": 0.55},
-                {"a": 0.75, "b": 0.75, "c": 0.5, "d": 0, "e": 0, "f": 0, "g": 0.67, "h": 0.5, "i": 0.5},
+                {
+                    "a": 0.75,
+                    "b": 0.75,
+                    "c": 0.5,
+                    "d": 0,
+                    "e": 0,
+                    "f": 0,
+                    "g": 0.67,
+                    "h": 0.5,
+                    "i": 0.5,
+                },
                 0.54,
             ),
         ],

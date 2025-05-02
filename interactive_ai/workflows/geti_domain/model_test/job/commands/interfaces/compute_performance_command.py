@@ -7,15 +7,15 @@ import logging
 from abc import abstractmethod
 from typing import TYPE_CHECKING
 
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.model_test_result import ModelTestResult
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import MediaScoreRepo, ModelTestResultRepo
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.model_test_result import ModelTestResult
+from iai_core.entities.project import Project
+from iai_core.repos import MediaScoreRepo, ModelTestResultRepo
 from jobs_common.commands.interfaces.command import ICommand
 from jobs_common.exceptions import CommandInitializationFailedException
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.label_schema import LabelSchema
+    from iai_core.entities.label_schema import LabelSchema
 
 logger = logging.getLogger(__name__)
 

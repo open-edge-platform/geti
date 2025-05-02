@@ -9,9 +9,9 @@ from entities.dataset_item_labels import DatasetItemLabels, NullDatasetItemLabel
 from service.label_schema_service import LabelSchemaService
 from storage.repos import DatasetItemCountRepo, DatasetItemLabelsRepo
 
-from iai_core_py.entities.label import Label
-from iai_core_py.repos import DatasetRepo, ProjectRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.label import Label
+from iai_core.repos import DatasetRepo, ProjectRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 
 class TestDatasetCounterUseCase:

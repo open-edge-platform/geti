@@ -6,15 +6,15 @@ from typing import TYPE_CHECKING
 import pytest
 
 from geti_types import ImageIdentifier, MediaType, ProjectIdentifier, VideoFrameIdentifier
-from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.video import VideoFrame
-from iai_core_py.repos import (
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import VideoFrame
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -22,13 +22,13 @@ from iai_core_py.repos import (
     ImageRepo,
     VideoRepo,
 )
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
-from iai_core_py.utils.time_utils import now
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.utils.time_utils import now
 
 if TYPE_CHECKING:
     from geti_types import ID
-    from iai_core_py.entities.dataset_storage import DatasetStorage
+    from iai_core.entities.dataset_storage import DatasetStorage
 
 
 @pytest.fixture

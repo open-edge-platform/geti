@@ -6,21 +6,21 @@ from unittest.mock import ANY, call, patch
 
 import pytest
 
-from iai_core_py.algorithms.crop.task import CropTask
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo
-from iai_core_py.services import ModelService
-from iai_core_py.utils.dataset_helper import DatasetHelper
-from iai_core_py.utils.media_factory import Media2DFactory
+from iai_core.algorithms.crop.task import CropTask
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo
+from iai_core.services import ModelService
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.media_factory import Media2DFactory
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.label_schema import LabelSchema
-    from iai_core_py.entities.project import Project
+    from iai_core.entities.label_schema import LabelSchema
+    from iai_core.entities.project import Project
 
 
 class TestDatasetHelper:

@@ -8,7 +8,7 @@ import pytest
 import yaml
 from omegaconf import DictConfig
 
-from iai_core_py.configuration.helper.utils import (
+from iai_core.configuration.helper.utils import (
     _search_in_config_dict_inner,
     deserialize_enum_value,
     ids_to_strings,

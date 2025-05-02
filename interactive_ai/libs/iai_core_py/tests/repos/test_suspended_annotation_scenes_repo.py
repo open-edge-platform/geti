@@ -3,11 +3,11 @@
 
 import pytest
 
-from iai_core_py.entities.suspended_scenes import (
+from iai_core.entities.suspended_scenes import (
     NullSuspendedAnnotationScenesDescriptor,
     SuspendedAnnotationScenesDescriptor,
 )
-from iai_core_py.repos import SuspendedAnnotationScenesRepo
+from iai_core.repos import SuspendedAnnotationScenesRepo
 
 from geti_types import CTX_SESSION_VAR, DatasetStorageIdentifier
 

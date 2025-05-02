@@ -10,9 +10,9 @@ from resource_management.deployment_package_manager import DeploymentPackageMana
 
 from geti_types import ProjectIdentifier
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import ModelRepo
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ModelRepo
 
 
 class TestDeploymentPackageRESTController:
@@ -52,19 +52,26 @@ class TestDeploymentPackageRESTController:
             ),
             patch.object(ModelRegistrationClient, "download_graph", return_value="test.zip") as mock_download_graph,
             patch.object(
-                ProjectManager, "get_project_by_id", return_value=fxt_detection_classification_chain_project
+                ProjectManager,
+                "get_project_by_id",
+                return_value=fxt_detection_classification_chain_project,
             ) as mock_get_project_by_id,
             patch.object(
                 ModelRepo,
                 "get_by_id",
                 return_value=fxt_optimized_openvino_model,
             ) as mock_get_model_by_id_and_storage,
-            patch.object(Project, "get_trainable_task_node_by_id", return_value=MagicMock(spec=TaskNode)),
+            patch.object(
+                Project,
+                "get_trainable_task_node_by_id",
+                return_value=MagicMock(spec=TaskNode),
+            ),
             patch.object(ModelMapper, "forward"),
             patch.object(ProjectMapper, "forward"),
         ):
             DeploymentPackageRESTController.download_ovms_package(
-                project_identifier=project_identifier, deployment_package_json=deployment_package_json
+                project_identifier=project_identifier,
+                deployment_package_json=deployment_package_json,
             )
             assert mock_download_graph.call_count == 1
             assert mock_get_project_by_id.call_count == 1
@@ -106,13 +113,19 @@ class TestDeploymentPackageRESTController:
             ),
             patch.object(ProjectRESTViews, "project_to_rest", return_value=fxt_project_rest) as mock_project_to_rest,
             patch.object(
-                ProjectManager, "get_project_by_id", return_value=fxt_detection_classification_chain_project
+                ProjectManager,
+                "get_project_by_id",
+                return_value=fxt_detection_classification_chain_project,
             ) as mock_get_project_by_id,
             patch.object(
-                DeploymentPackageRESTController, "_get_label_schema_per_task", return_value=None
+                DeploymentPackageRESTController,
+                "_get_label_schema_per_task",
+                return_value=None,
             ) as mock_get_label_schema_per_task,
             patch.object(
-                DeploymentPackageManager, "prepare_geti_sdk_package", return_value="test.zip"
+                DeploymentPackageManager,
+                "prepare_geti_sdk_package",
+                return_value="test.zip",
             ) as mock_prepare_geti_sdk_package,
         ):
             DeploymentPackageRESTController.download_geti_sdk_package(

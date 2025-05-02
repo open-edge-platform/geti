@@ -9,10 +9,10 @@ from repos.reference_feature_repo import ReferenceFeatureRepo
 from services.kafka_handler import VPSKafkaHandler
 
 from geti_kafka_tools import KafkaRawMessage
-from iai_core_py.entities.label_schema import NullLabelSchema
-from iai_core_py.entities.model import NullModel
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
+from iai_core.entities.label_schema import NullLabelSchema
+from iai_core.entities.model import NullModel
+from iai_core.entities.model_template import TaskType
+from iai_core.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
 
 
 class TestVPSKafkaHandler:

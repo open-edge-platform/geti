@@ -14,7 +14,7 @@ from collections.abc import Callable
 import datumaro as dm
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, Session
-from iai_core_py.utils.file_management import safely_unzip
+from iai_core.utils.file_management import safely_unzip
 
 from job.repos.object_storage_repo import ObjectStorageRepo
 from job.utils.exceptions import FileNotFoundException

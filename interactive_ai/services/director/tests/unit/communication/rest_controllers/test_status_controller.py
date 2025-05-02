@@ -14,8 +14,8 @@ from service.project_service import ProjectService
 from geti_types import ID
 from grpc_interfaces.job_submission.client import CommunicationError
 from grpc_interfaces.job_submission.pb.job_service_pb2 import JobResponse, ListJobsResponse
-from iai_core_py.repos import BinaryRepo, ProjectRepo
-from iai_core_py.utils.filesystem import MIN_FREE_SPACE_GIB
+from iai_core.repos import BinaryRepo, ProjectRepo
+from iai_core.utils.filesystem import MIN_FREE_SPACE_GIB
 
 DUMMY_USER = ID("dummy_user")
 

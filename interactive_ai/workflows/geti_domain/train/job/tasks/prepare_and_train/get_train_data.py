@@ -10,15 +10,15 @@ from typing import TYPE_CHECKING
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.model import Model
-from iai_core_py.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelStorageRepo, ProjectRepo
-from iai_core_py.services import ModelService
+from iai_core.entities.model import Model
+from iai_core.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelStorageRepo, ProjectRepo
+from iai_core.services import ModelService
 from jobs_common.jobs.helpers import select_input_model
 
 from job.utils.train_workflow_data import TrainWorkflowData
 
 if TYPE_CHECKING:
-    from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+    from iai_core.configuration.elements.hyper_parameters import HyperParameters
 
 logger = logging.getLogger(__name__)
 

@@ -15,10 +15,10 @@ from managers.project_manager import ProjectManager
 
 from geti_fastapi_tools.responses import success_response_rest
 from geti_types import ID
-from iai_core_py.entities.project import NullProject
-from iai_core_py.repos import ProjectRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_builder import PersistedProjectBuilder
+from iai_core.entities.project import NullProject
+from iai_core.repos import ProjectRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_builder import PersistedProjectBuilder
 
 
 class TestProjectRESTController:
@@ -85,7 +85,14 @@ class TestProjectRESTController:
             patch.object(
                 PersistedProjectBuilder,
                 "edit_existing_project",
-                return_value=[fxt_project, fxt_empty_label_schema, schema_per_task, [], {}, False],
+                return_value=[
+                    fxt_project,
+                    fxt_empty_label_schema,
+                    schema_per_task,
+                    [],
+                    {},
+                    False,
+                ],
             ) as mock_update_project,
             patch.object(ProjectRESTViews, "project_to_rest", return_value=fxt_project_rest) as mock_project_to_rest,
         ):

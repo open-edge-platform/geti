@@ -14,8 +14,8 @@ from geti_telemetry_tools.metrics import (
     videos_resolution_histogram,
 )
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier
-from iai_core_py.entities.media import ImageExtensions
-from iai_core_py.entities.video import NullVideo
+from iai_core.entities.media import ImageExtensions
+from iai_core.entities.video import NullVideo
 from media_utils import VideoFrameOutOfRangeInternalException
 
 from job.utils.constants import MAX_VIDEO_LENGTH, MAX_VIDEO_WIDTH, MIN_IMAGE_SIZE, MIN_VIDEO_SIZE
@@ -28,7 +28,9 @@ class TestUploadUtils:
     @staticmethod
     def _arrange_image_uploader() -> tuple[ImageUploadManager, dm.DatasetItem]:
         uploader = ImageUploadManager(
-            dataset_storage_identifier=MagicMock(), uploader_id="uploader_id", get_image_name=MagicMock()
+            dataset_storage_identifier=MagicMock(),
+            uploader_id="uploader_id",
+            get_image_name=MagicMock(),
         )
         uploader._image_repo = MagicMock()
         image_path = "/path/to/image.jpg"
@@ -68,7 +70,10 @@ class TestUploadUtils:
         uploader, dm_item = self._arrange_image_uploader()
 
         # Act
-        with pytest.raises(InvalidMediaException) as e, patch("job.utils.upload_utils.ConvertUtils") as convert_utils:
+        with (
+            pytest.raises(InvalidMediaException) as e,
+            patch("job.utils.upload_utils.ConvertUtils") as convert_utils,
+        ):
             convert_utils.get_image_from_dm_item.side_effect = ValueError("error")
             _ = uploader.upload(dm_item)
 
@@ -99,7 +104,9 @@ class TestUploadUtils:
     @staticmethod
     def _arrange_video_uploader() -> VideoUploadManager:
         uploader = VideoUploadManager(
-            dataset_storage_identifier=MagicMock(), uploader_id="uploader_id", get_video_name=MagicMock()
+            dataset_storage_identifier=MagicMock(),
+            uploader_id="uploader_id",
+            get_video_name=MagicMock(),
         )
         uploader._video_repo = MagicMock()
         return uploader
@@ -150,7 +157,10 @@ class TestUploadUtils:
         dm_item = dm.DatasetItem(id="frame", media=dm.VideoFrame(dm.Video(video_path), 1))
 
         # Act
-        with pytest.raises(InvalidMediaException) as e, patch("job.utils.upload_utils.ConvertUtils") as convert_utils:
+        with (
+            pytest.raises(InvalidMediaException) as e,
+            patch("job.utils.upload_utils.ConvertUtils") as convert_utils,
+        ):
             convert_utils.get_video_from_dm_item.side_effect = RuntimeError
             _ = uploader.upload(dm_item)
 
@@ -164,9 +174,15 @@ class TestUploadUtils:
         dm_item = dm.DatasetItem(id="frame", media=dm.VideoFrame(dm.Video("video.mp4"), 1))
 
         # Act
-        with pytest.raises(InvalidMediaException) as e, patch("job.utils.upload_utils.ConvertUtils") as convert_utils:
+        with (
+            pytest.raises(InvalidMediaException) as e,
+            patch("job.utils.upload_utils.ConvertUtils") as convert_utils,
+        ):
             convert_utils.get_video_from_dm_item.return_value = MagicMock(
-                total_frames=0, width=MAX_VIDEO_WIDTH + 1, height=MIN_VIDEO_SIZE - 1, duration=MAX_VIDEO_LENGTH + 1
+                total_frames=0,
+                width=MAX_VIDEO_WIDTH + 1,
+                height=MIN_VIDEO_SIZE - 1,
+                duration=MAX_VIDEO_LENGTH + 1,
             )
             _ = uploader.upload(dm_item)
 
@@ -293,7 +309,9 @@ class TestUploadUtils:
     def test_video_uploader__get_video_frame_thumbnail_numpy_with_error(self, side_effect, expected_error):
         # Arrange
         dataset_storage_identifier = DatasetStorageIdentifier(
-            workspace_id=ID("workspace123"), project_id=ID("project123"), dataset_storage_id=ID("storage123")
+            workspace_id=ID("workspace123"),
+            project_id=ID("project123"),
+            dataset_storage_id=ID("storage123"),
         )
         video = MagicMock(total_frames=10)
         uploader = VideoUploadManager(dataset_storage_identifier, "uploader_id", get_video_name=MagicMock())
@@ -309,7 +327,9 @@ class TestUploadUtils:
     def test_publish_media_upload_message(self, mocked_publish_event):
         # Arrange
         dataset_storage_identifier = DatasetStorageIdentifier(
-            workspace_id=ID("workspace123"), project_id=ID("project123"), dataset_storage_id=ID("storage123")
+            workspace_id=ID("workspace123"),
+            project_id=ID("project123"),
+            dataset_storage_id=ID("storage123"),
         )
         media_identifier = ImageIdentifier(image_id=ID("image123"))
 
@@ -336,7 +356,9 @@ class TestUploadUtils:
     def test_publish_annotation_scene_message(self, mocked_publish_event):
         # Arrange
         dataset_storage_identifier = DatasetStorageIdentifier(
-            workspace_id=ID("workspace456"), project_id=ID("project456"), dataset_storage_id=ID("storage456")
+            workspace_id=ID("workspace456"),
+            project_id=ID("project456"),
+            dataset_storage_id=ID("storage456"),
         )
         annotation_scene_id = ID("scene789")
 

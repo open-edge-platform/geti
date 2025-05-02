@@ -2,22 +2,16 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import pytest
 
-import iai_core_py.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_types import ID, make_session, session_context
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.model_template import (
-    HyperParameterData,
-    InstantiationType,
-    ModelTemplate,
-    TaskFamily,
-    TaskType,
-)
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_graph import TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
 
 
 @pytest.fixture

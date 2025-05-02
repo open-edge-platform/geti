@@ -18,20 +18,20 @@ from entities.dataset_item_labels import DatasetItemLabels
 from storage.repos import DatasetItemCountRepo, DatasetItemLabelsRepo
 
 from geti_types import DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity
-from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.model import Model, ModelConfiguration
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from iai_core_py.repos import (
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.model import Model, ModelConfiguration
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -40,10 +40,10 @@ from iai_core_py.repos import (
     ModelRepo,
     SuspendedAnnotationScenesRepo,
 )
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
-from iai_core_py.services.model_service import ModelService
-from iai_core_py.utils.dataset_helper import DatasetHelper
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.services.model_service import ModelService
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 
 class TestDatasetManagement:
@@ -62,9 +62,15 @@ class TestDatasetManagement:
         for x1, y1, i1, i2 in random_definitions:
             shape = Rectangle(x1=x1, y1=y1, x2=x1 + 0.3, y2=y1 + 0.3)
             labels = [
-                ScoredLabel(label_id=detection_label[i1].id_, is_empty=detection_label[i1].is_empty, probability=1.0),
                 ScoredLabel(
-                    label_id=classification_label[i2].id_, is_empty=classification_label[i2].is_empty, probability=1.0
+                    label_id=detection_label[i1].id_,
+                    is_empty=detection_label[i1].is_empty,
+                    probability=1.0,
+                ),
+                ScoredLabel(
+                    label_id=classification_label[i2].id_,
+                    is_empty=classification_label[i2].is_empty,
+                    probability=1.0,
                 ),
             ]
             randomized_annotations.append(Annotation(shape=shape, labels=labels))

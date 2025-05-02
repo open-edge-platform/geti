@@ -4,12 +4,12 @@ import logging
 
 import numpy as np
 from geti_types import ID, MediaIdentifierEntity
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import (
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -18,8 +18,8 @@ from iai_core_py.entities.metrics import (
     ScoreMetric,
     VisualizationType,
 )
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.utils.shape_factory import ShapeFactory
+from iai_core.entities.shapes import Rectangle
+from iai_core.utils.shape_factory import ShapeFactory
 
 from jobs_common_extras.evaluation.utils.evaluation_helpers import get_iou_matrix, get_n_false_negatives
 
@@ -81,7 +81,9 @@ class FMeasureMetric(PerformanceMetric):
         self._f_measure_per_label: dict[Label, ScoreMetric] = {}
         for label in self.labels:
             self._f_measure_per_label[label] = ScoreMetric(
-                name=label.name, value=result.f_measure_per_class[label.id_], label_id=label.id_
+                name=label.name,
+                value=result.f_measure_per_class[label.id_],
+                label_id=label.id_,
             )
         self._precision = ScoreMetric(name="Precision", value=result.precision)
         self._recall = ScoreMetric(name="Recall", value=result.recall)
@@ -142,7 +144,11 @@ class FMeasureMetric(PerformanceMetric):
 
     def get_per_label_scores(self) -> tuple[ScoreMetric, ...]:
         return tuple(
-            ScoreMetric(name=self.metric_name, value=score_metric.value, label_id=score_metric.label_id)
+            ScoreMetric(
+                name=self.metric_name,
+                value=score_metric.value,
+                label_id=score_metric.label_id,
+            )
             for score_metric in self.f_measure_per_label.values()
         )
 
@@ -392,7 +398,8 @@ class _FMeasureCalculator:
 
     @staticmethod
     def __filter_class(
-        boxes_per_image: list[list[tuple[float, float, float, float, ID, float]]], class_name: ID
+        boxes_per_image: list[list[tuple[float, float, float, float, ID, float]]],
+        class_name: ID,
     ) -> list[list[tuple[float, float, float, float, ID, float]]]:
         """
         Filters boxes to only keep members of one class.

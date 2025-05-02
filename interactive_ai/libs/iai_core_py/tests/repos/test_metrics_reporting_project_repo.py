@@ -2,9 +2,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_factory import ProjectFactory
 
 
 class TestMetricsReportingProjectRepo:

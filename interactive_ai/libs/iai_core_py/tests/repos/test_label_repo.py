@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.repos import LabelRepo
+from iai_core.entities.label import Domain, Label
+from iai_core.repos import LabelRepo
 
 
 class TestLabelRepo:

@@ -8,11 +8,11 @@ import logging
 from typing import Optional
 
 from geti_types import ID
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.model import ModelFormat
-from iai_core_py.entities.model_test_result import TestState
-from iai_core_py.repos import ModelStorageRepo, ModelTestResultRepo, ProjectRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.model import ModelFormat
+from iai_core.entities.model_test_result import TestState
+from iai_core.repos import ModelStorageRepo, ModelTestResultRepo, ProjectRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common.exceptions import UnsupportedModelFormatForModelTestingException
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.tasks import flyte_multi_container_task as task
@@ -126,7 +126,10 @@ def create_testing_dataset(  # pylint: disable=unused-argument
 
 
 def infer_on_testing_dataset(
-    project_id: str, model_test_result_id: str, gt_dataset: Dataset, progress_range: ProgressRange = ProgressRange()
+    project_id: str,
+    model_test_result_id: str,
+    gt_dataset: Dataset,
+    progress_range: ProgressRange = ProgressRange(),
 ) -> Dataset:
     """
     Runs batch inference on the testing  dataset

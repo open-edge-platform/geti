@@ -4,8 +4,8 @@
 #
 
 
-from iai_core_py.entities.model_test_result import NullModelTestResult
-from iai_core_py.repos import ModelTestResultRepo
+from iai_core.entities.model_test_result import NullModelTestResult
+from iai_core.repos import ModelTestResultRepo
 
 
 class TestModelTestResultRepo:

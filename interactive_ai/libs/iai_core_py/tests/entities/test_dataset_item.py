@@ -6,21 +6,21 @@ from copy import deepcopy
 
 import numpy as np
 
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.metadata import MetadataItem
-from iai_core_py.entities.model import Model, ModelConfiguration
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon, Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.tensor import Tensor
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.color import Color
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metadata import MetadataItem
+from iai_core.entities.model import Model, ModelConfiguration
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Point, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.tensor import Tensor
 
 from geti_types import ID, NullMediaIdentifier
 

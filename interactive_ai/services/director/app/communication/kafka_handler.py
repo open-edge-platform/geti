@@ -23,15 +23,15 @@ from service.project_service import ProjectService
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Singleton
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.model_test_result import TestState
-from iai_core_py.repos import ModelRepo, ModelStorageRepo, ModelTestResultRepo, TaskNodeRepo
-from iai_core_py.session.session_propagation import setup_session_kafka
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.type_helpers import str2bool
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.model_test_result import TestState
+from iai_core.repos import ModelRepo, ModelStorageRepo, ModelTestResultRepo, TaskNodeRepo
+from iai_core.session.session_propagation import setup_session_kafka
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.type_helpers import str2bool
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.model import Model
+    from iai_core.entities.model import Model
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +75,9 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
             start_time = datetime.fromisoformat(value["start_time"])
             end_time = datetime.fromisoformat(value["end_time"])
             model_storage_identifier = ModelStorageIdentifier(
-                workspace_id=workspace_id, project_id=project_id, model_storage_id=model_storage_id
+                workspace_id=workspace_id,
+                project_id=project_id,
+                model_storage_id=model_storage_id,
             )
 
             duration = (end_time - start_time).total_seconds()
@@ -142,7 +144,8 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
                     )
             case JobType.TRAIN:
                 self._process_failed_or_canceled_train_job(
-                    raw_message=raw_message, training_duration_status=TrainingDurationCounterJobStatus.FAILED
+                    raw_message=raw_message,
+                    training_duration_status=TrainingDurationCounterJobStatus.FAILED,
                 )
 
     @setup_session_kafka
@@ -168,10 +171,12 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
                 model_test_result_id = ID(job_payload["model_test_result_id"])
                 model_test_result = ModelTestResultRepo(project_identifier).get_by_id(model_test_result_id)
                 DeletionHelpers.delete_model_test_result(
-                    project_identifier=project_identifier, model_test_result=model_test_result
+                    project_identifier=project_identifier,
+                    model_test_result=model_test_result,
                 )
                 logger.info(
-                    "Deleted model test result with ID `%s` after cancelling its model test job.", model_test_result_id
+                    "Deleted model test result with ID `%s` after cancelling its model test job.",
+                    model_test_result_id,
                 )
             case JobType.OPTIMIZE_POT:
                 deleted_model_ids = self._delete_optimize_job_models(
@@ -187,7 +192,8 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
                     )
             case JobType.TRAIN:
                 self._process_failed_or_canceled_train_job(
-                    raw_message=raw_message, training_duration_status=TrainingDurationCounterJobStatus.CANCELLED
+                    raw_message=raw_message,
+                    training_duration_status=TrainingDurationCounterJobStatus.CANCELLED,
                 )
 
     @staticmethod
@@ -206,7 +212,9 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         model_storage_id = ID(job_metadata["model_storage_id"])
         optimized_model_id = ID(job_metadata["optimized_model_id"])
         model_storage_identifier = ModelStorageIdentifier(
-            workspace_id=workspace_id, project_id=project_id, model_storage_id=model_storage_id
+            workspace_id=workspace_id,
+            project_id=project_id,
+            model_storage_id=model_storage_id,
         )
         model_repo = ModelRepo(model_storage_identifier)
         optimize_model = model_repo.get_by_id(optimized_model_id)
@@ -216,7 +224,8 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
 
     @staticmethod
     def _process_failed_or_canceled_train_job(
-        raw_message: KafkaRawMessage, training_duration_status: TrainingDurationCounterJobStatus
+        raw_message: KafkaRawMessage,
+        training_duration_status: TrainingDurationCounterJobStatus,
     ) -> None:
         """
         Process failed or canceled training job events. Specifically, report training duration and delete the models if
@@ -337,7 +346,9 @@ def _report_training_duration(  # noqa: PLR0913
 
     if model_id is not None and model_storage_id is not None:
         model_storage_identifier = ModelStorageIdentifier(
-            workspace_id=session.workspace_id, project_id=project_id, model_storage_id=model_storage_id
+            workspace_id=session.workspace_id,
+            project_id=project_id,
+            model_storage_id=model_storage_id,
         )
         model_storage_repo = ModelStorageRepo(project_identifier)
         model_storage = model_storage_repo.get_by_id(model_storage_id)

@@ -37,22 +37,22 @@ from geti_kafka_tools import publish_event
 from geti_telemetry_tools import ENABLE_METRICS, unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaType, ProjectIdentifier, Singleton
 from geti_types.session import add_extra_to_current_session
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.entities.datasets import DatasetIdentifier, DatasetPurpose, NullDataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.media import ImageExtensions, VideoExtensions
-from iai_core_py.entities.video import Video
-from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
-from iai_core_py.repos import DatasetRepo, VideoRepo
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.repos.storage.storage_client import BytesStream
-from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
-from iai_core_py.utils.identifier_factory import IdentifierFactory
-from iai_core_py.utils.type_helpers import SequenceOrSet
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.datasets import DatasetIdentifier, DatasetPurpose, NullDataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.media import ImageExtensions, VideoExtensions
+from iai_core.entities.video import Video
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.repos import DatasetRepo, VideoRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.repos.storage.storage_client import BytesStream
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.utils.identifier_factory import IdentifierFactory
+from iai_core.utils.type_helpers import SequenceOrSet
 
 if TYPE_CHECKING:
-    from iai_core_py.utils.annotation_scene_state_helper import AnnotationStatePerTask
+    from iai_core.utils.annotation_scene_state_helper import AnnotationStatePerTask
 
 DEFAULT_SIZE = 250
 DEFAULT_THUMBNAIL_JPG_QUALITY = 85
@@ -454,7 +454,9 @@ class MediaRESTController(metaclass=Singleton):
             annotation_state_per_task = dict.fromkeys(task_ids, annotation_state)
             if isinstance(media_entity, Video):
                 video_annotation_stat = VideoAnnotationStatistics(
-                    annotated=0, partially_annotated=0, unannotated=media_entity.total_frames
+                    annotated=0,
+                    partially_annotated=0,
+                    unannotated=media_entity.total_frames,
                 )
 
         return MediaRESTViews.media_to_rest(

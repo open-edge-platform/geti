@@ -6,8 +6,8 @@
 
 import pytest
 
-from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from iai_core_py.utils.shape_factory import ShapeFactory
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core.utils.shape_factory import ShapeFactory
 
 
 class TestShapeFactory:

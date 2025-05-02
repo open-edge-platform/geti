@@ -17,8 +17,8 @@ from model.telemetry import Telemetry
 
 from geti_spicedb_tools import SpiceDB, SpiceDBResourceTypes
 from geti_types import ID
-from iai_core_py.utils.constants import DEFAULT_USER_NAME
-from iai_core_py.utils.time_utils import now
+from iai_core.utils.constants import DEFAULT_USER_NAME
+from iai_core.utils.time_utils import now
 
 DUMMY_JOB_KEY = json.dumps({"job_key": "value"})
 project_id = ID("234567890123456789010000")
@@ -185,7 +185,9 @@ def test_submit_replace(
     )
     assert job_id == ID("job_id")
     mock_create_project_job.assert_called_once_with(
-        job_id="job_id", parent_entity_type=SpiceDBResourceTypes.PROJECT.value, parent_entity_id=str(project_id)
+        job_id="job_id",
+        parent_entity_type=SpiceDBResourceTypes.PROJECT.value,
+        parent_entity_id=str(project_id),
     )
 
 
@@ -358,7 +360,9 @@ def test_submit_cost_requests(
     )
     assert job_id == ID("job_id")
     mock_create_project_job.assert_called_once_with(
-        job_id="job_id", parent_entity_type=SpiceDBResourceTypes.PROJECT.value, parent_entity_id=str(project_id)
+        job_id="job_id",
+        parent_entity_type=SpiceDBResourceTypes.PROJECT.value,
+        parent_entity_id=str(project_id),
     )
 
 
@@ -525,7 +529,10 @@ def test_get_jobs_count_filter(mock_repo_count, request) -> None:
             "author": "author_uid",
             "start_time": {"$gte": from_val, "$lte": to_val},
             "project_id": str(project_id),
-            "$or": [{"project_id": {"$in": [project_id]}}, {"project_id": {"$exists": False}, "author": "author_uid"}],
+            "$or": [
+                {"project_id": {"$in": [project_id]}},
+                {"project_id": {"$exists": False}, "author": "author_uid"},
+            ],
         }
     )
 
@@ -732,7 +739,12 @@ def test_get_acl_filter_permitted_projects() -> None:
     acl_filter = JobManager()._get_acl_filter(acl=acl)
 
     # Assert
-    assert acl_filter == {"$or": [{"project_id": {"$in": [project_id]}}, {"project_id": {"$exists": False}}]}
+    assert acl_filter == {
+        "$or": [
+            {"project_id": {"$in": [project_id]}},
+            {"project_id": {"$exists": False}},
+        ]
+    }
 
 
 def test_get_acl_filter_workspace_jobs_author() -> None:
@@ -744,7 +756,10 @@ def test_get_acl_filter_workspace_jobs_author() -> None:
 
     # Assert
     assert acl_filter == {
-        "$or": [{"project_id": {"$exists": True}}, {"project_id": {"$exists": False}, "author": "author_id"}]
+        "$or": [
+            {"project_id": {"$exists": True}},
+            {"project_id": {"$exists": False}, "author": "author_id"},
+        ]
     }
 
 
@@ -757,5 +772,8 @@ def test_get_acl_filter_workspace_full() -> None:
 
     # Assert
     assert acl_filter == {
-        "$or": [{"project_id": {"$in": [project_id]}}, {"project_id": {"$exists": False}, "author": "author_id"}]
+        "$or": [
+            {"project_id": {"$in": [project_id]}},
+            {"project_id": {"$exists": False}, "author": "author_id"},
+        ]
     }

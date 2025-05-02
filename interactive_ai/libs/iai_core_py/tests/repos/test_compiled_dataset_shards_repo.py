@@ -3,12 +3,12 @@
 
 from testfixtures import compare
 
-from iai_core_py.entities.compiled_dataset_shards import (
+from iai_core.entities.compiled_dataset_shards import (
     CompiledDatasetShard,
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
-from iai_core_py.repos import CompiledDatasetShardsRepo
+from iai_core.repos import CompiledDatasetShardsRepo
 
 from geti_types import ID, DatasetStorageIdentifier
 

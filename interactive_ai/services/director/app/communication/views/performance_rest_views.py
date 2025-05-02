@@ -8,8 +8,8 @@ from typing import Any
 
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
-from iai_core_py.entities.metrics import AnomalyLocalizationPerformance, NullPerformance, Performance
-from iai_core_py.entities.project_performance import (
+from iai_core.entities.metrics import AnomalyLocalizationPerformance, NullPerformance, Performance
+from iai_core.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
     TaskPerformance,

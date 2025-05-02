@@ -5,15 +5,15 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from iai_core_py.adapters.model_adapter import DataSource
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.model import Model, ModelPurgeInfo, NullModel
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.repos import ModelStorageRepo
-from iai_core_py.repos.model_repo import ModelRepo, ModelStatusFilter
-from iai_core_py.repos.storage.binary_repos import ModelBinaryRepo
-from iai_core_py.services.model_service import ModelService
-from iai_core_py.utils.exceptions import (
+from iai_core.adapters.model_adapter import DataSource
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.model import Model, ModelPurgeInfo, NullModel
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.repos import ModelStorageRepo
+from iai_core.repos.model_repo import ModelRepo, ModelStatusFilter
+from iai_core.repos.storage.binary_repos import ModelBinaryRepo
+from iai_core.services.model_service import ModelService
+from iai_core.utils.exceptions import (
     PurgeActiveModelException,
     PurgeLatestModelException,
     PurgeOptimizedModelException,
@@ -275,9 +275,9 @@ class TestModelService:
         size = ModelService.get_model_size(purged_model, model_storage_identifier)
         assert size == 0
 
-    @mock.patch("iai_core_py.services.model_service.ModelStorageRepo")
-    @mock.patch("iai_core_py.services.model_service.ModelRepo")
-    @mock.patch("iai_core_py.services.model_service.NUM_MODELS_TO_KEEP_IN_STORAGE", 1)
+    @mock.patch("iai_core.services.model_service.ModelStorageRepo")
+    @mock.patch("iai_core.services.model_service.ModelRepo")
+    @mock.patch("iai_core.services.model_service.NUM_MODELS_TO_KEEP_IN_STORAGE", 1)
     def test_should_purge_oldest_models_when_storage_limit_exceeded(self, mock_model_repo, fxt_model):
         # Setup
         identifier = ModelStorageIdentifier(ID(), ID(), ID())
@@ -288,7 +288,7 @@ class TestModelService:
         model_2.version = 2
 
         mock_model_repo.return_value.get_non_purged_base_models.return_value = [model_1, model_2]
-        mock_purge = mock.patch("iai_core_py.services.model_service.ModelService.purge_model_binaries")
+        mock_purge = mock.patch("iai_core.services.model_service.ModelService.purge_model_binaries")
 
         # Execute
         with mock_purge as mocked_purge:
@@ -297,8 +297,8 @@ class TestModelService:
         # Assert
         assert mocked_purge.call_count == 1
 
-    @mock.patch("iai_core_py.services.model_service.ModelStorageRepo")
-    @mock.patch("iai_core_py.services.model_service.ModelRepo")
+    @mock.patch("iai_core.services.model_service.ModelStorageRepo")
+    @mock.patch("iai_core.services.model_service.ModelRepo")
     def test_should_not_purge_any_models_when_under_storage_limit(self, mock_model_repo, fxt_model):
         # Setup
         identifier = ModelStorageIdentifier(ID(), ID(), ID())
@@ -307,7 +307,7 @@ class TestModelService:
         model_1.version = 1
 
         mock_model_repo.return_value.get_non_purged_base_models.return_value = [model_1]
-        mock_purge = mock.patch("iai_core_py.services.model_service.ModelService.purge_model_binaries")
+        mock_purge = mock.patch("iai_core.services.model_service.ModelService.purge_model_binaries")
 
         # Execute
         with mock_purge as mocked_purge:

@@ -4,7 +4,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from copy import deepcopy
 
-from iai_core_py.entities.model_test_result import NullModelTestResult
+from iai_core.entities.model_test_result import NullModelTestResult
 
 
 class TestModelTestResult:

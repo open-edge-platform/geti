@@ -18,11 +18,11 @@ from entities.auto_train_activation import AutoTrainActivation, NullAutoTrainAct
 from storage.mappers.auto_train_activation_mapper import AutoTrainActivationToMongo
 
 from geti_types import ID, ProjectIdentifier, Session
-from iai_core_py.repos.base import ProjectBasedSessionRepo
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.mappers import IDToMongo
-from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
-from iai_core_py.services import ModelService
+from iai_core.repos.base import ProjectBasedSessionRepo
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.mappers import IDToMongo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.services import ModelService
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +74,9 @@ class ProjectBasedAutoTrainActivationRepo(ProjectBasedSessionRepo[AutoTrainActiv
         )
 
     def upsert_timestamp_for_task(
-        self, instance: AutoTrainActivation, mongodb_session: ClientSession | None = None
+        self,
+        instance: AutoTrainActivation,
+        mongodb_session: ClientSession | None = None,
     ) -> None:
         """
         Updates the timestamp (`request_time`) of an AutoTrainActivation document if it already exists.

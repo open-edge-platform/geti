@@ -4,7 +4,7 @@ from typing import Any
 
 import datumaro as dm
 import pytest
-from iai_core_py.entities.model_template import TaskType
+from iai_core.entities.model_template import TaskType
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
 from jobs_common_extras.datumaro_conversion.definitions import ANOMALY_PROJECT_TYPES, GetiProjectType
 
@@ -21,7 +21,10 @@ class TestDatumaroProjectParser:
             ["fxt_datumaro_dataset", GetiProjectType.CLASSIFICATION],
             ["fxt_datumaro_dataset", GetiProjectType.DETECTION],
             ["fxt_datumaro_dataset_segmentation", GetiProjectType.SEGMENTATION],
-            ["fxt_datumaro_dataset_instances_segmentation", GetiProjectType.INSTANCE_SEGMENTATION],
+            [
+                "fxt_datumaro_dataset_instances_segmentation",
+                GetiProjectType.INSTANCE_SEGMENTATION,
+            ],
             ["fxt_datumaro_dataset_multi_label", GetiProjectType.CLASSIFICATION],
             ["fxt_datumaro_dataset_hierarchical", GetiProjectType.CLASSIFICATION],
             [
@@ -432,7 +435,10 @@ class TestDatumaroProjectParser:
             ["fxt_datumaro_dataset", GetiProjectType.CLASSIFICATION],
             ["fxt_datumaro_dataset", GetiProjectType.DETECTION],
             ["fxt_datumaro_dataset_segmentation", GetiProjectType.SEGMENTATION],
-            ["fxt_datumaro_dataset_instances_segmentation", GetiProjectType.INSTANCE_SEGMENTATION],
+            [
+                "fxt_datumaro_dataset_instances_segmentation",
+                GetiProjectType.INSTANCE_SEGMENTATION,
+            ],
             ["fxt_datumaro_dataset_multi_label", GetiProjectType.CLASSIFICATION],
             ["fxt_datumaro_dataset_hierarchical", GetiProjectType.CLASSIFICATION],
             [

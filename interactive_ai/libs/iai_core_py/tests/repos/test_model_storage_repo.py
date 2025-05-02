@@ -6,9 +6,9 @@
 
 import pytest
 
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.model_template import NullModelTemplate
-from iai_core_py.repos import ModelStorageRepo
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import NullModelTemplate
+from iai_core.repos import ModelStorageRepo
 
 
 class TestModelStorageRepo:

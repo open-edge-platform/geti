@@ -3,11 +3,11 @@
 
 import pytest
 from attr import attrs
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from iai_core_py.configuration.elements.primitive_parameters import (
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_integer,
     float_selectable,

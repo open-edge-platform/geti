@@ -6,15 +6,15 @@ from unittest.mock import patch
 
 import pytest
 
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroupType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelRepo
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from iai_core_py.utils.project_builder import ProjectBuilder
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroupType
+from iai_core.entities.project import Project
+from iai_core.entities.shapes import Rectangle
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.project_builder import ProjectBuilder
 from tests.tools.custom_project_parser import CustomTestProjectParser
 
 

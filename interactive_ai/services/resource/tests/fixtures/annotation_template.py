@@ -3,7 +3,7 @@
 import pytest
 
 from geti_types import ID
-from iai_core_py.entities.annotation_template import AnnotationTemplate
+from iai_core.entities.annotation_template import AnnotationTemplate
 
 
 @pytest.fixture

@@ -4,19 +4,19 @@ from unittest.mock import patch
 
 import pytest
 
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.model_template import TaskFamily, TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.task_graph import TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
-from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, VideoRepo
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from iai_core_py.utils.identifier_factory import IdentifierFactory
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.model_template import TaskFamily, TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, VideoRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.identifier_factory import IdentifierFactory
 
 from geti_types import ID, ImageIdentifier, VideoFrameIdentifier, VideoIdentifier
 
@@ -272,7 +272,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             unannotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -337,7 +337,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[detection_annotation, segmentation_annotation_in_box],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             annotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -412,7 +412,7 @@ class TestAnnotationSceneStateHelper:
             ],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             partially_annotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -477,7 +477,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[detection_annotation_empty],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             empty_label_annotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -533,7 +533,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             unannotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -598,7 +598,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[annotation_both_tasks],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             annotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -669,7 +669,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[annotation_both_tasks, annotation_detection_only],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             partially_annotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(
@@ -733,7 +733,7 @@ class TestAnnotationSceneStateHelper:
             annotations=[detection_annotation_empty],
         )
         with patch(
-            "iai_core_py.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
+            "iai_core.utils.annotation_scene_state_helper.LabelSchemaRepo.get_latest_view_by_task",
             new=lambda self, task_node_id: fxt_node_to_schema(task_node_id),
         ):
             empty_label_annotated_state = AnnotationSceneStateHelper.compute_annotation_scene_state(

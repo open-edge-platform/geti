@@ -3,9 +3,9 @@
 
 import copy
 
-import iai_core_py.configuration.elements.metadata_keys as metadata_keys
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.enums.config_element_type import ConfigElementType
+import iai_core.configuration.elements.metadata_keys as metadata_keys
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.enums.config_element_type import ConfigElementType
 from tests.configuration.dummy_config import DatasetManagerConfig
 
 from geti_types import ID

@@ -13,8 +13,8 @@ from entities.deployment import CodeDeployment, NullCodeDeployment
 from repos.code_deployment_mapper import CodeDeploymentToMongo
 
 from geti_types import ProjectIdentifier, Session
-from iai_core_py.repos.base.project_based_repo import ProjectBasedSessionRepo
-from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.base.project_based_repo import ProjectBasedSessionRepo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
 
 
 class CodeDeploymentRepo(ProjectBasedSessionRepo[CodeDeployment]):

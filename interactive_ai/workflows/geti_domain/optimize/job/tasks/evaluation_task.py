@@ -7,16 +7,16 @@ Optimized model evaluation task
 from typing import Optional
 
 from geti_types import ID
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.datasets import DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.model import Model, ModelStatus
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import DatasetStorageRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.datasets import DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model import Model, ModelStatus
+from iai_core.entities.project import Project
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import DatasetStorageRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.time_utils import now
 from jobs_common.exceptions import CommandInternalError
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger

@@ -15,9 +15,9 @@ import numpy as np
 from bson import ObjectId
 
 from geti_types import ID
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Point, Polygon
 
 Contour = list[tuple[float, float]]
 
@@ -134,7 +134,9 @@ def create_annotation_from_segmentation_map(
                                     shape=polygon,
                                     labels=[
                                         ScoredLabel(
-                                            label_id=label.id_, is_empty=label.is_empty, probability=probability
+                                            label_id=label.id_,
+                                            is_empty=label.is_empty,
+                                            probability=probability,
                                         )
                                     ],
                                     id_=ID(ObjectId()),

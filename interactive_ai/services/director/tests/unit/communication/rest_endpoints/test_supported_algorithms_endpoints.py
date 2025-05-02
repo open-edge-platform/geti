@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from communication.controllers.supported_algorithm_controller import SupportedAlgorithmRESTController
 
-from iai_core_py.repos import TaskNodeRepo
+from iai_core.repos import TaskNodeRepo
 
 DUMMY_ORGANIZATION_ID = "567890123456789012340001"
 DUMMY_WORKSPACE_ID = "567890123456789012340000"

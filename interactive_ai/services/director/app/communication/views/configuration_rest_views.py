@@ -11,16 +11,16 @@ from attr import fields_dict
 from geti_fastapi_tools.exceptions import InvalidEntityIdentifierException
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.configuration.elements import metadata_keys
-from iai_core_py.configuration.elements.entity_identifiers import EntityIdentifier, ModelEntityIdentifier
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup
-from iai_core_py.configuration.enums.config_element_type import ConfigElementType
-from iai_core_py.configuration.enums.configurable_parameter_type import ConfigurableParameterType
-from iai_core_py.configuration.helper.convert import parameter_group_to_dict
-from iai_core_py.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
-from iai_core_py.configuration.ui_rules.rules import NullUIRules
-from iai_core_py.entities.task_node import TaskNode
+from iai_core.configuration.elements import metadata_keys
+from iai_core.configuration.elements.entity_identifiers import EntityIdentifier, ModelEntityIdentifier
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup
+from iai_core.configuration.enums.config_element_type import ConfigElementType
+from iai_core.configuration.enums.configurable_parameter_type import ConfigurableParameterType
+from iai_core.configuration.helper.convert import parameter_group_to_dict
+from iai_core.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
+from iai_core.configuration.ui_rules.rules import NullUIRules
+from iai_core.entities.task_node import TaskNode
 
 logger = logging.getLogger("sc_rest_views")
 BE_VIEWS = logging.DEBUG

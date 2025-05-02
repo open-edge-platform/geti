@@ -32,16 +32,16 @@ from usecases.statistics import StatisticsUseCase
 from geti_fastapi_tools.exceptions import GetiBaseException, ModelNotFoundException
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.model import ModelFormat, NullModel
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.video import Video, VideoFrame
-from iai_core_py.repos import ModelRepo
-from iai_core_py.repos.storage.binary_repos import CodeDeploymentBinaryRepo
+from iai_core.entities.model import ModelFormat, NullModel
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.project import Project
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos import ModelRepo
+from iai_core.repos.storage.binary_repos import CodeDeploymentBinaryRepo
 from media_utils import get_media_numpy
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.image import Image
+    from iai_core.entities.image import Image
 
 logger = logging.getLogger(__name__)
 

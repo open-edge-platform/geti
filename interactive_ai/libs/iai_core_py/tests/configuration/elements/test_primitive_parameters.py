@@ -3,8 +3,8 @@
 
 from attr import _make, validators
 
-from iai_core_py.configuration.elements.configurable_enum import ConfigurableEnum
-from iai_core_py.configuration.elements.primitive_parameters import (
+from iai_core.configuration.elements.configurable_enum import ConfigurableEnum
+from iai_core.configuration.elements.primitive_parameters import (
     boolean_attribute,
     configurable_boolean,
     configurable_float,
@@ -14,8 +14,8 @@ from iai_core_py.configuration.elements.primitive_parameters import (
     set_common_metadata,
     string_attribute,
 )
-from iai_core_py.configuration.enums import ConfigElementType, ModelLifecycle
-from iai_core_py.configuration.ui_rules import NullUIRules, Rule, UIRules
+from iai_core.configuration.enums import ConfigElementType, ModelLifecycle
+from iai_core.configuration.ui_rules import NullUIRules, Rule, UIRules
 from tests.configuration.dummy_config import SomeEnumSelectable
 
 

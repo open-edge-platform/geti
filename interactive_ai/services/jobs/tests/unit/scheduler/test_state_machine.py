@@ -25,8 +25,8 @@ from scheduler.state_machine import StateMachine
 
 from geti_spicedb_tools import SpiceDB
 from geti_types import ID, make_session, session_context
-from iai_core_py.repos.mappers import IDToMongo
-from iai_core_py.utils.time_utils import now
+from iai_core.repos.mappers import IDToMongo
+from iai_core.utils.time_utils import now
 
 ORG = ID(ObjectId())
 
@@ -550,7 +550,10 @@ def test_update_cost_consumed(mock_sm_get_by_id, mock_repo_update, request) -> N
     mock_repo_update.return_value = True
     job = MagicMock()
     job.cost = JobCost(
-        requests=(JobResource(amount=100, unit="images"), JobResource(amount=100, unit="images")),
+        requests=(
+            JobResource(amount=100, unit="images"),
+            JobResource(amount=100, unit="images"),
+        ),
         lease_id="lease_id",
         consumed=(JobConsumedResource(amount=100, unit="images", consuming_date=now(), service="training"),),
         reported=False,
@@ -574,7 +577,14 @@ def test_update_cost_consumed(mock_sm_get_by_id, mock_repo_update, request) -> N
         update={
             "$push": {
                 "cost.consumed": {
-                    "$each": [{"amount": 1, "unit": "frames", "consuming_date": now(), "service": "other_service"}]
+                    "$each": [
+                        {
+                            "amount": 1,
+                            "unit": "frames",
+                            "consuming_date": now(),
+                            "service": "other_service",
+                        }
+                    ]
                 }
             }
         },

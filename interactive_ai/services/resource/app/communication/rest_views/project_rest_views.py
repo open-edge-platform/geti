@@ -9,8 +9,8 @@ from communication.rest_views.pipeline import PipelineRESTViews
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.project import Project
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.project import Project
 
 logger = logging.getLogger(__name__)
 
@@ -130,5 +130,7 @@ class ProjectRESTViews:
         }
 
     @staticmethod
-    def projects_names_to_rest(projects_names: dict[ID, str]) -> dict[str, list[dict[str, str]]]:
+    def projects_names_to_rest(
+        projects_names: dict[ID, str],
+    ) -> dict[str, list[dict[str, str]]]:
         return {PROJECTS: [{ID_: str(id_), NAME: projects_names[id_]} for id_ in projects_names]}

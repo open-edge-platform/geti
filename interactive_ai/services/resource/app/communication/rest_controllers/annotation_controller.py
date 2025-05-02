@@ -28,18 +28,18 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.video import Video
-from iai_core_py.entities.video_annotation_range import VideoAnnotationRange
-from iai_core_py.repos import AnnotationSceneRepo, LabelSchemaRepo, VideoAnnotationRangeRepo, VideoRepo
-from iai_core_py.utils.filesystem import check_free_space_for_operation
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState
+from iai_core.entities.image import Image
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.video import Video
+from iai_core.entities.video_annotation_range import VideoAnnotationRange
+from iai_core.repos import AnnotationSceneRepo, LabelSchemaRepo, VideoAnnotationRangeRepo, VideoRepo
+from iai_core.utils.filesystem import check_free_space_for_operation
 
 LATEST = "latest"
 
@@ -343,7 +343,10 @@ class AnnotationRESTController:
             value will be annotated. If 0, the video FPS will be used as value instead.
         :return: JSON representation of the created video annotation range.
         """
-        check_free_space_for_operation(operation="Annotate video frame range", exception_type=NotEnoughSpaceException)
+        check_free_space_for_operation(
+            operation="Annotate video frame range",
+            exception_type=NotEnoughSpaceException,
+        )
 
         project = ProjectManager.get_project_by_id(project_id=dataset_storage_identifier.project_id)
         label_schema = LabelSchemaService.get_latest_label_schema_for_project(project.identifier)
@@ -368,7 +371,8 @@ class AnnotationRESTController:
 
         # Parse and save the new VideoAnnotationRange
         new_video_ann_range = VideoAnnotationRangeRESTViews.video_annotation_range_from_rest(
-            video_annotation_range_data=video_annotation_range_data, video_id=video_id
+            video_annotation_range_data=video_annotation_range_data,
+            video_id=video_id,
         )
         video_ann_range_repo.save(new_video_ann_range)
 

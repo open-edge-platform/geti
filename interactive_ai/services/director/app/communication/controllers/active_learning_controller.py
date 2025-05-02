@@ -9,12 +9,12 @@ from communication.views.active_set_views import ActiveSetRESTViews
 from service.project_service import ProjectService
 
 from geti_types import ID, MediaIdentifierEntity, MediaType
-from iai_core_py.repos import ImageRepo, VideoRepo
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.repos import ImageRepo, VideoRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.image import Image
-    from iai_core_py.entities.video import Video
+    from iai_core.entities.image import Image
+    from iai_core.entities.video import Video
 
 
 class ActiveLearningController:

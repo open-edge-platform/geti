@@ -8,7 +8,7 @@ from testfixtures import compare
 from communication.views.prediction_rest_views import PredictionRESTViews
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
 
-from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core.entities.annotation import AnnotationSceneKind
 
 
 class TestPredictionRESTViews:
@@ -82,14 +82,21 @@ class TestPredictionRESTViews:
                     ],
                     "modified": "2021-07-15T00:00:00",
                     "shape": {
-                        "points": [{"x": 80, "y": 60}, {"x": 200, "y": 180}, {"x": 320, "y": 360}],
+                        "points": [
+                            {"x": 80, "y": 60},
+                            {"x": 200, "y": 180},
+                            {"x": 320, "y": 360},
+                        ],
                         "type": "POLYGON",
                     },
                 },
             ],
             "id": "60d31793d5f1fb7e6e3c1a4f",
             "kind": "prediction",
-            "media_identifier": {"image_id": "60d31793d5f1fb7e6e3c1a4f", "type": "image"},
+            "media_identifier": {
+                "image_id": "60d31793d5f1fb7e6e3c1a4f",
+                "type": "image",
+            },
             "modified": "2021-07-15T00:00:00",
         }
 
@@ -120,20 +127,39 @@ class TestPredictionRESTViews:
         fxt_annotation_scene.kind = AnnotationSceneKind.PREDICTION
         expected_result = {
             "created": "2021-07-15T00:00:00",
-            "media_identifier": {"image_id": "60d31793d5f1fb7e6e3c1a4f", "type": "image"},
+            "media_identifier": {
+                "image_id": "60d31793d5f1fb7e6e3c1a4f",
+                "type": "image",
+            },
             "predictions": [
                 {
                     "labels": [{"id": "60d31793d5f1fb7e6e3c1a50", "probability": 0.97}],
-                    "shape": {"height": 60, "type": "RECTANGLE", "width": 160, "x": 240, "y": 120},
-                },
-                {
-                    "labels": [{"id": "60d31793d5f1fb7e6e3c1a50", "probability": 0.97}],
-                    "shape": {"height": 60, "type": "ELLIPSE", "width": 160, "x": 240, "y": 120},
+                    "shape": {
+                        "height": 60,
+                        "type": "RECTANGLE",
+                        "width": 160,
+                        "x": 240,
+                        "y": 120,
+                    },
                 },
                 {
                     "labels": [{"id": "60d31793d5f1fb7e6e3c1a50", "probability": 0.97}],
                     "shape": {
-                        "points": [{"x": 80, "y": 60}, {"x": 200, "y": 180}, {"x": 320, "y": 360}],
+                        "height": 60,
+                        "type": "ELLIPSE",
+                        "width": 160,
+                        "x": 240,
+                        "y": 120,
+                    },
+                },
+                {
+                    "labels": [{"id": "60d31793d5f1fb7e6e3c1a50", "probability": 0.97}],
+                    "shape": {
+                        "points": [
+                            {"x": 80, "y": 60},
+                            {"x": 200, "y": 180},
+                            {"x": 320, "y": 360},
+                        ],
                         "type": "POLYGON",
                     },
                 },

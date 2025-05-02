@@ -2,12 +2,12 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon, Rectangle
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Point, Polygon, Rectangle
+from iai_core.utils.time_utils import now
 
 from geti_types import ID
 

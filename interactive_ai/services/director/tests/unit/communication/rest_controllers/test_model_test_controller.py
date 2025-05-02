@@ -22,9 +22,9 @@ from service.label_schema_service import LabelSchemaService
 from geti_fastapi_tools.responses import success_response_rest
 from geti_types import ID
 from grpc_interfaces.job_submission.client import CommunicationError
-from iai_core_py.entities.model import ModelFormat
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import (
+from iai_core.entities.model import ModelFormat
+from iai_core.entities.project import Project
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -33,10 +33,10 @@ from iai_core_py.repos import (
     ModelTestResultRepo,
     ProjectRepo,
 )
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.model_test_result import ModelTestResult
+    from iai_core.entities.model_test_result import ModelTestResult
 
 DUMMY_USER = ID("dummy_user")
 

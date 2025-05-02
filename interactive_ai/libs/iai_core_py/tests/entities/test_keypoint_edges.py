@@ -3,7 +3,7 @@
 
 import pytest
 
-from iai_core_py.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
+from iai_core.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
 
 from geti_types import ID
 

@@ -8,8 +8,8 @@ from resource_management.media_manager import MediaManager
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_types import ID
-from iai_core_py.entities.media import ImageExtensions, VideoExtensions
-from iai_core_py.repos.storage.storage_client import BytesStream
+from iai_core.entities.media import ImageExtensions, VideoExtensions
+from iai_core.repos.storage.storage_client import BytesStream
 
 
 class TestIntegrationMediaManager:

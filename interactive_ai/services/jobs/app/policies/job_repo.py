@@ -12,8 +12,8 @@ from typing import TYPE_CHECKING
 from model.job import Job, NullJob
 from model.mapper.job_mapper import JobMapper
 
-from iai_core_py.repos.base.session_repo import MissingSessionPolicy, QueryAccessMode, SessionBasedRepo
-from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.base.session_repo import MissingSessionPolicy, QueryAccessMode, SessionBasedRepo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
 
 if TYPE_CHECKING:
     from collections.abc import Callable

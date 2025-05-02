@@ -4,10 +4,10 @@ from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
 
-from iai_core_py.entities.dataset_entities import NullPipelineDataset, PipelineDataset
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.repos import DatasetRepo, TaskNodeRepo
-from iai_core_py.repos.dataset_entity_repo import DuplicatePipelineDatasetException, PipelineDatasetRepo
+from iai_core.entities.dataset_entities import NullPipelineDataset, PipelineDataset
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.repos import DatasetRepo, TaskNodeRepo
+from iai_core.repos.dataset_entity_repo import DuplicatePipelineDatasetException, PipelineDatasetRepo
 
 
 class TestPipelineDatasetRepo:

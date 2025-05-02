@@ -1,6 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from iai_core_py.entities.model import Model
+from iai_core.entities.model import Model
 
 
 def get_tiling_parameters(model: Model) -> dict:

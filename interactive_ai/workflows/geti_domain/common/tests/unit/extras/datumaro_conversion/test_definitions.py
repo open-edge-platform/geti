@@ -1,6 +1,6 @@
 import datumaro as dm
 import pytest
-from iai_core_py.entities.label import Domain
+from iai_core.entities.label import Domain
 
 from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES
 

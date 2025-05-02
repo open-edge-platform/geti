@@ -4,11 +4,11 @@ import copy
 
 import pytest
 
-from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
-from iai_core_py.entities.metrics import NullPerformance, Performance, ScoreMetric
-from iai_core_py.entities.model import Model, NullModel
-from iai_core_py.repos import DatasetRepo, EvaluationResultRepo, ModelRepo
-from iai_core_py.services.model_service import ModelService
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
+from iai_core.entities.metrics import NullPerformance, Performance, ScoreMetric
+from iai_core.entities.model import Model, NullModel
+from iai_core.repos import DatasetRepo, EvaluationResultRepo, ModelRepo
+from iai_core.services.model_service import ModelService
 from tests.test_helpers import (
     empty_model_configuration,
     generate_inference_dataset_of_all_media_in_project,

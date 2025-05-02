@@ -14,9 +14,9 @@ import cv2
 import numpy as np
 from bson import ObjectId
 
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Point, Polygon
 
 from geti_types import ID
 

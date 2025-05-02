@@ -7,10 +7,10 @@ import pytest
 from pymongo import UpdateOne
 from pymongo.results import DeleteResult
 
-from iai_core_py.entities.persistent_entity import PersistentEntity
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
-from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.entities.persistent_entity import PersistentEntity
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 from geti_types import ID, make_session
 from geti_types.session import DEFAULT_ORGANIZATION_ID, DEFAULT_WORKSPACE_ID

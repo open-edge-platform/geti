@@ -6,15 +6,15 @@ from pathlib import Path
 
 from _pytest.fixtures import FixtureRequest
 
-import iai_core_py.configuration.helper as otx_config_helper
-from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import ConfigurableParametersRepo
-from iai_core_py.services.model_service import ModelService
+import iai_core.configuration.helper as otx_config_helper
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
+from iai_core.entities.project import Project
+from iai_core.repos import ConfigurableParametersRepo
+from iai_core.services.model_service import ModelService
 from tests.configuration.dummy_config import DatasetManagerConfig
 from tests.test_helpers import generate_random_annotated_project, register_model_template
 

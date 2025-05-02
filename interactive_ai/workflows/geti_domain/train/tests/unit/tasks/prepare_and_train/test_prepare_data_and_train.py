@@ -7,8 +7,8 @@ from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.repos import ProjectRepo
+from iai_core.entities.datasets import Dataset
+from iai_core.repos import ProjectRepo
 from jobs_common.tasks.utils.secrets import JobMetadata
 
 from job.tasks.prepare_and_train.prepare_data_and_train import prepare_training_data_model_and_start_training

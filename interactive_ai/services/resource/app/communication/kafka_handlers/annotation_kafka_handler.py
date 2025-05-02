@@ -4,8 +4,8 @@ import logging
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, Singleton
-from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
-from iai_core_py.session.session_propagation import setup_session_kafka
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 

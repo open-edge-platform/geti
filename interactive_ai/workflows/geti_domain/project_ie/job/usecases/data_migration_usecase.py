@@ -7,7 +7,7 @@ This module is responsible for migrating the documents and binaries to the lates
 import logging
 
 from geti_types import CTX_SESSION_VAR, ID, Session
-from iai_core_py.versioning import DataVersion
+from iai_core.versioning import DataVersion
 from migration.utils import VersionManager
 
 from job.entities.exceptions import ProjectUpgradeFailedException
@@ -32,14 +32,23 @@ class DataMigrationUseCase:
         session: Session = CTX_SESSION_VAR.get()
         current_version = DataVersion.get_current()
         versions_to_upgrade = VersionManager.find_all_minor_releases_in_range(
-            start_version=version.version_string, end_version=current_version.version_string, include_end=True
+            start_version=version.version_string,
+            end_version=current_version.version_string,
+            include_end=True,
         )
         try:
             for v in versions_to_upgrade:
-                logger.info("Upgrading data of imported project '%s' to version '%s'.", project_id, v)
+                logger.info(
+                    "Upgrading data of imported project '%s' to version '%s'.",
+                    project_id,
+                    v,
+                )
                 metadata = VersionManager.get_changeset_metadata_by_version(version=v)
                 if metadata.skip_on_project_import:
-                    logger.info("Skipped upgrade script to version '%s' as specified in the metadata.", v)
+                    logger.info(
+                        "Skipped upgrade script to version '%s' as specified in the metadata.",
+                        v,
+                    )
                     continue
                 script = VersionManager.get_migration_script_cls_by_version(version=v)
                 script.upgrade_project(

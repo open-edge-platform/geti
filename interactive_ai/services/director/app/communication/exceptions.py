@@ -8,9 +8,9 @@ from starlette import status
 
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import ID
-from iai_core_py.entities.model import ModelOptimizationType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
+from iai_core.entities.model import ModelOptimizationType
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
 
 
 class InvalidConfigurationException(GetiBaseException):

@@ -7,12 +7,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import DatasetRepo, ModelRepo, ModelStorageRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.subset import Subset
+from iai_core.repos import DatasetRepo, ModelRepo, ModelStorageRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.utils.exceptions import EmptyEvaluationDatasetException
 

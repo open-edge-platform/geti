@@ -15,11 +15,11 @@ from managers.annotation_manager import AnnotationManager
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.video import Video
-from iai_core_py.repos import AnnotationSceneRepo
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.entities.video import Video
+from iai_core.repos import AnnotationSceneRepo
 
 logger = logging.getLogger(__name__)
 

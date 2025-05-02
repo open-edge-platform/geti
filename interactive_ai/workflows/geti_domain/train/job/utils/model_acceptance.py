@@ -11,9 +11,9 @@ import logging
 import numpy as np
 import scipy
 from geti_types import ProjectIdentifier
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.model import Model, NullModel
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model import Model, NullModel
 from jobs_common.jobs.helpers.model_helpers import get_model_accuracy
 
 logger = logging.getLogger(__name__)

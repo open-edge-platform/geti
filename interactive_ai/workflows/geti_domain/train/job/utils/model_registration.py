@@ -5,12 +5,12 @@
 
 from geti_types import ID
 from grpc_interfaces.model_registration.pb.service_pb2 import Connection, Label, Model, Pipeline, Project, Task
-from iai_core_py.entities.label import Label as SdkLabel
-from iai_core_py.entities.label_schema import LabelGroup as SdkLabelGroup
-from iai_core_py.entities.model import Model as SdkModel
-from iai_core_py.entities.project import Project as SdkProject
-from iai_core_py.entities.task_node import TaskNode as SdkTask
-from iai_core_py.repos import LabelSchemaRepo
+from iai_core.entities.label import Label as SdkLabel
+from iai_core.entities.label_schema import LabelGroup as SdkLabelGroup
+from iai_core.entities.model import Model as SdkModel
+from iai_core.entities.project import Project as SdkProject
+from iai_core.entities.task_node import TaskNode as SdkTask
+from iai_core.repos import LabelSchemaRepo
 
 
 class ProjectMapper:
@@ -40,7 +40,10 @@ class TaskMapper:
                 for label in group.labels:
                     labels.append(LabelMapper.forward(label, group))  # type: ignore
             grpc_task = Task(
-                id=str(task.id_), title=task.title, task_type=task.task_properties.task_type.name, labels=labels
+                id=str(task.id_),
+                title=task.title,
+                task_type=task.task_properties.task_type.name,
+                labels=labels,
             )
         else:
             grpc_task = Task(
@@ -72,7 +75,12 @@ class ConnectionMapper:
 class ModelMapper:
     @staticmethod
     def forward(
-        model: SdkModel, project_id: ID, workspace_id: ID, optimized_model_id: ID, task_id: ID, organization_id: ID
+        model: SdkModel,
+        project_id: ID,
+        workspace_id: ID,
+        optimized_model_id: ID,
+        task_id: ID,
+        organization_id: ID,
     ) -> Model:
         return Model(
             workspace_id=str(workspace_id),

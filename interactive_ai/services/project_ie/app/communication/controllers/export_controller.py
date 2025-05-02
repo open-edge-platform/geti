@@ -16,9 +16,9 @@ from repos import ZipStorageRepo
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from iai_core_py.entities.project import NullProject
-from iai_core_py.repos import ProjectRepo
-from iai_core_py.utils.naming_helpers import slugify
+from iai_core.entities.project import NullProject
+from iai_core.repos import ProjectRepo
+from iai_core.utils.naming_helpers import slugify
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,10 @@ class ExportController:
 
     @classmethod
     def get_exported_archive_presigned_url(
-        cls, project_identifier: ProjectIdentifier, export_operation_id: ID, domain_name: str
+        cls,
+        project_identifier: ProjectIdentifier,
+        export_operation_id: ID,
+        domain_name: str,
     ) -> RedirectResponse:
         """
         Get a pre-signed URL to download the exported project archive
@@ -95,7 +98,8 @@ class ExportController:
         """
         try:
             internal_presigned_url = cls._get_zip_presigned_url(
-                project_id=project_identifier.project_id, export_operation_id=export_operation_id
+                project_id=project_identifier.project_id,
+                export_operation_id=export_operation_id,
             )
         except Exception as exc:
             logger.exception(

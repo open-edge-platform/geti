@@ -8,7 +8,7 @@ import pytest
 from communication.rest_parsers import RestProjectParser, RestProjectUpdateParser
 
 from geti_types import ID
-from iai_core_py.entities.model_template import TaskType
+from iai_core.entities.model_template import TaskType
 
 logger = logging.getLogger(__name__)
 

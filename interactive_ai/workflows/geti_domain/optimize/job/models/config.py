@@ -2,10 +2,10 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from dataclasses import dataclass
 
-from iai_core_py.entities.compiled_dataset_shards import CompiledDatasetShards
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.project import Project
+from iai_core.entities.compiled_dataset_shards import CompiledDatasetShards
+from iai_core.entities.model import Model
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.project import Project
 
 
 @dataclass

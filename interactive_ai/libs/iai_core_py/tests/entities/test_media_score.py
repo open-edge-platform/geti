@@ -4,7 +4,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from copy import deepcopy
 
-from iai_core_py.entities.media_score import NullMediaScore
+from iai_core.entities.media_score import NullMediaScore
 
 
 class TestMediaScore:

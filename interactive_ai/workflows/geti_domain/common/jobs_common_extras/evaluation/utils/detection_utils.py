@@ -4,7 +4,7 @@
 import logging
 
 import numpy as np
-from iai_core_py.entities.model import Model
+from iai_core.entities.model import Model
 from model_api.models.utils import Detection
 
 from jobs_common_extras.evaluation.utils.helpers import is_model_legacy_otx_version

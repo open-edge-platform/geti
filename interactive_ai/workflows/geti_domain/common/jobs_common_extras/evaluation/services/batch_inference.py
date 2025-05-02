@@ -11,14 +11,14 @@ from collections.abc import Callable, Sequence
 from geti_telemetry_tools import unified_tracing
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import DatasetStorageIdentifier, ProjectIdentifier
-from iai_core_py.entities.annotation import AnnotationScene
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult
-from iai_core_py.entities.metadata import IMetadata
-from iai_core_py.entities.model import Model, NullModel
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import EvaluationResultRepo
-from iai_core_py.utils.post_process_predictions import PostProcessPredictionsUtils
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core.entities.metadata import IMetadata
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import EvaluationResultRepo
+from iai_core.utils.post_process_predictions import PostProcessPredictionsUtils
 
 from jobs_common.exceptions import CommandInitializationFailedException
 from jobs_common.tasks.utils.progress import ProgressRange
@@ -131,7 +131,11 @@ class BatchInference:
         self._progress = 0  # reset progress
         logger.info("Saving evaluation results for datasets.")
         self._create_evaluation_results()
-        logger.info("Running batch inference on with ID '%s' (%s).", self.model.id_, self.model.precision)
+        logger.info(
+            "Running batch inference on with ID '%s' (%s).",
+            self.model.id_,
+            self.model.precision,
+        )
         for batch_dataset in self.batch_inference_datasets:
             self.infer_dataset(batch_dataset, use_async)
             with tracer.start_as_current_span("PostProcessPredictionsUtils.post_process_prediction_dataset"):
@@ -169,7 +173,11 @@ class BatchInference:
             dataset_storage_id=batch_dataset.dataset_storage.id_,
         )
 
-        def add_prediction(dataset_item_idx: int, predicted_ann_scene: AnnotationScene, metadata: Sequence[IMetadata]):
+        def add_prediction(
+            dataset_item_idx: int,
+            predicted_ann_scene: AnnotationScene,
+            metadata: Sequence[IMetadata],
+        ):
             dataset_item = dataset[dataset_item_idx]
             for data in metadata:
                 dataset_item.append_metadata_item(data=data, model=self.model)
@@ -193,9 +201,15 @@ class BatchInference:
                 )
             else:  # use sync API
                 predicted_ann_scene, metadata = self.inferencer.predict(
-                    dataset_storage_id=dataset_storage_id, media=dataset_item.media, roi=dataset_item.roi
+                    dataset_storage_id=dataset_storage_id,
+                    media=dataset_item.media,
+                    roi=dataset_item.roi,
                 )
-                add_prediction(dataset_item_idx=idx, predicted_ann_scene=predicted_ann_scene, metadata=metadata)
+                add_prediction(
+                    dataset_item_idx=idx,
+                    predicted_ann_scene=predicted_ann_scene,
+                    metadata=metadata,
+                )
             self._update_progress()
 
         if use_async:

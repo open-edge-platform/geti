@@ -3,16 +3,16 @@
 
 import datetime
 
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.entities.dataset_storage_filter_data import (
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
     ShapeFilterData,
     VideoFilterData,
 )
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessingStatus
-from iai_core_py.entities.shapes import ShapeType
+from iai_core.entities.media import ImageExtensions, MediaPreprocessingStatus
+from iai_core.entities.shapes import ShapeType
 
 
 class TestDatasetStorageFilterData:

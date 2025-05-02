@@ -10,8 +10,8 @@ from usecases.query_builder import QueryBuilder
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID
-from iai_core_py.entities.model_test_result import NullModelTestResult, TestState
-from iai_core_py.repos import DatasetRepo, MediaScoreRepo, ModelTestResultRepo
+from iai_core.entities.model_test_result import NullModelTestResult, TestState
+from iai_core.repos import DatasetRepo, MediaScoreRepo, ModelTestResultRepo
 
 
 class MediaScoreRESTController:

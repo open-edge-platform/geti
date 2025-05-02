@@ -23,14 +23,14 @@ from testcontainers.core.waiting_utils import wait_for_logs
 CTX_SESSION_VAR.set(make_session())
 
 import datumaro as dm
-import iai_core_py.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.model_template import (
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.entities.label import Domain
+from iai_core.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,
@@ -131,7 +131,10 @@ def fxt_dataset_id(fxt_temp_directory, fxt_zipped_coco_dataset_path, fxt_import_
 def fxt_test_dataset_id_generator(fxt_temp_directory, fxt_import_data_repo):
     def _test_dataset_id_generator(dataset_zip_path: str):
         id_ = ID("000000000000000000000001")
-        path = download_file(URL_DATASETS + dataset_zip_path, pathlib.Path(fxt_temp_directory) / dataset_zip_path)
+        path = download_file(
+            URL_DATASETS + dataset_zip_path,
+            pathlib.Path(fxt_temp_directory) / dataset_zip_path,
+        )
         with open(path, "rb") as file:
             data = file.read()
         fxt_import_data_repo._save_file(id_, data)
@@ -175,7 +178,10 @@ def download_file(url: str, file_path: pathlib.Path) -> pathlib.Path:
 @pytest.fixture
 def fxt_test_dataset_generator(fxt_temp_directory):
     def _test_dataset_generator(dataset_zip_path: str, format: str):
-        path = download_file(URL_DATASETS + dataset_zip_path, pathlib.Path(fxt_temp_directory) / dataset_zip_path)
+        path = download_file(
+            URL_DATASETS + dataset_zip_path,
+            pathlib.Path(fxt_temp_directory) / dataset_zip_path,
+        )
         with zipfile.ZipFile(path, "r") as zip_ref:
             zip_ref.extractall(fxt_temp_directory)
         return dm.Dataset.import_from(fxt_temp_directory, format=format)
@@ -758,7 +764,14 @@ def fxt_spicedb_server(request: FixtureRequest):
     test_dir = pathlib.Path(__file__).parent
     container.with_volume_mapping((test_dir / "configs/spicedb.zaml").resolve(), "/schema/spicedb.zaml", "ro")
     container.with_env("SPICEDB_GRPC_PRESHARED_KEY", "test")
-    container.with_command(["serve-testing", "--skip-release-check", "--load-configs", "/schema/spicedb.zaml"])
+    container.with_command(
+        [
+            "serve-testing",
+            "--skip-release-check",
+            "--load-configs",
+            "/schema/spicedb.zaml",
+        ]
+    )
     container.start()
 
     wait_for_logs(container, "grpc server started serving", timeout=30)

@@ -11,13 +11,13 @@ from tests.utils.test_helpers import (
 
 from usecases.update_project_performance_usecase import UpdateProjectPerformanceUseCase
 
-from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult
-from iai_core_py.entities.metrics import Performance, ScoreMetric
-from iai_core_py.repos import EvaluationResultRepo, ProjectRepo
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core.entities.metrics import Performance, ScoreMetric
+from iai_core.repos import EvaluationResultRepo, ProjectRepo
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.model import Model
-    from iai_core_py.entities.project import Project
+    from iai_core.entities.model import Model
+    from iai_core.entities.project import Project
 
 
 class TestIntegrationUpdateProjectPerformanceUseCase:
@@ -34,9 +34,15 @@ class TestIntegrationUpdateProjectPerformanceUseCase:
         task_node_id = task_performance.task_node_id
         assert task_performance.score is None
 
-        with patch.object(EvaluationResultRepo, "get_performance_by_model_ids", return_value=fxt_performance):
+        with patch.object(
+            EvaluationResultRepo,
+            "get_performance_by_model_ids",
+            return_value=fxt_performance,
+        ):
             UpdateProjectPerformanceUseCase.update_project_performance(
-                project_id=project.id_, task_node_id=task_node_id, inference_model_id=model.id_
+                project_id=project.id_,
+                task_node_id=task_node_id,
+                inference_model_id=model.id_,
             )
 
         project_repo: ProjectRepo = ProjectRepo()
@@ -83,7 +89,9 @@ class TestIntegrationUpdateProjectPerformanceUseCase:
         request.addfinalizer(lambda: evaluation_result_repo.delete_all())
 
         UpdateProjectPerformanceUseCase.update_project_performance(
-            project_id=project.id_, task_node_id=task_node_id, inference_model_id=model.id_
+            project_id=project.id_,
+            task_node_id=task_node_id,
+            inference_model_id=model.id_,
         )
         updated_project = project_repo.get_by_id(project.id_)
         assert updated_project.performance.score == 0.7

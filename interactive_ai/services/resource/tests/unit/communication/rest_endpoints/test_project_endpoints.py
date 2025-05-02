@@ -17,9 +17,9 @@ from features.feature_flags import FeatureFlag
 from managers.project_manager import ProjectManager
 
 from geti_types import ID, DatasetStorageIdentifier
-from iai_core_py.entities.project import Project
-from iai_core_py.repos.annotation_template_repo import AnnotationTemplateRepo
-from iai_core_py.repos.project_repo_helpers import ProjectSortBy, SortDirection
+from iai_core.entities.project import Project
+from iai_core.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core.repos.project_repo_helpers import ProjectSortBy, SortDirection
 
 DUMMY_DATA = {"dummy_key": "dummy_value"}
 DUMMY_ORGANIZATION_ID = "6682a33b-3d18-4dab-abee-f797090480e0"
@@ -247,7 +247,11 @@ class TestProjectRESTEndpoint:
         # Act
         with (
             patch.object(ProjectManager, "get_project_by_id", return_value=fxt_project),
-            patch.object(Project, "get_training_dataset_storage", return_value=fxt_dataset_storage),
+            patch.object(
+                Project,
+                "get_training_dataset_storage",
+                return_value=fxt_dataset_storage,
+            ),
             patch.object(
                 MediaRESTController,
                 "get_project_thumbnail",
@@ -268,7 +272,11 @@ class TestProjectRESTEndpoint:
         # Act
         with (
             patch.object(ProjectManager, "get_project_by_id", return_value=fxt_project),
-            patch.object(Project, "get_training_dataset_storage", return_value=fxt_dataset_storage),
+            patch.object(
+                Project,
+                "get_training_dataset_storage",
+                return_value=fxt_dataset_storage,
+            ),
         ):
             response = fxt_resource_rest.get(endpoint)
         assert response.status_code == NoMediaInProjectException.http_status
@@ -320,5 +328,8 @@ class TestProjectRESTEndpoint:
         mock_get_annotation_template.assert_called_once()
         assert result.status_code == HTTPStatus.OK
         assert result.json() == {
-            "annotation_templates": [fxt_annotation_template_1_mapped, fxt_annotation_template_2_mapped]
+            "annotation_templates": [
+                fxt_annotation_template_1_mapped,
+                fxt_annotation_template_2_mapped,
+            ]
         }

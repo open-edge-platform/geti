@@ -19,38 +19,38 @@ from bson import ObjectId
 from pytest import FixtureRequest
 from testfixtures import compare
 
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from iai_core_py.configuration.elements.primitive_parameters import (
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_float,
     configurable_integer,
     string_attribute,
 )
-from iai_core_py.configuration.enums.model_lifecycle import ModelLifecycle
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, NullLabelSchema
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from iai_core_py.entities.model import ModelConfiguration
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.model_template import ModelTemplate
-from iai_core_py.entities.persistent_entity import PersistentEntity
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.video import Video, VideoFrame
-from iai_core_py.repos import (
+from iai_core.configuration.enums.model_lifecycle import ModelLifecycle
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.color import Color
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, NullLabelSchema
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.model import ModelConfiguration
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.entities.persistent_entity import PersistentEntity
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -59,7 +59,7 @@ from iai_core_py.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from iai_core_py.repos.mappers.mongodb_mapper_interface import (
+from iai_core.repos.mappers.mongodb_mapper_interface import (
     IMapperBackward,
     IMapperDatasetStorageBackward,
     IMapperDatasetStorageForward,
@@ -73,13 +73,13 @@ from iai_core_py.repos.mappers.mongodb_mapper_interface import (
     MappableEntityType,
     MapperClassT,
 )
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo
-from iai_core_py.services.model_service import ModelService
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.identifier_factory import IdentifierFactory
-from iai_core_py.utils.media_factory import Media2DFactory
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.services.model_service import ModelService
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.identifier_factory import IdentifierFactory
+from iai_core.utils.media_factory import Media2DFactory
+from iai_core.utils.project_factory import ProjectFactory
 
 from .segmentation_utils import create_annotation_from_segmentation_map
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
@@ -323,7 +323,7 @@ def generate_random_annotated_project(
             {"name": "ellipse", "color": "#0000ffff"},
             {"name": "triangle", "color": "#ff0000ff"},
         ]
-    from iai_core_py.repos import AnnotationSceneRepo, ImageRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo
 
     if isinstance(model_template_id, ModelTemplate):
         model_template_id = model_template_id.model_template_id
@@ -433,7 +433,7 @@ def generate_inference_dataset_of_all_media_in_project(project: Project) -> Data
     :param project: Project to generate inference Dataset for
     :return: Dataset
     """
-    from iai_core_py.repos import ImageRepo, VideoRepo
+    from iai_core.repos import ImageRepo, VideoRepo
 
     dataset_storage = project.get_training_dataset_storage()
     image_identifiers = [i.media_identifier for i in ImageRepo(dataset_storage.identifier).get_all()]
@@ -479,7 +479,7 @@ def generate_training_dataset_of_all_annotated_media_in_project(  # noqa: C901
     :param ignore_some_labels: If True, mark some labels within the item as ignored
     :return: generated Dataset
     """
-    from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, VideoRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo, VideoRepo
 
     dataset_storage = project.get_training_dataset_storage()
     ann_scene_repo = AnnotationSceneRepo(dataset_storage.identifier)
@@ -561,7 +561,7 @@ def generate_and_save_random_simple_segmentation_project(
     :param request: pytest Request
     :param projectname: Name of the project that is created
     """
-    from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo
 
     register_model_template(request, type(None), "segmentation", "SEGMENTATION", trainable=True)
     project = ProjectFactory().create_project_single_task(

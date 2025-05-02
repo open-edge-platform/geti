@@ -27,13 +27,13 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from iai_core_py.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from iai_core_py.entities.project import NullProject, Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import DatasetStorageRepo, ProjectRepo, VideoRepo
-from iai_core_py.services import ModelService
-from iai_core_py.utils.iteration import grouper
-from iai_core_py.utils.type_helpers import SequenceOrSet
+from iai_core.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import DatasetStorageRepo, ProjectRepo, VideoRepo
+from iai_core.services import ModelService
+from iai_core.utils.iteration import grouper
+from iai_core.utils.type_helpers import SequenceOrSet
 
 logger = logging.getLogger(__name__)
 
@@ -296,7 +296,7 @@ class BaseActiveManager(Generic[TActiveLearningConfig], metaclass=abc.ABCMeta): 
             for candidate_info in best_from_list:
                 if pq.qsize() >= size:
                     _, worst_candidate = pq.get()
-                    candidate_info = min([worst_candidate, candidate_info], key=lambda x: x.score)  # noqa: PLW2901
+                    candidate_info = min([worst_candidate, candidate_info], key=lambda x: x.score)
                 # score negated because we want to keep the best candidates (lowest score)
                 pq.put((-candidate_info.score, candidate_info))
 
@@ -366,7 +366,10 @@ class BaseActiveManager(Generic[TActiveLearningConfig], metaclass=abc.ABCMeta): 
 
     @unified_tracing
     def mark_as_suggested(
-        self, suggested_media_info: Sequence[ActiveScoreSuggestionInfo], user_id: str, reason: str = ""
+        self,
+        suggested_media_info: Sequence[ActiveScoreSuggestionInfo],
+        user_id: str,
+        reason: str = "",
     ) -> None:
         """
         Mark a set of media as suggested to the user.

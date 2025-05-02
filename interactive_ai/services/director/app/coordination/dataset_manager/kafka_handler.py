@@ -9,7 +9,7 @@ from .dataset_update import DatasetUpdateUseCase
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, Singleton
-from iai_core_py.session.session_propagation import setup_session_kafka
+from iai_core.session.session_propagation import setup_session_kafka
 
 
 class DatasetManagementMediaAndAnnotationKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
@@ -22,7 +22,10 @@ class DatasetManagementMediaAndAnnotationKafkaHandler(BaseKafkaHandler, metaclas
     def topics_subscriptions(self) -> list[TopicSubscription]:
         return [
             TopicSubscription(topic="media_deletions", callback=self.on_media_deleted),
-            TopicSubscription(topic="annotation_scenes_to_revisit", callback=self.on_annotations_suspended),
+            TopicSubscription(
+                topic="annotation_scenes_to_revisit",
+                callback=self.on_annotations_suspended,
+            ),
             TopicSubscription(topic="new_annotation_scene", callback=self.on_new_annotation_scene),
         ]
 

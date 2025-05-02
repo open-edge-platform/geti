@@ -11,7 +11,7 @@ import typing
 
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.utils.type_helpers import str2bool
+from iai_core.utils.type_helpers import str2bool
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.k8s_helpers.k8s_resources_calculation import ComputeResources, EphemeralStorageResources
 from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo

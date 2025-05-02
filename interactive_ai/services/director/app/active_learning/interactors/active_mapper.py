@@ -22,14 +22,14 @@ from active_learning.utils.exceptions import (
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, ProjectIdentifier, Singleton
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, NullDataset
-from iai_core_py.entities.metadata import FloatMetadata
-from iai_core_py.entities.model import Model, NullModel
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.repos import DatasetRepo, MetadataRepo, ModelRepo
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.metadata import FloatMetadata
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.subset import Subset
+from iai_core.entities.tensor import Tensor
+from iai_core.repos import DatasetRepo, MetadataRepo, ModelRepo
 
 logger = logging.getLogger(__name__)
 
@@ -160,13 +160,16 @@ class ActiveMapper(metaclass=Singleton):
         dataset_repo = DatasetRepo(dataset_storage_identifier)
         # Bound the dataset size by sampling a constant number of items
         annotation_dataset_items = dataset_repo.sample(
-            dataset_id=annotated_dataset_id, size=MAX_DATASET_SAMPLE_SIZE, subset=Subset.TRAINING
+            dataset_id=annotated_dataset_id,
+            size=MAX_DATASET_SAMPLE_SIZE,
+            subset=Subset.TRAINING,
         )
         media_identifiers = [item.media_identifier for item in annotation_dataset_items]
 
         prediction_dataset_items = tuple(
             dataset_repo.get_items_by_dataset_and_media_identifiers(
-                dataset_id=train_dataset_with_predictions_id, media_identifiers=media_identifiers
+                dataset_id=train_dataset_with_predictions_id,
+                media_identifiers=media_identifiers,
             )
         )
         seen_features = ActiveMapper._extract_features_from_dataset(dataset_items=prediction_dataset_items)
@@ -221,7 +224,9 @@ class ActiveMapper(metaclass=Singleton):
 
     @staticmethod
     @unified_tracing
-    def _extract_features_from_dataset(dataset_items: Sequence[DatasetItem]) -> np.ndarray:
+    def _extract_features_from_dataset(
+        dataset_items: Sequence[DatasetItem],
+    ) -> np.ndarray:
         """
         Given a dataset of N items, each associated to an M-sized feature vector
         ('representation_vector' metadata), extract the NxM numpy array of features.

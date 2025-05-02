@@ -10,20 +10,20 @@ import cv2
 import numpy as np
 import testfixtures.comparison
 from geti_types import DatasetStorageIdentifier, ImageIdentifier, VideoFrameIdentifier
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from iai_core_py.entities.model_template import ModelTemplate
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from iai_core_py.entities.video import Video
-from iai_core_py.repos import (
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.video import Video
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -31,11 +31,11 @@ from iai_core_py.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo
-from iai_core_py.services.model_service import ModelService
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.services.model_service import ModelService
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_factory import ProjectFactory
 from pytest import FixtureRequest
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,8 @@ def generate_random_annotated_image(  # noqa: C901
     for label_name in img_labels:
         rx, ry = rng.integers(low=[1, 1], high=[image_width - min_size, image_height - min_size])
         rw, rh = rng.integers(
-            low=[min_size, min_size], high=[min(max_size, image_width - rx), min(max_size, image_height - ry)]
+            low=[min_size, min_size],
+            high=[min(max_size, image_width - rx), min(max_size, image_height - ry)],
         )
         y_min, y_max = float(ry / image_height), float((ry + rh) / image_height)
         x_min, x_max = float(rx / image_width), float((rx + rw) / image_width)
@@ -277,7 +278,7 @@ def generate_random_annotated_project(
             {"name": "ellipse", "color": "#0000ffff"},
             {"name": "triangle", "color": "#ff0000ff"},
         ]
-    from iai_core_py.repos import AnnotationSceneRepo, ImageRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo
 
     if isinstance(model_template_id, ModelTemplate):
         model_template_id = model_template_id.model_template_id

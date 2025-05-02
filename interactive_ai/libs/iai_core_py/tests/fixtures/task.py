@@ -3,13 +3,13 @@
 
 import pytest
 
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
 
 from .values import DummyValues, IDOffsets
 from geti_types import ID

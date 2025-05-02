@@ -6,14 +6,14 @@ from unittest.mock import patch
 
 from shapely.geometry import Polygon as ShapelyPolgon
 
-from iai_core_py.entities.annotation import Annotation, AnnotationSceneKind
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon
-from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo
-from iai_core_py.utils.post_process_predictions import PostProcessPredictionsUtils
+from iai_core.entities.annotation import Annotation, AnnotationSceneKind
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.model import Model
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Point, Polygon
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo
+from iai_core.utils.post_process_predictions import PostProcessPredictionsUtils
 
 
 class TestPostProcessPredictions:

@@ -17,7 +17,7 @@ from domain.entities.geti_project_type import GetiProjectType
 
 from geti_types import ID
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from iai_core_py.entities.label import Domain, Label, NullLabel
+from iai_core.entities.label import Domain, Label, NullLabel
 
 
 @pytest.mark.DatasetIEMsComponent
@@ -58,7 +58,11 @@ class TestImportManager:
         project_type = "detection"
         metadata = {
             "file_id": str(fxt_dataset_id),
-            "project": {"id": str(fxt_project.id_), "name": fxt_project.name, "type": project_type},
+            "project": {
+                "id": str(fxt_project.id_),
+                "name": fxt_project.name,
+                "type": project_type,
+            },
         }
 
         with patch.object(GRPCJobsClient, "submit", return_value=None) as mock_submit:
@@ -93,7 +97,10 @@ class TestImportManager:
         label_names = (["car", "truck", "bus"],)
         color_by_label = {"car": "#00ff00ff", "truck": "#ff0000ff", "bus": "#0000ffff"}
         keypoint_structure = {"edges": [], "positions": []}
-        metadata = {"file_id": fxt_dataset_id, "project": {"name": project_name, "type": "detection"}}
+        metadata = {
+            "file_id": fxt_dataset_id,
+            "project": {"name": project_name, "type": "detection"},
+        }
 
         with patch.object(GRPCJobsClient, "submit", return_value=None) as mock_submit:
             fxt_import_manager.submit_perform_import_to_new_project_job(
@@ -132,12 +139,21 @@ class TestImportManager:
         )
 
     def test_submit_perform_import_to_existing_project_job(
-        self, fxt_import_manager, fxt_workspace_id, fxt_project, fxt_dataset_id, fxt_user_id
+        self,
+        fxt_import_manager,
+        fxt_workspace_id,
+        fxt_project,
+        fxt_dataset_id,
+        fxt_user_id,
     ):
         labels_map = {"a": "car", "b": "person"}
         metadata = {
             "file_id": str(fxt_dataset_id),
-            "project": {"id": str(fxt_project.id_), "name": fxt_project.name, "type": "detection"},
+            "project": {
+                "id": str(fxt_project.id_),
+                "name": fxt_project.name,
+                "type": "detection",
+            },
             "dataset": {
                 "id": None,
                 "name": "",
@@ -279,7 +295,12 @@ class TestImportManager:
             assert "cannot map a label name to an invalid ID" in e.details
 
     def test_save_project_id(
-        self, request: FixtureRequest, fxt_import_manager, fxt_workspace_id, fxt_dataset_id, fxt_project_id
+        self,
+        request: FixtureRequest,
+        fxt_import_manager,
+        fxt_workspace_id,
+        fxt_dataset_id,
+        fxt_project_id,
     ):
         repo = FileMetadataRepo()
         repo.save(ImportMetadata(fxt_dataset_id, size=10, offset=10))

@@ -7,8 +7,8 @@ import numpy
 
 from resource_management.deployment_package_manager import DeploymentPackageManager
 
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import ModelRepo
+from iai_core.entities.project import Project
+from iai_core.repos import ModelRepo
 
 
 class TestDeploymentPackageManager:

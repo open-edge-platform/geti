@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 import pytest
 
-from iai_core_py.factories.project_validator import ProjectCreationValidator, ProjectUpdateValidator
-from iai_core_py.utils.exceptions import (
+from iai_core.factories.project_validator import ProjectCreationValidator, ProjectUpdateValidator
+from iai_core.utils.exceptions import (
     BadNumberOfConnectionsException,
     BadNumberOfLabelsException,
     DuplicateEdgeInGraphException,

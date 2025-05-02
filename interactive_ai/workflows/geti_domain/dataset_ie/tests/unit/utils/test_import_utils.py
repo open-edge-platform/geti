@@ -14,10 +14,10 @@ from datumaro.components.errors import (
     UnknownFormatError,
 )
 from geti_types import ID
-from iai_core_py.entities.label import NullLabel
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.video import NullVideo
+from iai_core.entities.label import NullLabel
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.video import NullVideo
 
 from job.utils.exceptions import (
     DatasetFormatException,
@@ -200,11 +200,19 @@ class TestImportUtils:
         dm_dataset = dm.Dataset.from_iterable(
             iterable=[
                 dm.DatasetItem(
-                    "image", media=dm.Image.from_file("image.jpg"), annotations=[dm.Bbox(1, 1, 5, 5, label=0)]
+                    "image",
+                    media=dm.Image.from_file("image.jpg"),
+                    annotations=[dm.Bbox(1, 1, 5, 5, label=0)],
                 ),
-                dm.DatasetItem("video", media=dm.Video("video.mp4"), annotations=[dm.Label(label=2)]),
                 dm.DatasetItem(
-                    "video1_frame0", media=dm.VideoFrame(dm.Video("video1.mp4"), 0), annotations=[dm.Label(label=1)]
+                    "video",
+                    media=dm.Video("video.mp4"),
+                    annotations=[dm.Label(label=2)],
+                ),
+                dm.DatasetItem(
+                    "video1_frame0",
+                    media=dm.VideoFrame(dm.Video("video1.mp4"), 0),
+                    annotations=[dm.Label(label=1)],
                 ),
                 dm.DatasetItem(
                     "video1_frame1",
@@ -220,7 +228,11 @@ class TestImportUtils:
                     "video3",
                     media=dm.Video("video3.mp4"),
                 ),
-                dm.DatasetItem("not_supported", media=dm.MediaElement(), annotations=[dm.Label(label=3)]),
+                dm.DatasetItem(
+                    "not_supported",
+                    media=dm.MediaElement(),
+                    annotations=[dm.Label(label=3)],
+                ),
             ],
             categories=["a", "b", "c", "d"],
             media_type=dm.MediaElement,
@@ -266,7 +278,10 @@ class TestImportUtils:
 
         with (
             pytest.raises(MaxDatasetStorageReachedException),
-            patch("job.utils.import_utils.MAX_NUMBER_OF_DATASET_STORAGES", len(project.dataset_storage_adapters)),
+            patch(
+                "job.utils.import_utils.MAX_NUMBER_OF_DATASET_STORAGES",
+                len(project.dataset_storage_adapters),
+            ),
         ):
             ImportUtils.create_dataset_storage(project=project)
 
@@ -315,7 +330,9 @@ class TestImportUtils:
         dm_dataset = dm.Dataset.from_iterable(
             iterable=[
                 dm.DatasetItem(
-                    "video1_frame0", media=dm.VideoFrame(dm.Video(video_path), 0), annotations=[dm.Label(label=1)]
+                    "video1_frame0",
+                    media=dm.VideoFrame(dm.Video(video_path), 0),
+                    annotations=[dm.Label(label=1)],
                 ),
             ],
             categories=["a", "b", "c", "d"],

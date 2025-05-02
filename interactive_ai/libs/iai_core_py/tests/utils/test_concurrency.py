@@ -3,7 +3,7 @@
 
 import pytest
 
-from iai_core_py.utils.concurrency import TimeoutLock
+from iai_core.utils.concurrency import TimeoutLock
 
 
 class TestTimeoutLock:

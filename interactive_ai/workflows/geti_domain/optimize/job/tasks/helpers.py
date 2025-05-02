@@ -4,10 +4,10 @@
 import logging
 from typing import Optional
 
-import iai_core_py.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_telemetry_tools.tracing.common import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.model import (
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelFormat,
@@ -16,8 +16,8 @@ from iai_core_py.entities.model import (
     ModelStatus,
     OptimizationMethod,
 )
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.repos import CompiledDatasetShardsRepo, ModelRepo, ProjectRepo
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.repos import CompiledDatasetShardsRepo, ModelRepo, ProjectRepo
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.tasks.utils.progress import publish_metadata_update
 from jobs_common.tasks.utils.secrets import JobMetadata
@@ -91,7 +91,9 @@ def prepare_optimize(
 
     project = ProjectRepo().get_by_id(project_id_)
     model_storage_identifier = ModelStorageIdentifier(
-        workspace_id=project.workspace_id, project_id=project_id_, model_storage_id=ID(model_storage_id)
+        workspace_id=project.workspace_id,
+        project_id=project_id_,
+        model_storage_id=ID(model_storage_id),
     )
     model_repo = ModelRepo(model_storage_identifier)
     optimized_models = (
@@ -150,7 +152,10 @@ def prepare_optimize(
 
     trainer_ctx = OptimizationTrainerContext.create_from_config(optimization_cfg=optimization_config)
 
-    _prepare_mlflow_s3_bucket(project_identifier=trainer_ctx.project_identifier, optimization_cfg=optimization_config)
+    _prepare_mlflow_s3_bucket(
+        project_identifier=trainer_ctx.project_identifier,
+        optimization_cfg=optimization_config,
+    )
 
     return trainer_ctx
 
@@ -162,7 +167,7 @@ def finalize_optimize(
 ) -> None:
     """Function should be called after model optimization task.
 
-    It updates iai-core-py model entity and clean the directory in the MLFLow experiment bucket.
+    It updates iai-core model entity and clean the directory in the MLFLow experiment bucket.
 
     :param trainer_ctx: Data class defining data used for optimization and providing helpers to get
         frequently used objects

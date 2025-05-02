@@ -13,14 +13,14 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from iai_core_py.entities.annotation import AnnotationScene
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.metrics import (
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
+from iai_core.entities.label import Domain
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     CountMetric,
@@ -32,10 +32,10 @@ from iai_core_py.entities.metrics import (
     TextChartInfo,
     TextMetricsGroup,
 )
-from iai_core_py.entities.model import Model, NullModel
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import (
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.project import Project
+from iai_core.entities.subset import Subset
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -343,7 +343,7 @@ class StatisticsUseCase:
         :return stat: array, which contains object size statistics
         """
 
-        def compute_object_imbalanced_stats(aspect_ratio_threshold_tall, aspect_ratio_threshold_wide):  # noqa: ANN001
+        def compute_object_imbalanced_stats(aspect_ratio_threshold_tall, aspect_ratio_threshold_wide):
             object_ratio = np.transpose(obj_sizes)[1] / np.transpose(obj_sizes)[0]
             n_objects_tall = len(object_ratio[object_ratio >= aspect_ratio_threshold_tall])
             n_objects_wide = len(object_ratio[object_ratio <= aspect_ratio_threshold_wide])

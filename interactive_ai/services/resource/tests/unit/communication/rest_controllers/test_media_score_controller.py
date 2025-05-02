@@ -10,8 +10,8 @@ from tests.unit.mocked_method_helpers import mock_get_image_by_id, mock_get_vide
 from usecases.dataset_filter import DatasetFilterSortDirection, MediaScoreFilterField
 
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, ProjectIdentifier, VideoFrameIdentifier
-from iai_core_py.entities.video import Video
-from iai_core_py.repos import (
+from iai_core.entities.video import Video
+from iai_core.repos import (
     AnnotationSceneRepo,
     DatasetRepo,
     ImageRepo,
@@ -20,8 +20,8 @@ from iai_core_py.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.mappers import IDToMongo, MediaIdentifierToMongo
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.mappers import IDToMongo, MediaIdentifierToMongo
 
 LABEL_IDS = [
     ID("5f7b1b3b7f7e4b0001f3b3b1"),

@@ -3,7 +3,7 @@
 
 import numpy as np
 
-from iai_core_py.entities.shapes import Rectangle
+from iai_core.entities.shapes import Rectangle
 from tests.test_helpers import register_model_template
 
 

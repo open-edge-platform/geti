@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
-from iai_core_py.entities.model import ModelStatus
+from iai_core.entities.model import ModelStatus
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
 
 from job.tasks.prepare_and_train.train_helpers import finalize_train, prepare_train
@@ -80,7 +80,8 @@ class TestTrainHelpers:
         mock_geti_otx_interface_adapter.pull_metrics.assert_called_once()
 
         for model, call_args in zip(
-            fxt_train_output_models.get_all_models(), mock_model_repo.return_value.update_model_status.call_args_list
+            fxt_train_output_models.get_all_models(),
+            mock_model_repo.return_value.update_model_status.call_args_list,
         ):
             assert call_args.kwargs["model"] == model
             assert call_args.kwargs["model_status"] == ModelStatus.TRAINED_NO_STATS

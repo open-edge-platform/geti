@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from shapely.errors import TopologicalError
 
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.label import NullLabel, distinct_colors
-from iai_core_py.entities.shapes import Ellipse, GeometryException, Keypoint, Point, Polygon, Rectangle
-from iai_core_py.entities.shapes import Rectangle as SDK_Rectangle
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.label import NullLabel, distinct_colors
+from iai_core.entities.shapes import Ellipse, GeometryException, Keypoint, Point, Polygon, Rectangle
+from iai_core.entities.shapes import Rectangle as SDK_Rectangle
 from tests.test_helpers import assert_almost_equal
 
 

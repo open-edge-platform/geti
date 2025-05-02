@@ -8,14 +8,14 @@ import cv2
 import numpy as np
 import pytest
 from geti_types import ID
-from iai_core_py.entities.annotation import AnnotationScene
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.model import Model, ModelConfiguration, ModelStatus, TrainingFramework, TrainingFrameworkType
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.repos.metadata_repo import FloatMetadata
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.model import Model, ModelConfiguration, ModelStatus, TrainingFramework, TrainingFrameworkType
+from iai_core.entities.tensor import Tensor
+from iai_core.repos.metadata_repo import FloatMetadata
 from model_api.adapters import OpenvinoAdapter
 from model_api.models import ImageModel, SAMDecoder, SAMImageEncoder, SAMLearnableVisualPrompter
 from model_api.models.utils import AnomalyResult, ClassificationResult, DetectedKeypoints, ImageResultWithSoftPrediction
@@ -258,7 +258,11 @@ def fxt_image(fxt_ote_id) -> Image:
 @pytest.mark.JobsComponent
 class TestInferencer:
     def test_classification_inferencer(
-        self, fxt_dataset_storage, fxt_model_with_adapters, fxt_image, fxt_model_api_image_model
+        self,
+        fxt_dataset_storage,
+        fxt_model_with_adapters,
+        fxt_image,
+        fxt_model_api_image_model,
     ) -> None:
         mock_feature_vector = np.zeros((1, 10, 1, 1))
         mock_saliency_map = np.zeros((1, 2, 7, 7))
@@ -318,7 +322,13 @@ class TestInferencer:
         ),
     )
     def test_detection_inferencer(
-        self, enable_tiling, lazyfxt_model, request, fxt_dataset_storage, fxt_image, fxt_model_api_image_model
+        self,
+        enable_tiling,
+        lazyfxt_model,
+        request,
+        fxt_dataset_storage,
+        fxt_image,
+        fxt_model_api_image_model,
     ) -> None:
         # Arrange
         model_config = {
@@ -592,7 +602,11 @@ class TestInferencer:
         mock_get_media_roi_numpy.assert_called_once()
 
     def test_semantic_segmentation_inferencer(
-        self, fxt_dataset_storage, fxt_model_with_adapters, fxt_image, fxt_model_api_image_model
+        self,
+        fxt_dataset_storage,
+        fxt_model_with_adapters,
+        fxt_image,
+        fxt_model_api_image_model,
     ) -> None:
         mock_result_image = MagicMock()
         mock_soft_prediction = np.zeros((5, 5, 2))
@@ -640,7 +654,11 @@ class TestInferencer:
         mock_get_media_roi_numpy.assert_called_once()
 
     def test_anomaly_inferencer(
-        self, fxt_dataset_storage, fxt_anomaly_model_with_adapters, fxt_image, fxt_model_api_image_model
+        self,
+        fxt_dataset_storage,
+        fxt_anomaly_model_with_adapters,
+        fxt_image,
+        fxt_model_api_image_model,
     ) -> None:
         mock_anomaly_map = MagicMock()
         fxt_model_api_image_model.postprocess.return_value = AnomalyResult(anomaly_map=mock_anomaly_map)
@@ -668,7 +686,11 @@ class TestInferencer:
                 "convert_to_annotations",
                 return_value=[],
             ) as mock_convert_to_annotations,
-            patch.object(AnnotationScene, "get_label_ids", return_value={label.id_ for label in labels}),
+            patch.object(
+                AnnotationScene,
+                "get_label_ids",
+                return_value={label.id_ for label in labels},
+            ),
             patch(
                 "jobs_common_extras.evaluation.services.inferencer.get_media_roi_numpy",
                 return_value=image_numpy_data,
@@ -686,7 +708,11 @@ class TestInferencer:
         mock_get_media_roi_numpy.assert_called_once()
 
     def test_keypoint_detection_inferencer(
-        self, fxt_dataset_storage, fxt_keypoint_detection_model_with_adapters, fxt_image, fxt_model_api_image_model
+        self,
+        fxt_dataset_storage,
+        fxt_keypoint_detection_model_with_adapters,
+        fxt_image,
+        fxt_model_api_image_model,
     ) -> None:
         fxt_model_api_image_model.postprocess.return_value = DetectedKeypoints(
             keypoints=[[20, 30], [40, 50]],
@@ -716,7 +742,11 @@ class TestInferencer:
                 "convert_to_annotations",
                 return_value=[],
             ) as mock_convert_to_annotations,
-            patch.object(AnnotationScene, "get_label_ids", return_value={label.id_ for label in labels}),
+            patch.object(
+                AnnotationScene,
+                "get_label_ids",
+                return_value={label.id_ for label in labels},
+            ),
             patch(
                 "jobs_common_extras.evaluation.services.inferencer.get_media_roi_numpy",
                 return_value=image_numpy_data,

@@ -4,10 +4,10 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from iai_core_py.entities.label import Color, Domain, Label
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.repos import LabelRepo
+from iai_core.entities.label import Color, Domain, Label
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.repos import LabelRepo
 
 from .values import DummyValues, IDOffsets
 from geti_types import ID, ProjectIdentifier

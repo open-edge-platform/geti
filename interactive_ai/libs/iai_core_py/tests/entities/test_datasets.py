@@ -13,20 +13,20 @@ import pytest
 from _pytest.fixtures import FixtureRequest
 from testfixtures import compare
 
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Label, NullLabel
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Point, Polygon, Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, LabelSchemaRepo
-from iai_core_py.repos.mappers.mongodb_mappers.dataset_mapper import AnnotationSceneCache
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label, NullLabel
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Point, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, LabelSchemaRepo
+from iai_core.repos.mappers.mongodb_mappers.dataset_mapper import AnnotationSceneCache
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
 from tests.entities.test_dataset_item import DatasetItemParameters
 from tests.test_helpers import (
     generate_inference_dataset_of_all_media_in_project,
@@ -682,7 +682,7 @@ class TestDataset:
         Test that images are not changed when read and fetched.
 
         <b>Input data:</b>
-        PNG image: "iai_core_py/tests/crate.png"
+        PNG image: "iai_core/tests/crate.png"
 
         <b>Expected results:</b>
         Test passes if the image from the dataset is the same as the original image

@@ -4,8 +4,8 @@
 
 import pytest
 
-from iai_core_py.entities.annotation_template import AnnotationTemplate, NullAnnotationTemplate
-from iai_core_py.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core.entities.annotation_template import AnnotationTemplate, NullAnnotationTemplate
+from iai_core.repos.annotation_template_repo import AnnotationTemplateRepo
 
 from geti_types import ID, ProjectIdentifier
 

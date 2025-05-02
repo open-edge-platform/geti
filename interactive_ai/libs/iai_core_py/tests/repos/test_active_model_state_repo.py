@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from iai_core_py.entities.active_model_state import ActiveModelState
-from iai_core_py.repos import ActiveModelStateRepo
+from iai_core.entities.active_model_state import ActiveModelState
+from iai_core.repos import ActiveModelStateRepo
 
 
 class TestActiveModelStateRepo:

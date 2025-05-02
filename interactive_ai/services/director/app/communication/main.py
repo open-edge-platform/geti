@@ -40,7 +40,7 @@ from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_fastapi_tools.responses import error_response_rest
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry, KafkaTelemetry
-from iai_core_py.algorithms import ModelTemplateList
+from iai_core.algorithms import ModelTemplateList
 
 
 @asynccontextmanager
@@ -111,12 +111,14 @@ def handle_not_found(request, exception) -> JSONResponse:  # noqa: ANN001, ARG00
     logger.info(message)
     headers = {"Cache-Control": "no-cache"}  # always revalidate
     return JSONResponse(
-        {"endpoint_not_found_response": message}, status_code=status.HTTP_404_NOT_FOUND, headers=headers
+        {"endpoint_not_found_response": message},
+        status_code=status.HTTP_404_NOT_FOUND,
+        headers=headers,
     )
 
 
 @app.exception_handler(jsonschema.exceptions.ValidationError)
-def handle_validation_error(request: Request, e: jsonschema.exceptions.ValidationError) -> JSONResponse:  # noqa: ARG001
+def handle_validation_error(request: Request, e: jsonschema.exceptions.ValidationError) -> JSONResponse:
     """
     Handler for invalid json schemas, improves error message for failed JSON schema validation for common cases.
     """
@@ -161,7 +163,7 @@ def handle_base_exception(request: Request, e: GetiBaseException) -> Response:
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:  # noqa: ARG001
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """
     Converts a RequestValidationError to a better readable Bad request exception.
     """

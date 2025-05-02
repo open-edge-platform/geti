@@ -2,14 +2,14 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.adapters.model_adapter import ExportableCodeAdapter
-from iai_core_py.entities.datasets import NullDataset
-from iai_core_py.entities.model import Model, ModelFormat, ModelStatus
-from iai_core_py.repos import ModelRepo
-from iai_core_py.repos.metrics_reporting_model_storage_repo import MetricsReportingModelStorageRepo
-from iai_core_py.services import ModelService
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.adapters.model_adapter import ExportableCodeAdapter
+from iai_core.entities.datasets import NullDataset
+from iai_core.entities.model import Model, ModelFormat, ModelStatus
+from iai_core.repos import ModelRepo
+from iai_core.repos.metrics_reporting_model_storage_repo import MetricsReportingModelStorageRepo
+from iai_core.services import ModelService
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_factory import ProjectFactory
 from tests.test_helpers import empty_model_configuration
 
 

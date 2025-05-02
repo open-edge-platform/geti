@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json
 from geti_k8s_tools import calculate_available_resources_per_node, k8s_cpu_to_millicpus, k8s_memory_to_kibibytes
-from iai_core_py.entities.compiled_dataset_shards import CompiledDatasetShards
+from iai_core.entities.compiled_dataset_shards import CompiledDatasetShards
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,10 @@ RESOURCES_MULTIPLIER = 0.9
 # Resources configuration per environment type
 RESOURCES_CONFIGURATION: dict = {
     "VM": {"requests": {"cpu": "1", "memory": "8GB"}, "limits": {"cpu": "100"}},
-    "BM": {"requests": {"cpu": "2", "memory": "20GB"}, "limits": {"cpu": "100", "memory": "50GB"}},
+    "BM": {
+        "requests": {"cpu": "2", "memory": "20GB"},
+        "limits": {"cpu": "100", "memory": "50GB"},
+    },
 }
 
 

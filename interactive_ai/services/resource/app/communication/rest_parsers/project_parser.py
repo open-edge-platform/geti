@@ -12,8 +12,8 @@ import jsonschema
 from communication.rest_data_validator import ProjectRestValidator
 
 from geti_types import ID
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.factories import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
+from iai_core.entities.model_template import TaskType
+from iai_core.factories import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
 
 COLOR = "color"
 CONNECTIONS = "connections"

@@ -7,14 +7,14 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import DatasetRepo, ModelRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.entities.subset import Subset
+from iai_core.repos import DatasetRepo, ModelRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.utils.exceptions import EmptyEvaluationDatasetException
 
@@ -302,7 +302,11 @@ class TestEvaluateTask:
         mock_project.get_training_dataset_storage.assert_called_once_with()
         mocked_dr_get_by_id.assert_called_once_with(ID(self.dataset_id))
         mocked_mr_get_by_id.assert_has_calls(
-            [call(ID(self.base_model_id)), call(ID(self.mo_model_id)), call(ID(train_data.active_model_id))]
+            [
+                call(ID(self.base_model_id)),
+                call(ID(self.mo_model_id)),
+                call(ID(train_data.active_model_id)),
+            ]
         )
         progress_callback.assert_has_calls(
             [

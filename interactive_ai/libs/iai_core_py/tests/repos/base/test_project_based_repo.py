@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 from bson import ObjectId
 
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.base.session_repo import QueryAccessMode
 
 from geti_types import ProjectIdentifier, make_session
 

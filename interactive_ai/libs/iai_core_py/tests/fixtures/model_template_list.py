@@ -3,10 +3,10 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-import iai_core_py.configuration.helper as otx_config_helper
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
-from iai_core_py.entities.model_template import (
+import iai_core.configuration.helper as otx_config_helper
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,

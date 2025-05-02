@@ -4,10 +4,10 @@
 from unittest.mock import patch
 
 import pytest
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
 
 from tests.fixtures.values import DummyValues, IDOffsets
 

@@ -6,9 +6,9 @@ from random import random
 import pytest
 
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaType, VideoFrameIdentifier
-from iai_core_py.entities.media_score import MediaScore
-from iai_core_py.entities.metrics import ScoreMetric
-from iai_core_py.repos import ImageRepo, MediaScoreRepo, ProjectRepo, VideoRepo
+from iai_core.entities.media_score import MediaScore
+from iai_core.entities.metrics import ScoreMetric
+from iai_core.repos import ImageRepo, MediaScoreRepo, ProjectRepo, VideoRepo
 
 
 @pytest.fixture

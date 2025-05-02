@@ -5,7 +5,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
 from jobs_common.exceptions import DatasetCreationFailedException
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 

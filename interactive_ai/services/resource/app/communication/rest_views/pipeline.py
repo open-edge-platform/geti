@@ -8,13 +8,13 @@ from features.feature_flags import FeatureFlag
 
 from geti_feature_tools import FeatureFlagProvider
 from geti_types import ID
-from iai_core_py.entities.keypoint_structure import KeypointStructure
-from iai_core_py.entities.label_schema import LabelSchemaView, NullLabelSchema
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode
+from iai_core.entities.keypoint_structure import KeypointStructure
+from iai_core.entities.label_schema import LabelSchemaView, NullLabelSchema
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.label import Label
+    from iai_core.entities.label import Label
 
 ZERO = "0"
 CONNECTIONS = "connections"

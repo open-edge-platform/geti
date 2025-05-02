@@ -5,10 +5,10 @@ from unittest.mock import patch
 import pytest
 from pymongo.results import DeleteResult
 
-from iai_core_py.entities.metadata import FloatMetadata, NullMetadataItem
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.repos import MetadataRepo
-from iai_core_py.repos.storage.binary_repos import TensorBinaryRepo
+from iai_core.entities.metadata import FloatMetadata, NullMetadataItem
+from iai_core.entities.tensor import Tensor
+from iai_core.repos import MetadataRepo
+from iai_core.repos.storage.binary_repos import TensorBinaryRepo
 
 from geti_types import ImageIdentifier
 

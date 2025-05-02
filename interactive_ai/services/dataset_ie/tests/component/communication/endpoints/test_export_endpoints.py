@@ -15,8 +15,8 @@ from communication.helpers.http_exceptions import NotEnoughSpaceGetiBaseExceptio
 from domain.entities.dataset_ie_file_metadata import ExportFormat
 
 from geti_types import ID
-from iai_core_py.entities.project import Project
-from iai_core_py.utils.naming_helpers import slugify
+from iai_core.entities.project import Project
+from iai_core.utils.naming_helpers import slugify
 
 ENV_VARS = {
     "S3_CREDENTIALS_PROVIDER": "local",
@@ -90,7 +90,12 @@ class TestExportEndpoints:
         fxt_dataset_storage_id,
     ):
         response = self._call_prepare_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project_id, fxt_dataset_storage_id, export_format="unknown"
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project_id,
+            fxt_dataset_storage_id,
+            export_format="unknown",
         )
 
         assert response.status_code == 400
@@ -125,7 +130,11 @@ class TestExportEndpoints:
     ):
         # invalid project_id
         response = self._call_prepare_dataset(
-            client, fxt_headers, fxt_url_prefix, ID("invalid_project_id"), fxt_dataset_storage_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            ID("invalid_project_id"),
+            fxt_dataset_storage_id,
         )
 
         assert response.status_code == 400
@@ -133,18 +142,31 @@ class TestExportEndpoints:
 
         # project_id is in valid format but cannot find the project
         response = self._call_prepare_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_mongo_id(2000), fxt_dataset_storage_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_mongo_id(2000),
+            fxt_dataset_storage_id,
         )
 
         assert response.status_code == 404
         assert response.json()["message"].startswith("The requested project could not be found.")
 
     def test_prepare_dataset_endpoint_wrong_dataset_storage(
-        self, client: TestClient, fxt_headers, fxt_url_prefix, fxt_project: Project, fxt_mongo_id
+        self,
+        client: TestClient,
+        fxt_headers,
+        fxt_url_prefix,
+        fxt_project: Project,
+        fxt_mongo_id,
     ):
         # invalid dataset_storage_id
         response = self._call_prepare_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, ID("invalid_dataset_storage_id")
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            ID("invalid_dataset_storage_id"),
         )
         assert response.status_code == 400
         assert response.json()["message"].startswith("Invalid request parameters: 'dataset_storage_id'")
@@ -197,7 +219,12 @@ class TestExportEndpoints:
         fxt_download_path,
     ):
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, fxt_dataset_storage_id, fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            fxt_dataset_storage_id,
+            fxt_dataset_id,
         )
 
         assert response.status_code == 307  # redirect
@@ -213,13 +240,23 @@ class TestExportEndpoints:
         fxt_mongo_id,
     ):
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, ID("invalid_project_id"), fxt_dataset_storage_id, fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            ID("invalid_project_id"),
+            fxt_dataset_storage_id,
+            fxt_dataset_id,
         )
         assert response.status_code == 400
         assert response.json()["message"].startswith("Invalid request parameters: 'project_id'")
 
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_mongo_id(2000), fxt_dataset_storage_id, fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_mongo_id(2000),
+            fxt_dataset_storage_id,
+            fxt_dataset_id,
         )
         assert response.status_code == 404
         assert response.json()["message"].startswith("The requested project could not be found.")
@@ -234,13 +271,23 @@ class TestExportEndpoints:
         fxt_mongo_id,
     ):
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, ID("invalid_dataset_storage_id"), fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            ID("invalid_dataset_storage_id"),
+            fxt_dataset_id,
         )
         assert response.status_code == 400
         assert response.json()["message"].startswith("Invalid request parameters: 'dataset_storage_id'")
 
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, fxt_mongo_id(2000), fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            fxt_mongo_id(2000),
+            fxt_dataset_id,
         )
         assert response.status_code == 404
         assert response.json()["message"].startswith("The requested dataset could not be found.")
@@ -260,16 +307,27 @@ class TestExportEndpoints:
         export_manager.get_exported_dataset_presigned_url.side_effect = FileNotFoundError
 
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, fxt_dataset_storage_id, ID("invalid_dataset_id")
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            fxt_dataset_storage_id,
+            ID("invalid_dataset_id"),
         )
         assert response.status_code == 400
         assert response.json()["message"].startswith("Invalid request parameters: 'export_dataset_id'")
 
         with patch(
-            "communication.endpoints.export_endpoints.get_validated_project", return_value=fxt_project
+            "communication.endpoints.export_endpoints.get_validated_project",
+            return_value=fxt_project,
         ) as mock_get_validated_project:
             response = self._call_download_dataset(
-                client, fxt_headers, fxt_url_prefix, fxt_project.id_, fxt_dataset_storage_id, fxt_mongo_id(2000)
+                client,
+                fxt_headers,
+                fxt_url_prefix,
+                fxt_project.id_,
+                fxt_dataset_storage_id,
+                fxt_mongo_id(2000),
             )
             mock_get_validated_project.assert_called()
 
@@ -291,14 +349,24 @@ class TestExportEndpoints:
         export_manager.get_exported_dataset_presigned_url.return_value = None
 
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, fxt_dataset_storage_id, fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            fxt_dataset_storage_id,
+            fxt_dataset_id,
         )
 
         assert response.status_code == 500
 
         export_manager.get_exported_dataset_presigned_url.side_effect = ValueError
         response = self._call_download_dataset(
-            client, fxt_headers, fxt_url_prefix, fxt_project.id_, fxt_dataset_storage_id, fxt_dataset_id
+            client,
+            fxt_headers,
+            fxt_url_prefix,
+            fxt_project.id_,
+            fxt_dataset_storage_id,
+            fxt_dataset_id,
         )
         assert response.status_code == 500
 
@@ -318,10 +386,16 @@ class TestExportEndpoints:
         export_manager.get_exported_dataset_presigned_url.return_value = None
 
         with patch(
-            "communication.endpoints.export_endpoints.get_validated_project", return_value=fxt_project
+            "communication.endpoints.export_endpoints.get_validated_project",
+            return_value=fxt_project,
         ) as mock_get_validated_project:
             response = self._call_download_dataset(
-                client, fxt_headers, fxt_url_prefix, fxt_project_id, fxt_dataset_storage_id, fxt_dataset_id
+                client,
+                fxt_headers,
+                fxt_url_prefix,
+                fxt_project_id,
+                fxt_dataset_storage_id,
+                fxt_dataset_id,
             )
             mock_get_validated_project.assert_called()
         assert response.status_code == 500
@@ -364,7 +438,12 @@ class TestExportEndpoints:
 
     @staticmethod
     def _call_download_dataset(
-        client: TestClient, headers: dict, url_prefix: str, project_id: ID, dataset_storage_id: ID, file_id: ID
+        client: TestClient,
+        headers: dict,
+        url_prefix: str,
+        project_id: ID,
+        dataset_storage_id: ID,
+        file_id: ID,
     ):
         return client.get(
             f"{url_prefix}/projects/{str(project_id)}/datasets/{str(dataset_storage_id)}/exports/{str(file_id)}/download",

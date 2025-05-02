@@ -21,8 +21,8 @@ from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscriptio
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, RequestSource, Singleton, make_session, session_context
 from grpc_interfaces.credit_system.client import CreditSystemClient
-from iai_core_py.session.session_propagation import setup_session_kafka
-from iai_core_py.utils.time_utils import now
+from iai_core.session.session_propagation import setup_session_kafka
+from iai_core.utils.time_utils import now
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +91,9 @@ class ProgressHandler(BaseKafkaHandler, metaclass=Singleton):
 
         with session_context(
             session=make_session(
-                organization_id=organization_id, workspace_id=workspace_id, source=RequestSource.INTERNAL
+                organization_id=organization_id,
+                workspace_id=workspace_id,
+                source=RequestSource.INTERNAL,
             )
         ):
             job = StateMachine().get_by_id(job_id=ID(job_id))

@@ -10,16 +10,16 @@ from pathlib import Path
 
 import pytest
 
-import iai_core_py.configuration.helper as cfg_helper
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.annotation import NullAnnotationScene
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, NullDataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import NullPerformance, Performance, ScoreMetric
-from iai_core_py.entities.model import (
+import iai_core.configuration.helper as cfg_helper
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import NullAnnotationScene
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import NullPerformance, Performance, ScoreMetric
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelDeprecationStatus,
@@ -32,11 +32,11 @@ from iai_core_py.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from iai_core_py.entities.model_storage import NullModelStorage
-from iai_core_py.entities.model_template import TargetDevice, parse_model_template
-from iai_core_py.entities.project import NullProject
-from iai_core_py.entities.task_environment import TaskEnvironment
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.model_storage import NullModelStorage
+from iai_core.entities.model_template import TargetDevice, parse_model_template
+from iai_core.entities.project import NullProject
+from iai_core.entities.task_environment import TaskEnvironment
+from iai_core.utils.time_utils import now
 from tests.entities.test_dataset_item import DatasetItemParameters
 from tests.test_helpers import empty_model_configuration, generate_random_single_image
 

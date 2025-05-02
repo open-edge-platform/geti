@@ -34,7 +34,7 @@ from grpc_interfaces.job_update.pb.job_update_service_pb2_grpc import (
     JobUpdateServiceServicer,
     add_JobUpdateServiceServicer_to_server,
 )
-from iai_core_py.session.session_propagation import setup_session_grpc
+from iai_core.session.session_propagation import setup_session_grpc
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,10 @@ class JobUpdateService(JobUpdateServiceServicer):
                 StateMachine().set_gpu_state_released(job_id=ID(job_id))
         except AutoReconnect:
             logger.exception("Database connection has been lost")
-            context.abort(code=grpc.StatusCode.UNAVAILABLE, details="Database connection has been lost")
+            context.abort(
+                code=grpc.StatusCode.UNAVAILABLE,
+                details="Database connection has been lost",
+            )
 
         return JobUpdateResponse(empty=Empty())
 

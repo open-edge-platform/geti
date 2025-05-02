@@ -3,9 +3,9 @@
 
 import pytest
 
-from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
 
 from .values import DummyValues
 from geti_types import ID

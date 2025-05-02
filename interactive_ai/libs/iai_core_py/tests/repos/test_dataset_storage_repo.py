@@ -4,9 +4,9 @@
 #
 
 
-from iai_core_py.entities.dataset_storage import NullDatasetStorage
-from iai_core_py.repos import DatasetStorageRepo
-from iai_core_py.repos.mappers import DatasetStorageToMongo
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.repos import DatasetStorageRepo
+from iai_core.repos.mappers import DatasetStorageToMongo
 
 from geti_types import ProjectIdentifier
 

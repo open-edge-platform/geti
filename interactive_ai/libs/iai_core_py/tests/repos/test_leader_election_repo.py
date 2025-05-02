@@ -3,7 +3,7 @@
 
 from time import sleep
 
-from iai_core_py.repos.leader_election_repo import LeaderElectionRepo
+from iai_core.repos.leader_election_repo import LeaderElectionRepo
 
 
 class TestLeaderElectionRepo:

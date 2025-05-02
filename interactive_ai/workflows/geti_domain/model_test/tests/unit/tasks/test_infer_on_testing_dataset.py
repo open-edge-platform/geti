@@ -4,9 +4,9 @@ from copy import copy
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
-from iai_core_py.entities.model import ModelFormat
-from iai_core_py.repos import DatasetRepo, ModelTestResultRepo, ProjectRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.model import ModelFormat
+from iai_core.repos import DatasetRepo, ModelTestResultRepo, ProjectRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common.exceptions import UnsupportedModelFormatForModelTestingException
 from jobs_common_extras.evaluation.services.batch_inference import BatchInference
 
@@ -28,7 +28,12 @@ def fxt_model_base_framework(fxt_model):
 @pytest.mark.JobsComponent
 class TestInferOnTestingDataset:
     def test_infer_on_testing_dataset(
-        self, fxt_empty_project, fxt_model_test_result, fxt_dataset_non_empty_2, fxt_task_node, fxt_dataset
+        self,
+        fxt_empty_project,
+        fxt_model_test_result,
+        fxt_dataset_non_empty_2,
+        fxt_task_node,
+        fxt_dataset,
     ) -> None:
         with (
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
@@ -68,7 +73,12 @@ class TestInferOnTestingDataset:
         assert output_dataset == fxt_dataset_non_empty_2
 
     def test_unsupported_model_format(
-        self, fxt_empty_project, fxt_dataset_non_empty_2, fxt_task_node, fxt_model_base_framework, fxt_dataset
+        self,
+        fxt_empty_project,
+        fxt_dataset_non_empty_2,
+        fxt_task_node,
+        fxt_model_base_framework,
+        fxt_dataset,
     ) -> None:
         mock_model_test = MagicMock()
         mock_model_test.get_model.return_value = fxt_model_base_framework

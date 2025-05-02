@@ -16,7 +16,7 @@ from networkx.classes.reportviews import (
 )
 from networkx.exception import NetworkXError, NetworkXNotImplemented
 
-from iai_core_py.entities.graph import Graph, MultiDiGraph
+from iai_core.entities.graph import Graph, MultiDiGraph
 
 
 class TestGraph:

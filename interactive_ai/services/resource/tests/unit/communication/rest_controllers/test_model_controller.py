@@ -10,16 +10,16 @@ from communication.rest_controllers import ModelRESTController
 from tests.fixtures.job import do_nothing
 from usecases.statistics import StatisticsUseCase
 
-import iai_core_py.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_kafka_tools import publish_event
 from geti_types import ID, make_session, session_context
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from iai_core_py.services import ModelService
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core.services import ModelService
 
 
 class TestModelRESTController:

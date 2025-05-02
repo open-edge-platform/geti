@@ -5,9 +5,9 @@ from unittest.mock import patch
 
 import pytest
 from geti_types import ID
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.project import Project
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.entities.label import Domain
+from iai_core.entities.project import Project
+from iai_core.utils.deletion_helpers import DeletionHelpers
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
 
@@ -37,12 +37,16 @@ class TestParseDatasetExistingProject:
             domain = ImportUtils.project_type_to_label_domain(dataset_info.exported_project_type)
             possible_domains = {domain}
             possible_domains.update(
-                map(ImportUtils.project_type_to_label_domain, dataset_info.label_names_by_cross_project.keys())
+                map(
+                    ImportUtils.project_type_to_label_domain,
+                    dataset_info.label_names_by_cross_project.keys(),
+                )
             )
         else:
             possible_domains = set()
             domains = map(
-                ImportUtils.project_type_to_label_domain, dataset_info.label_names_by_ann_based_project.keys()
+                ImportUtils.project_type_to_label_domain,
+                dataset_info.label_names_by_ann_based_project.keys(),
             )
             if domains:
                 possible_domains.update(domains)
@@ -72,7 +76,10 @@ class TestParseDatasetExistingProject:
     def _parse_dataset_for_import_to_existing_project(
         data_repo: ImportDataRepo, dataset_id: ID, project: Project
     ) -> tuple[list, list]:
-        with patch("job.tasks.import_tasks.parse_dataset_existing_project.ImportDataRepo", return_value=data_repo):
+        with patch(
+            "job.tasks.import_tasks.parse_dataset_existing_project.ImportDataRepo",
+            return_value=data_repo,
+        ):
             label_names, warnings = _parse_dataset_for_import_to_existing_project(
                 import_id=str(dataset_id),
                 project_id=str(project.id_),
@@ -139,7 +146,10 @@ class TestParseDatasetExistingProject:
         else:
             expected_labels = set()
         warnings = self._get_expected_warnings_for_specific_task(
-            project_type, dataset_info, expected_labels, possible_domains_from_cross=possible_domains_from_cross
+            project_type,
+            dataset_info,
+            expected_labels,
+            possible_domains_from_cross=possible_domains_from_cross,
         )
 
         if (
@@ -154,7 +164,13 @@ class TestParseDatasetExistingProject:
             warnings.add(warning_local_annotations_lost())
 
         self._check_label_names_from_parse_dataset_for_import_to_existing_project(
-            request, import_data_repo, dataset_id, project, expected_labels, warnings, project_type
+            request,
+            import_data_repo,
+            dataset_id,
+            project,
+            expected_labels,
+            warnings,
+            project_type,
         )
 
         # import dataset based on annotation type. (assume the dataset is not exported from Geti)
@@ -168,7 +184,13 @@ class TestParseDatasetExistingProject:
                 expected_labels = set()
             warnings = self._get_expected_warnings_for_specific_task(project_type, dataset_info, expected_labels)
             self._check_label_names_from_parse_dataset_for_import_to_existing_project(
-                request, import_data_repo, dataset_id, project, expected_labels, warnings, project_type
+                request,
+                import_data_repo,
+                dataset_id,
+                project,
+                expected_labels,
+                warnings,
+                project_type,
             )
 
             if project_type not in CHAINED_PROJECT_TYPES:
@@ -184,7 +206,12 @@ class TestParseDatasetExistingProject:
         fxt_dataset_id, dataset_info = fxt_dataset_id__datumaro
         fxt_project_str, project = fxt_project
         self._test_parse_dataset_for_import_to_existing_project__datumaro_format(
-            request, fxt_dataset_id, dataset_info, fxt_project_str, project, fxt_import_data_repo
+            request,
+            fxt_dataset_id,
+            dataset_info,
+            fxt_project_str,
+            project,
+            fxt_import_data_repo,
         )
 
     @pytest.mark.parametrize(
@@ -215,7 +242,12 @@ class TestParseDatasetExistingProject:
         project = fxt_annotated_anomaly_cls_project
 
         self._test_parse_dataset_for_import_to_existing_project__datumaro_format(
-            request, dataset_id, dataset_info, project_str, project, fxt_import_data_repo
+            request,
+            dataset_id,
+            dataset_info,
+            project_str,
+            project,
+            fxt_import_data_repo,
         )
 
     def test_parse_dataset_for_import_to_existing_project__public_format(
@@ -237,7 +269,13 @@ class TestParseDatasetExistingProject:
         warnings = self._get_expected_warnings_for_specific_task(project_type, dataset_info, expected_labels)
 
         self._check_label_names_from_parse_dataset_for_import_to_existing_project(
-            request, fxt_import_data_repo, fxt_dataset_id, project, expected_labels, warnings, project_type
+            request,
+            fxt_import_data_repo,
+            fxt_dataset_id,
+            project,
+            expected_labels,
+            warnings,
+            project_type,
         )
 
     def test_parse_dataset_for_import_to_existing_project__by_annotation_types(
@@ -264,5 +302,11 @@ class TestParseDatasetExistingProject:
         warnings = self._get_expected_warnings_for_specific_task(project_type, dataset_info, expected_labels)
 
         self._check_label_names_from_parse_dataset_for_import_to_existing_project(
-            request, fxt_import_data_repo, dataset_id, project, expected_labels, warnings, project_type
+            request,
+            fxt_import_data_repo,
+            dataset_id,
+            project,
+            expected_labels,
+            warnings,
+            project_type,
         )

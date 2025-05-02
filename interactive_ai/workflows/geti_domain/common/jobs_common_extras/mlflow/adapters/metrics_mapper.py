@@ -9,7 +9,7 @@ from typing import ClassVar
 
 import numpy as np
 from geti_types import ID
-from iai_core_py.entities.metrics import (
+from iai_core.entities.metrics import (
     AnomalyLocalizationPerformance,
     BarChartInfo,
     BarMetricsGroup,
@@ -69,7 +69,10 @@ class MetricDeserializer:
             result = NullScoreMetric()
         elif metric_type == DurationMetric.type():
             result = DurationMetric(
-                name=instance["name"], hour=instance["hour"], minute=instance["minute"], second=instance["second"]
+                name=instance["name"],
+                hour=instance["hour"],
+                minute=instance["minute"],
+                second=instance["second"],
             )
         elif metric_type == CurveMetric.type():
             result = CurveMetric(name=instance["name"], ys=instance["ys"], xs=instance.get("xs"))
@@ -157,7 +160,10 @@ class MetricsGroupDeserializer:
     def backward_text_metrics(metrics: list[MetricEntity], visualization_info: TextChartInfo) -> TextMetricsGroup:
         filtered_metrics = []
         for metric in metrics:
-            if isinstance(metric, ScoreMetric | CountMetric | StringMetric | DateMetric | DurationMetric):
+            if isinstance(
+                metric,
+                ScoreMetric | CountMetric | StringMetric | DateMetric | DurationMetric,
+            ):
                 filtered_metrics.append(metric)
             else:
                 raise ValueError(f"Metric type {type(metric)} is not supported for text visualization.")
@@ -271,7 +277,9 @@ class PerformanceDeserializer:
         return score_metric
 
     @staticmethod
-    def _validate_optional_score_metric(score_metric: MetricEntity) -> ScoreMetric | None:
+    def _validate_optional_score_metric(
+        score_metric: MetricEntity,
+    ) -> ScoreMetric | None:
         """
         Validate that a metric passed as a model or project score is of the correct
         type, and convert to a dummy score if not.

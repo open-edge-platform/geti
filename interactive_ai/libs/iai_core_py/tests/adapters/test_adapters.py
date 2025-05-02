@@ -3,7 +3,7 @@
 
 import pytest
 
-from iai_core_py.adapters.model_adapter import DataSource, ExportableCodeAdapter, ModelAdapter
+from iai_core.adapters.model_adapter import DataSource, ExportableCodeAdapter, ModelAdapter
 
 
 class DummyDataSource(DataSource):

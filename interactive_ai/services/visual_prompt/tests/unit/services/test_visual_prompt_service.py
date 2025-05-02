@@ -25,18 +25,18 @@ from services.visual_prompt_service import (
 )
 
 from geti_types import DatasetStorageIdentifier, NullMediaIdentifier
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, NullDataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.metrics import MultiScorePerformance, ScoreMetric
-from iai_core_py.entities.model import (
+from iai_core.algorithms import ModelTemplateList
+from iai_core.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metrics import MultiScorePerformance, ScoreMetric
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelFormat,
@@ -44,13 +44,13 @@ from iai_core_py.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from iai_core_py.entities.model_storage import ModelStorage, NullModelStorage
-from iai_core_py.entities.model_template import TaskFamily, TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
-from iai_core_py.repos import (
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import TaskFamily, TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.repos import (
     AnnotationSceneRepo,
     DatasetRepo,
     EvaluationResultRepo,
@@ -59,7 +59,7 @@ from iai_core_py.repos import (
     ModelStorageRepo,
     ProjectRepo,
 )
-from iai_core_py.repos.storage.s3_connector import S3Connector
+from iai_core.repos.storage.s3_connector import S3Connector
 
 
 def return_none(*args, **kwargs) -> None:
@@ -142,7 +142,13 @@ def fxt_task_node(fxt_project, fxt_ote_id):
 
 class TestVisualPromptService:
     @pytest.mark.parametrize(
-        "label_domain", [Domain.ROTATED_DETECTION, Domain.DETECTION, Domain.SEGMENTATION, Domain.INSTANCE_SEGMENTATION]
+        "label_domain",
+        [
+            Domain.ROTATED_DETECTION,
+            Domain.DETECTION,
+            Domain.SEGMENTATION,
+            Domain.INSTANCE_SEGMENTATION,
+        ],
     )
     def test_infer(
         self,
@@ -182,36 +188,54 @@ class TestVisualPromptService:
         # Act
         with (
             patch.object(
-                ReferenceFeatureRepo, "get_all_ids_by_task_id", return_value=learned_label_ids
+                ReferenceFeatureRepo,
+                "get_all_ids_by_task_id",
+                return_value=learned_label_ids,
             ) as mock_get_learned_ids,
             patch.object(
-                ReferenceFeatureRepo, "get_all_by_task_id", return_value=mock_reference_features
+                ReferenceFeatureRepo,
+                "get_all_by_task_id",
+                return_value=mock_reference_features,
             ) as mock_get_all_ref_features,
             patch.object(
-                LabelSchemaRepo, "get_latest_view_by_task", return_value=mock_label_schema
+                LabelSchemaRepo,
+                "get_latest_view_by_task",
+                return_value=mock_label_schema,
             ) as mock_label_schema,
             patch.object(VisualPromptService, "one_shot_learn", return_value=None) as mock_learn,
             patch.object(
-                VisualPromptingFeaturesConverter, "convert_to_visual_prompting_features", return_value=mock_vp_features
+                VisualPromptingFeaturesConverter,
+                "convert_to_visual_prompting_features",
+                return_value=mock_vp_features,
             ) as mock_convert_vp_features,
             patch.object(SAMLearnableVisualPrompter, "infer", return_value=dummy_vp_results) as mock_vp_infer,
             patch.object(
-                AnnotationConverter, "convert_to_bboxes", return_value=mock_predicted_annotations
+                AnnotationConverter,
+                "convert_to_bboxes",
+                return_value=mock_predicted_annotations,
             ) as mock_convert_to_bbox,
             patch.object(
-                AnnotationConverter, "convert_to_rotated_bboxes", return_value=mock_predicted_annotations
+                AnnotationConverter,
+                "convert_to_rotated_bboxes",
+                return_value=mock_predicted_annotations,
             ) as mock_convert_to_rot_bbox,
             patch.object(
-                AnnotationConverter, "convert_to_polygons", return_value=mock_predicted_annotations
+                AnnotationConverter,
+                "convert_to_polygons",
+                return_value=mock_predicted_annotations,
             ) as mock_convert_to_polygons,
             patch.object(
-                VisualPromptService, "_get_or_create_sam_model_storage", return_value=fxt_model.model_storage
+                VisualPromptService,
+                "_get_or_create_sam_model_storage",
+                return_value=fxt_model.model_storage,
             ) as mock_get_sam_model_storage,
             patch.object(ModelRepo, "get_one", return_value=fxt_model),
             patch.object(VisualPromptService, "_resize_image", return_value=resized_image_numpy),
         ):
             predicted_annotations = fxt_visual_prompt_service.infer(
-                project_identifier=fxt_project_identifier, task_id=task_id, media=fxt_image
+                project_identifier=fxt_project_identifier,
+                task_id=task_id,
+                media=fxt_image,
             )
 
         # Assert
@@ -238,10 +262,14 @@ class TestVisualPromptService:
         mock_get_all_ref_features.assert_called_once_with(task_id=task_id)
         mock_label_schema.assert_called_once_with(task_node_id=task_id)
         mock_learn.assert_called_once_with(
-            project_identifier=fxt_project_identifier, label_ids=[fxt_ote_id(3)], task_id=task_id
+            project_identifier=fxt_project_identifier,
+            label_ids=[fxt_ote_id(3)],
+            task_id=task_id,
         )
         mock_vp_infer.assert_called_once_with(
-            image=resized_image_numpy, reference_features=mock_vp_features, apply_masks_refinement=False
+            image=resized_image_numpy,
+            reference_features=mock_vp_features,
+            apply_masks_refinement=False,
         )
         mock_convert_vp_features.assert_called_once_with(reference_features=mock_reference_features)
         mock_get_sam_model_storage.assert_called_once_with(project_identifier=fxt_project_identifier, task_id=task_id)
@@ -271,11 +299,15 @@ class TestVisualPromptService:
             patch.object(ReferenceFeatureRepo, "get_all_ids_by_task_id", return_value=[]) as mock_get_learned_ids,
             patch.object(ReferenceFeatureRepo, "get_all_by_task_id", return_value=[]) as mock_get_all_ref_features,
             patch.object(
-                LabelSchemaRepo, "get_latest_view_by_task", return_value=mock_label_schema
+                LabelSchemaRepo,
+                "get_latest_view_by_task",
+                return_value=mock_label_schema,
             ) as mock_label_schema,
         ):
             predicted_annotations = fxt_visual_prompt_service.infer(
-                project_identifier=fxt_project_identifier, task_id=task_id, media=fxt_image
+                project_identifier=fxt_project_identifier,
+                task_id=task_id,
+                media=fxt_image,
             )
 
         # Assert
@@ -291,7 +323,12 @@ class TestVisualPromptService:
         assert predicted_annotations.polygons == []
 
     def test_one_shot_learn(
-        self, fxt_project, fxt_visual_prompt_service, fxt_annotation_scene, fxt_image, fxt_ote_id
+        self,
+        fxt_project,
+        fxt_visual_prompt_service,
+        fxt_annotation_scene,
+        fxt_image,
+        fxt_ote_id,
     ) -> None:
         # Arrange
         task_id = fxt_ote_id(1001)
@@ -322,7 +359,11 @@ class TestVisualPromptService:
             size=100,
             preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED),
         )
-        dataset_item = DatasetItem(id_=fxt_ote_id(100), media=dummy_image_media, annotation_scene=fxt_annotation_scene)
+        dataset_item = DatasetItem(
+            id_=fxt_ote_id(100),
+            media=dummy_image_media,
+            annotation_scene=fxt_annotation_scene,
+        )
 
         # Act
         with (
@@ -337,9 +378,15 @@ class TestVisualPromptService:
                 PromptConverter, "extract_bbox_prompts", return_value=mock_box_prompts
             ) as mock_extract_box_prompt,
             patch.object(
-                PromptConverter, "extract_polygon_prompts", return_value=mock_polygon_prompts
+                PromptConverter,
+                "extract_polygon_prompts",
+                return_value=mock_polygon_prompts,
             ) as mock_extract_polygon_prompt,
-            patch.object(SAMLearnableVisualPrompter, "learn", return_value=mock_vp_features_and_masks) as mock_vp_learn,
+            patch.object(
+                SAMLearnableVisualPrompter,
+                "learn",
+                return_value=mock_vp_features_and_masks,
+            ) as mock_vp_learn,
             patch.object(
                 VisualPromptService,
                 "_get_2d_media_by_media_identifier",
@@ -350,7 +397,11 @@ class TestVisualPromptService:
                 "convert_to_reference_features",
                 return_value=mock_ref_features,
             ) as mock_convert_to_ref_features,
-            patch.object(VisualPromptingFeaturesConverter, "index_to_label_id", side_effect=label_ids),
+            patch.object(
+                VisualPromptingFeaturesConverter,
+                "index_to_label_id",
+                side_effect=label_ids,
+            ),
             patch.object(ReferenceFeatureRepo, "save_many") as mock_save_ref_features,
             patch.object(VisualPromptService, "_save_sam_model") as mock_save_sam_model,
             patch.object(
@@ -363,12 +414,15 @@ class TestVisualPromptService:
             patch.object(VisualPromptService, "_resize_image", return_value=resized_image_numpy),
         ):
             reference_features = fxt_visual_prompt_service.one_shot_learn(
-                project_identifier=fxt_project.identifier, label_ids=label_ids, task_id=task_id
+                project_identifier=fxt_project.identifier,
+                label_ids=label_ids,
+                task_id=task_id,
             )
 
         # Assert
         mock_sample_annotations.assert_called_once_with(
-            label_ids=label_ids, dataset_storage_id=fxt_project.training_dataset_storage_id
+            label_ids=label_ids,
+            dataset_storage_id=fxt_project.training_dataset_storage_id,
         )
         mock_extract_box_prompt.assert_called_once_with(annotation_scene=fxt_annotation_scene, height=2, width=2)
         mock_extract_polygon_prompt.assert_called_once_with(annotation_scene=fxt_annotation_scene, height=2, width=2)
@@ -377,10 +431,15 @@ class TestVisualPromptService:
             media_identifier=fxt_annotation_scene.media_identifier,
         )
         mock_vp_learn.assert_called_once_with(
-            image=resized_image_numpy, boxes=mock_box_prompts, polygons=mock_polygon_prompts, reset_features=True
+            image=resized_image_numpy,
+            boxes=mock_box_prompts,
+            polygons=mock_polygon_prompts,
+            reset_features=True,
         )
         mock_sam_infer.assert_called_once_with(
-            image=resized_image_numpy, reference_features=mock_vp_features_and_masks[0], apply_masks_refinement=False
+            image=resized_image_numpy,
+            reference_features=mock_vp_features_and_masks[0],
+            apply_masks_refinement=False,
         )
         mock_generate_dice_metrics.assert_called_once_with(
             image_height=2,
@@ -482,23 +541,51 @@ class TestVisualPromptService:
         dataset_item = DatasetItem(id_=fxt_ote_id(100), media=fxt_image, annotation_scene=fxt_annotation_scene)
         dice_intersection_per_label = defaultdict(int, {label.id_: 50})
         dice_cardinality_per_label = (defaultdict(int, {label.id_: 100}),)
-        reference_dataset = Dataset(items=[dataset_item], id=fxt_ote_id(1000), label_schema_id=fxt_label_schema.id_)
+        reference_dataset = Dataset(
+            items=[dataset_item],
+            id=fxt_ote_id(1000),
+            label_schema_id=fxt_label_schema.id_,
+        )
 
         # Act
         with (
-            patch.object(VisualPromptService, "_sam_encoder_xml", return_value=model_data_sources["encoder.xml"]),
-            patch.object(VisualPromptService, "_sam_encoder_bin", return_value=model_data_sources["encoder.bin"]),
-            patch.object(VisualPromptService, "_sam_decoder_xml", return_value=model_data_sources["decoder.xml"]),
-            patch.object(VisualPromptService, "_sam_decoder_bin", return_value=model_data_sources["decoder.bin"]),
+            patch.object(
+                VisualPromptService,
+                "_sam_encoder_xml",
+                return_value=model_data_sources["encoder.xml"],
+            ),
+            patch.object(
+                VisualPromptService,
+                "_sam_encoder_bin",
+                return_value=model_data_sources["encoder.bin"],
+            ),
+            patch.object(
+                VisualPromptService,
+                "_sam_decoder_xml",
+                return_value=model_data_sources["decoder.xml"],
+            ),
+            patch.object(
+                VisualPromptService,
+                "_sam_decoder_bin",
+                return_value=model_data_sources["decoder.bin"],
+            ),
             patch.object(VisualPromptService, "_save_sam_evaluation_result") as mock_save_sam_evaluation_result,
             patch.object(Project, "get_trainable_task_nodes", return_value=[fxt_task_node]),
-            patch.object(Project, "get_training_dataset_storage", return_value=fxt_dataset_storage),
+            patch.object(
+                Project,
+                "get_training_dataset_storage",
+                return_value=fxt_dataset_storage,
+            ),
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_project) as mock_get_project,
             patch.object(
-                LabelSchemaRepo, "get_latest_view_by_task", return_value=fxt_label_schema
+                LabelSchemaRepo,
+                "get_latest_view_by_task",
+                return_value=fxt_label_schema,
             ) as mock_get_label_schema,
             patch.object(
-                ModelStorageRepo, "get_one_by_task_node_id", return_value=NullModelStorage()
+                ModelStorageRepo,
+                "get_one_by_task_node_id",
+                return_value=NullModelStorage(),
             ) as mock_get_model_storage,
             patch.object(ModelStorageRepo, "generate_id", return_value=sam_model_storage.id_),
             patch.object(ModelStorageRepo, "save") as mock_save_model_storage,
@@ -572,7 +659,9 @@ class TestVisualPromptService:
         # Act
         with (
             patch.object(
-                EvaluationResultRepo, "get_latest_by_model_ids", return_value=mock_evaluation_result
+                EvaluationResultRepo,
+                "get_latest_by_model_ids",
+                return_value=mock_evaluation_result,
             ) as mock_get_latest_evaluation_result,
             patch.object(EvaluationResultRepo, "save", return_value=mock_evaluation_result) as mock_save_evaluation,
             patch.object(LabelSchema, "get_labels", return_value=[fxt_label, fxt_label_2]),

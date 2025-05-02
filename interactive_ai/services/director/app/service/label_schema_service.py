@@ -3,9 +3,9 @@
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
-from iai_core_py.repos import LabelSchemaRepo
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
+from iai_core.repos import LabelSchemaRepo
 
 
 class LabelSchemaService:
@@ -51,7 +51,9 @@ class LabelSchemaService:
     @staticmethod
     @unified_tracing
     def get_latest_labels_for_task(
-        project_identifier: ProjectIdentifier, task_node_id: ID, include_empty: bool = False
+        project_identifier: ProjectIdentifier,
+        task_node_id: ID,
+        include_empty: bool = False,
     ) -> list[Label]:
         """
         Get the labels from the latest label schema of the given task node.

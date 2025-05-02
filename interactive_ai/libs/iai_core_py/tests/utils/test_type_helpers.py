@@ -3,7 +3,7 @@
 
 import pytest
 
-from iai_core_py.utils.type_helpers import str2bool
+from iai_core.utils.type_helpers import str2bool
 
 
 class TestStr2Bool:

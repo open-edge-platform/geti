@@ -9,7 +9,7 @@ import pytest
 from grpc import RpcError
 
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from iai_core_py.repos import ProjectRepo
+from iai_core.repos import ProjectRepo
 
 
 def do_nothing(self, *args, **kwargs) -> None:

@@ -8,17 +8,17 @@ from _pytest.fixtures import FixtureRequest
 from tests.fixtures.values import DummyValues
 
 from geti_types import DatasetStorageIdentifier, ImageIdentifier
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, DatasetIdentifier
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetIdentifier
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.project import Project
+from iai_core.entities.subset import Subset
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
 
 
 @pytest.fixture

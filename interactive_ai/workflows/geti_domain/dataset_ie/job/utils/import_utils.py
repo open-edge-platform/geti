@@ -22,14 +22,14 @@ from datumaro.components.errors import (
 )
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ProjectIdentifier, VideoFrameIdentifier
-from iai_core_py.adapters.adapter import ReferenceAdapter
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.label import Label, NullLabel
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.project import NullProject, Project
-from iai_core_py.entities.video import NullVideo
-from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from iai_core_py.repos import (
+from iai_core.adapters.adapter import ReferenceAdapter
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.label import Label, NullLabel
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.video import NullVideo
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.repos import (
     DatasetStorageRepo,
     ImageRepo,
     LabelRepo,
@@ -198,7 +198,9 @@ class ImportUtils(BaseImportUtils):
         return project
 
     @staticmethod
-    def is_task_hierarhical_or_multi_labels(project_identifier: ProjectIdentifier) -> tuple[bool, bool]:
+    def is_task_hierarhical_or_multi_labels(
+        project_identifier: ProjectIdentifier,
+    ) -> tuple[bool, bool]:
         """
         Check if the given classification task is hierarchical or multi-labels.
 
@@ -325,7 +327,9 @@ class PopulationManager:
         get_video_name = ConvertUtils.map_video_names(has_single_subset)
 
         image_uploader = ImageUploadManager(
-            dataset_storage_identifier=dataset_storage_identifier, uploader_id=user_id, get_image_name=get_image_name
+            dataset_storage_identifier=dataset_storage_identifier,
+            uploader_id=user_id,
+            get_image_name=get_image_name,
         )
         video_uploader = VideoUploadManager(
             dataset_storage_identifier=dataset_storage_identifier,
@@ -423,7 +427,9 @@ class PopulationManager:
                 continue
             # TODO: Need to check if the actual annotations match the video annotation range.
             video_annotation_range = VideoAnnotationRange(
-                video_id=video_id, range_labels=range_labels, id_=VideoAnnotationRangeRepo.generate_id()
+                video_id=video_id,
+                range_labels=range_labels,
+                id_=VideoAnnotationRangeRepo.generate_id(),
             )
             video_ann_range_repo.save(video_annotation_range)
             count += 1

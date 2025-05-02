@@ -1,9 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
 from jobs_common.exceptions import CommandInternalError
 
 

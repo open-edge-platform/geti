@@ -8,8 +8,8 @@ This module contains Configuration components for the TaskDatasetCounter classes
 
 import attr
 
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.primitive_parameters import (
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_integer,
     string_attribute,

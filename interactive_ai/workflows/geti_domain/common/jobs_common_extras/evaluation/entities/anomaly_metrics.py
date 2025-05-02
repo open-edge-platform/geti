@@ -5,11 +5,11 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 
 from geti_types import ID, MediaIdentifierEntity
-from iai_core_py.entities.annotation import AnnotationScene
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import (
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import (
     AnomalyLocalizationPerformance,
     BarChartInfo,
     ColorPalette,
@@ -19,7 +19,7 @@ from iai_core_py.entities.metrics import (
     ScoreMetric,
     VisualizationType,
 )
-from iai_core_py.entities.shapes import Rectangle
+from iai_core.entities.shapes import Rectangle
 
 from jobs_common.utils.progress_helper import noop_progress_callback
 
@@ -216,7 +216,12 @@ class AnomalyMetric(PerformanceMetric, ABC):
                     ignored_label_ids=item.ignored_label_ids,
                 )
             )
-        return Dataset(id=ID(), items=global_items, purpose=dataset.purpose, label_schema_id=dataset.label_schema_id)
+        return Dataset(
+            id=ID(),
+            items=global_items,
+            purpose=dataset.purpose,
+            label_schema_id=dataset.label_schema_id,
+        )
 
     @staticmethod
     def get_local_subset(dataset: Dataset, local_indices: Sequence[int]) -> Dataset:
@@ -251,7 +256,12 @@ class AnomalyMetric(PerformanceMetric, ABC):
                     ignored_label_ids=item.ignored_label_ids,
                 )
             )
-        return Dataset(id=ID(), items=local_items, purpose=dataset.purpose, label_schema_id=dataset.label_schema_id)
+        return Dataset(
+            id=ID(),
+            items=local_items,
+            purpose=dataset.purpose,
+            label_schema_id=dataset.label_schema_id,
+        )
 
     @staticmethod
     def _locally_annotated_indices(dataset: Dataset, label_schema: LabelSchema) -> list[int]:

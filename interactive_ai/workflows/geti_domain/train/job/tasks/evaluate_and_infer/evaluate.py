@@ -10,15 +10,15 @@ from collections.abc import Callable
 from geti_telemetry_tools import unified_tracing
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.model import Model, ModelStatus
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import DatasetRepo, ModelRepo
-from iai_core_py.services import ModelService
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model import Model, ModelStatus
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.subset import Subset
+from iai_core.repos import DatasetRepo, ModelRepo
+from iai_core.services import ModelService
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common.utils.annotation_filter import AnnotationFilter
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import infer_and_evaluate

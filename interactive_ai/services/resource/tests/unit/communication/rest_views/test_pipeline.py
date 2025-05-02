@@ -9,8 +9,8 @@ from testfixtures import compare
 from communication.rest_views.pipeline import CONNECTIONS, TASKS, PipelineRESTViews
 from features.feature_flags import FeatureFlag
 
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.model_template import TaskType
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.model_template import TaskType
 
 
 class TestPipelineRESTViews:
@@ -68,7 +68,9 @@ class TestPipelineRESTViews:
             keypoint_structure = fxt_keypoint_structure
         with patch.object(LabelSchema, "get_all_labels", return_value=[fxt_label]):
             result = PipelineRESTViews.task_node_to_rest(
-                node=node, task_label_schema=fxt_label_schema, keypoint_structure=keypoint_structure
+                node=node,
+                task_label_schema=fxt_label_schema,
+                keypoint_structure=keypoint_structure,
             )
 
         compare(result, task_rest, ignore_eq=True)

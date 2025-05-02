@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
 
-from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.mongo_connector import MongoConnector
 
 
 @pytest.fixture

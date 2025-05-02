@@ -17,12 +17,12 @@ from pathlib import Path
 import pytest
 import yaml
 
-import iai_core_py.configuration.helper as cfg_helper
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.model_template import parse_model_template
-from iai_core_py.entities.task_environment import TaskEnvironment
+import iai_core.configuration.helper as cfg_helper
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.model_template import parse_model_template
+from iai_core.entities.task_environment import TaskEnvironment
 from tests.test_helpers import ConfigExample
 
 from geti_types import ID

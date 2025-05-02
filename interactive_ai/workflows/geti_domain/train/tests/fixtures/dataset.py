@@ -3,17 +3,17 @@
 
 import pytest
 from geti_types import ID
-from iai_core_py.entities.compiled_dataset_shards import (
+from iai_core.entities.compiled_dataset_shards import (
     CompiledDatasetShard,
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.video import VideoFrame
-from iai_core_py.repos import DatasetRepo
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import VideoFrame
+from iai_core.repos import DatasetRepo
 
 
 @pytest.fixture

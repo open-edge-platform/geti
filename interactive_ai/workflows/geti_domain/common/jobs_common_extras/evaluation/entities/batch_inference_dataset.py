@@ -3,9 +3,9 @@
 
 from dataclasses import dataclass, field
 
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult
 
 
 @dataclass

@@ -6,9 +6,9 @@ from pathlib import Path
 import pytest
 from omegaconf import OmegaConf
 
-import iai_core_py.configuration.elements.metadata_keys as metadata_keys
-import iai_core_py.configuration.helper as cfg_helper
-from iai_core_py.configuration.enums.model_lifecycle import ModelLifecycle
+import iai_core.configuration.elements.metadata_keys as metadata_keys
+import iai_core.configuration.helper as cfg_helper
+from iai_core.configuration.enums.model_lifecycle import ModelLifecycle
 from tests.configuration.dummy_config import DatasetManagerConfig, SomeEnumSelectable
 
 

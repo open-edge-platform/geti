@@ -12,8 +12,8 @@ from managers.project_manager import ProjectManager
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import DatasetStorageRepo
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetStorageRepo
 
 
 @pytest.fixture
@@ -135,7 +135,11 @@ class TestDatasetRESTControllerUnit(unittest.TestCase):
     @patch("communication.rest_controllers.dataset_controller.DatasetRepo")
     @patch("communication.rest_controllers.dataset_controller.StatisticsUseCase.get_dataset_statistics")
     def test_get_dataset_statistics_successful(
-        self, mock_get_stats, mock_dataset_repo, mock_dataset_storage_repo, mock_get_project
+        self,
+        mock_get_stats,
+        mock_dataset_repo,
+        mock_dataset_storage_repo,
+        mock_get_project,
     ):
         project_id = ID("project_id")
         dataset_storage_id = ID("dataset_storage_id")

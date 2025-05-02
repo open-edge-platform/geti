@@ -13,9 +13,9 @@ from flytekit.core import utils
 from geti_telemetry_tools import unified_tracing
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import DatasetStorageIdentifier
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.utils.crypto import get_sha256_checksum
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.utils.crypto import get_sha256_checksum
 
 from jobs_common.commands.interfaces.command import ICommand
 from jobs_common.exceptions import DataShardCreationFailedException

@@ -12,7 +12,7 @@ from typing import Any
 from model.job_state import JobState
 from policies.job_repo import SessionBasedPolicyJobRepo
 
-from iai_core_py.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.base.session_repo import QueryAccessMode
 
 logger = logging.getLogger(__name__)
 

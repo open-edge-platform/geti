@@ -5,14 +5,14 @@ import datetime
 
 import pytest
 
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.entities.dataset_storage_filter_data import (
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
 )
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.image import Image
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
 
 from .values import DummyValues
 

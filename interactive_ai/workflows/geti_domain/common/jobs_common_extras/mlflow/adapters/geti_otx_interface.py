@@ -15,15 +15,15 @@ import numpy as np
 import pyarrow as pa
 from geti_telemetry_tools import unified_tracing
 from geti_types import ProjectIdentifier
-from iai_core_py.adapters.binary_interpreters import RAWBinaryInterpreter
-from iai_core_py.adapters.model_adapter import DataSource
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.helper import create
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import CurveMetric, LineChartInfo, MetricsGroup, Performance, ScoreMetric
-from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus
-from iai_core_py.repos.model_repo import ModelRepo
-from iai_core_py.repos.project_repo import ProjectRepo
+from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core.adapters.model_adapter import DataSource
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.helper import create
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import CurveMetric, LineChartInfo, MetricsGroup, Performance, ScoreMetric
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus
+from iai_core.repos.model_repo import ModelRepo
+from iai_core.repos.project_repo import ProjectRepo
 from pandas import DataFrame
 
 # NOTE: workaround for CVS-156400 -> the following imports are needed for the workaround
@@ -109,7 +109,7 @@ class GetiOTXInterfaceAdapter:
 
             # NOTE: This is a workaround to construct
             # jobs/<job-id>/... directory structure in the S3 bucket.
-            # It is because iai-core-py binary repo `save()` function only allows a filename, not a filepath.
+            # It is because iai-core binary repo `save()` function only allows a filename, not a filepath.
             self.binary_repo.save_group(source_directory=root)
 
     @unified_tracing
@@ -139,7 +139,7 @@ class GetiOTXInterfaceAdapter:
 
             # NOTE: This is a workaround to construct
             # jobs/<job-id>/... directory structure in the S3 bucket.
-            # It is because iai-core-py binary repo `save()` function only allows a filename, not a filepath.
+            # It is because iai-core binary repo `save()` function only allows a filename, not a filepath.
             self.binary_repo.save_group(source_directory=root)
 
     @unified_tracing
@@ -157,7 +157,13 @@ class GetiOTXInterfaceAdapter:
         if model.optimization_type == ModelOptimizationType.MO:
             model_keys = [OPENVINO_XML_KEY, OPENVINO_BIN_KEY]
             if is_model_legacy_otx_version(model):
-                model_keys.extend(["confidence_threshold", "tile_classifier.xml", "tile_classifier.bin"])
+                model_keys.extend(
+                    [
+                        "confidence_threshold",
+                        "tile_classifier.xml",
+                        "tile_classifier.bin",
+                    ]
+                )
 
         if not model.has_trained_weights() or model_keys[0] not in model.model_adapters:
             logger.warning(
@@ -186,7 +192,11 @@ class GetiOTXInterfaceAdapter:
             self.binary_repo.copy_from(
                 model_binary_repo=model_repo.binary_repo,
                 src_filename=data_source.binary_filename,
-                dst_filepath=os.path.join(self.dst_path_prefix, "inputs", model_alias.get(model_key, model_key)),
+                dst_filepath=os.path.join(
+                    self.dst_path_prefix,
+                    "inputs",
+                    model_alias.get(model_key, model_key),
+                ),
             )
 
     @unified_tracing
@@ -204,7 +214,7 @@ class GetiOTXInterfaceAdapter:
 
             # NOTE: This is a workaround to construct
             # jobs/<job-id>/... directory structure in the S3 bucket.
-            # It is because iai-core-py binary repo `save()` function only allows a filename, not a filepath.
+            # It is because iai-core binary repo `save()` function only allows a filename, not a filepath.
             self.binary_repo.save_group(source_directory=root)
 
     @unified_tracing
@@ -245,7 +255,7 @@ class GetiOTXInterfaceAdapter:
 
             # NOTE: This is a workaround to construct
             # jobs/<job-id>/... directory structure in the S3 bucket.
-            # It is because iai-core-py binary repo `save()` function only allows a filename, not a filepath.
+            # It is because iai-core binary repo `save()` function only allows a filename, not a filepath.
             self.binary_repo.save_group(source_directory=root)
 
     @unified_tracing
@@ -457,7 +467,10 @@ class GetiOTXInterfaceAdapter:
             try:
                 obj = self.binary_repo.storage_client.client.get_object(  # type: ignore
                     bucket_name=self.binary_repo.storage_client.bucket_name,  # type: ignore
-                    object_name=os.path.join(self.binary_repo.storage_client.object_name_base, metrics_filepath),  # type: ignore
+                    object_name=os.path.join(
+                        self.binary_repo.storage_client.object_name_base,
+                        metrics_filepath,
+                    ),  # type: ignore
                 )
                 table = pa.ipc.RecordBatchFileReader(io.BytesIO(obj.data)).read_all()
                 data_frame = table.to_pandas()
@@ -549,7 +562,10 @@ class GetiOTXInterfaceAdapter:
             info = LineChartInfo(name=name, x_axis_label="Timestamp", y_axis_label=name)
 
             dashboard_metrics.append(MetricsGroup(metrics=[metric], visualization_info=info))
-        return Performance(score=ScoreMetric(name="Model accuracy", value=0.5), dashboard_metrics=dashboard_metrics)
+        return Performance(
+            score=ScoreMetric(name="Model accuracy", value=0.5),
+            dashboard_metrics=dashboard_metrics,
+        )
 
     @unified_tracing
     def clean(self) -> None:

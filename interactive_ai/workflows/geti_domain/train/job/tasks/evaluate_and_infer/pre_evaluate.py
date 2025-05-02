@@ -9,12 +9,12 @@ import logging
 from collections.abc import Callable
 
 from geti_telemetry_tools import unified_tracing
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.subset import Subset
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model import Model
+from iai_core.entities.subset import Subset
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common.utils.annotation_filter import AnnotationFilter
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import infer_and_evaluate

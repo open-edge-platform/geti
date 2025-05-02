@@ -4,10 +4,10 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.label import Color, Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.repos import LabelRepo
+from iai_core.entities.label import Color, Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.repos import LabelRepo
 
 from tests.fixtures.values import DummyValues, IDOffsets
 
@@ -25,7 +25,12 @@ def fxt_detection_label_schema(fxt_mongo_id, fxt_label_schema_id):
             name="default detection",
             labels=[
                 Label(name="detection label", domain=Domain.DETECTION, id_=fxt_mongo_id(1)),
-                Label(name="Empty detection label", domain=Domain.DETECTION, is_empty=True, id_=fxt_mongo_id(7)),
+                Label(
+                    name="Empty detection label",
+                    domain=Domain.DETECTION,
+                    is_empty=True,
+                    id_=fxt_mongo_id(7),
+                ),
             ],
         )
     )
@@ -204,7 +209,11 @@ def fxt_anomalous_label(fxt_mongo_id):
 @pytest.fixture
 def fxt_anomaly_labels_factory(fxt_mongo_id):
     def _build_anom_labels(domain: Domain) -> list[Label]:
-        if domain not in (Domain.ANOMALY_CLASSIFICATION, Domain.ANOMALY_SEGMENTATION, Domain.ANOMALY_DETECTION):
+        if domain not in (
+            Domain.ANOMALY_CLASSIFICATION,
+            Domain.ANOMALY_SEGMENTATION,
+            Domain.ANOMALY_DETECTION,
+        ):
             raise ValueError("This fixtures only generates anomaly labels.")
         normal_label = Label(
             name="dummy_normal_label",
@@ -229,7 +238,11 @@ def fxt_anomaly_labels_factory(fxt_mongo_id):
 
 @pytest.fixture
 def fxt_scored_label(fxt_label):
-    yield ScoredLabel(label_id=fxt_label.id_, is_empty=fxt_label.is_empty, probability=DummyValues.LABEL_PROBABILITY)
+    yield ScoredLabel(
+        label_id=fxt_label.id_,
+        is_empty=fxt_label.is_empty,
+        probability=DummyValues.LABEL_PROBABILITY,
+    )
 
 
 @pytest.fixture

@@ -4,11 +4,11 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from geti_types import DatasetStorageIdentifier
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.shapes import Polygon, Rectangle
-from iai_core_py.entities.video import VideoFrame
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
+from iai_core.entities.image import Image
+from iai_core.entities.shapes import Polygon, Rectangle
+from iai_core.entities.video import VideoFrame
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
 
 from media_utils import (
     VideoFrameReader,
@@ -40,7 +40,10 @@ class TestMediaUtils:
         # Assert
         assert result == expected_result
         patch_get_by_filename.assert_called_once_with(filename=image.data_binary_filename, binary_interpreter=ANY)
-        assert isinstance(patch_get_by_filename.call_args[1]["binary_interpreter"], RAWBinaryInterpreter)
+        assert isinstance(
+            patch_get_by_filename.call_args[1]["binary_interpreter"],
+            RAWBinaryInterpreter,
+        )
 
     @patch.object(VideoBinaryRepo, "__init__", new=return_none)
     def test_get_video_bytes(self) -> None:
@@ -56,7 +59,10 @@ class TestMediaUtils:
         # Assert
         assert result == expected_result
         patch_get_by_filename.assert_called_once_with(filename=video.data_binary_filename, binary_interpreter=ANY)
-        assert isinstance(patch_get_by_filename.call_args[1]["binary_interpreter"], RAWBinaryInterpreter)
+        assert isinstance(
+            patch_get_by_filename.call_args[1]["binary_interpreter"],
+            RAWBinaryInterpreter,
+        )
 
     @patch.object(ImageBinaryRepo, "__init__", new=return_none)
     def test_get_image_numpy(self) -> None:
@@ -72,7 +78,10 @@ class TestMediaUtils:
         # Assert
         assert result == expected_result
         patch_get_by_filename.assert_called_once_with(filename=image.data_binary_filename, binary_interpreter=ANY)
-        assert isinstance(patch_get_by_filename.call_args[1]["binary_interpreter"], NumpyBinaryInterpreter)
+        assert isinstance(
+            patch_get_by_filename.call_args[1]["binary_interpreter"],
+            NumpyBinaryInterpreter,
+        )
 
     @patch.object(VideoBinaryRepo, "__init__", new=return_none)
     def test_get_video_frame_numpy(self) -> None:
@@ -84,7 +93,8 @@ class TestMediaUtils:
         # Act
         with patch.object(VideoFrameReader, "get_frame_numpy", return_value=expected_result) as patch_get_frame_numpy:
             result = get_video_frame_numpy(
-                dataset_storage_identifier=dataset_storage_identifier, video_frame=video_frame
+                dataset_storage_identifier=dataset_storage_identifier,
+                video_frame=video_frame,
             )
 
         # Assert
@@ -125,7 +135,8 @@ class TestMediaUtils:
         with (
             patch("media_utils.media_utils.get_image_numpy") as patch_get_image_numpy,
             patch(
-                "media_utils.media_utils.get_video_frame_numpy", return_value=expected_result
+                "media_utils.media_utils.get_video_frame_numpy",
+                return_value=expected_result,
             ) as patch_get_video_frame_numpy,
         ):
             result = get_media_numpy(dataset_storage_identifier=dataset_storage_identifier, media=video_frame)
@@ -134,7 +145,8 @@ class TestMediaUtils:
         assert result == expected_result
         patch_get_image_numpy.assert_not_called()
         patch_get_video_frame_numpy.assert_called_once_with(
-            dataset_storage_identifier=dataset_storage_identifier, video_frame=video_frame
+            dataset_storage_identifier=dataset_storage_identifier,
+            video_frame=video_frame,
         )
 
     def test_get_media_roi_numpy_wrong_shape(self) -> None:
@@ -149,7 +161,11 @@ class TestMediaUtils:
             patch("media_utils.media_utils.get_media_numpy", return_value=expected_result) as patch_get_media_numpy,
             pytest.raises(ValueError),
         ):
-            get_media_roi_numpy(dataset_storage_identifier=dataset_storage_identifier, media=media, roi_shape=roi_shape)
+            get_media_roi_numpy(
+                dataset_storage_identifier=dataset_storage_identifier,
+                media=media,
+                roi_shape=roi_shape,
+            )
 
         # Assert
         patch_get_media_numpy.assert_not_called()
@@ -163,7 +179,9 @@ class TestMediaUtils:
         # Act
         with patch("media_utils.media_utils.get_media_numpy", return_value=expected_result) as patch_get_media_numpy:
             result = get_media_roi_numpy(
-                dataset_storage_identifier=dataset_storage_identifier, media=media, roi_shape=None
+                dataset_storage_identifier=dataset_storage_identifier,
+                media=media,
+                roi_shape=None,
             )
 
         # Assert
@@ -185,7 +203,11 @@ class TestMediaUtils:
             patch("media_utils.media_utils.get_media_numpy", return_value=media_numpy) as patch_get_media_numpy,
             pytest.raises(ValueError),
         ):
-            get_media_roi_numpy(dataset_storage_identifier=dataset_storage_identifier, media=media, roi_shape=roi_shape)
+            get_media_roi_numpy(
+                dataset_storage_identifier=dataset_storage_identifier,
+                media=media,
+                roi_shape=roi_shape,
+            )
 
         # Assert
         patch_get_media_numpy.assert_called_once_with(
@@ -205,7 +227,9 @@ class TestMediaUtils:
         # Act
         with patch("media_utils.media_utils.get_media_numpy", return_value=media_numpy) as patch_get_media_numpy:
             result = get_media_roi_numpy(
-                dataset_storage_identifier=dataset_storage_identifier, media=media, roi_shape=roi_shape
+                dataset_storage_identifier=dataset_storage_identifier,
+                media=media,
+                roi_shape=roi_shape,
             )
 
         # Assert

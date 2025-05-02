@@ -6,8 +6,8 @@ This module contains the ComponentRegisterEntry class, which is used to add comp
 configurations into the ComponentRegistry
 """
 
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.model_template import TaskType
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.model_template import TaskType
 
 
 class ComponentRegisterEntry:

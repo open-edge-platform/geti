@@ -4,15 +4,15 @@
 #
 
 
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.entities.dataset_storage_filter_data import DatasetStorageFilterData, NullDatasetStorageFilterData
-from iai_core_py.entities.media import MediaPreprocessingStatus
-from iai_core_py.entities.video import VideoFrameIdentifier, VideoIdentifier
-from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
-from iai_core_py.repos import VideoRepo
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.repos.mappers import IDToMongo
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage_filter_data import DatasetStorageFilterData, NullDatasetStorageFilterData
+from iai_core.entities.media import MediaPreprocessingStatus
+from iai_core.entities.video import VideoFrameIdentifier, VideoIdentifier
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.repos import VideoRepo
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.repos.mappers import IDToMongo
 
 from geti_types import ID, ImageIdentifier, MediaIdentifierEntity
 

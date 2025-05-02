@@ -3,21 +3,21 @@
 
 from functools import partial
 
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup
-from iai_core_py.configuration.elements.primitive_parameters import (
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_float,
     configurable_integer,
     float_selectable,
     selectable,
 )
-from iai_core_py.configuration.helper.config_element_mapping import (
+from iai_core.configuration.helper.config_element_mapping import (
     GroupElementMapping,
     PrimitiveElementMapping,
     RuleElementMapping,
 )
-from iai_core_py.configuration.ui_rules.rules import Rule, UIRules
+from iai_core.configuration.ui_rules.rules import Rule, UIRules
 
 
 class TestPrimitiveElementMapping:

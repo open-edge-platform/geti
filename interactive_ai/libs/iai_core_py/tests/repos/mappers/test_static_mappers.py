@@ -11,20 +11,20 @@ import pytest
 from bson import ObjectId
 from testfixtures import compare
 
-from iai_core_py.adapters.adapter import ProxyAdapter
-from iai_core_py.adapters.tensor_adapter import TensorAdapter
-from iai_core_py.entities.active_model_state import ActiveModelState
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from iai_core_py.entities.annotation_template import AnnotationTemplate
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.evaluation_result import EvaluationResult
-from iai_core_py.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.metadata import FloatMetadata, FloatType, MetadataItem
-from iai_core_py.entities.metrics import (
+from iai_core.adapters.adapter import ProxyAdapter
+from iai_core.adapters.tensor_adapter import TensorAdapter
+from iai_core.entities.active_model_state import ActiveModelState
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.annotation_template import AnnotationTemplate
+from iai_core.entities.color import Color
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationResult
+from iai_core.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.metadata import FloatMetadata, FloatType, MetadataItem
+from iai_core.entities.metrics import (
     AnomalyLocalizationPerformance,
     BarChartInfo,
     BarMetricsGroup,
@@ -41,7 +41,7 @@ from iai_core_py.entities.metrics import (
     TextMetricsGroup,
     VisualizationType,
 )
-from iai_core_py.entities.model import (
+from iai_core.entities.model import (
     Model,
     ModelFormat,
     ModelOptimizationType,
@@ -49,24 +49,24 @@ from iai_core_py.entities.model import (
     ModelPurgeInfo,
     ModelStatus,
 )
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.model_template import NullModelTemplate, TaskFamily, TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.project_performance import (
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import NullModelTemplate, TaskFamily, TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
     TaskPerformance,
     TaskPerformanceScore,
 )
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from iai_core_py.repos import (
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.entities.tensor import Tensor
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.repos import (
     AnnotationSceneRepo,
     DatasetRepo,
     DatasetStorageRepo,
@@ -80,8 +80,8 @@ from iai_core_py.repos import (
     TaskNodeRepo,
     VideoRepo,
 )
-from iai_core_py.repos.dataset_repo import _DatasetItemRepo
-from iai_core_py.repos.mappers import (
+from iai_core.repos.dataset_repo import _DatasetItemRepo
+from iai_core.repos.mappers import (
     ActiveModelStateToMongo,
     AnnotationSceneStateToMongo,
     AnnotationSceneToMongo,
@@ -109,22 +109,22 @@ from iai_core_py.repos.mappers import (
     VideoIdentifierToMongo,
     VideoToMongo,
 )
-from iai_core_py.repos.mappers.mongodb_mappers.annotation_template_mapper import AnnotationTemplateToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.dataset_mapper import AnnotationSceneCache, DatasetItemToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.dataset_storage_filter_mapper import DatasetStorageFilterDataToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.metadata_mapper import (
+from iai_core.repos.mappers.mongodb_mappers.annotation_template_mapper import AnnotationTemplateToMongo
+from iai_core.repos.mappers.mongodb_mappers.dataset_mapper import AnnotationSceneCache, DatasetItemToMongo
+from iai_core.repos.mappers.mongodb_mappers.dataset_storage_filter_mapper import DatasetStorageFilterDataToMongo
+from iai_core.repos.mappers.mongodb_mappers.metadata_mapper import (
     MetadataItemMapperBackwardParameters,
     MetadataItemToMongo,
     TensorMapperBackwardParameters,
 )
-from iai_core_py.repos.mappers.mongodb_mappers.model_mapper import TrainingFrameworkToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.project_mapper import KeypointStructureToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.project_performance_mapper import ProjectPerformanceToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.training_revision_mapper import TrainingRevisionToMongo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_factory import ProjectFactory
-from iai_core_py.utils.time_utils import now
+from iai_core.repos.mappers.mongodb_mappers.model_mapper import TrainingFrameworkToMongo
+from iai_core.repos.mappers.mongodb_mappers.project_mapper import KeypointStructureToMongo
+from iai_core.repos.mappers.mongodb_mappers.project_performance_mapper import ProjectPerformanceToMongo
+from iai_core.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
+from iai_core.repos.mappers.mongodb_mappers.training_revision_mapper import TrainingRevisionToMongo
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_factory import ProjectFactory
+from iai_core.utils.time_utils import now
 from tests.test_helpers import (
     empty_model_configuration,
     generate_inference_dataset_of_all_media_in_project,

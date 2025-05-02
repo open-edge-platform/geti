@@ -10,10 +10,10 @@ import pytest
 
 from tests.fixtures.values import DefaultImageValues
 
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.label import Domain, Label, NullLabel
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.label import Domain, Label, NullLabel
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +99,11 @@ def fxt_random_annotated_image_factory():  # noqa: C901
         for label_name in img_labels:
             rx, ry = rng.integers(low=[1, 1], high=[image_width - min_size, image_height - min_size])
             rw, rh = rng.integers(
-                low=[min_size, min_size], high=[min(max_size, image_width - rx), min(max_size, image_height - ry)]
+                low=[min_size, min_size],
+                high=[
+                    min(max_size, image_width - rx),
+                    min(max_size, image_height - ry),
+                ],
             )
             y_min, y_max = float(ry / image_height), float((ry + rh) / image_height)
             x_min, x_max = float(rx / image_width), float((rx + rw) / image_width)

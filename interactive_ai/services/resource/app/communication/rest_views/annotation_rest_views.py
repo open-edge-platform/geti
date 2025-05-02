@@ -14,9 +14,9 @@ from communication.rest_views.scored_label_rest_views import ScoredLabelRESTView
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from iai_core_py.repos import AnnotationSceneRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core.repos import AnnotationSceneRepo
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -24,9 +24,9 @@ if TYPE_CHECKING:
     from entities.video_annotation_properties import VideoAnnotationProperties
 
     from geti_types import MediaIdentifierEntity
-    from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-    from iai_core_py.entities.label import Label
-    from iai_core_py.entities.shapes import Shape
+    from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+    from iai_core.entities.label import Label
+    from iai_core.entities.shapes import Shape
 
 
 ANNOTATIONS = "annotations"

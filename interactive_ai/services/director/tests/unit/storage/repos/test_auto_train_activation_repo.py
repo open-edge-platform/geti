@@ -10,7 +10,7 @@ from storage.mappers.auto_train_activation_mapper import AutoTrainActivationToMo
 from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActivationRepo
 
 from geti_types import ProjectIdentifier
-from iai_core_py.services import ModelService
+from iai_core.services import ModelService
 
 
 @pytest.fixture
@@ -76,7 +76,8 @@ class TestAutoTrainActivationRepo:
             repo.set_auto_train_readiness_by_task_id(task_node_id=fxt_auto_train_activation.id_, readiness=True)
 
         mock_get_active_model_storage.assert_called_once_with(
-            project_identifier=project_identifier, task_node_id=fxt_auto_train_activation.id_
+            project_identifier=project_identifier,
+            task_node_id=fxt_auto_train_activation.id_,
         )
         result_b = repo.get_by_id(fxt_auto_train_activation.id_)
         assert result_b.ready is True

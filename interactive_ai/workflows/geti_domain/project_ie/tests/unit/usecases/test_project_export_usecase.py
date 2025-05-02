@@ -7,8 +7,8 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from geti_types import CTX_SESSION_VAR, ID, Session
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.versioning import DataVersion
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.versioning import DataVersion
 
 from job.entities.zip_archive import ProjectZipArchive, ProjectZipArchiveWrapper
 from job.repos import BinaryStorageRepo, DocumentRepo, ZipStorageRepo
@@ -51,26 +51,64 @@ class TestProjectExportUseCase:
             patch.object(SessionBasedRepo, "generate_id", return_value=export_id),
             patch.object(BinaryStorageRepo, "__init__", new=do_nothing),
             patch.object(
-                BinaryStorageRepo, "get_all_objects_by_type", return_value=[("local_path_1", "remote_path_1")]
+                BinaryStorageRepo,
+                "get_all_objects_by_type",
+                return_value=[("local_path_1", "remote_path_1")],
             ),
             patch.object(ZipStorageRepo, "__init__", new=do_nothing),
-            patch.object(ZipStorageRepo, "upload_downloadable_archive", new=mocked_upload_downloadable_archive),
-            patch.object(DocumentRepo, "get_all_documents_from_db_for_collection", return_value=[{"key1": "value1"}]),
-            patch.object(DocumentRepo, "get_collection_names", return_value=("collection_1",)),
-            patch.object(ExportDataRedactionUseCase, "remove_container_info_in_mongodb_doc", new=identity_map),
-            patch.object(ExportDataRedactionUseCase, "remove_job_id_in_mongodb_doc", new=identity_map),
-            patch.object(ExportDataRedactionUseCase, "remove_lock_in_mongodb_doc", new=identity_map),
-            patch.object(ExportDataRedactionUseCase, "replace_objectid_in_mongodb_doc", new=identity_map),
             patch.object(
-                ExportDataRedactionUseCase, "replace_objectid_based_binary_filename_in_mongodb_doc", new=identity_map
+                ZipStorageRepo,
+                "upload_downloadable_archive",
+                new=mocked_upload_downloadable_archive,
+            ),
+            patch.object(
+                DocumentRepo,
+                "get_all_documents_from_db_for_collection",
+                return_value=[{"key1": "value1"}],
+            ),
+            patch.object(DocumentRepo, "get_collection_names", return_value=("collection_1",)),
+            patch.object(
+                ExportDataRedactionUseCase,
+                "remove_container_info_in_mongodb_doc",
+                new=identity_map,
+            ),
+            patch.object(
+                ExportDataRedactionUseCase,
+                "remove_job_id_in_mongodb_doc",
+                new=identity_map,
+            ),
+            patch.object(
+                ExportDataRedactionUseCase,
+                "remove_lock_in_mongodb_doc",
+                new=identity_map,
+            ),
+            patch.object(
+                ExportDataRedactionUseCase,
+                "replace_objectid_in_mongodb_doc",
+                new=identity_map,
+            ),
+            patch.object(
+                ExportDataRedactionUseCase,
+                "replace_objectid_based_binary_filename_in_mongodb_doc",
+                new=identity_map,
             ),
             patch.object(ExportDataRedactionUseCase, "replace_objectid_in_url", new=identity_map),
             patch.object(ExportDataRedactionUseCase, "replace_objectid_in_file", new=identity_map),
-            patch.object(ExportDataRedactionUseCase, "mask_user_info_in_mongodb_doc", new=identity_map),
             patch.object(
-                ExportDataRedactionUseCase, "objectid_replacement_min_id", return_value="00000000000000000000000f"
+                ExportDataRedactionUseCase,
+                "mask_user_info_in_mongodb_doc",
+                new=identity_map,
             ),
-            patch.object(SignatureUseCaseHelper, "get_signature_use_case", return_value=mocked_signing_use_case),
+            patch.object(
+                ExportDataRedactionUseCase,
+                "objectid_replacement_min_id",
+                return_value="00000000000000000000000f",
+            ),
+            patch.object(
+                SignatureUseCaseHelper,
+                "get_signature_use_case",
+                return_value=mocked_signing_use_case,
+            ),
         ]
         with (
             contextlib.ExitStack() as stack,

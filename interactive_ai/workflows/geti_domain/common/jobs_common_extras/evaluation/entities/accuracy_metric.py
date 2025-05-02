@@ -6,10 +6,10 @@ from collections.abc import Callable
 
 import numpy as np
 from geti_types import ID, MediaIdentifierEntity
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from iai_core_py.entities.metrics import (
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -143,7 +143,11 @@ class AccuracyMetric(PerformanceMetric):
 
     def get_per_label_scores(self) -> tuple[ScoreMetric, ...]:
         return tuple(
-            ScoreMetric(name=self.metric_name, value=self.label_counters[label.id_].accuracy, label_id=label.id_)
+            ScoreMetric(
+                name=self.metric_name,
+                value=self.label_counters[label.id_].accuracy,
+                label_id=label.id_,
+            )
             for label in self.task_labels
         )
 

@@ -11,8 +11,8 @@ from communication.job_creation_helpers import JobDuplicatePolicy
 from repos import ZipStorageRepo
 
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from iai_core_py.entities.project import NullProject
-from iai_core_py.repos import ProjectRepo
+from iai_core.entities.project import NullProject
+from iai_core.repos import ProjectRepo
 
 
 def do_nothing(*args, **kwargs):
@@ -60,11 +60,14 @@ class TestExportController:
         operation_id = fxt_ote_id(123)
         with patch.object(ExportController, "_get_zip_presigned_url", return_value=internal_url) as mock_get_url:
             response = ExportController.get_exported_archive_presigned_url(
-                project_identifier=fxt_project_identifier, export_operation_id=operation_id, domain_name=domain_name
+                project_identifier=fxt_project_identifier,
+                export_operation_id=operation_id,
+                domain_name=domain_name,
             )
 
         mock_get_url.assert_called_once_with(
-            project_id=fxt_project_identifier.project_id, export_operation_id=operation_id
+            project_id=fxt_project_identifier.project_id,
+            export_operation_id=operation_id,
         )
         assert (
             response.headers["location"]
@@ -77,12 +80,15 @@ class TestExportController:
         with (
             patch.object(ZipStorageRepo, "__init__", new=do_nothing),
             patch.object(
-                ZipStorageRepo, "get_downloadable_archive_presigned_url", return_value=dummy_presigned_url
+                ZipStorageRepo,
+                "get_downloadable_archive_presigned_url",
+                return_value=dummy_presigned_url,
             ) as mock_get_url,
             patch.object(ProjectRepo, "get_by_id", return_value=NullProject()) as mock_get_project,
         ):
             url = ExportController._get_zip_presigned_url(
-                project_id=fxt_project_identifier.project_id, export_operation_id=operation_id
+                project_id=fxt_project_identifier.project_id,
+                export_operation_id=operation_id,
             )
 
         mock_get_project.assert_called_once_with(fxt_project_identifier.project_id)

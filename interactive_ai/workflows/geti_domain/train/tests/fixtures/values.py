@@ -3,7 +3,7 @@
 
 from datetime import datetime, timezone
 
-from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core.entities.annotation import AnnotationSceneKind
 
 
 class DummyValues:

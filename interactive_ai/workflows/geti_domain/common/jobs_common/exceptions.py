@@ -3,7 +3,7 @@
 
 """This module defines the exceptions potentially raised by the scheduler."""
 
-from iai_core_py.entities.model_test_result import MetricType
+from iai_core.entities.model_test_result import MetricType
 
 
 class TaskErrorMessage:

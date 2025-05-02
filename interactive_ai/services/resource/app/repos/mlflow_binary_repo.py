@@ -5,9 +5,9 @@ import logging
 
 from minio.deleteobjects import DeleteObject
 
-from iai_core_py.repos.storage.binary_repo import BinaryRepo
-from iai_core_py.repos.storage.object_storage import ObjectStorageClient, reinit_client_and_retry_on_timeout
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core.repos.storage.binary_repo import BinaryRepo
+from iai_core.repos.storage.object_storage import ObjectStorageClient, reinit_client_and_retry_on_timeout
+from iai_core.repos.storage.storage_client import BinaryObjectType
 
 logger = logging.getLogger(__name__)
 

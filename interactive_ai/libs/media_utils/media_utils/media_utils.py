@@ -5,12 +5,12 @@ import logging
 
 import numpy as np
 from geti_types import DatasetStorageIdentifier
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media_2d import Media2D
-from iai_core_py.entities.shapes import Rectangle, Shape
-from iai_core_py.entities.video import Video, VideoFrame
-from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
+from iai_core.entities.image import Image
+from iai_core.entities.media_2d import Media2D
+from iai_core.entities.shapes import Rectangle, Shape
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
 
 from .video_frame_reader import VideoFrameReader
 
@@ -44,7 +44,8 @@ def get_media_roi_numpy(
 
 
 def get_media_numpy(
-    dataset_storage_identifier: DatasetStorageIdentifier, media: Image | VideoFrame | Media2D
+    dataset_storage_identifier: DatasetStorageIdentifier,
+    media: Image | VideoFrame | Media2D,
 ) -> np.ndarray:
     """
     Returns media (image or video frame) numpy array

@@ -18,12 +18,12 @@ from service.job_submission import ModelOptimizationJobSubmitter
 
 from geti_fastapi_tools.exceptions import ModelNotFoundException, ProjectNotFoundException
 from geti_types import ID
-from iai_core_py.configuration.elements.optimization_parameters import POTOptimizationParameters
-from iai_core_py.entities.model import Model, ModelDeprecationStatus, ModelOptimizationType, NullModel
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.entities.project import NullProject, Project
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import ConfigurableParametersRepo, ModelRepo, ProjectRepo
+from iai_core.configuration.elements.optimization_parameters import POTOptimizationParameters
+from iai_core.entities.model import Model, ModelDeprecationStatus, ModelOptimizationType, NullModel
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.subset import Subset
+from iai_core.repos import ConfigurableParametersRepo, ModelRepo, ProjectRepo
 
 
 class OptimizationController:
@@ -134,5 +134,8 @@ class OptimizationController:
         model.configuration.configurable_parameters.pot_parameters = repo_pot_parameters  # type: ignore[attr-defined]
         job_submitter = ModelOptimizationJobSubmitter(JobsClient().jobs_client)
         return job_submitter.execute(
-            project=project, model=model, optimization_type=ModelOptimizationType.POT, author=author
+            project=project,
+            model=model,
+            optimization_type=ModelOptimizationType.POT,
+            author=author,
         )

@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.entities.color import Color
+from iai_core.entities.color import Color
 
 red = 40
 red_hex = "28"

@@ -14,14 +14,14 @@ from typing import Any, NamedTuple, cast
 import numpy as np
 from geti_telemetry_tools import unified_tracing
 from geti_types import DatasetStorageIdentifier
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.media_2d import Media2D
-from iai_core_py.entities.metadata import FloatMetadata, FloatType, IMetadata
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.tensor import Tensor
-from iai_core_py.repos import AnnotationSceneRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label import Domain
+from iai_core.entities.media_2d import Media2D
+from iai_core.entities.metadata import FloatMetadata, FloatType, IMetadata
+from iai_core.entities.model import Model
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.tensor import Tensor
+from iai_core.repos import AnnotationSceneRepo
 from media_utils import get_media_roi_numpy
 from model_api.adapters.openvino_adapter import OpenvinoAdapter, create_core
 from model_api.models import ImageModel, SAMDecoder, SAMImageEncoder, SAMLearnableVisualPrompter, SegmentationModel
@@ -110,7 +110,10 @@ class Inferencer(ABC):
             f"Creating OpenVINO adapter with max_async_requests: {max_async_requests} "
             f"(only valid for asynchronous inferencer)"
         )
-        if {WeightsKey.OPENVINO_BIN.value, WeightsKey.OPENVINO_XML.value} - model.model_adapters.keys():
+        if {
+            WeightsKey.OPENVINO_BIN.value,
+            WeightsKey.OPENVINO_XML.value,
+        } - model.model_adapters.keys():
             raise ValueError(f"Model with ID '{model.id_}' does not contain the required OpenVINO model weights.")
         self.model_adapter = OpenvinoAdapter(
             self._openvino_core,
@@ -147,7 +150,12 @@ class Inferencer(ABC):
         feature_vector = raw_predictions.feature_vector
         metadata: list[IMetadata] = []
         if len(feature_vector) > 0:
-            metadata.append(Tensor(name=Metadata.REPRESENTATION_VECTOR.value, numpy=feature_vector.reshape(-1)))
+            metadata.append(
+                Tensor(
+                    name=Metadata.REPRESENTATION_VECTOR.value,
+                    numpy=feature_vector.reshape(-1),
+                )
+            )
         return metadata
 
     @unified_tracing
@@ -288,7 +296,10 @@ class ClassificationInferencer(Inferencer):
                 self.model_adapter.get_rt_info(["model_info", "hierarchical_config"])
             except RuntimeError:
                 configuration["hierarchical_config"] = json.dumps(
-                    {"cls_heads_info": {"label_to_idx": [], "all_groups": []}, "label_tree_edges": []}
+                    {
+                        "cls_heads_info": {"label_to_idx": [], "all_groups": []},
+                        "label_tree_edges": [],
+                    }
                 )
         return configuration
 
@@ -302,7 +313,9 @@ class ClassificationInferencer(Inferencer):
         probs = raw_predictions.raw_scores
         active_score = np.max(probs) - np.min(probs)
         active_score_metadata = FloatMetadata(
-            name=Metadata.ACTIVE_SCORE.value, value=active_score, float_type=FloatType.ACTIVE_SCORE
+            name=Metadata.ACTIVE_SCORE.value,
+            value=active_score,
+            float_type=FloatType.ACTIVE_SCORE,
         )
         return [*super_metadata, active_score_metadata]
 
@@ -311,7 +324,9 @@ class DetectionInferencer(Inferencer):
     def __init__(self, model: Model, **kwargs):
         super().__init__(model=model, **kwargs)
         self._converter = DetectionToAnnotationConverter(
-            label_schema=self.label_schema, model_api_labels=self.model.labels, configuration=self.configuration
+            label_schema=self.label_schema,
+            model_api_labels=self.model.labels,
+            configuration=self.configuration,
         )
         self.tiling_parameters = get_tiling_parameters(model=model)
         self.tiling_enabled = self.tiling_parameters["enable_tiling"]
@@ -356,7 +371,9 @@ class RotatedDetectionInferencer(DetectionInferencer):
     def __init__(self, model: Model, device: str = "CPU", max_async_requests: int = 0):
         super().__init__(model=model, device=device, max_async_requests=max_async_requests)
         self._converter = RotatedRectToAnnotationConverter(
-            label_schema=self.label_schema, model_api_labels=self.model.labels, configuration=self.configuration
+            label_schema=self.label_schema,
+            model_api_labels=self.model.labels,
+            configuration=self.configuration,
         )
         self.tiling_classifier_enabled = self.tiling_parameters["enable_tile_classifier"]
         tile_classifier_model = None
@@ -385,7 +402,9 @@ class RotatedDetectionInferencer(DetectionInferencer):
                 get_tiler_configuration(tiling_parameters=self.tiling_parameters) if self.is_legacy_otx_model else {}
             )
             self.tiler = InstanceSegmentationTiler(
-                model=self.model, configuration=tiler_config, tile_classifier_model=tile_classifier_model
+                model=self.model,
+                configuration=tiler_config,
+                tile_classifier_model=tile_classifier_model,
             )
 
 
@@ -408,7 +427,9 @@ class InstanceSegmentationInferencer(Inferencer):
     def __init__(self, model: Model, device: str = "CPU", max_async_requests: int = 0):
         super().__init__(model=model, device=device, max_async_requests=max_async_requests)
         self._converter = InstanceSegmentationToAnnotationConverter(
-            label_schema=self.label_schema, model_api_labels=self.model.labels, configuration=self.configuration
+            label_schema=self.label_schema,
+            model_api_labels=self.model.labels,
+            configuration=self.configuration,
         )
         self.tiling_parameters = get_tiling_parameters(model=model)
         self.tiling_enabled = self.tiling_parameters["enable_tiling"]
@@ -439,7 +460,9 @@ class InstanceSegmentationInferencer(Inferencer):
                 get_tiler_configuration(tiling_parameters=self.tiling_parameters) if self.is_legacy_otx_model else {}
             )
             self.tiler = InstanceSegmentationTiler(
-                model=self.model, configuration=tiler_config, tile_classifier_model=tile_classifier_model
+                model=self.model,
+                configuration=tiler_config,
+                tile_classifier_model=tile_classifier_model,
             )
 
     def convert_to_annotations(self, raw_predictions: NamedTuple, **kwargs) -> list[Annotation]:
@@ -510,9 +533,14 @@ class VisualPromptingInferencer(Inferencer):
         self._openvino_core = create_core()
         self.configuration = self.get_configuration()
         self.tiling_enabled = False
-        self._load_sam_model(device=device, max_async_requests=max_async_requests, performance_hint=performance_hint)
+        self._load_sam_model(
+            device=device,
+            max_async_requests=max_async_requests,
+            performance_hint=performance_hint,
+        )
         self._converter = VisualPromptingToAnnotationConverter(
-            label_schema=self.geti_model.get_label_schema(), model_api_labels=self.learned_label_ids
+            label_schema=self.geti_model.get_label_schema(),
+            model_api_labels=self.learned_label_ids,
         )
 
     def _load_sam_model(self, device: str, max_async_requests: int, performance_hint: PerformanceHint) -> None:

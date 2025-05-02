@@ -7,13 +7,13 @@ import time
 import pytest
 from testfixtures import compare
 
-from iai_core_py.adapters.adapter import ReferenceAdapter
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import DatasetStorageRepo, ProjectRepo
-from iai_core_py.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.adapters.adapter import ReferenceAdapter
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetStorageRepo, ProjectRepo
+from iai_core.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_factory import ProjectFactory
 from tests.test_helpers import register_model_template
 
 from geti_types import ID, ProjectIdentifier

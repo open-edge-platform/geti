@@ -17,15 +17,15 @@ from active_learning.algorithms import (
 )
 
 from geti_types import ID, MediaIdentifierEntity
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset, NullDataset
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.metadata import MetadataItem
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.tensor import Tensor
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.label import Label
+from iai_core.entities.metadata import MetadataItem
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.tensor import Tensor
 
 logger = logging.getLogger(__name__)
 random.seed("6371")

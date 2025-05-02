@@ -3,12 +3,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties, TaskType
-from iai_core_py.repos import TaskNodeRepo
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties, TaskType
+from iai_core.repos import TaskNodeRepo
+from iai_core.utils.project_factory import ProjectFactory
 from tests.test_helpers import register_model_template
 
 from geti_types import ID

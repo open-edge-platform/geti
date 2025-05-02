@@ -2,9 +2,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from iai_core_py.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
 
 from geti_types import ID
 

@@ -6,15 +6,15 @@ Implements crop task tests
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from datetime import datetime, timezone
 
-from iai_core_py.algorithms.crop.task import CropTask
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.model import NullModel
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.task_environment import TaskEnvironment
+from iai_core.algorithms.crop.task import CropTask
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.model import NullModel
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_environment import TaskEnvironment
 
 
 class TestCropTask:

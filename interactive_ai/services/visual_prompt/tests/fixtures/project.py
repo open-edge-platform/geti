@@ -6,9 +6,9 @@ from _pytest.fixtures import FixtureRequest
 from tests.fixtures.values import DummyValues, IDOffsets
 
 from geti_types import ProjectIdentifier
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.repos import ProjectRepo
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.repos import ProjectRepo
 
 
 @pytest.fixture

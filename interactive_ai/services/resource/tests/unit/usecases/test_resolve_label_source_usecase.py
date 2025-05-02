@@ -6,16 +6,16 @@ from unittest.mock import patch
 from usecases.resolve_label_source_usecase import ResolveLabelSourceUseCase
 
 from geti_types import ID
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.repos import AnnotationSceneRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.repos import AnnotationSceneRepo
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.label import Label
+    from iai_core.entities.label import Label
 
 
 @patch(
-    "iai_core_py.repos.annotation_scene_repo.AnnotationSceneRepo.__init__",
+    "iai_core.repos.annotation_scene_repo.AnnotationSceneRepo.__init__",
     return_value=None,
 )
 class TestResolveLabelSourceUseCase:
@@ -50,10 +50,14 @@ class TestResolveLabelSourceUseCase:
         )
 
         new_annotation = Annotation(
-            shape=fxt_rectangle_shape, labels=[scored_label_0, scored_label_1, scored_label_2], id_=annotation_id
+            shape=fxt_rectangle_shape,
+            labels=[scored_label_0, scored_label_1, scored_label_2],
+            id_=annotation_id,
         )
         prev_annotation = Annotation(
-            shape=fxt_rectangle_shape, labels=[prev_scored_label_0, prev_scored_label_1], id_=annotation_id
+            shape=fxt_rectangle_shape,
+            labels=[prev_scored_label_0, prev_scored_label_1],
+            id_=annotation_id,
         )
 
         new_annotation_scene = AnnotationScene(

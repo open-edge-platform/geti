@@ -5,12 +5,8 @@ from unittest.mock import patch
 
 import pytest
 
-from iai_core_py.repos import BinaryRepo
-from iai_core_py.utils.filesystem import (
-    check_free_space_for_operation,
-    check_free_space_for_upload,
-    compute_project_size,
-)
+from iai_core.repos import BinaryRepo
+from iai_core.utils.filesystem import check_free_space_for_operation, check_free_space_for_upload, compute_project_size
 
 FEATURE_FLAG_STORAGE_SIZE_COMPUTATION = "FEATURE_FLAG_STORAGE_SIZE_COMPUTATION"
 

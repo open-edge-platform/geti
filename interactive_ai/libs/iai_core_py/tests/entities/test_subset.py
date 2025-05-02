@@ -5,7 +5,7 @@
 
 import pytest
 
-from iai_core_py.entities.subset import Subset
+from iai_core.entities.subset import Subset
 
 
 class TestSubset:

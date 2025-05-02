@@ -8,14 +8,14 @@ dependencies = [
     "cachetools~=5.5",
     "opencv-python-headless==4.10.0.84",
     "geti-types",
-    "iai_core_py",
+    "iai_core",
     "geti_feature_tools",
 ]
 
 [tool.uv.sources]
 geti-types = { path = "../../../libs/types", editable = true }
 geti-feature-tools = { path = "../../../libs/feature_tools", editable = true }
-iai_core_py = { path = "../iai_core_py", editable = true }
+iai_core = { path = "../iai_core_py", editable = true }
 
 [dependency-groups]
 dev = [

@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core_py.configuration.elements.metadata_keys import (
+from iai_core.configuration.elements.metadata_keys import (
     AFFECTS_OUTCOME_OF,
     DEFAULT_VALUE,
     DESCRIPTION,

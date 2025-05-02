@@ -2,9 +2,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import pytest
 
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.repos import ImageRepo
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.repos import ImageRepo
 
 
 class TestCursorIterator:

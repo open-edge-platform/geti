@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from unittest.mock import patch
 
-from iai_core_py.repos import (
+from iai_core.repos import (
     AnnotationSceneRepo,
     LabelRepo,
     LabelSchemaRepo,
@@ -65,10 +65,22 @@ class TestVideoAnnotationRangeIntegration:
         ) + "/frames/{frame_index}/annotations/latest"
 
         with (
-            patch.object(ProjectRepo, "get_by_id", return_value=fxt_project_with_classification_task),
+            patch.object(
+                ProjectRepo,
+                "get_by_id",
+                return_value=fxt_project_with_classification_task,
+            ),
             patch.object(VideoRepo, "get_by_id", return_value=fxt_video_entity),
-            patch.object(LabelSchemaRepo, "get_latest", return_value=fxt_classification_label_schema),
-            patch.object(LabelSchemaRepo, "get_latest_view_by_task", return_value=fxt_classification_label_schema),
+            patch.object(
+                LabelSchemaRepo,
+                "get_latest",
+                return_value=fxt_classification_label_schema,
+            ),
+            patch.object(
+                LabelSchemaRepo,
+                "get_latest_view_by_task",
+                return_value=fxt_classification_label_schema,
+            ),
         ):
             # POST /range_annotation to annotate frames [1-3]
             range_data_1 = {"range_labels": [{"start_frame": 1, "end_frame": 3, "label_ids": [str(label_0.id_)]}]}
@@ -153,10 +165,22 @@ class TestVideoAnnotationRangeIntegration:
         ) + "/frames/{frame_index}/annotations"
 
         with (
-            patch.object(ProjectRepo, "get_by_id", return_value=fxt_project_with_classification_task),
+            patch.object(
+                ProjectRepo,
+                "get_by_id",
+                return_value=fxt_project_with_classification_task,
+            ),
             patch.object(VideoRepo, "get_by_id", return_value=fxt_video_entity),
-            patch.object(LabelSchemaRepo, "get_latest", return_value=fxt_classification_label_schema),
-            patch.object(LabelSchemaRepo, "get_latest_view_by_task", return_value=fxt_classification_label_schema),
+            patch.object(
+                LabelSchemaRepo,
+                "get_latest",
+                return_value=fxt_classification_label_schema,
+            ),
+            patch.object(
+                LabelSchemaRepo,
+                "get_latest_view_by_task",
+                return_value=fxt_classification_label_schema,
+            ),
         ):
             # POST /range_annotation to annotate frames [0-3] with label 0
             range_data_1 = {"range_labels": [{"start_frame": 0, "end_frame": 3, "label_ids": [str(label_0.id_)]}]}
@@ -172,7 +196,11 @@ class TestVideoAnnotationRangeIntegration:
                 "height": fxt_video_entity.height,
             }
             ann_data_frame_3 = {
-                "media_identifier": {"type": "video_frame", "video_id": str(fxt_video_entity.id_), "frame_index": 3},
+                "media_identifier": {
+                    "type": "video_frame",
+                    "video_id": str(fxt_video_entity.id_),
+                    "frame_index": 3,
+                },
                 "annotations": [
                     {
                         "id": str(fxt_mongo_id(10)),
@@ -186,7 +214,11 @@ class TestVideoAnnotationRangeIntegration:
 
             # POST /annotations to annotate frame 4 with label 0
             ann_data_frame_4 = {
-                "media_identifier": {"type": "video_frame", "video_id": str(fxt_video_entity.id_), "frame_index": 4},
+                "media_identifier": {
+                    "type": "video_frame",
+                    "video_id": str(fxt_video_entity.id_),
+                    "frame_index": 4,
+                },
                 "annotations": [
                     {
                         "id": str(fxt_mongo_id(11)),
@@ -200,7 +232,11 @@ class TestVideoAnnotationRangeIntegration:
 
             # POST /annotations to unannotate frame 2
             ann_data_frame_2 = {
-                "media_identifier": {"type": "video_frame", "video_id": str(fxt_video_entity.id_), "frame_index": 2},
+                "media_identifier": {
+                    "type": "video_frame",
+                    "video_id": str(fxt_video_entity.id_),
+                    "frame_index": 2,
+                },
                 "annotations": [],
             }
             post_result = fxt_resource_rest.post(post_ann_endpoint.format(frame_index=2), json=ann_data_frame_2)
@@ -271,10 +307,22 @@ class TestVideoAnnotationRangeIntegration:
             raise ValueError(f"unrecognized label id {id_}")
 
         with (
-            patch.object(ProjectRepo, "get_by_id", return_value=fxt_project_with_classification_task),
+            patch.object(
+                ProjectRepo,
+                "get_by_id",
+                return_value=fxt_project_with_classification_task,
+            ),
             patch.object(VideoRepo, "get_by_id", return_value=fxt_video_entity),
-            patch.object(LabelSchemaRepo, "get_latest", return_value=fxt_classification_label_schema),
-            patch.object(LabelSchemaRepo, "get_latest_view_by_task", return_value=fxt_classification_label_schema),
+            patch.object(
+                LabelSchemaRepo,
+                "get_latest",
+                return_value=fxt_classification_label_schema,
+            ),
+            patch.object(
+                LabelSchemaRepo,
+                "get_latest_view_by_task",
+                return_value=fxt_classification_label_schema,
+            ),
             patch.object(LabelRepo, "get_by_id", new=_new_labelrepo_get_by_id),
         ):
             # POST /annotations to annotate frame 4 with label 0
@@ -286,7 +334,11 @@ class TestVideoAnnotationRangeIntegration:
                 "height": fxt_video_entity.height,
             }
             ann_data_frame_4 = {
-                "media_identifier": {"type": "video_frame", "video_id": str(fxt_video_entity.id_), "frame_index": 4},
+                "media_identifier": {
+                    "type": "video_frame",
+                    "video_id": str(fxt_video_entity.id_),
+                    "frame_index": 4,
+                },
                 "annotations": [
                     {
                         "id": str(fxt_mongo_id(11)),

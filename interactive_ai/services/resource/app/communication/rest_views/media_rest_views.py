@@ -3,10 +3,10 @@
 from typing import Any
 
 from geti_types import CTX_SESSION_VAR, DatasetStorageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.video import Video
-from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationStatePerTask
+from iai_core.entities.image import Image
+from iai_core.entities.video import Video
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.utils.annotation_scene_state_helper import AnnotationStatePerTask
 
 
 class MediaRESTViews:

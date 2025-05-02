@@ -7,19 +7,23 @@ from service.job_submission.base import JobParams, ModelJobSubmitter
 from service.job_submission.job_creation_helpers import OPTIMIZE_JOB_PRIORITY, JobDuplicatePolicy, OptimizationJobData
 
 from geti_types import ID
-from iai_core_py.configuration.elements.component_parameters import ComponentType
-from iai_core_py.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
-from iai_core_py.entities.model import Model, ModelOptimizationType
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import ConfigurableParametersRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core.entities.model import Model, ModelOptimizationType
+from iai_core.entities.project import Project
+from iai_core.repos import ConfigurableParametersRepo
 
 if TYPE_CHECKING:
-    from iai_core_py.configuration.elements.optimization_parameters import POTOptimizationParameters
+    from iai_core.configuration.elements.optimization_parameters import POTOptimizationParameters
 
 
 class ModelOptimizationJobSubmitter(ModelJobSubmitter):
     def prepare_data(  # type: ignore
-        self, project: Project, model: Model, optimization_type: ModelOptimizationType, author: ID
+        self,
+        project: Project,
+        model: Model,
+        optimization_type: ModelOptimizationType,
+        author: ID,
     ) -> JobParams:
         """
         Prepares data for an optimize job submission.

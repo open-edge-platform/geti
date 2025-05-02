@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.repos import BinaryRepo
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core.repos import BinaryRepo
+from iai_core.repos.storage.storage_client import BinaryObjectType
 
 
 class ReferenceFeatureBinaryRepo(BinaryRepo):

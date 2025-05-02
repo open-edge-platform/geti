@@ -14,20 +14,20 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaIdentifierEntity
-from iai_core_py.entities.annotation import NullAnnotationScene
-from iai_core_py.entities.dataset_entities import PipelineDataset
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.model_template import TaskFamily
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
-from iai_core_py.utils.flow_control import FlowControl
+from iai_core.entities.annotation import NullAnnotationScene
+from iai_core.entities.dataset_entities import PipelineDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.model_template import TaskFamily
+from iai_core.entities.project import Project
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.flow_control import FlowControl
 
 
 class DatasetUpdateUseCase:
@@ -125,7 +125,9 @@ class DatasetUpdateUseCase:
 
                 # Select only the dataset items relevant for the current task
                 new_items_dataset_for_task = DatasetUpdateUseCase.filter_dataset(
-                    dataset=new_items_dataset_for_task, task_label_ids=task_label_ids, task_node=task_node
+                    dataset=new_items_dataset_for_task,
+                    task_label_ids=task_label_ids,
+                    task_node=task_node,
                 )
 
                 # Compare the dataset items to the current dataset items, and in case nothing changed copy the subsets

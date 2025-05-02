@@ -16,12 +16,12 @@ from entities.video_prediction_properties import VideoPredictionProperties
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.annotation import AnnotationScene
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
 
 
 class PredictionRESTViews(AnnotationRESTViews):

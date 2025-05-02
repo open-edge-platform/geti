@@ -15,8 +15,8 @@
 
 import pytest
 
-from iai_core_py.entities.shapes import Point, Polygon, Rectangle
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.shapes import Point, Polygon, Rectangle
+from iai_core.utils.time_utils import now
 
 
 class TestPoint:

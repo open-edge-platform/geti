@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.mongo_connector import MongoConnector
 from migration.utils.connection import MongoDBConnection
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for_logs
@@ -43,7 +43,14 @@ def fxt_spicedb_server(request: FixtureRequest):
     test_dir = pathlib.Path(__file__).parent
     container.with_volume_mapping((test_dir / "configs/spicedb.zaml").resolve(), "/schema/spicedb.zaml", "ro")
     container.with_env("SPICEDB_GRPC_PRESHARED_KEY", "test")
-    container.with_command(["serve-testing", "--skip-release-check", "--load-configs", "/schema/spicedb.zaml"])
+    container.with_command(
+        [
+            "serve-testing",
+            "--skip-release-check",
+            "--load-configs",
+            "/schema/spicedb.zaml",
+        ]
+    )
     container.start()
 
     wait_for_logs(container, "grpc server started serving", timeout=30)

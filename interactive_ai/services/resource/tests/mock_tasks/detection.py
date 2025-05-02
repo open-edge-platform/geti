@@ -7,7 +7,7 @@ from pytest import FixtureRequest
 
 from tests.utils.test_helpers import register_model_template
 
-from iai_core_py.entities.model_template import ModelTemplate
+from iai_core.entities.model_template import ModelTemplate
 
 logger = logging.getLogger(__name__)
 

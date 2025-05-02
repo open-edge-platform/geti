@@ -6,9 +6,9 @@
 from entities.deployment import CodeDeployment, DeploymentState
 from repos.model_identifier_mapper import ModelIdentifierToMongo
 
-from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
+from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
 
 
 class CodeDeploymentToMongo(IMapperSimple[CodeDeployment, dict]):

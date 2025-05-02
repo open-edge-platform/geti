@@ -10,7 +10,7 @@ from services.models.media_info_payload import MediaInfoPayload
 from geti_fastapi_tools.dependencies import get_optional_request_json
 from geti_fastapi_tools.exceptions import InvalidMediaException, PayloadTooLargeException
 from geti_fastapi_tools.validation import RestApiValidator
-from iai_core_py.entities.media import ImageExtensions
+from iai_core.entities.media import ImageExtensions
 
 
 class MediaRestValidator(RestApiValidator):

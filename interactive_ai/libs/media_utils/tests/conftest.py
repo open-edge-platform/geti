@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 from geti_types import CTX_SESSION_VAR, make_session
-from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.mongo_connector import MongoConnector
 from testcontainers.mongodb import MongoDbContainer
 
 CTX_SESSION_VAR.set(make_session())

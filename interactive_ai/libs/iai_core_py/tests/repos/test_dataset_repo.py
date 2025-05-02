@@ -5,18 +5,18 @@ from unittest.mock import call, patch
 
 import pytest
 
-from iai_core_py.adapters.adapter import ReferenceAdapter
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset, DatasetIdentifier
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.entities.video import VideoFrame
-from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, MetadataRepo
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.repos.dataset_repo import _DatasetItemRepo
+from iai_core.adapters.adapter import ReferenceAdapter
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetIdentifier
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import VideoFrame
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, MetadataRepo
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.dataset_repo import _DatasetItemRepo
 
 from geti_types import ProjectIdentifier
 

@@ -11,8 +11,8 @@ from collections.abc import Callable
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.entities.datasets import DatasetPurpose
-from iai_core_py.repos import ModelRepo
+from iai_core.entities.datasets import DatasetPurpose
+from iai_core.repos import ModelRepo
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.services.batch_inference import BatchInference

@@ -7,12 +7,12 @@ from collections.abc import Sequence
 import numpy as np
 import pytest
 
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Domain, Label, NullLabel
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label, NullLabel
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
 
 from .values import DefaultImageValues, DummyValues, IDOffsets
 

@@ -4,7 +4,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-from iai_core_py.entities.task_node import TaskNode
+from iai_core.entities.task_node import TaskNode
 
 from tests.test_helpers import ID
 

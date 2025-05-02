@@ -11,22 +11,15 @@ from tests.integration.test_helpers import auto_wire_task_chain
 from tests.mock_tasks import register_classification_task, register_detection_task
 
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.active_model_state import ActiveModelState
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
-from iai_core_py.repos import (
-    ActiveModelStateRepo,
-    LabelRepo,
-    LabelSchemaRepo,
-    ModelStorageRepo,
-    ProjectRepo,
-    TaskNodeRepo,
-)
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
-from iai_core_py.utils.project_factory import ProjectFactory
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.active_model_state import ActiveModelState
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.repos import ActiveModelStateRepo, LabelRepo, LabelSchemaRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_factory import ProjectFactory
 
 
 @pytest.fixture(scope="function")

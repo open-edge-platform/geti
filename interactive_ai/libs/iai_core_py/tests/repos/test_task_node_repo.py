@@ -4,9 +4,9 @@
 #
 
 
-from iai_core_py.entities.task_node import NullTaskNode
-from iai_core_py.repos import TaskNodeRepo
-from iai_core_py.repos.mappers.mongodb_mappers.task_node_mapper import TaskNodeToMongo
+from iai_core.entities.task_node import NullTaskNode
+from iai_core.repos import TaskNodeRepo
+from iai_core.repos.mappers.mongodb_mappers.task_node_mapper import TaskNodeToMongo
 
 from geti_types import ProjectIdentifier
 

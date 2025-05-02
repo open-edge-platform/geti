@@ -8,9 +8,9 @@ from unittest.mock import patch
 import pytest
 from networkx.classes.reportviews import NodeView, OutMultiEdgeDataView
 
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import (
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import (
     LabelGroup,
     LabelGroupDoesNotExistException,
     LabelGroupExistsException,
@@ -21,8 +21,8 @@ from iai_core_py.entities.label_schema import (
     NullLabelSchema,
     natural_sort_label_id,
 )
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.repos import LabelSchemaRepo
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.repos import LabelSchemaRepo
 
 from geti_types import ID
 

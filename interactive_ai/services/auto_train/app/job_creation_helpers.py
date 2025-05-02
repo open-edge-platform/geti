@@ -10,10 +10,10 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 from geti_types import ID
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
 
 logger = logging.getLogger(__name__)
 

@@ -3,10 +3,10 @@
 
 import pytest
 from geti_types import ID
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.scored_label import ScoredLabel
 
 from tests.fixtures.values import DummyValues
 
@@ -35,7 +35,12 @@ def fxt_detection_label_schema(fxt_mongo_id):
             name="default detection",
             labels=[
                 Label(name="detection label", domain=Domain.DETECTION, id_=fxt_mongo_id(1)),
-                Label(name="Empty detection label", domain=Domain.DETECTION, is_empty=True, id_=fxt_mongo_id(7)),
+                Label(
+                    name="Empty detection label",
+                    domain=Domain.DETECTION,
+                    is_empty=True,
+                    id_=fxt_mongo_id(7),
+                ),
             ],
         )
     )

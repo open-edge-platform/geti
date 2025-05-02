@@ -8,13 +8,13 @@ import itertools
 from typing import TYPE_CHECKING, Any
 
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.annotation import AnnotationSceneKind
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, LabelRepo, LabelSchemaRepo, VideoRepo
-from iai_core_py.utils.uid_generator import generate_uid
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.label import Domain
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.project import Project
+from iai_core.repos import AnnotationSceneRepo, ImageRepo, LabelRepo, LabelSchemaRepo, VideoRepo
+from iai_core.utils.uid_generator import generate_uid
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
 
 from job.utils.import_utils import ImportUtils
@@ -62,7 +62,8 @@ class ExportUtils:
             label_ids.update(set(itertools.chain.from_iterable(scene.get_label_ids(include_empty) for scene in latest)))
 
         project_identifier = ProjectIdentifier(
-            workspace_id=dataset_storage.workspace_id, project_id=dataset_storage.project_id
+            workspace_id=dataset_storage.workspace_id,
+            project_id=dataset_storage.project_id,
         )
         label_repo = LabelRepo(project_identifier=project_identifier)
         label_list = [label_repo.get_by_id(label_id) for label_id in label_ids]

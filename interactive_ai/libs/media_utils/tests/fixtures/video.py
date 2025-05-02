@@ -9,13 +9,13 @@ import cv2
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import VideoFrameIdentifier
-from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.video import Video
-from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelSchemaRepo, VideoRepo
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label import Label
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.project import Project
+from iai_core.entities.video import Video
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelSchemaRepo, VideoRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
 
 from tests.fixtures.values import DummyValues
 

@@ -30,7 +30,7 @@ from geti_fastapi_tools.dependencies import (
     setup_session_fastapi,
 )
 from geti_types import ID, DatasetStorageIdentifier, MediaType
-from iai_core_py.utils.filesystem import check_free_space_for_upload
+from iai_core.utils.filesystem import check_free_space_for_upload
 
 GENERIC_DS_RULE = {
     "rules": [
@@ -46,7 +46,11 @@ logger = logging.getLogger(__name__)
 media_api_prefix_url = (
     "/api/v1/organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/datasets/{dataset_id}"
 )
-media_router = APIRouter(prefix=media_api_prefix_url, tags=["Media"], dependencies=[Depends(setup_session_fastapi)])
+media_router = APIRouter(
+    prefix=media_api_prefix_url,
+    tags=["Media"],
+    dependencies=[Depends(setup_session_fastapi)],
+)
 
 
 Skip = Annotated[int, Query(ge=0)]
@@ -105,7 +109,8 @@ def post_image(
     be empty.
     """
     check_free_space_for_upload(
-        upload_size=int(request.headers["content-length"]), exception_type=NotEnoughSpaceException
+        upload_size=int(request.headers["content-length"]),
+        exception_type=NotEnoughSpaceException,
     )
     return MediaRESTController.upload_media(
         user_id=user_id,
@@ -134,7 +139,8 @@ def post_video(
     or 'Normal' label id of the destination project, it also cannot be empty.
     """
     check_free_space_for_upload(
-        upload_size=int(request.headers["content-length"]), exception_type=NotEnoughSpaceException
+        upload_size=int(request.headers["content-length"]),
+        exception_type=NotEnoughSpaceException,
     )
     return MediaRESTController.upload_media(
         user_id=user_id,
@@ -216,7 +222,9 @@ def get_video_display(  # noqa: ANN201
             video_id=video_id,
         )
         return send_file_from_path_or_url(
-            request_host=str(request.base_url), file_location=media_location, mimetype="video/mp4"
+            request_host=str(request.base_url),
+            file_location=media_location,
+            mimetype="video/mp4",
         )
 
     if display_type == VideoDisplayType.thumb_stream:

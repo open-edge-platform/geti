@@ -27,10 +27,10 @@ from geti_spicedb_tools import SpiceDB, SpiceDBResourceTypes
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, Singleton
 from grpc_interfaces.credit_system.client import CreditSystemClient, ResourceRequest
-from iai_core_py.utils.time_utils import now
+from iai_core.utils.time_utils import now
 
 if TYPE_CHECKING:
-    from iai_core_py.repos.base import SessionBasedRepo
+    from iai_core.repos.base import SessionBasedRepo
 
 logger = logging.getLogger(__name__)
 
@@ -205,7 +205,10 @@ class JobManager(metaclass=Singleton):
         if project_id is not None:
             document["project_id"] = str(project_id)
         if gpu_num_required is not None:
-            document["gpu"] = {"num_required": gpu_num_required, "state": JobGpuRequestState.WAITING.value}
+            document["gpu"] = {
+                "num_required": gpu_num_required,
+                "state": JobGpuRequestState.WAITING.value,
+            }
 
         if cost_requests is not None:
             with CreditSystemClient(metadata_getter=lambda: ()) as client:

@@ -4,9 +4,9 @@
 import pytest
 
 from geti_types import ID
-from iai_core_py.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
-from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
 
 
 @pytest.fixture
@@ -293,7 +293,10 @@ def fxt_task_graph_rest(fxt_task_1_rest, fxt_task_2_rest, fxt_task_edge_rest):
 def fxt_keypoint_structure(fxt_task_1_rest, fxt_task_2_rest, fxt_task_edge_rest):
     yield KeypointStructure(
         edges=[KeypointEdge(node_1=ID("node_1"), node_2=ID("node_2"))],
-        positions=[KeypointPosition(node=ID("node_1"), x=0, y=0), KeypointPosition(node=ID("node_2"), x=1, y=1)],
+        positions=[
+            KeypointPosition(node=ID("node_1"), x=0, y=0),
+            KeypointPosition(node=ID("node_2"), x=1, y=1),
+        ],
     )
 
 
@@ -301,5 +304,8 @@ def fxt_keypoint_structure(fxt_task_1_rest, fxt_task_2_rest, fxt_task_edge_rest)
 def fxt_keypoint_structure_rest(fxt_task_1_rest, fxt_task_2_rest, fxt_task_edge_rest):
     yield {
         "edges": [{"nodes": ["node_1", "node_2"]}],
-        "positions": [{"label": "node_1", "x": 0, "y": 0}, {"label": "node_2", "x": 1, "y": 1}],
+        "positions": [
+            {"label": "node_1", "x": 0, "y": 0},
+            {"label": "node_2", "x": 1, "y": 1},
+        ],
     }

@@ -8,8 +8,8 @@ from typing import Optional
 
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import CTX_SESSION_VAR, ID
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.repos import ModelRepo, ProjectRepo
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.repos import ModelRepo, ProjectRepo
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.k8s_helpers.trainer_pod_definition import create_flyte_container_task
 from jobs_common.tasks import flyte_multi_container_dynamic as dynamic

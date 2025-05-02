@@ -3,8 +3,8 @@
 
 import pytest
 
-from iai_core_py.entities.task_graph import TaskGraph
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.entities.task_node import TaskNode, TaskProperties
 
 from geti_types import ID
 

@@ -6,7 +6,7 @@ from http import HTTPStatus
 from typing import Any
 from unittest.mock import ANY, patch
 
-from iai_core_py.algorithms import ModelTemplateList
+from iai_core.algorithms import ModelTemplateList
 
 DETECTION_PROJECT_DATA: dict[str, Any] = {
     "connections": [

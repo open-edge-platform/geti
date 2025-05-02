@@ -6,9 +6,9 @@ from types import FunctionType
 import pytest
 from attr import fields
 
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup
-from iai_core_py.configuration.elements.utils import (
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup
+from iai_core.configuration.elements.utils import (
     _convert_enum_selectable_value,
     _validate_and_convert_float,
     attr_enum_to_str_serializer,
@@ -21,7 +21,7 @@ from iai_core_py.configuration.elements.utils import (
     construct_attr_value_validator,
     convert_string_to_id,
 )
-from iai_core_py.configuration.enums.config_element_type import ElementCategory
+from iai_core.configuration.enums.config_element_type import ElementCategory
 from tests.configuration.dummy_config import SomeEnumSelectable
 
 from geti_types import ID

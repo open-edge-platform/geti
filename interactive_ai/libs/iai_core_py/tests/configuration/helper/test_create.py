@@ -5,13 +5,13 @@ import pytest
 from attr import _make
 from omegaconf import DictConfig
 
-from iai_core_py.configuration.elements.configurable_enum import ConfigurableEnum
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.parameter_group import ParameterGroup
-from iai_core_py.configuration.enums.config_element_type import ConfigElementType
-from iai_core_py.configuration.enums.model_lifecycle import ModelLifecycle
-from iai_core_py.configuration.helper.config_element_mapping import GroupElementMapping
-from iai_core_py.configuration.helper.create import (
+from iai_core.configuration.elements.configurable_enum import ConfigurableEnum
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup
+from iai_core.configuration.enums.config_element_type import ConfigElementType
+from iai_core.configuration.enums.model_lifecycle import ModelLifecycle
+from iai_core.configuration.helper.config_element_mapping import GroupElementMapping
+from iai_core.configuration.helper.create import (
     construct_attrib_from_dict,
     construct_ui_rules_from_dict,
     contains_parameter_groups,
@@ -21,8 +21,8 @@ from iai_core_py.configuration.helper.create import (
     from_dict_attr,
     gather_parameter_arguments_and_values_from_dict,
 )
-from iai_core_py.configuration.ui_rules.rules import NullUIRules, Rule, UIRules
-from iai_core_py.configuration.ui_rules.types import Action, Operator
+from iai_core.configuration.ui_rules.rules import NullUIRules, Rule, UIRules
+from iai_core.configuration.ui_rules.types import Action, Operator
 from tests.configuration.dummy_config import SomeEnumSelectable
 
 

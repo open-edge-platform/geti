@@ -3,9 +3,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from iai_core_py.entities.model_storage import ModelStorage, NullModelStorage
-from iai_core_py.entities.model_template import NullModelTemplate
-from iai_core_py.repos import ModelStorageRepo
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import NullModelTemplate
+from iai_core.repos import ModelStorageRepo
 
 from geti_types import ID
 

@@ -14,15 +14,16 @@ from entities import AutoTrainActivationRequest, NullAutoTrainActivationRequest
 from mapper import AutoTrainActivationToMongo
 
 from geti_types import ID
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.repos.base.session_repo import MissingSessionPolicy
-from iai_core_py.repos.mappers import CursorIterator, DatetimeToMongo, IDToMongo
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.base.session_repo import MissingSessionPolicy
+from iai_core.repos.mappers import CursorIterator, DatetimeToMongo, IDToMongo
 
 
 class SessionBasedAutoTrainActivationRepo(SessionBasedRepo[AutoTrainActivationRequest]):
     def __init__(self) -> None:
         super().__init__(
-            collection_name="auto_train_activation", missing_session_policy=MissingSessionPolicy.USE_DEFAULT
+            collection_name="auto_train_activation",
+            missing_session_policy=MissingSessionPolicy.USE_DEFAULT,
         )
 
     @property

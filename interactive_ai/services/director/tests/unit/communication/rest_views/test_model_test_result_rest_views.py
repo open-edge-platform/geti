@@ -8,13 +8,18 @@ from testfixtures import compare
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 
 from geti_types import ID
-from iai_core_py.repos import DatasetStorageRepo, ModelRepo
+from iai_core.repos import DatasetStorageRepo, ModelRepo
 
 
 class TestModelTestResultRESTViews:
     @pytest.mark.parametrize("job_id_available", [False, True])
     def test_model_test_result_to_rest(
-        self, job_id_available, fxt_model_test_result, fxt_model_test_result_rest, fxt_dataset_storage, fxt_model
+        self,
+        job_id_available,
+        fxt_model_test_result,
+        fxt_model_test_result_rest,
+        fxt_dataset_storage,
+        fxt_model,
     ) -> None:
         # Arrange
         dataset_info = fxt_model_test_result_rest["datasets_info"][0]
@@ -34,7 +39,8 @@ class TestModelTestResultRESTViews:
             patch.object(ModelRepo, "get_by_id", return_value=fxt_model) as mock_get_model,
         ):
             result = ModelTestResultRestViews.model_test_result_to_rest(
-                model_test_result=fxt_model_test_result, datasets_counts=dummy_datasets_counts
+                model_test_result=fxt_model_test_result,
+                datasets_counts=dummy_datasets_counts,
             )
 
         # Assert

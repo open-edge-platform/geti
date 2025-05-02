@@ -13,8 +13,8 @@
 # and limitations under the License.
 
 
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
 
 from geti_types import ID
 

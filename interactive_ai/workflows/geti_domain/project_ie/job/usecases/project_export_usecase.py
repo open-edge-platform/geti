@@ -15,9 +15,9 @@ from functools import partial
 from bson.binary import UuidRepresentation
 from bson.json_util import DatetimeRepresentation, JSONOptions, dumps
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.utils.iteration import multi_map
-from iai_core_py.versioning import DataVersion
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.utils.iteration import multi_map
+from iai_core.versioning import DataVersion
 from jobs_common.tasks.utils.progress import publish_metadata_update
 
 from job.entities import ProjectZipArchive, ProjectZipArchiveWrapper
@@ -78,7 +78,10 @@ class ProjectExportUseCase:
         project_archive_path = os.path.join(tmp_folder, ProjectZipArchiveWrapper.PROJECT_ARCHIVE)
         with ProjectZipArchive(zip_file_path=project_archive_path) as zip_archive:
             # Fetch MongoDB documents, redact them and finally add them to the zip archive
-            logger.info("Exporting the documents from DB collections for project '%s'", project_id)
+            logger.info(
+                "Exporting the documents from DB collections for project '%s'",
+                project_id,
+            )
             progress_callback(25, "Exporting project database")
             collection_names = document_repo.get_collection_names()
             for collection_name in collection_names:
@@ -111,7 +114,10 @@ class ProjectExportUseCase:
                 try:
                     zip_archive.add_collection_with_documents(collection_name=collection_name, documents=redacted_docs)
                 except Exception:  # log the collection name before re-raising the exception
-                    logger.error("Error occurred while exporting collection '%s'", collection_name)
+                    logger.error(
+                        "Error occurred while exporting collection '%s'",
+                        collection_name,
+                    )
                     raise
 
             progress_callback(50, "Exporting project binary files")
@@ -128,7 +134,10 @@ class ProjectExportUseCase:
                     )
                     for lp, rp in objects_local_and_remote_paths
                 )
-                zip_archive.add_objects_by_type(object_type=object_type, local_and_remote_paths=redacted_objects_paths)
+                zip_archive.add_objects_by_type(
+                    object_type=object_type,
+                    local_and_remote_paths=redacted_objects_paths,
+                )
 
             # Add the manifest
             logger.info("Adding manifest to the archive of exported project '%s'", project_id)
@@ -177,7 +186,9 @@ class ProjectExportUseCase:
         try:
             with tempfile.TemporaryDirectory() as tmp_dir_path:
                 ProjectExportUseCase.__export_as_zip(
-                    project_id=project_id, tmp_folder=tmp_dir_path, progress_callback=progress_callback
+                    project_id=project_id,
+                    tmp_folder=tmp_dir_path,
+                    progress_callback=progress_callback,
                 )
         except Exception as exc:
             logger.exception("Failed to export project with id '%s'.", project_id)
@@ -189,7 +200,11 @@ class ProjectExportUseCase:
             raise ExportProjectFailedException from exc
 
     @staticmethod
-    def _get_download_url(organization_id: ID, project_identifier: ProjectIdentifier, export_operation_id: ID) -> str:
+    def _get_download_url(
+        organization_id: ID,
+        project_identifier: ProjectIdentifier,
+        export_operation_id: ID,
+    ) -> str:
         """
         Returns the download URL for the project export zip archive
 

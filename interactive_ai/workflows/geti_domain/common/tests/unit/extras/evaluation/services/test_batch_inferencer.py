@@ -4,15 +4,9 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.model_template import (
-    HyperParameterData,
-    InstantiationType,
-    ModelTemplate,
-    TaskFamily,
-    TaskType,
-)
-from iai_core_py.utils.post_process_predictions import PostProcessPredictionsUtils
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
+from iai_core.utils.post_process_predictions import PostProcessPredictionsUtils
 
 from jobs_common_extras.evaluation.services.batch_inference import BatchInference
 from jobs_common_extras.evaluation.services.inferencer import InferencerFactory
@@ -83,8 +77,16 @@ class TestBatchInference:
         (
             (True, "Custom_Counting_Instance_Segmentation_MaskRCNN_SwinT_FP16", False),
             (True, "Object_Detection_ResNeXt101_ATSS", False),
-            (True, "Custom_Counting_Instance_Segmentation_MaskRCNN_EfficientNetB2B", True),
-            (False, "Custom_Counting_Instance_Segmentation_MaskRCNN_EfficientNetB2B", False),
+            (
+                True,
+                "Custom_Counting_Instance_Segmentation_MaskRCNN_EfficientNetB2B",
+                True,
+            ),
+            (
+                False,
+                "Custom_Counting_Instance_Segmentation_MaskRCNN_EfficientNetB2B",
+                False,
+            ),
         ),
     )
     def test_run(

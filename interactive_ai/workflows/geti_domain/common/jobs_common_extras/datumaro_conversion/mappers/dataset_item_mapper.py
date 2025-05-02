@@ -9,11 +9,11 @@ import cv2
 import datumaro as dm
 import numpy as np
 from geti_types import ID, DatasetStorageIdentifier
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
-from iai_core_py.entities.subset import Subset
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.label import Label
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
+from iai_core.entities.subset import Subset
 from media_utils import get_media_numpy
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper
@@ -215,7 +215,10 @@ class DatasetItemMapper:
     ) -> dm.DatasetItem:
         """Convert DatasetItem from SC to Datumaro"""
         if image_bytes_future is None:
-            numpy_data = get_media_numpy(dataset_storage_identifier=dataset_storage_identifier, media=instance.media)
+            numpy_data = get_media_numpy(
+                dataset_storage_identifier=dataset_storage_identifier,
+                media=instance.media,
+            )
             dm_image = dm.Image.from_numpy(
                 lambda: cv2.cvtColor(numpy_data, cv2.COLOR_RGB2BGR),
                 ext=".jpg",

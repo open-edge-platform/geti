@@ -10,12 +10,12 @@ import logging
 from collections.abc import Sequence
 
 from geti_types import ID, DatasetStorageIdentifier
-from iai_core_py.entities.dataset_entities import TaskDataset
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import DatasetRepo, ProjectRepo, SuspendedAnnotationScenesRepo
-from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
-from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetRepo, ProjectRepo, SuspendedAnnotationScenesRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 logger = logging.getLogger(__name__)
 

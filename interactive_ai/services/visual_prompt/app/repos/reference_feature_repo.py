@@ -19,9 +19,9 @@ from repos.reference_feature_binary_repo import ReferenceFeatureBinaryRepo
 from repos.reference_feature_mapper import ReferenceFeatureToMongo
 
 from geti_types import ID, ProjectIdentifier, Session
-from iai_core_py.repos.base import ProjectBasedSessionRepo
-from iai_core_py.repos.base.session_repo import QueryAccessMode
-from iai_core_py.repos.mappers import CursorIterator, IDToMongo
+from iai_core.repos.base import ProjectBasedSessionRepo
+from iai_core.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.mappers import CursorIterator, IDToMongo
 
 FILENAME_PREFIX = "vps_reference_feature"
 

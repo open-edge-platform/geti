@@ -9,8 +9,8 @@ from testfixtures import compare
 from communication.controllers.model_test_controller import ModelTestController
 
 from geti_types import ID
-from iai_core_py.repos import ModelTestResultRepo, ProjectRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.repos import ModelTestResultRepo, ProjectRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 DUMMY_ORGANIZATION_ID = "567890123456789012340001"
 DUMMY_PROJECT_ID = "234567890123456789010000"
@@ -97,7 +97,8 @@ class TestModelTestsRESTEndpoint:
         # Assert
         assert result.status_code == HTTPStatus.OK
         mock_delete_test_result.assert_called_once_with(
-            project_identifier=fxt_project.identifier, model_test_result=fxt_model_test_result
+            project_identifier=fxt_project.identifier,
+            model_test_result=fxt_model_test_result,
         )
 
     def test_get_model_tests_prediction_endpoint(self, fxt_director_app, fxt_model_test_results_rest) -> None:

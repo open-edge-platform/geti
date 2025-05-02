@@ -22,8 +22,8 @@ from communication.helpers.validation_helpers import (
 from geti_fastapi_tools.dependencies import get_user_id_fastapi, setup_session_fastapi
 from geti_fastapi_tools.exceptions import DatasetStorageNotFoundException, GetiBaseException
 from geti_types import ID
-from iai_core_py.entities.dataset_storage import NullDatasetStorage
-from iai_core_py.repos import DatasetStorageRepo
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.repos import DatasetStorageRepo
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(setup_session_fastapi)])
@@ -71,7 +71,7 @@ def import_project_from_dataset_endpoint(
     project_name: str = Body(...),  # noqa: FAST002
     task_type: str = Body(...),  # noqa: FAST002
     labels: list[dict] = Body(...),  # noqa: FAST002
-    keypoint_structure: dict[str, list[dict]] = Body(default={"edges": [], "positions": []}),  # noqa: FAST002
+    keypoint_structure: dict[str, list[dict]] = Body(default={"edges": [], "positions": []}),
     user_id: ID = Depends(get_user_id_fastapi),  # noqa: FAST002
 ) -> JSONResponse:
     """
@@ -100,7 +100,10 @@ def import_project_from_dataset_endpoint(
     label_colors = {label_meta["name"]: label_meta["color"] for label_meta in labels if "color" in label_meta}
     project_type = get_validated_project_type_from_task_type(task_type)
 
-    job_metadata = {"file_id": str(file_metadata.id_), "project": {"name": project_name, "type": task_type}}
+    job_metadata = {
+        "file_id": str(file_metadata.id_),
+        "project": {"name": project_name, "type": task_type},
+    }
 
     logger.info("Feature flag for import jobs is enabled, submitting perform import to new project job")
     try:

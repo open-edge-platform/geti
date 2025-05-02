@@ -6,11 +6,11 @@ import pytest
 from tests.fixtures.values import DummyValues, IDOffsets
 
 from geti_types import ProjectIdentifier
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_graph import TaskGraph
-from iai_core_py.repos import ProjectRepo
-from iai_core_py.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.repos import ProjectRepo
+from iai_core.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
 
 
 @pytest.fixture

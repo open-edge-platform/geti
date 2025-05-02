@@ -12,11 +12,11 @@ from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from iai_core_py.entities.model import NullModel
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.repos import ModelRepo, ModelStorageRepo, ProjectRepo
-from iai_core_py.repos.model_repo import ModelStatusFilter
-from iai_core_py.services import ModelService
+from iai_core.entities.model import NullModel
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.repos import ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core.repos.model_repo import ModelStatusFilter
+from iai_core.services import ModelService
 from jobs_common.tasks.utils.progress import publish_metadata_update
 
 from job.utils.model_registration import ModelMapper, ProjectMapper
@@ -133,17 +133,25 @@ def register_models(
             # Single task project, register 'active' model only -> no further action needed,
             # return immediately after registration
             model_registration_client.register(
-                name=f"{str(project_id)}-active", project=project, models=[model], override=True
+                name=f"{str(project_id)}-active",
+                project=project,
+                models=[model],
+                override=True,
             )
             return
         if REGISTER_BY_TASK_ID and len(trainable_task_ids) > 1:
             # Task chain, register individual model by task id
             model_registration_client.register(
-                name=f"{str(project_id)}-{str(task_id)}", project=project, models=[model], override=True
+                name=f"{str(project_id)}-{str(task_id)}",
+                project=project,
+                models=[model],
+                override=True,
             )
         else:
             model_registration_client.register(
-                name=f"{str(project_id)}-{str(model_id)}", project=project, models=[model]
+                name=f"{str(project_id)}-{str(model_id)}",
+                project=project,
+                models=[model],
             )
 
         # Register new active pipeline

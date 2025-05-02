@@ -3,8 +3,8 @@
 
 from copy import deepcopy
 
-from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
 
 
 class TestAnnotationScene:

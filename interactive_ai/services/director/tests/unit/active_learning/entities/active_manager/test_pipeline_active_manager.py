@@ -10,8 +10,8 @@ from active_learning.entities import ActiveScore, ActiveScoreReductionFunction
 from active_learning.entities.active_manager.task_active_manager import TaskActiveManager
 from active_learning.storage.repos import ActiveScoreRepo
 
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 if TYPE_CHECKING:
     from active_learning.entities.active_manager.pipeline_active_manager import PipelineActiveManager

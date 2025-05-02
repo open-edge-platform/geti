@@ -19,12 +19,12 @@ from communication.rest_views.project_rest_views import (
     ProjectRESTViews,
 )
 
-from iai_core_py.repos import ModelRepo
-from iai_core_py.services.model_service import ModelService
+from iai_core.repos import ModelRepo
+from iai_core.services.model_service import ModelService
 
 if TYPE_CHECKING:
     from geti_types import ID
-    from iai_core_py.entities.label_schema import LabelSchemaView
+    from iai_core.entities.label_schema import LabelSchemaView
 
 
 class TestProjectRESTViews:

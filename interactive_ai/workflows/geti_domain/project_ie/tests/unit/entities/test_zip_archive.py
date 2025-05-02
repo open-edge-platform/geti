@@ -8,7 +8,7 @@ from datetime import datetime
 
 import pytest
 from bson import json_util
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core.repos.storage.storage_client import BinaryObjectType
 
 from job.entities import ProjectZipArchive
 from job.entities.exceptions import (
@@ -135,7 +135,10 @@ class TestZipArchive:
         assert isinstance(found_manifest.export_date, datetime)
 
         # Creating the manifest twice should fail
-        with ProjectZipArchive(zip_file_path=archive_path) as zip_archive, pytest.raises(ManifestAlreadyExistsError):
+        with (
+            ProjectZipArchive(zip_file_path=archive_path) as zip_archive,
+            pytest.raises(ManifestAlreadyExistsError),
+        ):
             zip_archive.add_manifest(version=DUMMY_VERSION, min_id=min_id)
 
     def test_get_collection_names(self, fxt_project_archive_file_path) -> None:
@@ -199,14 +202,18 @@ class TestZipArchive:
             # Act: add the objects to the archive
             with ProjectZipArchive(zip_file_path=fxt_project_archive_file_path) as zip_archive:
                 zip_archive.add_objects_by_type(
-                    object_type=BinaryObjectType.VIDEOS, local_and_remote_paths=local_and_remote_paths
+                    object_type=BinaryObjectType.VIDEOS,
+                    local_and_remote_paths=local_and_remote_paths,
                 )
 
             # Assert: check that the objects have been added to the archive and can be retrieved
             num_found_objs = 0
             remote_paths = [rp for _, rp in local_and_remote_paths]
             with ProjectZipArchive(zip_file_path=fxt_project_archive_file_path, readonly=True) as zip_archive:
-                for obj_local_path, obj_remote_rel_path in zip_archive.get_objects_by_type(BinaryObjectType.VIDEOS):
+                for (
+                    obj_local_path,
+                    obj_remote_rel_path,
+                ) in zip_archive.get_objects_by_type(BinaryObjectType.VIDEOS):
                     num_found_objs += 1
                     assert os.path.basename(obj_local_path) in video_names
                     with open(obj_local_path, "rb") as obj_fp:

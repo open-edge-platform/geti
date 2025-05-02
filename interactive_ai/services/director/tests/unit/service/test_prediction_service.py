@@ -9,8 +9,8 @@ from entities import PredictionType
 from service.prediction_service import PredictionService
 
 from geti_types import ID, ImageIdentifier
-from iai_core_py.entities.annotation import AnnotationSceneKind, NullAnnotationScene
-from iai_core_py.repos import AnnotationSceneRepo
+from iai_core.entities.annotation import AnnotationSceneKind, NullAnnotationScene
+from iai_core.repos import AnnotationSceneRepo
 
 
 @pytest.fixture
@@ -156,7 +156,9 @@ class TestPredictionService:
         model_ids = {fxt_mongo_id(3)}
 
         with patch.object(
-            PredictionService, "_get_single_prediction", return_value=fxt_annotation_scene
+            PredictionService,
+            "_get_single_prediction",
+            return_value=fxt_annotation_scene,
         ) as patched_get_single_prediction:
             result = PredictionService.get_prediction_by_type(
                 project=fxt_project,
@@ -203,7 +205,11 @@ class TestPredictionService:
         task_id = fxt_mongo_id(1)
 
         with (
-            patch.object(PredictionService, "_get_single_prediction", return_value=NullAnnotationScene()),
+            patch.object(
+                PredictionService,
+                "_get_single_prediction",
+                return_value=NullAnnotationScene(),
+            ),
             pytest.raises(NoPredictionsFoundException) as error,
         ):
             PredictionService.get_prediction_by_type(

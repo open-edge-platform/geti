@@ -5,12 +5,12 @@ from random import choice, randint, random, sample, uniform
 
 import pytest
 
-from iai_core_py.entities.annotation import Annotation
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.metrics import AnomalyLocalizationPerformance, MultiScorePerformance, ScoreMetric
-from iai_core_py.entities.model_test_result import ModelTestResult, TestState
-from iai_core_py.entities.scored_label import ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.metrics import AnomalyLocalizationPerformance, MultiScorePerformance, ScoreMetric
+from iai_core.entities.model_test_result import ModelTestResult, TestState
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
 
 from .values import IDOffsets
 

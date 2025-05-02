@@ -9,21 +9,21 @@ from service.label_schema_service import LabelSchemaService
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Rectangle
-from iai_core_py.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, SuspendedAnnotationScenesRepo, VideoRepo
-from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper, AnnotationStatePerTask
-from iai_core_py.utils.iteration import grouper
-from iai_core_py.utils.label_resolver import LabelResolver
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, SuspendedAnnotationScenesRepo, VideoRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper, AnnotationStatePerTask
+from iai_core.utils.iteration import grouper
+from iai_core.utils.label_resolver import LabelResolver
 
 logger = logging.getLogger(__name__)
 
@@ -210,7 +210,10 @@ class AnnotationManager:
         """
         scored_labels = [
             ScoredLabel(
-                label_id=label.id_, is_empty=label.is_empty, probability=1.0, label_source=LabelSource(user_id=user_id)
+                label_id=label.id_,
+                is_empty=label.is_empty,
+                probability=1.0,
+                label_source=LabelSource(user_id=user_id),
             )
             for label in labels
         ]

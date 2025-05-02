@@ -4,8 +4,8 @@
 #
 
 
-from iai_core_py.entities.media_score import NullMediaScore
-from iai_core_py.repos import MediaScoreRepo
+from iai_core.entities.media_score import NullMediaScore
+from iai_core.repos import MediaScoreRepo
 
 
 class TestMediaScoreRepo:

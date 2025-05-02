@@ -6,7 +6,7 @@
 import logging
 
 from geti_telemetry_tools import unified_tracing
-from iai_core_py.entities.datasets import Dataset
+from iai_core.entities.datasets import Dataset
 
 from job.commands.create_task_train_dataset_command import CreateTaskTrainDatasetCommand
 from job.utils.train_workflow_data import TrainWorkflowData

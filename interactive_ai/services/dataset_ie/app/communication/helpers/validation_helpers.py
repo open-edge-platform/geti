@@ -14,9 +14,9 @@ from domain.entities.geti_project_type import GetiProjectType
 
 from geti_fastapi_tools.exceptions import DatasetStorageNotFoundException, InvalidIDException, ProjectNotFoundException
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from iai_core_py.entities.project import NullProject, Project
-from iai_core_py.repos import DatasetStorageRepo, ProjectRepo
+from iai_core.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core.entities.project import NullProject, Project
+from iai_core.repos import DatasetStorageRepo, ProjectRepo
 
 logger = logging.getLogger(__name__)
 

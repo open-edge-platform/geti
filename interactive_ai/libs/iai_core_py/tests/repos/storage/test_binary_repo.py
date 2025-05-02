@@ -12,10 +12,10 @@ import pytest
 from minio import InvalidResponseError, Minio
 from urllib3.exceptions import ReadTimeoutError
 
-from iai_core_py.adapters.binary_interpreters import RAWBinaryInterpreter
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.repos.storage.binary_repo import BinaryRepo
-from iai_core_py.repos.storage.binary_repos import (
+from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.repos.storage.binary_repo import BinaryRepo
+from iai_core.repos.storage.binary_repos import (
     CodeDeploymentBinaryRepo,
     ImageBinaryRepo,
     ModelBinaryRepo,
@@ -23,13 +23,13 @@ from iai_core_py.repos.storage.binary_repos import (
     ThumbnailBinaryRepo,
     VideoBinaryRepo,
 )
-from iai_core_py.repos.storage.object_storage import (
+from iai_core.repos.storage.object_storage import (
     ObjectStorageClient,
     reinit_client_and_retry_on_timeout,
     retry_on_rate_limit,
 )
-from iai_core_py.repos.storage.s3_connector import S3Connector
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core.repos.storage.s3_connector import S3Connector
+from iai_core.repos.storage.storage_client import BinaryObjectType
 
 from geti_types import DatasetStorageIdentifier
 from geti_types.session import DEFAULT_ORGANIZATION_ID

@@ -14,10 +14,10 @@ from services.rest_views.prediction_rest_views import PredictionRESTViews
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, ProjectIdentifier
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
-from iai_core_py.entities.image import Image, NullImage
-from iai_core_py.entities.video import NullVideo, VideoFrame
-from iai_core_py.repos import ImageRepo, VideoRepo
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.entities.image import Image, NullImage
+from iai_core.entities.video import NullVideo, VideoFrame
+from iai_core.repos import ImageRepo, VideoRepo
 from media_utils import get_media_numpy
 
 logger = logging.getLogger(__name__)
@@ -48,7 +48,9 @@ class PredictController:
         :return: REST representation of the VPS predictions.
         """
         numpy_data, media_identifier = cls._get_numpy_data(
-            project_identifier=project_identifier, media_info_payload=media_info_payload, file=file
+            project_identifier=project_identifier,
+            media_info_payload=media_info_payload,
+            file=file,
         )
 
         prediction_results = request.app.visual_prompt_service.infer(
@@ -88,13 +90,15 @@ class PredictController:
                 dataset_storage_id=ID(media_info_payload.dataset_storage_id),
             )
             return cls._get_media(
-                dataset_storage_identifier=dataset_storage_identifier, media_info_payload=media_info_payload
+                dataset_storage_identifier=dataset_storage_identifier,
+                media_info_payload=media_info_payload,
             )
         raise MissingInputMediaException
 
     @staticmethod
     def _get_media(
-        dataset_storage_identifier: DatasetStorageIdentifier, media_info_payload: MediaInfoPayload
+        dataset_storage_identifier: DatasetStorageIdentifier,
+        media_info_payload: MediaInfoPayload,
     ) -> tuple[np.ndarray, MediaIdentifierEntity | None]:
         """
         Gets the media from the media user's provided media info payload.

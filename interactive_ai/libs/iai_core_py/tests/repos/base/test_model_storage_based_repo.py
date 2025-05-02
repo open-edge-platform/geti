@@ -4,9 +4,9 @@ from unittest.mock import patch
 
 from bson import ObjectId
 
-from iai_core_py.entities.model_storage import ModelStorageIdentifier
-from iai_core_py.repos.base import SessionBasedRepo
-from iai_core_py.repos.base.session_repo import QueryAccessMode
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.base.session_repo import QueryAccessMode
 
 from geti_types import make_session
 

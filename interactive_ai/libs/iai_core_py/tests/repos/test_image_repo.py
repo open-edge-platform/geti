@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING
 
 import cv2
 
-from iai_core_py.entities.image import Image, NullImage
-from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
-from iai_core_py.repos import ImageRepo
+from iai_core.entities.image import Image, NullImage
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.repos import ImageRepo
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.dataset_storage import DatasetStorage
+    from iai_core.entities.dataset_storage import DatasetStorage
 
 
 class TestImageRepo:

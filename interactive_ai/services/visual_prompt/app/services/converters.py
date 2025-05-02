@@ -11,10 +11,10 @@ from model_api.models.visual_prompting import Prompt, VisualPromptingFeatures
 from entities.reference_feature import ReferenceFeature, ReferenceMediaInfo
 
 from geti_types import ID
-from iai_core_py.entities.annotation import Annotation, AnnotationScene
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
+from iai_core.entities.annotation import Annotation, AnnotationScene
+from iai_core.entities.label import Label
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,10 @@ class VisualPromptingFeaturesConverter(LabelIndexConverter):
         return VisualPromptingFeatures(feature_vectors=feature_vectors, used_indices=used_indices)
 
     def convert_to_reference_features(
-        self, visual_prompting_features: VisualPromptingFeatures, reference_media_info: ReferenceMediaInfo, task_id: ID
+        self,
+        visual_prompting_features: VisualPromptingFeatures,
+        reference_media_info: ReferenceMediaInfo,
+        task_id: ID,
     ) -> list[ReferenceFeature]:
         """
         Converts ModelAPI's visual prompting features to reference feature entities.
@@ -82,7 +85,12 @@ class VisualPromptingFeaturesConverter(LabelIndexConverter):
             feature_vec = feature_vectors[used_index]
             label_id = self.index_to_label_id(used_index)
             reference_features.append(
-                ReferenceFeature(task_id=task_id, label_id=label_id, numpy=feature_vec, media_info=reference_media_info)
+                ReferenceFeature(
+                    task_id=task_id,
+                    label_id=label_id,
+                    numpy=feature_vec,
+                    media_info=reference_media_info,
+                )
             )
         return reference_features
 
@@ -125,7 +133,14 @@ class PromptConverter(LabelIndexConverter):
             shape = annotation.shape
             if not isinstance(shape, Ellipse | Rectangle):
                 continue
-            data = np.array([shape.x1 * width, shape.y1 * height, shape.x2 * width, shape.y2 * height])
+            data = np.array(
+                [
+                    shape.x1 * width,
+                    shape.y1 * height,
+                    shape.x2 * width,
+                    shape.y2 * height,
+                ]
+            )
             for label in annotation.get_labels():
                 if label.id_ not in self._label_map:
                     continue
@@ -149,7 +164,15 @@ class AnnotationConverter:
         masks = np.array(segmentation_masks).astype(np.uint8)
         for mask in masks:
             # adding a border to the mask to avoid edge cases
-            _mask = cv2.copyMakeBorder(mask, top=1, bottom=1, left=1, right=1, borderType=cv2.BORDER_CONSTANT, value=0)  # type: ignore[call-overload]
+            _mask = cv2.copyMakeBorder(
+                mask,
+                top=1,
+                bottom=1,
+                left=1,
+                right=1,
+                borderType=cv2.BORDER_CONSTANT,
+                value=0,
+            )  # type: ignore[call-overload]
             mask_area = _mask.shape[0] * _mask.shape[1]
             min_contour_size_threshold = mask_area * 0.001  # 0.1% of the image size
             max_contour_area_threshold = mask_area * 0.9  # 90% of the image size
@@ -215,7 +238,10 @@ class AnnotationConverter:
 
     @classmethod
     def convert_to_bboxes(
-        cls, predicted_mask: PredictedMask, predicted_label: Label, label_source: LabelSource
+        cls,
+        predicted_mask: PredictedMask,
+        predicted_label: Label,
+        label_source: LabelSource,
     ) -> list[Annotation]:
         """
         Convert predicted mask to annotations with bounding boxes.
@@ -240,7 +266,10 @@ class AnnotationConverter:
 
     @classmethod
     def convert_to_rotated_bboxes(
-        cls, predicted_mask: PredictedMask, predicted_label: Label, label_source: LabelSource
+        cls,
+        predicted_mask: PredictedMask,
+        predicted_label: Label,
+        label_source: LabelSource,
     ) -> list[Annotation]:
         """
         Convert predicted mask to annotations with rotated bounding boxes.
@@ -263,12 +292,18 @@ class AnnotationConverter:
             return Polygon(points=points)
 
         return cls._convert_to_annotation(
-            predicted_mask, predicted_label, contour_to_rotated_rect, label_source=label_source
+            predicted_mask,
+            predicted_label,
+            contour_to_rotated_rect,
+            label_source=label_source,
         )
 
     @classmethod
     def convert_to_polygons(
-        cls, predicted_mask: PredictedMask, predicted_label: Label, label_source: LabelSource
+        cls,
+        predicted_mask: PredictedMask,
+        predicted_label: Label,
+        label_source: LabelSource,
     ) -> list[Annotation]:
         """
         Convert predicted mask to annotations with polygons.
@@ -291,5 +326,8 @@ class AnnotationConverter:
             return Polygon(points=points)
 
         return cls._convert_to_annotation(
-            predicted_mask, predicted_label, contour_to_polygon, label_source=label_source
+            predicted_mask,
+            predicted_label,
+            contour_to_polygon,
+            label_source=label_source,
         )

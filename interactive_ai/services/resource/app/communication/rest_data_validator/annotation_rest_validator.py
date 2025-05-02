@@ -23,14 +23,14 @@ from geti_fastapi_tools.validation import RestApiValidator
 from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelGroupType, LabelSchema, LabelSchemaView
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.utils.constants import MAX_POLYGON_POINTS
-from iai_core_py.utils.type_helpers import SequenceOrSet
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelGroupType, LabelSchema, LabelSchemaView
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.task_node import TaskNode
+from iai_core.utils.constants import MAX_POLYGON_POINTS
+from iai_core.utils.type_helpers import SequenceOrSet
 
 ANNOTATIONS = "annotations"
 ID_ = "id"
@@ -123,7 +123,10 @@ class AnnotationRestValidator(RestApiValidator):
         )
 
     def validate_video_annotation_range(
-        self, video_annotation_range_rest: dict, label_schema: LabelSchema, video_total_frames: int
+        self,
+        video_annotation_range_rest: dict,
+        label_schema: LabelSchema,
+        video_total_frames: int,
     ) -> None:
         """
         Validation video annotation range JSON data. Steps:
@@ -770,7 +773,9 @@ class AnnotationRestValidator(RestApiValidator):
                 )
 
     @staticmethod
-    def __get_label_ids_from_video_annotation_range(video_annotation_range_rest: dict) -> set[ID]:
+    def __get_label_ids_from_video_annotation_range(
+        video_annotation_range_rest: dict,
+    ) -> set[ID]:
         """
         Get the set of label IDs contained in a video annotation range.
 

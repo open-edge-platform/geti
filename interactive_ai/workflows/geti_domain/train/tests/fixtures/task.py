@@ -4,10 +4,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.model_template import TaskFamily, TaskType
-from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model_template import TaskFamily, TaskType
+from iai_core.entities.task_node import TaskNode, TaskProperties
 
 from tests.fixtures.values import IDOffsets
 

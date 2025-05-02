@@ -14,18 +14,18 @@ from coordination.dataset_manager.dataset_counter_config import (
 )
 
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.configuration.elements.component_parameters import ComponentType
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.metrics import NullPerformance, Performance
-from iai_core_py.entities.model import NullModel
-from iai_core_py.entities.model_template import TaskType
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import ConfigurableParametersRepo, EvaluationResultRepo, ModelRepo, ProjectRepo
-from iai_core_py.services.model_service import ModelService
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.metrics import NullPerformance, Performance
+from iai_core.entities.model import NullModel
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ConfigurableParametersRepo, EvaluationResultRepo, ModelRepo, ProjectRepo
+from iai_core.services.model_service import ModelService
 
 if TYPE_CHECKING:
-    from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+    from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
 
 
 # New number of images is calculated to achieve a relative increase of 10% value from the current performance

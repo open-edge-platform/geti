@@ -3,7 +3,7 @@
 
 import io
 
-from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
 
 
 class TestBinaryInterpreters:

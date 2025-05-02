@@ -29,8 +29,8 @@ from model.job_state import JobStateGroup
 
 from geti_spicedb_tools import Permissions, SpiceDB, SpiceDBResourceTypes
 from geti_types import ID
-from iai_core_py.utils.constants import DEFAULT_USER_NAME
-from iai_core_py.utils.time_utils import now
+from iai_core.utils.constants import DEFAULT_USER_NAME
+from iai_core.utils.time_utils import now
 
 DUMMY_ORGANIZATION_ID = "000000000000000000000001"
 DUMMY_JOB_KEY = json.dumps({"job_key": "job_value"})
@@ -252,7 +252,10 @@ class TestJobController:
             author_uid=author_uid,
             start_time=start_time,
             pagination=expected_pagination,
-            acl=JobsAcl(permitted_projects=[], workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR),
+            acl=JobsAcl(
+                permitted_projects=[],
+                workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR,
+            ),
             sort_by=JobSortingField[sort_by.upper()],
             sort_direction=SortDirection[sort_direction.upper()],
         )
@@ -263,14 +266,20 @@ class TestJobController:
             key=key,
             author_uid=author_uid,
             start_time=start_time,
-            acl=JobsAcl(permitted_projects=[], workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR),
+            acl=JobsAcl(
+                permitted_projects=[],
+                workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR,
+            ),
         )
         mock_get_count_per_state.assert_called_once_with(
             project_id=project_id,
             job_types=[job_type],
             author_uid=author_uid,
             start_time=start_time,
-            acl=JobsAcl(permitted_projects=[], workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR),
+            acl=JobsAcl(
+                permitted_projects=[],
+                workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR,
+            ),
         )
         mock_spice_db_get_user_projects.assert_called_once_with(
             user_id=DUMMY_AUTHOR, permission=Permissions.VIEW_PROJECT
@@ -345,7 +354,9 @@ class TestJobController:
         with (
             pytest.raises(JobNotCancellableHTTPException) as error,
             patch.object(
-                JobManager, "mark_cancelled", side_effect=JobNotCancellableException(job_id=job_id)
+                JobManager,
+                "mark_cancelled",
+                side_effect=JobNotCancellableException(job_id=job_id),
             ) as mock_mark_cancelled,
         ):
             JobController().cancel_job(job_id=job_id, user_uid=DEFAULT_USER_NAME)

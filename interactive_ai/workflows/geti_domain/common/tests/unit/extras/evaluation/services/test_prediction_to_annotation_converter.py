@@ -5,9 +5,9 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from geti_types import ID
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
 from model_api.models import Contour
 from model_api.models.utils import (
     AnomalyResult,
@@ -41,7 +41,10 @@ class TestPredictionToAnnotationConverter:
         labels = label_schema.get_labels(include_empty=False)
         labels_str = [label.name for label in labels]
         raw_prediction = ClassificationResult(
-            top_labels=[(1, labels[1].name, 0.81)], raw_scores=[0.19, 0.81], saliency_map=None, feature_vector=None
+            top_labels=[(1, labels[1].name, 0.81)],
+            raw_scores=[0.19, 0.81],
+            saliency_map=None,
+            feature_vector=None,
         )
 
         # Act
@@ -118,7 +121,9 @@ class TestPredictionToAnnotationConverter:
 
         # Act
         converter = RotatedRectToAnnotationConverter(
-            label_schema, configuration={"use_ellipse_shapes": use_ellipse_shapes}, model_api_labels=labels_str
+            label_schema,
+            configuration={"use_ellipse_shapes": use_ellipse_shapes},
+            model_api_labels=labels_str,
         )
         annotations = converter.convert_to_annotations(raw_prediction, metadata=metadata)
 
@@ -172,7 +177,13 @@ class TestPredictionToAnnotationConverter:
         seg_model.labels = labels_str
 
         def get_contours(_: ImageResultWithSoftPrediction):
-            return [Contour(labels_str[0], 0.8, shape=np.array([[(1, 1), (0, 3), (1, 3), (3, 3)]]))]
+            return [
+                Contour(
+                    labels_str[0],
+                    0.8,
+                    shape=np.array([[(1, 1), (0, 3), (1, 3), (3, 3)]]),
+                )
+            ]
 
         seg_model.get_contours = get_contours
 
@@ -190,7 +201,12 @@ class TestPredictionToAnnotationConverter:
             assert p1.y == pytest.approx(p2.y, 0.01)
 
     @pytest.mark.parametrize(
-        "domain", [Domain.ANOMALY_CLASSIFICATION, Domain.ANOMALY_SEGMENTATION, Domain.ANOMALY_DETECTION]
+        "domain",
+        [
+            Domain.ANOMALY_CLASSIFICATION,
+            Domain.ANOMALY_SEGMENTATION,
+            Domain.ANOMALY_DETECTION,
+        ],
     )
     def test_anomaly_to_annotation_converter(self, domain, fxt_label_schema_factory):
         # Arrange
@@ -218,7 +234,14 @@ class TestPredictionToAnnotationConverter:
         assert anomalous_label_id in annotations[0].get_label_ids()
         assert Rectangle.is_full_box(annotations[0].shape)
         if domain == Domain.ANOMALY_SEGMENTATION:
-            expected_polygon = Polygon(points=[Point(0.0, 0.0), Point(0.0, 1.0), Point(1.0, 1.0), Point(1.0, 0.0)])
+            expected_polygon = Polygon(
+                points=[
+                    Point(0.0, 0.0),
+                    Point(0.0, 1.0),
+                    Point(1.0, 1.0),
+                    Point(1.0, 0.0),
+                ]
+            )
             for p1, p2 in zip(annotations[1].shape.points, expected_polygon.points):
                 assert p1.x == pytest.approx(p2.x, 0.01)
                 assert p1.y == pytest.approx(p2.y, 0.01)
@@ -270,7 +293,13 @@ class TestPredictionToAnnotationConverter:
             ]
         )
         raw_prediction = ZSLVisualPromptingResult(
-            data={0: PredictedMask(mask=[mask], points=np.array([[1, 1], [4, 1], [4, 4], [1, 4]]), scores=[0.51])}
+            data={
+                0: PredictedMask(
+                    mask=[mask],
+                    points=np.array([[1, 1], [4, 1], [4, 4], [1, 4]]),
+                    scores=[0.51],
+                )
+            }
         )
         height, width = mask.shape
         metadata = {"original_shape": (height, width, 3)}

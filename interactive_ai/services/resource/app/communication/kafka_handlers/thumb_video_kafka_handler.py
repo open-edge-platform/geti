@@ -6,7 +6,7 @@ from resource_management.media_manager import MediaManager
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, DatasetStorageIdentifier, Singleton
-from iai_core_py.session.session_propagation import setup_session_kafka
+from iai_core.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,10 @@ class ThumbVideoKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
     @property
     def topics_subscriptions(self) -> list[TopicSubscription]:
         return [
-            TopicSubscription(topic="thumbnail_video_missing", callback=self.generate_and_save_thumbnail_video),
+            TopicSubscription(
+                topic="thumbnail_video_missing",
+                callback=self.generate_and_save_thumbnail_video,
+            ),
         ]
 
     @staticmethod

@@ -15,8 +15,8 @@
 import pytest
 from shapely.geometry.polygon import Polygon
 
-from iai_core_py.entities.shapes import Ellipse, Rectangle
-from iai_core_py.utils.time_utils import now
+from iai_core.entities.shapes import Ellipse, Rectangle
+from iai_core.utils.time_utils import now
 
 
 class TestEllipse:

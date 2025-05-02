@@ -5,10 +5,10 @@
 
 import pytest
 
-from iai_core_py.adapters.adapter import IAdapter, ProxyAdapter
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_graph import NullTaskGraph
+from iai_core.adapters.adapter import IAdapter, ProxyAdapter
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import NullTaskGraph
 
 
 class TestProject:

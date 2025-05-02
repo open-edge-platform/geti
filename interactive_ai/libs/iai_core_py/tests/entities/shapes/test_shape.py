@@ -17,7 +17,7 @@ import warnings
 
 import pytest
 
-from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
 
 
 class TestShape:

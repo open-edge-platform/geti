@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from zipfile import ZipFile
 
 from bson import ObjectId, json_util
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core.repos.storage.storage_client import BinaryObjectType
 
 from .exceptions import (
     CollectionAlreadyExistsError,
@@ -108,7 +108,11 @@ class ZipArchive(abc.ABC):
         if not allow_nested_zip:
             for f in self._zip_file.namelist():
                 if os.path.splitext(f)[1] == ".zip":
-                    logger.warning("Archive '%s' rejected because it contains a nested zip: %s", self._zip_file_path, f)
+                    logger.warning(
+                        "Archive '%s' rejected because it contains a nested zip: %s",
+                        self._zip_file_path,
+                        f,
+                    )
                     raise ZipBombDetectedError
 
         compression_ratio = self.get_compression_ratio()
@@ -336,7 +340,9 @@ class ProjectZipArchive(ZipArchive):
                         os.remove(local_object_path)
 
     def add_objects_by_type(
-        self, object_type: BinaryObjectType, local_and_remote_paths: Iterable[tuple[str, str]]
+        self,
+        object_type: BinaryObjectType,
+        local_and_remote_paths: Iterable[tuple[str, str]],
     ) -> None:
         """
         Write all binaries for an object type to the project archive
@@ -348,7 +354,10 @@ class ProjectZipArchive(ZipArchive):
         """
         zip_objects_folder = os.path.join(self.BINARIES_FOLDER, object_type.name.lower())
 
-        for local_object_path, remote_object_path_from_project_root in local_and_remote_paths:
+        for (
+            local_object_path,
+            remote_object_path_from_project_root,
+        ) in local_and_remote_paths:
             if not os.path.exists(local_object_path):
                 logger.error(f"Local object file {local_object_path} not found")
                 raise RuntimeError("Object to add to the archive cannot be found locally")

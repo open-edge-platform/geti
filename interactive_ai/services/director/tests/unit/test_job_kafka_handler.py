@@ -13,10 +13,10 @@ from service.project_service import ProjectService
 
 from geti_kafka_tools import KafkaRawMessage
 from geti_types import ID, ProjectIdentifier
-from iai_core_py.entities.model import Model
-from iai_core_py.entities.model_storage import ModelStorage
-from iai_core_py.repos import AnnotationSceneRepo, ModelRepo, ModelTestResultRepo
-from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core.entities.model import Model
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.repos import AnnotationSceneRepo, ModelRepo, ModelTestResultRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 WORKSPACE_ID = "63b183d00000000000000001"
 
@@ -401,7 +401,10 @@ class TestJobKafkaHandler:
         # Assert
         mock_unlock_project(job_type=job_type, project_id=project_identifier.project_id)
         mock_model_test_result.assert_called_with(model_test_result_id)
-        mock_delete.assert_called_with(project_identifier=project_identifier, model_test_result=fxt_model_test_result)
+        mock_delete.assert_called_with(
+            project_identifier=project_identifier,
+            model_test_result=fxt_model_test_result,
+        )
 
     def test_on_optimize_job_cancelled(
         self,

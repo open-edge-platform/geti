@@ -13,7 +13,7 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 from usecases.auto_train import AutoTrainUseCase
 
 from geti_types import CTX_SESSION_VAR, ID, RequestSource, make_session, session_context
-from iai_core_py.repos import ProjectRepo, TaskNodeRepo
+from iai_core.repos import ProjectRepo, TaskNodeRepo
 
 WORKSPACE_ID = ID("workspace_id")
 
@@ -27,7 +27,9 @@ class TestAutoTrainUseCase:
         CTX_SESSION_VAR.set(make_session())
         with (
             patch.object(
-                AutoTrainUseCase, "_check_conditions_and_set_auto_train_readiness", return_value=None
+                AutoTrainUseCase,
+                "_check_conditions_and_set_auto_train_readiness",
+                return_value=None,
             ) as mock_check_conditions_and_set_auto_train_readiness,
             patch.dict(os.environ, {"AUTO_TRAIN_DEBOUNCE_TIME": "0.1"}),
         ):
@@ -43,7 +45,11 @@ class TestAutoTrainUseCase:
                 bypass_debouncer=False,
             )
 
-    @pytest.mark.parametrize("enough_annotations", [True, False], ids=["enough annotations", "not enough annotations"])
+    @pytest.mark.parametrize(
+        "enough_annotations",
+        [True, False],
+        ids=["enough annotations", "not enough annotations"],
+    )
     def test_check_conditions_and_set_auto_train_readiness(
         self,
         enough_annotations,
@@ -57,7 +63,9 @@ class TestAutoTrainUseCase:
         with (
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_project) as mock_get_project,
             patch.object(
-                ProjectBasedAutoTrainActivationRepo, "set_auto_train_readiness_by_task_id", return_value=None
+                ProjectBasedAutoTrainActivationRepo,
+                "set_auto_train_readiness_by_task_id",
+                return_value=None,
             ) as mock_set_readiness,
             patch.object(
                 MissingAnnotationsHelper,
@@ -94,7 +102,11 @@ class TestAutoTrainUseCase:
     ) -> None:
         task_id_1, task_id_2 = fxt_ote_id(201), fxt_ote_id(202)
         with (
-            patch.object(TaskNodeRepo, "get_trainable_task_ids", return_value=[task_id_1, task_id_2]),
+            patch.object(
+                TaskNodeRepo,
+                "get_trainable_task_ids",
+                return_value=[task_id_1, task_id_2],
+            ),
             patch.object(ProjectBasedAutoTrainActivationRepo, "upsert_timestamp_for_task") as mock_upsert_timestamp,
         ):
             AutoTrainUseCase.upsert_auto_train_request_timestamps_for_tasks(fxt_project_identifier)
@@ -116,9 +128,15 @@ class TestAutoTrainUseCase:
         "session_request_source,session_extra",
         [
             pytest.param(RequestSource.INTERNAL, {}, id="internal request (job)"),
-            pytest.param(RequestSource.BROWSER, {}, id="browser request - media labeled manually)"),
             pytest.param(
-                RequestSource.BROWSER, {"labeled_media_upload": "True"}, id="browser request - media labeled on upload"
+                RequestSource.BROWSER,
+                {},
+                id="browser request - media labeled manually)",
+            ),
+            pytest.param(
+                RequestSource.BROWSER,
+                {"labeled_media_upload": "True"},
+                id="browser request - media labeled on upload",
             ),
             pytest.param(RequestSource.API_KEY, {}, id="API request - Geti SDK"),
             pytest.param(RequestSource.INTERNAL, {}, id="internal request - job"),
@@ -126,7 +144,11 @@ class TestAutoTrainUseCase:
         ],
     )
     def test_on_dataset_counters_updated(
-        self, fxt_organization_id, fxt_project_identifier, session_request_source, session_extra
+        self,
+        fxt_organization_id,
+        fxt_project_identifier,
+        session_request_source,
+        session_extra,
     ) -> None:
         auto_train_use_case = AutoTrainUseCase()
         session = make_session(
@@ -142,7 +164,8 @@ class TestAutoTrainUseCase:
                 auto_train_use_case, "_check_conditions_and_set_auto_train_readiness"
             ) as mock_check_conditions_immediate,
             patch.object(
-                auto_train_use_case, "_check_conditions_and_set_auto_train_readiness_debounce"
+                auto_train_use_case,
+                "_check_conditions_and_set_auto_train_readiness_debounce",
             ) as mock_check_conditions_debounced,
         ):
             auto_train_use_case.on_dataset_counters_updated(fxt_project_identifier)

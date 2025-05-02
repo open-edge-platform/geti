@@ -16,15 +16,15 @@ from service.label_schema_service import LabelSchemaService
 from usecases.statistics import StatisticsUseCase
 
 from geti_types import DatasetStorageIdentifier
-from iai_core_py.entities.annotation_scene_state import AnnotationState
-from iai_core_py.entities.evaluation_result import EvaluationPurpose
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import NullPerformance
-from iai_core_py.entities.model import NullModel
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.shapes import Ellipse, Polygon, Rectangle
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import (
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import NullPerformance
+from iai_core.entities.model import NullModel
+from iai_core.entities.project import Project
+from iai_core.entities.shapes import Ellipse, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -37,7 +37,7 @@ from iai_core_py.repos import (
 )
 
 if TYPE_CHECKING:
-    from iai_core_py.entities.annotation import Annotation
+    from iai_core.entities.annotation import Annotation
 
 
 @pytest.fixture

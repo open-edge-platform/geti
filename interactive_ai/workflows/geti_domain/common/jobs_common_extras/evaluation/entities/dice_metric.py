@@ -4,10 +4,10 @@ from collections import defaultdict
 
 import numpy as np
 from geti_types import MediaIdentifierEntity
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import (
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -143,7 +143,9 @@ class DiceMetric(PerformanceMetric):
         ) = self.get_intersections_and_cardinalities(hard_references, hard_predictions, labels, self._media_identifiers)
 
         self._overall_dice, self._dice_per_label = self.compute_dice_using_intersection_and_cardinality(
-            all_intersection=all_intersection, all_cardinality=all_cardinality, average=self.average
+            all_intersection=all_intersection,
+            all_cardinality=all_cardinality,
+            average=self.average,
         )
 
     @classmethod
@@ -203,7 +205,12 @@ class DiceMetric(PerformanceMetric):
         predictions: list[np.ndarray],
         labels: list[Label],
         media_identifiers: list[MediaIdentifierEntity],
-    ) -> tuple[CounterPerLabel, CounterPerLabel, CounterPerMediaPerLabel, CounterPerMediaPerLabel]:
+    ) -> tuple[
+        CounterPerLabel,
+        CounterPerLabel,
+        CounterPerMediaPerLabel,
+        CounterPerMediaPerLabel,
+    ]:
         """
         Returns all intersections and cardinalities between reference masks and prediction masks.
 
@@ -226,7 +233,12 @@ class DiceMetric(PerformanceMetric):
             all_intersections[None] += np.count_nonzero(intersection)
             all_cardinalities[None] += np.count_nonzero(reference) + np.count_nonzero(prediction)
 
-            inters.append((np.count_nonzero(intersection), np.count_nonzero(reference) + np.count_nonzero(prediction)))
+            inters.append(
+                (
+                    np.count_nonzero(intersection),
+                    np.count_nonzero(reference) + np.count_nonzero(prediction),
+                )
+            )
 
             per_label_intersections = CounterPerLabel()
             per_label_cardinalities = CounterPerLabel()
@@ -247,7 +259,12 @@ class DiceMetric(PerformanceMetric):
             intersections_per_media[media_identifier] = per_label_intersections
             cardinalities_per_media[media_identifier] = per_label_cardinalities
 
-        return all_intersections, all_cardinalities, intersections_per_media, cardinalities_per_media
+        return (
+            all_intersections,
+            all_cardinalities,
+            intersections_per_media,
+            cardinalities_per_media,
+        )
 
     @staticmethod
     def __compute_single_dice_score_using_intersection_and_cardinality(intersection: int, cardinality: int) -> float:

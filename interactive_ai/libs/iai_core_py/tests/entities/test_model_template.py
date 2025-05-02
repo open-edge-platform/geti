@@ -13,9 +13,9 @@ import pytest
 import yaml
 from testfixtures import compare
 
-from iai_core_py.algorithms import ModelTemplateList
-from iai_core_py.entities.label import Domain
-from iai_core_py.entities.model_template import (
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.label import Domain
+from iai_core.entities.model_template import (
     ANOMALY_TASK_TYPES,
     TRAINABLE_TASK_TYPES,
     DatasetRequirements,

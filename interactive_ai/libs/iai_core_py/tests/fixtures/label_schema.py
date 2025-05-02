@@ -4,12 +4,12 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from iai_core_py.entities.color import Color
-from iai_core_py.entities.label import Domain, Label
-from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import LabelRepo, LabelSchemaRepo
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import LabelRepo, LabelSchemaRepo
 
 from .values import IDOffsets
 

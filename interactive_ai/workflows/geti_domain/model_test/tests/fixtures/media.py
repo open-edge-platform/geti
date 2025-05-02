@@ -3,8 +3,8 @@
 
 import pytest
 from geti_types import ID, ImageIdentifier, VideoFrameIdentifier
-from iai_core_py.entities.image import Image
-from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
 
 from tests.fixtures.values import DummyValues
 

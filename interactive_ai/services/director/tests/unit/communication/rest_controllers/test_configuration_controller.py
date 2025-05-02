@@ -15,10 +15,10 @@ from configuration.configuration_manager import ConfigurationManager
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_fastapi_tools.responses import success_response_rest
 from geti_types import ID
-from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
-from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
-from iai_core_py.entities.project import Project
-from iai_core_py.repos import ConfigurableParametersRepo, ProjectRepo
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.entities.project import Project
+from iai_core.repos import ConfigurableParametersRepo, ProjectRepo
 
 
 @pytest.fixture

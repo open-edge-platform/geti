@@ -6,7 +6,7 @@
 from collections.abc import Sequence
 
 import numpy as np
-from iai_core_py.entities.shapes import Rectangle
+from iai_core.entities.shapes import Rectangle
 
 
 def intersection_box(box1: Rectangle, box2: Rectangle) -> list[float] | None:

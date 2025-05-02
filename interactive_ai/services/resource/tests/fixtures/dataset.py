@@ -3,10 +3,10 @@
 
 import pytest
 
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.subset import Subset
-from iai_core_py.repos import DatasetRepo
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.subset import Subset
+from iai_core.repos import DatasetRepo
 
 
 @pytest.fixture

@@ -5,12 +5,12 @@
 
 from active_learning.entities import ActiveSuggestion
 
-from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 
 __all__ = ["ActiveSuggestionToMongo"]
 
-from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from iai_core_py.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
 
 
 class ActiveSuggestionToMongo(IMapperSimple[ActiveSuggestion, dict]):

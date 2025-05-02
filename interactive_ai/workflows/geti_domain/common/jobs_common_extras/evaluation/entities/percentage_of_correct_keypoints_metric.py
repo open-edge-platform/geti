@@ -5,11 +5,11 @@ from collections import defaultdict
 
 import numpy as np
 from geti_types import MediaIdentifierEntity
-from iai_core_py.entities.dataset_item import DatasetItem
-from iai_core_py.entities.datasets import Dataset
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.label_schema import LabelSchema
-from iai_core_py.entities.metrics import (
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -20,7 +20,7 @@ from iai_core_py.entities.metrics import (
     TextMetricsGroup,
     VisualizationType,
 )
-from iai_core_py.entities.shapes import Keypoint
+from iai_core.entities.shapes import Keypoint
 
 from .performance_metric import PerformanceMetric
 
@@ -80,7 +80,9 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
         self._score_metric_per_label: dict[Label, ScoreMetric] = {}
         for label in self.labels:
             self._score_metric_per_label[label] = ScoreMetric(
-                name=label.name, value=self._accuracy_per_label[label.id_], label_id=label.id_
+                name=label.name,
+                value=self._accuracy_per_label[label.id_],
+                label_id=label.id_,
             )
 
         self._pck_value_per_media: dict[MediaIdentifierEntity, list[ScoreMetric]] = {}
@@ -164,7 +166,14 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             for annotation in item.get_annotations():
                 if isinstance(annotation.shape, Keypoint):
                     label = annotation.get_labels()[0]  # always contains a list with one label
-                    keypoints.append((annotation.shape.x, annotation.shape.y, label.id_, annotation.shape.is_visible))
+                    keypoints.append(
+                        (
+                            annotation.shape.x,
+                            annotation.shape.y,
+                            label.id_,
+                            annotation.shape.is_visible,
+                        )
+                    )
                 else:
                     raise ValueError(f"Unexpected shape of type {annotation.shape.type}")
             keypoints_per_item.append(keypoints)

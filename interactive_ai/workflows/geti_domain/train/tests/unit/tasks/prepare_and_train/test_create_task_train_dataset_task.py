@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
-from iai_core_py.entities.datasets import Dataset
+from iai_core.entities.datasets import Dataset
 
 from job.tasks.prepare_and_train.create_task_train_dataset import create_task_train_dataset
 from job.utils.train_workflow_data import TrainWorkflowData

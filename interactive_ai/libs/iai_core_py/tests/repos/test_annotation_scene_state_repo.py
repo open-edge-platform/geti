@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import copy
 
-from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
-from iai_core_py.repos import AnnotationSceneStateRepo
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
+from iai_core.repos import AnnotationSceneStateRepo
 
 from geti_types import ID, ImageIdentifier
 

@@ -13,7 +13,7 @@ from communication.helpers.job_helper import IMPORT_JOBS, JobType
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, Singleton
-from iai_core_py.session.session_propagation import setup_session_kafka
+from iai_core.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,10 @@ class DatasetIEKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         value: dict = raw_message.value
         logger.debug(f"Job finished event received: {value}")
         job_type = value.get("job_type")
-        if job_type in [JobType.PERFORM_IMPORT_TO_NEW_PROJECT, JobType.PERFORM_IMPORT_TO_EXISTING_PROJECT]:
+        if job_type in [
+            JobType.PERFORM_IMPORT_TO_NEW_PROJECT,
+            JobType.PERFORM_IMPORT_TO_EXISTING_PROJECT,
+        ]:
             job_payload: dict = value["job_payload"]
             # remove metadata
             try:

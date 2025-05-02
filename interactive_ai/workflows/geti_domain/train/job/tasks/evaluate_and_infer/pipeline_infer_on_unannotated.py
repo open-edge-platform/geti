@@ -10,17 +10,17 @@ from collections.abc import Callable
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from iai_core_py.entities.dataset_storage import DatasetStorage
-from iai_core_py.entities.datasets import Dataset, DatasetPurpose
-from iai_core_py.entities.label_schema import LabelSchemaView
-from iai_core_py.entities.model import Model, NullModel
-from iai_core_py.entities.model_template import TaskFamily
-from iai_core_py.entities.project import Project
-from iai_core_py.entities.task_node import TaskNode
-from iai_core_py.repos import DatasetRepo, LabelSchemaRepo
-from iai_core_py.services import ModelService
-from iai_core_py.utils.dataset_helper import DatasetHelper
-from iai_core_py.utils.flow_control import FlowControl
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.model_template import TaskFamily
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import DatasetRepo, LabelSchemaRepo
+from iai_core.services import ModelService
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.flow_control import FlowControl
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common.utils.progress_helper import create_bounded_progress_callback
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
@@ -45,7 +45,10 @@ def pipeline_infer_on_unannotated(
     project, _ = train_data.get_common_entities()
     if len(project.get_trainable_task_nodes()) == 1:
         logger.info("Only one trainable task for project. Skipping pipeline inference on unannotated dataset.")
-        progress_callback(100, "Skipping generation of task-chain predictions because the project has only one task.")
+        progress_callback(
+            100,
+            "Skipping generation of task-chain predictions because the project has only one task.",
+        )
         return
 
     dataset_storage = project.get_training_dataset_storage()
@@ -71,14 +74,19 @@ def pipeline_infer_on_unannotated(
         for task_node in project.get_trainable_task_nodes()
     }
     if any(isinstance(model, NullModel) for model in active_model_by_task_id.values()):
-        progress_callback(100, "Skipped generating task-chain predictions because not all tasks have a trained model")
+        progress_callback(
+            100,
+            "Skipped generating task-chain predictions because not all tasks have a trained model",
+        )
         return
 
     dataset_repo = DatasetRepo(dataset_storage.identifier)
     for i, task_node in enumerate(project.tasks):
         if task_node.task_properties.is_trainable:
             task_progress_callback = create_bounded_progress_callback(
-                progress_callback, start=(i / len(project.tasks)) * 100, end=((i + 1) / len(project.tasks)) * 100
+                progress_callback,
+                start=(i / len(project.tasks)) * 100,
+                end=((i + 1) / len(project.tasks)) * 100,
             )
             model = active_model_by_task_id[task_node.id_]
             inference_dataset = perform_task_inference(

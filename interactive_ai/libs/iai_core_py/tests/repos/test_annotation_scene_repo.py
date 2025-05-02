@@ -7,11 +7,11 @@ from datetime import datetime
 
 import pytest
 
-from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from iai_core_py.entities.label import Label
-from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
-from iai_core_py.entities.shapes import Keypoint, Point, Polygon
-from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.label import Label
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Keypoint, Point, Polygon
+from iai_core.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo
 from tests.test_helpers import generate_random_annotated_project, register_model_template
 
 from geti_types import ID, ImageIdentifier, NullMediaIdentifier, VideoFrameIdentifier

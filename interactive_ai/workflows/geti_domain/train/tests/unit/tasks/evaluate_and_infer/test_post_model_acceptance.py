@@ -6,8 +6,8 @@ import os
 from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
-from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from iai_core_py.services import ModelService
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.services import ModelService
 
 from job.tasks.evaluate_and_infer.post_model_acceptance import activate_model_storage, post_model_acceptance
 from job.utils.train_workflow_data import TrainWorkflowData
@@ -18,7 +18,11 @@ from tests.unit.tasks.utils import TEST_ENV_VARS
 class TestPostModelAcceptanceTask:
     model_id = "model_id"
 
-    @pytest.mark.parametrize("old_id,new_id", [("id_1", "id_2"), ("id_3", "id_3")], ids=["Different ids", "Same id"])
+    @pytest.mark.parametrize(
+        "old_id,new_id",
+        [("id_1", "id_2"), ("id_3", "id_3")],
+        ids=["Different ids", "Same id"],
+    )
     @patch.object(ModelService, "activate_model_storage")
     @patch.object(ModelService, "get_active_model_storage")
     def test_activate_model_storage(self, mocked_get_active_ms, mocked_activate_ms, old_id, new_id) -> None:
@@ -64,7 +68,11 @@ class TestPostModelAcceptanceTask:
         train_data = fxt_train_data()
 
         # Act
-        post_model_acceptance(train_data=train_data, base_model_id=self.model_id, inference_model_id=self.model_id)
+        post_model_acceptance(
+            train_data=train_data,
+            base_model_id=self.model_id,
+            inference_model_id=self.model_id,
+        )
 
         # Assert
         mocked_get_entities.assert_called_once_with()

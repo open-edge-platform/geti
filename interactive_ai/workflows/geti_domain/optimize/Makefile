@@ -4,7 +4,7 @@ COMPONENT_NAME       := optimize-job
 
 DOCKER_BUILD_CONTEXT := --build-context common=../common \
 						--build-context libs=../../../../libs \
-						--build-context iai_core_py=../../../../interactive_ai/libs/iai_core_py \
+						--build-context iai_core=../../../../interactive_ai/libs/iai_core \
 						--build-context media_utils=../../../../interactive_ai/libs/media_utils \
 						--build-context grpc_interfaces=../../../../grpc_interfaces \
 

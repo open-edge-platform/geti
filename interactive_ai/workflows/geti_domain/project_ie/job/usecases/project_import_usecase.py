@@ -18,13 +18,13 @@ from bson.json_util import DatetimeRepresentation, JSONOptions, loads
 from geti_spicedb_tools import SpiceDB
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from iai_core_py.entities.model import NullModel
-from iai_core_py.repos import ProjectRepo
-from iai_core_py.repos.mappers import IDToMongo
-from iai_core_py.repos.storage.storage_client import BinaryObjectType
-from iai_core_py.services import ModelService
-from iai_core_py.utils.iteration import multi_map
-from iai_core_py.versioning import DataVersion
+from iai_core.entities.model import NullModel
+from iai_core.repos import ProjectRepo
+from iai_core.repos.mappers import IDToMongo
+from iai_core.repos.storage.storage_client import BinaryObjectType
+from iai_core.services import ModelService
+from iai_core.utils.iteration import multi_map
+from iai_core.versioning import DataVersion
 from jobs_common.tasks.utils.progress import publish_metadata_update
 
 from job.entities import ProjectZipArchive, ProjectZipArchiveWrapper
@@ -260,7 +260,8 @@ class ProjectImportUseCase:
             if collection_name == DocumentRepo.PROJECTS_COLLECTION:
                 # The project document has been already redacted, can be inserted directly
                 document_repo.insert_documents_to_db_collection(
-                    collection_name=DocumentRepo.PROJECTS_COLLECTION, documents=[project_document]
+                    collection_name=DocumentRepo.PROJECTS_COLLECTION,
+                    documents=[project_document],
                 )
                 continue
             documents_from_zip = zip_archive.get_documents_by_collection(collection_name=collection_name)
@@ -326,7 +327,11 @@ class ProjectImportUseCase:
             raise ImportProjectUnsupportedVersionException(version=project_archive_version.version_string)
 
     def __import_zip(  # noqa: PLR0915
-        self, file_id: ID, creator_id: ID, tmp_folder: str, progress_callback: Callable[[float, str], None]
+        self,
+        file_id: ID,
+        creator_id: ID,
+        tmp_folder: str,
+        progress_callback: Callable[[float, str], None],
     ) -> None:
         """
         Import a project from a zip file previously uploaded to S3.
@@ -346,7 +351,11 @@ class ProjectImportUseCase:
         )
 
         # Download the zip file to the local filesystem
-        logger.info("Downloading the zip archive of operation '%s' to '%s'", file_id, local_zip_path)
+        logger.info(
+            "Downloading the zip archive of operation '%s' to '%s'",
+            file_id,
+            local_zip_path,
+        )
         progress_callback(5, "Retrieving the zip archive.")
         ProjectImportUseCase._download_import_zip(file_id=file_id, local_zip_path=local_zip_path)
 
@@ -362,7 +371,11 @@ class ProjectImportUseCase:
                     compression_ratio,
                 )
             zip_wrapper.validate_files_structure(
-                files_whitelist=[zip_wrapper.PROJECT_ARCHIVE, zip_wrapper.ECDSA_P384_SIGNATURE, zip_wrapper.PUBLIC_KEY]
+                files_whitelist=[
+                    zip_wrapper.PROJECT_ARCHIVE,
+                    zip_wrapper.ECDSA_P384_SIGNATURE,
+                    zip_wrapper.PUBLIC_KEY,
+                ]
             )
             # Extract the internal project archive zip
             local_project_archive_path = zip_wrapper.extract_project_archive()
@@ -384,10 +397,15 @@ class ProjectImportUseCase:
                 objectid_replacement_min_int=int(manifest.min_id, 16),
                 user_replacement_new_id=uuid.UUID(creator_id),
             )
-            logger.info("Extracting and processing the main project document (operation '%s')", file_id)
+            logger.info(
+                "Extracting and processing the main project document (operation '%s')",
+                file_id,
+            )
             progress_callback(25, "Extracting and processing project database.")
             project_document = self.__extract_project_document(
-                zip_archive=zip_archive, data_redaction_use_case=data_redaction_use_case, json_options=json_options
+                zip_archive=zip_archive,
+                data_redaction_use_case=data_redaction_use_case,
+                json_options=json_options,
             )
 
             self.project_id = IDToMongo.backward(project_document["_id"])
@@ -399,7 +417,10 @@ class ProjectImportUseCase:
             )
 
             # Store all documents
-            logger.info("Importing documents to DB collections for new project '%s'", project_identifier.project_id)
+            logger.info(
+                "Importing documents to DB collections for new project '%s'",
+                project_identifier.project_id,
+            )
             self.__store_all_documents(
                 project_identifier=project_identifier,
                 project_document=project_document,
@@ -409,7 +430,10 @@ class ProjectImportUseCase:
             )
 
             # Store the objects
-            logger.info("Importing binary objects for new project '%s'", project_identifier.project_id)
+            logger.info(
+                "Importing binary objects for new project '%s'",
+                project_identifier.project_id,
+            )
             progress_callback(50, "Importing project binary files.")
             binary_storage_repo = BinaryStorageRepo(
                 organization_id=session.organization_id,
@@ -455,7 +479,8 @@ class ProjectImportUseCase:
             ProjectImportUseCase._register_active_models(project_identifier=project_identifier)
         except Exception:
             logger.exception(
-                "Skipping model registration for project '%s' due to an error", project_identifier.project_id
+                "Skipping model registration for project '%s' due to an error",
+                project_identifier.project_id,
             )
 
         metadata = {
@@ -476,12 +501,18 @@ class ProjectImportUseCase:
 
         # Update the metrics
         logger.info(
-            "Updating metrics for imported images and videos within project '%s'", project_identifier.project_id
+            "Updating metrics for imported images and videos within project '%s'",
+            project_identifier.project_id,
         )
         UpdateMetricsUseCase.update_metrics(project_identifier=project_identifier)
         logger.info("Project '%s' has been successfully imported", project_identifier.project_id)
 
-    def import_zip(self, file_id: ID, creator_id: ID, progress_callback: Callable[[float, str], None]) -> None:
+    def import_zip(
+        self,
+        file_id: ID,
+        creator_id: ID,
+        progress_callback: Callable[[float, str], None],
+    ) -> None:
         """
         Import a project from a zip file previously uploaded to S3.
 
