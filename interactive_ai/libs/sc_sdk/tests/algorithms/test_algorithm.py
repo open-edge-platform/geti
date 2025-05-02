@@ -8,7 +8,7 @@ import pytest
 
 from sc_sdk.algorithms import Hyperparameters, AugmentationParameters, \
     DatasetPreparationParameters, TrainingHyperParameters, EvaluationParameters, Algorithm, AlgorithmStats, \
-    SupportedStatus, AlgorithmsList
+    SupportedStatus, NullAlgorithm
 from sc_sdk.algorithms.utils import parse_manifest, MODEL_MANIFEST_PATH
 
 BASE_MANIFEST_PATH = os.path.join(MODEL_MANIFEST_PATH, "base.yaml")
@@ -71,12 +71,27 @@ def fxt_dummy_algorithm(
 
 
 @pytest.mark.ScSdkComponent
-class TestModelManifestParsing:
+class TestAlgorithm:
     """
     Test class for parsing model manifest files.
     """
 
-    def test_parse_dummy_manifest(self, fxt_dummy_algorithm):
+    def test_dummy_model_manifest_parsing(self, fxt_dummy_algorithm):
         algorithm = parse_manifest(BASE_MANIFEST_PATH, DUMMY_BASE_MANIFEST_PATH, DUMMY_MANIFEST_PATH)
 
         assert algorithm == fxt_dummy_algorithm
+
+    def test_null_algorithm(self):
+        null_algorithm = NullAlgorithm()
+
+        assert null_algorithm.id == "null"
+        assert null_algorithm.support_status == SupportedStatus.OBSOLETE
+        assert null_algorithm.stats.gigaflops == 1
+        assert null_algorithm.stats.trainable_parameters == 1
+        assert null_algorithm.supported_gpus == {}
+        assert null_algorithm.hyperparameters.dataset_preparation.augmentation == AugmentationParameters(
+            horizontal_flip=False,
+            vertical_flip=False,
+            gaussian_blur=False,
+            random_rotate=False,
+        )

@@ -4,7 +4,8 @@
 from enum import Enum
 
 from pydantic import BaseModel, Field
-from sc_sdk.algorithms.models.hyperparameters import Hyperparameters
+from sc_sdk.algorithms.hyperparameters import Hyperparameters, DatasetPreparationParameters, AugmentationParameters, \
+    TrainingHyperParameters, EvaluationParameters
 
 
 class AlgorithmStats(BaseModel):
@@ -52,6 +53,26 @@ class NullAlgorithm(Algorithm):
     name: str = Field(default="null")
     description: str = Field(default="null")
     task: str = Field(default="null")
-    stats: AlgorithmStats = Field(default=AlgorithmStats(gigaflops=0, trainable_parameters=0))
+    stats: AlgorithmStats = Field(default=AlgorithmStats(gigaflops=1, trainable_parameters=1))
     support_status: SupportedStatus = Field(default=SupportedStatus.OBSOLETE)
     supported_gpus: dict[str, bool] = Field(default={})
+    hyperparameters: Hyperparameters = Field(
+        default=Hyperparameters(
+            dataset_preparation=DatasetPreparationParameters(
+                augmentation=AugmentationParameters(
+                    horizontal_flip=False,
+                    vertical_flip=False,
+                    gaussian_blur=False,
+                    random_rotate=False,
+                )
+            ),
+            training=TrainingHyperParameters(
+                max_epochs=1,
+                early_stopping_epochs=1,
+                learning_rate=0.001,
+                learning_rate_warmup_epochs=0,
+                batch_size=1,
+            ),
+            evaluation=EvaluationParameters(metric=None)
+        )
+    )

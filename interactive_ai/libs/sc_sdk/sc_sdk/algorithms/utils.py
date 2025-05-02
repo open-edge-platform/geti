@@ -5,7 +5,7 @@ import os
 
 import hiyapyco
 
-from sc_sdk.algorithms.models.algorithm import Algorithm
+from sc_sdk.algorithms.algorithm import Algorithm
 
 # base manifest folder: interactive_ai/supported_models/manifests
 MODEL_MANIFEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../supported_models/manifests"))

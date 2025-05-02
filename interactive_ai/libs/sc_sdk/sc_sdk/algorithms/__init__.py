@@ -20,8 +20,8 @@ from sc_sdk.entities.model_template import (
 
 from geti_types import Singleton
 
-from .models.algorithm import Algorithm, AlgorithmStats, SupportedStatus, NullAlgorithm
-from .models.hyperparameters import Hyperparameters, AugmentationParameters, DatasetPreparationParameters, EvaluationParameters, TrainingHyperParameters
+from .algorithm import Algorithm, AlgorithmStats, SupportedStatus, NullAlgorithm
+from .hyperparameters import Hyperparameters, AugmentationParameters, DatasetPreparationParameters, EvaluationParameters, TrainingHyperParameters
 
 
 __all__ = [
