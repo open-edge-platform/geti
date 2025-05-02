@@ -1,6 +1,6 @@
 # Contributing to Intel Geti Web UI
 
-**Prerequisites**: we recommend developing Geti's UI locally using node v22.12.0 and npm v10.9.0. You will also need to have a Geti server available. Please see our [documentation]() for instructions to install Geti on your hardware.
+**Prerequisites**: We recommend developing Geti's UI locally using node v22.12.0 and npm v10.9.0. You will also need to have a Geti server available. Please see our [documentation]() for instructions to install Geti on your hardware.
 
 ## Local Setup with npm 
 
@@ -9,13 +9,15 @@ To get started with contributing to the UI first install all node dependencies l
 ```sh
 web_ui/ $ npm ci
 ```
+## Setting up environment variables
 
+Duplicate .env.example file and rename it to .env
 Next make a `.env` file that includes a `REACT_APP_API_PROXY` variable, you copy over the `.env.example` file,
 ```sh
 web_ui/ $ cp .env.example .env
 ```
 
-By default `REACT_APP_API_PROXY` is set to `localhost:80`, assuming you have a server running on port 80. We will redirect all requests to `/api` to `localhost:80/api`.
+Our proxy will redirect all `/api` requests  to `localhost:80/api` assuming your `REACT_APP_API_PROXY` is set to `localhost:80`. Update this variable with your server address/
 Assuming you have your Geti server running on `localhost:80` you are now all set to start changing the Geti UI.
 Start up the [Rsbuild](https://rsbuild.dev/) dev server with,
 
@@ -23,7 +25,9 @@ Start up the [Rsbuild](https://rsbuild.dev/) dev server with,
 web_ui/ $ npm run start
 ```
 
-Continue reading to learn more about our linting and testing setup.
+The project should now load correctly.
+
+Keep reading to learn more about our linting and testing setup.
 
 ## Testing and Quality Control
 
