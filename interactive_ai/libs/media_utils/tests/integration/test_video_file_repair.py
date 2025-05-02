@@ -4,8 +4,8 @@
 from unittest.mock import patch
 
 import pytest
-
 from iai_core_py.repos.storage.binary_repos import VideoBinaryRepo
+
 from media_utils import VideoDecoder, VideoFileRepair
 
 
