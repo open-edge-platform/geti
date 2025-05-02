@@ -4,8 +4,14 @@
 from enum import Enum
 
 from pydantic import BaseModel, Field
-from sc_sdk.algorithms.hyperparameters import Hyperparameters, DatasetPreparationParameters, AugmentationParameters, \
-    TrainingHyperParameters, EvaluationParameters
+
+from sc_sdk.algorithms.hyperparameters import (
+    AugmentationParameters,
+    DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
+    TrainingHyperParameters,
+)
 
 
 class AlgorithmStats(BaseModel):
@@ -33,6 +39,7 @@ class Algorithm(BaseModel):
         supported_gpus: Dictionary mapping GPU types to compatibility status
         hyperparameters: Configuration parameters for model training
     """
+
     id: str
     name: str
     description: str
@@ -49,6 +56,7 @@ class NullAlgorithm(Algorithm):
 
     This class is used to represent the absence of a valid algorithm configuration.
     """
+
     id: str = Field(default="null")
     name: str = Field(default="null")
     description: str = Field(default="null")
@@ -73,6 +81,6 @@ class NullAlgorithm(Algorithm):
                 learning_rate_warmup_epochs=0,
                 batch_size=1,
             ),
-            evaluation=EvaluationParameters(metric=None)
+            evaluation=EvaluationParameters(metric=None),
         )
     )

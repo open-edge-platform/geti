@@ -6,10 +6,18 @@ import pathlib
 
 import pytest
 
-from sc_sdk.algorithms import Hyperparameters, AugmentationParameters, \
-    DatasetPreparationParameters, TrainingHyperParameters, EvaluationParameters, Algorithm, AlgorithmStats, \
-    SupportedStatus, NullAlgorithm
-from sc_sdk.algorithms.utils import parse_manifest, MODEL_MANIFEST_PATH
+from sc_sdk.algorithms import (
+    Algorithm,
+    AlgorithmStats,
+    AugmentationParameters,
+    DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
+    NullAlgorithm,
+    SupportedStatus,
+    TrainingHyperParameters,
+)
+from sc_sdk.algorithms.utils import MODEL_MANIFEST_PATH, parse_manifest
 
 BASE_MANIFEST_PATH = os.path.join(MODEL_MANIFEST_PATH, "base.yaml")
 TEST_PATH = pathlib.Path(os.path.dirname(__file__))
@@ -35,18 +43,11 @@ def fxt_dummy_algorithm_hyperparameters():
     yield Hyperparameters(
         dataset_preparation=DatasetPreparationParameters(
             augmentation=AugmentationParameters(
-                horizontal_flip=True,
-                vertical_flip=False,
-                gaussian_blur=False,
-                random_rotate=True
+                horizontal_flip=True, vertical_flip=False, gaussian_blur=False, random_rotate=True
             )
         ),
         training=TrainingHyperParameters(
-            max_epochs=100,
-            early_stopping_epochs=4,
-            learning_rate=0.05,
-            learning_rate_warmup_epochs=4,
-            batch_size=32
+            max_epochs=100, early_stopping_epochs=4, learning_rate=0.05, learning_rate_warmup_epochs=4, batch_size=32
         ),
         evaluation=EvaluationParameters(metric=None),
     )
@@ -54,9 +55,7 @@ def fxt_dummy_algorithm_hyperparameters():
 
 @pytest.fixture
 def fxt_dummy_algorithm(
-    fxt_dummy_algorithm_stats,
-    fxt_dummy_algorithm_supported_gpu,
-    fxt_dummy_algorithm_hyperparameters
+    fxt_dummy_algorithm_stats, fxt_dummy_algorithm_supported_gpu, fxt_dummy_algorithm_hyperparameters
 ):
     yield Algorithm(
         id="dummy_algorithm",

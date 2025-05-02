@@ -18,25 +18,27 @@ from sc_sdk.entities.model_template import (
     parse_model_template_from_dict,
 )
 
+from .algorithm import Algorithm, AlgorithmStats, NullAlgorithm, SupportedStatus
+from .hyperparameters import (
+    AugmentationParameters,
+    DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
+    TrainingHyperParameters,
+)
 from geti_types import Singleton
-
-from .algorithm import Algorithm, AlgorithmStats, SupportedStatus, NullAlgorithm
-from .hyperparameters import Hyperparameters, AugmentationParameters, DatasetPreparationParameters, EvaluationParameters, TrainingHyperParameters
-
 
 __all__ = [
     "Algorithm",
-    "NullAlgorithm",
     "AlgorithmStats",
-    "SupportedStatus",
-    "Hyperparameters",
     "AugmentationParameters",
     "DatasetPreparationParameters",
     "EvaluationParameters",
+    "Hyperparameters",
+    "NullAlgorithm",
+    "SupportedStatus",
     "TrainingHyperParameters",
 ]
-
-from .utils import parse_manifest
 
 
 class ModelTemplateList(metaclass=Singleton):
