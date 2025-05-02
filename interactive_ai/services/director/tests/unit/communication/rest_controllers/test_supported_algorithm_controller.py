@@ -7,8 +7,8 @@ import pytest
 from communication.controllers.supported_algorithm_controller import SupportedAlgorithmRESTController
 from communication.views.model_template_rest_views import ModelTemplateRESTViews
 
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.model_template import TaskType
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.model_template import TaskType
 
 
 class TestSupportedAlgorithmRESTController:

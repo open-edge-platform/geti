@@ -5,9 +5,9 @@ from unittest.mock import call, patch
 
 import numpy as np
 import pytest
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.subset import Subset
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.subset import Subset
 
 from jobs_common.utils.subset_management.subset_manager import (
     BATCH_SIZE_THRESHOLD,

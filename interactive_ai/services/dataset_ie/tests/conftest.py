@@ -23,11 +23,11 @@ from communication.endpoints.main import app
 
 from geti_fastapi_tools.dependencies import get_source_fastapi, get_user_id_fastapi
 from geti_types import ID, RequestSource
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.base.mongo_connector import MongoConnector
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 
 ## a valid JWT x-auth-request-access-token
 payload = {"preferred_username": "testing"}

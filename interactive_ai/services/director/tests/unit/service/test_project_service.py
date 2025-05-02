@@ -6,7 +6,7 @@ import pytest
 
 from service.project_service import ProjectService
 
-from sc_sdk.repos import AnnotationSceneRepo, ProjectRepo
+from iai_core_py.repos import AnnotationSceneRepo, ProjectRepo
 
 
 @pytest.fixture

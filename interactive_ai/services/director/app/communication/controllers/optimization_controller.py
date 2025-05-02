@@ -18,12 +18,12 @@ from service.job_submission import ModelOptimizationJobSubmitter
 
 from geti_fastapi_tools.exceptions import ModelNotFoundException, ProjectNotFoundException
 from geti_types import ID
-from sc_sdk.configuration.elements.optimization_parameters import POTOptimizationParameters
-from sc_sdk.entities.model import Model, ModelDeprecationStatus, ModelOptimizationType, NullModel
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import ConfigurableParametersRepo, ModelRepo, ProjectRepo
+from iai_core_py.configuration.elements.optimization_parameters import POTOptimizationParameters
+from iai_core_py.entities.model import Model, ModelDeprecationStatus, ModelOptimizationType, NullModel
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.subset import Subset
+from iai_core_py.repos import ConfigurableParametersRepo, ModelRepo, ProjectRepo
 
 
 class OptimizationController:

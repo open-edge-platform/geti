@@ -15,9 +15,9 @@ import numpy as np
 from bson import ObjectId
 
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Point, Polygon
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Point, Polygon
 
 Contour = list[tuple[float, float]]
 

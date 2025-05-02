@@ -7,16 +7,16 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
+from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.evaluation_result import EvaluationPurpose
+from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core_py.entities.subset import Subset
+from iai_core_py.repos import DatasetRepo, ModelRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.utils.exceptions import EmptyEvaluationDatasetException
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import DatasetRepo, ModelRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
 
 from job.tasks.evaluate_and_infer.evaluate import evaluate
 from job.utils.train_workflow_data import TrainWorkflowData

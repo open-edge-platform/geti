@@ -11,14 +11,14 @@ from collections.abc import Callable, Sequence
 from geti_telemetry_tools import unified_tracing
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult
-from sc_sdk.entities.metadata import IMetadata
-from sc_sdk.entities.model import Model, NullModel
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import EvaluationResultRepo
-from sc_sdk.utils.post_process_predictions import PostProcessPredictionsUtils
+from iai_core_py.entities.annotation import AnnotationScene
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core_py.entities.metadata import IMetadata
+from iai_core_py.entities.model import Model, NullModel
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import EvaluationResultRepo
+from iai_core_py.utils.post_process_predictions import PostProcessPredictionsUtils
 
 from jobs_common.exceptions import CommandInitializationFailedException
 from jobs_common.tasks.utils.progress import ProgressRange

@@ -1,10 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
 from jobs_common.exceptions import CommandInternalError
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
 
 
 def _get_task_node(model_storage: ModelStorage, project: Project) -> TaskNode:

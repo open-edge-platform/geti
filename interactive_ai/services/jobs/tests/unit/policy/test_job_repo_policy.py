@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 from policies.job_repo import SessionBasedPolicyJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.base.session_repo import QueryAccessMode
+from iai_core_py.repos.base.session_repo import QueryAccessMode
 
 project_id = ID("project")
 

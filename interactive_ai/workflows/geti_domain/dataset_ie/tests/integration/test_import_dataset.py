@@ -13,6 +13,18 @@ import pkg_resources
 import pytest
 from datumaro.components.annotation import GroupType, LabelCategories
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.annotation import AnnotationScene
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelSchema, NullLabelSchema
+from iai_core_py.entities.media import ImageExtensions
+from iai_core_py.entities.model_template import NullModelTemplate, TaskType
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.shapes import Ellipse, Polygon, Rectangle
+from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo, ProjectRepo
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.project_builder import ModelTemplateError
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common.tasks.utils.secrets import JobMetadata
 from jobs_common_extras.datumaro_conversion.definitions import (
@@ -20,18 +32,6 @@ from jobs_common_extras.datumaro_conversion.definitions import (
     SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES,
     GetiProjectType,
 )
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema, NullLabelSchema
-from sc_sdk.entities.media import ImageExtensions
-from sc_sdk.entities.model_template import NullModelTemplate, TaskType
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.shapes import Ellipse, Polygon, Rectangle
-from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo, ProjectRepo
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.project_builder import ModelTemplateError
 
 from job.repos.data_repo import ImportDataRepo
 from job.repos.object_storage_repo import ObjectStorageRepo

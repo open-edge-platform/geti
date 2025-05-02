@@ -13,9 +13,9 @@ from communication.constants import (
 
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import DatasetStorageIdentifier, MediaIdentifierEntity
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo, VideoRepo
+from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo, VideoRepo
 
 logger = logging.getLogger(__name__)
 

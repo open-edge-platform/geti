@@ -5,7 +5,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from sc_sdk.entities.compiled_dataset_shards import CompiledDatasetShard
+from iai_core_py.entities.compiled_dataset_shards import CompiledDatasetShard
 
 from jobs_common_extras.shard_dataset.commands.create_and_save_compiled_dataset_shards_command import (
     CreateAndSaveCompiledDatasetShardsCommand,

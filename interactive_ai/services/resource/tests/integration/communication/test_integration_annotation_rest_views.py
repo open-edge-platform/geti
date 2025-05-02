@@ -7,9 +7,9 @@ from tests.utils.test_helpers import create_empty_segmentation_project
 from communication.rest_views.annotation_rest_views import AnnotationRESTViews
 
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState
-from sc_sdk.repos import LabelSchemaRepo
+from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState
+from iai_core_py.repos import LabelSchemaRepo
 
 
 class TestAnnotationRESTViews:

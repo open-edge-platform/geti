@@ -20,9 +20,9 @@ from tests.fixtures.values import DummyValues
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView, LabelTree
-from sc_sdk.entities.project import Project
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView, LabelTree
+from iai_core_py.entities.project import Project
 
 
 @pytest.fixture

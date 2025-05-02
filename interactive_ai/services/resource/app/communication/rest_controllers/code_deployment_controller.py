@@ -17,10 +17,10 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.project import Project
-from sc_sdk.utils.filesystem import check_free_space_for_operation
-from sc_sdk.utils.naming_helpers import slugify
+from iai_core_py.entities.label_schema import LabelSchemaView
+from iai_core_py.entities.project import Project
+from iai_core_py.utils.filesystem import check_free_space_for_operation
+from iai_core_py.utils.naming_helpers import slugify
 
 export_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="Code_deployment_worker")
 logger = logging.getLogger(__name__)

@@ -18,20 +18,20 @@ from entities.dataset_item_labels import DatasetItemLabels
 from storage.repos import DatasetItemCountRepo, DatasetItemLabelsRepo
 
 from geti_types import DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.model import Model, ModelConfiguration
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from sc_sdk.repos import (
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core_py.entities.model import Model, ModelConfiguration
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -40,10 +40,10 @@ from sc_sdk.repos import (
     ModelRepo,
     SuspendedAnnotationScenesRepo,
 )
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.services.model_service import ModelService
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.services.model_service import ModelService
+from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 
 
 class TestDatasetManagement:

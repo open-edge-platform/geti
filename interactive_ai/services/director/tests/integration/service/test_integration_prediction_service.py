@@ -10,8 +10,8 @@ from managers.annotation_manager import AnnotationManager
 from service.prediction_service import PredictionService
 
 from geti_types import VideoFrameIdentifier
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.repos import AnnotationSceneRepo
+from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core_py.repos import AnnotationSceneRepo
 
 
 class TestPredictionService:

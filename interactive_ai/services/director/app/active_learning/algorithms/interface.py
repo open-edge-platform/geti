@@ -10,8 +10,8 @@ import numpy as np
 
 from active_learning.utils import NullableDataset
 
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.utils.classes import classproperty
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.utils.classes import classproperty
 
 logger = logging.getLogger(__name__)
 

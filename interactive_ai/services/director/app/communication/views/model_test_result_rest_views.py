@@ -11,10 +11,10 @@ from enum import Enum, auto
 from typing import Any
 
 from geti_types import ID
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.entities.metrics import ScoreMetric
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_test_result import ModelTestResult, TestState
+from iai_core_py.entities.dataset_storage import NullDatasetStorage
+from iai_core_py.entities.metrics import ScoreMetric
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.model_test_result import ModelTestResult, TestState
 
 logger = logging.getLogger(__name__)
 

@@ -11,8 +11,8 @@ from communication.job_creation_helpers import JobDuplicatePolicy
 from repos import ZipStorageRepo
 
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import ProjectRepo
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import ProjectRepo
 
 
 def do_nothing(*args, **kwargs):

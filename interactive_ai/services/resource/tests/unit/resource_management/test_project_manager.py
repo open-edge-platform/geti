@@ -10,16 +10,16 @@ from managers.project_manager import ProjectManager
 
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import ID
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import DatasetStorageRepo, ProjectRepo
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import DatasetStorageRepo, ProjectRepo
+from iai_core_py.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from sc_sdk.entities.label import Label
-    from sc_sdk.entities.label_schema import LabelSchema
+    from iai_core_py.entities.label import Label
+    from iai_core_py.entities.label_schema import LabelSchema
 
 
 class TestProjectManagerGetProjects:
@@ -83,7 +83,7 @@ class TestProjectManager:
 
         # Act
         with (
-            patch("sc_sdk.repos.project_repo.ProjectRepo.__init__", return_value=None) as patched_repo,
+            patch("iai_core_py.repos.project_repo.ProjectRepo.__init__", return_value=None) as patched_repo,
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_project) as patched_get_by_id,
         ):
             result = ProjectManager().get_project_by_id(project_id=PROJECT_ID)

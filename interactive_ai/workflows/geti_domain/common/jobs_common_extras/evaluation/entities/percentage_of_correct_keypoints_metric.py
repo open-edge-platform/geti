@@ -5,11 +5,11 @@ from collections import defaultdict
 
 import numpy as np
 from geti_types import MediaIdentifierEntity
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.metrics import (
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,
@@ -20,7 +20,7 @@ from sc_sdk.entities.metrics import (
     TextMetricsGroup,
     VisualizationType,
 )
-from sc_sdk.entities.shapes import Keypoint
+from iai_core_py.entities.shapes import Keypoint
 
 from .performance_metric import PerformanceMetric
 

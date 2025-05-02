@@ -8,8 +8,8 @@ import pytest
 from communication.rest_controllers.annotation_template_controller import AnnotationTemplateRESTController
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.annotation_template import AnnotationTemplate
-from sc_sdk.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core_py.entities.annotation_template import AnnotationTemplate
+from iai_core_py.repos.annotation_template_repo import AnnotationTemplateRepo
 
 
 @pytest.fixture

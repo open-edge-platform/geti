@@ -34,19 +34,18 @@ from geti_types import (
     ProjectIdentifier,
     VideoFrameIdentifier,
 )
-from media_utils import get_media_numpy
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.metrics import MultiScorePerformance, ScoreMetric
-from sc_sdk.entities.model import (
+from iai_core_py.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
+from iai_core_py.entities.image import Image, NullImage
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.metrics import MultiScorePerformance, ScoreMetric
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelFormat,
@@ -54,13 +53,13 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import NullModelTemplate
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import NullVideo, VideoFrame
-from sc_sdk.repos import (
+from iai_core_py.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core_py.entities.model_template import NullModelTemplate
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.video import NullVideo, VideoFrame
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     DatasetRepo,
     EvaluationResultRepo,
@@ -71,7 +70,8 @@ from sc_sdk.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from sc_sdk.repos.storage.s3_connector import S3Connector
+from iai_core_py.repos.storage.s3_connector import S3Connector
+from media_utils import get_media_numpy
 
 SAM_ENCODER_XML_PATH_ENV = "SAM_ENCODER_XML_PATH"
 SAM_ENCODER_BIN_PATH_ENV = "SAM_ENCODER_BIN_PATH"

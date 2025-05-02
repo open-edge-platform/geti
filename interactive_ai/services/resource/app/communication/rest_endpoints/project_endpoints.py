@@ -25,7 +25,7 @@ from geti_fastapi_tools.dependencies import (
 )
 from geti_feature_tools import FeatureFlagProvider
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData
+from iai_core_py.repos.project_repo_helpers import ProjectQueryData
 
 DEFAULT_THUMBNAIL_JPG_QUALITY = 85
 

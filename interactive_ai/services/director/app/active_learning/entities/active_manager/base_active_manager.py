@@ -27,13 +27,13 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import DatasetStorageRepo, ProjectRepo, VideoRepo
-from sc_sdk.services import ModelService
-from sc_sdk.utils.iteration import grouper
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core_py.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import DatasetStorageRepo, ProjectRepo, VideoRepo
+from iai_core_py.services import ModelService
+from iai_core_py.utils.iteration import grouper
+from iai_core_py.utils.type_helpers import SequenceOrSet
 
 logger = logging.getLogger(__name__)
 

@@ -12,8 +12,8 @@ from managers.project_manager import ProjectManager
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import DatasetStorageRepo
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import DatasetStorageRepo
 
 
 @pytest.fixture

@@ -29,8 +29,8 @@ from model.job_state import JobStateGroup
 
 from geti_spicedb_tools import Permissions, SpiceDB, SpiceDBResourceTypes
 from geti_types import ID
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.constants import DEFAULT_USER_NAME
+from iai_core_py.utils.time_utils import now
 
 DUMMY_ORGANIZATION_ID = "000000000000000000000001"
 DUMMY_JOB_KEY = json.dumps({"job_key": "job_value"})

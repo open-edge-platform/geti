@@ -20,15 +20,15 @@ from service.project_service import ProjectService
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID, ImageIdentifier
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneStateRepo, DatasetRepo, ModelStorageRepo, TaskNodeRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.services import ModelService
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import AnnotationSceneStateRepo, DatasetRepo, ModelStorageRepo, TaskNodeRepo
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.services import ModelService
 
 DUMMY_USER = ID("dummy_user")
 
@@ -222,7 +222,7 @@ class TestTrainingController:
         patched_get_by_task_node_id.assert_called_once_with(task_node_id=fxt_detection_task.id_)
         assert train_jobs_per_task == fxt_ote_id()
 
-    @patch("sc_sdk.entities.model_storage.now", return_value="now")
+    @patch("iai_core_py.entities.model_storage.now", return_value="now")
     def test_submit_train_jobs_new_model_storage(
         self,
         fxt_project,

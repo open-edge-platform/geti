@@ -4,9 +4,9 @@ from typing import Any
 
 import datumaro as dm
 import pytest
+from iai_core_py.entities.model_template import TaskType
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
 from jobs_common_extras.datumaro_conversion.definitions import ANOMALY_PROJECT_TYPES, GetiProjectType
-from sc_sdk.entities.model_template import TaskType
 
 from job.utils.datumaro_parser import DatumaroProjectParser
 from job.utils.exceptions import DatasetParsingException

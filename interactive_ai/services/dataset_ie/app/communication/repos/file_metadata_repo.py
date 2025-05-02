@@ -17,9 +17,9 @@ from communication.mappers.file_metadata_mapper import TTL_FIELD_NAME, FileMetad
 from domain.entities.dataset_ie_file_metadata import FileMetadata, NullFileMetadata
 
 from geti_types import Session
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.base.mongo_connector import MongoConnector
-from sc_sdk.repos.mappers import CursorIterator
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core_py.repos.mappers import CursorIterator
 
 logger = logging.getLogger(__name__)
 

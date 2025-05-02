@@ -8,10 +8,10 @@ import cv2
 import numpy as np
 import pytest
 from geti_types import make_session, session_context
+from iai_core_py.repos import CompiledDatasetShardsRepo
+from iai_core_py.repos.storage.binary_repo import StorageClientFactory
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
 from media_utils import VideoFrameReader
-from sc_sdk.repos import CompiledDatasetShardsRepo
-from sc_sdk.repos.storage.binary_repo import StorageClientFactory
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
 
 from job.tasks.prepare_and_train.shard_dataset import shard_dataset_for_train
 from job.utils.train_workflow_data import TrainWorkflowData

@@ -9,8 +9,8 @@ from entities import PredictionType
 from service.prediction_service import PredictionService
 
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import AnnotationSceneKind, NullAnnotationScene
-from sc_sdk.repos import AnnotationSceneRepo
+from iai_core_py.entities.annotation import AnnotationSceneKind, NullAnnotationScene
+from iai_core_py.repos import AnnotationSceneRepo
 
 
 @pytest.fixture

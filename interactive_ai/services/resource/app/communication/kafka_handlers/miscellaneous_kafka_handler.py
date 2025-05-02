@@ -9,8 +9,8 @@ from usecases.update_project_performance_usecase import UpdateProjectPerformance
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ProjectIdentifier, Singleton
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from sc_sdk.repos import VideoAnnotationRangeRepo
-from sc_sdk.session.session_propagation import setup_session_kafka
+from iai_core_py.repos import VideoAnnotationRangeRepo
+from iai_core_py.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 

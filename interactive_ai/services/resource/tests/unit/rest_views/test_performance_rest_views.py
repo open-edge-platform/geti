@@ -7,7 +7,7 @@ import pytest
 from communication.rest_views.performance_rest_views import PerformanceRESTViews
 from features.feature_flags import FeatureFlag
 
-from sc_sdk.entities.project_performance import (
+from iai_core_py.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
     TaskPerformance,

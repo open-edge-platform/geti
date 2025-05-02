@@ -6,8 +6,8 @@ import os
 from unittest.mock import ANY, MagicMock, call, patch
 
 import pytest
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.services import ModelService
+from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core_py.services import ModelService
 
 from job.tasks.evaluate_and_infer.post_model_acceptance import activate_model_storage, post_model_acceptance
 from job.utils.train_workflow_data import TrainWorkflowData

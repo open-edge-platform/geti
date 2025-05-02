@@ -10,10 +10,10 @@ import os
 from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json
+from iai_core_py.entities.model import TrainingFramework, TrainingFrameworkType
 from kubernetes_asyncio import client, config
 from kubernetes_asyncio.config import ConfigException
 from packaging.version import parse as parse_version
-from sc_sdk.entities.model import TrainingFramework, TrainingFrameworkType
 
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 

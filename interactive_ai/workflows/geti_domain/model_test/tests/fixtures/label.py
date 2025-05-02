@@ -3,10 +3,10 @@
 
 import pytest
 from geti_types import ID
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.scored_label import ScoredLabel
+from iai_core_py.entities.color import Color
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
+from iai_core_py.entities.scored_label import ScoredLabel
 
 from tests.fixtures.values import DummyValues
 

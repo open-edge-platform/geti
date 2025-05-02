@@ -6,10 +6,10 @@ from collections.abc import Callable
 
 import numpy as np
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from sc_sdk.entities.metrics import (
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core_py.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,

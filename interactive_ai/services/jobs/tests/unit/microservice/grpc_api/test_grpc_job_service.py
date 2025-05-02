@@ -29,7 +29,7 @@ from grpc_interfaces.job_submission.pb.job_service_pb2 import (
     ListJobsResponse,
     SubmitJobRequest,
 )
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
+from iai_core_py.utils.constants import DEFAULT_USER_NAME
 
 DUMMY_USER = ID("dummy_user")
 DUMMY_KEY = json.dumps({"key2": "value2", "key1": "value1"})

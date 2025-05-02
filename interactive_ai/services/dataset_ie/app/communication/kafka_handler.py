@@ -13,7 +13,7 @@ from communication.helpers.job_helper import IMPORT_JOBS, JobType
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, Singleton
-from sc_sdk.session.session_propagation import setup_session_kafka
+from iai_core_py.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 

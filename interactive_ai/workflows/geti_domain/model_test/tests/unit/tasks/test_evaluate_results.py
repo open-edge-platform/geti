@@ -3,7 +3,7 @@
 from unittest.mock import patch
 
 import pytest
-from sc_sdk.repos import MediaScoreRepo, ModelTestResultRepo, ProjectRepo
+from iai_core_py.repos import MediaScoreRepo, ModelTestResultRepo, ProjectRepo
 
 from job.tasks.model_testing import evaluate_results
 

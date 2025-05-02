@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
+from iai_core_py.entities.project import Project
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.project import Project
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
 
 from job.tasks.export_tasks.export_dataset_task import STEPS_PROGRESS_RATIO as STEPS_RATIO_EXPORT
 from job.tasks.export_tasks.export_dataset_task import export_dataset_task

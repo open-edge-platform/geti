@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
+from iai_core_py.entities.model import ModelStatus
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
-from sc_sdk.entities.model import ModelStatus
 
 from job.tasks.prepare_and_train.train_helpers import finalize_train, prepare_train
 

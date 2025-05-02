@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from geti_types import ID
-from sc_sdk.entities.model_template import ModelTemplate
+from iai_core_py.entities.model_template import ModelTemplate
 
 
 class NoActiveLearningAlgorithmSupported(RuntimeError):

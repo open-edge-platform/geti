@@ -7,8 +7,8 @@ This module is responsible for migrating the documents and binaries to the lates
 import logging
 
 from geti_types import CTX_SESSION_VAR, ID, Session
+from iai_core_py.versioning import DataVersion
 from migration.utils import VersionManager
-from sc_sdk.versioning import DataVersion
 
 from job.entities.exceptions import ProjectUpgradeFailedException
 

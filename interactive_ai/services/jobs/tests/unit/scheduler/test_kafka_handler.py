@@ -16,7 +16,7 @@ from scheduler.state_machine import StateMachine
 
 from geti_kafka_tools import KafkaRawMessage
 from geti_types import ID, RequestSource
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 ORG = ID(ObjectId())
 

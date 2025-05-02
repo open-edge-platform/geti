@@ -14,15 +14,15 @@ from geti_fastapi_tools.exceptions import BadRequestException, ProjectNotFoundEx
 from geti_fastapi_tools.responses import success_response_rest
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.configuration.enums.configurable_parameter_type import ConfigurableParameterType
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import ConfigurableParametersRepo, ProjectRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+from iai_core_py.configuration.enums.configurable_parameter_type import ConfigurableParameterType
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import ConfigurableParametersRepo, ProjectRepo
 
 if TYPE_CHECKING:
-    from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-    from sc_sdk.configuration.interfaces import IConfigurableParameterContainer
+    from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+    from iai_core_py.configuration.interfaces import IConfigurableParameterContainer
 
 
 class ConfigurationRESTController:

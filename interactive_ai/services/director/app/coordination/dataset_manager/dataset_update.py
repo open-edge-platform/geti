@@ -14,20 +14,20 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaIdentifierEntity
-from sc_sdk.entities.annotation import NullAnnotationScene
-from sc_sdk.entities.dataset_entities import PipelineDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.model_template import TaskFamily
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.flow_control import FlowControl
+from iai_core_py.entities.annotation import NullAnnotationScene
+from iai_core_py.entities.dataset_entities import PipelineDataset
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.model_template import TaskFamily
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core_py.utils.flow_control import FlowControl
 
 
 class DatasetUpdateUseCase:

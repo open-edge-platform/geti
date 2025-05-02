@@ -7,10 +7,10 @@ from unittest.mock import patch
 
 import pytest
 from geti_types import ID
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.model_template import TaskType
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.model_template import TaskType
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks.import_tasks.parse_dataset_new_project import _parse_dataset_for_import_to_new_project

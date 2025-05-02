@@ -5,11 +5,11 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable, Sequence
 
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.metrics import (
+from iai_core_py.entities.annotation import AnnotationScene
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.metrics import (
     AnomalyLocalizationPerformance,
     BarChartInfo,
     ColorPalette,
@@ -19,7 +19,7 @@ from sc_sdk.entities.metrics import (
     ScoreMetric,
     VisualizationType,
 )
-from sc_sdk.entities.shapes import Rectangle
+from iai_core_py.entities.shapes import Rectangle
 
 from jobs_common.utils.progress_helper import noop_progress_callback
 

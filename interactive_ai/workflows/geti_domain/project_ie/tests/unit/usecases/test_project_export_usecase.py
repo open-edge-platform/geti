@@ -7,8 +7,8 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from geti_types import CTX_SESSION_VAR, ID, Session
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.versioning import DataVersion
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.versioning import DataVersion
 
 from job.entities.zip_archive import ProjectZipArchive, ProjectZipArchiveWrapper
 from job.repos import BinaryStorageRepo, DocumentRepo, ZipStorageRepo

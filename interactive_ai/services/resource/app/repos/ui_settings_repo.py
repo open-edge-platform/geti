@@ -15,10 +15,10 @@ from entities.ui_settings import NullUISettings, UISettings
 from repos.ui_settings_mapper import UISettingsToMongo
 
 from geti_types import ID, Session
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.base.session_repo import MissingSessionPolicy
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.base.session_repo import MissingSessionPolicy
+from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 
 class UISettingsRepo(SessionBasedRepo[UISettings]):

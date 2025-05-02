@@ -8,6 +8,8 @@ from typing import Optional
 
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import CTX_SESSION_VAR, ID
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.repos import ModelRepo, ProjectRepo
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.k8s_helpers.trainer_pod_definition import create_flyte_container_task
 from jobs_common.tasks import flyte_multi_container_dynamic as dynamic
@@ -17,8 +19,6 @@ from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common.utils.annotation_filter import AnnotationFilter
 from jobs_common_extras.shard_dataset.tasks.shard_dataset import SHARD_DATASET_TASK_POD_SPEC, shard_dataset
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.repos import ModelRepo, ProjectRepo
 
 from job.models import OptimizationTrainerContext
 from job.tasks.constants import NULL_COMPILED_DATASET_SHARDS_ID

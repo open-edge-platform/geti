@@ -22,7 +22,7 @@ from model.telemetry import Telemetry
 
 from geti_types import ID, RequestSource, make_session, session_context
 from grpc_interfaces.job_submission.pb.job_service_pb2 import JobResponse
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 DUMMY_ORGANIZATION_ID = "000000000000000000000001"
 DUMMY_WORKSPACE_ID = "652651cd3ffd5b3dc7f1d391"

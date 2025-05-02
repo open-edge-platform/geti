@@ -11,9 +11,9 @@ from typing import Any
 
 from domain.entities.dataset_ie_file_metadata import ExportMetadata, FileMetadata, ImportMetadata
 
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
+from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
 
 logger = logging.getLogger(__name__)
 

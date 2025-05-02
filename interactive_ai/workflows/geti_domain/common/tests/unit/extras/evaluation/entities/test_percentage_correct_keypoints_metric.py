@@ -4,16 +4,16 @@
 import numpy as np
 import pytest
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import BarMetricsGroup, Performance, ScoreMetric, TextMetricsGroup
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Keypoint
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
+from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core_py.entities.metrics import BarMetricsGroup, Performance, ScoreMetric, TextMetricsGroup
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Keypoint
 
 from jobs_common_extras.evaluation.entities.percentage_of_correct_keypoints_metric import (
     PercentageCorrectKeypointsMetric,

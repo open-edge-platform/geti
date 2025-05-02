@@ -15,8 +15,8 @@ from service.project_service import ProjectService
 from geti_types import ID, DatasetStorageIdentifier
 from grpc_interfaces.job_submission.client import CommunicationError
 from grpc_interfaces.job_submission.pb.job_service_pb2 import ListJobsResponse
-from sc_sdk.repos import BinaryRepo
-from sc_sdk.utils.filesystem import MIN_FREE_SPACE_GIB
+from iai_core_py.repos import BinaryRepo
+from iai_core_py.utils.filesystem import MIN_FREE_SPACE_GIB
 
 logger = logging.getLogger(__name__)
 FREE_SPACE_WARNING_THRESHOLD = 10000000000  # 10GB in bytes

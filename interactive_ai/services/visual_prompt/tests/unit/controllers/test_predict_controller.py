@@ -12,7 +12,7 @@ from services.models.media_info_payload import MediaInfoPayload
 from services.visual_prompt_service import VPSPredictionResults
 
 from geti_types import DatasetStorageIdentifier, ImageIdentifier
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 
 def return_none(*args, **kwargs) -> None:

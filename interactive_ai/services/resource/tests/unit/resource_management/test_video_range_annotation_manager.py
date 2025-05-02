@@ -8,19 +8,19 @@ from resource_management import VideoRangeAnnotationManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.repos import LabelSchemaRepo, VideoAnnotationRangeRepo
-from sc_sdk.utils.identifier_factory import IdentifierFactory
+from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.repos import LabelSchemaRepo, VideoAnnotationRangeRepo
+from iai_core_py.utils.identifier_factory import IdentifierFactory
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.annotation import AnnotationScene
+    from iai_core_py.entities.annotation import AnnotationScene
 
 
 @patch(
-    "sc_sdk.repos.annotation_scene_repo.AnnotationSceneRepo.__init__",
+    "iai_core_py.repos.annotation_scene_repo.AnnotationSceneRepo.__init__",
     return_value=None,
 )
 class TestVideoRangeAnnotationManager:

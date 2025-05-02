@@ -36,25 +36,21 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES, GetiProjectType
-from jobs_common_extras.datumaro_conversion.mappers.id_mapper import VideoNameIDMapper
-from jobs_common_extras.datumaro_conversion.sc_extractor import RangeIdentifier
-from pytest import FixtureRequest
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from sc_sdk.repos import (
+from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.entities.model_template import ModelTemplate
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core_py.entities.video import Video, VideoFrame
+from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -64,9 +60,13 @@ from sc_sdk.repos import (
     VideoAnnotationRangeRepo,
     VideoRepo,
 )
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo
+from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES, GetiProjectType
+from jobs_common_extras.datumaro_conversion.mappers.id_mapper import VideoNameIDMapper
+from jobs_common_extras.datumaro_conversion.sc_extractor import RangeIdentifier
+from pytest import FixtureRequest
 
 from job.repos.data_repo import ImportDataRepo
 from job.utils.constants import MIN_VIDEO_SIZE

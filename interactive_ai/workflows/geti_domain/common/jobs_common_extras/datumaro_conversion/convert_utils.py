@@ -17,15 +17,15 @@ from datumaro.components.annotation import NO_GROUP
 from datumaro.components.transformer import ItemTransform
 from datumaro.util import take_by
 from geti_types import ID, MediaIdentifierEntity
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.label import Domain, Label, NullLabel
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core_py.entities.video import Video
+from iai_core_py.repos import AnnotationSceneRepo, BinaryRepo, VideoRepo
 from media_utils import VideoDecoder
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label import Domain, Label, NullLabel
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from sc_sdk.entities.video import Video
-from sc_sdk.repos import AnnotationSceneRepo, BinaryRepo, VideoRepo
 
 from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES, GetiProjectType
 from jobs_common_extras.datumaro_conversion.import_utils import ImportUtils

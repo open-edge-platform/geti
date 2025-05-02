@@ -49,10 +49,10 @@ from features.feature_flags import FeatureFlag
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.factories.project_parser import DOMAIN_TO_EMPTY_LABEL_NAME
+from iai_core_py.entities.color import Color
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.factories.project_parser import DOMAIN_TO_EMPTY_LABEL_NAME
 
 CONNECTIONS = "connections"
 EDGES = "edges"

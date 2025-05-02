@@ -8,6 +8,8 @@ Prepare training data task
 import logging
 
 from geti_types import ID
+from iai_core_py.entities.model import NullModel
+from iai_core_py.repos import ModelRepo
 from jobs_common.exceptions import CommandDeliberateFailureException, TaskErrorMessage
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
@@ -20,8 +22,6 @@ from jobs_common.tasks.utils.progress import (
 from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import INFER_AND_EVALUATE_TASK_POD_SPEC
-from sc_sdk.entities.model import NullModel
-from sc_sdk.repos import ModelRepo
 
 from job.tasks.evaluate_and_infer.evaluate import evaluate
 from job.tasks.evaluate_and_infer.pipeline_infer_on_unannotated import pipeline_infer_on_unannotated

@@ -8,9 +8,9 @@ from typing import TypeVar
 
 import attr
 
-from sc_sdk.configuration.elements.configurable_enum import ConfigurableEnum
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.primitive_parameters import configurable_integer, selectable, string_attribute
+from iai_core_py.configuration.elements.configurable_enum import ConfigurableEnum
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.configuration.elements.primitive_parameters import configurable_integer, selectable, string_attribute
 
 
 class ActiveScoreReductionFunction(ConfigurableEnum):

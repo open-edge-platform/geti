@@ -6,12 +6,12 @@ from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json
 from geti_types import ID, ProjectIdentifier
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.repos import ModelRepo
 from jobs_common.k8s_helpers.k8s_resources_calculation import ComputeResources, EphemeralStorageResources
 from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo
 from jobs_common.tasks.utils.secrets import JobMetadata
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.repos import ModelRepo
 
 from .config import OptimizationConfig
 

@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import pytest
-from sc_sdk.entities.shapes import Rectangle
+from iai_core_py.entities.shapes import Rectangle
 
 from media_utils import VideoFrameReader
 from tests.test_helpers import generate_random_annotated_project

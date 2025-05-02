@@ -7,11 +7,11 @@ import pytest
 
 from coordination.dataset_manager.dataset_update import DatasetUpdateUseCase
 
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core_py.entities.dataset_entities import TaskDataset
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.subset import Subset
+from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
 
 
 class TestDatasetUpdateUseCase:

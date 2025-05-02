@@ -3,9 +3,9 @@
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskGraph
-from sc_sdk.repos import ProjectRepo
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_graph import TaskGraph
+from iai_core_py.repos import ProjectRepo
 
 from tests.fixtures.values import DummyValues, IDOffsets
 

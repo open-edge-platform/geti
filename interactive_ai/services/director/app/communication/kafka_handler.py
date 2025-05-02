@@ -23,15 +23,15 @@ from service.project_service import ProjectService
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Singleton
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.model_test_result import TestState
-from sc_sdk.repos import ModelRepo, ModelStorageRepo, ModelTestResultRepo, TaskNodeRepo
-from sc_sdk.session.session_propagation import setup_session_kafka
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.type_helpers import str2bool
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.entities.model_test_result import TestState
+from iai_core_py.repos import ModelRepo, ModelStorageRepo, ModelTestResultRepo, TaskNodeRepo
+from iai_core_py.session.session_propagation import setup_session_kafka
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.type_helpers import str2bool
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.model import Model
+    from iai_core_py.entities.model import Model
 
 logger = logging.getLogger(__name__)
 

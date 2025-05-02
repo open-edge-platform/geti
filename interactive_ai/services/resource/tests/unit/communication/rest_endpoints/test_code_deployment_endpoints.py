@@ -12,7 +12,7 @@ from testfixtures import compare
 from communication.rest_controllers import CodeDeploymentRESTController, DeploymentPackageRESTController
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 MODEL_IDENTIFIER_LIST = [
     {

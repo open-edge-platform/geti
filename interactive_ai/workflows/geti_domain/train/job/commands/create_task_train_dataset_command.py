@@ -6,14 +6,14 @@
 import logging
 
 from geti_telemetry_tools import unified_tracing
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, NullDataset
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
 from jobs_common.commands.create_dataset_command import CreateDatasetCommand
 from jobs_common.exceptions import DatasetCreationFailedException
 from jobs_common.utils.dataset_helpers import DatasetHelpers
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, NullDataset
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
 
 logger = logging.getLogger(__name__)
 

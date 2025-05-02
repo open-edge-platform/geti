@@ -15,10 +15,10 @@ from functools import partial
 from bson.binary import UuidRepresentation
 from bson.json_util import DatetimeRepresentation, JSONOptions, dumps
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.utils.iteration import multi_map
+from iai_core_py.versioning import DataVersion
 from jobs_common.tasks.utils.progress import publish_metadata_update
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.utils.iteration import multi_map
-from sc_sdk.versioning import DataVersion
 
 from job.entities import ProjectZipArchive, ProjectZipArchiveWrapper
 from job.entities.exceptions import ExportProjectFailedException

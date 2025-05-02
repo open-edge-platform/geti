@@ -10,7 +10,7 @@ from functools import wraps
 
 from flytekit import Secret, current_context
 from geti_types import CTX_SESSION_VAR, ID, RequestSource, make_session
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 SECRETS = [
     Secret(
@@ -134,7 +134,7 @@ class JobMetadata:
         author: ID of the author who created this job
         start_time: Date time when this job was started by the job microservice.
             Sometimes, the job microserivce can submit start_time with None (="null").
-            In this case, start_time is assigned with `sc_sdk.utils.time_utils.now()`.
+            In this case, start_time is assigned with `iai_core_py.utils.time_utils.now()`.
     """
 
     id: ID

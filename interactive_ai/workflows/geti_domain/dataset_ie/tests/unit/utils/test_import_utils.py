@@ -14,10 +14,10 @@ from datumaro.components.errors import (
     UnknownFormatError,
 )
 from geti_types import ID
-from sc_sdk.entities.label import NullLabel
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import NullVideo
+from iai_core_py.entities.label import NullLabel
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.video import NullVideo
 
 from job.utils.exceptions import (
     DatasetFormatException,

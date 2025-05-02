@@ -5,12 +5,12 @@ import logging
 
 import numpy as np
 from geti_types import DatasetStorageIdentifier
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.media_2d import Media2D
-from sc_sdk.entities.shapes import Rectangle, Shape
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
+from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.media_2d import Media2D
+from iai_core_py.entities.shapes import Rectangle, Shape
+from iai_core_py.entities.video import Video, VideoFrame
+from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
 
 from .video_frame_reader import VideoFrameReader
 

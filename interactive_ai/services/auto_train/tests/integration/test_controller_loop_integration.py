@@ -14,10 +14,10 @@ from repo import SessionBasedAutoTrainActivationRepo
 from geti_types import ID, ProjectIdentifier
 from grpc_interfaces.job_submission.client import GRPCJobsClient
 from grpc_interfaces.job_submission.pb.job_service_pb2 import SubmitJobRequest
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
-from sc_sdk.repos import (
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
+from iai_core_py.repos import (
     ConfigurableParametersRepo,
     DatasetRepo,
     DatasetStorageRepo,
@@ -25,9 +25,9 @@ from sc_sdk.repos import (
     ProjectRepo,
     TaskNodeRepo,
 )
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.repos.mappers import DatetimeToMongo
-from sc_sdk.utils.time_utils import now
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.repos.mappers import DatetimeToMongo
+from iai_core_py.utils.time_utils import now
 
 
 def return_none(*args, **kwargs) -> None:

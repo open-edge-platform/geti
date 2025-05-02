@@ -1,5 +1,5 @@
 include ../../../Makefile.shared-python
 
 DOCKER_BUILD_CONTEXT := --build-context libs=../../../libs \
-						--build-context sc_sdk=../../../interactive_ai/libs/sc_sdk \
+						--build-context iai_core_py=../../../interactive_ai/libs/iai_core_py \
 						--build-context media_utils=../../../interactive_ai/libs/media_utils \

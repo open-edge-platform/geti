@@ -6,7 +6,7 @@ from testfixtures import compare
 
 from communication.rest_views.statistics_rest_views import StatisticsRESTViews
 
-from sc_sdk.entities.metrics import BarChartInfo, BarMetricsGroup, TextChartInfo, TextMetricsGroup
+from iai_core_py.entities.metrics import BarChartInfo, BarMetricsGroup, TextChartInfo, TextMetricsGroup
 
 
 class TestStatisticsRESTViews:

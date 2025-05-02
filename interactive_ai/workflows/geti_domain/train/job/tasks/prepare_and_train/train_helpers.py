@@ -5,16 +5,12 @@
 
 import logging
 
-import sc_sdk.configuration.helper as otx_config_helper
+import iai_core_py.configuration.helper as otx_config_helper
 from geti_telemetry_tools import unified_tracing
-from jobs_common.exceptions import CommandInitializationFailedException, TrainingPodFailedException
-from jobs_common.tasks.utils.secrets import JobMetadata
-from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
-from jobs_common_extras.mlflow.utils.train_output_models import TrainOutputModelIds, TrainOutputModels
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.model import (
+from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelFormat,
@@ -23,11 +19,15 @@ from sc_sdk.entities.model import (
     ModelStatus,
     TrainingFramework,
 )
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ModelRepo
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ModelRepo
+from jobs_common.exceptions import CommandInitializationFailedException, TrainingPodFailedException
+from jobs_common.tasks.utils.secrets import JobMetadata
+from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
+from jobs_common_extras.mlflow.utils.train_output_models import TrainOutputModelIds, TrainOutputModels
 
 from job.utils.train_workflow_data import TrainWorkflowData
 
@@ -69,7 +69,7 @@ def validate_training_dataset(dataset: Dataset, task_node: TaskNode) -> None:
 
 
 class _ModelBuilder:
-    """Helper class to create a new SC-SDK `Model` entity and save it to the repository."""
+    """Helper class to create a new iai-core-py `Model` entity and save it to the repository."""
 
     def __init__(
         self,
@@ -101,7 +101,7 @@ class _ModelBuilder:
         previous_revision: Model | None = None,
         previous_trained_revision: Model | None = None,
     ) -> Model:
-        """Create a new SC-SDK `Model` entity and save it to the repository."""
+        """Create a new iai-core-py `Model` entity and save it to the repository."""
         # If fine-tuning, use the same trainer as the original model, else use the default one (latest OTX)
         training_framework = (
             previous_trained_revision.training_framework
@@ -198,7 +198,7 @@ def _get_export_parameters(train_output_models: TrainOutputModels) -> list[dict[
 def prepare_train(train_data: TrainWorkflowData, dataset: Dataset) -> TrainOutputModels:
     """Function should be called in prior to model training Flyte task.
 
-    It creates SC-SDK model entities and prepares MLFlow experiement buckets for
+    It creates iai-core-py model entities and prepares MLFlow experiement buckets for
     the subsequent model training Flyte task.
 
     :param train_data: Data class defining data used for training and providing helpers to get
@@ -301,7 +301,7 @@ def finalize_train(
     """Function should be called after model training Flyte task.
 
     It decides whether the model training is failed or not. If succeeded, update
-    SC-SDK model entity status and clean the directory in the MLFLow experiment bucket.
+    iai-core-py model entity status and clean the directory in the MLFLow experiment bucket.
 
     :param train_data: Data class defining data used for training and providing helpers to get
         frequently used objects

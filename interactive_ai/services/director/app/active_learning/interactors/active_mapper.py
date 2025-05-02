@@ -22,14 +22,14 @@ from active_learning.utils.exceptions import (
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, ProjectIdentifier, Singleton
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset, NullDataset
-from sc_sdk.entities.metadata import FloatMetadata
-from sc_sdk.entities.model import Model, NullModel
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.tensor import Tensor
-from sc_sdk.repos import DatasetRepo, MetadataRepo, ModelRepo
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset, NullDataset
+from iai_core_py.entities.metadata import FloatMetadata
+from iai_core_py.entities.model import Model, NullModel
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.tensor import Tensor
+from iai_core_py.repos import DatasetRepo, MetadataRepo, ModelRepo
 
 logger = logging.getLogger(__name__)
 

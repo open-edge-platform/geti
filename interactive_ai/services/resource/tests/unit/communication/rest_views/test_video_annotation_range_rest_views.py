@@ -6,7 +6,7 @@ from testfixtures import compare
 from communication.rest_views.video_annotation_range_rest_views import VideoAnnotationRangeRESTViews
 
 from geti_types import ID
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
 
 
 class TestVideoAnnotationRangeRESTViews:

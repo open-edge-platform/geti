@@ -20,10 +20,10 @@ from entities.dataset_item_count import (
 from storage.mappers import DatasetItemCountToMongo
 
 from geti_types import ID, DatasetStorageIdentifier, Session
-from sc_sdk.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
-from sc_sdk.repos.base.session_repo import QueryAccessMode
-from sc_sdk.repos.mappers import IDToMongo
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
+from iai_core_py.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
+from iai_core_py.repos.base.session_repo import QueryAccessMode
+from iai_core_py.repos.mappers import IDToMongo
+from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
 
 
 class DatasetItemCountRepo(DatasetStorageBasedSessionRepo[DatasetItemCount]):

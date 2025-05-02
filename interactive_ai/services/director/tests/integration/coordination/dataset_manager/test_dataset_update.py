@@ -4,10 +4,10 @@
 
 from coordination.dataset_manager.dataset_update import DatasetUpdateUseCase
 
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import AnnotationSceneRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.entities.annotation import AnnotationScene
+from iai_core_py.entities.subset import Subset
+from iai_core_py.repos import AnnotationSceneRepo
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
 
 
 class TestDatasetUpdateUseCase:

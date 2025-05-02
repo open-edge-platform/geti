@@ -4,11 +4,11 @@
 from copy import copy
 
 import pytest
-from sc_sdk.adapters.model_adapter import ExportableCodeAdapter
-from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
-from sc_sdk.entities.datasets import NullDataset
-from sc_sdk.entities.label_schema import NullLabelSchema
-from sc_sdk.entities.model import (
+from iai_core_py.adapters.model_adapter import ExportableCodeAdapter
+from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core_py.entities.datasets import NullDataset
+from iai_core_py.entities.label_schema import NullLabelSchema
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -16,8 +16,8 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.repos import ModelRepo
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.repos import ModelRepo
 
 
 @pytest.fixture

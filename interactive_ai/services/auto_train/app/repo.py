@@ -14,9 +14,9 @@ from entities import AutoTrainActivationRequest, NullAutoTrainActivationRequest
 from mapper import AutoTrainActivationToMongo
 
 from geti_types import ID
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.base.session_repo import MissingSessionPolicy
-from sc_sdk.repos.mappers import CursorIterator, DatetimeToMongo, IDToMongo
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.base.session_repo import MissingSessionPolicy
+from iai_core_py.repos.mappers import CursorIterator, DatetimeToMongo, IDToMongo
 
 
 class SessionBasedAutoTrainActivationRepo(SessionBasedRepo[AutoTrainActivationRequest]):

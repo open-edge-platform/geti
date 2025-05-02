@@ -12,13 +12,13 @@ from enum import Enum, auto
 from communication.exceptions import JobCreationFailedException
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.model import Model, ModelOptimizationType
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.model_test_result import ModelTestResult
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.services import ModelService
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.model import Model, ModelOptimizationType
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.model_test_result import ModelTestResult
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.services import ModelService
 
 logger = logging.getLogger(__name__)
 

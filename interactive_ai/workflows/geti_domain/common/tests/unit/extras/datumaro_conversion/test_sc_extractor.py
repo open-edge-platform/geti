@@ -5,8 +5,8 @@
 import datumaro as dm
 import pytest
 from geti_types import DatasetStorageIdentifier
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label_schema import LabelSchema
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label_schema import LabelSchema
 
 from jobs_common_extras.datumaro_conversion.sc_extractor import ScExtractor
 

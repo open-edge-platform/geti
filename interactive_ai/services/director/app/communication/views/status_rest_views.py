@@ -14,8 +14,8 @@ from coordination.dataset_manager.missing_annotations_helper import MissingAnnot
 
 from geti_types import ID
 from grpc_interfaces.job_submission.pb.job_service_pb2 import JobResponse
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
 
 logger = logging.getLogger(__name__)
 

@@ -23,16 +23,14 @@ from testcontainers.core.waiting_utils import wait_for_logs
 CTX_SESSION_VAR.set(make_session())
 
 import datumaro as dm
+import iai_core_py.configuration.helper as otx_config_helper
 import pytest
-import sc_sdk.configuration.helper as otx_config_helper
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID
-from jobs_common.features.feature_flag_provider import FeatureFlag
-from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.model_template import (
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,
@@ -40,6 +38,8 @@ from sc_sdk.entities.model_template import (
     TaskFamily,
     TaskType,
 )
+from jobs_common.features.feature_flag_provider import FeatureFlag
+from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
 
 from job.repos.data_repo import ExportDataRepo, ImportDataRepo
 from tests.features.test_feature_flag_provider import TestFeatureFlagProvider

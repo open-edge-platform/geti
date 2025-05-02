@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from dataclasses_json import dataclass_json
 from geti_k8s_tools import calculate_available_resources_per_node, k8s_cpu_to_millicpus, k8s_memory_to_kibibytes
-from sc_sdk.entities.compiled_dataset_shards import CompiledDatasetShards
+from iai_core_py.entities.compiled_dataset_shards import CompiledDatasetShards
 
 logger = logging.getLogger(__name__)
 

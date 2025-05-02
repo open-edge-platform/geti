@@ -8,7 +8,7 @@ from bson import ObjectId
 
 from mapper import AutoTrainActivationToMongo
 
-from sc_sdk.repos.mappers import DatetimeToMongo
+from iai_core_py.repos.mappers import DatetimeToMongo
 
 
 @pytest.mark.AutoTrainControllerComponent

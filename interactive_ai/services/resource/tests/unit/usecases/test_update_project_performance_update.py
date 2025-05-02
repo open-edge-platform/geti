@@ -5,22 +5,22 @@ from unittest.mock import patch
 
 from usecases.update_project_performance_usecase import UpdateProjectPerformanceUseCase
 
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.project_performance import (
+from iai_core_py.entities.evaluation_result import EvaluationPurpose
+from iai_core_py.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
     TaskPerformance,
     TaskPerformanceScore,
 )
-from sc_sdk.repos import EvaluationResultRepo, ProjectRepo
+from iai_core_py.repos import EvaluationResultRepo, ProjectRepo
 
 
 @patch(
-    "sc_sdk.repos.project_repo.ProjectRepo.__init__",
+    "iai_core_py.repos.project_repo.ProjectRepo.__init__",
     return_value=None,
 )
 @patch(
-    "sc_sdk.repos.evaluation_result_repo.EvaluationResultRepo.__init__",
+    "iai_core_py.repos.evaluation_result_repo.EvaluationResultRepo.__init__",
     return_value=None,
 )
 class TestUpdateProjectPerformanceUseCase:

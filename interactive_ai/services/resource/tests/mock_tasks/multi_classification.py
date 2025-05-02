@@ -6,10 +6,10 @@ from attr import attrib, attrs
 
 from tests.utils.test_helpers import add_hyper_parameters_to_template, register_model_template
 
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from sc_sdk.configuration.elements.primitive_parameters import configurable_integer, string_attribute
-from sc_sdk.entities.model_template import ModelTemplate
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core_py.configuration.elements.primitive_parameters import configurable_integer, string_attribute
+from iai_core_py.entities.model_template import ModelTemplate
 
 
 @attrs

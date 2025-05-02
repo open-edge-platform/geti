@@ -7,7 +7,7 @@ from datetime import timedelta
 
 from scheduler.state_machine import StateMachine
 
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 logger = logging.getLogger(__name__)
 

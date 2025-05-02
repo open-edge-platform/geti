@@ -3,7 +3,7 @@
 
 
 from .score_computation import reduce_dict_values
-from sc_sdk.entities.datasets import Dataset, NullDataset
+from iai_core_py.entities.datasets import Dataset, NullDataset
 
 NullableDataset = Dataset | NullDataset
 

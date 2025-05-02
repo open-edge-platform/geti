@@ -8,7 +8,7 @@ from datetime import datetime
 
 import pytest
 from bson import json_util
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
 
 from job.entities import ProjectZipArchive
 from job.entities.exceptions import (

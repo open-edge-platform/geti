@@ -5,8 +5,8 @@ from unittest.mock import patch
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from sc_sdk.repos import ModelRepo
-from sc_sdk.repos.model_repo import ModelStatusFilter
+from iai_core_py.repos import ModelRepo
+from iai_core_py.repos.model_repo import ModelStatusFilter
 from testfixtures import compare
 
 from jobs_common.jobs.helpers.model_helpers import select_input_model

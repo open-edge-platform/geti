@@ -17,9 +17,9 @@ from features.feature_flags import FeatureFlag
 from managers.project_manager import ProjectManager
 
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.project import Project
-from sc_sdk.repos.annotation_template_repo import AnnotationTemplateRepo
-from sc_sdk.repos.project_repo_helpers import ProjectSortBy, SortDirection
+from iai_core_py.entities.project import Project
+from iai_core_py.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core_py.repos.project_repo_helpers import ProjectSortBy, SortDirection
 
 DUMMY_DATA = {"dummy_key": "dummy_value"}
 DUMMY_ORGANIZATION_ID = "6682a33b-3d18-4dab-abee-f797090480e0"

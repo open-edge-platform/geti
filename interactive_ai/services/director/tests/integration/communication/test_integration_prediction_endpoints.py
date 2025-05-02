@@ -11,12 +11,12 @@ from communication.exceptions import NoModelTrainedException
 from service.project_service import ProjectService
 
 from geti_types import ID, VideoFrameIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.model import NullModel
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.repos import AnnotationSceneRepo
-from sc_sdk.services import ModelService
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.model import NullModel
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.repos import AnnotationSceneRepo
+from iai_core_py.services import ModelService
 
 
 @pytest.fixture

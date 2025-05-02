@@ -9,15 +9,15 @@ from os import getenv
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import DatasetStorageIdentifier, ProjectIdentifier
+from iai_core_py.entities.evaluation_result import EvaluationResult
+from iai_core_py.entities.media_score import MediaScore
+from iai_core_py.entities.metrics import AnomalyLocalizationPerformance, MultiScorePerformance
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.model_test_result import ModelTestResult, TestState
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import EvaluationResultRepo, MediaScoreRepo, ModelTestResultRepo
 from kubernetes.client import V1ResourceRequirements, V1Toleration
-from sc_sdk.entities.evaluation_result import EvaluationResult
-from sc_sdk.entities.media_score import MediaScore
-from sc_sdk.entities.metrics import AnomalyLocalizationPerformance, MultiScorePerformance
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.model_test_result import ModelTestResult, TestState
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import EvaluationResultRepo, MediaScoreRepo, ModelTestResultRepo
 
 from jobs_common.tasks.primary_container_task import get_flyte_pod_spec
 from jobs_common.utils.progress_helper import create_bounded_progress_callback, noop_progress_callback

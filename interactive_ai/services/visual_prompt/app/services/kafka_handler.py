@@ -7,11 +7,11 @@ from repos.reference_feature_repo import ReferenceFeatureRepo
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, Singleton
-from sc_sdk.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
-from sc_sdk.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
-from sc_sdk.entities.model import NullModel
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.repos import (
+from iai_core_py.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
+from iai_core_py.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
+from iai_core_py.entities.model import NullModel
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.repos import (
     DatasetRepo,
     EvaluationResultRepo,
     LabelSchemaRepo,
@@ -20,7 +20,7 @@ from sc_sdk.repos import (
     ProjectRepo,
     TaskNodeRepo,
 )
-from sc_sdk.session.session_propagation import setup_session_kafka
+from iai_core_py.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 

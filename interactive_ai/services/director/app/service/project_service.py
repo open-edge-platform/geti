@@ -15,10 +15,10 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.repos import ConfigurableParametersRepo, ProjectRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.repos import ConfigurableParametersRepo, ProjectRepo
 
 logger = logging.getLogger(__name__)
 

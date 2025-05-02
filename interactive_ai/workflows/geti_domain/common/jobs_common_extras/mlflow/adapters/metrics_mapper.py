@@ -9,7 +9,7 @@ from typing import ClassVar
 
 import numpy as np
 from geti_types import ID
-from sc_sdk.entities.metrics import (
+from iai_core_py.entities.metrics import (
     AnomalyLocalizationPerformance,
     BarChartInfo,
     BarMetricsGroup,

@@ -11,10 +11,10 @@ from model_api.models.visual_prompting import Prompt, VisualPromptingFeatures
 from entities.reference_feature import ReferenceFeature, ReferenceMediaInfo
 
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation, AnnotationScene
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
+from iai_core_py.entities.annotation import Annotation, AnnotationScene
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle, Shape
 
 logger = logging.getLogger(__name__)
 

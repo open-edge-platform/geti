@@ -10,7 +10,7 @@ from storage.mappers.auto_train_activation_mapper import AutoTrainActivationToMo
 from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActivationRepo
 
 from geti_types import ProjectIdentifier
-from sc_sdk.services import ModelService
+from iai_core_py.services import ModelService
 
 
 @pytest.fixture

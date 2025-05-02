@@ -32,10 +32,10 @@ from features.feature_flags import FeatureFlag
 from geti_fastapi_tools.dependencies import get_user_id_fastapi, setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import ID
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.utils.filesystem import check_free_space_for_operation
-from sc_sdk.utils.naming_helpers import slugify
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.utils.filesystem import check_free_space_for_operation
+from iai_core_py.utils.naming_helpers import slugify
 
 api_version = "v1"
 api_prefix_url = f"/api/{api_version}"

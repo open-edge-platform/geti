@@ -14,7 +14,7 @@ from microservice.rest.main import app
 
 from geti_fastapi_tools.dependencies import get_source_fastapi, get_user_id_fastapi
 from geti_types import ID, RequestSource
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 DUMMY_ORGANIZATION_ID = "000000000000000000000001"
 DUMMY_WORKSPACE_ID = "567890123456789012340000"

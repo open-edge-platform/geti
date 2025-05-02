@@ -15,8 +15,8 @@ from communication.helpers.http_exceptions import NotEnoughSpaceGetiBaseExceptio
 from domain.entities.dataset_ie_file_metadata import ExportFormat
 
 from geti_types import ID
-from sc_sdk.entities.project import Project
-from sc_sdk.utils.naming_helpers import slugify
+from iai_core_py.entities.project import Project
+from iai_core_py.utils.naming_helpers import slugify
 
 ENV_VARS = {
     "S3_CREDENTIALS_PROVIDER": "local",

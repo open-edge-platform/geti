@@ -6,12 +6,12 @@
 from active_learning.entities import ActiveScore, TaskActiveScore
 
 from geti_types import ID
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperSimple
 
 __all__ = ["ActiveScoreToMongo"]
 
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
 
 
 class TaskActiveScoreToMongo(IMapperSimple[TaskActiveScore, dict]):

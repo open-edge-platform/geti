@@ -9,7 +9,7 @@ import logging
 import os
 from enum import Enum, auto
 
-from sc_sdk.utils.type_helpers import str2bool
+from iai_core_py.utils.type_helpers import str2bool
 
 logger = logging.getLogger(__name__)
 

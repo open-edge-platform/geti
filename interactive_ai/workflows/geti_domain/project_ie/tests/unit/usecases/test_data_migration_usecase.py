@@ -5,8 +5,8 @@ from unittest.mock import patch
 import pytest
 from bson import ObjectId
 from geti_types import ID
+from iai_core_py.versioning.data_version import DataVersion
 from migration.utils import ChangesetMetadata, IMigrationScript, MongoDBConnection, VersionManager
-from sc_sdk.versioning.data_version import DataVersion
 
 from job.entities.exceptions import ProjectUpgradeFailedException
 from job.usecases.data_migration_usecase import DataMigrationUseCase

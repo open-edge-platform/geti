@@ -8,15 +8,15 @@ from freezegun import freeze_time
 from repos.vps_dataset_filter_repo import VPSDatasetFilterRepo
 
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_storage_filter_data import (
+from iai_core_py.entities.annotation_scene_state import AnnotationState
+from iai_core_py.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
 )
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.utils.time_utils import now
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core_py.utils.time_utils import now
 
 
 @pytest.fixture

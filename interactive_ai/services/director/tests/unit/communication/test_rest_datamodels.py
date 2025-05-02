@@ -11,8 +11,8 @@ from communication.views.performance_rest_views import PerformanceRESTViews
 from features.feature_flag_provider import FeatureFlag
 
 from geti_types import ID
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.repos import DatasetStorageRepo, ModelRepo
+from iai_core_py.entities.dataset_storage import NullDatasetStorage
+from iai_core_py.repos import DatasetStorageRepo, ModelRepo
 
 
 class TestRestDataModels:

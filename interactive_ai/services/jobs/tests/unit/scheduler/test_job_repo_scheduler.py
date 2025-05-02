@@ -9,8 +9,8 @@ import pytest
 from scheduler.job_repo import SessionBasedSchedulerJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.base.session_repo import QueryAccessMode
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.base.session_repo import QueryAccessMode
 
 project_id = ID("project")
 

@@ -5,8 +5,8 @@ from unittest.mock import patch
 import pytest
 from geti_telemetry_tools.metrics.instruments import in_memory_metric_reader
 from geti_types import ID
+from iai_core_py.repos import ImageRepo, ProjectRepo, VideoRepo
 from opentelemetry.sdk.metrics.export import InMemoryMetricReader  # type: ignore
-from sc_sdk.repos import ImageRepo, ProjectRepo, VideoRepo
 
 from job.usecases import UpdateMetricsUseCase
 

@@ -7,7 +7,7 @@ This module implements rest views for keypoint structure entities
 
 from typing import Any
 
-from sc_sdk.entities.keypoint_structure import KeypointStructure
+from iai_core_py.entities.keypoint_structure import KeypointStructure
 
 EDGES = "edges"
 KEYPOINT_STRUCTURE = "keypoint_structure"

@@ -13,10 +13,10 @@ from service.project_service import ProjectService
 
 from geti_kafka_tools import KafkaRawMessage
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.repos import AnnotationSceneRepo, ModelRepo, ModelTestResultRepo
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.repos import AnnotationSceneRepo, ModelRepo, ModelTestResultRepo
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 
 WORKSPACE_ID = "63b183d00000000000000001"
 

@@ -38,17 +38,24 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.entities.annotation import Annotation, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, NullDataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.label_schema import LabelGroupType, LabelSchema
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, LabelRepo, VideoAnnotationRangeRepo, VideoRepo
+from iai_core_py.entities.annotation import Annotation, AnnotationSceneKind
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, NullDataset
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.label_schema import LabelGroupType, LabelSchema
+from iai_core_py.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.video import Video, VideoFrame
+from iai_core_py.repos import (
+    AnnotationSceneRepo,
+    DatasetRepo,
+    ImageRepo,
+    LabelRepo,
+    VideoAnnotationRangeRepo,
+    VideoRepo,
+)
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper, LabelMap
 from jobs_common_extras.datumaro_conversion.mappers.dataset_item_mapper import DatasetItemMapper
@@ -58,11 +65,11 @@ from jobs_common_extras.datumaro_conversion.mappers.label_mapper import LabelSch
 __all__ = ["ScExtractor", "ScExtractorForFlyteJob", "ScExtractorFromDatasetStorage"]
 
 from geti_types import CTX_SESSION_VAR, Session, session_context
+from iai_core_py.repos.storage.binary_repos import VideoBinaryRepo
 from media_utils import get_image_bytes, get_media_numpy, get_video_bytes
-from sc_sdk.repos.storage.binary_repos import VideoBinaryRepo
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+    from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
 
 logger = logging.getLogger(__name__)
 

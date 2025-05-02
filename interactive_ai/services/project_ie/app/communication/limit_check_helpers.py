@@ -7,7 +7,7 @@ import logging
 from communication.constants import MAX_NUMBER_OF_PROJECTS_PER_ORGANIZATION
 from communication.http_exceptions import MaxProjectsReachedException
 
-from sc_sdk.repos import ProjectRepo
+from iai_core_py.repos import ProjectRepo
 
 logger = logging.getLogger(__name__)
 

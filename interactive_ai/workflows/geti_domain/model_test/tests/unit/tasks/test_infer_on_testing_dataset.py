@@ -4,11 +4,11 @@ from copy import copy
 from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
+from iai_core_py.entities.model import ModelFormat
+from iai_core_py.repos import DatasetRepo, ModelTestResultRepo, ProjectRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
 from jobs_common.exceptions import UnsupportedModelFormatForModelTestingException
 from jobs_common_extras.evaluation.services.batch_inference import BatchInference
-from sc_sdk.entities.model import ModelFormat
-from sc_sdk.repos import DatasetRepo, ModelTestResultRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
 
 import job.tasks.model_testing
 from job.tasks.model_testing import infer_on_testing_dataset

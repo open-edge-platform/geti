@@ -15,16 +15,16 @@ from geti_fastapi_tools.exceptions import ModelNotFoundException, ProjectNotFoun
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
-from sc_sdk.entities.model import Model, NullModel
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier, NullModelStorage
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.services.model_service import ModelService
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+from iai_core_py.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
+from iai_core_py.entities.model import Model, NullModel
+from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier, NullModelStorage
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ConfigurableParametersRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core_py.services.model_service import ModelService
 
 logger = logging.getLogger(__name__)
 

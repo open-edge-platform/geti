@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskGraph
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_graph import TaskGraph
 
 from tests.fixtures.values import DummyValues, IDOffsets
 

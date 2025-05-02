@@ -10,7 +10,7 @@ from policies import GpuPolicy, MaxRunningJobsPolicy, Prioritizer, QuotaPolicy, 
 from policies.job_repo import SessionBasedPolicyJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.mappers import IDToMongo
+from iai_core_py.repos.mappers import IDToMongo
 
 ORG = ID("000000000000000000000001")
 WORK = ID("000000000000000000000002")

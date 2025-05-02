@@ -16,9 +16,9 @@ from model.job import Job, NullJob
 from model.job_state import JobState
 from model.mapper.job_mapper import JobMapper
 
-from sc_sdk.repos.base.session_repo import QueryAccessMode, SessionBasedRepo
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.base.session_repo import QueryAccessMode, SessionBasedRepo
+from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence

@@ -16,9 +16,9 @@ from repos import ZipStorageRepo
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.utils.naming_helpers import slugify
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.utils.naming_helpers import slugify
 
 logger = logging.getLogger(__name__)
 

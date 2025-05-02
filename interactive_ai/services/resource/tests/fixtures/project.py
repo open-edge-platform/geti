@@ -4,10 +4,10 @@
 import pytest
 
 from geti_types import ProjectIdentifier
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
 
 
 @pytest.fixture

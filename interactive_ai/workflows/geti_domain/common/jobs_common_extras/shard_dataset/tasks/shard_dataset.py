@@ -11,11 +11,11 @@ from queue import Queue
 import flytekit
 from geti_telemetry_tools import unified_tracing
 from geti_types import DatasetStorageIdentifier
+from iai_core_py.entities.compiled_dataset_shards import CompiledDatasetShard
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.project import Project
 from kubernetes.client.models import V1ResourceRequirements
-from sc_sdk.entities.compiled_dataset_shards import CompiledDatasetShard
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.project import Project
 
 from jobs_common.tasks.primary_container_task import get_flyte_pod_spec
 from jobs_common.utils.annotation_filter import AnnotationFilter

@@ -7,16 +7,16 @@ import logging
 from collections.abc import Callable, Iterable, Iterator
 
 from geti_types import ProjectIdentifier, Session
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.repos.base import ProjectBasedSessionRepo
+from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core_py.repos.base.session_repo import QueryAccessMode
+from iai_core_py.repos.mappers import CursorIterator
+from iai_core_py.utils.iteration import grouper
 from pymongo import IndexModel
 from pymongo.collection import Collection
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.base import ProjectBasedSessionRepo
-from sc_sdk.repos.base.mongo_connector import MongoConnector
-from sc_sdk.repos.base.session_repo import QueryAccessMode
-from sc_sdk.repos.mappers import CursorIterator
-from sc_sdk.utils.iteration import grouper
 
 logger = logging.getLogger(__name__)
 

@@ -7,20 +7,20 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 from geti_types import DatasetStorageIdentifier, ImageIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import (
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.dataset_entities import TaskDataset
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -28,9 +28,9 @@ from sc_sdk.repos import (
     ImageRepo,
     LabelSchemaRepo,
 )
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.project_factory import ProjectFactory
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core_py.utils.project_factory import ProjectFactory
 from testfixtures import compare
 
 from jobs_common.utils.dataset_helpers import DatasetHelpers

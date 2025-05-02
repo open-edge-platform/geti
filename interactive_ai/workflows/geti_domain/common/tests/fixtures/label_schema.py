@@ -3,12 +3,12 @@
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import LabelRepo, LabelSchemaRepo
+from iai_core_py.entities.color import Color
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import LabelRepo, LabelSchemaRepo
 
 from tests.fixtures.values import IDOffsets
 

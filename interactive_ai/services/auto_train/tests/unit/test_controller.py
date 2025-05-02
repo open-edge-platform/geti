@@ -16,14 +16,14 @@ from repo import SessionBasedAutoTrainActivationRepo
 from geti_types import Session
 from grpc_interfaces.job_submission.client import GRPCJobsClient
 from grpc_interfaces.job_submission.pb.job_service_pb2 import SubmitJobRequest
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
-from sc_sdk.entities.model_storage import NullModelStorage
-from sc_sdk.entities.model_template import ModelTemplateDeprecationStatus, TaskFamily, TaskType
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_node import TaskNode, TaskProperties
-from sc_sdk.repos import ConfigurableParametersRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
-from sc_sdk.utils.time_utils import now
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core_py.entities.model_storage import NullModelStorage
+from iai_core_py.entities.model_template import ModelTemplateDeprecationStatus, TaskFamily, TaskType
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core_py.repos import ConfigurableParametersRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
+from iai_core_py.utils.time_utils import now
 
 MOCK_JOBS_CLIENT = MagicMock()
 

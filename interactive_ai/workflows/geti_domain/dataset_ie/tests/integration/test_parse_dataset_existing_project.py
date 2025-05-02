@@ -5,11 +5,11 @@ from unittest.mock import patch
 
 import pytest
 from geti_types import ID
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.project import Project
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.project import Project
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks.import_tasks.parse_dataset_existing_project import _parse_dataset_for_import_to_existing_project

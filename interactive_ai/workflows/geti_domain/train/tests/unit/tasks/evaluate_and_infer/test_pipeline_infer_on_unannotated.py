@@ -7,19 +7,19 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose, NullDataset
+from iai_core_py.entities.label_schema import LabelSchemaView
+from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core_py.entities.model_template import TaskFamily
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import DatasetRepo, LabelSchemaRepo, ModelRepo
+from iai_core_py.services import ModelService
+from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core_py.utils.flow_control import FlowControl
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import BATCH_INFERENCE_NUM_ASYNC_REQUESTS
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose, NullDataset
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.entities.model_template import TaskFamily
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import DatasetRepo, LabelSchemaRepo, ModelRepo
-from sc_sdk.services import ModelService
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.flow_control import FlowControl
 
 from job.tasks.evaluate_and_infer.pipeline_infer_on_unannotated import (
     MAX_UNANNOTATED_MEDIA,

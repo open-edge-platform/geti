@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 from zipfile import ZipFile
 
 from bson import ObjectId, json_util
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
 
 from .exceptions import (
     CollectionAlreadyExistsError,

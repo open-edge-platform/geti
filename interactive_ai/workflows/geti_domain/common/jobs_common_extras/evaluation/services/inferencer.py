@@ -14,6 +14,14 @@ from typing import Any, NamedTuple, cast
 import numpy as np
 from geti_telemetry_tools import unified_tracing
 from geti_types import DatasetStorageIdentifier
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.media_2d import Media2D
+from iai_core_py.entities.metadata import FloatMetadata, FloatType, IMetadata
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.tensor import Tensor
+from iai_core_py.repos import AnnotationSceneRepo
 from media_utils import get_media_roi_numpy
 from model_api.adapters.openvino_adapter import OpenvinoAdapter, create_core
 from model_api.models import ImageModel, SAMDecoder, SAMImageEncoder, SAMLearnableVisualPrompter, SegmentationModel
@@ -26,14 +34,6 @@ from model_api.models.utils import (
 )
 from model_api.models.visual_prompting import VisualPromptingFeatures
 from model_api.tilers import DetectionTiler, InstanceSegmentationTiler
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.media_2d import Media2D
-from sc_sdk.entities.metadata import FloatMetadata, FloatType, IMetadata
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.tensor import Tensor
-from sc_sdk.repos import AnnotationSceneRepo
 
 from jobs_common_extras.evaluation.utils.configuration_utils import get_tiler_configuration, get_tiling_parameters
 from jobs_common_extras.evaluation.utils.detection_utils import get_legacy_detection_inferencer_configuration

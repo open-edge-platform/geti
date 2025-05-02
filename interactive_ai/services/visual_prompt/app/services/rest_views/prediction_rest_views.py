@@ -11,8 +11,8 @@ from services.rest_views.scored_label_rest_views import ScoredLabelRESTViews
 from services.visual_prompt_service import VPSPredictionResults
 
 from geti_types import MediaIdentifierEntity
-from sc_sdk.entities.shapes import Point, Polygon, Rectangle
-from sc_sdk.utils.time_utils import now
+from iai_core_py.entities.shapes import Point, Polygon, Rectangle
+from iai_core_py.utils.time_utils import now
 
 logger = logging.getLogger(__name__)
 TYPE = "type"

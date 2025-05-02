@@ -5,8 +5,8 @@ from entities.reference_feature_adapter import ReferenceFeatureAdapter
 from repos.reference_feature_binary_repo import ReferenceFeatureBinaryRepo
 
 from geti_types import ProjectIdentifier
-from sc_sdk.repos.mappers import IDToMongo, IMapperForward, MediaIdentifierToMongo
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperBackward
+from iai_core_py.repos.mappers import IDToMongo, IMapperForward, MediaIdentifierToMongo
+from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperBackward
 
 
 class MediaInfoToMongo(IMapperForward[ReferenceMediaInfo, dict], IMapperBackward[ReferenceMediaInfo, dict]):

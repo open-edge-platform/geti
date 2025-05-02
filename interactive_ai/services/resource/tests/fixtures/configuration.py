@@ -5,13 +5,13 @@ import pytest
 from attr import attrs
 
 from geti_types import ID
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
-from sc_sdk.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from sc_sdk.configuration.elements.primitive_parameters import (
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core_py.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
+from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+from iai_core_py.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core_py.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_float,
     configurable_integer,

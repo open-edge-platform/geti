@@ -11,7 +11,7 @@ from minio import Minio, S3Error
 from repos.mlflow_binary_repo import MLFlowBinaryRepo
 
 from geti_types import ProjectIdentifier
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core_py.adapters.binary_interpreters import RAWBinaryInterpreter
 
 
 class TestMLFlowBinaryRepo:

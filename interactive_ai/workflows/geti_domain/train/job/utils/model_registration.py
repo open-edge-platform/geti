@@ -5,12 +5,12 @@
 
 from geti_types import ID
 from grpc_interfaces.model_registration.pb.service_pb2 import Connection, Label, Model, Pipeline, Project, Task
-from sc_sdk.entities.label import Label as SdkLabel
-from sc_sdk.entities.label_schema import LabelGroup as SdkLabelGroup
-from sc_sdk.entities.model import Model as SdkModel
-from sc_sdk.entities.project import Project as SdkProject
-from sc_sdk.entities.task_node import TaskNode as SdkTask
-from sc_sdk.repos import LabelSchemaRepo
+from iai_core_py.entities.label import Label as SdkLabel
+from iai_core_py.entities.label_schema import LabelGroup as SdkLabelGroup
+from iai_core_py.entities.model import Model as SdkModel
+from iai_core_py.entities.project import Project as SdkProject
+from iai_core_py.entities.task_node import TaskNode as SdkTask
+from iai_core_py.repos import LabelSchemaRepo
 
 
 class ProjectMapper:

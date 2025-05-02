@@ -3,11 +3,11 @@
 from unittest.mock import ANY, call, patch
 
 import pytest
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import DatasetRepo, LabelSchemaRepo
+from iai_core_py.entities.dataset_entities import TaskDataset
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import DatasetRepo, LabelSchemaRepo
 
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common.utils.subset_management.subset_manager import TaskSubsetManager

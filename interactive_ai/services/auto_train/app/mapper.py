@@ -5,9 +5,9 @@
 
 from entities import AutoTrainActivationRequest
 
-from sc_sdk.repos.mappers import DatetimeToMongo, IDToMongo
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperBackward
-from sc_sdk.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
+from iai_core_py.repos.mappers import DatetimeToMongo, IDToMongo
+from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperBackward
+from iai_core_py.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
 
 
 class AutoTrainActivationToMongo(IMapperBackward[AutoTrainActivationRequest, dict]):

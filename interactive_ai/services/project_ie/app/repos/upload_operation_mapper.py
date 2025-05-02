@@ -10,8 +10,8 @@ import logging
 from entities.exceptions import InvalidUploadFileType
 from entities.upload_operation import FileType, UploadOperation
 
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 logger = logging.getLogger(__name__)
 

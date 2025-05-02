@@ -9,8 +9,8 @@ from uuid import uuid4
 
 import pytest
 from geti_types import ID
+from iai_core_py.versioning import DataVersion
 from migration.utils.connection import MinioStorageClient
-from sc_sdk.versioning import DataVersion
 
 from job.entities.exceptions import ImportProjectUnsupportedVersionException, SignatureVerificationFailed
 from job.repos.base.storage_repo import StorageRepo

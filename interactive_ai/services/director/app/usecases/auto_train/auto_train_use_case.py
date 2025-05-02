@@ -30,10 +30,10 @@ from geti_types import (
     Session,
     session_context,
 )
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo, ProjectRepo, TaskNodeRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ConfigurableParametersRepo, ProjectRepo, TaskNodeRepo
 
 if TYPE_CHECKING:
     from geti_types import ID

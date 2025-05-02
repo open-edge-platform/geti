@@ -15,10 +15,10 @@ from geti_types import (
     MediaIdentifierEntity,
     VideoFrameIdentifier,
 )
-from sc_sdk.entities.media_score import MediaScore, NullMediaScore
-from sc_sdk.entities.model_test_result import ModelTestResult
-from sc_sdk.entities.project import Project
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationStatePerTask
+from iai_core_py.entities.media_score import MediaScore, NullMediaScore
+from iai_core_py.entities.model_test_result import ModelTestResult
+from iai_core_py.entities.project import Project
+from iai_core_py.utils.annotation_scene_state_helper import AnnotationStatePerTask
 
 logger = logging.getLogger(__name__)
 

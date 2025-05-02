@@ -5,7 +5,7 @@
 
 from enum import Enum
 
-from sc_sdk.entities.label_schema import LabelSchema
+from iai_core_py.entities.label_schema import LabelSchema
 
 from jobs_common_extras.evaluation.utils.classification_utils import get_cls_inferencer_configuration
 

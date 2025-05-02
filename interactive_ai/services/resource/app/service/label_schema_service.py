@@ -3,9 +3,9 @@
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
-from sc_sdk.repos import LabelSchemaRepo
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
+from iai_core_py.repos import LabelSchemaRepo
 
 
 class LabelSchemaService:

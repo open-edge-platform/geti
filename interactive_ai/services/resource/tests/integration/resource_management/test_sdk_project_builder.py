@@ -23,14 +23,14 @@ from managers.project_manager import ProjectManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_types import ID
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.label_schema import LabelGroupType
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import LabelSchemaRepo, ProjectRepo
-from sc_sdk.utils.project_builder import ProjectBuilder, ProjectUpdateError
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.label_schema import LabelGroupType
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import LabelSchemaRepo, ProjectRepo
+from iai_core_py.utils.project_builder import ProjectBuilder, ProjectUpdateError
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core_py.entities.label import Label
 
 
 class TestProjectCRUD:

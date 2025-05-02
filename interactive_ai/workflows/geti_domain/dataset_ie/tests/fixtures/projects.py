@@ -7,17 +7,23 @@ This module implements project fixtures
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView
-from sc_sdk.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
-from sc_sdk.entities.task_node import TaskNode, TaskProperties
-from sc_sdk.repos import LabelRepo, LabelSchemaRepo, TaskNodeRepo
-from sc_sdk.utils.project_factory import ProjectFactory
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.color import Color
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView
+from iai_core_py.entities.model_template import (
+    HyperParameterData,
+    InstantiationType,
+    ModelTemplate,
+    TaskFamily,
+    TaskType,
+)
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
+from iai_core_py.entities.task_node import TaskNode, TaskProperties
+from iai_core_py.repos import LabelRepo, LabelSchemaRepo, TaskNodeRepo
+from iai_core_py.utils.project_factory import ProjectFactory
 
 from tests.test_helpers import (
     generate_ellipse_shape,

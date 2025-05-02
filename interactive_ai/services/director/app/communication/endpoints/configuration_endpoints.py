@@ -18,7 +18,7 @@ from geti_fastapi_tools.dependencies import (
     setup_session_fastapi,
 )
 from geti_types import ID
-from sc_sdk.utils.filesystem import check_free_space_for_operation
+from iai_core_py.utils.filesystem import check_free_space_for_operation
 
 logger = logging.getLogger(__name__)
 

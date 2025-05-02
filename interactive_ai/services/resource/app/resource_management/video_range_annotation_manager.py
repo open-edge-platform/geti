@@ -7,16 +7,16 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.video import Video
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from sc_sdk.repos import AnnotationSceneRepo, VideoAnnotationRangeRepo
-from sc_sdk.utils.identifier_factory import IdentifierFactory
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState, NullAnnotationSceneState
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.video import Video
+from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core_py.repos import AnnotationSceneRepo, VideoAnnotationRangeRepo
+from iai_core_py.utils.identifier_factory import IdentifierFactory
 
 logger = logging.getLogger(__name__)
 

@@ -4,11 +4,18 @@ from unittest.mock import MagicMock, patch
 
 import jobs_common.tasks.utils.secrets
 import pytest
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.evaluation_result import EvaluationPurpose
+from iai_core_py.repos import (
+    DatasetRepo,
+    DatasetStorageRepo,
+    EvaluationResultRepo,
+    ModelRepo,
+    ModelStorageRepo,
+    ProjectRepo,
+)
+from iai_core_py.utils.dataset_helper import DatasetHelper
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.repos import DatasetRepo, DatasetStorageRepo, EvaluationResultRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
 
 from tests.unit.tasks.mock_utils import mock_decorator
 

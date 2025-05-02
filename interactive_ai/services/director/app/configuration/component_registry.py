@@ -18,7 +18,7 @@ from coordination.dataset_manager.dataset_counter_config import (
 from coordination.dataset_manager.subset_manager_config import AnomalySubsetManagerConfig, SubsetManagerConfig
 
 from .component_register_entry import ComponentRegisterEntry
-from sc_sdk.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core_py.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
 
 
 class ConfigurableComponentRegister(Enum):

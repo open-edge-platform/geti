@@ -21,18 +21,18 @@ from usecases.query_builder import MediaQueryResult, QueryResults
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_types import ID
+from iai_core_py.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core_py.entities.image import Image, NullImage
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.entities.video import NullVideo, Video, VideoFrame
+from iai_core_py.repos import ImageRepo, ProjectRepo, VideoRepo
+from iai_core_py.repos.storage.binary_repos import ThumbnailBinaryRepo, VideoBinaryRepo
+from iai_core_py.repos.storage.storage_client import BytesStream
+from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.media_factory import Media2DFactory
 from media_utils import VideoFileRepair, VideoFrameOutOfRangeInternalException, VideoFrameReader, VideoFrameReadingError
 from media_utils.video_decoder import _VideoDecoderOpenCV
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.video import NullVideo, Video, VideoFrame
-from sc_sdk.repos import ImageRepo, ProjectRepo, VideoRepo
-from sc_sdk.repos.storage.binary_repos import ThumbnailBinaryRepo, VideoBinaryRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.media_factory import Media2DFactory
 
 
 class TestMediaManager:

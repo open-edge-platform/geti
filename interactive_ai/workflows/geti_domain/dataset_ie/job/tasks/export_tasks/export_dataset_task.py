@@ -12,6 +12,8 @@ from datumaro.components.dataset import StreamDataset
 from datumaro.components.media import Image as dm_Image
 from datumaro.components.media import MediaElement as dm_MediaElement
 from geti_types import ID, ProjectIdentifier
+from iai_core_py.entities.label_schema import LabelSchema, NullLabelSchema
+from iai_core_py.repos import DatasetStorageRepo, LabelSchemaRepo
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
 from jobs_common.tasks.utils.progress import publish_metadata_update, task_progress
@@ -23,8 +25,6 @@ from jobs_common_extras.datumaro_conversion.sc_extractor import (
     ScExtractorFromDatasetStorage,
     VideoExportConfig,
 )
-from sc_sdk.entities.label_schema import LabelSchema, NullLabelSchema
-from sc_sdk.repos import DatasetStorageRepo, LabelSchemaRepo
 
 from job.repos.data_repo import ExportDataRepo
 from job.tasks import IMPORT_EXPORT_TASK_POD_SPEC

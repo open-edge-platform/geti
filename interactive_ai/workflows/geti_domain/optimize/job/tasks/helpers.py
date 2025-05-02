@@ -4,15 +4,10 @@
 import logging
 from typing import Optional
 
-import sc_sdk.configuration.helper as otx_config_helper
+import iai_core_py.configuration.helper as otx_config_helper
 from geti_telemetry_tools.tracing.common import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from jobs_common.jobs.helpers.project_helpers import lock_project
-from jobs_common.tasks.utils.progress import publish_metadata_update
-from jobs_common.tasks.utils.secrets import JobMetadata
-from jobs_common.utils.annotation_filter import AnnotationFilter
-from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
-from sc_sdk.entities.model import (
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelFormat,
@@ -21,8 +16,13 @@ from sc_sdk.entities.model import (
     ModelStatus,
     OptimizationMethod,
 )
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.repos import CompiledDatasetShardsRepo, ModelRepo, ProjectRepo
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.repos import CompiledDatasetShardsRepo, ModelRepo, ProjectRepo
+from jobs_common.jobs.helpers.project_helpers import lock_project
+from jobs_common.tasks.utils.progress import publish_metadata_update
+from jobs_common.tasks.utils.secrets import JobMetadata
+from jobs_common.utils.annotation_filter import AnnotationFilter
+from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
 
 from job.models import OptimizationConfig, OptimizationTrainerContext
 
@@ -72,7 +72,7 @@ def prepare_optimize(
 ) -> OptimizationTrainerContext:
     """Function should be called in prior to model optimization task.
 
-    It creates SC-SDK model entities (dataset shards with model placeholder) and prepares MLFlow experiment buckets for
+    It creates Geti model entities (dataset shards with model placeholder) and prepares MLFlow experiment buckets for
     the subsequent model optimization task.
 
     :param project_id: project ID
@@ -162,7 +162,7 @@ def finalize_optimize(
 ) -> None:
     """Function should be called after model optimization task.
 
-    It updates SC-SDK model entity and clean the directory in the MLFLow experiment bucket.
+    It updates iai-core-py model entity and clean the directory in the MLFLow experiment bucket.
 
     :param trainer_ctx: Data class defining data used for optimization and providing helpers to get
         frequently used objects

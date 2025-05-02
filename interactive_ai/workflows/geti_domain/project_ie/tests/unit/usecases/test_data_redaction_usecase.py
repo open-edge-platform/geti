@@ -12,7 +12,7 @@ from zipfile import ZipFile
 import pytest
 from bson import ObjectId, UuidRepresentation
 from bson.json_util import JSONOptions, dumps, loads
-from sc_sdk.repos.mappers import MediaIdentifierToMongo
+from iai_core_py.repos.mappers import MediaIdentifierToMongo
 
 from job.usecases import ExportDataRedactionUseCase, ImportDataRedactionUseCase
 from job.usecases.data_redaction_usecase import BaseDataRedactionUseCase, get_random_objectid_between_dates

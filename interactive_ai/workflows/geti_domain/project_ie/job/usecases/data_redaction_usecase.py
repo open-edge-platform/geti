@@ -18,8 +18,8 @@ from zipfile import ZipFile
 from bson import ObjectId, UuidRepresentation
 from bson.json_util import JSONOptions, dumps
 from defusedxml import ElementTree
-from sc_sdk.repos.mappers import DatetimeToMongo, MediaIdentifierToMongo
-from sc_sdk.utils.time_utils import now
+from iai_core_py.repos.mappers import DatetimeToMongo, MediaIdentifierToMongo
+from iai_core_py.utils.time_utils import now
 
 from job.entities.exceptions import ExportDataRedactionFailedException, ImportDataRedactionFailedException
 

@@ -38,7 +38,7 @@ from grpc_interfaces.job_submission.pb.job_service_pb2 import (
     SubmitJobRequest,
 )
 from grpc_interfaces.job_submission.pb.job_service_pb2_grpc import JobServiceServicer, add_JobServiceServicer_to_server
-from sc_sdk.session.session_propagation import setup_session_grpc
+from iai_core_py.session.session_propagation import setup_session_grpc
 
 logger = logging.getLogger(__name__)
 

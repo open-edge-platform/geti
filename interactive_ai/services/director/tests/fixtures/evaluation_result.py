@@ -3,8 +3,8 @@
 
 import pytest
 
-from sc_sdk.entities.evaluation_result import EvaluationResult
-from sc_sdk.entities.metrics import Performance, ScoreMetric
+from iai_core_py.entities.evaluation_result import EvaluationResult
+from iai_core_py.entities.metrics import Performance, ScoreMetric
 
 
 @pytest.fixture

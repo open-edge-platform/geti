@@ -11,12 +11,12 @@ from collections.abc import Callable
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID
+from iai_core_py.entities.datasets import DatasetPurpose
+from iai_core_py.repos import ModelRepo
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.services.batch_inference import BatchInference
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import BATCH_INFERENCE_NUM_ASYNC_REQUESTS
-from sc_sdk.entities.datasets import DatasetPurpose
-from sc_sdk.repos import ModelRepo
 
 from job.tasks.evaluate_and_infer.pipeline_infer_on_unannotated import MAX_UNANNOTATED_MEDIA
 from job.utils.train_workflow_data import TrainWorkflowData

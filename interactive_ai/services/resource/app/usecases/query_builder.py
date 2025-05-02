@@ -18,17 +18,24 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.entities.datasets import DatasetIdentifier
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.video import Video
-from sc_sdk.entities.video_annotation_statistics import VideoAnnotationStatistics
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, MediaScoreRepo, ModelTestResultRepo, VideoRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.repos.mappers import DatetimeToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
-from sc_sdk.repos.training_revision_filter_repo import _TrainingRevisionFilterRepo
+from iai_core_py.entities.datasets import DatasetIdentifier
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.entities.video import Video
+from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core_py.repos import (
+    AnnotationSceneRepo,
+    DatasetRepo,
+    ImageRepo,
+    MediaScoreRepo,
+    ModelTestResultRepo,
+    VideoRepo,
+)
+from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core_py.repos.mappers import DatetimeToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
+from iai_core_py.repos.training_revision_filter_repo import _TrainingRevisionFilterRepo
 
 logger = logging.getLogger(__name__)
 

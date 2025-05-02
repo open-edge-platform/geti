@@ -16,9 +16,9 @@ from coordination.dataset_manager.dataset_counter_config import (
 )
 from service.project_service import ProjectService
 
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.enums.utils import get_enum_names
-from sc_sdk.repos import ConfigurableParametersRepo, ProjectRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.configuration.enums.utils import get_enum_names
+from iai_core_py.repos import ConfigurableParametersRepo, ProjectRepo
 
 
 class TestConfigurationInitializer:

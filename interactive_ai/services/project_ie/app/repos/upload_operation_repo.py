@@ -14,8 +14,8 @@ from entities import NullUploadOperation, UploadOperation
 from repos.upload_operation_mapper import UploadOperationToMongo
 
 from geti_types import Session
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.mappers import CursorIterator
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.mappers import CursorIterator
 
 
 class UploadOperationRepo(SessionBasedRepo[UploadOperation]):

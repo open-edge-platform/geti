@@ -20,7 +20,7 @@ from entities.dataset_item_count import LabelData, NullDatasetItemCount
 from storage.repos import DatasetItemCountRepo
 
 from geti_types import ID
-from sc_sdk.repos import ConfigurableParametersRepo, LabelSchemaRepo
+from iai_core_py.repos import ConfigurableParametersRepo, LabelSchemaRepo
 
 WORKSPACE_ID = ID("workspace")
 

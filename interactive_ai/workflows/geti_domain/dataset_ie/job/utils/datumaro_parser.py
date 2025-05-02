@@ -9,11 +9,11 @@ from typing import Any
 
 import datumaro as dm
 from geti_telemetry_tools import unified_tracing
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.factories import ProjectParser
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.factories import ProjectParser
 
 from job.utils.exceptions import DatasetParsingException
 from job.utils.import_utils import ImportUtils

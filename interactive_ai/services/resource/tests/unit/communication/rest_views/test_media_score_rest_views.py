@@ -14,8 +14,8 @@ from usecases.query_builder import MediaQueryResult, QueryResults
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID, ImageIdentifier, VideoFrameIdentifier
-from sc_sdk.entities.media_score import NullMediaScore
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core_py.entities.media_score import NullMediaScore
+from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
 
 
 @pytest.fixture

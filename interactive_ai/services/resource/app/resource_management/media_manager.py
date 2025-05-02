@@ -42,6 +42,19 @@ from geti_telemetry_tools.metrics import (
     videos_resolution_histogram,
 )
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaType
+from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter, StreamBinaryInterpreter
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.image import Image, NullImage
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.video import NullVideo, Video, VideoFrame
+from iai_core_py.repos import ImageRepo, ProjectRepo, VideoRepo
+from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo, VideoBinaryRepo
+from iai_core_py.repos.storage.storage_client import BytesStream
+from iai_core_py.utils.constants import DEFAULT_THUMBNAIL_SIZE
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.media_factory import Media2DFactory
 from media_utils import (
     VideoDecoder,
     VideoFileRepair,
@@ -51,19 +64,6 @@ from media_utils import (
     get_image_numpy,
     get_media_roi_numpy,
 )
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter, StreamBinaryInterpreter
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import NullVideo, Video, VideoFrame
-from sc_sdk.repos import ImageRepo, ProjectRepo, VideoRepo
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo, VideoBinaryRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.utils.constants import DEFAULT_THUMBNAIL_SIZE
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.media_factory import Media2DFactory
 
 IMAGES = "images"
 VIDEOS = "videos"

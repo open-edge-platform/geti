@@ -9,10 +9,10 @@ from communication.exceptions import NotReadyForOptimizationException
 
 from geti_types import ID
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.model import ModelOptimizationType
-from sc_sdk.entities.model_template import EntryPoints
-from sc_sdk.repos import DatasetRepo, ModelRepo
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.model import ModelOptimizationType
+from iai_core_py.entities.model_template import EntryPoints
+from iai_core_py.repos import DatasetRepo, ModelRepo
 
 
 class TestOptimizationController:

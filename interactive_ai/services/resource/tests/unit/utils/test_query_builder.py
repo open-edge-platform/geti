@@ -12,20 +12,20 @@ from usecases.dataset_filter import DatasetFilter, DatasetFilterField, MediaScor
 from usecases.query_builder import MediaQueryResult, QueryBuilder, QueryResults
 
 from geti_types import ID, ImageIdentifier, ProjectIdentifier, VideoFrameIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.dataset_storage_filter_data import (
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
 )
-from sc_sdk.entities.datasets import Dataset, DatasetIdentifier, DatasetPurpose
-from sc_sdk.entities.media import MediaPreprocessingStatus
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.video_annotation_statistics import VideoAnnotationStatistics
-from sc_sdk.repos import (
+from iai_core_py.entities.datasets import Dataset, DatasetIdentifier, DatasetPurpose
+from iai_core_py.entities.media import MediaPreprocessingStatus
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -33,9 +33,9 @@ from sc_sdk.repos import (
     ImageRepo,
     VideoRepo,
 )
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
+from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core_py.utils.constants import DEFAULT_USER_NAME
 
 logger = logging.getLogger(__name__)
 

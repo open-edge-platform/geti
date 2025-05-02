@@ -9,8 +9,8 @@ from communication.rest_views.pipeline import PipelineRESTViews
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.project import Project
+from iai_core_py.entities.label_schema import LabelSchemaView
+from iai_core_py.entities.project import Project
 
 logger = logging.getLogger(__name__)
 

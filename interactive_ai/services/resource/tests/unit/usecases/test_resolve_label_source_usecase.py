@@ -6,16 +6,16 @@ from unittest.mock import patch
 from usecases.resolve_label_source_usecase import ResolveLabelSourceUseCase
 
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.repos import AnnotationSceneRepo
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.repos import AnnotationSceneRepo
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core_py.entities.label import Label
 
 
 @patch(
-    "sc_sdk.repos.annotation_scene_repo.AnnotationSceneRepo.__init__",
+    "iai_core_py.repos.annotation_scene_repo.AnnotationSceneRepo.__init__",
     return_value=None,
 )
 class TestResolveLabelSourceUseCase:

@@ -8,7 +8,7 @@ from testfixtures import compare
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 
 from geti_types import ID
-from sc_sdk.repos import DatasetStorageRepo, ModelRepo
+from iai_core_py.repos import DatasetStorageRepo, ModelRepo
 
 
 class TestModelTestResultRESTViews:

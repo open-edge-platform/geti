@@ -8,12 +8,12 @@ from unittest.mock import MagicMock, patch
 import datumaro as dm
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper, LabelMap
 from jobs_common_extras.datumaro_conversion.mappers.dataset_item_mapper import (

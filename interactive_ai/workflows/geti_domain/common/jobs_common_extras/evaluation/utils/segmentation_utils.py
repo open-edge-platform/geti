@@ -8,13 +8,13 @@ import cv2
 import numpy as np
 from bson import ObjectId
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Point, Polygon
-from sc_sdk.utils.shape_factory import ShapeFactory
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Point, Polygon
+from iai_core_py.utils.shape_factory import ShapeFactory
 
 from jobs_common_extras.evaluation.utils.helpers import is_model_legacy_otx_version
 

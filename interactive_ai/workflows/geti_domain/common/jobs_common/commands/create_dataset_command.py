@@ -6,8 +6,8 @@
 import logging
 from abc import ABCMeta, abstractmethod
 
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import Project
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.project import Project
 
 from jobs_common.commands.interfaces.command import ICommand
 

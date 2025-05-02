@@ -9,12 +9,12 @@ import cv2
 import datumaro as dm
 import numpy as np
 from geti_types import ID, DatasetStorageIdentifier
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
+from iai_core_py.entities.subset import Subset
 from media_utils import get_media_numpy
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
-from sc_sdk.entities.subset import Subset
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper
 from jobs_common_extras.datumaro_conversion.mappers.id_mapper import IDMapper

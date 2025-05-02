@@ -11,7 +11,7 @@ from managers.project_manager import ProjectManager
 from resource_management.code_deployment_manager import DEPLOYMENT_FILENAME_TEMPLATE, CodeDeploymentManager
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.utils.naming_helpers import slugify
+from iai_core_py.utils.naming_helpers import slugify
 
 
 class TestCodeDeploymentRESTController:

@@ -6,8 +6,8 @@ from communication.rest_data_validator.annotation_template_rest_validator import
 from communication.rest_views.annotation_template_rest_views import AnnotationTemplateRESTViews
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.annotation_template import AnnotationTemplate
-from sc_sdk.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core_py.entities.annotation_template import AnnotationTemplate
+from iai_core_py.repos.annotation_template_repo import AnnotationTemplateRepo
 
 
 class AnnotationTemplateRESTController:

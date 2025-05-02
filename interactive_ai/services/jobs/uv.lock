@@ -1535,7 +1535,7 @@ dependencies = [
     { name = "geti-types" },
     { name = "grpc-interfaces", extra = ["job-submission"] },
     { name = "marshmallow-enum" },
-    { name = "sc-sdk" },
+    { name = "iai-core-py" },
     { name = "uvicorn" },
 ]
 
@@ -1565,7 +1565,7 @@ requires-dist = [
     { name = "geti-types", editable = "../../../libs/types" },
     { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
     { name = "marshmallow-enum", specifier = "==1.5.1" },
-    { name = "sc-sdk", editable = "../../libs/sc_sdk" },
+    { name = "iai-core-py", editable = "../../libs/iai_core_py" },
     { name = "uvicorn", specifier = "~=0.27" },
 ]
 
@@ -3008,9 +3008,9 @@ wheels = [
 ]
 
 [[package]]
-name = "sc-sdk"
+name = "iai-core-py"
 version = "1.0.0"
-source = { editable = "../../libs/sc_sdk" }
+source = { editable = "../../libs/iai_core_py" }
 dependencies = [
     { name = "attrs" },
     { name = "cachetools" },

@@ -12,10 +12,10 @@ from typing import TYPE_CHECKING
 from model.job import Job, NullJob
 from model.mapper.job_mapper import JobMapper
 
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.base.session_repo import MissingSessionPolicy, QueryAccessMode
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.base import SessionBasedRepo
+from iai_core_py.repos.base.session_repo import MissingSessionPolicy, QueryAccessMode
+from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence

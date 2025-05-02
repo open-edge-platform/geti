@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+from iai_core_py.repos.base.mongo_connector import MongoConnector
 from migration.utils.connection import MongoDBConnection
-from sc_sdk.repos.base.mongo_connector import MongoConnector
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for_logs
 from testcontainers.mongodb import MongoDbContainer

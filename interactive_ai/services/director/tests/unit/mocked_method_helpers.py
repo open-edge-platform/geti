@@ -3,9 +3,9 @@
 """This module contains mock functions useful for testing"""
 
 from geti_types import ID
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.video import Video
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core_py.entities.video import Video
 
 
 def mock_get_image_by_id(image_id: ID) -> Image:

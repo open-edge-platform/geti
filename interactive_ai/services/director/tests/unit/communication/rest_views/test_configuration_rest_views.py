@@ -4,8 +4,8 @@ import copy
 
 from communication.views.configuration_rest_views import ConfigurationRESTViews
 
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.elements.entity_identifiers import ComponentEntityIdentifier
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.configuration.elements.entity_identifiers import ComponentEntityIdentifier
 
 
 class TestSCConfigurationRESTViews:

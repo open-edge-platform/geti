@@ -15,10 +15,10 @@ from managers.project_manager import ProjectManager
 
 from geti_fastapi_tools.responses import success_response_rest
 from geti_types import ID
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.project_builder import PersistedProjectBuilder
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.project_builder import PersistedProjectBuilder
 
 
 class TestProjectRESTController:

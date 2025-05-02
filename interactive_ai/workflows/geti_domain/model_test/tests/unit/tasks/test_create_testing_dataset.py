@@ -3,8 +3,8 @@
 from unittest.mock import patch
 
 import pytest
+from iai_core_py.repos import DatasetRepo, ModelTestResultRepo, ProjectRepo
 from jobs_common.utils.dataset_helpers import DatasetHelpers
-from sc_sdk.repos import DatasetRepo, ModelTestResultRepo, ProjectRepo
 
 from job.tasks.model_testing import create_testing_dataset
 

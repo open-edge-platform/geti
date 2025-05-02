@@ -11,14 +11,14 @@ from communication.rest_views.performance_rest_views import PerformanceRESTViews
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
-from sc_sdk.entities.metrics import Performance
-from sc_sdk.entities.model import Model, ModelFormat, ModelOptimizationType
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.repos.model_repo import ModelStatusFilter
+from iai_core_py.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
+from iai_core_py.entities.metrics import Performance
+from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.repos.model_repo import ModelStatusFilter
 
 if TYPE_CHECKING:
-    from sc_sdk.configuration.elements.optimization_parameters import POTOptimizationParameters
+    from iai_core_py.configuration.elements.optimization_parameters import POTOptimizationParameters
 
 ACTIVE_MODEL = "active_model"
 ARCHITECTURE = "architecture"

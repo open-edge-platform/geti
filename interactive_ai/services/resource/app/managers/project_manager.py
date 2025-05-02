@@ -14,18 +14,18 @@ from geti_fastapi_tools.exceptions import BadRequestException, ProjectNotFoundEx
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID
-from sc_sdk.adapters.adapter import ReferenceAdapter
-from sc_sdk.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
-from sc_sdk.entities.model_template import TaskFamily, TaskType
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_graph import TaskGraph
-from sc_sdk.factories import ProjectParser, ProjectUpdateParser
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.project_builder import PersistedProjectBuilder, ProjectUpdateError
+from iai_core_py.adapters.adapter import ReferenceAdapter
+from iai_core_py.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
+from iai_core_py.entities.model_template import TaskFamily, TaskType
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.task_graph import TaskGraph
+from iai_core_py.factories import ProjectParser, ProjectUpdateParser
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.repos.project_repo_helpers import ProjectQueryData
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.project_builder import PersistedProjectBuilder, ProjectUpdateError
 
 CONNECTIONS = "connections"
 FROM = "from"

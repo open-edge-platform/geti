@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from unittest.mock import patch
 
-from sc_sdk.repos import (
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     LabelRepo,
     LabelSchemaRepo,

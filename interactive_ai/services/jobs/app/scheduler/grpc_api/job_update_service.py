@@ -34,7 +34,7 @@ from grpc_interfaces.job_update.pb.job_update_service_pb2_grpc import (
     JobUpdateServiceServicer,
     add_JobUpdateServiceServicer_to_server,
 )
-from sc_sdk.session.session_propagation import setup_session_grpc
+from iai_core_py.session.session_propagation import setup_session_grpc
 
 logger = logging.getLogger(__name__)
 

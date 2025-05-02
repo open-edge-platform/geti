@@ -14,9 +14,9 @@ from geti_telemetry_tools.metrics import (
     videos_resolution_histogram,
 )
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier
+from iai_core_py.entities.media import ImageExtensions
+from iai_core_py.entities.video import NullVideo
 from media_utils import VideoFrameOutOfRangeInternalException
-from sc_sdk.entities.media import ImageExtensions
-from sc_sdk.entities.video import NullVideo
 
 from job.utils.constants import MAX_VIDEO_LENGTH, MAX_VIDEO_WIDTH, MIN_IMAGE_SIZE, MIN_VIDEO_SIZE
 from job.utils.exceptions import FileNotFoundException, InvalidMediaException

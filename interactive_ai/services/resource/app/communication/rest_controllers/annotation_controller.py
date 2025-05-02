@@ -28,18 +28,18 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.video import Video
-from sc_sdk.entities.video_annotation_range import VideoAnnotationRange
-from sc_sdk.repos import AnnotationSceneRepo, LabelSchemaRepo, VideoAnnotationRangeRepo, VideoRepo
-from sc_sdk.utils.filesystem import check_free_space_for_operation
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.scored_label import LabelSource, ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.video import Video
+from iai_core_py.entities.video_annotation_range import VideoAnnotationRange
+from iai_core_py.repos import AnnotationSceneRepo, LabelSchemaRepo, VideoAnnotationRangeRepo, VideoRepo
+from iai_core_py.utils.filesystem import check_free_space_for_operation
 
 LATEST = "latest"
 

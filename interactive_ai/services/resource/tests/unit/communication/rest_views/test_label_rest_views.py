@@ -6,7 +6,7 @@ from testfixtures import compare
 
 from communication.rest_views.label_rest_views import LabelRESTViews
 
-from sc_sdk.entities.label_schema import LabelSchema
+from iai_core_py.entities.label_schema import LabelSchema
 
 
 class TestSCLabelRESTViews:

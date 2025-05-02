@@ -18,12 +18,12 @@ from geti_fastapi_tools.exceptions import BadRequestException, ModelNotFoundExce
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model import NullModel
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import ModelRepo
-from sc_sdk.utils.filesystem import check_free_space_for_operation
+from iai_core_py.entities.label_schema import LabelSchemaView
+from iai_core_py.entities.model import NullModel
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import ModelRepo
+from iai_core_py.utils.filesystem import check_free_space_for_operation
 
 export_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="Deployment_package_worker")
 logger = logging.getLogger(__name__)

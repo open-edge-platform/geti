@@ -10,9 +10,9 @@ from resource_management.deployment_package_manager import DeploymentPackageMana
 
 from geti_types import ProjectIdentifier
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ModelRepo
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ModelRepo
 
 
 class TestDeploymentPackageRESTController:

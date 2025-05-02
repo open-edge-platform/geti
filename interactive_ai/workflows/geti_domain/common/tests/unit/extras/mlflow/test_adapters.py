@@ -8,11 +8,11 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-from sc_sdk.adapters.model_adapter import DataSource
-from sc_sdk.configuration.helper import convert
-from sc_sdk.entities.metrics import CurveMetric, LineChartInfo, LineMetricsGroup, Performance, ScoreMetric
-from sc_sdk.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus
-from sc_sdk.repos.model_repo import ModelRepo
+from iai_core_py.adapters.model_adapter import DataSource
+from iai_core_py.configuration.helper import convert
+from iai_core_py.entities.metrics import CurveMetric, LineChartInfo, LineMetricsGroup, Performance, ScoreMetric
+from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus
+from iai_core_py.repos.model_repo import ModelRepo
 
 from jobs_common_extras.mlflow.adapters.definitions import OPENVINO_BIN_KEY, OPENVINO_XML_KEY, ClsSubTaskType
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter

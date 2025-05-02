@@ -8,6 +8,7 @@ from enum import IntEnum, auto
 from typing import TYPE_CHECKING, cast
 
 from geti_spicedb_tools import SpiceDB
+from iai_core_py.utils.project_builder import PersistedProjectBuilder
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
 from jobs_common.tasks.utils.progress import publish_metadata_update, task_progress
@@ -15,7 +16,6 @@ from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
-from sc_sdk.utils.project_builder import PersistedProjectBuilder
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks import IMPORT_EXPORT_TASK_POD_SPEC
@@ -25,7 +25,7 @@ from job.utils.import_utils import ImportUtils
 from job.utils.progress_utils import WeightedProgressReporter
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core_py.entities.label import Label
 
 logger = logging.getLogger(__name__)
 

@@ -10,11 +10,11 @@ from communication.rest_controllers.model_controller import ModelRESTController
 from communication.rest_views.model_rest_views import ModelRESTViews
 
 from geti_types import CTX_SESSION_VAR, ID
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.metrics import Performance, ScoreMetric
-from sc_sdk.entities.model import (
+from iai_core_py.configuration.elements.hyper_parameters import HyperParameters
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelSchemaView
+from iai_core_py.entities.metrics import Performance, ScoreMetric
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -22,9 +22,9 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo
-from sc_sdk.services import ModelService
+from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core_py.repos import ConfigurableParametersRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo
+from iai_core_py.services import ModelService
 
 
 class TestModelRESTEndpoint:

@@ -20,14 +20,14 @@ from geti_telemetry_tools import ENABLE_METRICS, unified_tracing
 from geti_telemetry_tools.metrics import ModelExportsCounterAttributes, model_exports_counter
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.model import Model, ModelFormat, ModelOptimizationType, NullModel
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.repos.model_repo import ModelStatusFilter
-from sc_sdk.services import ModelService
-from sc_sdk.utils.exceptions import (
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.model import Model, ModelFormat, ModelOptimizationType, NullModel
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import DatasetRepo, LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core_py.repos.model_repo import ModelStatusFilter
+from iai_core_py.services import ModelService
+from iai_core_py.utils.exceptions import (
     PurgeActiveModelException,
     PurgeLatestModelException,
     PurgeOptimizedModelException,

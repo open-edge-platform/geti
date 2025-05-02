@@ -6,6 +6,7 @@
 import logging
 from enum import IntEnum, auto
 
+from iai_core_py.entities.model_template import task_type_to_label_domain
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
@@ -13,7 +14,6 @@ from jobs_common.tasks.utils.progress import publish_metadata_update, task_progr
 from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.model_template import task_type_to_label_domain
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks import IMPORT_EXPORT_TASK_POD_SPEC

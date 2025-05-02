@@ -8,7 +8,7 @@ from .auto_train_use_case import AutoTrainUseCase
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ProjectIdentifier, Singleton
-from sc_sdk.session.session_propagation import setup_session_kafka
+from iai_core_py.session.session_propagation import setup_session_kafka
 
 
 class AutoTrainingKafkaHandler(BaseKafkaHandler, metaclass=Singleton):

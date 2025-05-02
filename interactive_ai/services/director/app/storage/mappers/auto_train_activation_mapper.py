@@ -8,10 +8,10 @@ a serialized representation compatible with MongoDB
 
 from entities.auto_train_activation import AutoTrainActivation
 
-from sc_sdk.repos.mappers import DatetimeToMongo
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
+from iai_core_py.repos.mappers import DatetimeToMongo
+from iai_core_py.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core_py.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core_py.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
 
 
 class AutoTrainActivationToMongo(IMapperSimple[AutoTrainActivation, dict]):

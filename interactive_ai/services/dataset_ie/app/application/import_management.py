@@ -18,9 +18,9 @@ from domain.entities.geti_project_type import GetiProjectType
 
 from geti_types import CTX_SESSION_VAR, ID
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from sc_sdk.entities.label import NullLabel
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import LabelRepo, ProjectRepo
+from iai_core_py.entities.label import NullLabel
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import LabelRepo, ProjectRepo
 
 logger = logging.getLogger(__name__)
 

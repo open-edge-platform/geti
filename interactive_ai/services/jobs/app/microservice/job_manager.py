@@ -27,10 +27,10 @@ from geti_spicedb_tools import SpiceDB, SpiceDBResourceTypes
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, Singleton
 from grpc_interfaces.credit_system.client import CreditSystemClient, ResourceRequest
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 if TYPE_CHECKING:
-    from sc_sdk.repos.base import SessionBasedRepo
+    from iai_core_py.repos.base import SessionBasedRepo
 
 logger = logging.getLogger(__name__)
 

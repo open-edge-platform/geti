@@ -13,9 +13,9 @@ from typing import Any
 import datumaro as dm
 from datumaro import ImportErrorPolicy, errors
 from datumaro.components.errors import AnnotationImportError, ItemImportError, MultipleFormatsMatchError
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.model_template import TaskType, task_type_to_label_domain
-from sc_sdk.entities.project import Project
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.model_template import TaskType, task_type_to_label_domain
+from iai_core_py.entities.project import Project
 
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import (

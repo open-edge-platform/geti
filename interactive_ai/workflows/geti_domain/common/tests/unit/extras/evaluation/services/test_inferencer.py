@@ -8,18 +8,18 @@ import cv2
 import numpy as np
 import pytest
 from geti_types import ID
+from iai_core_py.entities.annotation import AnnotationScene
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
+from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core_py.entities.model import Model, ModelConfiguration, ModelStatus, TrainingFramework, TrainingFrameworkType
+from iai_core_py.entities.tensor import Tensor
+from iai_core_py.repos.metadata_repo import FloatMetadata
 from model_api.adapters import OpenvinoAdapter
 from model_api.models import ImageModel, SAMDecoder, SAMImageEncoder, SAMLearnableVisualPrompter
 from model_api.models.utils import AnomalyResult, ClassificationResult, DetectedKeypoints, ImageResultWithSoftPrediction
 from model_api.tilers import DetectionTiler, InstanceSegmentationTiler
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.model import Model, ModelConfiguration, ModelStatus, TrainingFramework, TrainingFrameworkType
-from sc_sdk.entities.tensor import Tensor
-from sc_sdk.repos.metadata_repo import FloatMetadata
 
 from jobs_common_extras.evaluation.services.inferencer import (
     AnomalyInferencer,

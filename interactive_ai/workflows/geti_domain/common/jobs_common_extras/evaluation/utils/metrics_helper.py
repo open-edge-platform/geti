@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from sc_sdk.entities.evaluation_result import EvaluationResult
-from sc_sdk.entities.model_template import TaskType
+from iai_core_py.entities.evaluation_result import EvaluationResult
+from iai_core_py.entities.model_template import TaskType
 
 from jobs_common_extras.evaluation.entities.accuracy_metric import AccuracyMetric
 from jobs_common_extras.evaluation.entities.dice_metric import DiceMetric

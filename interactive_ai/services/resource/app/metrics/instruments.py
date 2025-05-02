@@ -20,9 +20,9 @@ from geti_telemetry_tools import DEBUG_METRICS, OTLP_METRICS_RECEIVER, TEST_METR
 from geti_telemetry_tools.metrics.instruments import BaseInstrumentAttributes
 from geti_telemetry_tools.metrics.instruments import MetricName as MetricNameBase
 from geti_telemetry_tools.metrics.utils import if_elected_publisher_for_metric
-from sc_sdk.repos.leader_election_repo import LeaderElectionRepo
-from sc_sdk.repos.metrics_reporting_model_storage_repo import MetricsReportingModelStorageRepo
-from sc_sdk.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
+from iai_core_py.repos.leader_election_repo import LeaderElectionRepo
+from iai_core_py.repos.metrics_reporting_model_storage_repo import MetricsReportingModelStorageRepo
+from iai_core_py.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
 
 logger = logging.getLogger(__name__)
 

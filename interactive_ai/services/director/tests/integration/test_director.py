@@ -13,9 +13,9 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 from usecases.auto_train import AutoTrainUseCase
 
 from geti_types import CTX_SESSION_VAR
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.repos import ConfigurableParametersRepo, ImageRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.repos import ConfigurableParametersRepo, ImageRepo
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
 
 
 class TestIntegrationDirector:

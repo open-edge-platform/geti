@@ -9,8 +9,8 @@ from typing import Any
 from features.feature_flags import FeatureFlag
 
 from geti_feature_tools import FeatureFlagProvider
-from sc_sdk.entities.metrics import AnomalyLocalizationPerformance, NullPerformance, Performance
-from sc_sdk.entities.project_performance import (
+from iai_core_py.entities.metrics import AnomalyLocalizationPerformance, NullPerformance, Performance
+from iai_core_py.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
     TaskPerformance,

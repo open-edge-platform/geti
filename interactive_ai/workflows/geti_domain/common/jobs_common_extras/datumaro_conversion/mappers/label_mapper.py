@@ -7,9 +7,9 @@ from dataclasses import dataclass
 import datumaro as dm
 from datumaro.components.annotation import GroupType as DmGroupType
 from geti_types import ID
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelGroupType, LabelSchema
+from iai_core_py.entities.color import Color
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelGroupType, LabelSchema
 
 from jobs_common_extras.datumaro_conversion.mappers.datetime_mapper import DatetimeMapper
 from jobs_common_extras.datumaro_conversion.mappers.id_mapper import IDMapper

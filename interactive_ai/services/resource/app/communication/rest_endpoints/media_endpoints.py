@@ -30,7 +30,7 @@ from geti_fastapi_tools.dependencies import (
     setup_session_fastapi,
 )
 from geti_types import ID, DatasetStorageIdentifier, MediaType
-from sc_sdk.utils.filesystem import check_free_space_for_upload
+from iai_core_py.utils.filesystem import check_free_space_for_upload
 
 GENERIC_DS_RULE = {
     "rules": [

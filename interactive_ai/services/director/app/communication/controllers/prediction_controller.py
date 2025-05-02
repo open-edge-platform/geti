@@ -16,10 +16,10 @@ from service.project_service import ProjectService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import NullVideo
-from sc_sdk.repos import VideoRepo
-from sc_sdk.services import ModelService
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.video import NullVideo
+from iai_core_py.repos import VideoRepo
+from iai_core_py.services import ModelService
 
 
 class PredictionController:

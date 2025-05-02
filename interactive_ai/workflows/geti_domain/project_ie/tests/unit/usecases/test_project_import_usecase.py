@@ -15,13 +15,13 @@ from geti_types import ID, ProjectIdentifier
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
 from grpc_interfaces.model_registration.pb.service_pb2 import Model as ProtoModel
 from grpc_interfaces.model_registration.pb.service_pb2 import Project as ProtoProject
-from sc_sdk.entities.model import Model, NullModel
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
-from sc_sdk.services import ModelService
-from sc_sdk.versioning import DataVersion
+from iai_core_py.entities.model import Model, NullModel
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core_py.services import ModelService
+from iai_core_py.versioning import DataVersion
 
 from job.entities import Manifest, ProjectZipArchive, ProjectZipArchiveWrapper, ZipArchive
 from job.entities.exceptions import (

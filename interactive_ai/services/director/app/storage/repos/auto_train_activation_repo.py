@@ -18,11 +18,11 @@ from entities.auto_train_activation import AutoTrainActivation, NullAutoTrainAct
 from storage.mappers.auto_train_activation_mapper import AutoTrainActivationToMongo
 
 from geti_types import ID, ProjectIdentifier, Session
-from sc_sdk.repos.base import ProjectBasedSessionRepo
-from sc_sdk.repos.base.session_repo import QueryAccessMode
-from sc_sdk.repos.mappers import IDToMongo
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.services import ModelService
+from iai_core_py.repos.base import ProjectBasedSessionRepo
+from iai_core_py.repos.base.session_repo import QueryAccessMode
+from iai_core_py.repos.mappers import IDToMongo
+from iai_core_py.repos.mappers.cursor_iterator import CursorIterator
+from iai_core_py.services import ModelService
 
 logger = logging.getLogger(__name__)
 

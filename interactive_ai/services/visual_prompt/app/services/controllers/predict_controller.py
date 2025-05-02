@@ -14,11 +14,11 @@ from services.rest_views.prediction_rest_views import PredictionRESTViews
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, ProjectIdentifier
+from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core_py.entities.image import Image, NullImage
+from iai_core_py.entities.video import NullVideo, VideoFrame
+from iai_core_py.repos import ImageRepo, VideoRepo
 from media_utils import get_media_numpy
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.video import NullVideo, VideoFrame
-from sc_sdk.repos import ImageRepo, VideoRepo
 
 logger = logging.getLogger(__name__)
 

@@ -4,9 +4,15 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
-from sc_sdk.utils.post_process_predictions import PostProcessPredictionsUtils
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.entities.model_template import (
+    HyperParameterData,
+    InstantiationType,
+    ModelTemplate,
+    TaskFamily,
+    TaskType,
+)
+from iai_core_py.utils.post_process_predictions import PostProcessPredictionsUtils
 
 from jobs_common_extras.evaluation.services.batch_inference import BatchInference
 from jobs_common_extras.evaluation.services.inferencer import InferencerFactory

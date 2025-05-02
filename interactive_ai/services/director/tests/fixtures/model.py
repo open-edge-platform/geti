@@ -11,11 +11,11 @@ import pytest
 
 from tests.fixtures.values import DummyValues
 
-from sc_sdk.adapters.model_adapter import ExportableCodeAdapter
-from sc_sdk.configuration.elements.hyper_parameters import NullHyperParameters
-from sc_sdk.entities.active_model_state import ActiveModelState
-from sc_sdk.entities.metrics import NullPerformance, Performance, ScoreMetric
-from sc_sdk.entities.model import (
+from iai_core_py.adapters.model_adapter import ExportableCodeAdapter
+from iai_core_py.configuration.elements.hyper_parameters import NullHyperParameters
+from iai_core_py.entities.active_model_state import ActiveModelState
+from iai_core_py.entities.metrics import NullPerformance, Performance, ScoreMetric
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -26,8 +26,8 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import (
+from iai_core_py.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core_py.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,
@@ -37,7 +37,7 @@ from sc_sdk.entities.model_template import (
     TaskFamily,
     TaskType,
 )
-from sc_sdk.repos import ModelRepo
+from iai_core_py.repos import ModelRepo
 
 os.environ["DEFAULT_TRAINER_VERSION"] = "2.2.0"
 

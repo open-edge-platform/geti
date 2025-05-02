@@ -13,24 +13,24 @@ from active_learning.storage.repos import ActiveScoreRepo
 from active_learning.usecases import ActiveScoresUpdateUseCase, ActiveSetRetrievalUseCase
 
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.algorithms.crop.task import CropTask
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.metadata import FloatMetadata, FloatType, MetadataItem
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_environment import TaskEnvironment
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.entities.tensor import Tensor
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, EvaluationResultRepo, MetadataRepo
+from iai_core_py.algorithms.crop.task import CropTask
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.metadata import FloatMetadata, FloatType, MetadataItem
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_environment import TaskEnvironment
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.entities.tensor import Tensor
+from iai_core_py.repos import AnnotationSceneRepo, DatasetRepo, EvaluationResultRepo, MetadataRepo
 
 logger = logging.getLogger(__name__)
 

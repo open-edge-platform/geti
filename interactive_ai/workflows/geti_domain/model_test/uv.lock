@@ -1302,7 +1302,7 @@ dependencies = [
     { name = "geti-feature-tools" },
     { name = "geti-types" },
     { name = "opencv-python-headless" },
-    { name = "sc-sdk" },
+    { name = "iai-core-py" },
 ]
 
 [package.metadata]
@@ -1311,7 +1311,7 @@ requires-dist = [
     { name = "geti-feature-tools", editable = "../../../../libs/feature_tools" },
     { name = "geti-types", editable = "../../../../libs/types" },
     { name = "opencv-python-headless", specifier = "==4.10.0.84" },
-    { name = "sc-sdk", editable = "../../../libs/sc_sdk" },
+    { name = "iai-core-py", editable = "../../../libs/iai_core_py" },
 ]
 
 [package.metadata.requires-dev]
@@ -2332,9 +2332,9 @@ wheels = [
 ]
 
 [[package]]
-name = "sc-sdk"
+name = "iai-core-py"
 version = "1.0.0"
-source = { editable = "../../../libs/sc_sdk" }
+source = { editable = "../../../libs/iai_core_py" }
 dependencies = [
     { name = "attrs" },
     { name = "cachetools" },
@@ -2613,7 +2613,7 @@ dependencies = [
     { name = "grpc-interfaces" },
     { name = "kubernetes-asyncio" },
     { name = "s3fs" },
-    { name = "sc-sdk" },
+    { name = "iai-core-py" },
 ]
 
 [package.optional-dependencies]
@@ -2640,7 +2640,7 @@ requires-dist = [
     { name = "media-utils", marker = "extra == 'evaluation'", editable = "../../../libs/media_utils" },
     { name = "openvino-model-api", marker = "extra == 'evaluation'", specifier = "==0.2.5.2" },
     { name = "s3fs", specifier = "==2023.9.2" },
-    { name = "sc-sdk", editable = "../../../libs/sc_sdk" },
+    { name = "iai-core-py", editable = "../../../libs/iai_core_py" },
     { name = "scikit-learn", marker = "extra == 'evaluation'", specifier = "==1.6.1" },
 ]
 provides-extras = ["evaluation", "shard-dataset", "datumaro-conversion"]

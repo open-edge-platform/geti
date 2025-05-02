@@ -13,7 +13,7 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 from usecases.auto_train import AutoTrainUseCase
 
 from geti_types import CTX_SESSION_VAR, ID, RequestSource, make_session, session_context
-from sc_sdk.repos import ProjectRepo, TaskNodeRepo
+from iai_core_py.repos import ProjectRepo, TaskNodeRepo
 
 WORKSPACE_ID = ID("workspace_id")
 

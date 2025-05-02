@@ -3,7 +3,7 @@
 
 from unittest.mock import patch
 
-from sc_sdk.repos.storage.binary_repos import VideoBinaryRepo
+from iai_core_py.repos.storage.binary_repos import VideoBinaryRepo
 
 from media_utils import VideoDecoder, VideoFileRepair
 

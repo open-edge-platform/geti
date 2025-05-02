@@ -6,9 +6,9 @@
 
 import attr
 
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.primitive_parameters import configurable_boolean, string_attribute
-from sc_sdk.configuration.enums.model_lifecycle import ModelLifecycle
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.configuration.elements.primitive_parameters import configurable_boolean, string_attribute
+from iai_core_py.configuration.enums.model_lifecycle import ModelLifecycle
 
 
 @attr.s

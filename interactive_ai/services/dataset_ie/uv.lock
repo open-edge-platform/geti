@@ -237,7 +237,7 @@ dependencies = [
     { name = "grpc-interfaces", extra = ["job-submission"] },
     { name = "httpx" },
     { name = "python-multipart" },
-    { name = "sc-sdk" },
+    { name = "iai-core-py" },
     { name = "uvicorn" },
 ]
 
@@ -260,7 +260,7 @@ requires-dist = [
     { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
     { name = "httpx", specifier = "~=0.23" },
     { name = "python-multipart", specifier = "==0.0.20" },
-    { name = "sc-sdk", editable = "../../libs/sc_sdk" },
+    { name = "iai-core-py", editable = "../../libs/iai_core_py" },
     { name = "uvicorn", specifier = "~=0.27.1" },
 ]
 
@@ -1410,9 +1410,9 @@ wheels = [
 ]
 
 [[package]]
-name = "sc-sdk"
+name = "iai-core-py"
 version = "1.0.0"
-source = { editable = "../../libs/sc_sdk" }
+source = { editable = "../../libs/iai_core_py" }
 dependencies = [
     { name = "attrs" },
     { name = "cachetools" },

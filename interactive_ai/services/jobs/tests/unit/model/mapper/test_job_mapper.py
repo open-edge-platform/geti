@@ -29,7 +29,7 @@ from model.mapper.job_mapper import (
 from model.telemetry import Telemetry
 
 from geti_types import ID, Session
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.time_utils import now
 
 
 class TestJobTaskExecutionBranchMapper:

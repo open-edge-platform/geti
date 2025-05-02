@@ -1,6 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from sc_sdk.entities.annotation_template import AnnotationTemplate
+from iai_core_py.entities.annotation_template import AnnotationTemplate
 
 ID = "id"
 NAME = "name"

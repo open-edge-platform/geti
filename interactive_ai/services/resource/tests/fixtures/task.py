@@ -4,9 +4,9 @@
 import pytest
 
 from geti_types import ID
-from sc_sdk.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
-from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
-from sc_sdk.entities.task_node import TaskNode, TaskProperties
+from iai_core_py.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
+from iai_core_py.entities.task_graph import TaskEdge, TaskGraph
+from iai_core_py.entities.task_node import TaskNode, TaskProperties
 
 
 @pytest.fixture

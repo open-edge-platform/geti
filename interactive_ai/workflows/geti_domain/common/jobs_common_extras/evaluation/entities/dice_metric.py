@@ -4,10 +4,17 @@ from collections import defaultdict
 
 import numpy as np
 from geti_types import MediaIdentifierEntity
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.metrics import BarChartInfo, BarMetricsGroup, ColorPalette, MetricsGroup, Performance, ScoreMetric
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.metrics import (
+    BarChartInfo,
+    BarMetricsGroup,
+    ColorPalette,
+    MetricsGroup,
+    Performance,
+    ScoreMetric,
+)
 
 from jobs_common_extras.evaluation.utils.segmentation_utils import mask_from_dataset_item
 

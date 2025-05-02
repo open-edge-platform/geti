@@ -7,13 +7,13 @@ import pytest
 
 from coordination.dataset_manager.dataset_suspender import DatasetSuspender
 
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState
-from sc_sdk.entities.dataset_entities import PipelineDataset, TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from sc_sdk.repos import ProjectRepo, SuspendedAnnotationScenesRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState
+from iai_core_py.entities.dataset_entities import PipelineDataset, TaskDataset
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core_py.repos import ProjectRepo, SuspendedAnnotationScenesRepo
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
 
 
 def do_nothing(*args, **kwargs):

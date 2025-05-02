@@ -10,7 +10,7 @@ from communication.controllers.supported_algorithm_controller import SupportedAl
 
 from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi
 from geti_types import ProjectIdentifier
-from sc_sdk.repos import TaskNodeRepo
+from iai_core_py.repos import TaskNodeRepo
 
 logger = logging.getLogger(__name__)
 

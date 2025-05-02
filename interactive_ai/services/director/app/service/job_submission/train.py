@@ -13,12 +13,12 @@ from service.job_submission.job_creation_helpers import (
 
 from geti_types import ID
 from grpc_interfaces.job_submission.pb.job_service_pb2 import SubmitJobRequest
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ConfigurableParametersRepo
 
 
 class ModelTrainingJobSubmitter(ModelJobSubmitter):

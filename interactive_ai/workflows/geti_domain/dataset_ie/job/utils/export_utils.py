@@ -8,14 +8,14 @@ import itertools
 from typing import TYPE_CHECKING, Any
 
 from geti_types import ID, ProjectIdentifier
+from iai_core_py.entities.annotation import AnnotationSceneKind
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.label import Domain
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
+from iai_core_py.entities.project import Project
+from iai_core_py.repos import AnnotationSceneRepo, ImageRepo, LabelRepo, LabelSchemaRepo, VideoRepo
+from iai_core_py.utils.uid_generator import generate_uid
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, LabelRepo, LabelSchemaRepo, VideoRepo
-from sc_sdk.utils.uid_generator import generate_uid
 
 from job.utils.import_utils import ImportUtils
 

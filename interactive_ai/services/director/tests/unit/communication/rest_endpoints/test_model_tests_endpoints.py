@@ -9,8 +9,8 @@ from testfixtures import compare
 from communication.controllers.model_test_controller import ModelTestController
 
 from geti_types import ID
-from sc_sdk.repos import ModelTestResultRepo, ProjectRepo
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.repos import ModelTestResultRepo, ProjectRepo
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 
 DUMMY_ORGANIZATION_ID = "567890123456789012340001"
 DUMMY_PROJECT_ID = "234567890123456789010000"

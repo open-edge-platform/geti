@@ -37,22 +37,22 @@ from geti_kafka_tools import publish_event
 from geti_telemetry_tools import ENABLE_METRICS, unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaType, ProjectIdentifier, Singleton
 from geti_types.session import add_extra_to_current_session
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.datasets import DatasetIdentifier, DatasetPurpose, NullDataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import ImageExtensions, VideoExtensions
-from sc_sdk.entities.video import Video
-from sc_sdk.entities.video_annotation_statistics import VideoAnnotationStatistics
-from sc_sdk.repos import DatasetRepo, VideoRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
-from sc_sdk.utils.identifier_factory import IdentifierFactory
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core_py.entities.annotation_scene_state import AnnotationState
+from iai_core_py.entities.datasets import DatasetIdentifier, DatasetPurpose, NullDataset
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.media import ImageExtensions, VideoExtensions
+from iai_core_py.entities.video import Video
+from iai_core_py.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core_py.repos import DatasetRepo, VideoRepo
+from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core_py.repos.storage.storage_client import BytesStream
+from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core_py.utils.identifier_factory import IdentifierFactory
+from iai_core_py.utils.type_helpers import SequenceOrSet
 
 if TYPE_CHECKING:
-    from sc_sdk.utils.annotation_scene_state_helper import AnnotationStatePerTask
+    from iai_core_py.utils.annotation_scene_state_helper import AnnotationStatePerTask
 
 DEFAULT_SIZE = 250
 DEFAULT_THUMBNAIL_JPG_QUALITY = 85

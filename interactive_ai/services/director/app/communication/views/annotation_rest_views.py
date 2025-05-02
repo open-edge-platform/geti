@@ -15,9 +15,9 @@ from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
 
 ANNOTATIONS = "annotations"
 ANNOTATION_STATE_PER_TASK = "annotation_state_per_task"

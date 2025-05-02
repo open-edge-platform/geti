@@ -19,7 +19,7 @@ from communication.helpers.http_exceptions import (
 from domain.entities.dataset_ie_file_metadata import ImportMetadata
 
 from geti_types import ID
-from sc_sdk.entities.model_template import TaskType
+from iai_core_py.entities.model_template import TaskType
 
 logger = logging.getLogger(__name__)
 

@@ -6,8 +6,8 @@ import copy
 from unittest.mock import patch
 
 import pytest
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.model import NullModel
+from iai_core_py.entities.evaluation_result import EvaluationPurpose
+from iai_core_py.entities.model import NullModel
 
 from job.utils.model_acceptance import is_model_acceptable, proportions_ztest
 

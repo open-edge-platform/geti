@@ -15,7 +15,7 @@ dependencies = [
     "geti-k8s-tools",
     "geti-fastapi-tools",
     "geti-types",
-    "sc_sdk",
+    "iai_core_py",
     "grpc_interfaces[job_submission]"
 ]
 
@@ -26,7 +26,7 @@ geti-kafka-tools = { path = "../../../libs/kafka_tools", editable = true }
 geti-spicedb-tools = { path = "../../../libs/spicedb_tools", editable = true }
 geti-k8s-tools = { path = "../../../libs/k8s_tools", editable = true }
 geti-fastapi-tools = { path = "../../../libs/fastapi_tools", editable = true }
-sc_sdk = { path = "../../libs/sc_sdk", editable = true }
+iai_core_py = { path = "../../libs/iai_core_py", editable = true }
 grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
 
 [dependency-groups]
@@ -67,7 +67,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
-known-local-folder = ["geti_types", "geti_spicedb_tools", "geti_kafka_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "sc_sdk"]
+known-local-folder = ["geti_types", "geti_spicedb_tools", "geti_kafka_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "iai_core_py"]
 
 [tool.ruff.lint.pylint]
 max-args=7

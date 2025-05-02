@@ -8,7 +8,7 @@ from testfixtures import compare
 from communication.views.prediction_rest_views import PredictionRESTViews
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
 
-from sc_sdk.entities.annotation import AnnotationSceneKind
+from iai_core_py.entities.annotation import AnnotationSceneKind
 
 
 class TestPredictionRESTViews:

@@ -8,7 +8,7 @@ from starlette.responses import FileResponse, RedirectResponse
 from communication.constants import DEFAULT_N_PROJECTS_RETURNED
 from communication.rest_utils import project_query_data, send_file_from_path_or_url
 
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection, SortDirection
+from iai_core_py.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection, SortDirection
 
 
 class TestRestUtils:

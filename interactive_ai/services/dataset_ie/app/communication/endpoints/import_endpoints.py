@@ -22,8 +22,8 @@ from communication.helpers.validation_helpers import (
 from geti_fastapi_tools.dependencies import get_user_id_fastapi, setup_session_fastapi
 from geti_fastapi_tools.exceptions import DatasetStorageNotFoundException, GetiBaseException
 from geti_types import ID
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.repos import DatasetStorageRepo
+from iai_core_py.entities.dataset_storage import NullDatasetStorage
+from iai_core_py.repos import DatasetStorageRepo
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1", dependencies=[Depends(setup_session_fastapi)])

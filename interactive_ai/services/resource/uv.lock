@@ -837,7 +837,7 @@ dependencies = [
     { name = "geti-feature-tools" },
     { name = "geti-types" },
     { name = "opencv-python-headless" },
-    { name = "sc-sdk" },
+    { name = "iai-core-py" },
 ]
 
 [package.metadata]
@@ -846,7 +846,7 @@ requires-dist = [
     { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
     { name = "opencv-python-headless", specifier = "==4.10.0.84" },
-    { name = "sc-sdk", editable = "../../libs/sc_sdk" },
+    { name = "iai-core-py", editable = "../../libs/iai_core_py" },
 ]
 
 [package.metadata.requires-dev]
@@ -1682,7 +1682,7 @@ dependencies = [
     { name = "jsonschema" },
     { name = "media-utils" },
     { name = "python-multipart" },
-    { name = "sc-sdk" },
+    { name = "iai-core-py" },
     { name = "uvicorn" },
 ]
 
@@ -1717,7 +1717,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.18.0a10" },
     { name = "media-utils", editable = "../../libs/media_utils" },
     { name = "python-multipart", specifier = "~=0.0.18" },
-    { name = "sc-sdk", editable = "../../libs/sc_sdk" },
+    { name = "iai-core-py", editable = "../../libs/iai_core_py" },
     { name = "uvicorn", specifier = "~=0.27" },
 ]
 
@@ -1873,9 +1873,9 @@ wheels = [
 ]
 
 [[package]]
-name = "sc-sdk"
+name = "iai-core-py"
 version = "1.0.0"
-source = { editable = "../../libs/sc_sdk" }
+source = { editable = "../../libs/iai_core_py" }
 dependencies = [
     { name = "attrs" },
     { name = "cachetools" },

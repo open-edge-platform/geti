@@ -22,13 +22,13 @@ from service.label_schema_service import LabelSchemaService
 from storage.repos import DatasetItemCountRepo
 
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ConfigurableParametersRepo
 
 if TYPE_CHECKING:
-    from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
+    from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
 
 REQUIRED_ANOMALOUS_IMAGES_FIRST_TRAINING = 3
 REQUIRED_ANNOTATIONS_MANUAL_TRAINING = 3

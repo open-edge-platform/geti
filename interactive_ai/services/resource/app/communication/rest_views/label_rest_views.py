@@ -1,9 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.repos import LabelRepo
+from iai_core_py.entities.color import Color
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.repos import LabelRepo
 
 COLOR = "color"
 DOMAIN = "domain"

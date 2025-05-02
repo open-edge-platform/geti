@@ -13,14 +13,14 @@ from collections.abc import Iterable, Iterator, Sequence
 import numpy as np
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ConfigurableParametersRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core_py.utils.type_helpers import SequenceOrSet
 
 from .subset_manager_config import SubsetManagerConfig
 

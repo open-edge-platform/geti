@@ -6,9 +6,9 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
 from minio import Minio
 from minio.datatypes import Object
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
 
 from job.repos import BinaryStorageRepo
 

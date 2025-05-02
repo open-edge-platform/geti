@@ -9,8 +9,8 @@ import itertools
 from typing import Any
 
 from geti_types import ID
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.factories.project_parser import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.factories.project_parser import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
 
 
 class CustomTestProjectParser(ProjectParser):

@@ -11,10 +11,10 @@ from datumaro.components.annotation import GroupType
 from datumaro.components.dataset_base import DatasetInfo
 from datumaro.components.transformer import ItemTransform
 from geti_types import ProjectIdentifier
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.project import Project
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
 
 from job.utils.datumaro_parser import DatumaroProjectParser
 from job.utils.exceptions import ResearvedLabelException, UnsupportedMappingException

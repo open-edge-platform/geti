@@ -9,9 +9,9 @@ import datumaro as dm
 import numpy as np
 import pytest
 from datumaro.components.annotation import GroupType, LabelCategories
+from iai_core_py.entities.label import Domain
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.label import Domain
 
 from job.utils.constants import MIN_IMAGE_SIZE
 

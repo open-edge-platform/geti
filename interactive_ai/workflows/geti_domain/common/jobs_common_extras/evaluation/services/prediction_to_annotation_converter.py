@@ -12,6 +12,11 @@ import cv2
 import numpy as np
 from bson import ObjectId
 from geti_types import ID
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
 from model_api.models import SegmentationModel
 from model_api.models.utils import (
     AnomalyResult,
@@ -22,11 +27,6 @@ from model_api.models.utils import (
     InstanceSegmentationResult,
     ZSLVisualPromptingResult,
 )
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
 
 from jobs_common_extras.evaluation.utils.detection_utils import detection2array
 from jobs_common_extras.evaluation.utils.segmentation_utils import create_annotation_from_segmentation_map
@@ -92,7 +92,7 @@ class ClassificationToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: ClassificationResult, **kwargs) -> list[Annotation]:  # noqa: ARG002
         """
-        Converts ModelAPI ClassificationResult predictions to sc_sdk annotations.
+        Converts ModelAPI ClassificationResult predictions to iai_core_py annotations.
 
         :param predictions: classification labels represented in ModelAPI format (label_index, label_name, confidence)
         :return: list of full box annotations objects with corresponding label
@@ -124,7 +124,7 @@ class DetectionToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: DetectionResult, **kwargs) -> list[Annotation]:
         """
-        Convert ModelAPI DetectionResult predictions to sc_sdk annotations.
+        Convert ModelAPI DetectionResult predictions to iai_core_py annotations.
 
         :param predictions: detection represented in ModelAPI format (x1, y1, x2, y2, label, confidence).
             Note:
@@ -238,7 +238,7 @@ class SemanticSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
         **kwargs,  # noqa: ARG002
     ) -> list[Annotation]:
         """
-        Converts ModelAPI semantic segmentation predictions to sc_sdk annotations.
+        Converts ModelAPI semantic segmentation predictions to iai_core_py annotations.
 
         :param predictions: semantic segmentation represented in ModelAPI format
         :return: list of annotations object containing the contour polygon obtained from the segmentation
@@ -288,7 +288,7 @@ class InstanceSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
 
     def convert_to_annotations(self, predictions: InstanceSegmentationResult, **kwargs) -> list[Annotation]:
         """
-        Converts ModelAPI instance segmentation predictions to sc_sdk annotations.
+        Converts ModelAPI instance segmentation predictions to iai_core_py annotations.
 
         :param predictions: instance segmentation represented in ModelAPI format
         :return: list of annotations object containing the contour polygon obtained from the segmentation
@@ -350,7 +350,7 @@ class AnomalyToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: AnomalyResult, **kwargs) -> list[Annotation]:  # noqa: ARG002
         """
-        Converts ModelAPI AnomalyResult predictions to sc_sdk annotations.
+        Converts ModelAPI AnomalyResult predictions to iai_core_py annotations.
 
         :param predictions: anomaly result represented in ModelAPI format (same for all anomaly tasks)
         :return: list of annotation objects based on the specific anomaly task:
@@ -404,7 +404,7 @@ class KeypointToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: DetectedKeypoints, **kwargs) -> list[Annotation]:
         """
-        Converts ModelAPI DetectedKeypoints predictions to sc_sdk annotations.
+        Converts ModelAPI DetectedKeypoints predictions to iai_core_py annotations.
 
         :param predictions: detected keypoints represented in ModelAPI format
         :return: list of annotation objects containing the keypoint coordinates and its label
@@ -430,7 +430,7 @@ class VisualPromptingToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: ZSLVisualPromptingResult, **kwargs) -> list[Annotation]:
         """
-        Converts ModelAPI VisualPromptingResult predictions to sc_sdk annotations.
+        Converts ModelAPI VisualPromptingResult predictions to iai_core_py annotations.
 
         :param predictions: visual prompting represented in ModelAPI format
         :return: list of annotations object containing the shapes obtained from the raw predictions

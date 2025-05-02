@@ -32,14 +32,14 @@ from geti_fastapi_tools.responses import success_response_rest
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
 from grpc_interfaces.job_submission.client import CommunicationError
-from sc_sdk.entities.annotation import NullAnnotationScene
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.entities.model import Model, ModelFormat, NullModel
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.model_test_result import ModelTestResult, NullModelTestResult
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import (
+from iai_core_py.entities.annotation import NullAnnotationScene
+from iai_core_py.entities.annotation_scene_state import AnnotationState
+from iai_core_py.entities.dataset_storage import NullDatasetStorage
+from iai_core_py.entities.model import Model, ModelFormat, NullModel
+from iai_core_py.entities.model_storage import ModelStorageIdentifier
+from iai_core_py.entities.model_test_result import ModelTestResult, NullModelTestResult
+from iai_core_py.entities.project import NullProject
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -48,7 +48,7 @@ from sc_sdk.repos import (
     ModelTestResultRepo,
     ProjectRepo,
 )
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 
 logger = logging.getLogger(__name__)
 

@@ -23,20 +23,20 @@ from coordination.configuration_manager.task_node_config import TaskNodeConfig
 
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ImageIdentifier, MediaType, ProjectIdentifier
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.metrics import Performance, ScoreMetric
-from sc_sdk.entities.model import (
+from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core_py.algorithms import ModelTemplateList
+from iai_core_py.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core_py.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core_py.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label import Domain, Label
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core_py.entities.metrics import Performance, ScoreMetric
+from iai_core_py.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -44,16 +44,22 @@ from sc_sdk.entities.model import (
     ModelStatus,
     TrainingFramework,
 )
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.entities.video import Video
-from sc_sdk.factories import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
-from sc_sdk.repos import (
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.model_template import (
+    HyperParameterData,
+    InstantiationType,
+    ModelTemplate,
+    TaskFamily,
+    TaskType,
+)
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Rectangle
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.entities.video import Video
+from iai_core_py.factories import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
+from iai_core_py.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -63,13 +69,13 @@ from sc_sdk.repos import (
     ModelRepo,
     VideoRepo,
 )
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo
-from sc_sdk.services import ModelService
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.project_builder import PersistedProjectBuilder, ProjectBuilder
+from iai_core_py.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core_py.services import ModelService
+from iai_core_py.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.utils.project_builder import PersistedProjectBuilder, ProjectBuilder
 
 __all__ = [
     "DETECTION_CLASSIFICATION_PIPELINE_DATA",

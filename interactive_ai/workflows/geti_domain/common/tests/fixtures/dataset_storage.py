@@ -3,12 +3,12 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import CTX_SESSION_VAR, DatasetStorageIdentifier, ImageIdentifier, ProjectIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.image import Image
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetStorageRepo, ImageRepo
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.image import Image
+from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetStorageRepo, ImageRepo
+from iai_core_py.utils.deletion_helpers import DeletionHelpers
 
 from tests.fixtures.values import DummyValues, IDOffsets
 

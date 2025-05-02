@@ -4,11 +4,11 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from geti_types import DatasetStorageIdentifier
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.shapes import Polygon, Rectangle
-from sc_sdk.entities.video import VideoFrame
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
+from iai_core_py.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.shapes import Polygon, Rectangle
+from iai_core_py.entities.video import VideoFrame
+from iai_core_py.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
 
 from media_utils import (
     VideoFrameReader,

@@ -7,7 +7,7 @@ This module implements rest views for dataset storage entities
 
 from typing import Any
 
-from sc_sdk.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.dataset_storage import DatasetStorage
 
 ID_ = "id"
 NAME = "name"

@@ -12,8 +12,8 @@ from service.label_schema_service import LabelSchemaService
 from service.prediction_service import PredictionService
 from service.project_service import ProjectService
 
-from sc_sdk.entities.model import NullModel
-from sc_sdk.services import ModelService
+from iai_core_py.entities.model import NullModel
+from iai_core_py.services import ModelService
 
 
 class TestPredictionController:

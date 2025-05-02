@@ -10,10 +10,10 @@ import pytest
 
 from tests.fixtures.values import DefaultImageValues
 
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.label import Domain, Label, NullLabel
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core_py.entities.annotation import Annotation
+from iai_core_py.entities.label import Domain, Label, NullLabel
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
 
 logger = logging.getLogger(__name__)
 

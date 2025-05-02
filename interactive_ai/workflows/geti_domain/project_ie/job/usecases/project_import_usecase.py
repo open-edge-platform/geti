@@ -18,14 +18,14 @@ from bson.json_util import DatetimeRepresentation, JSONOptions, loads
 from geti_spicedb_tools import SpiceDB
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
+from iai_core_py.entities.model import NullModel
+from iai_core_py.repos import ProjectRepo
+from iai_core_py.repos.mappers import IDToMongo
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
+from iai_core_py.services import ModelService
+from iai_core_py.utils.iteration import multi_map
+from iai_core_py.versioning import DataVersion
 from jobs_common.tasks.utils.progress import publish_metadata_update
-from sc_sdk.entities.model import NullModel
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.mappers import IDToMongo
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
-from sc_sdk.services import ModelService
-from sc_sdk.utils.iteration import multi_map
-from sc_sdk.versioning import DataVersion
 
 from job.entities import ProjectZipArchive, ProjectZipArchiveWrapper
 from job.entities.exceptions import (

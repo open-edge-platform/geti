@@ -7,11 +7,11 @@ from unittest.mock import patch
 import datumaro as dm
 import pytest
 from geti_types import CTX_SESSION_VAR, ID
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.video import Video, VideoFrame
 from jobs_common_extras.datumaro_conversion.mappers.id_mapper import MediaNameIDMapper, VideoNameIDMapper
 from jobs_common_extras.datumaro_conversion.sc_extractor import ScExtractor
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.video import Video, VideoFrame
 
 from job.repos.data_repo import ExportDataRepo
 from job.repos.object_storage_repo import ObjectStorageRepo

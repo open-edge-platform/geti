@@ -34,16 +34,16 @@ from communication.exceptions import (
 )
 
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import ModelTemplate, TaskType
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo, ModelStorageRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core_py.configuration.elements.component_parameters import ComponentType
+from iai_core_py.entities.annotation_scene_state import AnnotationState
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.label_schema import LabelSchemaView
+from iai_core_py.entities.model import Model
+from iai_core_py.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core_py.entities.model_template import ModelTemplate, TaskType
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import ConfigurableParametersRepo, ModelStorageRepo
+from iai_core_py.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 logger = logging.getLogger(__name__)
 

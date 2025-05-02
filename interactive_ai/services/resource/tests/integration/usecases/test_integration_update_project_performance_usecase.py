@@ -11,13 +11,13 @@ from tests.utils.test_helpers import (
 
 from usecases.update_project_performance_usecase import UpdateProjectPerformanceUseCase
 
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult
-from sc_sdk.entities.metrics import Performance, ScoreMetric
-from sc_sdk.repos import EvaluationResultRepo, ProjectRepo
+from iai_core_py.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core_py.entities.metrics import Performance, ScoreMetric
+from iai_core_py.repos import EvaluationResultRepo, ProjectRepo
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.model import Model
-    from sc_sdk.entities.project import Project
+    from iai_core_py.entities.model import Model
+    from iai_core_py.entities.project import Project
 
 
 class TestIntegrationUpdateProjectPerformanceUseCase:

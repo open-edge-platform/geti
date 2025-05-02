@@ -3,8 +3,8 @@
 
 
 import pytest
-from sc_sdk.entities.video import VideoFrame
-from sc_sdk.repos import ImageRepo, VideoRepo
+from iai_core_py.entities.video import VideoFrame
+from iai_core_py.repos import ImageRepo, VideoRepo
 
 from media_utils import get_image_bytes, get_image_numpy, get_video_bytes, get_video_frame_numpy
 from tests.test_helpers import generate_random_annotated_project

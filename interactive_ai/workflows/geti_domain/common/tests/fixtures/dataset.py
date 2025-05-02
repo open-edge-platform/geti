@@ -3,18 +3,18 @@
 
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.compiled_dataset_shards import (
+from iai_core_py.entities.compiled_dataset_shards import (
     CompiledDatasetShard,
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import VideoFrame
-from sc_sdk.repos import DatasetRepo
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.datasets import Dataset
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.video import VideoFrame
+from iai_core_py.repos import DatasetRepo
 
 from tests.test_helpers import (
     generate_random_annotated_project,

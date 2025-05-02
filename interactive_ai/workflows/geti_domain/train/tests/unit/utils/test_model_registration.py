@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from grpc_interfaces.model_registration.pb.service_pb2 import Connection, Model, Pipeline, Project, Task
-from sc_sdk.repos import LabelSchemaRepo
+from iai_core_py.repos import LabelSchemaRepo
 
 from job.utils.model_registration import LabelMapper, ModelMapper, ProjectMapper
 

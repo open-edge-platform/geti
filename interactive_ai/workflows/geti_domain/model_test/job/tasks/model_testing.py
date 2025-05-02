@@ -8,6 +8,11 @@ import logging
 from typing import Optional
 
 from geti_types import ID
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.model import ModelFormat
+from iai_core_py.entities.model_test_result import TestState
+from iai_core_py.repos import ModelStorageRepo, ModelTestResultRepo, ProjectRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
 from jobs_common.exceptions import UnsupportedModelFormatForModelTestingException
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.tasks import flyte_multi_container_task as task
@@ -22,11 +27,6 @@ from jobs_common_extras.evaluation.tasks.infer_and_evaluate import (
     INFER_AND_EVALUATE_TASK_POD_SPEC,
     evaluate_and_save_results,
 )
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.model import ModelFormat
-from sc_sdk.entities.model_test_result import TestState
-from sc_sdk.repos import ModelStorageRepo, ModelTestResultRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
 
 from job.commands.create_testing_dataset_command import CreateTaskTestingDatasetCommand
 

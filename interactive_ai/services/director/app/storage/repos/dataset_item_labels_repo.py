@@ -14,8 +14,8 @@ from entities.dataset_item_labels import DatasetItemLabels, NullDatasetItemLabel
 from storage.mappers import DatasetItemLabelsToMongo
 
 from geti_types import DatasetStorageIdentifier, Session
-from sc_sdk.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
-from sc_sdk.repos.mappers import CursorIterator
+from iai_core_py.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
+from iai_core_py.repos.mappers import CursorIterator
 
 
 class DatasetItemLabelsRepo(DatasetStorageBasedSessionRepo[DatasetItemLabels]):

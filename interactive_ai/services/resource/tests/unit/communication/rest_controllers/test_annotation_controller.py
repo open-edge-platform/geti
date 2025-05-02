@@ -15,11 +15,11 @@ from managers.project_manager import ProjectManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, VideoFrameIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label_schema import LabelSchema, NullLabelSchema
-from sc_sdk.entities.video import Video
-from sc_sdk.entities.video_annotation_range import NullVideoAnnotationRange, VideoAnnotationRange
-from sc_sdk.repos import AnnotationSceneRepo, LabelSchemaRepo, VideoAnnotationRangeRepo, VideoRepo
+from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.label_schema import LabelSchema, NullLabelSchema
+from iai_core_py.entities.video import Video
+from iai_core_py.entities.video_annotation_range import NullVideoAnnotationRange, VideoAnnotationRange
+from iai_core_py.repos import AnnotationSceneRepo, LabelSchemaRepo, VideoAnnotationRangeRepo, VideoRepo
 
 
 class TestAnnotationRESTController:

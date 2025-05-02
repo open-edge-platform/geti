@@ -7,7 +7,7 @@ import logging
 import os
 
 from geti_types import ID
-from sc_sdk.repos import ProjectRepo
+from iai_core_py.repos import ProjectRepo
 
 PROJECT_LOCK_TIME = int(os.environ.get("PROJECT_LOCK_TIME", 8 * 60 * 60))
 logger = logging.getLogger(__name__)

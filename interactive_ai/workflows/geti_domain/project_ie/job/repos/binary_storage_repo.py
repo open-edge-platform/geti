@@ -8,8 +8,8 @@ import os
 from collections.abc import Iterable, Iterator
 
 from geti_types import ID
+from iai_core_py.repos.storage.storage_client import BinaryObjectType
 from minio.deleteobjects import DeleteObject
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
 
 from .base.storage_repo import StorageRepo
 

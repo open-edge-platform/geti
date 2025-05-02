@@ -22,15 +22,15 @@ from storage.repos import DatasetItemCountRepo, DatasetItemLabelsRepo
 
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import DatasetRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import DatasetRepo, ProjectRepo
+from iai_core_py.utils.dataset_helper import DatasetHelper
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.dataset_item import DatasetItem
-    from sc_sdk.repos.mappers import CursorIterator
+    from iai_core_py.entities.dataset_item import DatasetItem
+    from iai_core_py.repos.mappers import CursorIterator
 
 
 REQUIRED_ANOMALOUS_IMAGES_FIRST_TRAINING = 3

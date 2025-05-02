@@ -5,7 +5,7 @@ from services.rest_views.prediction_rest_views import PredictionRESTViews, RestS
 from services.visual_prompt_service import VPSPredictionResults
 
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.shapes import Point, Polygon, Rectangle
+from iai_core_py.entities.shapes import Point, Polygon, Rectangle
 
 
 class TestPredictionRESTViews(unittest.TestCase):

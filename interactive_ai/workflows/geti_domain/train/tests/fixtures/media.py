@@ -4,9 +4,9 @@
 
 import pytest
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.video import Video, VideoFrame
+from iai_core_py.entities.image import Image
+from iai_core_py.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core_py.entities.video import Video, VideoFrame
 
 
 @pytest.fixture

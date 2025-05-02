@@ -25,8 +25,8 @@ from scheduler.state_machine import StateMachine
 
 from geti_spicedb_tools import SpiceDB
 from geti_types import ID, make_session, session_context
-from sc_sdk.repos.mappers import IDToMongo
-from sc_sdk.utils.time_utils import now
+from iai_core_py.repos.mappers import IDToMongo
+from iai_core_py.utils.time_utils import now
 
 ORG = ID(ObjectId())
 

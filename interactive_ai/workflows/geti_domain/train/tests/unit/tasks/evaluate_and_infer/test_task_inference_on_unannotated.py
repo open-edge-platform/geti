@@ -7,13 +7,13 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from geti_types import ID
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core_py.repos import ModelRepo
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import BATCH_INFERENCE_NUM_ASYNC_REQUESTS
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.repos import ModelRepo
 
 from job.tasks.evaluate_and_infer.pipeline_infer_on_unannotated import MAX_UNANNOTATED_MEDIA
 from job.tasks.evaluate_and_infer.task_infer_on_unannotated import task_infer_on_unannotated

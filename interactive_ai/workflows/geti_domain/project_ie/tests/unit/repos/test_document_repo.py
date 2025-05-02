@@ -3,8 +3,8 @@
 from unittest.mock import patch
 
 import pytest
-from sc_sdk.repos.base.mongo_connector import MongoConnector
-from sc_sdk.repos.mappers import IDToMongo
+from iai_core_py.repos.base.mongo_connector import MongoConnector
+from iai_core_py.repos.mappers import IDToMongo
 
 from job.repos.document_repo import DocumentRepo
 

@@ -1,7 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from sc_sdk.entities.label_schema import LabelSchema
+from iai_core_py.entities.label_schema import LabelSchema
 
 
 def get_cls_inferencer_configuration(label_schema: LabelSchema) -> dict:

@@ -23,14 +23,14 @@ from geti_fastapi_tools.validation import RestApiValidator
 from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelGroupType, LabelSchema, LabelSchemaView
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.utils.constants import MAX_POLYGON_POINTS
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core_py.entities.label import Label
+from iai_core_py.entities.label_schema import LabelGroupType, LabelSchema, LabelSchemaView
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.utils.constants import MAX_POLYGON_POINTS
+from iai_core_py.utils.type_helpers import SequenceOrSet
 
 ANNOTATIONS = "annotations"
 ID_ = "id"

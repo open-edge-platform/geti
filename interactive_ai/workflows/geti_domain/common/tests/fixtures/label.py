@@ -4,10 +4,10 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.label import Color, Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.repos import LabelRepo
+from iai_core_py.entities.label import Color, Domain, Label
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema, LabelSchemaView
+from iai_core_py.entities.scored_label import ScoredLabel
+from iai_core_py.repos import LabelRepo
 
 from tests.fixtures.values import DummyValues, IDOffsets
 

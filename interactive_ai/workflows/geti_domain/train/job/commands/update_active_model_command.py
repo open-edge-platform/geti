@@ -5,10 +5,10 @@
 
 import logging
 
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.services.model_service import ModelService
 from jobs_common.commands.interfaces.command import ICommand
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.services.model_service import ModelService
 
 logger = logging.getLogger(__name__)
 

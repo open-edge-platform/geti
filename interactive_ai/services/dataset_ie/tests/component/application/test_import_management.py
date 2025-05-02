@@ -17,7 +17,7 @@ from domain.entities.geti_project_type import GetiProjectType
 
 from geti_types import ID
 from grpc_interfaces.job_submission.client import GRPCJobsClient
-from sc_sdk.entities.label import Domain, Label, NullLabel
+from iai_core_py.entities.label import Domain, Label, NullLabel
 
 
 @pytest.mark.DatasetIEMsComponent

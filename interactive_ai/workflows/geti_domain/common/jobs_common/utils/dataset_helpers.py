@@ -8,22 +8,22 @@ import os
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetRepo, LabelSchemaRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.flow_control import FlowControl
-from sc_sdk.utils.iteration import grouper
-from sc_sdk.utils.media_factory import Media2DFactory
+from iai_core_py.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core_py.entities.annotation_scene_state import AnnotationState
+from iai_core_py.entities.dataset_entities import TaskDataset
+from iai_core_py.entities.dataset_item import DatasetItem
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.datasets import Dataset, DatasetPurpose
+from iai_core_py.entities.model_template import TaskType
+from iai_core_py.entities.project import Project
+from iai_core_py.entities.subset import Subset
+from iai_core_py.entities.task_node import TaskNode
+from iai_core_py.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetRepo, LabelSchemaRepo
+from iai_core_py.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core_py.utils.dataset_helper import DatasetHelper
+from iai_core_py.utils.flow_control import FlowControl
+from iai_core_py.utils.iteration import grouper
+from iai_core_py.utils.media_factory import Media2DFactory
 
 from jobs_common.tasks.utils.progress import report_progress
 from jobs_common.utils.subset_management.subset_manager import TaskSubsetManager

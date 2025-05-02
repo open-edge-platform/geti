@@ -22,18 +22,14 @@ from datumaro.components.errors import (
 )
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ProjectIdentifier, VideoFrameIdentifier
-from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils, MediaInfo
-from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from jobs_common_extras.datumaro_conversion.import_utils import ImportUtils as BaseImportUtils
-from jobs_common_extras.datumaro_conversion.import_utils import ScImportErrorPolicy
-from sc_sdk.adapters.adapter import ReferenceAdapter
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.label import Label, NullLabel
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.video import NullVideo
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from sc_sdk.repos import (
+from iai_core_py.adapters.adapter import ReferenceAdapter
+from iai_core_py.entities.dataset_storage import DatasetStorage
+from iai_core_py.entities.label import Label, NullLabel
+from iai_core_py.entities.label_schema import LabelGroup, LabelSchema
+from iai_core_py.entities.project import NullProject, Project
+from iai_core_py.entities.video import NullVideo
+from iai_core_py.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core_py.repos import (
     DatasetStorageRepo,
     ImageRepo,
     LabelRepo,
@@ -42,6 +38,10 @@ from sc_sdk.repos import (
     VideoAnnotationRangeRepo,
     VideoRepo,
 )
+from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils, MediaInfo
+from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
+from jobs_common_extras.datumaro_conversion.import_utils import ImportUtils as BaseImportUtils
+from jobs_common_extras.datumaro_conversion.import_utils import ScImportErrorPolicy
 
 from job.utils.constants import MAX_NUMBER_OF_DATASET_STORAGES, MAX_NUMBER_OF_MEDIA_PER_PROJECT
 from job.utils.exceptions import (

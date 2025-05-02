@@ -6,11 +6,11 @@
 import logging
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.model import Model, ModelDeprecationStatus, NullModel
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.repos import EvaluationResultRepo, ModelRepo
-from sc_sdk.repos.model_repo import ModelStatusFilter
+from iai_core_py.entities.evaluation_result import EvaluationPurpose
+from iai_core_py.entities.model import Model, ModelDeprecationStatus, NullModel
+from iai_core_py.entities.model_storage import ModelStorage
+from iai_core_py.repos import EvaluationResultRepo, ModelRepo
+from iai_core_py.repos.model_repo import ModelStatusFilter
 
 logger = logging.getLogger(__name__)
 

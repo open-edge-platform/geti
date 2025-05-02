@@ -17,8 +17,8 @@ from model.telemetry import Telemetry
 
 from geti_spicedb_tools import SpiceDB, SpiceDBResourceTypes
 from geti_types import ID
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
-from sc_sdk.utils.time_utils import now
+from iai_core_py.utils.constants import DEFAULT_USER_NAME
+from iai_core_py.utils.time_utils import now
 
 DUMMY_JOB_KEY = json.dumps({"job_key": "value"})
 project_id = ID("234567890123456789010000")

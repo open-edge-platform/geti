@@ -11,7 +11,7 @@ import pytest
 from testcontainers.mongodb import MongoDbContainer
 
 from geti_types import CTX_SESSION_VAR, make_session
-from sc_sdk.repos.base.mongo_connector import MongoConnector
+from iai_core_py.repos.base.mongo_connector import MongoConnector
 
 CTX_SESSION_VAR.set(make_session())
 os.environ["FEATURE_FLAG_CREDIT_SYSTEM"] = "True"

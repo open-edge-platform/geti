@@ -6,7 +6,7 @@ from resource_management.media_manager import MediaManager
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, DatasetStorageIdentifier, Singleton
-from sc_sdk.session.session_propagation import setup_session_kafka
+from iai_core_py.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 

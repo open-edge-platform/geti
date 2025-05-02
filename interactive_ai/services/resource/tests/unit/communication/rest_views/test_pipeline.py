@@ -9,8 +9,8 @@ from testfixtures import compare
 from communication.rest_views.pipeline import CONNECTIONS, TASKS, PipelineRESTViews
 from features.feature_flags import FeatureFlag
 
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.model_template import TaskType
+from iai_core_py.entities.label_schema import LabelSchema
+from iai_core_py.entities.model_template import TaskType
 
 
 class TestPipelineRESTViews:
