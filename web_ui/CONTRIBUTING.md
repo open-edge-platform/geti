@@ -17,7 +17,7 @@ Next make a `.env` file that includes a `REACT_APP_API_PROXY` variable, you copy
 web_ui/ $ cp .env.example .env
 ```
 
-Our proxy will redirect all `/api` requests  to `localhost:80/api` assuming your `REACT_APP_API_PROXY` is set to `localhost:80`. Update this variable with your server address/
+Our proxy will redirect all `/api` requests  to `localhost:80/api` assuming your `REACT_APP_API_PROXY` is set to `localhost:80`. Update this variable with your server address.
 Assuming you have your Geti server running on `localhost:80` you are now all set to start changing the Geti UI.
 Start up the [Rsbuild](https://rsbuild.dev/) dev server with,
 

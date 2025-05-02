@@ -15,14 +15,14 @@ Below is a diagram of our route structure,
 The `intel-admin` routes are used to manage organizations and users as well as assigning credits. These routese are used by the [admin environment](https://github.com/open-edge-platform/geti/blob/7e46430b7afeca6288f7e751d49adacac61fd7f3/web_ui/rsbuild.config.ts#L66-L77) while the other routes are used by the [geti environment](https://github.com/open-edge-platform/geti/blob/7e46430b7afeca6288f7e751d49adacac61fd7f3/web_ui/rsbuild.config.ts#L53-L65).
 The admin environment isn't available via our installer or helm chart instructions, this will likely change in the future.
 
-Keep reading to get an overview of our core architecture, our stack, testing strategies and how we use client side computer vision algorithms to speed up annotation time.
+Keep reading to get an overview of our core architecture, stack, testing strategies and usage of client side computer vision algorithms to speed up annotation time.
 
 ## Architecture 
 
-- **Core stack**: Our UI is a React application build using Rsbuild & npm. Typescript is language of choice.
+- **Core stack**: Our UI is a React application build using Rsbuild & npm. Typescript is our language of choice.
 - **Application**: React Router and TanStack Query are critical for managing navigation and data fetching efficiently in our application.
 - **Testing**: we aim to have a high code coverage where we use jest for unit tests and Playwright for our component and end-to-end tests.
-- **Algorithms & AI**: Our UI contains smart annotation tools that speed up annotation efforts. We use [OpenCV](https://opencv.org/), [OnnxRUntime](https://onnxruntime.ai) compiled to [WebAssembly](https://webassembly.org/) and use [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) to make sure heavy computions don't block the UI thread.
+- **Algorithms & AI**: Our UI contains smart annotation tools that speed up annotation efforts. We use [OpenCV](https://opencv.org/), [OnnxRUntime](https://onnxruntime.ai) compiled to [WebAssembly](https://webassembly.org/) and use [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) to make sure heavy computations don't block the UI thread.
 
 ---
 
@@ -33,7 +33,7 @@ Keep reading to get an overview of our core architecture, our stack, testing str
 
 Our core architecture consists of using [npm](https://www.npmjs.com/) as our package manager, [Typescript](https://www.typescriptlang.org/) as the language of choice and [react](react.dev) as our frontend framework.
 
-Initially the UI was build from [Create React App](https://github.com/facebook/create-react-app). We've migrated since to [rsbuild](https://rsbuild.dev/). 
+Initially the UI was build from [Create React App](https://github.com/facebook/create-react-app). Which we then migrated since to [rsbuild](https://rsbuild.dev/). 
 Thanks to Rspack, Rsbuild allows us to have lightning fast builds and provides consistency between development and production. See [Rsbuild's comparisons](https://rsbuild.dev/guide/start/#-comparisons) for more info.
 
 ### Application
@@ -60,6 +60,6 @@ Thanks to Rspack, Rsbuild allows us to have lightning fast builds and provides c
 | ![WebAssembly](./web-assembly.png) | ![OpenCV](./open-cv.png) | ![ONNXRuntime](./onnx-runtime.png) | ![Web Workers](./web-workers.png) |
 |------------------------------------|--------------------------|------------------------------------|------------------------------------|
 
-Our annotator contains smart tools such as [Detection Assitant](https://docs.geti.intel.com/docs/user-guide/geti-fundamentals/annotations/annotation-tools#detection-assistant-tool) or [Automatic Segmentation](https://docs.geti.intel.com/docs/user-guide/geti-fundamentals/annotations/annotation-tools#automatic-segmentation-tool) are local only and rely on [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) to keep the UI smooth and non blocking when we are performing heavy compute.
+Our annotator contains smart tools such as [Detection Assistant](https://docs.geti.intel.com/docs/user-guide/geti-fundamentals/annotations/annotation-tools#detection-assistant-tool) or [Automatic Segmentation](https://docs.geti.intel.com/docs/user-guide/geti-fundamentals/annotations/annotation-tools#automatic-segmentation-tool) are local only and rely on [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) to keep the UI smooth and non blocking when we are performing heavy compute.
 The tools are implemented using [OpenCV](https://opencv.org/), [OnnxRUntime](https://onnxruntime.ai) compiled to [WebAssembly](https://webassembly.org/).
 
