@@ -13,7 +13,6 @@ from sc_sdk.repos.storage.binary_repos import TensorBinaryRepo
 from geti_types import ImageIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestMetadataRepo:
     def test_indexes(self, fxt_dataset_storage) -> None:
         metadata_repo = MetadataRepo(fxt_dataset_storage.identifier)

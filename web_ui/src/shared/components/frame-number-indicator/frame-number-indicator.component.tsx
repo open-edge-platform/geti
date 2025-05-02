@@ -3,7 +3,7 @@
 
 import { useNumberFormatter, View } from '@adobe/react-spectrum';
 
-export const useFormatFrames = (frames: number) => {
+const useFormatFrames = (frames: number) => {
     const formatter = useNumberFormatter({
         minimumFractionDigits: 0,
         maximumFractionDigits: 1,

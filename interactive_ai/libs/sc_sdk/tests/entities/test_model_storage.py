@@ -3,8 +3,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
-
 from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
 from sc_sdk.entities.model_template import NullModelTemplate
 from sc_sdk.repos import ModelStorageRepo
@@ -12,7 +10,6 @@ from sc_sdk.repos import ModelStorageRepo
 from geti_types import ID
 
 
-@pytest.mark.ScSdkComponent
 class TestModelStorage:
     def test_model_storage_equality(self, fxt_mongo_id) -> None:
         """

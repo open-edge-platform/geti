@@ -36,7 +36,6 @@ from sc_sdk.utils.exceptions import (
 from tests.tools.custom_project_parser import CustomTestProjectParser, CustomTestProjectUpdateParser
 
 
-@pytest.mark.ScSdkComponent
 class TestProjectValidator:
     # fmt: off
     @pytest.mark.parametrize(

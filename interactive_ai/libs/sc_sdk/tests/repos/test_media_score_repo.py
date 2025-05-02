@@ -3,13 +3,11 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 #
 
-import pytest
 
 from sc_sdk.entities.media_score import NullMediaScore
 from sc_sdk.repos import MediaScoreRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestMediaScoreRepo:
     def test_media_score_repo(self, request, fxt_media_score, fxt_image_identifier, fxt_dataset_storage) -> None:
         """

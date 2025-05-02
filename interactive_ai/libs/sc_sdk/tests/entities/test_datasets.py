@@ -38,7 +38,6 @@ from tests.test_helpers import (
 from geti_types import ID, ImageIdentifier
 
 
-@pytest.mark.ScSdkComponent
 class TestDataset:
     @staticmethod
     def __assert_equality(dataset: Dataset):

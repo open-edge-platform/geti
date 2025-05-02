@@ -103,7 +103,7 @@ class VideoFileRepair:
                 remove_source=True,
                 overwrite=True,
             )
-            VideoDecoder.reset_reader(file_location=file_location)
+            VideoDecoder.reset_reader(file_location=str(file_location))
 
             # Retry reading last frame again:
             video_info = VideoDecoder.get_video_information(str(video_binary_repo.get_path_or_presigned_url(filename)))

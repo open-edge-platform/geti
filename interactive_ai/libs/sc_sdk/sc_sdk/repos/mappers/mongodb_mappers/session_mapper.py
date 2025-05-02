@@ -5,6 +5,8 @@
 
 """This module contains the MongoDB mapper for session related entities"""
 
+from typing import Any
+
 from sc_sdk.repos.mappers import IDToMongo
 from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
 
@@ -16,7 +18,7 @@ class SessionToMongo(IMapperSimple[Session, dict]):
 
     @staticmethod
     def forward(instance: Session) -> dict:
-        serialized_instance = {
+        serialized_instance: dict[str, Any] = {
             "organization_id": IDToMongo.forward(instance.organization_id),
             "workspace_id": IDToMongo.forward(instance.workspace_id),
             "source": instance.source_str,

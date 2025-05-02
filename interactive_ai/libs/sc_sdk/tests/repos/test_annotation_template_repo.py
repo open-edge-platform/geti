@@ -28,7 +28,6 @@ def fxt_annotation_template_2():
     )
 
 
-@pytest.mark.ScSdkComponent
 class TestAnnotationTemplateRepo:
     def test_annotation_template_repo(self, fxt_annotation_template_1, fxt_annotation_template_2) -> None:
         """

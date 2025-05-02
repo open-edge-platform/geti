@@ -6,7 +6,6 @@ import pytest
 from sc_sdk.utils.concurrency import TimeoutLock
 
 
-@pytest.mark.ScSdkComponent
 class TestTimeoutLock:
     def test_timeout_lock(self) -> None:
         """

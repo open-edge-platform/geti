@@ -74,6 +74,7 @@ export const useTrainModelState = () => {
     );
 
     const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
+    const [trainFromScratch, setTrainFromScratch] = useState<boolean>(false);
 
     if (selectedModelTemplateId === null) {
         setSelectedModelTemplateId(activeModelTemplateId);
@@ -84,7 +85,6 @@ export const useTrainModelState = () => {
     };
 
     const constructTrainingBodyDTO = (): TrainingBodyDTO => {
-        const trainFromScratch = false;
         const configParam = undefined;
 
         const { totalMedias } = getCreditPrice(selectedTask.id);
@@ -120,5 +120,7 @@ export const useTrainModelState = () => {
         isReshufflingSubsetsEnabled,
         changeReshufflingSubsetsEnabled: setIsReshufflingSubsetsEnabled,
         configParameters,
+        trainFromScratch,
+        changeTrainFromScratch: setTrainFromScratch,
     } as const;
 };

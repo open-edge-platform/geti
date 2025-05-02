@@ -3,13 +3,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
-
 from sc_sdk.entities.dataset_storage import DatasetStorage, NullDatasetStorage
 from sc_sdk.repos import DatasetStorageRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestDatasetStorage:
     def test_datastorage_equality(self, fxt_ote_id) -> None:
         """

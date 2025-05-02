@@ -65,7 +65,6 @@ def environment():
     return environment
 
 
-@pytest.mark.ScSdkComponent
 class TestTaskEnvironment:
     def test_task_environment(self):
         """

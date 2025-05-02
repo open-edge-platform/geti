@@ -185,7 +185,7 @@ class DatasetToMongo(
         id_ = IDToMongo.backward(instance["_id"])
         creation_date = DatetimeToMongo.backward(instance.get("creation_date"))
         mutable = instance.get("mutable", True)
-        label_schema_id = IDToMongo.backward(instance.get("label_schema_id"))
+        label_schema_id = IDToMongo.backward(instance.get("label_schema_id", ""))
 
         dataset_item_repo = _DatasetItemRepo(
             dataset_identifier=DatasetIdentifier.from_ds_identifier(

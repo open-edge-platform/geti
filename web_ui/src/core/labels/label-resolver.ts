@@ -21,7 +21,7 @@ function labelsIncludingParent(
     return recursivelyAddLabel(annotationLabels, parentLabel, projectLabels);
 }
 
-export const labelsConflictPredicate = (label: Label, otherLabel: Label) => {
+const labelsConflictPredicate = (label: Label, otherLabel: Label) => {
     return label.group === otherLabel.group || isExclusive(label) || isExclusive(otherLabel);
 };
 

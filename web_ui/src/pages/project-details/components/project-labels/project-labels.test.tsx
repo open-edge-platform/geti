@@ -108,7 +108,7 @@ describe('Project labels', () => {
         jest.resetAllMocks();
     });
 
-    describe(`Segmentation`, () => {
+    describe('Segmentation', () => {
         const addLabel = (name: string) => {
             fireEvent.input(screen.getByRole('textbox', { name: 'Project label name input' }), {
                 target: { value: name },
@@ -116,7 +116,7 @@ describe('Project labels', () => {
             fireEvent.click(screen.getByRole('button', { name: 'Create label' }));
         };
 
-        it('Should open saving popup when there are some new labels', async () => {
+        it('Should open "Assign" popup when there are some new labels', async () => {
             await renderApp({ projectId: 'test' });
 
             addLabel('test');
@@ -124,10 +124,11 @@ describe('Project labels', () => {
             expect(screen.getByRole('button', { name: 'Assign' })).toBeInTheDocument();
         });
 
-        it('Should not open saving popup when there are only idle, edited or deleted labels', async () => {
+        it('Should not open "Assign" popup when there are only idle, edited or deleted labels', async () => {
             await renderApp({ projectId: 'test' });
 
-            fireEvent.click(screen.getByRole('button', { name: 'delete' }));
+            addLabel('test');
+            fireEvent.click(screen.getAllByRole('button', { name: 'delete' })[0]);
             fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
             expect(screen.queryByRole('button', { name: 'Assign' })).not.toBeInTheDocument();
@@ -168,7 +169,8 @@ describe('Project labels', () => {
         it('Saving deleted labels - text "Labels have been changed successfully." is in notification', async () => {
             await renderApp({ projectId: 'test' });
 
-            fireEvent.click(screen.getByRole('button', { name: 'delete' }));
+            addLabel('test1');
+            fireEvent.click(screen.getAllByRole('button', { name: 'delete' })[0]);
             fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
             await waitFor(() => {
@@ -185,6 +187,38 @@ describe('Project labels', () => {
             fireEvent.click(screen.getByRole('button', { name: 'Stay on page' }));
             mockDefaultUseHistoryBlock();
         });
+
+        it('should prevent deleting more labels than allowed', async () => {
+            const projectService = createInMemoryProjectService();
+
+            const projectWithSingleLabel = getMockedProject({
+                tasks: [
+                    getMockedTask({
+                        id: 'task-1',
+                        domain: DOMAIN.SEGMENTATION,
+                        title: 'Segmentation',
+                        labels: [
+                            getMockedLabel({
+                                id: 'label-1',
+                                name: 'Label 1',
+                            }),
+                        ],
+                    }),
+                ],
+            });
+            projectService.getProject = async () => getMockedProject(projectWithSingleLabel);
+
+            await renderApp({ services: { projectService }, projectId: 'test' });
+
+            // Try to delete the only label
+            fireEvent.click(screen.getByRole('button', { name: 'delete' }));
+
+            // Verify that the info notification is shown
+            await waitFor(() => {
+                expect(screen.getByText('You must have at least 1 label in the project.')).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+            });
+        });
     });
 
     describe('Classification', () => {
@@ -195,6 +229,52 @@ describe('Project labels', () => {
                 screen.getAllByText('Single selection')[0],
                 'Only one label from such group can be applied to an image/frame.'
             );
+        });
+
+        it('should prevent deleting more labels than allowed', async () => {
+            const projectService = createInMemoryProjectService();
+
+            const mockProject = getMockedProject({
+                tasks: [
+                    getMockedTask({
+                        id: 'task-1',
+                        domain: DOMAIN.CLASSIFICATION,
+                        title: 'Classification',
+                        labels: [
+                            getMockedLabel({
+                                id: 'card',
+                                name: 'card',
+                                group: 'card-group',
+                            }),
+                            getMockedLabel({
+                                id: 'black',
+                                name: 'black',
+                                group: 'color',
+                                parentLabelId: 'card',
+                            }),
+                            getMockedLabel({
+                                id: 'red',
+                                name: 'red',
+                                group: 'color',
+                                parentLabelId: 'card',
+                            }),
+                        ],
+                    }),
+                ],
+            });
+            projectService.getProject = async () => getMockedProject(mockProject);
+
+            await renderApp({ services: { projectService }, projectId: 'test' });
+
+            // Try to delete the two labels
+            fireEvent.click(screen.getByTestId('red-label-delete-label-button'));
+            fireEvent.click(screen.getByTestId('black-label-delete-label-button'));
+
+            // Verify that the info notification is shown
+            await waitFor(() => {
+                expect(screen.getByText('You must have at least 2 labels in the project.')).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+            });
         });
     });
 

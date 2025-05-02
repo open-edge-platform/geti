@@ -73,7 +73,6 @@ def unset_object_storage_env_variables():
     os.environ.pop("S3_CREDENTIALS_PROVIDER", None)
 
 
-@pytest.mark.ScSdkComponent
 class TestBinaryRepoS3Storage:
     @pytest.fixture(
         params=[
@@ -561,7 +560,6 @@ class TestBinaryRepoS3Storage:
         assert mock_function.call_count == 3
 
 
-@pytest.mark.ScSdkComponent
 class TestBinaryRepoLocalStorage:
     def test_get_by_filename_local(self, request, tmp_path, fxt_dataset_identifier, fxt_dataset_storage) -> None:
         # Save bytes

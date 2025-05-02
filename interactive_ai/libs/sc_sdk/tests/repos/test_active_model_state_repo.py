@@ -10,7 +10,6 @@ from sc_sdk.entities.active_model_state import ActiveModelState
 from sc_sdk.repos import ActiveModelStateRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestActiveModelStateRepo:
     def test_indexes(self, fxt_project_identifier) -> None:
         active_model_state_repo = ActiveModelStateRepo(fxt_project_identifier)

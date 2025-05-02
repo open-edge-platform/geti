@@ -15,7 +15,6 @@ from sc_sdk.repos.storage.binary_repos import ModelBinaryRepo
 from tests.test_helpers import empty_model_configuration
 
 
-@pytest.mark.ScSdkComponent
 class TestModelRepo:
     def test_indexes(self, fxt_model_storage) -> None:
         model_repo = ModelRepo(fxt_model_storage.identifier)

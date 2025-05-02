@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session", autouse=True)
-def mongodb_testcontainer() -> None:
+def mongodb_testcontainer():
     image_name = "mongo:7.0.7"
     logger.info(f"Pulling MongoDB testcontainer image from: {image_name}")
     with MongoDbContainer(image_name) as mongo:

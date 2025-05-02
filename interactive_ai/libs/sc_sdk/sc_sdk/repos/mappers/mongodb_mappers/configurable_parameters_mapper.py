@@ -9,7 +9,7 @@ ComponentParameter entities
 """
 
 from enum import Enum
-from typing import Union
+from typing import Any, Union
 
 import sc_sdk.configuration.helper as otx_config_helper
 from sc_sdk.configuration.elements import metadata_keys
@@ -50,7 +50,7 @@ class ConfigurableParametersToMongo(IMapperSimple[IConfigurableParameterContaine
             values serialized to strings
 
         """
-        keys_as_strings = {}
+        keys_as_strings: dict[str, Any] = {}
         for key, value in identifiers.items():
             if isinstance(value, ID):
                 keys_as_strings[key] = IDToMongo.forward(value)

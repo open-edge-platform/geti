@@ -2,13 +2,11 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import numpy as np
-import pytest
 
 from sc_sdk.entities.shapes import Rectangle
 from tests.test_helpers import register_model_template
 
 
-@pytest.mark.ScSdkComponent
 class TestImage:
     def test_reading_image(self, request, fxt_random_annotated_image_factory) -> None:
         """

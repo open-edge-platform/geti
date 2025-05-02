@@ -8,7 +8,7 @@ import isEmpty from 'lodash/isEmpty';
 import { useNumberFormatter } from 'react-aria';
 
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
-import { Accordion } from '../../accordion/accordion.component';
+import { Accordion } from '../../ui/accordion/accordion.component';
 
 import styles from './balance-labels-distribution.module.scss';
 

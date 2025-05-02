@@ -3,12 +3,9 @@
 
 from time import sleep
 
-import pytest
-
 from sc_sdk.repos.leader_election_repo import LeaderElectionRepo
 
 
-@pytest.mark.ScSdkComponent
 class TestLeaderElectionRepo:
     def test_stand_for_election(
         self,

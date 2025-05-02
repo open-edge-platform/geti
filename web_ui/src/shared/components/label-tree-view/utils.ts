@@ -25,7 +25,7 @@ export const LABEL_ITEM_MENU_PLACEHOLDER_WIDTH = MAX_AMOUNT_OF_ICONS * ICONS_SIZ
 export const getDefaultGroupName = (domain: DOMAIN, parentGroup?: string | null) =>
     getFullGroupName(parentGroup ?? null, `${domain} labels`);
 
-export const getNewItemId = () => uuidv4();
+const getNewItemId = () => uuidv4();
 
 export const getEditedItemState = (
     isNew: boolean,

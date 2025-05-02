@@ -108,10 +108,8 @@ def export_dataset_task(  # noqa: PLR0915
         dm_fmt: str = FORMAT_NAME_MAP[export_format]
 
         if save_video_as_images:
-            video_root = None
             save_video_annotation_range = False
         else:
-            video_root = os.path.join(path, "videos", "default")
             tasks = project.get_trainable_task_nodes()
             # VideoAnnotationRange is supported only for a single global/anomaly task projects
             # If this condition is changed, please modify the condition in
@@ -150,6 +148,7 @@ def export_dataset_task(  # noqa: PLR0915
             ),
             media_type=dm_Image if save_video_as_images else dm_MediaElement,
         )
+
         progress_reporter.finish_step()
         logger.info(f"Dataset with ID `{str(export_id)}` is built for export.")
 

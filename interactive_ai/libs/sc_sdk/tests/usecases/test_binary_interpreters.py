@@ -3,12 +3,9 @@
 
 import io
 
-import pytest
-
 from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter, RAWBinaryInterpreter
 
 
-@pytest.mark.ScSdkComponent
 class TestBinaryInterpreters:
     def test_raw_binary_interpreter(self) -> None:
         """

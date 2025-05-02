@@ -12,7 +12,6 @@ from sc_sdk.entities.shapes import Rectangle as SDK_Rectangle
 from tests.test_helpers import assert_almost_equal
 
 
-@pytest.mark.ScSdkComponent
 class TestShapes:
     def test_normalize_denormalize_rectangle(self) -> None:
         """
