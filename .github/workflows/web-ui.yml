@@ -64,7 +64,7 @@ jobs:
 
       - name: Eslint
         working-directory: "web_ui"
-        run: npm run test:eslint
+        run: npm run lint
 
       - name: Eslint cyclic imports
         working-directory: "web_ui"

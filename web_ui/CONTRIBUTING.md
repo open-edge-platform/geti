@@ -44,11 +44,11 @@ Checks if there are no typescript violations. We have a relatively strict typesc
 ### Check lint rules
 
 ```sh
-npm run test:eslint
-npm run test:eslint:fix
+npm run lint
+npm run lint:fix
 ```
 
-Our CI uses `npm run test:eslint` to verify that no eslint rules are violated. For development we often use `npm run test:eslint:fix` to automatically fix these where possible.
+Our CI uses `npm run lint` to verify that no eslint rules are violated. For development we often use `npm run lint:fix` to automatically fix these where possible.
 
 #### Cyclic dependencies
 

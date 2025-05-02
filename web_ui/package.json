@@ -102,8 +102,8 @@
     "test:component:ui": "npm run test:component -- --ui",
     "test:coverage": "npm test -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
-    "test:eslint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0",
-    "test:eslint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\"",
+    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\"",
     "test:tsc": "tsc --noEmit",
     "test:unit": "jest --config jest.config.js --watchAll=false",
     "test:unit:watch": "jest --config jest.config.js --watch"
