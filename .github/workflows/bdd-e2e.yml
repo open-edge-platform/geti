@@ -1,0 +1,134 @@
+name: Run BDD end to end tests
+run-name: Run BDD end to end tests on ${{ inputs.host }}
+on:
+  workflow_call:
+    inputs:
+      geti_host:
+        type: string
+        required: true
+        description: Address of the Geti host where to run the tests (e.g. "https://10.20.30.40")
+      admin_email:
+        type: string
+        required: false
+        description: Email of the admin user that runs the tests, uses default credentials if not provided
+      admin_password:
+        type: string
+        required: false
+        description: Password of the admin user that runs the tests, uses default credentials if not provided
+      tag:
+        type: string
+        required: false
+        description: Run a subset of the tests defined by the tag. Defaults to "@smoke". Pass "all" to run all tests
+      feature:
+        type: string
+        required: false
+        description: Run a subset of the tests defined by a feature. Defaults to all features
+  workflow_dispatch:
+    inputs:
+      geti_host:
+        type: string
+        required: true
+        description: Address of the Geti host where to run the tests (e.g. "https://10.20.30.40")
+      admin_email:
+        type: string
+        required: false
+        description: Email of the admin user that runs the tests, uses default credentials if not provided
+      admin_password:
+        type: string
+        required: false
+        description: Password of the admin user that runs the tests, uses default credentials if not provided
+      tag:
+        type: string
+        required: false
+        description: Run a subset of the tests defined by the tag. Defaults to "@smoke". Pass "all" to run all tests
+      feature:
+        type: string
+        required: false
+        description: Run a subset of the tests defined by a feature. Defaults to all features
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  GETI_HOST: ${{ inputs.geti_host || 'https://10.211.120.131/' }}
+  ADMIN_EMAIL: ${{ inputs.admin_email || secrets.E2E_TEST_DEFAULT_ADMIN_EMAIL }}
+  ADMIN_PASSWORD: ${{ inputs.admin_password || secrets.E2E_TEST_DEFAULT_ADMIN_PASSWORD }}
+  BDD_TAG: ${{ inputs.tag || '@smoke' }}
+  FEATURE: ${{ inputs.feature }}
+
+jobs:
+  tests:
+    name: BDD E2E tests
+    timeout-minutes: 360
+    runs-on: geti-runner-xlarge
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: '3.10' 
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          role-to-assume: arn:aws:iam::092711417317:role/github_token_service_role
+          role-session-name: Github
+          aws-region: us-west-2
+          role-duration-seconds: 7200
+
+      - name: Install requirements
+        working-directory: "tests/bdd"
+        run: |
+          sudo -E apt-get update
+          sudo -E apt-get install  -y -q -o Dpkg::Options::="--force-confdef"  default-jre
+
+          pip install requests
+
+          npm install -g @apidevtools/swagger-cli
+          npm install @openapitools/openapi-generator-cli -g
+          
+          make generate_client
+          pip install -e rest_client
+
+      - name: Generate Geti API key
+        id: geti-api-key
+        run: |
+          geti_api_key=$(python ci/get_geti_pat.py --host "$HOST" --insecure --username "$USERNAME" --password "$PASSWORD")
+
+          # Redact the API key in the logs
+          echo "::add-mask::$geti_api_key"
+
+          echo "geti_api_key=$geti_api_key" >> $GITHUB_OUTPUT
+        env:
+          HOST: ${{ env.GETI_HOST }}
+          USERNAME: ${{ env.ADMIN_EMAIL }}
+          PASSWORD: ${{ env.ADMIN_PASSWORD }}
+
+      - name: Run E2E tests
+        working-directory: "tests/bdd"
+        run: |
+          make tests MAKEFILE_DIR="$(pwd)" BDD_TAG="${{ env.BDD_TAG }}" FEATURE="${{ env.FEATURE }}"
+        env:
+          GETI_SERVER_URL: ${{ env.GETI_HOST }}
+          GETI_API_KEY: ${{ steps.geti-api-key.outputs.geti_api_key }}
+
+      - name: Make reports
+        if: "always()"
+        working-directory: "tests/bdd"
+        run: |
+          MAKEFILE_DIR=$(pwd) make report
+
+      - name: Upload HTML report
+        if: "always()"
+        uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+        with:
+          name: bdd-html-report-attempt-${{ github.run_attempt }}
+          path: tests/bdd/reports/html
+          retention-days: 14
+
