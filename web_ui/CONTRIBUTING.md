@@ -53,7 +53,7 @@ Our CI uses `npm run test:eslint` to verify that no eslint rules are violated. F
 #### Cyclic dependencies
 
 In the past we've had issues where cyclic dependencies introduced build regressions, this is why we added an additional step in our CI to check for this.
-Use,
+
 ```sh
 npm run cyclic-deps-check
 ```
