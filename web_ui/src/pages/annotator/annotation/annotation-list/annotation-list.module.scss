@@ -1,9 +1,29 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-:root {
-    [data-drop-target='true'] {
-        outline: 1px solid var(--energy-blue);
+div:has(> .dropTarget) {
+    z-index: 1 !important;
+    overflow: unset !important;
+    background: var(--energy-blue);
+
+    &::before,
+    &::after {
+        content: '';
+        width: 0;
+        height: 0;
+        top: -4px;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        position: absolute;
+    }
+
+    &::before {
+        border-left: 10px solid var(--energy-blue);
+    }
+
+    &::after {
+        border-right: 10px solid var(--energy-blue);
+        right: 0;
     }
 }
 

@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import { Content } from '@adobe/react-spectrum';
 import {
     ListBox as AriaComponentsListBox,
+    DropIndicator,
     ListBoxItem,
     ListLayout,
     useDragAndDrop,
@@ -38,6 +39,11 @@ export const AnnotationList = ({ annotations, isLoading, isDragDisabled }: Annot
 
     const { dragAndDropHooks } = useDragAndDrop({
         isDisabled: isSceneBusy || isDragDisabled,
+
+        renderDropIndicator: (target) => {
+            return <DropIndicator target={target} className={styles.dropTarget} />;
+        },
+
         getItems: (keys) => {
             return [...keys].map((key) => ({
                 'text/plain': reversedAnnotations.find(hasEqualId(String(key)))?.id ?? '',
