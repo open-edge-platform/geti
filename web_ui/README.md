@@ -8,7 +8,9 @@ For a full deep dive visit our developer documentation [`here`](https://docs.get
 The web UI of Geti is a Single Page Application utilizing [react router](https://reactrouter.com/) for client side routing. [Rsbuild](https://rsbuild.dev) is our build tool.
 Below is a diagram of our route structure,
 
-![geti-route-structure](https://github.com/user-attachments/assets/baaae7a0-af5b-4d1c-8fa1-4ae8a71a8a38)
+<center>
+![geti-route-structure](https://github.com/user-attachments/assets/d32a2a62-183a-4b06-a1b7-f69da007893a)
+</center>
 
 The `intel-admin` routes are used to manage organizations and users as well as assigning credits. These routese are used by the [admin environment](https://github.com/open-edge-platform/geti/blob/7e46430b7afeca6288f7e751d49adacac61fd7f3/web_ui/rsbuild.config.ts#L66-L77) while the other routes are used by the [geti environment](https://github.com/open-edge-platform/geti/blob/7e46430b7afeca6288f7e751d49adacac61fd7f3/web_ui/rsbuild.config.ts#L53-L65).
 The admin environment isn't available via our installer or helm chart instructions, this will likely change in the future.
