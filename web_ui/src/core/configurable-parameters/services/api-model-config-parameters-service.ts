@@ -20,6 +20,8 @@ import {
     getTrainingConfigurationEntity,
 } from './utils';
 
+export type TrainingConfigurationQueryParameters = Partial<{ taskId: string; algorithmId: string; modelId: string }>;
+
 export interface CreateApiModelConfigParametersService {
     /**
      * @deprecated Please use getTrainingConfiguration instead
@@ -45,7 +47,7 @@ export interface CreateApiModelConfigParametersService {
     getProjectConfiguration: (projectIdentifier: ProjectIdentifier) => Promise<ProjectConfiguration>;
     getTrainingConfiguration: (
         projectIdentifier: ProjectIdentifier,
-        queryParameters?: Partial<{ taskId: string; algorithmId: string; modelId: string }>
+        queryParameters?: TrainingConfigurationQueryParameters
     ) => Promise<TrainingConfiguration>;
 }
 

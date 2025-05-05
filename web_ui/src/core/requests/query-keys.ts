@@ -4,6 +4,7 @@
 import { ANNOTATOR_MODE } from '../../pages/annotator/core/annotation-tool-context.interface';
 import { PredictionCache, PredictionMode } from '../annotations/services/prediction-service.interface';
 import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';
+import { TrainingConfigurationQueryParameters } from '../configurable-parameters/services/api-model-config-parameters-service';
 import { CreditAccountIdentifier } from '../credits/credits.interface';
 import {
     GetTransactionsAggregatesQueryOptions,
@@ -487,6 +488,26 @@ const PRODUCT = (productId: number) => [...PRODUCTS, productId];
 
 const MAINTENANCE = ['maintenance'];
 
+const CONFIGURATION_PARAMETERS = {
+    PROJECT: (projectIdentifier: ProjectIdentifier) =>
+        [
+            'project-configuration',
+            projectIdentifier.organizationId,
+            projectIdentifier.workspaceId,
+            projectIdentifier.projectId,
+        ] as const,
+    TRAINING: (projectIdentifier: ProjectIdentifier, queryParameters?: TrainingConfigurationQueryParameters) =>
+        [
+            'training-configuration',
+            projectIdentifier.organizationId,
+            projectIdentifier.workspaceId,
+            projectIdentifier.projectId,
+            queryParameters?.taskId,
+            queryParameters?.modelId,
+            queryParameters?.algorithmId,
+        ] as const,
+};
+
 const QUERY_KEYS = {
     WORKSPACES,
     DATASET_STATISTICS_KEY,
@@ -554,6 +575,7 @@ const QUERY_KEYS = {
     PRODUCTS,
     PRODUCT,
     MAINTENANCE,
+    CONFIGURATION_PARAMETERS,
 } as const;
 
 export default QUERY_KEYS;
