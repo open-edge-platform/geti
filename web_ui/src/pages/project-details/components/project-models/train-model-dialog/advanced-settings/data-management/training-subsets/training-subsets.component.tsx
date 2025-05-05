@@ -26,11 +26,13 @@ const Tile: FC<{ color: string }> = ({ color }) => {
     );
 };
 
-const SubsetDistributionStat: FC<{ count: number; color: string }> = ({ count, color }) => {
+const SubsetDistributionStat: FC<{ count: number; color: string; title: string }> = ({ count, color, title }) => {
     return (
         <Flex alignItems={'center'} gap={'size-50'}>
             <Tile color={color} />
-            <Text>Training: {count}</Text>
+            <Text>
+                {title}: {count}
+            </Text>
         </Flex>
     );
 };
@@ -40,9 +42,13 @@ const SubsetDistributionStats: FC<SubsetDistributionStatsProps> = ({ trainingCou
         <View gridArea={'counts'} backgroundColor={'static-gray-800'} borderRadius={'small'} padding={'size-100'}>
             <Flex alignItems={'center'} justifyContent={'space-between'} UNSAFE_className={styles.statsText}>
                 <Flex alignItems={'center'} gap={'size-200'}>
-                    <SubsetDistributionStat color={'var(--training-subset)'} count={trainingCount} />
-                    <SubsetDistributionStat color={'var(--validation-subset)'} count={validationCount} />
-                    <SubsetDistributionStat color={'var(--test-subset)'} count={testCount} />
+                    <SubsetDistributionStat title={'Training'} color={'var(--training-subset)'} count={trainingCount} />
+                    <SubsetDistributionStat
+                        title={'Validation'}
+                        color={'var(--validation-subset)'}
+                        count={validationCount}
+                    />
+                    <SubsetDistributionStat title={'Test'} color={'var(--test-subset)'} count={testCount} />
                 </Flex>
                 <Text>
                     <Text UNSAFE_className={styles.totalStats}>Total: </Text>

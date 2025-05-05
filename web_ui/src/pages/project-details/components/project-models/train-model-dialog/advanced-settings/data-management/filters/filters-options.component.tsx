@@ -3,11 +3,12 @@
 
 import { FC } from 'react';
 
-import { Content, ContextualHelp, Flex, NumberField, Text } from '@adobe/react-spectrum';
+import { Flex, NumberField, Text } from '@adobe/react-spectrum';
 
 import { Refresh } from '../../../../../../../../assets/icons';
 import { ActionButton } from '../../../../../../../../shared/components/button/button.component';
 import { Checkbox } from '../../../../../../../../shared/components/checkbox/checkbox.component';
+import { Tooltip } from '../../ui/tooltip.component';
 
 export interface FilterOption {
     key: string;
@@ -30,13 +31,7 @@ interface FilterOptionTooltipProps {
 }
 
 const FilterOptionTooltip: FC<FilterOptionTooltipProps> = ({ description }) => {
-    return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>{description}</Text>
-            </Content>
-        </ContextualHelp>
-    );
+    return <Tooltip>{description}</Tooltip>;
 };
 
 const FilterOption: FC<FilterOptionProps> = ({ option, onOptionChange }) => {

@@ -22,6 +22,10 @@ const AccordionTitle: FC<DisclosureTitleProps> = ({ UNSAFE_className, ...props }
     return <DisclosureTitle {...props} UNSAFE_className={clsx(UNSAFE_className, styles.accordionTitle)} />;
 };
 
+export const RawContent: FC<{ children: ReactNode }> = ({ children }) => {
+    return <View UNSAFE_className={styles.accordionContent}>{children}</View>;
+};
+
 const AccordionContent: FC<DisclosurePanelProps> = ({ UNSAFE_className, ...props }) => {
     return <DisclosurePanel {...props} UNSAFE_className={clsx(UNSAFE_className, styles.accordionContent)} />;
 };
