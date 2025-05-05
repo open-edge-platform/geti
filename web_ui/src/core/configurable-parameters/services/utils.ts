@@ -17,8 +17,12 @@ import {
     ConfigurableParametersTaskChainDTO,
     EntityIdentifierDTO,
 } from '../dtos/configurable-parameters.interface';
-import { ConfigurationParameterDTO, ProjectConfigurationDTO } from '../dtos/configuration.interface';
-import { ConfigurationParameter, ProjectConfiguration } from './configuration.interface';
+import {
+    ConfigurationParameterDTO,
+    ProjectConfigurationDTO,
+    TrainingConfigurationDTO,
+} from '../dtos/configuration.interface';
+import { ConfigurationParameter, ProjectConfiguration, TrainingConfiguration } from './configuration.interface';
 
 const getConfigParametersField = (
     parameters: ConfigurableParametersParamsDTO[],
@@ -250,4 +254,26 @@ export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigura
     return {
         taskConfigs,
     };
+};
+
+export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO): TrainingConfiguration => {
+    const trainingConfiguration: TrainingConfiguration = {};
+
+    Object.entries(config).forEach(([parameterGroupName, parameters]) => {
+        if (parameterGroupName === 'advanced_configuration') {
+            trainingConfiguration.advancedConfiguration = parameters.map(getParameter);
+        } else if (Array.isArray(parameters)) {
+            trainingConfiguration[parameterGroupName] = parameters.map(getParameter);
+        } else {
+            trainingConfiguration[parameterGroupName] = Object.entries(parameters).reduce(
+                (acc, [key, localParameters]) => ({
+                    ...acc,
+                    [key]: (localParameters as ConfigurationParameterDTO[]).map(getParameter),
+                }),
+                {}
+            );
+        }
+    });
+
+    return trainingConfiguration;
 };

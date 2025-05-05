@@ -12,8 +12,13 @@ import {
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
 import { ProjectConfigurationDTO } from '../dtos/configuration.interface';
-import { ProjectConfiguration } from './configuration.interface';
-import { getConfigParametersEntity, getModelConfigEntity, getProjectConfigurationEntity } from './utils';
+import { ProjectConfiguration, TrainingConfiguration } from './configuration.interface';
+import {
+    getConfigParametersEntity,
+    getModelConfigEntity,
+    getProjectConfigurationEntity,
+    getTrainingConfigurationEntity,
+} from './utils';
 
 export interface CreateApiModelConfigParametersService {
     /**
@@ -36,6 +41,12 @@ export interface CreateApiModelConfigParametersService {
         projectIdentifier: ProjectIdentifier,
         body: ConfigurableParametersReconfigureDTO
     ) => Promise<void>;
+
+    getProjectConfiguration: (projectIdentifier: ProjectIdentifier) => Promise<ProjectConfiguration>;
+    getTrainingConfiguration: (
+        projectIdentifier: ProjectIdentifier,
+        queryParameters?: Partial<{ taskId: string; algorithmId: string; modelId: string }>
+    ) => Promise<TrainingConfiguration>;
 }
 
 export const createApiModelConfigParametersService: CreateApiService<CreateApiModelConfigParametersService> = (
@@ -72,7 +83,24 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         await instance.post(router.CONFIGURATION_PARAMETERS(projectIdentifier), body);
     };
 
-    const getProjectConfiguration = async (projectIdentifier: ProjectIdentifier): Promise<ProjectConfiguration> => {
+    const getTrainingConfiguration: CreateApiModelConfigParametersService['getTrainingConfiguration'] = async (
+        projectIdentifier,
+        queryParameters
+    ): Promise<TrainingConfiguration> => {
+        const { data } = await instance.get(router.CONFIGURATION.TRAINING(projectIdentifier), {
+            params: {
+                task_id: queryParameters?.taskId,
+                model_id: queryParameters?.modelId,
+                algorithm_id: queryParameters?.algorithmId,
+            },
+        });
+
+        return getTrainingConfigurationEntity(data);
+    };
+
+    const getProjectConfiguration: CreateApiModelConfigParametersService['getProjectConfiguration'] = async (
+        projectIdentifier
+    ) => {
         const { data } = await instance.get<ProjectConfigurationDTO>(router.CONFIGURATION.PROJECT(projectIdentifier));
 
         return getProjectConfigurationEntity(data);
@@ -82,5 +110,7 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         getModelConfigParameters,
         getConfigParameters,
         reconfigureParameters,
+        getProjectConfiguration,
+        getTrainingConfiguration,
     };
 };
