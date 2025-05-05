@@ -11,9 +11,14 @@ import {
     ConfigurableParametersReconfigureDTO,
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
-import { getConfigParametersEntity, getModelConfigEntity } from './utils';
+import { ProjectConfigurationDTO } from '../dtos/configuration.interface';
+import { ProjectConfiguration } from './configuration.interface';
+import { getConfigParametersEntity, getModelConfigEntity, getProjectConfigurationEntity } from './utils';
 
 export interface CreateApiModelConfigParametersService {
+    /**
+     * @deprecated Please use getTrainingConfiguration instead
+     */
     getModelConfigParameters: (
         projectIdentifier: ProjectIdentifier,
         taskId: string,
@@ -22,6 +27,9 @@ export interface CreateApiModelConfigParametersService {
         editable?: boolean
     ) => Promise<ConfigurableParametersTaskChain>;
 
+    /**
+     * @deprecated Please use getTrainingConfiguration instead
+     */
     getConfigParameters: (projectIdentifier: ProjectIdentifier) => Promise<ConfigurableParametersTaskChain[]>;
 
     reconfigureParameters: (
@@ -62,6 +70,12 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         body: ConfigurableParametersReconfigureDTO
     ) => {
         await instance.post(router.CONFIGURATION_PARAMETERS(projectIdentifier), body);
+    };
+
+    const getProjectConfiguration = async (projectIdentifier: ProjectIdentifier): Promise<ProjectConfiguration> => {
+        const { data } = await instance.get<ProjectConfigurationDTO>(router.CONFIGURATION.PROJECT(projectIdentifier));
+
+        return getProjectConfigurationEntity(data);
     };
 
     return {

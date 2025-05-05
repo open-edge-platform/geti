@@ -17,6 +17,8 @@ import {
     ConfigurableParametersTaskChainDTO,
     EntityIdentifierDTO,
 } from '../dtos/configurable-parameters.interface';
+import { ConfigurationParameterDTO, ProjectConfigurationDTO } from '../dtos/configuration.interface';
+import { ConfigurationParameter, ProjectConfiguration } from './configuration.interface';
 
 const getConfigParametersField = (
     parameters: ConfigurableParametersParamsDTO[],
@@ -184,4 +186,68 @@ export const getConfigParametersEntity = (data: ConfigurableParametersDTO): Conf
     };
 
     return [newGlobal, ...taskChain];
+};
+
+export const getParameter = (parameter: ConfigurationParameterDTO): ConfigurationParameter => {
+    if (parameter.type === 'int' || parameter.type === 'float') {
+        const { type, description, key, default_value, max_value, min_value, value, name } = parameter;
+
+        return {
+            key,
+            type,
+            name,
+            value,
+            description,
+            defaultValue: default_value,
+            maxValue: max_value,
+            minValue: min_value,
+        };
+    }
+
+    if (parameter.type === 'bool') {
+        const { type, description, key, default_value, value, name } = parameter;
+
+        return {
+            key,
+            type,
+            name,
+            value,
+            description,
+            defaultValue: default_value,
+        };
+    }
+
+    if (parameter.type === 'enum') {
+        const { key, type, name, description, value, default_value, allowed_values } = parameter;
+
+        return {
+            key,
+            type,
+            name,
+            description,
+            allowedValues: allowed_values,
+            value,
+            defaultValue: default_value,
+        };
+    }
+
+    throw new Error(`${parameter.type} is not supported.`);
+};
+
+export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigurationDTO): ProjectConfiguration => {
+    const taskConfigs = task_configs.map((taskConfig) => {
+        const { task_id, training, auto_training, predictions } = taskConfig;
+
+        return {
+            taskId: task_id,
+            training: {
+                constraints: training.constraints.map(getParameter),
+            },
+            autoTraining: auto_training.map(getParameter),
+            predictions: predictions.map(getParameter),
+        };
+    });
+    return {
+        taskConfigs,
+    };
 };
