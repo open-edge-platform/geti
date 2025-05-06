@@ -84,6 +84,9 @@ const BalanceLabelsDistributionTooltip: FC = () => {
     );
 };
 
+/*
+ * This component is currently not used in the v1 of Training flow revamp. Will be used in the later version.
+ */
 export const BalanceLabelsDistribution: FC = () => {
     const [isEnabled, setIsEnabled] = useState<boolean>(false);
 

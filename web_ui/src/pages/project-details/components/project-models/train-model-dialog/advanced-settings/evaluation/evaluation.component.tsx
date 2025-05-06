@@ -121,6 +121,9 @@ const MODEL_ACCEPTANCE_TUNE_PARAMETERS = [
 
 type TuneParameter = (typeof MODEL_ACCEPTANCE_TUNE_PARAMETERS)[number]['name'];
 
+/*
+ * This component is currently not used in the v1 of Training flow revamp. Will be used in the later version.
+ */
 export const Evaluation: FC<EvaluationProps> = ({ evaluationParameters }) => {
     const [tuneParameter, setTuneParameter] = useState<TuneParameter>(MODEL_ACCEPTANCE_TUNE_PARAMETERS[0].name);
     const [confidenceThresholdMode, setConfidenceThresholdMode] = useState(() =>
