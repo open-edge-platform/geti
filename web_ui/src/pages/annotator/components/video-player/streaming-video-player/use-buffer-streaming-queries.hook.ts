@@ -110,12 +110,14 @@ const useBuffersFromQueryClient = (mediaItem: VideoFrame | undefined) => {
                 options.frameSkip !== undefined
             ) {
                 const status = isLoading ? BufferStatus.LOADING : BufferStatus.SUCCESS;
+                const annotatorMode = mode as ANNOTATOR_MODE;
+
                 buffers.push({
                     startFrame: options.startFrame,
                     endFrame: options.endFrame,
                     frameSkip: options.frameSkip,
                     status,
-                    mode,
+                    mode: annotatorMode,
                     selectedTaskId,
                 });
             }
