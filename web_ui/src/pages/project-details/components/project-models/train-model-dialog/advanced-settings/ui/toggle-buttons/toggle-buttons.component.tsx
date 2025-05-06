@@ -6,25 +6,25 @@ import clsx from 'clsx';
 
 import { Button } from '../../../../../../../../shared/components/button/button.component';
 
-import styles from './options-buttons.module.scss';
+import styles from './toggle-buttons.module.scss';
 
-interface OptionButtonProps<T extends string> {
+interface ToggleButtonProps<T extends string> {
     selectedOption: T;
     option: T;
     onOptionChange: (option: T) => void;
     className: string;
 }
 
-const OptionButton = <T extends string>({
+const ToggleButton = <T extends string>({
     selectedOption,
     option,
     onOptionChange,
     className,
-}: OptionButtonProps<T>) => {
+}: ToggleButtonProps<T>) => {
     return (
         <Button
             variant={selectedOption === option ? 'accent' : 'secondary'}
-            UNSAFE_className={clsx(styles.optionButton, className)}
+            UNSAFE_className={clsx(styles.toggleButton, className)}
             onPress={() => {
                 onOptionChange(option);
             }}
@@ -34,17 +34,13 @@ const OptionButton = <T extends string>({
     );
 };
 
-interface OptionsButtonsProps<T extends string> {
+interface ToggleButtonsProps<T extends string> {
     options: T[];
     selectedOption: T;
     onOptionChange: (option: T) => void;
 }
 
-export const OptionsButtons = <T extends string>({
-    options,
-    selectedOption,
-    onOptionChange,
-}: OptionsButtonsProps<T>) => {
+export const ToggleButtons = <T extends string>({ options, selectedOption, onOptionChange }: ToggleButtonsProps<T>) => {
     const getClassNames = (index: number) => {
         if (index === 0) {
             return styles.firstOptionButton;
@@ -58,7 +54,7 @@ export const OptionsButtons = <T extends string>({
     return (
         <Flex>
             {options.map((option, index) => (
-                <OptionButton
+                <ToggleButton
                     key={option}
                     selectedOption={selectedOption}
                     option={option}

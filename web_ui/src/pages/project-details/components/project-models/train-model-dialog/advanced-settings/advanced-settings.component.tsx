@@ -97,9 +97,9 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         },
         {
             name: 'Evaluation',
-            children: <></>,
+            children: undefined /*<Evaluation evaluationParameters={evaluationParameters} />*/,
         },
-    ];
+    ].filter((tab) => tab.children !== undefined);
 
     return (
         <Flex direction={'column'} gap={'size-100'} height={'100%'}>

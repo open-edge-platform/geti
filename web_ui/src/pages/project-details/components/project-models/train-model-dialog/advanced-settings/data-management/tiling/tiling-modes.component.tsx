@@ -3,9 +3,10 @@
 
 import { FC } from 'react';
 
-import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
+import { Text } from '@adobe/react-spectrum';
 
-import { OptionsButtons } from '../../ui/options-buttons/options-buttons.component';
+import { ToggleButtons } from '../../ui/toggle-buttons/toggle-buttons.component';
+import { Tooltip } from '../../ui/tooltip.component';
 
 import styles from './tiling.module.scss';
 
@@ -17,14 +18,10 @@ export enum TILING_MODES {
 
 const TilingModeTooltip: FC = () => {
     return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>
-                    Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to
-                    increase accuracy for small object detection tasks.
-                </Text>
-            </Content>
-        </ContextualHelp>
+        <Tooltip>
+            Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to increase
+            accuracy for small object detection tasks.
+        </Tooltip>
     );
 };
 
@@ -39,7 +36,7 @@ export const TilingModes: FC<TilingModesProps> = ({ selectedTilingMode, onTiling
             <Text UNSAFE_className={styles.title} width={'size-3000'}>
                 Tiling mode <TilingModeTooltip />
             </Text>
-            <OptionsButtons
+            <ToggleButtons
                 options={[TILING_MODES.OFF, TILING_MODES.Adaptive, TILING_MODES.Manual]}
                 selectedOption={selectedTilingMode}
                 onOptionChange={onTilingModeChange}

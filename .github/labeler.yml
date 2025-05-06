@@ -10,6 +10,11 @@ IAI:
         - 'docs/rest_api/**/*'
         - 'interactive_ai/**/*'
 
+Platform:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'platform/**/*'
+
 documentation:
   - changed-files:
     - any-glob-to-any-file:

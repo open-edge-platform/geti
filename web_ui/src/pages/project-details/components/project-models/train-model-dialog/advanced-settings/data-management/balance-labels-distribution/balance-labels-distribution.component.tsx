@@ -3,12 +3,13 @@
 
 import { FC, useState } from 'react';
 
-import { Content, ContextualHelp, Flex, Grid, Heading, Text, View } from '@adobe/react-spectrum';
+import { Flex, Grid, Heading, Text, View } from '@adobe/react-spectrum';
 import isEmpty from 'lodash/isEmpty';
 import { useNumberFormatter } from 'react-aria';
 
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
 import { Accordion } from '../../ui/accordion/accordion.component';
+import { Tooltip } from '../../ui/tooltip.component';
 
 import styles from './balance-labels-distribution.module.scss';
 
@@ -76,17 +77,16 @@ const LabelsDistribution: FC<LabelsDistributionProps> = ({ labels }) => {
 
 const BalanceLabelsDistributionTooltip: FC = () => {
     return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>
-                    This option creates another dataset (Balanced set), it does not alter the original dataset. The new
-                    balanced dataset does not occupy additional storage.
-                </Text>
-            </Content>
-        </ContextualHelp>
+        <Tooltip>
+            This option creates another dataset (Balanced set), it does not alter the original dataset. The new balanced
+            dataset does not occupy additional storage.
+        </Tooltip>
     );
 };
 
+/*
+ * This component is currently not used in the v1 of Training flow revamp. Will be used in the later version.
+ */
 export const BalanceLabelsDistribution: FC = () => {
     const [isEnabled, setIsEnabled] = useState<boolean>(false);
 
