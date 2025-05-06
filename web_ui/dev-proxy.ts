@@ -38,7 +38,10 @@ const proxyPaths = [
 const CSP_CONNECT = process.env.REACT_APP_GETI_CSP_CONNECT_DOMAIN ?? '';
 const proxy = process.env.HTTPS_PROXY ?? process.env.HTTP_PROXY ?? '';
 const useProxy =
-    proxy && (API.includes(GETI_DEV_DOMAIN) || API.includes(GETI_STAGING_DOMAIN) || API.includes('intel.com'));
+    proxy &&
+    ((GETI_DEV_DOMAIN !== '' && API.includes(GETI_DEV_DOMAIN)) ||
+        (GETI_STAGING_DOMAIN !== '' && API.includes(GETI_STAGING_DOMAIN)) ||
+        API.includes('intel.com'));
 
 const agent = useProxy
     ? new HttpsProxyAgent<string>(proxy, { rejectUnauthorized: false })
