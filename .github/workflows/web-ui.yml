@@ -4,9 +4,12 @@ on:
   workflow_call:
     inputs:
       image-tag:
-        description: 'Docker image tag'
+        description: "Docker image tag"
         type: string
         required: true
+
+permissions:
+  contents: read # required by all jobs to checkout code
 
 jobs:
   build:
