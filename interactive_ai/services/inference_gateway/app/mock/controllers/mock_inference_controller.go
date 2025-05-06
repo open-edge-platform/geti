@@ -5,11 +5,11 @@ package controllers
 import (
 	entities "inference_gateway/app/entities"
 
-	errors "geti.com/go_sdk/errors"
+	errors "geti.com/iai_core/errors"
 
 	gin "github.com/gin-gonic/gin"
 
-	go_sdkentities "geti.com/go_sdk/entities"
+	go_sdkentities "geti.com/iai_core/entities"
 
 	mock "github.com/stretchr/testify/mock"
 

@@ -33,7 +33,6 @@ import classes from './annotation-list-item.module.scss';
 
 interface AnnotationListItemContentProps {
     isLast?: boolean;
-    isDragging?: boolean;
     annotation: Annotation;
     annotationToolContext: AnnotationToolContext;
 }
@@ -132,7 +131,6 @@ const EditLabels = ({ annotation, annotationToolContext, close }: EditLabelsProp
 
 export const AnnotationListItemContent = ({
     isLast = false,
-    isDragging = false,
     annotation,
     annotationToolContext,
 }: AnnotationListItemContentProps): JSX.Element => {
@@ -177,7 +175,6 @@ export const AnnotationListItemContent = ({
     return (
         <ListItemGrid
             isLast={isLast}
-            isDragging={isDragging}
             isSelected={annotation.isSelected}
             id={`annotation-list-item-${annotation.id}`}
             ariaLabel={`Annotation with id ${annotation.id}`}
