@@ -52,7 +52,8 @@ export const useTrainingConfigurationMutation = () => {
         },
         onSuccess: async (_, { projectIdentifier, queryParameters }) => {
             await queryClient.invalidateQueries({
-                queryKey: QUERY_KEYS.CONFIGURATION_PARAMETERS.TRAINING(projectIdentifier, queryParameters),
+                queryKey: trainingConfigurationQueryOptions(configParametersService, projectIdentifier, queryParameters)
+                    .queryKey,
             });
         },
     });
