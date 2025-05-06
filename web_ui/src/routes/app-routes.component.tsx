@@ -62,7 +62,7 @@ import {
     RedirectToOptimizedModel,
     RedirectToUsersProfile,
     RedirectToWorkspace,
-} from './redirect.component.tsx';
+} from './redirect.component';
 import { RoutesCollector } from './routes-collector.component';
 import { UsersRoute } from './users/index.route';
 
