@@ -11,7 +11,7 @@ SPEC_HASH_FILE := .openapi_spec_hash
 
 all: test
 
-bdd-venv:
+venv:
 	uv sync
 	$(MAKE) generate_client_if_needed;
 	uv pip install -e $(CLIENT_PATH)
@@ -40,7 +40,7 @@ generate_client_if_needed: generate_json_spec
 	fi; \
 	echo $$SHA > $(SPEC_HASH_FILE)
 
-tests: bdd-venv
+tests: venv
 	@if [ -z "$(FEATURE)" ]; then \
 	  echo "Selected features: all"; \
 	  TARGET="features"; \
@@ -56,17 +56,20 @@ tests: bdd-venv
 	fi; \
 	uv run -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
-test_wip: bdd-venv
+test_wip: venv
 	@echo "Running WIP tests..."
 	uv run behave --wip features
 
-test_smoke: bdd-venv
+test_smoke: venv
 	@$(MAKE) tests BDD_TAG=@smoke
 
-report: bdd-venv
+report: venv
 	@echo "Generating HTML report..."
 	@mkdir -p $(MAKEFILE_DIR)/reports/html
 	@. $(ACTIVATE); for file in reports/junit/*.xml; do \
 	  basefile=$$(basename "$$file" .xml); \
 	  junit2html "$$file" "reports/html/$$basefile.html"; \
 	done
+
+mypy: venv
+	uv run mypy features --config-file=pyproject.toml

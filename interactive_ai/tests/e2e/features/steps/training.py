@@ -29,8 +29,7 @@ def _train(
         (
             task.id
             for task in context.project_info.pipeline.tasks
-            if task.labels
-            and (not task_type or TaskType(task.task_type) == TaskType(task_type))
+            if task.labels and (not task_type or TaskType(task.task_type) == TaskType(task_type))
         ),
         None,
     )
@@ -84,7 +83,7 @@ def step_then_model_created(context: Context, expected_model_type: str):
 
     trained_model_type = context.model_storage_info.model_template_id
     assert trained_model_type == expected_model_type, (
-        f"The trained model does not have the expected architecture (expected '{expected_model_type}', found '{trained_model_type}')"
+        f"The trained model does not have the expected architecture (expected '{expected_model_type}', found '{trained_model_type}')"  # noqa: E501
     )
 
 
@@ -102,38 +101,24 @@ def step_then_model_has_training_time_statistics(context: Context):
 
     available_headers = {statistic.header for statistic in model_statistics}
     is_anomaly_project = any(
-        TaskType(task.task_type) is TaskType.ANOMALY
-        for task in context.project_info.pipeline.tasks
-        if task.labels
+        TaskType(task.task_type) is TaskType.ANOMALY for task in context.project_info.pipeline.tasks if task.labels
     )
 
-    assert "Training date" in available_headers, (
-        "Training date is missing from model statistics"
-    )
-    assert "Training job duration" in available_headers, (
-        "Training job duration is missing from model statistics"
-    )
-    assert "Training duration" in available_headers, (
-        "Training duration is missing from model statistics"
-    )
-    assert "Dataset split" in available_headers, (
-        "Dataset split is missing from model statistics"
-    )
+    assert "Training date" in available_headers, "Training date is missing from model statistics"
+    assert "Training job duration" in available_headers, "Training job duration is missing from model statistics"
+    assert "Training duration" in available_headers, "Training duration is missing from model statistics"
+    assert "Dataset split" in available_headers, "Dataset split is missing from model statistics"
     if not is_anomaly_project:  # Some anomaly models do not output loss statistics
-        assert any("loss" in h.lower() for h in available_headers), (
-            "Loss statistics are missing"
-        )
+        assert any("loss" in h.lower() for h in available_headers), "Loss statistics are missing"
 
 
 @then("the model has a training dataset")
 def step_then_model_has_training_dataset(context: Context):
-    assert context.model_info.training_dataset_info is not None, (
-        "Model does not have a training dataset"
-    )
+    assert context.model_info.training_dataset_info is not None, "Model does not have a training dataset"
 
 
 @then("the model lifecycle stage is {lifecycle_stage}")
 def step_then_model_lifecycle_is(context: Context, lifecycle_stage: str):
     assert context.model_info.lifecycle_stage == lifecycle_stage, (
-        f"Model is not in the expected lifecycle stage (expected '{lifecycle_stage}', found '{context.model_info.lifecycle_stage}'."
+        f"Model is not in the expected lifecycle stage (expected '{lifecycle_stage}', found '{context.model_info.lifecycle_stage}'."  # noqa: E501
     )

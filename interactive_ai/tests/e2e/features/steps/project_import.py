@@ -35,20 +35,14 @@ def _resolve_project_to_import(
     trained: bool = False,
     trainer_type: TrainerType | None = None,
 ) -> Path:
-    project_type_pattern = (
-        project_type.value.replace(" > ", "_").replace(" ", "_").lower()
-    )
+    project_type_pattern = project_type.value.replace(" > ", "_").replace(" ", "_").lower()
 
     if trained:
         if trainer_type is None or trainer_type == TrainerType.OTX_2x:
             project_archive_name = f"{project_type_pattern}-trained.zip"
         else:
-            trainer_type_pattern = (
-                trainer_type.value.replace(".", "").replace(" ", "_").lower()
-            )
-            project_archive_name = (
-                f"{project_type_pattern}-trained-{trainer_type_pattern}.zip"
-            )
+            trainer_type_pattern = trainer_type.value.replace(".", "").replace(" ", "_").lower()
+            project_archive_name = f"{project_type_pattern}-trained-{trainer_type_pattern}.zip"
     else:
         project_archive_name = f"{project_type_pattern}-small.zip"
 
@@ -58,9 +52,7 @@ def _resolve_project_to_import(
     if not local_project_archive_path.exists():
         remote_relative_path = Path(f"projects/{project_archive_name}")
         try:
-            logger.info(
-                f"Downloading project archive file from remote archive: {remote_relative_path}"
-            )
+            logger.info(f"Downloading project archive file from remote archive: {remote_relative_path}")
             download_file_from_remote_archive(
                 remote_file_path=remote_relative_path,
                 local_file_path=local_project_archive_path,
@@ -90,12 +82,8 @@ def step_given_annotated_project(context: Context, project_type: str) -> None:
     """)
 
 
-@given(
-    "a trained exported project archive of type '{project_type}' trained with '{trainer}'"
-)
-def step_given_exported_project_archive_trainer(
-    context: Context, project_type: str, trainer: str
-) -> None:
+@given("a trained exported project archive of type '{project_type}' trained with '{trainer}'")
+def step_given_exported_project_archive_trainer(context: Context, project_type: str, trainer: str) -> None:
     context.project_to_import_path = _resolve_project_to_import(
         projects_dir=context.projects_dir,
         project_type=ProjectType(project_type),
@@ -105,9 +93,7 @@ def step_given_exported_project_archive_trainer(
 
 
 @given("a trained project of type '{project_type}' trained with '{trainer}'")
-def step_given_trained_project_with_trainer(
-    context: Context, project_type: str, trainer: str
-) -> None:
+def step_given_trained_project_with_trainer(context: Context, project_type: str, trainer: str) -> None:
     context.execute_steps(f"""
         Given a trained exported project archive of type '{project_type}' trained with '{trainer}'
           When the user uploads the project archive to the platform to create a new project
@@ -119,9 +105,7 @@ def step_given_trained_project_with_trainer(
 
 @given("a trained project of type '{project_type}'")
 def step_given_trained_project(context: Context, project_type: str) -> None:
-    step_given_trained_project_with_trainer(
-        context, project_type=project_type, trainer=TrainerType.OTX_2x.value
-    )
+    step_given_trained_project_with_trainer(context, project_type=project_type, trainer=TrainerType.OTX_2x.value)
 
 
 @when("the user uploads the project archive to the platform to create a new project")
@@ -130,13 +114,11 @@ def step_when_user_uploads_project_to_new_project(context: Context) -> None:
     project_to_import_path = context.project_to_import_path
 
     # Create TUS upload
-    create_tus_upload_response = (
-        project_ie_api.create_tus_project_upload_with_http_info(
-            organization_id=context.organization_id,
-            workspace_id=context.workspace_id,
-            tus_resumable="1.0.0",
-            upload_length=project_to_import_path.stat().st_size,
-        )
+    create_tus_upload_response = project_ie_api.create_tus_project_upload_with_http_info(
+        organization_id=context.organization_id,
+        workspace_id=context.workspace_id,
+        tus_resumable="1.0.0",
+        upload_length=project_to_import_path.stat().st_size,
     )
     assert create_tus_upload_response.status_code == 201, (
         f"Failed to create TUS upload: {create_tus_upload_response.raw_data}"
@@ -152,9 +134,7 @@ def step_when_user_uploads_project_to_new_project(context: Context) -> None:
     current_offset = 0
     with open(project_to_import_path, "rb") as file:
         while chunk := file.read(TUS_UPLOAD_CHUNK_SIZE):
-            logger.debug(
-                f"Uploading chunk of size {len(chunk)} bytes at offset {current_offset}"
-            )
+            logger.debug(f"Uploading chunk of size {len(chunk)} bytes at offset {current_offset}")
             project_ie_api.tus_project_upload_patch(
                 organization_id=context.organization_id,
                 workspace_id=context.workspace_id,

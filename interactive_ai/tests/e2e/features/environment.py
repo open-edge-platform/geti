@@ -44,13 +44,13 @@ from geti_client import (
 BEHAVE_DEBUG_ON_ERROR = True
 
 
-def setup_debug_on_error(userdata) -> None:  # noqa: ANN001
-    global BEHAVE_DEBUG_ON_ERROR
+def setup_debug_on_error(userdata) -> None:
+    global BEHAVE_DEBUG_ON_ERROR  # noqa: PLW0603
     BEHAVE_DEBUG_ON_ERROR = userdata.getbool("BEHAVE_DEBUG_ON_ERROR")
 
 
 @fixture
-def fxt_geti_server_config(context: Context) -> Configuration:
+def fxt_geti_server_config(context: Context) -> Configuration:  # noqa: ARG001
     geti_server_url = os.environ.get("GETI_SERVER_URL")
     if not geti_server_url:
         raise OSError("GETI_SERVER_URL env variable is not set")
@@ -144,7 +144,7 @@ def fxt_models_api(context: Context) -> ModelsApi:
 
 
 @fixture
-def fxt_organizations_api(context) -> OrganizationsApi:  # noqa: ANN001
+def fxt_organizations_api(context) -> OrganizationsApi:
     with context.api_client as api_client:
         context.organizations_api = OrganizationsApi(api_client)
         yield context.organizations_api
@@ -247,14 +247,14 @@ def before_all(context: Context) -> None:
     _setup_data_dirs(context)
 
 
-def after_step(context, step) -> None:  # noqa: ANN001
+def after_step(context, step) -> None:  # noqa: ARG001
     if BEHAVE_DEBUG_ON_ERROR and step.status == "failed":
         import pdb
 
         pdb.post_mortem(step.exc_traceback)
 
 
-def after_scenario(context: Context, scenario) -> None:
+def after_scenario(context: Context, scenario) -> None:  # noqa: ARG001
     try:
         _cleanup_project(context)
     except ApiException as e:

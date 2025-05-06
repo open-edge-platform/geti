@@ -46,9 +46,7 @@ class JobType(str, Enum):
     OPTIMIZATION = "optimize_pot"
     EVALUATION = "test"
     DATASET_IMPORT_TO_NEW_PROJECT_PREPARATION = "prepare_import_to_new_project"
-    DATASET_IMPORT_TO_EXISTING_PROJECT_PREPARATION = (
-        "prepare_import_to_existing_project"
-    )
+    DATASET_IMPORT_TO_EXISTING_PROJECT_PREPARATION = "prepare_import_to_existing_project"
     DATASET_IMPORT_TO_NEW_PROJECT = "perform_import_to_new_project"
     DATASET_IMPORT_TO_EXISTING_PROJECT = "perform_import_to_existing_project"
     DATASET_EXPORT = "export_dataset"
@@ -156,9 +154,7 @@ PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING = {
 
 
 # Map project types to the equivalent dataset import/export project types
-PROJECT_TYPE_TO_DATASET_IE_PROJECT_TYPE_MAPPING: dict[
-    ProjectType, DatasetIEProjectType
-] = {
+PROJECT_TYPE_TO_DATASET_IE_PROJECT_TYPE_MAPPING: dict[ProjectType, DatasetIEProjectType] = {
     ProjectType.MULTICLASS_CLASSIFICATION: DatasetIEProjectType.CLASSIFICATION,
     ProjectType.MULTILABEL_CLASSIFICATION: DatasetIEProjectType.CLASSIFICATION,
     ProjectType.HIERARCHICAL_CLASSIFICATION: DatasetIEProjectType.CLASSIFICATION_HIERARCHICAL,

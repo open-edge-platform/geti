@@ -34,17 +34,11 @@ def _add_label(context: Context, new_label_name: str) -> None:
     projects_api: ProjectsApi = context.projects_api
     project_info: CreateProject201Response = context.project_info
     first_non_empty_label = next(
-        label
-        for task in project_info.pipeline.tasks
-        if task.labels
-        for label in task.labels
-        if not label.is_empty
+        label for task in project_info.pipeline.tasks if task.labels for label in task.labels if not label.is_empty
     )
     edit_pipeline = EditProjectRequestPipeline(
         connections=[
-            EditProjectRequestPipelineConnectionsInner(
-                var_from=conn.var_from, to=conn.to
-            )
+            EditProjectRequestPipelineConnectionsInner(var_from=conn.var_from, to=conn.to)
             for conn in project_info.pipeline.connections
         ],
         tasks=[
@@ -111,9 +105,7 @@ def step_when_user_deletes_label(context: Context, label_name: str) -> None:
     project_info: CreateProject201Response = context.project_info
     edit_pipeline = EditProjectRequestPipeline(
         connections=[
-            EditProjectRequestPipelineConnectionsInner(
-                var_from=conn.var_from, to=conn.to
-            )
+            EditProjectRequestPipelineConnectionsInner(var_from=conn.var_from, to=conn.to)
             for conn in project_info.pipeline.connections
         ],
         tasks=[
@@ -192,9 +184,7 @@ def step_then_project_has_labels(context: Context, raw_label_names: str) -> None
 
     # Verify that the project has the expected labels (plus the empty label, if applicable)
     expected_label_names = set(raw_label_names.split(", "))
-    if empty_label_name := PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(
-        context.project_type
-    ):
+    if empty_label_name := PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(context.project_type):
         expected_label_names.add(empty_label_name)
     found_label_names = {
         label.name

@@ -35,7 +35,7 @@ def _predict(context: Context, image_path: Path) -> None:
         workspace_id=context.workspace_id,
         project_id=context.project_id,
         pipeline_id="active",
-        file=open(str(image_path), "rb").read(),
+        file=open(str(image_path), "rb").read(),  # noqa: SIM115
         use_cache="never",
         # Workaround for an openapi-generator issue where it always select
         # application/json as the content-type regardless of input parameters.
@@ -52,9 +52,7 @@ def _resolve_image_to_upload(images_dir: Path, image_name: str) -> Path:
     if not local_image_path.exists():
         remote_relative_path = Path(f"images/{image_name}")
         try:
-            logger.info(
-                f"Downloading image file from remote archive: {remote_relative_path}"
-            )
+            logger.info(f"Downloading image file from remote archive: {remote_relative_path}")
             download_file_from_remote_archive(
                 remote_file_path=remote_relative_path,
                 local_file_path=local_image_path,
@@ -68,9 +66,7 @@ def _resolve_image_to_upload(images_dir: Path, image_name: str) -> Path:
 
 @given("an annotated image of name '{image_name}'")
 def step_given_annotated_image(context: Context, image_name: str) -> None:
-    context.image_to_upload_path = _resolve_image_to_upload(
-        images_dir=context.images_dir, image_name=image_name
-    )
+    context.image_to_upload_path = _resolve_image_to_upload(images_dir=context.images_dir, image_name=image_name)
 
 
 @when("the user uploads a single image for prediction")
@@ -79,21 +75,13 @@ def step_when_user_uploads_image_for_prediction(context: Context) -> None:
 
 
 @then("the prediction has labels '{raw_expected_label_names}'")
-def step_then_prediction_has_expected_labels(
-    context: Context, raw_expected_label_names: str
-) -> None:
+def step_then_prediction_has_expected_labels(context: Context, raw_expected_label_names: str) -> None:
     predictions = context.prediction.predictions
 
     expected_label_names = raw_expected_label_names.split(", ")
 
-    label_info_by_id = {
-        label.id: label for label in context.label_info_by_name.values()
-    }
-    found_label_names = [
-        label_info_by_id[label.id].name
-        for prediction in predictions
-        for label in prediction.labels
-    ]
+    label_info_by_id = {label.id: label for label in context.label_info_by_name.values()}
+    found_label_names = [label_info_by_id[label.id].name for prediction in predictions for label in prediction.labels]
     expected_label_names_freq = Counter(expected_label_names)
     found_label_names_freq = Counter(found_label_names)
     assert expected_label_names_freq == found_label_names_freq, (
@@ -103,9 +91,5 @@ def step_then_prediction_has_expected_labels(
 
 
 @then("the prediction has label '{expected_label_name}'")
-def step_then_prediction_has_expected_label(
-    context: Context, expected_label_name: str
-) -> None:
-    step_then_prediction_has_expected_labels(
-        context=context, raw_expected_label_names=expected_label_name
-    )
+def step_then_prediction_has_expected_label(context: Context, expected_label_name: str) -> None:
+    step_then_prediction_has_expected_labels(context=context, raw_expected_label_names=expected_label_name)

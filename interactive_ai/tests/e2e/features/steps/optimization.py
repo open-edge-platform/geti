@@ -47,12 +47,8 @@ def step_when_user_tries_optimizing_model(context: Context) -> None:
         context.exception = e
 
 
-@then(
-    "a model of type '{expected_model_type}' and optimization type '{expected_optimization_type}' is created"
-)
-def step_then_model_created(
-    context: Context, expected_model_type: str, expected_optimization_type: str
-):
+@then("a model of type '{expected_model_type}' and optimization type '{expected_optimization_type}' is created")
+def step_then_model_created(context: Context, expected_model_type: str, expected_optimization_type: str):
     optimize_job_info: OptimizeJob = context.job_info.actual_instance
 
     context.model_storage_id = optimize_job_info.metadata.model_storage_id
@@ -77,8 +73,8 @@ def step_then_model_created(
     optimized_models = context.model_info.optimized_models
     optimization_types = {model.optimization_type for model in optimized_models}
     assert optimization_model_type == expected_model_type, (
-        f"The optimized model does not have the expected architecture (expected '{expected_model_type}', found '{optimization_model_type}')"
+        f"The optimized model does not have the expected architecture (expected '{expected_model_type}', found '{optimization_model_type}')"  # noqa: E501
     )
     assert expected_optimization_type in optimization_types, (
-        f"The optimized model does not have the expected optimization type (expected '{expected_optimization_type}', found '{optimization_types}'"
+        f"The optimized model does not have the expected optimization type (expected '{expected_optimization_type}', found '{optimization_types}'"  # noqa: E501
     )

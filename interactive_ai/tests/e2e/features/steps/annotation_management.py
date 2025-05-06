@@ -47,9 +47,7 @@ class Annotation:
     label_ids: list[str]
 
 
-def _generate_random_bbox_coords(
-    media_width: int, media_height: int, empty_label: bool
-) -> tuple[int, int, int, int]:
+def _generate_random_bbox_coords(media_width: int, media_height: int, empty_label: bool) -> tuple[int, int, int, int]:
     if empty_label:
         return 0, 0, media_width, media_height
 
@@ -61,34 +59,23 @@ def _generate_random_bbox_coords(
     return x, y, w, h
 
 
-def _generate_random_rotated_bbox_coords(
-    media_width: int, media_height: int
-) -> tuple[int, int, int, int, float]:
-    x, y, w, h = _generate_random_bbox_coords(
-        media_width=media_width, media_height=media_height, empty_label=False
-    )
+def _generate_random_rotated_bbox_coords(media_width: int, media_height: int) -> tuple[int, int, int, int, float]:
+    x, y, w, h = _generate_random_bbox_coords(media_width=media_width, media_height=media_height, empty_label=False)
     angle = random.uniform(-180.0, 180.0)
 
     return x, y, w, h, angle
 
 
-def _generate_random_polygon_coords(
-    media_width: int, media_height: int
-) -> list[tuple[int, int]]:
+def _generate_random_polygon_coords(media_width: int, media_height: int) -> list[tuple[int, int]]:
     num_points = random.randint(3, 10)
-    return [
-        (random.randint(0, media_width - 1), random.randint(0, media_height - 1))
-        for _ in range(num_points)
-    ]
+    return [(random.randint(0, media_width - 1), random.randint(0, media_height - 1)) for _ in range(num_points)]
 
 
-def _generate_random_keypoint_coords(
-    media_width: int, media_height: int
-) -> tuple[int, int]:
+def _generate_random_keypoint_coords(media_width: int, media_height: int) -> tuple[int, int]:
     return random.randint(0, media_width - 1), random.randint(0, media_height - 1)
 
 
-def _annotate_image_or_frame(  # noqa: C901
+def _annotate_image_or_frame(  # noqa: C901, PLR0912, PLR0915
     context: Context,
     media_type: str,
     media_name: str,
@@ -107,9 +94,7 @@ def _annotate_image_or_frame(  # noqa: C901
                 type="image",
             )
             create_annotations_inner = CreateImageAnnotationRequestAnnotationsInner
-            create_annotation_labels_inner = (
-                CreateImageAnnotationRequestAnnotationsInnerLabelsInner
-            )
+            create_annotation_labels_inner = CreateImageAnnotationRequestAnnotationsInnerLabelsInner
         case "video":
             media_identifier = CreateVideoFrameAnnotationRequestMediaIdentifier(
                 video_id=media_details.id,
@@ -117,20 +102,15 @@ def _annotate_image_or_frame(  # noqa: C901
                 frame_index=frame_index,
             )
             create_annotations_inner = CreateVideoFrameAnnotationRequestAnnotationsInner
-            create_annotation_labels_inner = (
-                CreateVideoFrameAnnotationRequestAnnotationsInnerLabelsInner
-            )
+            create_annotation_labels_inner = CreateVideoFrameAnnotationRequestAnnotationsInnerLabelsInner
         case _:
             raise ValueError(f"Unsupported media type: {media_type}")
 
     annotations: list[
-        CreateImageAnnotationRequestAnnotationsInner
-        | CreateVideoFrameAnnotationRequestAnnotationsInner
+        CreateImageAnnotationRequestAnnotationsInner | CreateVideoFrameAnnotationRequestAnnotationsInner
     ] = []
     label_req_obj_by_name = {
-        label_name: create_annotation_labels_inner(
-            id=context.label_info_by_name[label_name].id
-        )
+        label_name: create_annotation_labels_inner(id=context.label_info_by_name[label_name].id)
         for label_name in labels
     }
     match context.project_type:
@@ -144,13 +124,9 @@ def _annotate_image_or_frame(  # noqa: C901
                 ProjectType.MULTICLASS_CLASSIFICATION,
                 ProjectType.ANOMALY_DETECTION,
             ]:
-                assert len(labels) == 1, (
-                    f"{context.project_type} projects support only one label"
-                )
+                assert len(labels) == 1, f"{context.project_type} projects support only one label"
             if context.project_type == ProjectType.ANOMALY_DETECTION:
-                assert labels[0] in ("Normal", "Anomalous"), (
-                    f"Invalid label {labels[0]} for anomaly detection project"
-                )
+                assert labels[0] in ("Normal", "Anomalous"), f"Invalid label {labels[0]} for anomaly detection project"
             annotations = [
                 create_annotations_inner(
                     id=str(uuid4()),
@@ -163,9 +139,7 @@ def _annotate_image_or_frame(  # noqa: C901
                             height=media_height,
                         )
                     ),
-                    labels=[
-                        label_req_obj_by_name[label_name] for label_name in labels
-                    ],  # all labels to the same bbox
+                    labels=[label_req_obj_by_name[label_name] for label_name in labels],  # all labels to the same bbox
                 )
             ]
         case ProjectType.DETECTION:
@@ -184,9 +158,7 @@ def _annotate_image_or_frame(  # noqa: C901
                         labels=[label_req_obj_by_name[label_name]],
                     )
                 )
-        case (
-            ProjectType.ORIENTED_DETECTION
-        ):  # create a rotated bbox for each label (or full-image box for empty label)
+        case ProjectType.ORIENTED_DETECTION:  # create a rotated bbox for each label (or full-image box for empty label)
             for label_name in labels:
                 if context.label_info_by_name[label_name].is_empty:
                     x, y, w, h = 0, 0, media_width, media_height
@@ -229,13 +201,9 @@ def _annotate_image_or_frame(  # noqa: C901
                 else:
                     points = [
                         Point(x=x, y=y)
-                        for x, y in _generate_random_polygon_coords(
-                            media_width=media_width, media_height=media_height
-                        )
+                        for x, y in _generate_random_polygon_coords(media_width=media_width, media_height=media_height)
                     ]
-                    shape = CreateImageAnnotationRequestAnnotationsInnerShape(
-                        Polygon(type="POLYGON", points=points)
-                    )
+                    shape = CreateImageAnnotationRequestAnnotationsInnerShape(Polygon(type="POLYGON", points=points))
                 annotations.append(
                     create_annotations_inner(
                         id=str(uuid4()),
@@ -290,13 +258,9 @@ def _annotate_image_or_frame(  # noqa: C901
                 for label_name in labels[1:]:
                     points = [
                         Point(x=x + sx, y=y + sy)
-                        for sx, sy in _generate_random_polygon_coords(
-                            media_width=w, media_height=h
-                        )
+                        for sx, sy in _generate_random_polygon_coords(media_width=w, media_height=h)
                     ]
-                    shape = CreateImageAnnotationRequestAnnotationsInnerShape(
-                        Polygon(type="POLYGON", points=points)
-                    )
+                    shape = CreateImageAnnotationRequestAnnotationsInnerShape(Polygon(type="POLYGON", points=points))
                     annotations.append(
                         create_annotations_inner(
                             id=str(uuid4()),
@@ -305,9 +269,7 @@ def _annotate_image_or_frame(  # noqa: C901
                         )
                     )
         case _:
-            raise NotImplementedError(
-                f"Implementation not yet available for project type {context.project_type}"
-            )
+            raise NotImplementedError(f"Implementation not yet available for project type {context.project_type}")
 
     match media_type:
         case "image":
@@ -374,18 +336,12 @@ def _get_image_or_frame_annotations(
 
 
 @when("the user annotates the image '{image_name}' with label '{label_name}'")
-def step_when_user_annotates_image_with_custom_label(
-    context: Context, image_name: str, label_name: str
-) -> None:
-    _annotate_image_or_frame(
-        context=context, media_type="image", media_name=image_name, labels=[label_name]
-    )
+def step_when_user_annotates_image_with_custom_label(context: Context, image_name: str, label_name: str) -> None:
+    _annotate_image_or_frame(context=context, media_type="image", media_name=image_name, labels=[label_name])
 
 
 @when("the user annotates the image '{image_name}' with labels '{label_names}'")
-def step_when_user_annotates_image_with_custom_labels(
-    context: Context, image_name: str, label_names: str
-) -> None:
+def step_when_user_annotates_image_with_custom_labels(context: Context, image_name: str, label_names: str) -> None:
     _annotate_image_or_frame(
         context=context,
         media_type="image",
@@ -395,16 +351,10 @@ def step_when_user_annotates_image_with_custom_labels(
 
 
 @when("the user annotates the image '{image_name}' with the empty label")
-def step_when_user_annotates_image_with_empty_label(
-    context: Context, image_name: str
-) -> None:
-    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(
-        context.project_type
-    )
+def step_when_user_annotates_image_with_empty_label(context: Context, image_name: str) -> None:
+    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(context.project_type)
     labels = [empty_label_name] if empty_label_name else []
-    _annotate_image_or_frame(
-        context=context, media_type="image", media_name=image_name, labels=labels
-    )
+    _annotate_image_or_frame(context=context, media_type="image", media_name=image_name, labels=labels)
 
 
 @when("the user tries to annotate the image '{image_name}' with labels '{label_names}'")
@@ -423,22 +373,14 @@ def step_when_user_tries_annotating_image_with_custom_labels(
 
 
 @then("the image '{image_name}' has labels '{raw_expected_label_names}'")
-def step_then_image_has_expected_labels(
-    context: Context, image_name: str, raw_expected_label_names: str
-) -> None:
-    annotations = _get_image_or_frame_annotations(
-        context=context, media_type="image", media_name=image_name
-    )
+def step_then_image_has_expected_labels(context: Context, image_name: str, raw_expected_label_names: str) -> None:
+    annotations = _get_image_or_frame_annotations(context=context, media_type="image", media_name=image_name)
 
     expected_label_names = raw_expected_label_names.split(", ")
 
-    label_info_by_id = {
-        label.id: label for label in context.label_info_by_name.values()
-    }
+    label_info_by_id = {label.id: label for label in context.label_info_by_name.values()}
     found_label_names = [
-        label_info_by_id[label_id].name
-        for annotation in annotations
-        for label_id in annotation.label_ids
+        label_info_by_id[label_id].name for annotation in annotations for label_id in annotation.label_ids
     ]
     expected_label_names_freq = Counter(expected_label_names)
     found_label_names_freq = Counter(found_label_names)
@@ -449,9 +391,7 @@ def step_then_image_has_expected_labels(
 
 
 @then("the image '{image_name}' has label '{expected_label_name}'")
-def step_then_image_has_expected_label(
-    context: Context, image_name: str, expected_label_name: str
-) -> None:
+def step_then_image_has_expected_label(context: Context, image_name: str, expected_label_name: str) -> None:
     step_then_image_has_expected_labels(
         context=context,
         image_name=image_name,
@@ -461,17 +401,11 @@ def step_then_image_has_expected_label(
 
 @then("the image '{image_name}' has the empty label")
 def step_then_image_has_empty_label(context: Context, image_name: str) -> None:
-    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(
-        context.project_type
-    )
-    step_then_image_has_expected_label(
-        context=context, image_name=image_name, expected_label_name=empty_label_name
-    )
+    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(context.project_type)
+    step_then_image_has_expected_label(context=context, image_name=image_name, expected_label_name=empty_label_name)
 
 
-@when(
-    "the user annotates frame {frame_index:d} of the video '{video_name}' with label '{label_name}'"
-)
+@when("the user annotates frame {frame_index:d} of the video '{video_name}' with label '{label_name}'")
 def step_when_user_annotates_video_frame_with_custom_label(
     context: Context, frame_index: int, video_name: str, label_name: str
 ) -> None:
@@ -484,9 +418,7 @@ def step_when_user_annotates_video_frame_with_custom_label(
     )
 
 
-@when(
-    "the user annotates frame {frame_index:d} of the video '{video_name}' with labels '{label_names}'"
-)
+@when("the user annotates frame {frame_index:d} of the video '{video_name}' with labels '{label_names}'")
 def step_when_user_annotates_video_frame_with_custom_labels(
     context: Context, frame_index: int, video_name: str, label_names: str
 ) -> None:
@@ -499,15 +431,9 @@ def step_when_user_annotates_video_frame_with_custom_labels(
     )
 
 
-@when(
-    "the user annotates frame {frame_index:d} of the video '{video_name}' with the empty label"
-)
-def step_when_user_annotates_video_frame_with_empty_label(
-    context: Context, frame_index: int, video_name: str
-) -> None:
-    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(
-        context.project_type
-    )
+@when("the user annotates frame {frame_index:d} of the video '{video_name}' with the empty label")
+def step_when_user_annotates_video_frame_with_empty_label(context: Context, frame_index: int, video_name: str) -> None:
+    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(context.project_type)
     labels = [empty_label_name] if empty_label_name else []
     _annotate_image_or_frame(
         context=context,
@@ -518,9 +444,7 @@ def step_when_user_annotates_video_frame_with_empty_label(
     )
 
 
-@when(
-    "the user tries to annotate frame {frame_index:d} of the video '{video_name}' with labels '{label_names}'"
-)
+@when("the user tries to annotate frame {frame_index:d} of the video '{video_name}' with labels '{label_names}'")
 def step_when_user_tries_annotating_video_frame_with_custom_labels(
     context: Context, frame_index: int, video_name: str, label_names: str
 ) -> None:
@@ -536,9 +460,7 @@ def step_when_user_tries_annotating_video_frame_with_custom_labels(
         context.exception = e
 
 
-@then(
-    "frame {frame_index:d} of the video '{video_name}' has labels '{raw_expected_label_names}'"
-)
+@then("frame {frame_index:d} of the video '{video_name}' has labels '{raw_expected_label_names}'")
 def step_then_video_frame_has_expected_labels(
     context: Context,
     frame_index: int,
@@ -554,13 +476,9 @@ def step_then_video_frame_has_expected_labels(
 
     expected_label_names = raw_expected_label_names.split(", ")
 
-    label_info_by_id = {
-        label.id: label for label in context.label_info_by_name.values()
-    }
+    label_info_by_id = {label.id: label for label in context.label_info_by_name.values()}
     found_label_names = [
-        label_info_by_id[label_id].name
-        for annotation in annotations
-        for label_id in annotation.label_ids
+        label_info_by_id[label_id].name for annotation in annotations for label_id in annotation.label_ids
     ]
     expected_label_names_freq = Counter(expected_label_names)
     found_label_names_freq = Counter(found_label_names)
@@ -570,9 +488,7 @@ def step_then_video_frame_has_expected_labels(
     )
 
 
-@then(
-    "frame {frame_index:d} of the video '{video_name}' has label '{expected_label_name}'"
-)
+@then("frame {frame_index:d} of the video '{video_name}' has label '{expected_label_name}'")
 def step_then_video_frame_has_expected_label(
     context: Context, frame_index: int, video_name: str, expected_label_name: str
 ) -> None:
@@ -585,12 +501,8 @@ def step_then_video_frame_has_expected_label(
 
 
 @then("frame {frame_index:d} of the video '{video_name}' has the empty label")
-def step_then_video_frame_has_empty_label(
-    context: Context, frame_index: int, video_name: str
-) -> None:
-    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(
-        context.project_type
-    )
+def step_then_video_frame_has_empty_label(context: Context, frame_index: int, video_name: str) -> None:
+    empty_label_name = PROJECT_TYPE_TO_EMPTY_LABEL_NAME_MAPPING.get(context.project_type)
     step_then_video_frame_has_expected_label(
         context=context,
         video_name=video_name,

@@ -44,9 +44,7 @@ def _create_and_upload_random_image(context: Context, image_name: str) -> None:
             project_id=context.project_id,
             dataset_id=context.dataset_id,
             file=image_path,  # file.read(),
-            _headers={
-                "Content-Disposition": f'form-data; name="file"; filename="{image_name}"'
-            },
+            _headers={"Content-Disposition": f'form-data; name="file"; filename="{image_name}"'},
         )
 
         context._media_info_by_name[image_name] = upload_image_response
@@ -75,9 +73,7 @@ def _create_and_upload_random_video(context: Context, video_name: str) -> None:
             project_id=context.project_id,
             dataset_id=context.dataset_id,
             file=video_path,
-            _headers={
-                "Content-Disposition": f'form-data; name="file"; filename="{video_name}"'
-            },
+            _headers={"Content-Disposition": f'form-data; name="file"; filename="{video_name}"'},
         )
 
         context._media_info_by_name[video_name] = upload_video_response

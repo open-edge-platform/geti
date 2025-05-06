@@ -42,9 +42,7 @@ def step_then_job_scheduled(context: Context, job_type: str) -> None:
     )
 
     found_job_type = JobType(context.job_info.actual_instance.type)
-    assert found_job_type == expected_job_type, (
-        f"Expected job type {expected_job_type}, but found {found_job_type}"
-    )
+    assert found_job_type == expected_job_type, f"Expected job type {expected_job_type}, but found {found_job_type}"
 
 
 @then("the job completes successfully within {job_timeout:d} minutes")
@@ -71,9 +69,7 @@ def step_then_job_finishes_before_timeout(context: Context, job_timeout: int) ->
             logger.debug(f"Job `{context.job_id}` finished successfully")
             break
         if context.job_info.actual_instance.state == JobState.FAILED:
-            raise AssertionError(
-                f"Job `{context.job_id}` failed: {context.job_info.actual_instance.steps[-1].message}"
-            )
+            raise AssertionError(f"Job `{context.job_id}` failed: {context.job_info.actual_instance.steps[-1].message}")
         if context.job_info.actual_instance.state == JobState.CANCELLED:
             raise AssertionError(f"Job `{context.job_id}` was unexpectedly cancelled")
 
@@ -91,6 +87,4 @@ def step_then_job_finishes_before_timeout(context: Context, job_timeout: int) ->
             )
         except Exception as e:
             logger.warning(f"Failed to cancel job `{context.job_id}`: {e}")
-        raise TimeoutError(
-            f"Job `{context.job_id}` did not finish within {job_timeout} minutes"
-        )
+        raise TimeoutError(f"Job `{context.job_id}` did not finish within {job_timeout} minutes")

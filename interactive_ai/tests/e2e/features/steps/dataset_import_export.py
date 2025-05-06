@@ -45,14 +45,14 @@ def _resolve_dataset_to_import(
     annotation_type: AnnotationType,
     dataset_size: str = "small",
 ) -> Path:
-    dataset_name = f"{annotation_type.value.lower().replace(' ', '_')}-{dataset_format.value.lower()}-{dataset_size}.zip"
+    dataset_name = (
+        f"{annotation_type.value.lower().replace(' ', '_')}-{dataset_format.value.lower()}-{dataset_size}.zip"
+    )
     local_dataset_path = datasets_dir / dataset_name
     if not local_dataset_path.exists():
         remote_relative_path = Path(f"datasets/{dataset_name}")
         try:
-            logger.info(
-                f"Downloading dataset file from remote archive: {remote_relative_path}"
-            )
+            logger.info(f"Downloading dataset file from remote archive: {remote_relative_path}")
             download_file_from_remote_archive(
                 remote_file_path=remote_relative_path,
                 local_file_path=local_dataset_path,
@@ -84,13 +84,11 @@ def step_when_user_uploads_dataset_to_new_project(context: Context) -> None:
     dataset_ie_api: DatasetImportExportApi = context.dataset_import_export_api
 
     # Create TUS upload
-    create_tus_upload_response = (
-        dataset_ie_api.create_tus_dataset_upload_with_http_info(
-            organization_id=context.organization_id,
-            workspace_id=context.workspace_id,
-            tus_resumable="1.0.0",
-            upload_length=context.dataset_to_import_path.stat().st_size,
-        )
+    create_tus_upload_response = dataset_ie_api.create_tus_dataset_upload_with_http_info(
+        organization_id=context.organization_id,
+        workspace_id=context.workspace_id,
+        tus_resumable="1.0.0",
+        upload_length=context.dataset_to_import_path.stat().st_size,
     )
     assert create_tus_upload_response.status_code == 201, (
         f"Failed to create TUS upload: {create_tus_upload_response.raw_data}"
@@ -109,9 +107,7 @@ def step_when_user_uploads_dataset_to_new_project(context: Context) -> None:
             chunk = file.read(TUS_UPLOAD_CHUNK_SIZE)
             if not chunk:
                 break
-            logger.debug(
-                f"Uploading chunk of size {len(chunk)} bytes at offset {current_offset}"
-            )
+            logger.debug(f"Uploading chunk of size {len(chunk)} bytes at offset {current_offset}")
             dataset_ie_api.tus_dataset_upload_patch(
                 organization_id=context.organization_id,
                 workspace_id=context.workspace_id,
@@ -132,32 +128,19 @@ def step_when_user_uploads_dataset_to_new_project(context: Context) -> None:
     context.job_id = prepare_for_import_response.job_id
 
 
-@when(
-    "the user chooses '{project_type}' as the type of the new project to create via import"
-)
-def step_when_user_chooses_import_project_type(
-    context: Context, project_type: str
-) -> None:
+@when("the user chooses '{project_type}' as the type of the new project to create via import")
+def step_when_user_chooses_import_project_type(context: Context, project_type: str) -> None:
     dataset_ie_api: DatasetImportExportApi = context.dataset_import_export_api
-    chosen_project_type = PROJECT_TYPE_TO_DATASET_IE_PROJECT_TYPE_MAPPING[
-        ProjectType(project_type)
-    ]
+    chosen_project_type = PROJECT_TYPE_TO_DATASET_IE_PROJECT_TYPE_MAPPING[ProjectType(project_type)]
 
     # Retrieve the labels from the response of the prepare-for-import job
-    prepare_for_import_job_info: MetadataOfPerformImportToNewProjectJob1 = (
-        context.job_info.actual_instance
-    )
+    prepare_for_import_job_info: MetadataOfPerformImportToNewProjectJob1 = context.job_info.actual_instance
     pipeline_info: MetadataOfPrepareImportToNewProjectJobSupportedProjectTypesInnerPipeline = next(
         spt.pipeline
         for spt in prepare_for_import_job_info.metadata.supported_project_types
         if spt.project_type == chosen_project_type.value
     )
-    labels_info = [
-        label_info
-        for task in pipeline_info.tasks
-        if task.labels
-        for label_info in task.labels
-    ]
+    labels_info = [label_info for task in pipeline_info.tasks if task.labels for label_info in task.labels]
 
     # Import to new project
     import_response = dataset_ie_api.import_project_from_dataset(
@@ -180,18 +163,13 @@ def step_when_user_chooses_import_project_type(
     context.job_id = import_response.job_id
 
 
-@then(
-    "'{project_type}' is recognized as one of the project types compatible with the dataset"
-)
+@then("'{project_type}' is recognized as one of the project types compatible with the dataset")
 def step_then_import_type_recognized(context: Context, project_type: str) -> None:
-    expected_supported_project_type = PROJECT_TYPE_TO_DATASET_IE_PROJECT_TYPE_MAPPING[
-        ProjectType(project_type)
-    ]
+    expected_supported_project_type = PROJECT_TYPE_TO_DATASET_IE_PROJECT_TYPE_MAPPING[ProjectType(project_type)]
 
     job_info: MetadataOfPerformImportToNewProjectJob1 = context.job_info.actual_instance
     supported_project_types = {
-        DatasetIEProjectType(pt.project_type)
-        for pt in job_info.metadata.supported_project_types
+        DatasetIEProjectType(pt.project_type) for pt in job_info.metadata.supported_project_types
     }
 
     assert expected_supported_project_type in supported_project_types, (

@@ -29,12 +29,7 @@ from geti_client import (
     EditProjectRequestPipeline,
     ProjectsApi,
 )
-from static_definitions import (
-    PROJECT_TYPE_TO_TASK_MAPPING,
-    JobType,
-    ProjectType,
-    TaskType,
-)
+from static_definitions import PROJECT_TYPE_TO_TASK_MAPPING, JobType, ProjectType, TaskType
 
 logger = logging.getLogger(__name__)
 
@@ -177,9 +172,7 @@ def _create_project_from_scratch(  # noqa: C901
         first_task_labels = label_names
         second_task_labels = []
 
-    assign_labels_to_distinct_groups = (
-        project_type is ProjectType.MULTILABEL_CLASSIFICATION
-    )
+    assign_labels_to_distinct_groups = project_type is ProjectType.MULTILABEL_CLASSIFICATION
     if group_by_label_name is None:
         group_by_label_name = {}
 
@@ -255,9 +248,7 @@ def _create_project_from_scratch(  # noqa: C901
                         CreateProjectRequestPipelineTasksInnerLabelsInner(
                             name=label_name,
                             color=f"#{random.randint(0, 0xFFFFFF):06x}",
-                            group=group_by_label_name.get(
-                                label_name, "Default second task group"
-                            ),
+                            group=group_by_label_name.get(label_name, "Default second task group"),
                             parent_id=parent_by_child_label_name.get(label_name),
                         )
                         for label_name in second_task_labels
@@ -281,10 +272,7 @@ def _create_project_from_scratch(  # noqa: C901
     context.project_id = create_project_response.id
     context.dataset_id = create_project_response.datasets[0].id
     context.label_info_by_name = {  # dict[str, CreateProject201ResponsePipelineTasksInnerLabelsInner]
-        label.name: label
-        for task in create_project_response.pipeline.tasks
-        if task.labels
-        for label in task.labels
+        label.name: label for task in create_project_response.pipeline.tasks if task.labels for label in task.labels
     }
     context._media_info_by_name = {}  # dict[str, Image | Video]; populated when uploading media
 
@@ -294,13 +282,9 @@ def _create_project_from_scratch(  # noqa: C901
 
 
 @given("a project of type '{project_type}' with structure")
-def step_given_project_with_custom_type_and_label_structure(
-    context: Context, project_type: str
-) -> None:
+def step_given_project_with_custom_type_and_label_structure(context: Context, project_type: str) -> None:
     # the label structure is provided as docstring and accessible here via context.text
-    group_by_label_name, parent_by_child_label_name = _parse_label_structure(
-        context.text
-    )
+    group_by_label_name, parent_by_child_label_name = _parse_label_structure(context.text)
     _create_project_from_scratch(
         context=context,
         project_type=ProjectType(project_type),
@@ -311,13 +295,9 @@ def step_given_project_with_custom_type_and_label_structure(
 
 
 @given("a project of type '{project_type}' with keypoint structure")
-def step_given_project_with_custom_type_and_keypoint_structure(
-    context: Context, project_type: str
-) -> None:
+def step_given_project_with_custom_type_and_keypoint_structure(context: Context, project_type: str) -> None:
     # the keypoint structure is provided as docstring and accessible here via context.text
-    keypoint_labels, keypoint_edges, keypoint_positions = _parse_keypoint_structure(
-        context.text
-    )
+    keypoint_labels, keypoint_edges, keypoint_positions = _parse_keypoint_structure(context.text)
     _create_project_from_scratch(
         context=context,
         project_type=ProjectType(project_type),
@@ -332,16 +312,12 @@ def step_given_project_with_custom_type_and_label_names(
     context: Context, project_type: str, raw_label_names: str
 ) -> None:
     label_names = raw_label_names.split(", ")
-    _create_project_from_scratch(
-        context=context, project_type=ProjectType(project_type), label_names=label_names
-    )
+    _create_project_from_scratch(context=context, project_type=ProjectType(project_type), label_names=label_names)
 
 
 @given("a project of type '{project_type}'")
-def step_given_project_with_custom_type(context: Context, project_type) -> None:  # noqa: ANN001
-    _create_project_from_scratch(
-        context=context, project_type=ProjectType(project_type)
-    )
+def step_given_project_with_custom_type(context: Context, project_type) -> None:
+    _create_project_from_scratch(context=context, project_type=ProjectType(project_type))
 
 
 @when("the user renames the project to '{new_name}'")
@@ -351,19 +327,13 @@ def step_when_user_renames_project(context: Context, new_name: str) -> None:
     pipeline_dict = context.project_info.pipeline.to_dict()
     for task in pipeline_dict["tasks"]:
         # No Object label cannot be edited
-        task["labels"] = [
-            label
-            for label in task.get("labels", [])
-            if label["group"].lower() != "no object"
-        ]
+        task["labels"] = [label for label in task.get("labels", []) if label["group"].lower() != "no object"]
     pipeline = EditProjectRequestPipeline.from_dict(pipeline_dict)
     projects_api.edit_project(
         organization_id=context.organization_id,
         workspace_id=context.workspace_id,
         project_id=context.project_id,
-        edit_project_request=EditProjectRequest(
-            name=new_name, pipeline=pipeline, id=context.project_id
-        ),
+        edit_project_request=EditProjectRequest(name=new_name, pipeline=pipeline, id=context.project_id),
     )
     context.project_info = projects_api.get_project_info(
         organization_id=context.organization_id,
@@ -410,9 +380,7 @@ def step_then_project_name_is(context: Context, new_name: str) -> None:
 
 
 @then("a project of type '{project_type}' is created from '{job_type}' job")
-def step_then_imported_project_is_created_via_import(
-    context: Context, project_type: str, job_type: str
-) -> None:
+def step_then_imported_project_is_created_via_import(context: Context, project_type: str, job_type: str) -> None:
     expected_project_type = ProjectType(project_type)
     expected_job_type = JobType(job_type)
     projects_api: ProjectsApi = context.projects_api
@@ -431,21 +399,12 @@ def step_then_imported_project_is_created_via_import(
     )
 
     # Check that the project has the expected tasks
-    project_tasks = [
-        TaskType(task.task_type)
-        for task in context.project_info.pipeline.tasks
-        if task.labels
-    ]
+    project_tasks = [TaskType(task.task_type) for task in context.project_info.pipeline.tasks if task.labels]
     expected_tasks = PROJECT_TYPE_TO_TASK_MAPPING[expected_project_type]
-    assert project_tasks == expected_tasks, (
-        f"Expected tasks {expected_tasks}, but found {project_tasks}"
-    )
+    assert project_tasks == expected_tasks, f"Expected tasks {expected_tasks}, but found {project_tasks}"
 
     # Initialize other context attributes for the next steps, if any
     context.dataset_id = context.project_info.datasets[0].id
     context.label_info_by_name = {
-        label.name: label
-        for task in context.project_info.pipeline.tasks
-        if task.labels
-        for label in task.labels
+        label.name: label for task in context.project_info.pipeline.tasks if task.labels for label in task.labels
     }
