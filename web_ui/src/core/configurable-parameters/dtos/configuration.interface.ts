@@ -45,6 +45,15 @@ interface ProjectConfigurationTaskConfigsDTO {
     predictions: ConfigurationParameterDTO[];
 }
 
+export type ProjectConfigurationUploadPayloadDTO = {
+    [K in keyof Pick<
+        ProjectConfigurationTaskConfigsDTO,
+        'training' | 'auto_training' | 'predictions'
+    >]?: ProjectConfigurationTaskConfigsDTO[K] extends ConfigurationParameterDTO[]
+        ? Pick<ConfigurationParameterDTO, 'key' | 'value'>[]
+        : { [P in keyof ProjectConfigurationTaskConfigsDTO[K]]?: Pick<ConfigurationParameterDTO, 'key' | 'value'>[] };
+};
+
 export interface ProjectConfigurationDTO {
     task_configs: ProjectConfigurationTaskConfigsDTO[];
 }

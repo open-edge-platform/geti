@@ -11,7 +11,7 @@ import {
     ConfigurableParametersReconfigureDTO,
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
-import { ProjectConfigurationDTO } from '../dtos/configuration.interface';
+import { ProjectConfigurationDTO, ProjectConfigurationUploadPayloadDTO } from '../dtos/configuration.interface';
 import {
     ProjectConfiguration,
     TrainingConfiguration,
@@ -21,11 +21,13 @@ import {
     getConfigParametersEntity,
     getModelConfigEntity,
     getProjectConfigurationEntity,
+    getProjectConfigurationUploadPayloadDTO,
     getTrainingConfigurationEntity,
     getTrainingConfigurationUpdatePayloadDTO,
 } from './utils';
 
 export type TrainingConfigurationQueryParameters = Partial<{ taskId: string; algorithmId: string; modelId: string }>;
+export type ProjectConfigurationQueryParameters = { taskId?: string };
 
 export interface CreateApiModelConfigParametersService {
     /**
@@ -50,6 +52,11 @@ export interface CreateApiModelConfigParametersService {
     ) => Promise<void>;
 
     getProjectConfiguration: (projectIdentifier: ProjectIdentifier) => Promise<ProjectConfiguration>;
+    updateProjectConfiguration: (
+        projectIdentifier: ProjectIdentifier,
+        payload: ProjectConfigurationUploadPayloadDTO,
+        queryParameters?: ProjectConfigurationQueryParameters
+    ) => Promise<void>;
 
     getTrainingConfiguration: (
         projectIdentifier: ProjectIdentifier,
@@ -135,11 +142,28 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         });
     };
 
+    const updateProjectConfiguration: CreateApiModelConfigParametersService['updateProjectConfiguration'] = async (
+        projectIdentifier,
+        payload,
+        queryParameters
+    ) => {
+        const payloadDTO = getProjectConfigurationUploadPayloadDTO(payload);
+
+        await instance.patch(router.CONFIGURATION.PROJECT(projectIdentifier), payloadDTO, {
+            params: {
+                task_id: queryParameters?.taskId,
+            },
+        });
+    };
+
     return {
         getModelConfigParameters,
         getConfigParameters,
         reconfigureParameters,
+
         getProjectConfiguration,
+        updateProjectConfiguration,
+
         getTrainingConfiguration,
         updateTrainingConfiguration,
     };

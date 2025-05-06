@@ -20,6 +20,7 @@ import {
 import {
     ConfigurationParameterDTO,
     ProjectConfigurationDTO,
+    ProjectConfigurationUploadPayloadDTO,
     StaticParameterDTO,
     TrainingConfigurationDTO,
     TrainingConfigurationUpdatePayloadDTO,
@@ -27,6 +28,7 @@ import {
 import {
     ConfigurationParameter,
     ProjectConfiguration,
+    ProjectConfigurationUploadPayload,
     StaticParameter,
     TrainingConfiguration,
     TrainingConfigurationUpdatePayload,
@@ -298,10 +300,10 @@ export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO)
 export const getTrainingConfigurationUpdatePayloadDTO = (
     payload: TrainingConfigurationUpdatePayload
 ): TrainingConfigurationUpdatePayloadDTO => {
-    const trainingConfigurationUpdatePayload: TrainingConfigurationUpdatePayloadDTO = {};
+    const trainingConfigurationUpdatePayloadDTO: TrainingConfigurationUpdatePayloadDTO = {};
 
     if (payload.datasetPreparation !== undefined) {
-        trainingConfigurationUpdatePayload.dataset_preparation = Object.entries(payload.datasetPreparation).reduce(
+        trainingConfigurationUpdatePayloadDTO.dataset_preparation = Object.entries(payload.datasetPreparation).reduce(
             (acc, [key, parameters]) => {
                 return {
                     ...acc,
@@ -316,18 +318,49 @@ export const getTrainingConfigurationUpdatePayloadDTO = (
     }
 
     if (payload.training !== undefined) {
-        trainingConfigurationUpdatePayload.training = payload.training.map((parameter) => ({
+        trainingConfigurationUpdatePayloadDTO.training = payload.training.map((parameter) => ({
             key: parameter.key,
             value: parameter.value,
         }));
     }
 
     if (payload.evaluation !== undefined) {
-        trainingConfigurationUpdatePayload.evaluation = payload.evaluation.map((parameter) => ({
+        trainingConfigurationUpdatePayloadDTO.evaluation = payload.evaluation.map((parameter) => ({
             key: parameter.key,
             value: parameter.value,
         }));
     }
 
-    return trainingConfigurationUpdatePayload;
+    return trainingConfigurationUpdatePayloadDTO;
+};
+
+export const getProjectConfigurationUploadPayloadDTO = (
+    payload: ProjectConfigurationUploadPayload
+): ProjectConfigurationUploadPayloadDTO => {
+    const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {};
+
+    if (payload.training?.constraints !== undefined) {
+        projectConfigurationUploadPayloadDTO.training = {};
+
+        projectConfigurationUploadPayloadDTO.training.constraints = payload.training.constraints.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    if (payload.predictions) {
+        projectConfigurationUploadPayloadDTO.predictions = payload.predictions.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    if (payload.autoTraining) {
+        projectConfigurationUploadPayloadDTO.auto_training = payload.autoTraining.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    return projectConfigurationUploadPayloadDTO;
 };

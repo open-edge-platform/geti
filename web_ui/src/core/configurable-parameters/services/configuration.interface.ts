@@ -45,6 +45,15 @@ interface ProjectConfigurationTaskConfigs {
     predictions: ConfigurationParameter[];
 }
 
+export type ProjectConfigurationUploadPayload = {
+    [K in keyof Pick<
+        ProjectConfigurationTaskConfigs,
+        'training' | 'autoTraining' | 'predictions'
+    >]?: ProjectConfigurationTaskConfigs[K] extends ConfigurationParameter[]
+        ? Pick<ConfigurationParameter, 'key' | 'value'>[]
+        : { [P in keyof ProjectConfigurationTaskConfigs[K]]?: Pick<ConfigurationParameter, 'key' | 'value'>[] };
+};
+
 export interface ProjectConfiguration {
     taskConfigs: ProjectConfigurationTaskConfigs[];
 }
