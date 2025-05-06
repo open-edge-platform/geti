@@ -36,7 +36,7 @@ We heavily rely on Typescript, ESLint, Jest and Playwright to make sure we don't
 ### Typescript
 
 ```sh
-npm run test:tsc
+npm run type-check
 ```
 
 Checks if there are no typescript violations. We have a relatively strict typescript configuration and also use `typescript-eslint` for some additional safeguards.

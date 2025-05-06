@@ -72,7 +72,7 @@ jobs:
 
       - name: Typescript
         working-directory: "web_ui"
-        run: npm run test:tsc
+        run: npm run type-check
 
   unit-tests:
     name: Jest tests (${{ matrix.shard }}/${{ matrix.shardTotal }})

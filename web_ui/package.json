@@ -96,17 +96,17 @@
     "find-deadcode": "npx knip",
     "format": "prettier --write --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass,mjs}\" \"tests/**/*.ts*\"",
     "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass,mjs}\" \"tests/**/*.ts*\"",
+    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\"",
     "preview": "rsbuild preview",
     "start": "rsbuild dev --environment dev",
     "test:component": "npx playwright test --config=playwright.config.ts",
     "test:component:ui": "npm run test:component -- --ui",
     "test:coverage": "npm test -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
-    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0",
-    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\"",
-    "test:tsc": "tsc --noEmit",
     "test:unit": "jest --config jest.config.js --watchAll=false",
-    "test:unit:watch": "jest --config jest.config.js --watch"
+    "test:unit:watch": "jest --config jest.config.js --watch",
+    "type-check": "tsc --noEmit"
   },
   "browserslist": {
     "production": [
