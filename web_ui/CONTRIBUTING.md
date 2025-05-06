@@ -85,7 +85,8 @@ npm run test:unit:watch -- --maxWorkers=4
 
 ### Component testing
 
-We rely on [Playwright](https://playwright.dev/) for our component tests. 
+We rely on [Playwright](https://playwright.dev/) for our component tests.
+These tests rely on a server hosting the UI at http://localhost:3000, see the base URL configured at [`playwright.config.ts`]('./playwright-config.ts').
 There are two ways with which you can run these: using a dev server with HRM or using a build server without HRM which tends to make the component tests run be faster, with the caveat that you will need to rebuild the UI files whenever you make a change,
 
 1. **Dev Server**: First we start up a dev server,
@@ -93,6 +94,9 @@ There are two ways with which you can run these: using a dev server with HRM or 
 ```sh
 npm run start
 ```
+
+> [!NOTE]
+> When you don't have a dev/build server running we automatically start one for the duration of the tests.
 
 2. **Build server**:
 
