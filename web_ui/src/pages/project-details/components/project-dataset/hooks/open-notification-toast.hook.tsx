@@ -12,12 +12,12 @@ import { ModelGroupsAlgorithmDetails } from '../../../../../core/models/models.i
 import { hasActiveModels } from '../../../../../core/models/utils';
 import { paths } from '../../../../../core/services/routes';
 import { LifecycleStage } from '../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
+import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
-import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import { addAlgorithmDetails } from '../../project-models/utils';
 
 import classes from './open-notification-toast.module.scss';
