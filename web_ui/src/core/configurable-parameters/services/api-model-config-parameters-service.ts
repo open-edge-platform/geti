@@ -88,7 +88,7 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
     const getTrainingConfiguration: CreateApiModelConfigParametersService['getTrainingConfiguration'] = async (
         projectIdentifier,
         queryParameters
-    ): Promise<TrainingConfiguration> => {
+    ) => {
         const { data } = await instance.get(router.CONFIGURATION.TRAINING(projectIdentifier), {
             params: {
                 task_id: queryParameters?.taskId,

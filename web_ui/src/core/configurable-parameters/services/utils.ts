@@ -20,9 +20,15 @@ import {
 import {
     ConfigurationParameterDTO,
     ProjectConfigurationDTO,
+    StaticParameterDTO,
     TrainingConfigurationDTO,
 } from '../dtos/configuration.interface';
-import { ConfigurationParameter, ProjectConfiguration, TrainingConfiguration } from './configuration.interface';
+import {
+    ConfigurationParameter,
+    ProjectConfiguration,
+    StaticParameter,
+    TrainingConfiguration,
+} from './configuration.interface';
 
 const getConfigParametersField = (
     parameters: ConfigurableParametersParamsDTO[],
@@ -238,6 +244,17 @@ export const getParameter = (parameter: ConfigurationParameterDTO): Configuratio
     throw new Error(`${parameter.type} is not supported.`);
 };
 
+export const getStaticParameter = (parameter: StaticParameterDTO): StaticParameter => {
+    const { key, name, description, value } = parameter;
+
+    return {
+        key,
+        name,
+        description,
+        value,
+    };
+};
+
 export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigurationDTO): ProjectConfiguration => {
     const taskConfigs = task_configs.map((taskConfig) => {
         const { task_id, training, auto_training, predictions } = taskConfig;
@@ -257,23 +274,21 @@ export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigura
 };
 
 export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO): TrainingConfiguration => {
-    const trainingConfiguration: TrainingConfiguration = {};
+    const trainingConfiguration: TrainingConfiguration = {
+        datasetPreparation: Object.entries(config.dataset_preparation).reduce((acc, [key, value]) => {
+            const parameters = value.map(getParameter);
+            return {
+                ...acc,
+                [key]: parameters,
+            };
+        }, {}),
+        training: config.training.map(getParameter),
+        evaluation: config.evaluation.map(getParameter),
+    };
 
-    Object.entries(config).forEach(([parameterGroupName, parameters]) => {
-        if (parameterGroupName === 'advanced_configuration') {
-            trainingConfiguration.advancedConfiguration = parameters.map(getParameter);
-        } else if (Array.isArray(parameters)) {
-            trainingConfiguration[parameterGroupName] = parameters.map(getParameter);
-        } else {
-            trainingConfiguration[parameterGroupName] = Object.entries(parameters).reduce(
-                (acc, [key, localParameters]) => ({
-                    ...acc,
-                    [key]: (localParameters as ConfigurationParameterDTO[]).map(getParameter),
-                }),
-                {}
-            );
-        }
-    });
+    if (config.advanced_configuration !== undefined) {
+        trainingConfiguration.advancedConfiguration = config.advanced_configuration.map(getStaticParameter);
+    }
 
     return trainingConfiguration;
 };

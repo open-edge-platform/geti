@@ -28,7 +28,7 @@ interface EnumParameterDTO extends ParameterBaseDTO {
     allowed_values: string[];
 }
 
-interface StaticParameterDTO extends ParameterBaseDTO {
+export interface StaticParameterDTO extends ParameterBaseDTO {
     value: number | string | boolean;
 }
 
@@ -49,6 +49,9 @@ export interface ProjectConfigurationDTO {
     task_configs: ProjectConfigurationTaskConfigsDTO[];
 }
 
-export type TrainingConfigurationDTO =
-    | Record<string, Record<string, ConfigurationParameterDTO[]> | ConfigurationParameterDTO[]>
-    | { advanced_configuration: StaticParameterDTO[] };
+export type TrainingConfigurationDTO = {
+    dataset_preparation: Record<string, ConfigurationParameterDTO[]>;
+    training: ConfigurationParameterDTO[];
+    evaluation: ConfigurationParameterDTO[];
+    advanced_configuration?: StaticParameterDTO[];
+};

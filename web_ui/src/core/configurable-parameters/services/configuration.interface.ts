@@ -28,7 +28,7 @@ interface EnumParameter extends ParameterBase {
     allowedValues: string[];
 }
 
-interface StaticParameter extends ParameterBase {
+export interface StaticParameter extends ParameterBase {
     value: number | string | boolean;
 }
 
@@ -49,6 +49,9 @@ export interface ProjectConfiguration {
     taskConfigs: ProjectConfigurationTaskConfigs[];
 }
 
-export type TrainingConfiguration =
-    | Record<string, Record<string, ConfigurationParameter[]> | ConfigurationParameter[]>
-    | { advancedConfiguration: StaticParameter[] };
+export interface TrainingConfiguration {
+    datasetPreparation: Record<string, ConfigurationParameter[]>;
+    training: ConfigurationParameter[];
+    evaluation: ConfigurationParameter[];
+    advancedConfiguration?: StaticParameter[];
+}
