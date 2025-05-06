@@ -106,6 +106,8 @@ jobs:
   lib_test_workflow:
     name: Lib test workflow
     needs: get-vars
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/libs_test.yml
     if: ${{ !contains(needs.get-vars.outputs.libs-list, '[]') }}
@@ -119,6 +121,9 @@ jobs:
   component-workflow:
     name: Component workflow
     needs: get-vars
+    permissions:
+      contents: read
+      id-token: write # is required by nested component-check
     secrets: inherit
     uses: ./.github/workflows/component.yml
     if: ${{ !contains(needs.get-vars.outputs.filtered-components-list, '[]') }}
@@ -135,6 +140,9 @@ jobs:
   web-ui-workflow:
     name: Web UI workflow
     needs: get-vars
+    permissions:
+      contents: read
+      id-token: write # is required by nested component-check
     secrets: inherit
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
