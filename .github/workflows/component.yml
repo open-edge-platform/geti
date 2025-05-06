@@ -68,14 +68,24 @@ jobs:
           fi
 
       - name: Static code analysis
-        run: make builder -C ${COMPONENT_DIR} static-code-analysis
+        run: |
+          if [[ "${COMPONENT_DIR}" == "web_ui" ]]; then
+            make -C ${COMPONENT_DIR} static-code-analysis
+          else
+            make builder -C ${COMPONENT_DIR} static-code-analysis
+          fi
 
       - name: Unit testing
-        run: make builder -C ${COMPONENT_DIR} test-unit
+        run: |
+          if [[ "${COMPONENT_DIR}" == "web_ui" ]]; then
+            make -C ${COMPONENT_DIR} test-unit
+          else
+            make builder -C ${COMPONENT_DIR} test-unit
+          fi
 
       - name: Integration testing
         run: |
-          if [[ "${COMPONENT_DIR}" == "interactive_ai/workflows/geti_domain/project_ie" ]]; then
+          if [[ "${COMPONENT_DIR}" == "web_ui" || "${COMPONENT_DIR}" == "interactive_ai/workflows/geti_domain/project_ie" ]]; then
             make -C ${COMPONENT_DIR} test-integration
           else
             make builder -C ${COMPONENT_DIR} test-integration
