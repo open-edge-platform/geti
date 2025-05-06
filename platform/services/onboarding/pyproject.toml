@@ -20,7 +20,7 @@ dependencies = [
 
 [tool.uv.sources]
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
-grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+grpc_interfaces = { path = "../../../libs/grpc_interfaces", editable = true }
 
 [dependency-groups]
 dev = [

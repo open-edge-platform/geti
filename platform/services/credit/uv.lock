@@ -290,7 +290,7 @@ requires-dist = [
     { name = "fastapi", specifier = "~=0.109" },
     { name = "geti-kafka-tools", editable = "../../../libs/kafka_tools" },
     { name = "geti-telemetry-tools", extras = ["fastapi", "grpc", "logger", "telemetry"], editable = "../../../libs/telemetry_tools" },
-    { name = "grpc-interfaces", extras = ["account-service", "credit-system"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["account-service", "credit-system"], editable = "../../../libs/grpc_interfaces" },
     { name = "psycopg2-binary", specifier = "~=2.9.9" },
     { name = "python-dateutil", specifier = "==2.9.0" },
     { name = "sqlalchemy", specifier = "~=2.0.27" },
@@ -575,7 +575,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]

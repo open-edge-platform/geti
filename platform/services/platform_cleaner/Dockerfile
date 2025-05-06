@@ -19,7 +19,6 @@ RUN apt-get update && \
 # Copy the service dependencies
 WORKDIR /builder
 COPY --link --from=libs . ../libs
-COPY --link --from=grpc_interfaces . ../grpc_interfaces
 
 WORKDIR /builder/platform_cleaner/app
 

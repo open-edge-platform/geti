@@ -257,7 +257,7 @@ requires-dist = [
     { name = "geti-kafka-tools", editable = "../../../libs/kafka_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "logger", "grpc", "fastapi", "kafka"], editable = "../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
-    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../libs/grpc_interfaces" },
     { name = "httpx", specifier = "~=0.23" },
     { name = "python-multipart", specifier = "==0.0.20" },
     { name = "sc-sdk", editable = "../../libs/sc_sdk" },
@@ -504,7 +504,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]

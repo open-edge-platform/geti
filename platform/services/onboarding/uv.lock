@@ -497,7 +497,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -836,7 +836,7 @@ requires-dist = [
     { name = "fastapi", specifier = "==0.115.2" },
     { name = "geti-telemetry-tools", extras = ["grpc", "telemetry"], editable = "../../../libs/telemetry_tools" },
     { name = "googleapis-common-protos", specifier = "~=1.59.1" },
-    { name = "grpc-interfaces", extras = ["account-service"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["account-service"], editable = "../../../libs/grpc_interfaces" },
     { name = "httpx", specifier = "==0.26.*" },
     { name = "iso3166", specifier = "==2.1.1" },
     { name = "pyjwt", specifier = "==2.8.0" },

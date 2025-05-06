@@ -19,7 +19,7 @@ geti-types = { path = "../../../libs/types", editable = true }
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
 geti_fastapi_tools = { path = "../../../libs/fastapi_tools", editable = true }
 sc_sdk = { path = "../../libs/sc_sdk", editable = true }
-grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+grpc_interfaces = { path = "../../../libs/grpc_interfaces", editable = true }
 
 [dependency-groups]
 dev = [

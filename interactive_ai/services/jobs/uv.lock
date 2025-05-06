@@ -1265,7 +1265,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -1563,7 +1563,7 @@ requires-dist = [
     { name = "geti-spicedb-tools", editable = "../../../libs/spicedb_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "fastapi", "logger", "kafka", "grpc"], editable = "../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
-    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../libs/grpc_interfaces" },
     { name = "marshmallow-enum", specifier = "==1.5.1" },
     { name = "sc-sdk", editable = "../../libs/sc_sdk" },
     { name = "uvicorn", specifier = "~=0.27" },

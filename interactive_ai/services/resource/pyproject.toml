@@ -29,7 +29,7 @@ geti-types = { path = "../../../libs/types", editable = true }
 geti_spicedb_tools = { path = "../../../libs/spicedb_tools", editable = true }
 sc_sdk = { path = "../../libs/sc_sdk", editable = true }
 media_utils = { path = "../../libs/media_utils", editable = true }
-grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+grpc_interfaces = { path = "../../../libs/grpc_interfaces", editable = true }
 
 
 [dependency-groups]
