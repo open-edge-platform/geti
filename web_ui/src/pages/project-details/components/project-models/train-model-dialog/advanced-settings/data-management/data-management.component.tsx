@@ -6,10 +6,8 @@ import { FC } from 'react';
 import { View } from '@adobe/react-spectrum';
 
 import { ConfigurableParametersTaskChain } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { BalanceLabelsDistribution } from './balance-labels-distribution/balance-labels-distribution.component';
 import { DataAugmentation } from './data-augmentation/data-augmentation.component';
 import { Filters } from './filters/filters.component';
-import { RemovingDuplicates } from './removing-duplicated/removing-duplicates.component';
 import { Tiling } from './tiling/tiling.component';
 import { TrainingSubsets } from './training-subsets/training-subsets.component';
 
@@ -32,7 +30,7 @@ export const DataManagement: FC<DataManagementProps> = ({
 
     return (
         <View>
-            <BalanceLabelsDistribution />
+            {/* Not supported in v1 of training flow revamp <BalanceLabelsDistribution /> */}
             <TrainingSubsets
                 isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
                 onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
@@ -40,7 +38,7 @@ export const DataManagement: FC<DataManagementProps> = ({
             {tilingParameters !== undefined && <Tiling tilingParameters={tilingParameters} />}
             <DataAugmentation />
             <Filters />
-            <RemovingDuplicates />
+            {/* Not supported in v1 of training flow revamp <RemovingDuplicates /> */}
         </View>
     );
 };
