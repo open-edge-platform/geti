@@ -43,7 +43,7 @@ export class IntelAdminPage {
     }
 
     async selectRowMenu(name: string) {
-        await this.page.getByRole('row', { name }).getByRole('button').click();
+        await this.page.getByRole('button', { name: `${name} menu button` }).click();
     }
 
     async deleteOrganization(name: string) {
