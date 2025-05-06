@@ -16,7 +16,6 @@ import {
     useDateFormatter,
 } from '@adobe/react-spectrum';
 import { DateValue, getLocalTimeZone } from '@internationalized/date';
-import { RangeValue } from '@react-types/shared';
 import Calendar from '@spectrum-icons/workflow/Calendar';
 import isEmpty from 'lodash/isEmpty';
 import { RangeCalendarProps } from 'react-aria-components';
@@ -28,9 +27,14 @@ interface DateRangePickerSmall extends RangeCalendarProps<DateValue> {
     headerContent?: ReactNode;
 }
 
-export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({ hasManualEdition, headerContent, ...props }) => {
+export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({
+    hasManualEdition,
+    headerContent,
+    value: range,
+    onChange,
+    ...props
+}) => {
     const formatter = useDateFormatter({ dateStyle: 'long' });
-    const [range, setRange] = useState<RangeValue<DateValue> | undefined | null>(props.value);
     const [focusedDate, setFocusedDate] = useState<DateValue | undefined>();
 
     const rangeText = isEmpty(range)
@@ -42,7 +46,7 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({ hasManualEditio
             return;
         }
 
-        setRange({ ...range, [attribute]: value });
+        onChange && onChange({ ...range, [attribute]: value });
         setFocusedDate(value);
     };
 
@@ -77,9 +81,9 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({ hasManualEditio
                     <RangeCalendar
                         {...props}
                         value={range}
+                        onChange={onChange}
                         focusedValue={focusedDate}
                         onFocusChange={setFocusedDate}
-                        onChange={setRange}
                     />
                     {hasManualEdition ? rangeFields : <p>{rangeText}</p>}
                 </Content>
