@@ -3,10 +3,12 @@
 
 import { FC, RefObject, useRef } from 'react';
 
-import { Content, ContextualHelp, Flex, Text, View, VisuallyHidden } from '@adobe/react-spectrum';
+import { Flex, Text, View, VisuallyHidden } from '@adobe/react-spectrum';
 import clsx from 'clsx';
 import { mergeProps, useFocusRing, useNumberFormatter, useSlider, useSliderThumb } from 'react-aria';
 import { SliderState, useSliderState } from 'react-stately';
+
+import { Tooltip } from '../../../ui/tooltip.component';
 
 import styles from './subsets-distribution-slider.module.scss';
 
@@ -47,15 +49,10 @@ const Thumb: FC<ThumbProps> = (props) => {
 
 const DistributionTooltip: FC = () => {
     return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>
-                    Specify the distribution of annotated samples over the training, validation and test subsets. Note:
-                    items that have already been used for training will stay in the same subset even if these parameters
-                    are changed.
-                </Text>
-            </Content>
-        </ContextualHelp>
+        <Tooltip>
+            Specify the distribution of annotated samples over the training, validation and test subsets. Note: items
+            that have already been used for training will stay in the same subset even if these parameters are changed.
+        </Tooltip>
     );
 };
 

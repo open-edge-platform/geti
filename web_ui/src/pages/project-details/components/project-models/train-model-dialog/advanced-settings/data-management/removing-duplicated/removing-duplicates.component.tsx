@@ -3,25 +3,24 @@
 
 import { FC, useState } from 'react';
 
-import { Content, ContextualHelp, Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@adobe/react-spectrum';
 
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
 import { Accordion } from '../../ui/accordion/accordion.component';
+import { Tooltip } from '../../ui/tooltip.component';
 
 const RemovingDuplicatesTooltip: FC = () => {
     return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>
-                    Enable this option to automatically detect and remove duplicate media items from your dataset. This
-                    helps to ensure that your model is trained on unique and diverse data, improving its accuracy and
-                    performance.
-                </Text>
-            </Content>
-        </ContextualHelp>
+        <Tooltip>
+            Enable this option to automatically detect and remove duplicate media items from your dataset. This helps to
+            ensure that your model is trained on unique and diverse data, improving its accuracy and performance.
+        </Tooltip>
     );
 };
 
+/*
+ * This component is currently not used in the v1 of Training flow revamp. Will be used in the later version.
+ */
 export const RemovingDuplicates: FC = () => {
     const [isRemovingDuplicatesEnabled, setIsRemovingDuplicatesEnabled] = useState<boolean>(false);
 

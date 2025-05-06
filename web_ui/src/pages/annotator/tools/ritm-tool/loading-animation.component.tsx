@@ -1,7 +1,5 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-// Copyright (C) 2022-2025 Intel Corporation
-// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 export const LoadingAnimation = ({ x, y, radius }: { x: number; y: number; radius: number }): JSX.Element => {
     return (

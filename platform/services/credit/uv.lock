@@ -389,6 +389,7 @@ requires-dist = [{ name = "confluent-kafka", specifier = "~=2.3" }]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "ruff", specifier = "~=0.11" },
@@ -441,6 +442,7 @@ dev = [
     { name = "confluent-kafka", specifier = "~=2.3" },
     { name = "geti-telemetry-tools", extras = ["b3", "fastapi", "grpc", "jaeger", "kafka", "logger", "telemetry"] },
     { name = "httpx", specifier = "~=0.23" },
+    { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
     { name = "pytest-freezegun" },

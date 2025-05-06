@@ -3,14 +3,15 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Content, ContextualHelp, Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
 import isFunction from 'lodash/isFunction';
 
 import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { BooleanParameter } from './boolean-parameter.component';
 import { NumberParameter } from './number-parameter.component';
-import { OptionsButtons } from './options-buttons/options-buttons.component';
 import { ResetButton } from './reset-button.component';
+import { ToggleButtons } from './toggle-buttons/toggle-buttons.component';
+import { Tooltip } from './tooltip.component';
 
 interface ParametersProps {
     parameters: ConfigurableParametersParams[];
@@ -18,13 +19,7 @@ interface ParametersProps {
 }
 
 const ParameterTooltip: FC<{ text: string }> = ({ text }) => {
-    return (
-        <ContextualHelp variant='info'>
-            <Content>
-                <Text>{text}</Text>
-            </Content>
-        </ContextualHelp>
-    );
+    return <Tooltip>{text}</Tooltip>;
 };
 
 interface ParameterProps {
@@ -54,9 +49,7 @@ const ParameterLayout: FC<ParameterLayoutProps> = ({ header, children, descripti
 
 const ParameterField: FC<ParameterProps> = ({ parameter, onChange }) => {
     if (parameter.dataType === 'string' && parameter.templateType === 'selectable') {
-        return (
-            <OptionsButtons options={parameter.options} selectedOption={parameter.value} onOptionChange={onChange} />
-        );
+        return <ToggleButtons options={parameter.options} selectedOption={parameter.value} onOptionChange={onChange} />;
     }
 
     if (parameter.templateType === 'input' && (parameter.dataType === 'float' || parameter.dataType === 'integer')) {
