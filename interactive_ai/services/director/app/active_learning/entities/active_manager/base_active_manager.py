@@ -296,7 +296,7 @@ class BaseActiveManager(Generic[TActiveLearningConfig], metaclass=abc.ABCMeta): 
             for candidate_info in best_from_list:
                 if pq.qsize() >= size:
                     _, worst_candidate = pq.get()
-                    candidate_info = min([worst_candidate, candidate_info], key=lambda x: x.score)
+                    candidate_info = min([worst_candidate, candidate_info], key=lambda x: x.score)  # noqa: PLW2901
                 # score negated because we want to keep the best candidates (lowest score)
                 pq.put((-candidate_info.score, candidate_info))
 

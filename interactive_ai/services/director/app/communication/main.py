@@ -118,7 +118,7 @@ def handle_not_found(request, exception) -> JSONResponse:  # noqa: ANN001, ARG00
 
 
 @app.exception_handler(jsonschema.exceptions.ValidationError)
-def handle_validation_error(request: Request, e: jsonschema.exceptions.ValidationError) -> JSONResponse:
+def handle_validation_error(request: Request, e: jsonschema.exceptions.ValidationError) -> JSONResponse:  # noqa: ARG001
     """
     Handler for invalid json schemas, improves error message for failed JSON schema validation for common cases.
     """
@@ -163,7 +163,7 @@ def handle_base_exception(request: Request, e: GetiBaseException) -> Response:
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:  # noqa: ARG001
     """
     Converts a RequestValidationError to a better readable Bad request exception.
     """

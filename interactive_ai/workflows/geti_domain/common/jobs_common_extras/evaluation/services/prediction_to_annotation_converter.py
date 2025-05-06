@@ -90,7 +90,7 @@ class IPredictionToAnnotationConverter(metaclass=abc.ABCMeta):
 class ClassificationToAnnotationConverter(IPredictionToAnnotationConverter):
     """Converts ModelAPI Classification predictions to Annotations."""
 
-    def convert_to_annotations(self, predictions: ClassificationResult, **kwargs) -> list[Annotation]:
+    def convert_to_annotations(self, predictions: ClassificationResult, **kwargs) -> list[Annotation]:  # noqa: ARG002
         """
         Converts ModelAPI ClassificationResult predictions to iai_core annotations.
 
@@ -392,7 +392,7 @@ class AnomalyToAnnotationConverter(IPredictionToAnnotationConverter):
         self.anomalous_label = next(label for label in self.labels if label.is_anomalous)
         self.domain = self.anomalous_label.domain
 
-    def convert_to_annotations(self, predictions: AnomalyResult, **kwargs) -> list[Annotation]:
+    def convert_to_annotations(self, predictions: AnomalyResult, **kwargs) -> list[Annotation]:  # noqa: ARG002
         """
         Converts ModelAPI AnomalyResult predictions to iai_core annotations.
 

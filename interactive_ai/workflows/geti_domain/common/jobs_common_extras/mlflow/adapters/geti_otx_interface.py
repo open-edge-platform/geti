@@ -468,7 +468,7 @@ class GetiOTXInterfaceAdapter:
                 obj = self.binary_repo.storage_client.client.get_object(  # type: ignore
                     bucket_name=self.binary_repo.storage_client.bucket_name,  # type: ignore
                     object_name=os.path.join(
-                        self.binary_repo.storage_client.object_name_base,
+                        self.binary_repo.storage_client.object_name_base,  # type: ignore[attr-defined]
                         metrics_filepath,
                     ),  # type: ignore
                 )

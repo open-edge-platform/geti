@@ -71,7 +71,7 @@ def import_project_from_dataset_endpoint(
     project_name: str = Body(...),  # noqa: FAST002
     task_type: str = Body(...),  # noqa: FAST002
     labels: list[dict] = Body(...),  # noqa: FAST002
-    keypoint_structure: dict[str, list[dict]] = Body(default={"edges": [], "positions": []}),
+    keypoint_structure: dict[str, list[dict]] = Body(default={"edges": [], "positions": []}),  # noqa: FAST002
     user_id: ID = Depends(get_user_id_fastapi),  # noqa: FAST002
 ) -> JSONResponse:
     """

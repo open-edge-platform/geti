@@ -655,7 +655,7 @@ class ProjectRestValidator(RestApiValidator):
                 raise ReservedLabelNameException(label_name=empty_label_name)
 
     @staticmethod
-    def _validate_keypoint_structure(data: dict[str, Any], labels: list[LabelProperties]) -> None:
+    def _validate_keypoint_structure(data: dict[str, Any], labels: list[LabelProperties]) -> None:  # noqa: C901
         """
         Validates that a user defined keypoint structure has exactly 2 nodes, node names match with existing labels,
         has no duplicate edges, and position values are in the range [0.0 1.0]]

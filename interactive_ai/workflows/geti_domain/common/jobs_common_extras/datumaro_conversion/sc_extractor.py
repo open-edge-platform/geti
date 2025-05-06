@@ -207,7 +207,7 @@ class ScExtractor(dm_DatasetBase):
 
         return label_name_to_all_parents
 
-    def _convert_annotations(self, annotations: list[Annotation], width: int, height: int) -> list[dm_Annotation]:
+    def _convert_annotations(self, annotations: list[Annotation], width: int, height: int) -> list[dm_Annotation]:  # noqa: PLR0912, C901
         dm_anns: list[dm_Annotation] = []
         keypoints = []
         visibilities = []

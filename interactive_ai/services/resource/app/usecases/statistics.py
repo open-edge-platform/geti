@@ -343,7 +343,7 @@ class StatisticsUseCase:
         :return stat: array, which contains object size statistics
         """
 
-        def compute_object_imbalanced_stats(aspect_ratio_threshold_tall, aspect_ratio_threshold_wide):
+        def compute_object_imbalanced_stats(aspect_ratio_threshold_tall, aspect_ratio_threshold_wide):  # noqa: ANN001
             object_ratio = np.transpose(obj_sizes)[1] / np.transpose(obj_sizes)[0]
             n_objects_tall = len(object_ratio[object_ratio >= aspect_ratio_threshold_tall])
             n_objects_wide = len(object_ratio[object_ratio <= aspect_ratio_threshold_wide])
