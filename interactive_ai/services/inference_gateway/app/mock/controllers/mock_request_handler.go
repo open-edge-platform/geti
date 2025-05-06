@@ -9,7 +9,7 @@ import (
 
 	gin "github.com/gin-gonic/gin"
 
-	go_sdkentities "geti.com/go_sdk/entities"
+	go_sdkentities "geti.com/iai_core/entities"
 
 	mock "github.com/stretchr/testify/mock"
 )

@@ -9,9 +9,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"geti.com/go_sdk/entities"
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/middleware"
+	"geti.com/iai_core/entities"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"

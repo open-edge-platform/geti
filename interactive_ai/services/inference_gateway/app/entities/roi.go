@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	httperrors "geti.com/go_sdk/errors"
+	httperrors "geti.com/iai_core/errors"
 )
 
 type Roi struct {
