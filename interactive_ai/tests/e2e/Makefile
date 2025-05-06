@@ -13,6 +13,8 @@ all: test
 
 venv:
 	uv sync
+
+venv-dev: venv
 	$(MAKE) generate_client_if_needed;
 	uv pip install -e $(CLIENT_PATH)
 
@@ -40,7 +42,7 @@ generate_client_if_needed: generate_json_spec
 	fi; \
 	echo $$SHA > $(SPEC_HASH_FILE)
 
-tests: venv
+tests: venv-dev
 	@if [ -z "$(FEATURE)" ]; then \
 	  echo "Selected features: all"; \
 	  TARGET="features"; \
@@ -56,14 +58,14 @@ tests: venv
 	fi; \
 	uv run -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
-test_wip: venv
+test_wip: venv-dev
 	@echo "Running WIP tests..."
 	uv run behave --wip features
 
-test_smoke: venv
+test_smoke: venv-dev
 	@$(MAKE) tests BDD_TAG=@smoke
 
-report: venv
+report: venv-dev
 	@echo "Generating HTML report..."
 	@mkdir -p $(MAKEFILE_DIR)/reports/html
 	@. $(ACTIVATE); for file in reports/junit/*.xml; do \
