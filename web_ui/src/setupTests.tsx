@@ -147,8 +147,4 @@ jest.mock('./core/services/use-deployment-config-query.hook', () => ({
     })),
 }));
 
-jest.mock('@scalar/api-reference-react', () => ({
-    ApiReference: () => <div>ApiReference</div>,
-}));
-
 process.env.REACT_APP_VALIDATION_COMPONENT_TESTS = 'true';
