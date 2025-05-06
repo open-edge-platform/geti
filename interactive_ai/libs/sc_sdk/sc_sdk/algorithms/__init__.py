@@ -233,7 +233,7 @@ class AlgorithmsList(metaclass=Singleton):
 
         self._base_dirs = base_dirs
         self._update_lock = Lock()
-        self._obsolete_model_template_ids = []
+        self._obsolete_model_template_ids: set[str] = set()
         self._update_algorithms_list()
 
     @property
