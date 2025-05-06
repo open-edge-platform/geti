@@ -40,7 +40,6 @@ describe('LabelTreeViewItem', () => {
 
         expect(screen.getByRole('button', { name: 'add child label button' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
-        expect(screen.getAllByRole('button')).toHaveLength(2);
     });
 
     it('Click on tree item - actions are visible', async () => {

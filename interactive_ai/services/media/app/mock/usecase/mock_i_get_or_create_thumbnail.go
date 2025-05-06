@@ -6,7 +6,7 @@ import (
 	context "context"
 	io "io"
 
-	entities "geti.com/go_sdk/entities"
+	entities "geti.com/iai_core/entities"
 
 	mock "github.com/stretchr/testify/mock"
 )
