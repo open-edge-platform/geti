@@ -35,6 +35,9 @@ jobs:
     env:
       TAG: ${{ inputs.image-tag || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
+      USE_PROXY: true
+      PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
+      GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -42,35 +45,7 @@ jobs:
           persist-credentials: false
           ref: ${{ inputs.branch || '' }}
 
-      - name: Setup Python
-        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
-        with:
-          python-version: '3.10'
-
-      - name: Install missing dependencies
-        run: |
-          sudo -E apt update
-          sudo -E apt install -y libldap2-dev libsasl2-dev ffmpeg rsync
-
-      - name: Setup GO
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.23'
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-
-      - name: Static code analysis
-        run: make -C ${COMPONENT_DIR} static-code-analysis
-
-      - name: Unit testing
-        run: make -C ${COMPONENT_DIR} test-unit
-
-      - name: Integration testing
-        run: make -C ${COMPONENT_DIR} test-integration
-
       - name: Configure AWS Credentials
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
@@ -78,10 +53,34 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to Amazon ECR
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
-      
+
+      - name: Check if Python/Go project
+        id: check-python-go
+        run: |
+          if [ -f "${COMPONENT_DIR}/setup.py" ] || [ -f "${COMPONENT_DIR}/pyproject.toml" ]; then
+            echo "BUILDER_IMAGE=${REGISTRY}/${PYTHON_BUILDER_IMAGE}" >> $GITHUB_ENV
+          elif [ -f "${COMPONENT_DIR}/go.mod" ]; then
+            echo "BUILDER_IMAGE=${REGISTRY}/${GO_BUILDER_IMAGE}" >> $GITHUB_ENV
+          else
+            echo "BUILDER_IMAGE=builder_image_not_set" >> $GITHUB_ENV
+          fi
+
+      - name: Static code analysis
+        run: make builder -C ${COMPONENT_DIR} static-code-analysis
+
+      - name: Unit testing
+        run: make builder -C ${COMPONENT_DIR} test-unit
+
+      - name: Integration testing
+        run: |
+          if [[ "${COMPONENT_DIR}" == "interactive_ai/workflows/geti_domain/project_ie" ]]; then
+            make -C ${COMPONENT_DIR} test-integration
+          else
+            make builder -C ${COMPONENT_DIR} test-integration
+          fi
+
       - name: Build image
         id: build-image
         run: |
