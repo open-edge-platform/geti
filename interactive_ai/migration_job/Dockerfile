@@ -36,9 +36,9 @@ RUN apt-get update && \
 
 COPY --link --from=build --chown=10001 /builder/interactive_ai/migration_job /builder/interactive_ai/migration_job
 
-ARG VENV="/app/migration_job/.venv"
+ARG VENV="/builder/interactive_ai/migration_job/.venv"
 ENV PATH="$VENV/bin:$PATH"
-ENV PYTHONPATH="/app"
+ENV PYTHONPATH="/builder/interactive_ai"
 
 USER non-root
 WORKDIR /builder/interactive_ai/migration_job
