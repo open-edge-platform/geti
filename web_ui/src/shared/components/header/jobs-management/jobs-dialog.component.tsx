@@ -68,7 +68,6 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
     const [selectedJobState, setSelectedJobState] = useState<Key>(JobState.RUNNING);
     const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.DESC);
 
-    // Fetch jobs data
     const { data, isFetchingNextPage, isLoading, isPending, fetchNextPage, hasNextPage } = useGetJobs(
         {
             jobState: selectedJobState as JobState,
@@ -77,6 +76,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
             author: filters.userId,
             limit: DEFAULT_LIMIT,
             startTimeFrom: range.start.toString(),
+            //Filtering by date is exclusive - adding 1 day
             startTimeTo: range.end.add({ days: 1 }).toString(),
             sortDirection,
         },
