@@ -49,9 +49,18 @@ export interface ProjectConfiguration {
     taskConfigs: ProjectConfigurationTaskConfigs[];
 }
 
-export interface TrainingConfiguration {
+interface TrainingConfigurationBase {
     datasetPreparation: Record<string, ConfigurationParameter[]>;
     training: ConfigurationParameter[];
     evaluation: ConfigurationParameter[];
+}
+
+export interface TrainingConfiguration extends TrainingConfigurationBase {
     advancedConfiguration?: StaticParameter[];
 }
+
+export type TrainingConfigurationUpdatePayload = {
+    [K in keyof TrainingConfigurationBase]?: TrainingConfigurationBase[K] extends ConfigurationParameter[]
+        ? Pick<ConfigurationParameter, 'key' | 'value'>[]
+        : Record<string, Pick<ConfigurationParameter, 'key' | 'value'>[]>;
+};

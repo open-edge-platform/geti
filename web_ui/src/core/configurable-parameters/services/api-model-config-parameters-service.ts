@@ -12,12 +12,17 @@ import {
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
 import { ProjectConfigurationDTO } from '../dtos/configuration.interface';
-import { ProjectConfiguration, TrainingConfiguration } from './configuration.interface';
+import {
+    ProjectConfiguration,
+    TrainingConfiguration,
+    TrainingConfigurationUpdatePayload,
+} from './configuration.interface';
 import {
     getConfigParametersEntity,
     getModelConfigEntity,
     getProjectConfigurationEntity,
     getTrainingConfigurationEntity,
+    getTrainingConfigurationUpdatePayloadDTO,
 } from './utils';
 
 export type TrainingConfigurationQueryParameters = Partial<{ taskId: string; algorithmId: string; modelId: string }>;
@@ -45,10 +50,16 @@ export interface CreateApiModelConfigParametersService {
     ) => Promise<void>;
 
     getProjectConfiguration: (projectIdentifier: ProjectIdentifier) => Promise<ProjectConfiguration>;
+
     getTrainingConfiguration: (
         projectIdentifier: ProjectIdentifier,
         queryParameters?: TrainingConfigurationQueryParameters
     ) => Promise<TrainingConfiguration>;
+    updateTrainingConfiguration: (
+        projectIdentifier: ProjectIdentifier,
+        payload: TrainingConfigurationUpdatePayload,
+        queryParameters?: TrainingConfigurationQueryParameters
+    ) => Promise<void>;
 }
 
 export const createApiModelConfigParametersService: CreateApiService<CreateApiModelConfigParametersService> = (
@@ -108,11 +119,28 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         return getProjectConfigurationEntity(data);
     };
 
+    const updateTrainingConfiguration: CreateApiModelConfigParametersService['updateTrainingConfiguration'] = async (
+        projectIdentifier,
+        payload,
+        queryParameters
+    ) => {
+        const payloadDTO = getTrainingConfigurationUpdatePayloadDTO(payload);
+
+        await instance.patch(router.CONFIGURATION.TRAINING(projectIdentifier), payloadDTO, {
+            params: {
+                task_id: queryParameters?.taskId,
+                model_id: queryParameters?.modelId,
+                algorithm_id: queryParameters?.algorithmId,
+            },
+        });
+    };
+
     return {
         getModelConfigParameters,
         getConfigParameters,
         reconfigureParameters,
         getProjectConfiguration,
         getTrainingConfiguration,
+        updateTrainingConfiguration,
     };
 };

@@ -49,9 +49,18 @@ export interface ProjectConfigurationDTO {
     task_configs: ProjectConfigurationTaskConfigsDTO[];
 }
 
-export type TrainingConfigurationDTO = {
+interface TrainingConfigurationBaseDTO {
     dataset_preparation: Record<string, ConfigurationParameterDTO[]>;
     training: ConfigurationParameterDTO[];
     evaluation: ConfigurationParameterDTO[];
+}
+
+export interface TrainingConfigurationDTO extends TrainingConfigurationBaseDTO {
     advanced_configuration?: StaticParameterDTO[];
+}
+
+export type TrainingConfigurationUpdatePayloadDTO = {
+    [K in keyof TrainingConfigurationBaseDTO]?: TrainingConfigurationBaseDTO[K] extends ConfigurationParameterDTO[]
+        ? Pick<ConfigurationParameterDTO, 'key' | 'value'>[]
+        : Record<string, Pick<ConfigurationParameterDTO, 'key' | 'value'>[]>;
 };

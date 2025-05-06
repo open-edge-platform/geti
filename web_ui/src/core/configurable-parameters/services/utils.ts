@@ -22,12 +22,14 @@ import {
     ProjectConfigurationDTO,
     StaticParameterDTO,
     TrainingConfigurationDTO,
+    TrainingConfigurationUpdatePayloadDTO,
 } from '../dtos/configuration.interface';
 import {
     ConfigurationParameter,
     ProjectConfiguration,
     StaticParameter,
     TrainingConfiguration,
+    TrainingConfigurationUpdatePayload,
 } from './configuration.interface';
 
 const getConfigParametersField = (
@@ -291,4 +293,41 @@ export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO)
     }
 
     return trainingConfiguration;
+};
+
+export const getTrainingConfigurationUpdatePayloadDTO = (
+    payload: TrainingConfigurationUpdatePayload
+): TrainingConfigurationUpdatePayloadDTO => {
+    const trainingConfigurationUpdatePayload: TrainingConfigurationUpdatePayloadDTO = {};
+
+    if (payload.datasetPreparation !== undefined) {
+        trainingConfigurationUpdatePayload.dataset_preparation = Object.entries(payload.datasetPreparation).reduce(
+            (acc, [key, parameters]) => {
+                return {
+                    ...acc,
+                    [key]: parameters.map((parameter) => ({
+                        key: parameter.key,
+                        value: parameter.value,
+                    })),
+                };
+            },
+            {}
+        );
+    }
+
+    if (payload.training !== undefined) {
+        trainingConfigurationUpdatePayload.training = payload.training.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    if (payload.evaluation !== undefined) {
+        trainingConfigurationUpdatePayload.evaluation = payload.evaluation.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    return trainingConfigurationUpdatePayload;
 };
