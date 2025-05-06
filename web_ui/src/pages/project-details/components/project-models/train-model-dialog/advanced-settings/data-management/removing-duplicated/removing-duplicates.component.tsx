@@ -18,6 +18,9 @@ const RemovingDuplicatesTooltip: FC = () => {
     );
 };
 
+/*
+ * This component is currently not used in the v1 of Training flow revamp. Will be used in the later version.
+ */
 export const RemovingDuplicates: FC = () => {
     const [isRemovingDuplicatesEnabled, setIsRemovingDuplicatesEnabled] = useState<boolean>(false);
 

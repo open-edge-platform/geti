@@ -10,7 +10,6 @@ import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/
 import { ConfigurableParametersTaskChain } from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { TaskSelection } from '../model-types/task-selection.component';
 import { DataManagement } from './data-management/data-management.component';
-import { Evaluation } from './evaluation/evaluation.component';
 import { ModelArchitectures } from './model-architectures/model-architectures.component';
 import { Training } from './training/training.component';
 
@@ -64,12 +63,6 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
     trainFromScratch,
     onTrainFromScratchChange,
 }) => {
-    const evaluationParameters = configParameters.components
-        .find((component) => component.header === 'Postprocessing')
-        ?.parameters?.filter((parameter) =>
-            ['confidence_threshold', 'result_based_confidence_threshold'].includes(parameter.name)
-        );
-
     const TABS: TabProps[] = [
         {
             name: 'Architecture',
@@ -104,10 +97,7 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         },
         {
             name: 'Evaluation',
-            children:
-                evaluationParameters === undefined ? undefined : (
-                    <Evaluation evaluationParameters={evaluationParameters} />
-                ),
+            children: undefined /*<Evaluation evaluationParameters={evaluationParameters} />*/,
         },
     ].filter((tab) => tab.children !== undefined);
 
