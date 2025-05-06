@@ -641,7 +641,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -1714,7 +1714,7 @@ requires-dist = [
     { name = "geti-spicedb-tools", editable = "../../../libs/spicedb_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "fastapi", "logger", "kafka", "grpc"], editable = "../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
-    { name = "grpc-interfaces", editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", editable = "../../../libs/grpc_interfaces" },
     { name = "jsonschema", specifier = ">=4.18.0a10" },
     { name = "media-utils", editable = "../../libs/media_utils" },
     { name = "python-multipart", specifier = "~=0.0.18" },

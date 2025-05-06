@@ -1167,7 +1167,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../../grpc_interfaces" }
+source = { editable = "../../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -3358,7 +3358,7 @@ requires-dist = [
     { name = "geti-kafka-tools", editable = "../../../../libs/kafka_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "grpc", "kafka", "logger"], editable = "../../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../../libs/types" },
-    { name = "grpc-interfaces", editable = "../../../../grpc_interfaces" },
+    { name = "grpc-interfaces", editable = "../../../../libs/grpc_interfaces" },
     { name = "kubernetes-asyncio", specifier = "==29.0.0" },
     { name = "media-utils", marker = "extra == 'datumaro-conversion'", editable = "../../../libs/media_utils" },
     { name = "media-utils", marker = "extra == 'evaluation'", editable = "../../../libs/media_utils" },

@@ -5,8 +5,8 @@ go 1.23.3
 toolchain go1.23.8
 
 replace (
-	geti.com/account_service_grpc => ../../../grpc_interfaces/grpc_interfaces/account_service/go
-	geti.com/credit_system => ../../../grpc_interfaces/grpc_interfaces/credit_system/go
+	geti.com/account_service_grpc => ../../../libs/grpc_interfaces/grpc_interfaces/account_service/go
+	geti.com/credit_system => ../../../libs/grpc_interfaces/grpc_interfaces/credit_system/go
 )
 
 require (

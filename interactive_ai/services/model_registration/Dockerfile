@@ -10,7 +10,7 @@ ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
 WORKDIR /builder
-COPY --link --from=grpc_interfaces . grpc_interfaces
+COPY --link --from=libs . libs
 
 WORKDIR /builder/interactive_ai/services/model_registration
 

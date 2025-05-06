@@ -6,8 +6,8 @@ FROM golang:1.23.8 AS build
 WORKDIR /build/control_plane/account_service
 
 COPY --link app/common /build/control_plane/account_service/app/common
-COPY --link --from=credit_system . ../../../grpc_interfaces/grpc_interfaces/credit_system/go
-COPY --link --from=account_service_grpc . ../../../grpc_interfaces/grpc_interfaces/account_service/go
+COPY --link --from=credit_system . ../../../libs/grpc_interfaces/grpc_interfaces/credit_system/go
+COPY --link --from=account_service_grpc . ../../../libs/grpc_interfaces/grpc_interfaces/account_service/go
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.sum,target=go.sum \

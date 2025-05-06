@@ -6,9 +6,9 @@ FROM golang:1.23.8 AS build
 WORKDIR /build/interactive_ai/service
 
 COPY --link --from=go_sdk . ../../libs/go_sdk
-COPY --link --from=modelmesh . ../../../grpc_interfaces/grpc_interfaces/model_mesh/go/pb
-COPY --link --from=modelregistration . ../../../grpc_interfaces/grpc_interfaces/model_registration/go/pb
-COPY --link --from=predict . ../../../grpc_interfaces/grpc_interfaces/predict/go/pb
+COPY --link --from=modelmesh . ../../../libs/grpc_interfaces/grpc_interfaces/model_mesh/go/pb
+COPY --link --from=modelregistration . ../../../libs/grpc_interfaces/grpc_interfaces/model_registration/go/pb
+COPY --link --from=predict . ../../../libs/grpc_interfaces/grpc_interfaces/predict/go/pb
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.sum,target=go.sum \

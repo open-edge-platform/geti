@@ -1,4 +1,5 @@
-include ../Makefile.shared-python
+include ../Makefile.shared-python-libs
+#include ../../Makefile.shared-python
 
 # Variables
 PROTO_ROOT  	:= grpc_interfaces
@@ -9,8 +10,8 @@ PROTOC      	:= protoc
 YEAR 	        := $(shell date +%Y)
 COPYRIGHT_OWNER := Intel Corporation
 
-venv: pre-venv
-	uv sync ${PIP_INSTALL_PARAMS}
+#venv: pre-venv
+#	uv sync ${PIP_INSTALL_PARAMS}
 
 # Get interface names (e.g., account_service, credit_system)
 INTERFACES := $(shell find $(PROTO_ROOT) -mindepth 1 -maxdepth 1 -type d -exec basename {} \;)

@@ -389,7 +389,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -584,7 +584,7 @@ dev = [
 requires-dist = [
     { name = "geti-spicedb-tools", editable = "../../../libs/spicedb_tools" },
     { name = "geti-telemetry-tools", extras = ["logger"], editable = "../../../libs/telemetry_tools" },
-    { name = "grpc-interfaces", extras = ["account-service"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["account-service"], editable = "../../../libs/grpc_interfaces" },
     { name = "pillow", specifier = ">=10.2.0" },
     { name = "psycopg2-binary", specifier = "~=2.9.9" },
     { name = "pyjwt", specifier = "==2.4.0" },

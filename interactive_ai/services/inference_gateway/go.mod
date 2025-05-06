@@ -6,9 +6,9 @@ toolchain go1.23.8
 
 replace (
 	geti.com/go_sdk => ./../../libs/go_sdk
-	geti.com/modelmesh => ./../../../grpc_interfaces/grpc_interfaces/model_mesh/go/pb
-	geti.com/modelregistration => ./../../../grpc_interfaces/grpc_interfaces/model_registration/go/pb
-	geti.com/predict => ./../../../grpc_interfaces/grpc_interfaces/predict/go/pb
+	geti.com/modelmesh => ./../../../libs/grpc_interfaces/grpc_interfaces/model_mesh/go/pb
+	geti.com/modelregistration => ./../../../libs/grpc_interfaces/grpc_interfaces/model_registration/go/pb
+	geti.com/predict => ./../../../libs/grpc_interfaces/grpc_interfaces/predict/go/pb
 )
 
 require (

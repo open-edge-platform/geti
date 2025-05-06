@@ -26,7 +26,7 @@ dependencies = [
 [tool.uv.sources]
 geti-spicedb-tools = { path = "../../../libs/spicedb_tools", editable = true }
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
-grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+grpc_interfaces = { path = "../../../libs/grpc_interfaces", editable = true }
 users_handler = { path = "../../libs/users_handler", editable = true }
 
 [dependency-groups]

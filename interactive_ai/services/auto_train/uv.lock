@@ -53,7 +53,7 @@ dev = [
 requires-dist = [
     { name = "geti-telemetry-tools", extras = ["telemetry", "logger", "grpc"], editable = "../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
-    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../libs/grpc_interfaces" },
     { name = "sc-sdk", editable = "../../libs/sc_sdk" },
 ]
 
@@ -365,7 +365,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
