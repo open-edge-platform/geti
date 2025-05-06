@@ -30,14 +30,14 @@ libs/types:
   - .github/libs-path-filters.yml
 
 # # libraries for interactive_ai
-# interactive_ai/libs/go_sdk:
-#   - interactive_ai/libs/go_sdk/**
-#   - libs/Makefile**
-#   - .github/libs-path-filters.yml
-# interactive_ai/libs/media_utils:
-#   - interactive_ai/libs/media_utils/**
-#   - libs/Makefile**
-#   - .github/libs-path-filters.yml
+interactive_ai/libs/go_sdk:
+  - interactive_ai/libs/go_sdk/**
+  - libs/Makefile**
+  - .github/libs-path-filters.yml
+interactive_ai/libs/media_utils:
+  - interactive_ai/libs/media_utils/**
+  - libs/Makefile**
+  - .github/libs-path-filters.yml
 interactive_ai/libs/sc_sdk:
   - interactive_ai/libs/sc_sdk/**
   - libs/Makefile**
