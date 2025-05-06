@@ -22,7 +22,7 @@ export const LabelPicker = ({ availableLabels, backgroundLabel, handleSelectLabe
         <Picker
             label='Select label'
             labelPosition='side'
-            aria-label={'label picker'}
+            aria-label={'watershed label picker'}
             id='picker-label'
             placeholder={'Select label'}
             width='size-2400'

@@ -60,7 +60,7 @@ const changeLabelToBackgroundAndDrawShape = async (
     shape: { points: { x: number; y: number }[] }
 ) => {
     // Change label to background and draw background shape
-    await page.getByRole('button', { name: 'label Select label' }).click();
+    await page.getByRole('button', { name: 'watershed label picker' }).first().click();
     await page.locator('div[role="group"] >> #option-Background-color').click();
 
     await objectColoringTool.drawPolyline(shape);
@@ -165,7 +165,7 @@ test.describe('Object coloring', () => {
 
         await objectColoringTool.acceptAnnotation();
 
-        expect(await page.getByRole('list', { name: 'Annotations list' }).getByText('horse').count()).toBe(1);
+        expect(await page.getByTestId('annotation-list-accordion').getByText('horse').count()).toBe(1);
     });
 
     test('Draw shape and check tool works correctly', async ({ page, objectColoringTool }) => {
@@ -212,13 +212,13 @@ test.describe('Object coloring', () => {
         await changeLabelToBackgroundAndDrawShape(page, objectColoringTool, shapes.background);
 
         // Change label to the second one and draw shape
-        await page.getByRole('button', { name: 'label Select label' }).click();
+        await page.getByRole('button', { name: 'watershed label picker' }).first().click();
         await page.getByRole('group').locator(`#option-${labelNames[1]}-color`).click();
         await objectColoringTool.drawPolyline(shapes[1]);
         await waitForWatershedResponse(page);
 
         // Change label to the third one and draw shape
-        await page.getByRole('button', { name: 'label Select label' }).click();
+        await page.getByRole('button', { name: 'watershed label picker' }).first().click();
         await page.getByRole('group').locator(`#option-${labelNames[2]}-color`).click();
         await objectColoringTool.drawPolyline(shapes[2]);
         await waitForWatershedResponse(page);

@@ -43,13 +43,11 @@ export const AnnotationList = ({ annotations, isLoading, isDragDisabled }: Annot
         renderDropIndicator: (target) => {
             return <DropIndicator target={target} className={styles.dropTarget} />;
         },
-
         getItems: (keys) => {
             return [...keys].map((key) => ({
                 'text/plain': reversedAnnotations.find(hasEqualId(String(key)))?.id ?? '',
             }));
         },
-
         onReorder: ({ keys, target }) => {
             const arrayKeys = keys.keys().toArray();
             const sourceKey = arrayKeys.at(0)?.toString() ?? '';
@@ -70,8 +68,7 @@ export const AnnotationList = ({ annotations, isLoading, isDragDisabled }: Annot
     }
 
     return (
-        // "rowHeight" is necessary for testing purposes, or the container will render empty
-        <Virtualizer layout={ListLayout} layoutOptions={{ rowHeight: 50 }}>
+        <Virtualizer layout={ListLayout}>
             <AriaComponentsListBox
                 id='annotation-list'
                 aria-label='Annotations list'

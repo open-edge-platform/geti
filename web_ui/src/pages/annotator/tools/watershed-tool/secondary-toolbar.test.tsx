@@ -128,7 +128,7 @@ describe('Secondary Toolbar', () => {
     it('renders label picker correctly', async () => {
         await renderMockApp();
 
-        await userEvent.click(screen.getByLabelText('label picker'));
+        await userEvent.click(screen.getByLabelText('watershed label picker'));
 
         expect(screen.getByRole('option', { name: BACKGROUND_LABEL.name })).toBeInTheDocument();
         expect(screen.getByDisplayValue(mockLabels[1].name)).toBeInTheDocument();
@@ -288,7 +288,7 @@ describe('Secondary Toolbar', () => {
 
         await renderMockApp();
 
-        await userEvent.click(screen.getByLabelText('label picker'));
+        await userEvent.click(screen.getByLabelText('watershed label picker'));
 
         expect(screen.getByRole('option', { name: BACKGROUND_LABEL.name })).toBeInTheDocument();
         expect(screen.getByDisplayValue(mockLabels[1].name)).toBeInTheDocument();
