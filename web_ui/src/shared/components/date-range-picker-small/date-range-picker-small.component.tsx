@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FC, ReactNode, useEffect, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 
 import {
     Content,
@@ -30,16 +30,12 @@ interface DateRangePickerSmall extends RangeCalendarProps<DateValue> {
 
 export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({ hasManualEdition, headerContent, ...props }) => {
     const formatter = useDateFormatter({ dateStyle: 'long' });
-    const [range, setRange] = useState<RangeValue<DateValue>>();
+    const [range, setRange] = useState<RangeValue<DateValue> | undefined | null>(props.value);
     const [focusedDate, setFocusedDate] = useState<DateValue | undefined>();
 
     const rangeText = isEmpty(range)
         ? ''
         : formatter.formatRange(range.start.toDate(getLocalTimeZone()), range.end.toDate(getLocalTimeZone()));
-
-    useEffect(() => {
-        !isEmpty(props.value) && setRange(props.value);
-    }, [props.value]);
 
     const handleOnChange = (attribute: 'start' | 'end', value: DateValue | null | undefined) => {
         if (isEmpty(value) || isEmpty(range)) {
@@ -76,9 +72,15 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({ hasManualEditio
                 <Tooltip>{rangeText}</Tooltip>
             </TooltipTrigger>
             <Dialog>
-                <Heading>{headerContent}</Heading>
+                {headerContent ? <Heading>{headerContent}</Heading> : <></>}
                 <Content>
-                    <RangeCalendar {...props} value={range} focusedValue={focusedDate} onFocusChange={setFocusedDate} />
+                    <RangeCalendar
+                        {...props}
+                        value={range}
+                        focusedValue={focusedDate}
+                        onFocusChange={setFocusedDate}
+                        onChange={setRange}
+                    />
                     {hasManualEdition ? rangeFields : <p>{rangeText}</p>}
                 </Content>
             </Dialog>
