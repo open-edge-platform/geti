@@ -64,7 +64,7 @@ jobs:
 
       - name: Eslint
         working-directory: "web_ui"
-        run: npm run eslint
+        run: npm run lint
 
       - name: Eslint cyclic imports
         working-directory: "web_ui"
@@ -72,7 +72,7 @@ jobs:
 
       - name: Typescript
         working-directory: "web_ui"
-        run: npm run test:tsc
+        run: npm run type-check
 
   unit-tests:
     name: Jest tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
@@ -99,7 +99,7 @@ jobs:
 
       - name: UI Unit tests
         working-directory: "web_ui"
-        run: npm run test -- --silent --maxWorkers=2 --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
+        run: npm run test:unit -- --silent --maxWorkers=2 --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
 
   playwright-tests:
     name: Playwright Tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
