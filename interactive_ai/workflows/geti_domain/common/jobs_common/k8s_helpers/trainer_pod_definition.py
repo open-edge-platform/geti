@@ -7,7 +7,7 @@ import logging
 import os
 
 from flytekit import ContainerTask, PodTemplate, current_context
-from kubernetes.client import V1PodSpec, V1SecurityContext
+from kubernetes.client import V1Capabilities, V1PodSpec, V1SecurityContext
 from kubernetes.client.models import (
     V1ConfigMapEnvSource,
     V1ConfigMapKeySelector,
@@ -204,8 +204,11 @@ def create_flyte_container_task(  # noqa: PLR0913
     if trainer_image_info.render_gid != 0:
         security_context = V1SecurityContext(
             run_as_group=trainer_image_info.render_gid,
+            allow_privilege_escalation=False,
+            read_only_root_filesystem=True,
             run_as_non_root=True,
             run_as_user=10001,
+            capabilities=V1Capabilities(drop=["ALL"]),
         )
     role = "flyte_workflows"
 
