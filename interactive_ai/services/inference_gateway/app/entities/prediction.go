@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	sdkentities "geti.com/go_sdk/entities"
+	sdkentities "geti.com/iai_core/entities"
 )
 
 type CacheMode string

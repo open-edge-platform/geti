@@ -8,7 +8,7 @@ import (
 
 	"inference_gateway/app/entities"
 
-	"geti.com/go_sdk/logger"
+	"geti.com/iai_core/logger"
 	"github.com/caarlos0/env/v11"
 	"github.com/go-resty/resty/v2"
 )

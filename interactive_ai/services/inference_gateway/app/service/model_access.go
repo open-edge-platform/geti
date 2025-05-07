@@ -11,8 +11,8 @@ import (
 	"io"
 	"time"
 
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/telemetry"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/telemetry"
 	pb "geti.com/predict"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

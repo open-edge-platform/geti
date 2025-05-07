@@ -3,4 +3,4 @@
 
 include ../../../Makefile.shared-go
 
-DOCKER_BUILD_CONTEXT := --build-context go_sdk=$(CWD)/interactive_ai/libs/go_sdk
+DOCKER_BUILD_CONTEXT := --build-context iai_core=$(CWD)/interactive_ai/libs/iai_core_go

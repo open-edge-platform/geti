@@ -102,3 +102,8 @@ developer-venv: pre-venv
 		uv sync --frozen --inexact --all-extras --active && \
 		cd -; \
 	done
+
+##
+# Builder container image
+##
+BUILDER_IMAGE ?= python-builder

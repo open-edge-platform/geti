@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	sdkentities "geti.com/go_sdk/entities"
+	sdkentities "geti.com/iai_core/entities"
 	"github.com/stretchr/testify/assert"
 )
 

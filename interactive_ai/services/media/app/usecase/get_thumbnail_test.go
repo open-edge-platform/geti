@@ -11,15 +11,15 @@ import (
 	"os"
 	"testing"
 
-	sdk_endities "geti.com/go_sdk/entities"
+	sdk_endities "geti.com/iai_core/entities"
 
-	"geti.com/go_sdk/testhelper"
+	"geti.com/iai_core/testhelper"
 
 	"github.com/stretchr/testify/assert"
 
 	mock_service "media/app/mock/service"
 
-	mock_storage "geti.com/go_sdk/mock/storage"
+	mock_storage "geti.com/iai_core/mock/storage"
 )
 
 func readImage(t *testing.T) (*os.File, int64) {
