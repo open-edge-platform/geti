@@ -205,7 +205,7 @@ def create_flyte_container_task(  # noqa: PLR0913
         security_context = V1SecurityContext(
             run_as_group=trainer_image_info.render_gid,
             allow_privilege_escalation=False,
-            read_only_root_filesystem=True,
+            read_only_root_filesystem=False,
             run_as_non_root=True,
             run_as_user=10001,
             capabilities=V1Capabilities(drop=["ALL"]),
