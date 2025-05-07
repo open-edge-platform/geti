@@ -75,3 +75,6 @@ report: venv-dev
 
 mypy: venv
 	uv run mypy features --config-file=pyproject.toml
+
+build-image:
+	@echo "Skipping build image stage for e2e tests"
