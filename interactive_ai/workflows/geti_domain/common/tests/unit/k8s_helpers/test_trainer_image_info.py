@@ -13,7 +13,7 @@ from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo
 @pytest.mark.JobsComponent
 class TestTrainerImageInfo:
     @pytest.mark.parametrize(
-        "training_framework, feature_flag_otx_version_selection, primary_image_full_name, sidecar_image_full_name",
+        "training_framework, feature_flag_otx_version_selection, primary_image_full_name, sidecar_image_full_name, render_gid",
         [
             (
                 TrainingFramework(type=TrainingFrameworkType.OTX, version="2.1.0"),
