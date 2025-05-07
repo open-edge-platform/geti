@@ -15,8 +15,17 @@ from sc_sdk.algorithms.hyperparameters import (
 
 
 class AlgorithmStats(BaseModel):
-    gigaflops: float = Field(gt=0)
-    trainable_parameters: int = Field(gt=0)
+    """Information about a machine learning algorithm."""
+    gigaflops: float = Field(
+        gt=0,
+        title="Gigaflops",
+        description="Billions of floating-point operations per second required by the model"
+    )
+    trainable_parameters: int = Field(
+        gt=0,
+        title="Trainable parameters",
+        description="Number of trainable parameters in the model"
+    )
 
 
 class SupportedStatus(str, Enum):
@@ -26,28 +35,39 @@ class SupportedStatus(str, Enum):
 
 
 class Algorithm(BaseModel):
-    """
-    Algorithm contains the necessary information for training a specific machine learning model.
-
-    Attributes:
-        id: Unique identifier for the algorithm (equivalent to the legacy model_template_id)
-        name: Display name of the algorithm
-        description: Detailed description of the algorithm
-        task: Type of machine learning task the algorithm performs
-        stats: Statistics of the model
-        support_status: Current status (active, deprecated, or obsolete)
-        supported_gpus: Dictionary mapping GPU types to compatibility status
-        hyperparameters: Configuration parameters for model training
-    """
-
-    id: str
-    name: str
-    description: str
-    task: str
-    stats: AlgorithmStats
-    support_status: SupportedStatus
-    supported_gpus: dict[str, bool]
-    hyperparameters: Hyperparameters
+    """Algorithm contains the necessary information for training a specific machine learning model."""
+    id: str = Field(
+        title="Algorithm ID",
+        description="Unique identifier for the algorithm"
+    )
+    name: str = Field(
+        title="Algorithm Name",
+        description="Display name of the algorithm"
+    )
+    description: str = Field(
+        title="Description",
+        description="Detailed description of the algorithm's capabilities"
+    )
+    task: str = Field(
+        title="Task Type",
+        description="Type of machine learning task the algorithm performs"
+    )
+    stats: AlgorithmStats = Field(
+        title="Algorithm Statistics",
+        description="Performance statistics of the model"
+    )
+    support_status: SupportedStatus = Field(
+        title="Support Status",
+        description="Current support level (active, deprecated, or obsolete)"
+    )
+    supported_gpus: dict[str, bool] = Field(
+        title="Supported GPUs",
+        description="Dictionary mapping GPU types to compatibility status"
+    )
+    hyperparameters: Hyperparameters = Field(
+        title="Hyperparameters",
+        description="Configuration parameters for model training"
+    )
 
 
 class NullAlgorithm(Algorithm):

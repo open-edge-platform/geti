@@ -5,16 +5,7 @@ from pydantic import BaseModel, Field
 
 
 class AugmentationParameters(BaseModel):
-    """
-    Configuration parameters for data augmentation during training.
-
-    Attributes:
-        horizontal_flip: Whether to flip images horizontally (swap left and right)
-        vertical_flip: Whether to flip images vertically (swap up and down)
-        gaussian_blur: Whether to apply Gaussian blur augmentation
-        random_rotate: Whether to apply random rotation augmentation
-    """
-
+    """Configuration parameters for data augmentation during training."""
     horizontal_flip: bool = Field(
         title="Horizontal flip", description="Flip the image along the vertical axis (swap left and right)"
     )
@@ -26,56 +17,55 @@ class AugmentationParameters(BaseModel):
 
 
 class DatasetPreparationParameters(BaseModel):
-    """
-    Parameters for dataset preparation before training.
-
-    Attributes:
-        augmentation: Configuration for image augmentation techniques
-    """
-
+    """Parameters for dataset preparation before training."""
     augmentation: AugmentationParameters
 
 
 class TrainingHyperParameters(BaseModel):
-    """
-    Hyperparameters for model training process.
+    """Hyperparameters for model training process."""
 
-    Attributes:
-        max_epochs: Maximum number of training epochs
-        early_stopping_epochs: Number of epochs with no improvement after which training will stop
-        learning_rate: Learning rate for optimization algorithm
-        learning_rate_warmup_epochs: Number of epochs for learning rate warmup
-        batch_size: Number of samples in each training batch
-    """
-
-    max_epochs: int = Field(gt=0, description="Max number of epochs")
-    early_stopping_epochs: int = Field(gt=0)
-    learning_rate: float = Field(gt=0, lt=1)
-    learning_rate_warmup_epochs: int = Field(ge=0)
-    batch_size: int = Field(ge=1, le=2048)
+    max_epochs: int = Field(
+        gt=0,
+        title="Maximum epochs",
+        description="Maximum number of training epochs to run"
+    )
+    early_stopping_epochs: int = Field(
+        gt=0,
+        default=None,
+        title="Early stopping epochs",
+        description="Stop training if no improvement is seen for this many epochs"
+    )
+    learning_rate: float = Field(
+        gt=0,
+        lt=1,
+        title="Learning rate",
+        description="Base learning rate for the optimizer"
+    )
+    learning_rate_warmup_epochs: int = Field(
+        ge=0,
+        default=None,
+        title="Learning rate warmup epochs",
+        description="Number of epochs to gradually increase learning rate from 0 to base value"
+    )
+    batch_size: int = Field(
+        ge=1,
+        le=2048,
+        title="Batch size",
+        description="Number of samples processed in each training batch"
+    )
 
 
 class EvaluationParameters(BaseModel):
-    """
-    Parameters for model evaluation.
-
-    Attributes:
-        metric: Evaluation metric to use (currently a placeholder)
-    """
-
-    metric: None = None
+    """Parameters for model evaluation."""
+    metric: None = Field(
+        default=None,
+        title="Evaluation metric",
+        description="Metric used to evaluate model performance"
+    )
 
 
 class Hyperparameters(BaseModel):
-    """
-    Complete set of configurable parameters for model training and evaluation.
-
-    Attributes:
-        dataset_preparation: Parameters for dataset preparation
-        training: Hyperparameters for training
-        evaluation: Parameters for model evaluation
-    """
-
+    """Complete set of configurable parameters for model training and evaluation."""
     dataset_preparation: DatasetPreparationParameters
     training: TrainingHyperParameters
     evaluation: EvaluationParameters
