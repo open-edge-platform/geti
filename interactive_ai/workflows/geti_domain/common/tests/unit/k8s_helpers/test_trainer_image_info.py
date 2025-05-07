@@ -20,24 +20,28 @@ class TestTrainerImageInfo:
                 "false",
                 "otx2_image",
                 "mlflow_sidecar_image",
+                0,
             ),
             (
                 TrainingFramework(type=TrainingFrameworkType.OTX, version="1.6.0"),
                 "false",
                 "otx2_image",
                 "mlflow_sidecar_image",
+                0,
             ),
             (
                 TrainingFramework(type=TrainingFrameworkType.OTX, version="2.1.0"),
                 "true",
                 "otx2_image",
                 "mlflow_sidecar_image",
+                992,
             ),
             (
                 TrainingFramework(type=TrainingFrameworkType.OTX, version="1.6.0"),
                 "true",
                 "ote_image",
                 "mlflow_sidecar_image",
+                992,
             ),
         ],
     )
@@ -49,6 +53,7 @@ class TestTrainerImageInfo:
         feature_flag_otx_version_selection,
         primary_image_full_name,
         sidecar_image_full_name,
+        render_gid,
     ):
         os.environ.update(
             {
@@ -62,6 +67,7 @@ class TestTrainerImageInfo:
             "mlflow_sidecar_image": "mlflow_sidecar_image",
             "ote_image": "ote_image",
             "otx2_image": "otx2_image",
+            "render_gid": str(render_gid),
         }
         mock_get_config_map.return_value = MagicMock()
         mock_get_config_map.return_value.data.get.side_effect = lambda key: configmap_data.get(key)
@@ -70,3 +76,4 @@ class TestTrainerImageInfo:
 
         assert trainer_image_info.to_primary_image_full_name() == primary_image_full_name
         assert trainer_image_info.to_sidecar_image_full_name() == sidecar_image_full_name
+        assert trainer_image_info.render_gid == render_gid
