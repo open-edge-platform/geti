@@ -1,7 +1,0 @@
-behave~=1.2.7.dev6
-boto3~=1.35.97
-junit2html~=31.0.2
-numpy==1.26.4
-opencv-python-headless~=4.11
-pillow~=11.1.0
-urllib3~=2.3.0

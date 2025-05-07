@@ -1,5 +1,3 @@
-**TODO: CVS-160717 move this information to the internal documentation**
-
 # e2e BDD tests
 
 ## Setup
@@ -21,9 +19,6 @@ Set the following environment variables:
 
 - `GETI_SERVER_URL` -> address of the Geti server
 - `GETI_API_KEY` -> your personal access token
-
-The S3 credentials are required to download the test data; if you already have the data cached locally, you can skip setting these variables.
-If you don't know the credentials, ask the team.
 
 ## Run the tests
 
