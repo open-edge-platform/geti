@@ -76,8 +76,8 @@ class TrainerImageInfo:
             raise ValueError(msg.format("ote_image", namespace, name))
         if (otx2_image := configmap.data.get("otx2_image")) is None:
             raise ValueError(msg.format("otx2_image", namespace, name))
-        if configmap.data.get("render_gid"):
-            render_gid = int(configmap.data["render_gid"])
+        if render_gid_value := configmap.data.get("render_gid"):
+            render_gid = int(render_gid_value)
         if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_OTX_VERSION_SELECTION):
             if parse_version(training_framework.version) < parse_version("2.0.0"):
                 image_name = ote_image
