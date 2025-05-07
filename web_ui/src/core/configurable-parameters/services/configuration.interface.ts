@@ -45,31 +45,30 @@ interface ProjectConfigurationTaskConfigs {
     predictions: ConfigurationParameter[];
 }
 
-export type ProjectConfigurationUploadPayload = {
-    [K in keyof Pick<
-        ProjectConfigurationTaskConfigs,
-        'training' | 'autoTraining' | 'predictions'
-    >]?: ProjectConfigurationTaskConfigs[K] extends ConfigurationParameter[]
-        ? Pick<ConfigurationParameter, 'key' | 'value'>[]
-        : { [P in keyof ProjectConfigurationTaskConfigs[K]]?: Pick<ConfigurationParameter, 'key' | 'value'>[] };
-};
+type KeyValueParameter = Pick<ConfigurationParameter, 'key' | 'value'>;
+
+export interface ProjectConfigurationUploadPayload {
+    training?: {
+        constraints: KeyValueParameter[];
+    };
+    autoTraining?: KeyValueParameter[];
+    predictions?: KeyValueParameter[];
+}
 
 export interface ProjectConfiguration {
     taskConfigs: ProjectConfigurationTaskConfigs[];
 }
 
-interface TrainingConfigurationBase {
-    datasetPreparation: Record<string, ConfigurationParameter[]>;
-    training: ConfigurationParameter[];
-    evaluation: ConfigurationParameter[];
-}
-
-export interface TrainingConfiguration extends TrainingConfigurationBase {
+export interface TrainingConfiguration {
+    datasetPreparation?: Record<string, ConfigurationParameter[]>;
+    training?: ConfigurationParameter[];
+    evaluation?: ConfigurationParameter[];
     advancedConfiguration?: StaticParameter[];
 }
 
-export type TrainingConfigurationUpdatePayload = {
-    [K in keyof TrainingConfigurationBase]?: TrainingConfigurationBase[K] extends ConfigurationParameter[]
-        ? Pick<ConfigurationParameter, 'key' | 'value'>[]
-        : Record<string, Pick<ConfigurationParameter, 'key' | 'value'>[]>;
-};
+export interface TrainingConfigurationUpdatePayload {
+    datasetPreparation?: Record<string, KeyValueParameter[]>;
+    training?: KeyValueParameter[];
+    evaluation?: KeyValueParameter[];
+    advancedConfiguration?: KeyValueParameter[];
+}

@@ -339,23 +339,23 @@ export const getProjectConfigurationUploadPayloadDTO = (
 ): ProjectConfigurationUploadPayloadDTO => {
     const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {};
 
-    if (payload.training?.constraints !== undefined) {
-        projectConfigurationUploadPayloadDTO.training = {};
-
-        projectConfigurationUploadPayloadDTO.training.constraints = payload.training.constraints.map((parameter) => ({
-            key: parameter.key,
-            value: parameter.value,
-        }));
+    if (payload.training !== undefined) {
+        projectConfigurationUploadPayloadDTO.training = {
+            constraints: payload.training.constraints.map((parameter) => ({
+                key: parameter.key,
+                value: parameter.value,
+            })),
+        };
     }
 
-    if (payload.predictions) {
+    if (payload.predictions !== undefined) {
         projectConfigurationUploadPayloadDTO.predictions = payload.predictions.map((parameter) => ({
             key: parameter.key,
             value: parameter.value,
         }));
     }
 
-    if (payload.autoTraining) {
+    if (payload.autoTraining !== undefined) {
         projectConfigurationUploadPayloadDTO.auto_training = payload.autoTraining.map((parameter) => ({
             key: parameter.key,
             value: parameter.value,

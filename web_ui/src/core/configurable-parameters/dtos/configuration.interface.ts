@@ -45,31 +45,28 @@ interface ProjectConfigurationTaskConfigsDTO {
     predictions: ConfigurationParameterDTO[];
 }
 
-export type ProjectConfigurationUploadPayloadDTO = {
-    [K in keyof Pick<
-        ProjectConfigurationTaskConfigsDTO,
-        'training' | 'auto_training' | 'predictions'
-    >]?: ProjectConfigurationTaskConfigsDTO[K] extends ConfigurationParameterDTO[]
-        ? Pick<ConfigurationParameterDTO, 'key' | 'value'>[]
-        : { [P in keyof ProjectConfigurationTaskConfigsDTO[K]]?: Pick<ConfigurationParameterDTO, 'key' | 'value'>[] };
-};
+type KeyValueParameterDTO = Pick<ConfigurationParameterDTO, 'key' | 'value'>;
+
+export interface ProjectConfigurationUploadPayloadDTO {
+    training?: { constraints: KeyValueParameterDTO[] };
+    auto_training?: KeyValueParameterDTO[];
+    predictions?: KeyValueParameterDTO[];
+}
 
 export interface ProjectConfigurationDTO {
     task_configs: ProjectConfigurationTaskConfigsDTO[];
 }
 
-interface TrainingConfigurationBaseDTO {
+export interface TrainingConfigurationDTO {
     dataset_preparation: Record<string, ConfigurationParameterDTO[]>;
     training: ConfigurationParameterDTO[];
     evaluation: ConfigurationParameterDTO[];
-}
-
-export interface TrainingConfigurationDTO extends TrainingConfigurationBaseDTO {
     advanced_configuration?: StaticParameterDTO[];
 }
 
-export type TrainingConfigurationUpdatePayloadDTO = {
-    [K in keyof TrainingConfigurationBaseDTO]?: TrainingConfigurationBaseDTO[K] extends ConfigurationParameterDTO[]
-        ? Pick<ConfigurationParameterDTO, 'key' | 'value'>[]
-        : Record<string, Pick<ConfigurationParameterDTO, 'key' | 'value'>[]>;
-};
+export interface TrainingConfigurationUpdatePayloadDTO {
+    dataset_preparation?: Record<string, KeyValueParameterDTO[]>;
+    training?: KeyValueParameterDTO[];
+    evaluation?: KeyValueParameterDTO[];
+    advanced_configuration?: KeyValueParameterDTO[];
+}
