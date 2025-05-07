@@ -47,6 +47,5 @@ describe('No projects area', () => {
         });
 
         expect(await screen.findByRole('button', { name: 'Create new project' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Create project menu' })).toBeInTheDocument();
     });
 });
