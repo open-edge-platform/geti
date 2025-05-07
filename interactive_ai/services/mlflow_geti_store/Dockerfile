@@ -18,7 +18,6 @@ COPY --link entrypoints/ /entrypoints
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 

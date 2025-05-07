@@ -17,10 +17,10 @@ RUN apt-get update && \
     libssl-dev
 
 # Copy the service dependencies
-COPY --link --from=libs . ../libs
-COPY --link --from=grpc_interfaces . ../grpc_interfaces
+COPY --link --from=libs . libs
+COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /platform_cleaner/app
+WORKDIR /platform/services/platform_cleaner
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -29,7 +29,6 @@ COPY --link app .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -47,9 +46,10 @@ RUN useradd -l -u 10001 non-root && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /platform_cleaner/app /app
+COPY --link --from=build --chown=10001 /platform/services/platform_cleaner /platform/services/platform_cleaner
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/platform/services/platform_cleaner/.venv/bin:$PATH"
+ENV PYTHONPATH="/platform/services/platform_cleaner"
 
-WORKDIR /app
+WORKDIR /platform/services/platform_cleaner
