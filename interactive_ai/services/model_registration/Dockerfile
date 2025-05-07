@@ -9,10 +9,9 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /builder/interactive_ai/services/model_registration
+WORKDIR /interactive_ai/services/model_registration
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -36,12 +35,12 @@ RUN apt-get update && \
     rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/interactive_ai/services/model_registration /builder/interactive_ai/services/model_registration
+COPY --link --from=build --chown=10001 /interactive_ai/services/model_registration /interactive_ai/services/model_registration
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/interactive_ai/services/model_registration/.venv/bin:$PATH"
-ENV PYTHONPATH="/builder/interactive_ai/services/model_registration"
+ENV PATH="/interactive_ai/services/model_registration/.venv/bin:$PATH"
+ENV PYTHONPATH="/interactive_ai/services/model_registration"
 
 USER non-root
-WORKDIR /builder/interactive_ai/services/model_registration
+WORKDIR /interactive_ai/services/model_registration
 CMD ["python", "main.py"]

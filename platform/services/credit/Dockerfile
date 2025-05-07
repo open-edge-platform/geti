@@ -9,11 +9,10 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /builder/platform/services/credit_system
+WORKDIR /platform/services/credit_system
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -34,13 +33,13 @@ RUN useradd -l -u 10001 non-root && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/platform/services/credit_system /builder/platform/services/credit_system
-COPY --link entrypoint.sh /builder/platform/services/credit_system
-COPY --link logconfig.ini /builder/platform/services/credit_system
-COPY --link migration.sh /builder/platform/services/credit_system
+COPY --link --from=build --chown=10001 /platform/services/credit_system /platform/services/credit_system
+COPY --link entrypoint.sh /platform/services/credit_system
+COPY --link logconfig.ini /platform/services/credit_system
+COPY --link migration.sh /platform/services/credit_system
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/platform/services/credit_system/.venv/bin:$PATH"
+ENV PATH="/platform/services/credit_system/.venv/bin:$PATH"
 
-WORKDIR /builder/platform/services/credit_system
+WORKDIR /platform/services/credit_system
 ENTRYPOINT [ "./entrypoint.sh" ]

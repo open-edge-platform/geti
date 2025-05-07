@@ -9,10 +9,9 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 
-WORKDIR /builder/platform/services/notifier
+WORKDIR /platform/services/notifier
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -32,11 +31,11 @@ RUN useradd -l -u 10001 non-root && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/platform/services/notifier /builder/platform/services/notifier
-COPY --link entrypoint.sh /builder/platform/services/notifier
+COPY --link --from=build --chown=10001 /platform/services/notifier /platform/services/notifier
+COPY --link entrypoint.sh /platform/services/notifier
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/platform/services/notifier/.venv/bin:$PATH"
+ENV PATH="/platform/services/notifier/.venv/bin:$PATH"
 
-WORKDIR /builder/platform/services/notifier
+WORKDIR /platform/services/notifier
 ENTRYPOINT [ "./entrypoint.sh" ]

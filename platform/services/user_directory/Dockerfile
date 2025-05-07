@@ -17,12 +17,11 @@ RUN apt-get update && \
     libssl-dev
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=platform_libs . platform/libs
 COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /builder/platform/services/user_directory
+WORKDIR /platform/services/user_directory
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -49,12 +48,12 @@ RUN apt-get update && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/platform/services/user_directory /builder/platform/services/user_directory
-COPY --link entrypoint.sh /builder/platform/services/user_directory
-COPY --link logconfig.ini /builder/platform/services/user_directory
+COPY --link --from=build --chown=10001 /platform/services/user_directory /platform/services/user_directory
+COPY --link entrypoint.sh /platform/services/user_directory
+COPY --link logconfig.ini /platform/services/user_directory
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/platform/services/user_directory/.venv/bin:$PATH"
+ENV PATH="/platform/services/user_directory/.venv/bin:$PATH"
 
-WORKDIR /builder/platform/services/user_directory
+WORKDIR /platform/services/user_directory
 ENTRYPOINT [ "./entrypoint.sh" ]

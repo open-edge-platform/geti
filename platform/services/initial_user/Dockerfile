@@ -17,12 +17,11 @@ RUN apt-get update && \
     libssl-dev
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=common_libs . libs
 COPY --link --from=platform_libs . platform/libs
 COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /builder/platform/services/initial_user
+WORKDIR /platform/services/initial_user
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -49,9 +48,9 @@ RUN apt-get update && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/platform/services/initial_user /builder/platform/services/initial_user
+COPY --link --from=build --chown=10001 /platform/services/initial_user /platform/services/initial_user
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/platform/services/initial_user/.venv/bin:$PATH"
+ENV PATH="/platform/services/initial_user/.venv/bin:$PATH"
 
-WORKDIR /builder/platform/services/initial_user
+WORKDIR /platform/services/initial_user

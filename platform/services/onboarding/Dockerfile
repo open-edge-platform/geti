@@ -9,11 +9,10 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /builder/platform/services/onboarding_service
+WORKDIR /platform/services/onboarding_service
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -33,12 +32,12 @@ RUN useradd -l -u 10001 non-root && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/platform/services/onboarding_service /builder/platform/services/onboarding_service
-COPY --link entrypoint.sh /builder/platform/services/onboarding_service
-COPY --link logconfig.ini /builder/platform/services/onboarding_service
+COPY --link --from=build --chown=10001 /platform/services/onboarding_service /platform/services/onboarding_service
+COPY --link entrypoint.sh /platform/services/onboarding_service
+COPY --link logconfig.ini /platform/services/onboarding_service
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/platform/services/onboarding_service/.venv/bin:$PATH"
+ENV PATH="/platform/services/onboarding_service/.venv/bin:$PATH"
 
-WORKDIR /builder/platform/services/onboarding_service
+WORKDIR /platform/services/onboarding_service
 ENTRYPOINT [ "./entrypoint.sh" ]

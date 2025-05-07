@@ -41,10 +41,9 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 
-WORKDIR /builder/interactive_ai/workflows/otx_domain/trainer/otx_v2
+WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -73,8 +72,8 @@ RUN apt-get update && \
     rm -rf /root/.cache/pip
 
 # copy python dependencies
-COPY --link --from=build --chown=10001 /builder/interactive_ai/workflows/otx_domain/trainer/otx_v2/.venv/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --link --from=build --chown=10001 /builder/interactive_ai/workflows/otx_domain/trainer/otx_v2 /otx_v2
+COPY --link --from=build --chown=10001 /interactive_ai/workflows/otx_domain/trainer/otx_v2/.venv/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --link --from=build --chown=10001 /interactive_ai/workflows/otx_domain/trainer/otx_v2 /otx_v2
 COPY --link --from=cuda --chown=10001 /usr/local /usr/local
 
 ENV PATH="/otx_v2:$PATH"
