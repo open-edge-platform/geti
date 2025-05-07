@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.2
         with:
           persist-credentials: false
           ref: ${{ inputs.branch || '' }}
@@ -42,7 +42,7 @@ jobs:
           sudo -E apt install -y ffmpeg
 
       - name: Install uv
-        uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+        uses: astral-sh/setup-uv@6b9c6063abd6010835644d4c2e1bef4cf5cd0fca # v6.0.1
 
       - name: Setup GO
         uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
