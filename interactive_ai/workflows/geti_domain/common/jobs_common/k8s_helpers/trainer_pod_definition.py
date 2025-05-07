@@ -204,6 +204,8 @@ def create_flyte_container_task(  # noqa: PLR0913
     if trainer_image_info.render_gid != 0:
         security_context = V1SecurityContext(
             run_as_group=trainer_image_info.render_gid,
+            run_as_non_root=True,
+            run_as_user=10001,
         )
     role = "flyte_workflows"
 
