@@ -9,8 +9,8 @@ import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import isEmpty from 'lodash/isEmpty';
 
+import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import {
     isDeprecatedAlgorithm,
     isObsoleteAlgorithm,
