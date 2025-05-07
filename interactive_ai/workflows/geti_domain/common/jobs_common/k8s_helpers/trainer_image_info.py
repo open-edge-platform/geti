@@ -48,7 +48,7 @@ class TrainerImageInfo:
 
     train_image_name: str
     sidecar_image_name: str
-    render_gid: int = 0
+    render_gid: int = 0  # Should be non-zero value when training with Intel GPUs
 
     @classmethod
     def create(cls, training_framework: TrainingFramework) -> "TrainerImageInfo":
