@@ -6,11 +6,11 @@ package main
 import (
 	"context"
 
-	"geti.com/go_sdk/frames"
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/middleware"
-	"geti.com/go_sdk/storage/minio"
-	"geti.com/go_sdk/telemetry"
+	"geti.com/iai_core/frames"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/middleware"
+	"geti.com/iai_core/storage/minio"
+	"geti.com/iai_core/telemetry"
 	"github.com/caarlos0/env/v11"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"

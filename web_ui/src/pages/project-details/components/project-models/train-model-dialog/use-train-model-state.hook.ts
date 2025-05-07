@@ -13,11 +13,11 @@ import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { isActiveModel } from '../../../../../core/models/utils';
 import { Task } from '../../../../../core/projects/task.interface';
+import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { SupportedAlgorithm } from '../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { isNotCropTask } from '../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../hooks/use-credits-to-consume.hook';
-import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { getTrainingBodyDTO } from '../legacy-train-model-dialog/utils';
 

@@ -358,7 +358,7 @@ test.describe(`Classification`, () => {
 
                 await toggleShowPredictions(page, false);
 
-                await page.getByRole('button', { name: 'Spades' }).click();
+                await page.getByRole('button', { name: 'Spades', exact: true }).click();
                 await page.getByRole('button', { name: 'Next media item' }).click();
 
                 // Go to the next image/video while discarding changes

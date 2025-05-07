@@ -61,3 +61,7 @@ lint-install:
 		echo "golangci-lint $(GOLANGCI_LINT_VERSION) already installed"; \
 	fi
 
+##
+# Builder container image
+##
+BUILDER_IMAGE ?= go-builder

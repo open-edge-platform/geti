@@ -4,14 +4,18 @@ on:
   workflow_call:
     inputs:
       image-tag:
-        description: 'Docker image tag'
+        description: "Docker image tag"
         type: string
         required: true
+
+permissions: {} # No permissions by default on workflow level
 
 jobs:
   build:
     name: Build UI
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # to checkout code
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -43,6 +47,8 @@ jobs:
   lint:
     name: Eslint checks
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # to checkout code
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -77,6 +83,8 @@ jobs:
   unit-tests:
     name: Jest tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # to checkout code
     strategy:
       fail-fast: false
       matrix:
@@ -104,6 +112,8 @@ jobs:
   playwright-tests:
     name: Playwright Tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
     needs: build
+    permissions:
+      contents: read # to checkout code
     timeout-minutes: 60
     runs-on: ubuntu-latest
     container:
@@ -153,7 +163,8 @@ jobs:
     # Merge reports after playwright-tests, even if some shards have failed
     if: always()
     needs: [playwright-tests]
-
+    permissions:
+      contents: read # to checkout code
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -191,6 +202,9 @@ jobs:
   component-workflow:
     name: Component workflow
     needs: [lint, unit-tests, merge-playwright-reports]
+    permissions:
+      contents: read # to checkout code
+      id-token: write # is required by nested component-check
     secrets: inherit
     uses: ./.github/workflows/component.yml
     with:

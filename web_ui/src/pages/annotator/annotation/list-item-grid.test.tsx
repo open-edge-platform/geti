@@ -17,7 +17,6 @@ describe('ListItemGrid', () => {
                 id={'test'}
                 isLast={false}
                 isSelected={false}
-                isDragging={false}
                 ariaLabel={'list item test'}
                 onHoverEnd={noop}
                 onHoverStart={noop}

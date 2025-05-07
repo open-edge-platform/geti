@@ -14,7 +14,7 @@ import (
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
 
-	sdk_endities "geti.com/go_sdk/entities"
+	sdk_endities "geti.com/iai_core/entities"
 )
 
 func TestPredictionCacheService(t *testing.T) {

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"time"
 
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/telemetry"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/telemetry"
 	"github.com/caarlos0/env/v11"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"

@@ -14,7 +14,6 @@ interface ListItemGridProps {
     id: string;
     isLast: boolean;
     isSelected: boolean;
-    isDragging: boolean;
     ariaLabel: string;
     children: ReactNode;
     onHoverEnd: () => void;
@@ -56,7 +55,6 @@ export const ListItemGrid = ({
     children,
     ariaLabel,
     isSelected,
-    isDragging,
     onHoverStart,
     onHoverEnd,
 }: ListItemGridProps) => {
@@ -82,7 +80,7 @@ export const ListItemGrid = ({
             className={clsx({
                 [classes.annotationItem]: true,
                 [classes.lastAnnotationItem]: isLast,
-                [classes.selectedAnnotation]: isSelected || isHovered || isDragging,
+                [classes.selectedAnnotation]: isSelected || isHovered,
             })}
         >
             <ListItemGridContext.Provider value={{ isHovered, setIsHovered }}>
