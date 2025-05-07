@@ -88,11 +88,8 @@ test.describe('LabelSearch usage', () => {
             `http://localhost:3000/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/61011e42d891c82e13ec92da/projects/62946c61003ddb3967f14750/datasets/6101254defba22ca453f11cc/annotator/image/613a23866674c43ae7a777aa?task-id=${taskId}`
         );
 
-        await expect(page.getByRole('list', { name: 'Annotations list' })).toBeVisible();
-        const list = page.getByRole('list', { name: 'Annotations list' });
-        const annotationItem = list.getByRole('listitem', { name: /annotation/i });
-        await annotationItem.scrollIntoViewIfNeeded();
-        await annotationItem.getByRole('list').dblclick();
+        const list = page.getByTestId('annotation-list-accordion');
+        await list.getByRole('button', { name: 'rectangle' }).dblclick();
 
         const rectangle = page.getByRole('listitem', { name: 'label item rectangle' });
         await rectangle.click();
@@ -135,7 +132,8 @@ test.describe('LabelSearch usage', () => {
         });
 
         test('annotation list bulk action', async ({ page }) => {
-            await expect(page.getByRole('list', { name: 'Annotations list' })).toBeVisible();
+            const list = page.getByTestId('annotation-list-accordion');
+            await expect(list).toBeVisible();
 
             await page.getByRole('checkbox', { name: /annotations selected/i }).check();
 
@@ -148,7 +146,6 @@ test.describe('LabelSearch usage', () => {
             const resultsContainer = page.getByLabel('Label search results');
             await resultsContainer.getByRole('listitem', { name: targetLabel }).click();
 
-            const list = page.getByRole('list', { name: 'Annotations list' });
             const annotationItem = list.getByRole('listitem').nth(0);
 
             await expect(annotationItem).toHaveText(`${parentLabel} ${targetLabel}`);
@@ -171,13 +168,8 @@ test.describe('LabelSearch usage', () => {
         });
 
         test('annotation list item', async ({ page }) => {
-            const list = page.getByRole('list', { name: 'Annotations list' });
-            const annotationItem = list.getByRole('listitem');
-
-            await annotationItem.getByText('Select label').click();
-
-            const resultsContainer = page.getByLabel('Label search results');
-            await resultsContainer.getByRole('listitem', { name: targetLabel }).click();
+            await page.getByTestId('annotation-list-accordion').getByText('Select label').click();
+            await page.getByTestId('popover').getByText(targetLabel).click();
         });
 
         test('label filter', async ({ page }) => {

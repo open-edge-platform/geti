@@ -11,9 +11,9 @@ import (
 	"strings"
 	"testing"
 
-	sdkentities "geti.com/go_sdk/entities"
-	mockframes "geti.com/go_sdk/mock/frames"
-	mockstorage "geti.com/go_sdk/mock/storage"
+	sdkentities "geti.com/iai_core/entities"
+	mockframes "geti.com/iai_core/mock/frames"
+	mockstorage "geti.com/iai_core/mock/storage"
 	"github.com/stretchr/testify/assert"
 )
 

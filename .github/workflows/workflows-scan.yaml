@@ -1,6 +1,7 @@
 name: "Workflows static analysis"
 
-on:
+# This workflow does not generate/publish artifacts, uv is used to execute zizmor
+on: # zizmor: ignore[cache-poisoning]
   workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
@@ -13,7 +14,7 @@ on:
     paths:
       - ".github/**"
 env:
-  ZIZMOR_VERSION: 1.5.2
+  ZIZMOR_VERSION: 1.6.0
 
 permissions: {}
 

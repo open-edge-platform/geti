@@ -15,18 +15,18 @@ import (
 
 	"media/app/usecase"
 
-	sdk_endities "geti.com/go_sdk/entities"
+	sdk_endities "geti.com/iai_core/entities"
 
-	"geti.com/go_sdk/testhelper"
+	"geti.com/iai_core/testhelper"
 
-	"geti.com/go_sdk/middleware"
+	"geti.com/iai_core/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
 	mock_uc "media/app/mock/usecase"
 
-	mock_storage "geti.com/go_sdk/mock/storage"
+	mock_storage "geti.com/iai_core/mock/storage"
 )
 
 func readImage(t *testing.T) *os.File {

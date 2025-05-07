@@ -23,6 +23,7 @@ export const LabelTag = ({ id, label, onClick, isPointer }: LabelTagProps): JSX.
             <TooltipTrigger>
                 <PressableElement
                     id={id}
+                    aria-label={label}
                     onPress={onClick}
                     maxWidth={'size-2400'}
                     UNSAFE_style={{ cursor: isPointer ? 'pointer' : 'auto' }}

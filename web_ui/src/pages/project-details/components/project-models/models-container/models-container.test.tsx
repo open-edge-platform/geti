@@ -10,13 +10,13 @@ import {
     LifecycleStage,
     PerformanceCategory,
 } from '../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
+import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { mockedDetectionSupportedAlgorithms } from '../../../../../core/supported-algorithms/services/test-utils';
 import { getMockedProjectIdentifier } from '../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedModelVersion } from '../../../../../test-utils/mocked-items-factory/mocked-model';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { getById } from '../../../../../test-utils/utils';
-import { useTasksWithSupportedAlgorithms } from '../../../hooks/use-tasks-with-supported-algorithms';
 import { ProjectProvider, useProject } from '../../../providers/project-provider/project-provider.component';
 import { ModelVersion } from './model-card/model-card.interface';
 import { ModelsContainer } from './models-container.component';
@@ -38,7 +38,7 @@ jest.mock('../../../providers/project-provider/project-provider.component', () =
     })),
 }));
 
-jest.mock('../../../hooks/use-tasks-with-supported-algorithms', () => ({
+jest.mock('../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms', () => ({
     useTasksWithSupportedAlgorithms: jest.fn(() => ({
         tasksWithSupportedAlgorithms: {},
     })),

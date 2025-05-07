@@ -102,6 +102,19 @@ jest.mock('react-virtuoso', () => {
     return { VirtuosoGrid: mockVirtuoso(VirtuosoGrid), Virtuoso: mockVirtuoso(Virtuoso), ...rest };
 });
 
+jest.mock('react-aria-components', () => {
+    const { Virtualizer, ...rest } = jest.requireActual('react-aria-components');
+    const { forwardRef } = jest.requireActual('react');
+
+    const mockVirtualizer = () =>
+        forwardRef((props: Record<string, unknown>) => {
+            // "rowHeight" is necessary for testing purposes, or the container will render empty
+            return <Virtualizer layoutOptions={{ rowHeight: 50 }} {...props} />;
+        });
+
+    return { Virtualizer: mockVirtualizer(), ...rest };
+});
+
 jest.mock('@react-spectrum/utils', () => ({
     ...jest.requireActual('@react-spectrum/utils'),
     useMediaQuery: (query: string) => {
@@ -145,10 +158,6 @@ jest.mock('./core/services/use-deployment-config-query.hook', () => ({
     useDeploymentConfigQuery: jest.fn(() => ({
         data: mockConfig,
     })),
-}));
-
-jest.mock('@scalar/api-reference-react', () => ({
-    ApiReference: () => <div>ApiReference</div>,
 }));
 
 process.env.REACT_APP_VALIDATION_COMPONENT_TESTS = 'true';

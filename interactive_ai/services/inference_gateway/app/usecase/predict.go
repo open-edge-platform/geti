@@ -11,11 +11,11 @@ import (
 	"fmt"
 	"io"
 
-	sdkentities "geti.com/go_sdk/entities"
-	"geti.com/go_sdk/frames"
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/storage"
-	"geti.com/go_sdk/telemetry"
+	sdkentities "geti.com/iai_core/entities"
+	"geti.com/iai_core/frames"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/storage"
+	"geti.com/iai_core/telemetry"
 	"golang.org/x/sync/errgroup"
 
 	"inference_gateway/app/entities"

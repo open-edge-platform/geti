@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ANNOTATOR_MODE } from '../../pages/annotator/core/annotation-tool-context.interface';
 import { PredictionCache, PredictionMode } from '../annotations/services/prediction-service.interface';
 import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';
 import { CreditAccountIdentifier } from '../credits/credits.interface';
@@ -141,10 +140,10 @@ const VIDEO_ANNOTATIONS = (
     datasetIdentifier: DatasetIdentifier,
     identifier: VideoIdentifier,
     options?: VideoPaginationOptions
-): [DatasetIdentifier, VideoIdentifier, ANNOTATOR_MODE.ACTIVE_LEARNING, Partial<VideoPaginationOptions>] => [
+): [DatasetIdentifier, VideoIdentifier, 'active-learning', Partial<VideoPaginationOptions>] => [
     datasetIdentifier,
     identifier,
-    ANNOTATOR_MODE.ACTIVE_LEARNING,
+    'active-learning',
     options ?? {},
 ];
 
@@ -157,11 +156,11 @@ const VIDEO_PREDICTIONS = (
 ): [
     DatasetIdentifier,
     VideoIdentifier,
-    ANNOTATOR_MODE.PREDICTION,
+    'predictions',
     PredictionMode,
     string | undefined,
     Partial<VideoPaginationOptions>,
-] => [datasetIdentifier, identifier, ANNOTATOR_MODE.PREDICTION, predictionMode, selectedTask?.id, options ?? {}];
+] => [datasetIdentifier, identifier, 'predictions', predictionMode, selectedTask?.id, options ?? {}];
 
 const VIDEO_RANGE_ANNOTATIONS = (
     datasetIdentifier: DatasetIdentifier,

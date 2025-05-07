@@ -4,7 +4,7 @@
 # build_rest_api_specs
 #############
 
-FROM node_image as build_rest_api_specs
+FROM node_image AS build_rest_api_specs
 
 ARG LOCATION=/home/app/rest-api-specs/
 

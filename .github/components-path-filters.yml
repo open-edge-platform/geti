@@ -101,7 +101,7 @@ interactive_ai/services/director:
   - .github/workflows/component.yml
 interactive_ai/services/inference_gateway:
   - interactive_ai/services/inference_gateway/**
-  - interactive_ai/libs/go_sdk/**
+  - interactive_ai/libs/iai_core_go/**
   - grpc_interfaces/pyproject.toml
   - grpc_interfaces/model_mesh/**
   - grpc_interfaces/model_registration/**
@@ -128,7 +128,7 @@ interactive_ai/services/jobs:
   - .github/workflows/component.yml
 interactive_ai/services/media:
   - interactive_ai/services/media/**
-  - interactive_ai/libs/go_sdk/**
+  - interactive_ai/libs/iai_core_go/**
   - Makefile.shared-go
   - Makefile.shared
   - .github/workflows/component.yml

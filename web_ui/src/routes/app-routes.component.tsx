@@ -66,7 +66,6 @@ import { TemplateRoute } from './projects/template.route';
 import { TestsRoute } from './projects/tests/index.route';
 import { TestRoute } from './projects/tests/test.route';
 import { ProjectUsersRoute } from './projects/users';
-import { RestApiSpecs } from './rest-api-specs/rest-api-specs';
 import { RoutesCollector } from './routes-collector.component';
 import { UsersRoute } from './users/index.route';
 
@@ -226,7 +225,14 @@ export const appRoutes = () => {
             errorElement={<RouterErrorBoundary />}
         >
             <Route path={paths.logout.pattern} element={<LogoutRoute home={paths.root({})} />} />
-            <Route path={paths.restApiSpecs.pattern} element={<RestApiSpecs />} />
+            <Route
+                path={paths.restApiSpecs.pattern}
+                lazy={async () => {
+                    const { RestApiSpecs } = await import('./rest-api-specs/rest-api-specs');
+
+                    return { Component: RestApiSpecs };
+                }}
+            />
 
             <Route
                 path={paths.register.index.pattern}

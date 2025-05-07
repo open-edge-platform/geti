@@ -9,7 +9,7 @@ import (
 	"image/color"
 	"image/draw"
 
-	sdkentities "geti.com/go_sdk/entities"
+	sdkentities "geti.com/iai_core/entities"
 )
 
 // GetUniformTestImage returns a uniform grayscale image of dimensions `Dx` * `Dy` (width * heigth)
