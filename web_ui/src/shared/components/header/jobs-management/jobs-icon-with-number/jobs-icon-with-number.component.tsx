@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Bell } from '../../../assets/icons';
-import { NumberBadge } from '../number-badge/number-badge.component';
+import { Bell } from '../../../../../assets/icons';
+import { NumberBadge } from '../../../number-badge/number-badge.component';
 
-import sharedClasses from '../../shared.module.scss';
-import headerButtonClasses from '../header/header-actions/header-actions.module.scss';
+import sharedClasses from '../../../../shared.module.scss';
+import headerButtonClasses from '../../header-actions/header-actions.module.scss';
 
 interface JobsIconsWithNumberProps {
     runningJobs: number | undefined;
