@@ -14,7 +14,7 @@ import { providersRender as render } from '../../test-utils/required-providers-r
 import { MaintenanceBanner } from './maintenance-banner.component';
 
 jest.mock('../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
-    ...jest.requireActual('../../../hooks/use-is-saas-env/use-is-saas-env.hook'),
+    ...jest.requireActual('../../hooks/use-is-saas-env/use-is-saas-env.hook'),
     useIsSaasEnv: jest.fn(() => true),
 }));
 

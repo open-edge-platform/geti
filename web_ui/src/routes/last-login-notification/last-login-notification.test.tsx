@@ -9,12 +9,12 @@ import { providersRender as render } from '../../test-utils/required-providers-r
 import { LastLoginNotification } from './last-login-notification';
 
 jest.mock('../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
-    ...jest.requireActual('../../../hooks/use-is-saas-env/use-is-saas-env.hook'),
+    ...jest.requireActual('../../hooks/use-is-saas-env/use-is-saas-env.hook'),
     useIsSaasEnv: jest.fn(),
 }));
 
 jest.mock('../../shared/hooks/use-previous-sign-in.hook', () => ({
-    ...jest.requireActual('../../hooks/use-previous-sign-in.hook'),
+    ...jest.requireActual('../../shared/hooks/use-previous-sign-in.hook'),
     usePreviousSignIn: jest.fn(() => ({ lastLoginDate: null, userId: '' })),
 }));
 
