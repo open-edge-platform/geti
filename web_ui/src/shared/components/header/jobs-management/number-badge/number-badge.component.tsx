@@ -4,9 +4,9 @@
 import { Text, useNumberFormatter, View, ViewProps } from '@adobe/react-spectrum';
 import { StyleProps } from '@react-types/shared';
 
-import { LoadingIndicator } from '../loading/loading-indicator.component';
+import { LoadingIndicator } from '../../../loading/loading-indicator.component';
 
-import classes from '../number-badge/number-badge.module.scss';
+import classes from './number-badge.module.scss';
 
 interface NumberBadgeProps {
     id: string;

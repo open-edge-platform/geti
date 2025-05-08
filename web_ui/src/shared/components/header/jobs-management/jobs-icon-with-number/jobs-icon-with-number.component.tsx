@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Bell } from '../../../../../assets/icons';
-import { NumberBadge } from '../../../number-badge/number-badge.component';
+import { NumberBadge } from '../number-badge/number-badge.component';
 
 import sharedClasses from '../../../../shared.module.scss';
 import headerButtonClasses from '../../header-actions/header-actions.module.scss';
