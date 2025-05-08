@@ -3,8 +3,8 @@
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
-import { Refresh } from '../../../assets/icons';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
+import { Refresh } from '../../../../../../assets/icons';
+import { QuietActionButton } from '../../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './refresh-button.module.scss';
 
