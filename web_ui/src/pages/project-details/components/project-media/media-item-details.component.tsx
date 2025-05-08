@@ -5,7 +5,7 @@ import { Key, useRef, useState } from 'react';
 
 import { Divider, Flex, Grid, minmax, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import dayjs from 'dayjs';
-import delay from 'lodash/delay';
+import { delay } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { MediaItem } from '../../../../core/media/media.interface';

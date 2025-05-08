@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import isEmpty from 'lodash/isEmpty';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
+import { isEmpty } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { DatasetIdentifier } from '../../core/projects/dataset.interface';

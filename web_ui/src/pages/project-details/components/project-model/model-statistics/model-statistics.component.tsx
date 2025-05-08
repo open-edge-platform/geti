@@ -6,7 +6,7 @@ import { Fragment, useMemo, useRef } from 'react';
 import { Content, Flex, Grid } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { StatusCodes } from 'http-status-codes';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useModelStatistics } from '../../../../../core/statistics/hooks/use-model-statistics.hook';
 import { useModelIdentifier } from '../../../../../hooks/use-model-identifier/use-model-identifier.hook';

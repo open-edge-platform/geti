@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import countBy from 'lodash/countBy';
-import isEqual from 'lodash/isEqual';
+import { countBy, isEqual } from 'lodash-es';
 
 import { Annotation } from '../../../core/annotations/annotation.interface';
 import { hasEqualId } from '../../../shared/utils';

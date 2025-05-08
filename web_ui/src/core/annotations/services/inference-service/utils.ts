@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { AxiosInstance } from 'axios';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Label } from '../../../labels/label.interface';

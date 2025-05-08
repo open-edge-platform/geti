@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';

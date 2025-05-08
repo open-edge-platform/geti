@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import get from 'lodash/get';
+import { get } from 'lodash-es';
 
 import { ModelsGroups } from '../../core/models/models.interface';
 import { ModelDetails, OptimizationTypes } from '../../core/models/optimized-models.interface';

@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
 import { getLocalTimeZone, parseAbsolute } from '@internationalized/date';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { BorderClose } from '../../../assets/icons';
 import { Label } from '../../../core/labels/label.interface';

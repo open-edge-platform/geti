@@ -7,8 +7,7 @@ import { Flex, Text, View } from '@adobe/react-spectrum';
 import { isFirefox } from '@react-aria/utils';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import { isEmpty, isNil } from 'lodash-es';
 import { DropZone } from 'react-aria-components';
 
 import { MediaUpload } from '../../../assets/images';

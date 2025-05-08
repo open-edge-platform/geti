@@ -5,7 +5,7 @@ import { CSSProperties } from 'react';
 
 import { Content, Dialog, Flex, Heading, Text, View } from '@adobe/react-spectrum';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { ActionButton } from '../../../../shared/components/button/button.component';

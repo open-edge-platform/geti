@@ -3,8 +3,7 @@
 
 import { createContext, ReactNode, useContext, useReducer, useState } from 'react';
 
-import isEqual from 'lodash/isEqual';
-import noop from 'lodash/noop';
+import { isEqual, noop } from 'lodash-es';
 
 import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { useZoom } from '../../zoom/zoom-provider.component';

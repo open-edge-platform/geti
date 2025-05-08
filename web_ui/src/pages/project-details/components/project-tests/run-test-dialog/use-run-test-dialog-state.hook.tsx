@@ -4,8 +4,7 @@
 import { Key, useEffect, useMemo, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { isVisualPromptModel } from '../../../../../core/annotations/services/visual-prompt-service';

@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { Flex, Item, ListBox, Picker, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { useSelectedOrganization } from '../../../../core/organizations/hook/use-selected-organization.hook';
 import { getErrorMessage } from '../../../../core/services/utils';

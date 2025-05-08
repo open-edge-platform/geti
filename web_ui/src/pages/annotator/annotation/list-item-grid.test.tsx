@@ -3,7 +3,7 @@
 
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { providersRender } from '../../../test-utils/required-providers-render';
 import { ListItemGrid } from './list-item-grid.component';

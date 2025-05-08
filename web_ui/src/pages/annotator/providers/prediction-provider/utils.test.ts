@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash-es';
 
 import { labelFromModel } from '../../../../core/annotations/utils';
 import { hasDifferentId, hasEqualId } from '../../../../shared/utils';
@@ -35,7 +35,7 @@ const mockedExplanation2 = {
     roi,
 };
 
-jest.mock('lodash/sortBy');
+jest.mock('lodash-es/sortBy');
 
 describe('prediction-provider utils', () => {
     it('hasEqualId', () => {

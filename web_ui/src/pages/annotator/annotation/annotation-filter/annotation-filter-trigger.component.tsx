@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import { DialogTrigger, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Filter } from '../../../../assets/icons';
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';

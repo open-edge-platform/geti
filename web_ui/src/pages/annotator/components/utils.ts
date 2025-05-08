@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import maxBy from 'lodash/maxBy';
+import { maxBy } from 'lodash-es';
 
 import { Annotation, TaskChainInput } from '../../../core/annotations/annotation.interface';
 import { isVideo } from '../../../core/media/video.interface';

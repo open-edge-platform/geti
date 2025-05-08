@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup } from '@adobe/react-spectrum';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Pause, Play, StepBackward, StepForward } from '../../../../../assets/icons';
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';

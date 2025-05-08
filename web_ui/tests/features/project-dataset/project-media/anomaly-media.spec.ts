@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 
 import { OpenApiResponseBody } from '../../../../src/core/server/types';
 import { paths } from '../../../../src/core/services/routes';

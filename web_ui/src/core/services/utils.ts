@@ -3,7 +3,7 @@
 
 import { AxiosError, AxiosResponse } from 'axios';
 import { StatusCodes } from 'http-status-codes';
-import get from 'lodash/get';
+import { get } from 'lodash-es';
 
 import { isNonEmptyString } from '../../shared/utils';
 import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';

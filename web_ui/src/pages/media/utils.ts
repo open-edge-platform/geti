@@ -4,10 +4,7 @@
 import { KeyboardEvent } from 'react';
 
 import { InfiniteData } from '@tanstack/react-query';
-import differenceBy from 'lodash/differenceBy';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { differenceBy, get, isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Label } from '../../core/labels/label.interface';

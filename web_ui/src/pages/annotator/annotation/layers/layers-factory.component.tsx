@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import negate from 'lodash/negate';
+import { negate } from 'lodash-es';
 
 import { Annotation as AnnotationInterface } from '../../../../core/annotations/annotation.interface';
 import { isVideoFrame } from '../../../../core/media/video.interface';

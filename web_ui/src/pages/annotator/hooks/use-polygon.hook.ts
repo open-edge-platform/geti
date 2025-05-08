@@ -3,7 +3,7 @@
 
 import { PointerEvent, useCallback, useEffect, useRef } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { getIntersectionPoint } from '../../../core/annotations/math';
 import { Point, Polygon } from '../../../core/annotations/shapes.interface';

@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { SearchField, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Search } from '../../../assets/icons';
 import { AdvancedFilterOptions } from '../../../core/media/media-filter.interface';

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import negate from 'lodash/negate';
+import { isEmpty, negate } from 'lodash-es';
 
 import { Annotation } from '../../../core/annotations/annotation.interface';
 import { hasEqualBoundingBox } from '../../../core/annotations/math';

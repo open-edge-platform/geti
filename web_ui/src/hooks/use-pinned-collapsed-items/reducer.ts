@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Dataset } from '../../core/projects/dataset.interface';
 import { WorkspaceEntity } from '../../core/workspaces/services/workspaces.interface';

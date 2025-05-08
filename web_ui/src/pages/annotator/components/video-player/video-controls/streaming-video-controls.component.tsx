@@ -4,9 +4,7 @@
 import { useEffect, useRef } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import isNil from 'lodash/isNil';
+import { isEmpty, isFunction, isNil } from 'lodash-es';
 
 import { Play } from '../../../../../assets/icons';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';

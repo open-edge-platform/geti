@@ -4,8 +4,7 @@
 import { CSSProperties } from 'react';
 
 import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
+import { isEmpty, isFunction } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { Copy, DownloadIcon } from '../../../../assets/icons';

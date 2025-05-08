@@ -5,7 +5,7 @@ import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useSta
 
 import { Flex, Form } from '@adobe/react-spectrum';
 import { TextFieldRef } from '@react-types/textfield';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import {
     LabelItemEditionState,

@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';

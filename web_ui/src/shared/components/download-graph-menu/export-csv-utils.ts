@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
+import { isEmpty, isString } from 'lodash-es';
 
 import { downloadFile } from '../../utils';
 import { LineChartData } from '../charts/line-chart/line-chart.interface';

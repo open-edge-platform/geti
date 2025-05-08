@@ -3,7 +3,7 @@
 
 import { PointerEvent, SVGProps, useRef, useState } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { clampBox, clampPointBetweenImage, pointsToRect } from '../../../../core/annotations/math';
 import { Point, Rect as RectInterface } from '../../../../core/annotations/shapes.interface';

@@ -4,8 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { SpectrumButtonProps } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
-import throttle from 'lodash/throttle';
+import { isNil, throttle } from 'lodash-es';
 
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
 import { Button } from '../../../../shared/components/button/button.component';

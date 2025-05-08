@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import head from 'lodash/head';
+import { head } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useJobs } from '../../../../../core/jobs/hooks/use-jobs.hook';

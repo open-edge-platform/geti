@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import {
     BooleanGroupParams,
