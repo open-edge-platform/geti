@@ -3,8 +3,8 @@
 
 import { useControls } from 'react-zoom-pan-pinch';
 
-import { FitScreen } from '../../../assets/icons';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
+import { FitScreen } from '../../../../assets/icons';
+import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 
 export const FitImageToScreenButton = (): JSX.Element => {
     const { resetTransform } = useControls();
