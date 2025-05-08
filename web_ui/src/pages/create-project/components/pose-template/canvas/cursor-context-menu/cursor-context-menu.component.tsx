@@ -7,9 +7,9 @@ import { View } from '@adobe/react-spectrum';
 import { DOMRefValue } from '@react-types/shared';
 import { OverlayContainer } from 'react-aria';
 
-import { useEventListener } from '../../../hooks/event-listener/event-listener.hook';
-import { MouseEvents } from '../../../shared/mouse-events';
-import { ThemeProvider } from '../../../theme/theme-provider.component';
+import { useEventListener } from '../../../../../../hooks/event-listener/event-listener.hook';
+import { MouseEvents } from '../../../../../../shared/mouse-events';
+import { ThemeProvider } from '../../../../../../theme/theme-provider.component';
 
 export interface CursorContextMenuProps {
     isOpen: boolean;
