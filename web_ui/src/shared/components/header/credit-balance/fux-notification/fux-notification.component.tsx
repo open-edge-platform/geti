@@ -7,11 +7,11 @@ import { Divider, Flex, Text } from '@adobe/react-spectrum';
 import { Popover } from '@react-spectrum/overlays';
 import isFunction from 'lodash/isFunction';
 
-import { Close } from '../../../assets/icons';
-import { openNewTab } from '../../utils';
-import { Button } from '../button/button.component';
-import { CustomPopover } from '../custom-popover/custom-popover.component';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
+import { Close } from '../../../../../assets/icons';
+import { openNewTab } from '../../../../utils';
+import { Button } from '../../../button/button.component';
+import { CustomPopover } from '../../../custom-popover/custom-popover.component';
+import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
 import classes from './fux-notification.module.scss';
 
