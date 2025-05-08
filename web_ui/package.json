@@ -5,6 +5,7 @@
     "node": "22.12.0",
     "npm": "10.9.0"
   },
+  "type": "module",
   "private": true,
   "dependencies": {
     "@adobe/react-spectrum": "^3.41.0",
@@ -42,7 +43,7 @@
     "jspdf": "^3.0.1",
     "jwt-decode": "^4.0.0",
     "localforage": "^1.10.0",
-    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
     "ndarray": "^1.0.19",
     "ndarray-ops": "^1.2.2",
     "oidc-client-ts": "^2.4.0",
@@ -103,8 +104,8 @@
     "test:component:ui": "npm run test:component -- --ui",
     "test:coverage": "npm test -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
-    "test:unit": "jest --config jest.config.js --watchAll=false",
-    "test:unit:watch": "jest --config jest.config.js --watch",
+    "test:unit": "jest --config jest.config.mjs --watchAll=false",
+    "test:unit:watch": "jest --config jest.config.mjs --watch",
     "type-check": "tsc --noEmit"
   },
   "browserslist": {
@@ -135,7 +136,7 @@
     "@testing-library/user-event": "^14.6.1",
     "@types/adm-zip": "^0.5.7",
     "@types/jest": "^29.5.14",
-    "@types/lodash": "^4.17.16",
+    "@types/lodash-es": "^4.17.12",
     "@types/ndarray": "^1.0.14",
     "@types/ndarray-ops": "^1.2.7",
     "@types/node": "^22.15.3",
