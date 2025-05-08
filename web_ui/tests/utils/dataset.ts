@@ -3,8 +3,10 @@
 
 import * as path from 'path';
 
+import { getDirname } from './get-dirname';
+
 export const resolveTestAssetPath = (...p: string[]) => {
-    return path.resolve(__dirname, './../../src/assets/tests-assets/', ...p);
+    return path.resolve(getDirname(import.meta.url), './../../src/assets/tests-assets/', ...p);
 };
 
 export const resolveAntelopePath = () => {
@@ -12,9 +14,9 @@ export const resolveAntelopePath = () => {
 };
 
 export const resolveDatasetPath = (...p: string[]) => {
-    return path.resolve(__dirname, './../datasets', ...p);
+    return path.resolve(getDirname(import.meta.url), './../datasets', ...p);
 };
 
 export const resolveMockFilesPath = (...p: string[]) => {
-    return path.resolve(__dirname, './../mockFiles', ...p);
+    return path.resolve(getDirname(import.meta.url), './../mockFiles', ...p);
 };
