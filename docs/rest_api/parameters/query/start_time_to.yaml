@@ -1,6 +1,6 @@
 in: query
 name: start_time_to
 style: form
-description: Filter jobs which started before this time (inclusive). If time is not specified (only date), it defaults to the beginning of the day.
+description: Filter jobs which started before this time. If time is not specified (only date), it defaults to the beginning of the day.
 schema:
   $ref: "../../../../interactive_ai/services/api/schemas/parameters/timestamp.yaml"
