@@ -1,0 +1,6 @@
+---
+apiVersion: v2
+name: weights_uploader
+description: A Helm chart for weights uploader service
+version: 0.0.1
+appVersion: v0.0.1

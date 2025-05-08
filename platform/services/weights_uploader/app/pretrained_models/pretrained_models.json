@@ -1,0 +1,188 @@
+[
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.213/mobilenetv2_w1-0887-13a021bc.pth.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv2_w1-0887-13a021bc.pth",
+    "sha_sum": "447d0b5cf0aee0d901c270925b8448099c4f69149b4f04f80231188a6b4c8e10"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-atss.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenet_v2-atss.pth",
+    "sha_sum": "f0caa5966a77f4f74b1f051f626d942e60b30d53cbf2f7af93fe2951a2295602"
+  },
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.364/efficientnet_b0-0752-0e386130.pth.zip",
+    "target": "/home/non-root/.torch/models/efficientnet_b0-0752-0e386130.pth",
+    "sha_sum": "bb693fa44ebec3faa35219513eb876cf0e1a1bf9c18dc60949089b9b30e03580"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained/mobilenetv3-small-55df8e1f.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv3-small-55df8e1f.pth",
+    "sha_sum": "55df8e1f9178250b79eaa4333df33eed99a3252597f0244caa0e4319bf49a57c"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained/mobilenetv3-large-1cd25616.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv3-large-1cd25616.pth",
+    "sha_sum": "1cd25616db4b6481677fcbe5f6932520894cb34860ed86f7080f03eedf937b11"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained/mobilenetv3-large-1cd25616.pth",
+    "target": "/home/non-root/.cache/torch/checkpoints/mobilenetv3-large-1cd25616.pth",
+    "sha_sum": "1cd25616db4b6481677fcbe5f6932520894cb34860ed86f7080f03eedf937b11"
+  },
+  {
+    "url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained/mobilenetv3-large-0.75-9632d2a8.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv3-large-0.75-9632d2a8.pth",
+    "sha_sum": "9632d2a820912d612eb2893be5d98c39c5993adecd3e13489326bf0975c8dbfd"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/custom_semantic_segmentation/litehrnet18_imagenet1k_rsc.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/litehrnet18_imagenet1k_rsc.pth",
+    "sha_sum": "f72475bc1861de763d2646bf100ab80e054a33f45b0d19ad4626915e3d6d33e5"
+  },
+  {
+    "url": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnet18-5c106cde.pth",
+    "sha_sum": "5c106cde386e87d4033832f2996f5493238eda96ccf559d1d62760c4de0613f8"
+  },
+  {
+    "url": "https://download.pytorch.org/models/wide_resnet50_2-95faca4d.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/wide_resnet50_2-95faca4d.pth",
+    "sha_sum": "95faca4d11227dddf8633dbb5ff6c8a9003c1aa5b8945c73834b8007b10950b8"
+  },
+  {
+    "url": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-weights/wide_resnet50_racm-8234f177.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/wide_resnet50_racm-8234f177.pth",
+    "sha_sum": "8234f177589d8239cc335ec7f23d69c8c7a323f9a0ba0f9df830ccb66a6f83fa"
+  },
+  {
+    "url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnet50-0676ba61.pth",
+    "sha_sum": "0676ba61b6795bbe1773cffd859882e5e297624d384b6993f7c9e683e722fb8a"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-2s_ssd-992x736.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenet_v2-2s_ssd-992x736.pth",
+    "sha_sum": "c94e3d76fb60db7de2c6fc824a692564cf7ebb2156a58ed2e0f37ff4c0089d28"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/mask_rcnn/mask_rcnn_r50_fpn_mstrain-poly_3x_coco/mask_rcnn_r50_fpn_mstrain-poly_3x_coco_20210524_201154-21b550bb.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mask_rcnn_r50_fpn_mstrain-poly_3x_coco_20210524_201154-21b550bb.pth",
+    "sha_sum": "21b550bb3aa94fbaf85592931466a27b90520422c8b1f2ac08ddf4cf1e4fd650"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/instance_segmentation/v2/efficientnet_b2b-mask_rcnn-576x576.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_b2b-mask_rcnn-576x576.pth",
+    "sha_sum": "b00407a212bdba77866b6c337a24e997b4b2621afb50e62b261df1a4f8efd3c6"
+  },
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.403/efficientnet_b2b-0527-531f10e6.pth.zip",
+    "target": "/home/non-root/.torch/models/efficientnet_b2b-0527-531f10e6.pth",
+    "sha_sum": "fb90f072ce0f409eab002d440bc22eb9428e329ffa2751b7f6dd9c442a669c8e"
+  },
+  {
+    "url": "https://miil-public-eu.oss-eu-central-1.aliyuncs.com/model-zoo/ImageNet_21K_P/models/timm/mobilenetv3_large_100_in21k_miil.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv3_large_100_in21k_miil.pth",
+    "sha_sum": "b74bf618b7f8e41f5e534323c5e24be291ca74c72364d165772d7def8daa7063"
+  },
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.364/efficientnet_b0-0752-0e386130.pth.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_b0-0752-0e386130.pth.zip",
+    "unzip": false,
+    "sha_sum": "79f2b405a15399a0772337bd7f58052cb88299a65ed838a43c1ea8d3e0253f70"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/yolox_tiny_8x8.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_tiny_8x8.pth",
+    "sha_sum": "4ff3b67e005a6356a5794f5fbc42b133e077aa30ddcb0449b2153cfd953a0030"
+  },
+  {
+    "url": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-effv2-weights/tf_efficientnetv2_s_21k-6337ad01.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/tf_efficientnetv2_s_21k-6337ad01.pth",
+    "sha_sum": "6337ad01eda2fde154ffd358cf1583fb3040f1bf467739f28f17fb1dce1c3eb3"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/custom_semantic_segmentation/litehrnetsv2_imagenet1k_rsc.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/litehrnetsv2_imagenet1k_rsc.pth",
+    "sha_sum": "70e87e0a1485962d66ecf5dea337a886cfab252d3d6a893cf7b92bafe92c8a29"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/custom_semantic_segmentation/litehrnetxv3_imagenet1k_rsc.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/litehrnetxv3_imagenet1k_rsc.pth",
+    "sha_sum": "5c6d5a88275fedababdbae637498aae6599e7f5987470122d027765437bfe60a"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmclassification/v0/deit/deit-tiny_pt-4xb256_in1k_20220218-13b382a0.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/deit-tiny_pt-4xb256_in1k_20220218-13b382a0.pth",
+    "sha_sum": "13b382a0e7b4a79b8bcf7c908b9cae5eb922b8bb1d40810998d01a87b075e6b6"
+  },
+  {
+    "url": "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/swin_tiny_patch4_window7_224.pth",
+    "sha_sum": "9f71c168d837d1b99dd1dc29e14990a7a9e8bdc5f673d46b04fe36fe15590ad3"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/swin/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco_20210908_165006-90a4008c.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco_20210908_165006-90a4008c.pth",
+    "sha_sum": "90a4008ce84011fc0d75a08db1b65b01ee1f145e9a1dffe8acc15ea8894b348d"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/resnext101_atss_070623.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnext101_atss_070623.pth",
+    "sha_sum": "1515fb8de866c905c11172e160250044b8ecdb306334a4ba271f28f2c6ec3ccf"
+  },
+  {
+    "url": "https://download.openmmlab.com/pretrain/third_party/resnext101_64x4d-ee2c6f71.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnext101_64x4d-ee2c6f71.pth",
+    "sha_sum": "ee2c6f713dbd26a7bbc4f1bdd599dd19b1fc58b6e7d756c3eb080761cf820e1f"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
+    "sha_sum": "4592a793b95f18f62fd73fbb6cfe61dd445f71a8e072366e114e7134d4492760"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_l_8x8_300e_coco/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
+    "sha_sum": "d3bd2b23e4cd178bfcc756df67e0d0949f3d77e0a73482f6da694c580ed54da1"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_x_8x8_300e_coco/yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth",
+    "sha_sum": "1ef88d67f9c912a7c3a6df4f4d9bdf391cf70df867e6c9d7f249c7a3990e3dec"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_s_20230227-f33ccdf2.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mscan_s_20230227-f33ccdf2.pth",
+    "sha_sum": "f33ccdf2fc0afb78a39a44645eb8436891b95b1d3d9b48c1d9ace85936740a18"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_b_20230227-3ab7d230.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mscan_b_20230227-3ab7d230.pth",
+    "sha_sum": "3ab7d2301876e41fdd3950e59cdce44e18ebcc36a4cf7a4f5f0817d14f381c9b"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_t_20230227-119e8c9f.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mscan_t_20230227-119e8c9f.pth",
+    "sha_sum": "119e8c9f4479cb5ed7906c26adc3c9fe722d5c5fff63651549669bff941d11c4"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_encoder/openvino.xml",
+    "target": "/home/non-root/sam_vit_b_zsl_encoder.xml",
+    "sha_sum": "976e6926e9d8d9220f6b54bc9ae9fad1861177143feece772375e79c4b3b0e41"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_encoder/openvino.bin",
+    "target": "/home/non-root/sam_vit_b_zsl_encoder.bin",
+    "sha_sum": "2b1304d5e6721458b39c33f10cb9d67e951236bafce5df148e0c71b60234aba0"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_decoder/openvino.xml",
+    "target": "/home/non-root/sam_vit_b_zsl_decoder.xml",
+    "sha_sum": "b9acd3452d7d48fd2323b1b47cc5223657cdebe8ab264bca808b296b7682f660"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_decoder/openvino.bin",
+    "target": "/home/non-root/sam_vit_b_zsl_decoder.bin",
+    "sha_sum": "78d656dddb93c9ae714b86a71a3fd3eb9cd52db1f6ef55f300c6c9cd8833a9a0"
+  }
+]

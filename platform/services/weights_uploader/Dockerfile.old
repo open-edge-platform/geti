@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1.7
+
+FROM dev_python AS weights_uploader_deps
+ARG ARTIFACT_REPOSITORY
+ARG REQ_LOCK=requirements-lock.txt
+COPY --link ${REQ_LOCK} /tmp/${REQ_LOCK}
+
+RUN --mount=type=cache,target=~/.cache/pip --mount=type=secret,id=pip,target=/etc/pip.conf python -m pip install \
+        --user \
+        --no-warn-script-location \
+        -r /tmp/${REQ_LOCK}
+
+FROM base_python AS pretrained_models
+
+ARG ARTIFACT_REPOSITORY
+
+COPY --link /pretrained_models /pretrained_models
+
+WORKDIR /pretrained_models
+
+RUN python pretrained_models.py download --local-mirror ${ARTIFACT_REPOSITORY} \
+    && python pretrained_models.py put
+
+FROM base_python AS weights_uploader
+
+ARG ROOT_LOCAL=/root/.local
+ARG NON_ROOT_LOCAL=/home/non-root/.local
+ARG SITE_PACKAGES_ROOT=${ROOT_LOCAL}/lib/python3.10/site-packages/
+ARG SITE_PACKAGES=${NON_ROOT_LOCAL}/lib/python3.10/site-packages/
+ENV PATH=${NON_ROOT_LOCAL}/bin:$PATH
+ENV PYTHONPATH=/mnt
+
+RUN useradd -l -u 10001 non-root
+
+COPY --link --from=weights_uploader_deps --chown=10001 ${ROOT_LOCAL} ${NON_ROOT_LOCAL}
+COPY --link --chown=10001 ./weights_uploader /home/app/
+COPY --link --from=pretrained_models --chown=10001 ./pretrained_models/downloaded_models /weights/
+
+WORKDIR /home/app/
+USER non-root
