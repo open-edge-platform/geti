@@ -5,11 +5,11 @@ import { useEffect } from 'react';
 
 import { useLocalStorage } from 'usehooks-ts';
 
-import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
-import { useNotification } from '../../../notification/notification.component';
-import { usePreviousSignIn } from '../../hooks/use-previous-sign-in.hook';
-import { LOCAL_STORAGE_KEYS } from '../../local-storage-keys';
+import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
+import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
+import { useNotification } from '../../notification/notification.component';
+import { usePreviousSignIn } from '../../shared/hooks/use-previous-sign-in.hook';
+import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
 
 export const LastLoginNotification = (): JSX.Element => {
     const isSaaS = useIsSaasEnv();

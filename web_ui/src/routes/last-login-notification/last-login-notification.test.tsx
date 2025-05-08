@@ -3,17 +3,17 @@
 
 import { screen } from '@testing-library/react';
 
-import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { providersRender as render } from '../../../test-utils/required-providers-render';
-import { usePreviousSignIn } from '../../hooks/use-previous-sign-in.hook';
+import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
+import { usePreviousSignIn } from '../../shared/hooks/use-previous-sign-in.hook';
+import { providersRender as render } from '../../test-utils/required-providers-render';
 import { LastLoginNotification } from './last-login-notification';
 
-jest.mock('../../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
+jest.mock('../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
     ...jest.requireActual('../../../hooks/use-is-saas-env/use-is-saas-env.hook'),
     useIsSaasEnv: jest.fn(),
 }));
 
-jest.mock('../../hooks/use-previous-sign-in.hook', () => ({
+jest.mock('../../shared/hooks/use-previous-sign-in.hook', () => ({
     ...jest.requireActual('../../hooks/use-previous-sign-in.hook'),
     usePreviousSignIn: jest.fn(() => ({ lastLoginDate: null, userId: '' })),
 }));
