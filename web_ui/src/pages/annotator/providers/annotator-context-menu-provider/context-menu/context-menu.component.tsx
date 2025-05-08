@@ -9,7 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import isFunction from 'lodash/isFunction';
 import { useOverlay } from 'react-aria';
 
-import { ANIMATION_PARAMETERS } from '../../animation-parameters/animation-parameters';
+import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
 
 import classes from './context-menu.module.scss';
 

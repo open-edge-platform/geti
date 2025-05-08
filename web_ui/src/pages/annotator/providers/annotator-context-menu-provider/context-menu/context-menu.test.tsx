@@ -3,7 +3,7 @@
 
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { ThemeProvider } from '../../../theme/theme-provider.component';
+import { ThemeProvider } from '../../../../../theme/theme-provider.component';
 import { ContextMenu } from './context-menu.component';
 
 describe('ContextMenu', () => {
