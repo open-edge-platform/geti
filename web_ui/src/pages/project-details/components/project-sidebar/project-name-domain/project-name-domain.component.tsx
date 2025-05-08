@@ -6,20 +6,20 @@ import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { Flex } from '@adobe/react-spectrum';
 import { TextFieldRef } from '@react-types/textfield';
 
-import { Edit } from '../../../assets/icons';
-import { useProjectActions } from '../../../core/projects/hooks/use-project-actions.hook';
-import { ProjectProps } from '../../../core/projects/project.interface';
-import { projectNameSchema } from '../../../pages/create-project/components/utils';
-import { isYupValidationError } from '../../../pages/user-management/profile-page/utils';
-import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { KeyMap } from '../../keyboard-events/keyboard.interface';
-import { isNotCropDomain } from '../../utils';
-import { ActionButton } from '../button/button.component';
-import { LimitedTextField } from '../limited-text-field/limited-text-field.component';
-import { LoadingIndicator } from '../loading/loading-indicator.component';
-import { TruncatedTextWithTooltip } from '../truncated-text/truncated-text.component';
-import { ValidationErrorMsg } from '../validation-error-msg/validation-error-msg.component';
+import { Edit } from '../../../../../assets/icons';
+import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
+import { ProjectProps } from '../../../../../core/projects/project.interface';
+import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
+import { ActionButton } from '../../../../../shared/components/button/button.component';
+import { LimitedTextField } from '../../../../../shared/components/limited-text-field/limited-text-field.component';
+import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
+import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
+import { ValidationErrorMsg } from '../../../../../shared/components/validation-error-msg/validation-error-msg.component';
+import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
+import { isNotCropDomain } from '../../../../../shared/utils';
+import { idMatchingFormat } from '../../../../../test-utils/id-utils';
+import { projectNameSchema } from '../../../../create-project/components/utils';
+import { isYupValidationError } from '../../../../user-management/profile-page/utils';
 
 import classes from './project-name-domain.module.scss';
 

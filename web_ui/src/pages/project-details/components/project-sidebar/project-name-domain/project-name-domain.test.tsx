@@ -3,13 +3,13 @@
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { DOMAIN } from '../../../core/projects/core.interface';
-import { ProjectProps } from '../../../core/projects/project.interface';
-import { REQUIRED_PROJECT_NAME_VALIDATION_MESSAGE } from '../../../pages/create-project/components/utils';
-import { ProjectsImportProvider } from '../../../providers/projects-import-provider/projects-import-provider.component';
-import { getMockedProject } from '../../../test-utils/mocked-items-factory/mocked-project';
-import { providersRender } from '../../../test-utils/required-providers-render';
-import { checkTooltip } from '../../../test-utils/utils';
+import { DOMAIN } from '../../../../../core/projects/core.interface';
+import { ProjectProps } from '../../../../../core/projects/project.interface';
+import { ProjectsImportProvider } from '../../../../../providers/projects-import-provider/projects-import-provider.component';
+import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
+import { providersRender } from '../../../../../test-utils/required-providers-render';
+import { checkTooltip } from '../../../../../test-utils/utils';
+import { REQUIRED_PROJECT_NAME_VALIDATION_MESSAGE } from '../../../../create-project/components/utils';
 import { ProjectNameDomain } from './project-name-domain.component';
 
 jest.mock('react-router-dom', () => ({
