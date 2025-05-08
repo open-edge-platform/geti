@@ -8,8 +8,8 @@ import Calendar from '@spectrum-icons/workflow/Calendar';
 import { DateValue } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 
-import { ActionButton } from '../button/button.component';
-import { CustomPopover } from '../custom-popover/custom-popover.component';
+import { ActionButton } from '../../../../shared/components/button/button.component';
+import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
 import { MonthCalendar } from './month-calendar.component';
 
 interface MonthPickerProps extends CalendarProps<DateValue> {

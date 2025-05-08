@@ -13,7 +13,7 @@ import ChevronLeft from '@spectrum-icons/workflow/ChevronLeft';
 import ChevronRight from '@spectrum-icons/workflow/ChevronRight';
 import range from 'lodash/range';
 
-import { ActionButton } from '../button/button.component';
+import { ActionButton } from '../../../../shared/components/button/button.component';
 import { CalendarCell } from './calendar-cell.component';
 
 export const MonthCalendar = (props: CalendarProps<DateValue> & StyleProps): JSX.Element => {
