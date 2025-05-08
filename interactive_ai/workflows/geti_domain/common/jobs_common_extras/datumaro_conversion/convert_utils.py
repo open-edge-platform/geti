@@ -878,6 +878,9 @@ class ConvertUtils:
                     if not include_all_labels and not any(label in selected_labels for label in joint_names):
                         continue
                     structure["edges"].append({"nodes": list(joint_names)})
-                    # structure["positions"].append(???) TODO CVS-156570
+                for i in range(0, len(cat.positions), 2):
+                    structure["positions"].append(
+                        {"label": cat.labels[i // 2], "x": cat.positions[i], "y": cat.positions[i + 1]}
+                    )
 
         return structure

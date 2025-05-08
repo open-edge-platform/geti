@@ -551,17 +551,6 @@ class DatumaroProjectParser(ProjectParser):
                 FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_KEYPOINT_DETECTION)
                 and task_type == TaskType.KEYPOINT_DETECTION
             ):
-                # need 'keypoint_structure' field in the task
-                # "keypoint_structure": [
-                #     "edges": [
-                #         {"nodes": [label1, label2]},
-                #          ...,
-                #     ],
-                #     "positions": [
-                #         {"label": label1, "x": 0.5, "y": 0.5},
-                #         ...,
-                #     ]
-                # ]
                 task["keypoint_structure"] = self.get_keypoint_structure()
 
             tasks.append(task)
