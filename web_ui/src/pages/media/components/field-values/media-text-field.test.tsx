@@ -5,7 +5,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { MediaTextField } from './media-text-field.component';
 
-jest.mock('lodash-es/debounce', () => (callback: (t: string) => void) => (value: string) => callback(value));
+jest.mock('lodash-es', () => ({
+    ...jest.requireActual('lodash-es'),
+    debounce: (callback: (t: string) => void) => (value: string) => callback(value),
+}));
 
 describe('MediaTextField', () => {
     const ariaLabel = 'input-text';

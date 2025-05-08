@@ -6,7 +6,10 @@ import { fireEvent, screen } from '@testing-library/react';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { MediaIntegerField } from './media-integer-field.component';
 
-jest.mock('lodash-es/debounce', () => (callback: (t: string) => void) => (value: string) => callback(value));
+jest.mock('lodash-es', () => ({
+    ...jest.requireActual('lodash-es'),
+    debounce: (callback: (t: string) => void) => (value: string) => callback(value),
+}));
 
 describe('MediaNumberField', () => {
     const ariaLabel = 'Media number field';
