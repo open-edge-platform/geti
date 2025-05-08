@@ -35,7 +35,10 @@ const mockedExplanation2 = {
     roi,
 };
 
-jest.mock('lodash-es/sortBy');
+jest.mock('lodash-es', () => ({
+    ...jest.requireActual('lodash-es'),
+    sortBy: jest.fn(),
+}));
 
 describe('prediction-provider utils', () => {
     it('hasEqualId', () => {
