@@ -9,7 +9,7 @@ import { Outlet } from 'react-router-dom';
 import { LandingPageSidebar } from '../pages/landing-page/landing-page-sidebar/landing-page-sidebar.component';
 import { LandingPageHeader as Header } from '../shared/components/header/header.component';
 import { Loading } from '../shared/components/loading/loading.component';
-import { MaintenanceBanner } from '../shared/components/maintenance-banner/maintenance-banner.component';
+import { MaintenanceBanner } from './maintenance-banner/maintenance-banner.component';
 
 import classes from './routes.module.scss';
 

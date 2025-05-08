@@ -3,17 +3,17 @@
 
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { createInMemoryApiMaintenanceService } from '../../../core/maintenance/services/in-memory-api-maintenance-service';
-import { MaintenanceResponse } from '../../../core/maintenance/services/maintenance.interface';
-import { ApplicationServicesContextProps } from '../../../core/services/application-services-provider.component';
-import { GENERAL_SETTINGS_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
-import { createInMemoryUserSettingsService } from '../../../core/user-settings/services/in-memory-user-settings-service';
-import { getMockedMaintenanceInfo } from '../../../test-utils/mocked-items-factory/mocked-maintenance';
-import { getMockedUserGlobalSettings } from '../../../test-utils/mocked-items-factory/mocked-settings';
-import { providersRender as render } from '../../../test-utils/required-providers-render';
+import { createInMemoryApiMaintenanceService } from '../../core/maintenance/services/in-memory-api-maintenance-service';
+import { MaintenanceResponse } from '../../core/maintenance/services/maintenance.interface';
+import { ApplicationServicesContextProps } from '../../core/services/application-services-provider.component';
+import { GENERAL_SETTINGS_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
+import { createInMemoryUserSettingsService } from '../../core/user-settings/services/in-memory-user-settings-service';
+import { getMockedMaintenanceInfo } from '../../test-utils/mocked-items-factory/mocked-maintenance';
+import { getMockedUserGlobalSettings } from '../../test-utils/mocked-items-factory/mocked-settings';
+import { providersRender as render } from '../../test-utils/required-providers-render';
 import { MaintenanceBanner } from './maintenance-banner.component';
 
-jest.mock('../../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
+jest.mock('../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
     ...jest.requireActual('../../../hooks/use-is-saas-env/use-is-saas-env.hook'),
     useIsSaasEnv: jest.fn(() => true),
 }));

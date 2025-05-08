@@ -4,12 +4,12 @@
 import { Content, Flex, Heading, View } from '@adobe/react-spectrum';
 import dayjs from 'dayjs';
 
-import { Alert, Close } from '../../../assets/icons';
-import { useMaintenanceQuery } from '../../../core/maintenance/hooks/use-maintenance-query.hook';
-import { GENERAL_SETTINGS_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
-import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
-import { getSettingsOfType } from '../../../core/user-settings/utils';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
+import { Alert, Close } from '../../assets/icons';
+import { useMaintenanceQuery } from '../../core/maintenance/hooks/use-maintenance-query.hook';
+import { GENERAL_SETTINGS_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
+import { useUserGlobalSettings } from '../../core/user-settings/hooks/use-global-settings.hook';
+import { getSettingsOfType } from '../../core/user-settings/utils';
+import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './maintenance-banner.module.scss';
 
