@@ -8,16 +8,20 @@ import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import isNil from 'lodash/isNil';
 
-import { useSelectedOrganization } from '../../../core/organizations/hook/use-selected-organization.hook';
-import { getErrorMessage } from '../../../core/services/utils';
-import { useOnboardUserMutation } from '../../../core/users/hook/use-onboard-user-mutation.hook';
-import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
-import { useNotification } from '../../../notification/notification.component';
-import { isInvitedOrganization, isOrganizationVisible, isUserInvitedInOrg } from '../../../routes/organizations/util';
-import { hasEqualId, isNonEmptyString } from '../../utils';
-import { CustomPopover } from '../custom-popover/custom-popover.component';
-import { PhotoPlaceholder } from '../photo-placeholder/photo-placeholder.component';
-import { QuietToggleButton } from '../quiet-button/quiet-toggle-button.component';
+import { useSelectedOrganization } from '../../../../core/organizations/hook/use-selected-organization.hook';
+import { getErrorMessage } from '../../../../core/services/utils';
+import { useOnboardUserMutation } from '../../../../core/users/hook/use-onboard-user-mutation.hook';
+import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
+import { useNotification } from '../../../../notification/notification.component';
+import {
+    isInvitedOrganization,
+    isOrganizationVisible,
+    isUserInvitedInOrg,
+} from '../../../../routes/organizations/util';
+import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
+import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
+import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
+import { hasEqualId, isNonEmptyString } from '../../../../shared/utils';
 
 interface OrganizationsPickerProps {
     isLargeSize: boolean;

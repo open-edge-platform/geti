@@ -4,15 +4,15 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { useSelectedOrganization } from '../../../core/organizations/hook/use-selected-organization.hook';
-import { AccountStatus } from '../../../core/organizations/organizations.interface';
-import { createInMemoryOnboardingService } from '../../../core/users/services/inmemory-onboarding-service';
-import { OrganizationMetadata } from '../../../core/users/services/onboarding-service.interface';
-import { providersRender } from '../../../test-utils/required-providers-render';
-import { ThemeProvider } from '../../../theme/theme-provider.component';
+import { useSelectedOrganization } from '../../../../core/organizations/hook/use-selected-organization.hook';
+import { AccountStatus } from '../../../../core/organizations/organizations.interface';
+import { createInMemoryOnboardingService } from '../../../../core/users/services/inmemory-onboarding-service';
+import { OrganizationMetadata } from '../../../../core/users/services/onboarding-service.interface';
+import { providersRender } from '../../../../test-utils/required-providers-render';
+import { ThemeProvider } from '../../../../theme/theme-provider.component';
 import { OrganizationsPicker } from './organizations-picker.component';
 
-jest.mock('../../../core/organizations/hook/use-selected-organization.hook', () => ({
+jest.mock('../../../../core/organizations/hook/use-selected-organization.hook', () => ({
     useSelectedOrganization: jest.fn(),
 }));
 
