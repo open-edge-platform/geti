@@ -19,6 +19,10 @@ BUILDER_PROXY               := --build-arg HTTP_PROXY=$(http_proxy) \
 							 --build-arg https_proxy=$(https_proxy) \
 							 --build-arg no_proxy=$(no_proxy)
 
+###
+# Unset USE_PROXY variable if there is no proxy
+###
+USE_PROXY                   ?= true
 ifdef USE_PROXY
 BUILDER_DOCKER_EXTRA_ARGS   ?= ${BUILDER_PROXY}
 else
