@@ -10,7 +10,7 @@ import { keepPreviousData } from '@tanstack/react-query';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
-import { JobState, JobType } from '../../../../core/jobs/jobs.const';
+import { JobState } from '../../../../core/jobs/jobs.const';
 import { JobCount } from '../../../../core/jobs/jobs.interface';
 import { CornerIndicator } from '../../../../pages/annotator/annotation/annotation-filter/corner-indicator.component';
 import { RefreshButton } from '../../../../pages/annotator/components/sidebar/dataset/refresh-button/refresh-button.component';
@@ -21,6 +21,7 @@ import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.compone
 import { Tabs } from '../../tabs/tabs.component';
 import { TabItem } from '../../tabs/tabs.interface';
 import { Fullscreen } from './jobs-actions/fullscreen.component';
+import { FiltersType } from './jobs-actions/jobs-dialog.interface';
 import { JobsFiltering } from './jobs-actions/jobs-filtering.component';
 import { JobsList } from './jobs-list.component';
 import { NumberBadge } from './number-badge/number-badge.component';
@@ -57,10 +58,10 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         [TODAY]
     );
 
-    const [filters, setFilters] = useState({
-        projectId: undefined as string | undefined,
-        userId: undefined as string | undefined,
-        jobTypes: [] as JobType[],
+    const [filters, setFilters] = useState<FiltersType>({
+        projectId: undefined,
+        userId: undefined,
+        jobTypes: [],
     });
 
     const [range, setRange] = useState<RangeValue<DateValue>>(INITIAL_DATES);
@@ -90,6 +91,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         () => JSON.stringify(range) === JSON.stringify(INITIAL_DATES),
         [range, INITIAL_DATES]
     );
+
     const areFiltersChanged = useMemo(
         () => !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length,
         [isInitialRange, filters]
@@ -148,9 +150,6 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         setRange(INITIAL_DATES);
     };
 
-    const handleFilteringChange = (projectId: string | undefined, userId: string | undefined, jobTypes: JobType[]) => {
-        setFilters((prev) => ({ ...prev, projectId, userId, jobTypes }));
-    };
     const handleRangeChange = (value: SetStateAction<RangeValue<DateValue>> | null) => {
         value === null ? setRange(INITIAL_DATES) : setRange(value);
     };
@@ -160,15 +159,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
             <Content>
                 <Flex alignItems='center' marginBottom='size-150'>
                     <Flex flex={4} alignItems='center' justifyContent='left' gap='size-300'>
-                        <JobsFiltering
-                            onChange={handleFilteringChange}
-                            defaultValues={{
-                                projectIdFilter: filters.projectId,
-                                userIdFilter: filters.userId,
-                                jobTypeFilter: filters.jobTypes,
-                            }}
-                            key={`${filters.projectId}${filters.userId}${filters.jobTypes}`}
-                        />
+                        <JobsFiltering onChange={setFilters} values={filters} />
 
                         <CornerIndicator isActive={!isInitialRange}>
                             <DateRangePickerSmall

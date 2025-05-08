@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Key, useCallback, useEffect, useMemo, useState } from 'react';
+import { Key, useCallback, useEffect, useMemo } from 'react';
 
 import { InfiniteQueryObserverResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
@@ -16,26 +16,23 @@ import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-prov
 import { hasEqualId, isNonEmptyArray } from '../../../../utils';
 import { JobsFilterField } from '../jobs-filter-field.component';
 import { JobsTypeFilterField } from './job-types-filter-field.component';
+import { FiltersType } from './jobs-dialog.interface';
 
 interface JobsFilteringDefaultValuesProps {
-    projectIdFilter: string | undefined;
-    userIdFilter: string | undefined;
-    jobTypeFilter: JobType[];
+    projectId: string | undefined;
+    userId: string | undefined;
+    jobTypes: JobType[];
 }
 
 interface JobsFilteringProps {
-    defaultValues: JobsFilteringDefaultValuesProps;
-    onChange: (projectId: string | undefined, userId: string | undefined, type: JobType[]) => void;
+    values: JobsFilteringDefaultValuesProps;
+    onChange: (newFilters: FiltersType) => void;
 }
 
-export const JobsFiltering = ({ defaultValues, onChange }: JobsFilteringProps): JSX.Element => {
+export const JobsFiltering = ({ values, onChange }: JobsFilteringProps): JSX.Element => {
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
 
-    const { projectIdFilter, userIdFilter, jobTypeFilter } = defaultValues;
-
-    const [selectedProject, setSelectedProject] = useState<string | undefined>(projectIdFilter);
-    const [selectedUser, setSelectedUser] = useState<string | undefined>(userIdFilter);
-    const [selectedJobTypes, setSelectedJobTypes] = useState<JobType[]>(jobTypeFilter);
+    const { projectId, userId, jobTypes } = values;
 
     const { useGetProjects } = useProjectActions();
     const {
@@ -55,9 +52,9 @@ export const JobsFiltering = ({ defaultValues, onChange }: JobsFilteringProps): 
     const { useGetUsersQuery } = useUsers();
     const { users, isLoading: isLoadingUsers } = useGetUsersQuery(
         organizationId,
-        selectedProject
+        projectId
             ? {
-                  resourceId: selectedProject,
+                  resourceId: projectId,
                   resourceType: RESOURCE_TYPE.PROJECT,
               }
             : undefined
@@ -95,29 +92,24 @@ export const JobsFiltering = ({ defaultValues, onChange }: JobsFilteringProps): 
     const setSelectedProjectHandler = (key: Key | null): void => {
         const newFilterValue: undefined | string = isEmpty(key) ? undefined : (key as string);
 
-        setSelectedProject(newFilterValue);
+        onChange({ ...values, projectId: newFilterValue });
     };
 
     const setSelectedUserHandler = (key: Key | null): void => {
         const newFilterValue: undefined | string = isEmpty(key) ? undefined : (key as string);
 
-        setSelectedUser(newFilterValue);
+        onChange({ ...values, userId: newFilterValue });
     };
 
     useEffect(() => {
         if (isLoadingUsers) return;
 
-        const isSelectedUserInProject: boolean | undefined = users?.some(hasEqualId(selectedUser));
+        const isSelectedUserInProject: boolean | undefined = users?.some(hasEqualId(userId));
 
         if (!!isSelectedUserInProject) return;
 
-        setSelectedUser(undefined);
-        onChange(selectedProject, undefined, selectedJobTypes);
-    }, [isLoadingUsers, onChange, selectedJobTypes, selectedProject, selectedUser, users]);
-
-    useEffect(() => {
-        onChange(selectedProject, selectedUser, selectedJobTypes);
-    }, [selectedProject, selectedUser, selectedJobTypes, onChange]);
+        onChange({ ...values, userId: undefined });
+    }, [isLoadingUsers, onChange, users, userId, values]);
 
     return (
         <>
@@ -126,7 +118,7 @@ export const JobsFiltering = ({ defaultValues, onChange }: JobsFilteringProps): 
                 ariaLabel={'Job scheduler filter project'}
                 dataTestId={'job-scheduler-filter-project'}
                 options={[allProjectOption, ...projectOptions]}
-                value={selectedProject ?? allProjectOption.key}
+                value={projectId ?? allProjectOption.key}
                 onSelectionChange={setSelectedProjectHandler}
                 isLoading={isLoadingProjects || isFetchingNextPage}
                 loadMore={loadMoreProjects}
@@ -136,11 +128,14 @@ export const JobsFiltering = ({ defaultValues, onChange }: JobsFilteringProps): 
                 ariaLabel={'Job scheduler filter user'}
                 dataTestId={'job-scheduler-filter-user'}
                 options={[allUsersOption, ...usersOptions]}
-                value={selectedUser ?? allUsersOption.key}
+                value={userId ?? allUsersOption.key}
                 onSelectionChange={setSelectedUserHandler}
                 isLoading={isLoadingUsers}
             />
-            <JobsTypeFilterField selectedJobTypes={selectedJobTypes} setSelectedJobTypes={setSelectedJobTypes} />
+            <JobsTypeFilterField
+                selectedJobTypes={jobTypes}
+                setSelectedJobTypes={(newJobTypes) => onChange({ ...values, jobTypes: newJobTypes })}
+            />
         </>
     );
 };
