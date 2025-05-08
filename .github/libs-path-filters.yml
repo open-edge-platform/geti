@@ -38,7 +38,7 @@ interactive_ai/libs/media_utils:
   - interactive_ai/libs/media_utils/**
   - libs/Makefile**
   - .github/libs-path-filters.yml
-interactive_ai/libs/sc_sdk:
-  - interactive_ai/libs/sc_sdk/**
+interactive_ai/libs/iai_core:
+  - interactive_ai/libs/iai_core/**
   - libs/Makefile**
   - .github/libs-path-filters.yml
