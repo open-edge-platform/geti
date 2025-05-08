@@ -8,6 +8,7 @@ import { expect } from '@playwright/test';
 import { AnnotationDTO } from '../../../../src/core/annotations/dtos/annotation.interface';
 import { annotatorTest as test } from '../../../fixtures/annotator-test';
 import { registerFullImage } from '../../../utils/api';
+import { getDirname } from '../../../utils/get-dirname';
 import {
     annotationResponse,
     annotatorUrl,
@@ -20,7 +21,7 @@ import {
 
 test.beforeEach(({ registerApiResponse }) => {
     registerApiResponse('GetProjectInfo', (_, res, ctx) => res(ctx.json(project)));
-    registerFullImage(registerApiResponse, path.resolve(__dirname, './many-cards.jpeg'));
+    registerFullImage(registerApiResponse, path.resolve(getDirname(import.meta.url), './many-cards.jpeg'));
 
     registerApiResponse('GetImageAnnotation', (_, res, ctx) => res(ctx.json(annotationResponse)));
 });
