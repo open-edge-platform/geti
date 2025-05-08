@@ -744,7 +744,7 @@ def get_dataset_info(fxt_dataset_id_str: str) -> DatasetInfo:
                 "left_ankle",  # 16
                 "right_ankle",  # 17
             }
-            keypoint_structure = {
+            keypoint_structure: dict[str, list] = {
                 "edges": [
                     {"nodes": ["left_shoulder", "left_hip"]},  # [6,12]
                     {"nodes": ["left_ear", "left_shoulder"]},  # [4,6]
