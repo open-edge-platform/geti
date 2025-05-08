@@ -7,8 +7,8 @@ import { Content, Dialog, DialogTrigger, Flex } from '@adobe/react-spectrum';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 
 import { Button } from '../../../../../shared/components/button/button.component';
-import { ChangeColorButton } from '../../../../../shared/components/change-color-button/change-color-button.component';
 import { validateColor } from '../utils';
+import { ChangeColorButton } from './change-color-button.component';
 
 import classes from './color-picker-dialog.module.scss';
 
