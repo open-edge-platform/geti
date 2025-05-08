@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isNil from 'lodash/isNil';
-import overSome from 'lodash/overSome';
+import { isNil, overSome } from 'lodash-es';
 
 import { getSupportedProjectTypesFromDTO, getWarningsFromDTO } from '../datasets/services/utils';
 import {

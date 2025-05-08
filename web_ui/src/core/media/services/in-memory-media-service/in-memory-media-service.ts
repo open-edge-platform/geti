@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { AxiosResponse } from 'axios';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { DatasetIdentifier } from '../../../projects/dataset.interface';
 import { MediaItemDTO } from '../../dtos/media.interface';

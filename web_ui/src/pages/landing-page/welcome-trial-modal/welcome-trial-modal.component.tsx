@@ -3,7 +3,7 @@
 
 import { DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import sum from 'lodash/sum';
+import { sum } from 'lodash-es';
 
 import { FireWorks } from '../../../assets/images';
 import { useProducts } from '../../../core/credits/products/hooks/use-products.hook';

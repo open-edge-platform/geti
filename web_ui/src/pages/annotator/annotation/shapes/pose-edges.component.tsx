@@ -4,7 +4,7 @@
 import { Fragment } from 'react';
 
 import clsx from 'clsx';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { BoundingBox, getBoundingBox } from '../../../../core/annotations/math';
 import { isKeypointTask } from '../../../../core/projects/utils';

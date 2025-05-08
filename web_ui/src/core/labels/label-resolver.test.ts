@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import keyBy from 'lodash/keyBy';
+import { keyBy } from 'lodash-es';
 
 import { labels as labelMocks } from './../../test-utils/mocked-items-factory/mocked-labels';
 import { recursivelyAddLabel, recursivelyRemoveLabels } from './label-resolver';

@@ -4,7 +4,7 @@
 import { Key, useState } from 'react';
 
 import { DialogContainer } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Delete, Edit } from '../../../../../assets/icons';
 import { AccountStatus } from '../../../../../core/organizations/organizations.interface';

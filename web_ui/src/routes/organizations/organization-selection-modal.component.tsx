@@ -4,7 +4,7 @@
 import { Content, Dialog, DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { getErrorMessage } from '../../core/services/utils';
 import { useOnboardUserMutation } from '../../core/users/hook/use-onboard-user-mutation.hook';

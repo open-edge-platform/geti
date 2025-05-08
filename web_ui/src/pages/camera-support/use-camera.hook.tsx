@@ -3,7 +3,7 @@
 
 import { RefObject, useCallback, useRef, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import Webcam from 'react-webcam';
 import { v4 as uuid } from 'uuid';
 

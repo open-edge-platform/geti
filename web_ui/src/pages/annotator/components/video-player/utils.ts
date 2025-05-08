@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { VideoPlayerErrorReason } from './streaming-video-player/streaming-video-player.interface';
 

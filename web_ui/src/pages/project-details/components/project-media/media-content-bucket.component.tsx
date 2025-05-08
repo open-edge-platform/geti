@@ -8,7 +8,7 @@ import { useMediaQuery } from '@react-spectrum/utils';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { isKeypointTask } from '../../../../core/projects/utils';

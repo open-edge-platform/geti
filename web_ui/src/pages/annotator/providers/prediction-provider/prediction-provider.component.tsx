@@ -5,8 +5,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 
 import { UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import { isEmpty, isNil } from 'lodash-es';
 
 import { Annotation, TaskChainInput } from '../../../../core/annotations/annotation.interface';
 import { Explanation } from '../../../../core/annotations/prediction.interface';

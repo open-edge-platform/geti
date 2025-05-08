@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { expect } from '@playwright/test';
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 import { v4 as uuidV4 } from 'uuid';
 
 import { MAX_SUPPORTED_ANNOTATIONS } from '../../../../src/core/annotations/utils';

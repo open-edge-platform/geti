@@ -3,8 +3,7 @@
 
 import { useEffect } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';

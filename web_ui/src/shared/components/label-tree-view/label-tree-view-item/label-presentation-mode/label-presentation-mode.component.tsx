@@ -3,7 +3,7 @@
 
 import { Flex, Text } from '@adobe/react-spectrum';
 import { View } from '@react-spectrum/view';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import {
     LabelTreeLabelProps,

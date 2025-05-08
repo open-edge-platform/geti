@@ -8,7 +8,7 @@ import { Heading } from '@react-spectrum/text';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { InfoOutline } from '../../assets/icons';

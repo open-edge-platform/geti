@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { Flex, Grid } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useFocusManager } from 'react-aria';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';

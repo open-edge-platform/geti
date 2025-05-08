@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useQuery } from '@tanstack/react-query';
-import isNil from 'lodash/isNil';
-import sortBy from 'lodash/sortBy';
+import { isNil, sortBy } from 'lodash-es';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';

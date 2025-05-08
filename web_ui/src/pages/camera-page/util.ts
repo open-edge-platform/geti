@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import orderBy from 'lodash/orderBy';
+import { orderBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
 import { isAnomalyDomain, isClassificationDomain } from '../../core/projects/domains';

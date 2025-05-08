@@ -5,8 +5,7 @@ import { useMemo } from 'react';
 
 import { ButtonGroup, View } from '@adobe/react-spectrum';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { Alert } from '../../../../../assets/icons';
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP_TO_STATUS } from '../../../../../core/datasets/dataset.const';

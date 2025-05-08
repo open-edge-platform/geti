@@ -3,9 +3,7 @@
 
 import { useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
-import noop from 'lodash/noop';
+import { isEmpty, isNil, noop } from 'lodash-es';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { MediaItemsList as MediaListVirtuoso } from '../../../../shared/components/media-items-list/media-items-list.component';

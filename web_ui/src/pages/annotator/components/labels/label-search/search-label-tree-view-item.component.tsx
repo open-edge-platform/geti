@@ -4,7 +4,7 @@
 import { ReactNode, useState } from 'react';
 
 import { Flex, Grid, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';
 
 import { Expanded } from '../../../../../assets/icons';

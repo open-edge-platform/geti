@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 
 import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { DatasetIdentifier } from '../../../core/projects/dataset.interface';

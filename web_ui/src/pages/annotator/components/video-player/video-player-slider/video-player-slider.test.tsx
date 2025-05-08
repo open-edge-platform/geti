@@ -6,7 +6,7 @@ import '@wessberg/pointer-events';
 import { ReactNode } from 'react';
 
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { getMockedVideoFrameMediaItem } from '../../../../../test-utils/mocked-items-factory/mocked-media';

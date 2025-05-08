@@ -19,8 +19,7 @@ import {
     useCollator,
 } from '@adobe/react-spectrum';
 import { SortDescriptor } from '@react-types/shared';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, isEmpty } from 'lodash-es';
 import { Link } from 'react-router-dom';
 
 import { NoTests as NoTestsImage } from '../../../../assets/images';

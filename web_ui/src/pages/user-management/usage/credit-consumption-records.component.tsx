@@ -18,7 +18,7 @@ import {
 } from '@adobe/react-spectrum';
 import { getLocalTimeZone } from '@internationalized/date';
 import { dimensionValue } from '@react-spectrum/utils';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { DateValue } from 'react-aria';
 
 import { Refresh } from '../../../assets/icons';

@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Grid, repeat, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { AnimatePresence, motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../../assets/icons';
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';

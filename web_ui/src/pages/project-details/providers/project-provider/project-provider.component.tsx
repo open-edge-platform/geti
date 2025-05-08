@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useCallback, useContext } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 import { useErrorHandler } from 'react-error-boundary';
 
 import { DOMAIN, ProjectIdentifier } from '../../../../core/projects/core.interface';

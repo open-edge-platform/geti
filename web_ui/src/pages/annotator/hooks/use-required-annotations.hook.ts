@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { useProjectStatus } from '../../../core/projects/hooks/use-project-status.hook';
 import { RequiredAnnotationsDetailsEntry } from '../../../core/projects/project-status.interface';

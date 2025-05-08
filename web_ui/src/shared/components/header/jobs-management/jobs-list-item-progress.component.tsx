@@ -4,7 +4,7 @@
 import { FC } from 'react';
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import {
     CanceledIcon,

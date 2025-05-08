@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
+import { isEmpty, isString } from 'lodash-es';
 
 import { ExportDatasetLSData } from '../../../../../core/projects/dataset.interface';
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';

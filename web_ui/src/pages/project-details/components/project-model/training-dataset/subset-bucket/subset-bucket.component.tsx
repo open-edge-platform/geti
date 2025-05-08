@@ -4,7 +4,7 @@
 import { CSSProperties, useMemo, useState } from 'react';
 
 import { Flex, View } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { BulbIcon, DocumentIcon, ShieldFilled } from '../../../../../../assets/icons';
 import { useTrainingDatasetMediaQuery } from '../../../../../../core/datasets/hooks/use-training-dataset.hook';

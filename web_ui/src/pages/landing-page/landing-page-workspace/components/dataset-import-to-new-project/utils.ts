@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_DOMAIN, DATASET_IMPORT_TASK_TYPE } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportLabel, DatasetImportSupportedProjectType } from '../../../../../core/datasets/dataset.interface';

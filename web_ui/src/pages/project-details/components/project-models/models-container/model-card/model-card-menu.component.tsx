@@ -7,9 +7,7 @@ import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger, View } from '@a
 import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isAxiosError } from 'axios';
-import isEqual from 'lodash/isEqual';
-import isFunction from 'lodash/isFunction';
-import isNil from 'lodash/isNil';
+import { isEqual, isFunction, isNil } from 'lodash-es';
 
 import { ExclamationCircleOutlined, MoreMenu } from '../../../../../../assets/icons';
 import { isVisualPromptModel } from '../../../../../../core/annotations/services/visual-prompt-service';

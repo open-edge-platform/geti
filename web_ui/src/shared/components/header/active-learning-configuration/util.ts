@@ -3,7 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { Task } from '../../../../core/projects/task.interface';
 import { BooleanGroupParams, NumberGroupParams } from '../../configurable-parameters/configurable-parameters.interface';

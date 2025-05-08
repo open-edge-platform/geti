@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
-import isEqual from 'lodash/isEqual';
-import isNumber from 'lodash/isNumber';
+import { isEqual, isNumber } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash-es';
 
 import { TASK_TYPE } from '../../../src/core/projects/dtos/task.interface';
 import { OpenApiResponseBody } from '../../../src/core/server/types';

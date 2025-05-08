@@ -4,8 +4,7 @@
 import { useMemo } from 'react';
 
 import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { fetchLabelsTree } from '../../../../../core/labels/annotator-utils/labels-utils';

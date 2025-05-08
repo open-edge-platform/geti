@@ -7,7 +7,7 @@ import { Flex, Radio, RadioGroup, Text } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Arrow } from '../../../../shared/components/arrow/arrow.component';

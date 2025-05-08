@@ -5,7 +5,7 @@ import { ComponentProps, CSSProperties, ReactNode } from 'react';
 
 import { useStyleProps, viewStyleProps } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
-import omit from 'lodash/omit';
+import { omit } from 'lodash-es';
 import { Pressable } from 'react-aria-components';
 
 interface PressableElementProps extends Omit<ComponentProps<typeof Pressable>, 'children'>, StyleProps {

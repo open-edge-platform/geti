@@ -3,7 +3,7 @@
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { CreditCard } from '../../../../../assets/icons';
 import { CONTACT_SUPPORT } from '../../../../../core/const';

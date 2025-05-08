@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import partial from 'lodash/partial';
+import { partial } from 'lodash-es';
 
 import { rectToRotatedRect } from '../../../../core/annotations/rotated-rect-math';
 import { Rect } from '../../../../core/annotations/shapes.interface';

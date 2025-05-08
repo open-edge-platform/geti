@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import { AlertDialog, ButtonGroup, DialogTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useIsMounted } from 'usehooks-ts';
 

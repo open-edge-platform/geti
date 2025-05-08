@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { useLocalAnnotations } from '../../hooks/use-local-annotations.hooks';
 import { useAnnotationFilters } from './use-annotation-filters.hook';

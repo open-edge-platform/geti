@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { isIPad, isIPhone } from '@react-aria/utils';
-import omit from 'lodash/omit';
-import pick from 'lodash/pick';
+import { omit, pick } from 'lodash-es';
 
 import { getBrowserConstraints, getVideoUserMedia } from '../../../shared/navigator-utils';
 import { isNonEmptyArray } from '../../../shared/utils';

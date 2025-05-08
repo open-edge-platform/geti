@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { PerformanceCategory } from '../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { Tag } from '../../../../../../shared/components/tag/tag.component';

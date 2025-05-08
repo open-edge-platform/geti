@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import mergeWith from 'lodash/mergeWith';
+import { isEmpty, mergeWith } from 'lodash-es';
 
 import { Annotation, AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { recursivelyAddLabel } from '../../../../core/labels/label-resolver';

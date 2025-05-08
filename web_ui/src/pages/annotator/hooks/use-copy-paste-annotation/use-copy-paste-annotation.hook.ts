@@ -3,7 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useLocalStorage } from 'usehooks-ts';
 

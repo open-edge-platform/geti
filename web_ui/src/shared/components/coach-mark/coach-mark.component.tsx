@@ -4,7 +4,7 @@
 import { CSSProperties } from 'react';
 
 import { ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { ChevronLeft, Close, MoreMenu } from '../../../assets/icons';
 import { FUX_NOTIFICATION_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';

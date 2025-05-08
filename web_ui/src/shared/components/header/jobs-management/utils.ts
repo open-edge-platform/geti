@@ -3,9 +3,8 @@
 
 import { InfiniteData } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import durationPlugin from 'dayjs/plugin/duration';
-import isNil from 'lodash/isNil';
-import overSome from 'lodash/overSome';
+import durationPlugin from 'dayjs/plugin/duration.js';
+import { isNil, overSome } from 'lodash-es';
 
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { Job, JobExportStatus, RunningTrainingJob } from '../../../../core/jobs/jobs.interface';

@@ -4,7 +4,7 @@
 import { Flex } from '@adobe/react-spectrum';
 import { Text } from '@react-spectrum/text';
 import { useMediaQuery } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { BoundingBox, BoundingCircle } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';

@@ -3,8 +3,7 @@
 
 import { useEffect } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import { isEmpty, isNil } from 'lodash-es';
 
 import { hasMaxAllowedAnnotations } from '../../../../core/annotations/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';

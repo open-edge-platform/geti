@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import dayjs from 'dayjs';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { isImage } from '../../../../../core/media/image.interface';
 import { MediaItem } from '../../../../../core/media/media.interface';

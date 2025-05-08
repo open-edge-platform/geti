@@ -4,7 +4,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { USER_ROLE, UsersQueryParams } from '../../../core/users/users.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';

@@ -4,7 +4,7 @@
 import { CSSProperties } from 'react';
 
 import { View } from '@adobe/react-spectrum';
-import identity from 'lodash/identity';
+import { identity } from 'lodash-es';
 
 import { Layers } from '../../../../annotator/annotation/layers/layers.component';
 import { AnnotatorCanvasSettings } from '../../../../annotator/annotator-settings.component';

@@ -5,8 +5,7 @@ import { useEffect, useMemo } from 'react';
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isFunction from 'lodash/isFunction';
-import once from 'lodash/once';
+import { isFunction, once } from 'lodash-es';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';

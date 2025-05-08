@@ -41,8 +41,8 @@ jest.mock('../../providers/selected-media-item-provider/selected-media-item-prov
     useSelectedMediaItem: jest.fn(),
 }));
 
-jest.mock('lodash', () => ({
-    ...jest.requireActual('lodash'),
+jest.mock('lodash-es', () => ({
+    ...jest.requireActual('lodash-es'),
     debounce: (callback: () => void) => callback,
 }));
 

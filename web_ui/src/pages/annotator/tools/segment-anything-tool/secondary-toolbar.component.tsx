@@ -3,7 +3,7 @@
 
 import { Flex, Switch, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { RightClick } from '../../../../assets/icons';

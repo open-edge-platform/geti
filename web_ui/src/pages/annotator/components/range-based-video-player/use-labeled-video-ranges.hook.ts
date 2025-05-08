@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { LabeledVideoRange } from '../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../core/labels/label.interface';

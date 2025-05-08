@@ -3,7 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';

@@ -4,7 +4,7 @@
 import { Key, useEffect } from 'react';
 
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
-import omit from 'lodash/omit';
+import { omit } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { LabelTreeItem } from '../../../../core/labels/label-tree-view.interface';

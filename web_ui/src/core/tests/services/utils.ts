@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { MEDIA_TYPE } from '../../media/base-media.interface';

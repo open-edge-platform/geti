@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import {
     DATASET_IMPORT_DESCRIPTION,

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isObject from 'lodash/isObject';
-import sortBy from 'lodash/sortBy';
+import { isObject, sortBy } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { hasEqualId } from '../../../shared/utils';

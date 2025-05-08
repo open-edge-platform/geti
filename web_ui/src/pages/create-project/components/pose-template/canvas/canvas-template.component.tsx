@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { isEqual, isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Delete, SortUpDown } from '../../../../../assets/icons';

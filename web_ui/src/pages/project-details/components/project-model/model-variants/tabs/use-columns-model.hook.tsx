@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Cell, Text } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
 import { useApplicationServices } from '../../../../../../core/services/application-services-provider.component';

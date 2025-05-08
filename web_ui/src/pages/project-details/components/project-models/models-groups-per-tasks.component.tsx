@@ -4,7 +4,7 @@
 import { memo, useMemo } from 'react';
 
 import { Divider, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';
 import { Task } from '../../../../core/projects/task.interface';

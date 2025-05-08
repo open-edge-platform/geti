@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import * as yup from 'yup';
 
 import { LabelItemType, LabelTreeItem } from '../../core/labels/label-tree-view.interface';

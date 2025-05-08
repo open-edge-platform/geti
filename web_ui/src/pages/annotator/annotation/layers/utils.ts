@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { Annotation as AnnotationInterface } from '../../../../core/annotations/annotation.interface';
 import { Explanation } from '../../../../core/annotations/prediction.interface';

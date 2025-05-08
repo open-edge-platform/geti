@@ -3,7 +3,7 @@
 
 import { MouseEvent, useRef } from 'react';
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { isExclusive } from '../../core/labels/utils';
 import { MediaItem } from '../../core/media/media.interface';

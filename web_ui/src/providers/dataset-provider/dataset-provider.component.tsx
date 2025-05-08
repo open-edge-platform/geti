@@ -5,7 +5,7 @@ import { createContext, Dispatch, ReactNode, useContext } from 'react';
 
 import { UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { CreateDatasetBody, CreateDatasetResponse, Dataset } from '../../core/projects/dataset.interface';

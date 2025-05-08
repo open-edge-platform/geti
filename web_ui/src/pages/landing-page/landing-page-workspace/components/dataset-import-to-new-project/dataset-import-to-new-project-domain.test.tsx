@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import {
     DATASET_IMPORT_STATUSES,

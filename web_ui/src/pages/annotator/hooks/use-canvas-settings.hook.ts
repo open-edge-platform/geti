@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import {
     CANVAS_ADJUSTMENTS_KEYS,

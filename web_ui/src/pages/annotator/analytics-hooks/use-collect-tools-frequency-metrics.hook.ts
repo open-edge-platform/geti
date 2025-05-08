@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ValueType } from '@opentelemetry/api';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useAnalytics } from '../../../analytics/analytics-provider.component';
 import { getMetricName } from '../../../analytics/metrics';

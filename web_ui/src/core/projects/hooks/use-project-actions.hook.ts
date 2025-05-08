@@ -16,8 +16,7 @@ import {
     UseSuspenseQueryResult,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import omit from 'lodash/omit';
+import { isEmpty, omit } from 'lodash-es';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';

@@ -5,7 +5,7 @@ import { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode, useState }
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';
 
 import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../assets/icons';
