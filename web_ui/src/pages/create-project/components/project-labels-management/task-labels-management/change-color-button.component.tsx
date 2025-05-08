@@ -5,7 +5,7 @@ import { View } from '@adobe/react-spectrum';
 import { BorderRadiusValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
 
-import { ActionButton } from '../button/button.component';
+import { ActionButton } from '../../../../../shared/components/button/button.component';
 
 interface ChangeColorButtonProps {
     size: 'S' | 'L';
