@@ -5,7 +5,7 @@ from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from sc_sdk.algorithms.hyperparameters import (
+from geti_supported_models.hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,
@@ -14,8 +14,8 @@ from sc_sdk.algorithms.hyperparameters import (
 )
 
 
-class AlgorithmStats(BaseModel):
-    """Information about a machine learning algorithm."""
+class ModelStats(BaseModel):
+    """Information about a machine learning model."""
 
     gigaflops: float = Field(
         gt=0, title="Gigaflops", description="Billions of floating-point operations per second required by the model"
@@ -31,14 +31,14 @@ class SupportedStatus(str, Enum):
     OBSOLETE = "obsolete"
 
 
-class Algorithm(BaseModel):
+class ModelManifest(BaseModel):
     """Algorithm contains the necessary information for training a specific machine learning model."""
 
-    id: str = Field(title="Algorithm ID", description="Unique identifier for the algorithm")
-    name: str = Field(title="Algorithm Name", description="Display name of the algorithm")
-    description: str = Field(title="Description", description="Detailed description of the algorithm's capabilities")
-    task: str = Field(title="Task Type", description="Type of machine learning task the algorithm performs")
-    stats: AlgorithmStats = Field(title="Algorithm Statistics", description="Performance statistics of the model")
+    id: str = Field(title="Model manifest ID", description="Unique identifier for the model manifest")
+    name: str = Field(title="Model manifest name", description="Display name of the model manifest")
+    description: str = Field(title="Description", description="Detailed description of the model capabilities")
+    task: str = Field(title="Task Type", description="Type of machine learning task the model performs")
+    stats: ModelStats = Field(title="Model Statistics", description="Performance statistics of the model")
     support_status: SupportedStatus = Field(
         title="Support Status", description="Current support level (active, deprecated, or obsolete)"
     )
@@ -50,18 +50,18 @@ class Algorithm(BaseModel):
     )
 
 
-class NullAlgorithm(Algorithm):
+class NullModelManifest(ModelManifest):
     """
-    NullAlgorithm is a placeholder for an empty or non-existent algorithm.
+    NullModelManifest is a placeholder for an empty or non-existent model manifest.
 
-    This class is used to represent the absence of a valid algorithm configuration.
+    This class is used to represent the absence of a valid model manifest.
     """
 
     id: str = Field(default="null")
     name: str = Field(default="null")
     description: str = Field(default="null")
     task: str = Field(default="null")
-    stats: AlgorithmStats = Field(default=AlgorithmStats(gigaflops=1, trainable_parameters=1))
+    stats: ModelStats = Field(default=ModelStats(gigaflops=1, trainable_parameters=1))
     support_status: SupportedStatus = Field(default=SupportedStatus.OBSOLETE)
     supported_gpus: dict[str, bool] = Field(default={})
     hyperparameters: Hyperparameters = Field(

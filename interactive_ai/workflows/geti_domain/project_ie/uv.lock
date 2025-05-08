@@ -817,6 +817,32 @@ dev = [
 ]
 
 [[package]]
+name = "geti-supported-models"
+version = "1.0.0"
+source = { editable = "../../../supported_models" }
+dependencies = [
+    { name = "hiyapyco" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "hiyapyco", specifier = "==0.7.0" },
+    { name = "pydantic", specifier = "==2.5.3" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = "~=1.15" },
+    { name = "pre-commit", specifier = "~=4.1" },
+    { name = "pytest", specifier = "~=8.3" },
+    { name = "ruff", specifier = "~=0.11" },
+    { name = "testfixtures", specifier = "~=7.2" },
+    { name = "types-cachetools" },
+    { name = "types-pyyaml" },
+]
+
+[[package]]
 name = "geti-telemetry-tools"
 version = "1.0.3"
 source = { editable = "../../../../libs/telemetry_tools" }
@@ -2380,15 +2406,14 @@ dependencies = [
     { name = "attrs" },
     { name = "cachetools" },
     { name = "geti-feature-tools" },
+    { name = "geti-supported-models" },
     { name = "geti-types" },
-    { name = "hiyapyco" },
     { name = "minio" },
     { name = "networkx" },
     { name = "numpy" },
     { name = "omegaconf" },
     { name = "opencv-python-headless" },
     { name = "pycountry" },
-    { name = "pydantic" },
     { name = "pymongo", extra = ["aws"] },
     { name = "scipy" },
     { name = "shapely" },
@@ -2400,15 +2425,14 @@ requires-dist = [
     { name = "attrs", specifier = "~=24.3" },
     { name = "cachetools", specifier = "~=5.5" },
     { name = "geti-feature-tools", editable = "../../../../libs/feature_tools" },
+    { name = "geti-supported-models", editable = "../../../supported_models" },
     { name = "geti-types", editable = "../../../../libs/types" },
-    { name = "hiyapyco", specifier = "==0.7.0" },
     { name = "minio", specifier = "~=7.1.0" },
     { name = "networkx", specifier = ">=2.6,<=2.8" },
     { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },
     { name = "omegaconf", specifier = "~=2.3" },
     { name = "opencv-python-headless", specifier = "~=4.10" },
     { name = "pycountry", specifier = "==22.3.*" },
-    { name = "pydantic", specifier = "==2.5.3" },
     { name = "pymongo", extras = ["aws"], specifier = "~=4.10" },
     { name = "scipy", specifier = "~=1.14" },
     { name = "shapely", specifier = "~=2.0" },

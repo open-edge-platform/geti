@@ -1,5 +1,5 @@
-id: dummy_algorithm
-name: "Dummy Algorithm"
+id: dummy_model_manifest
+name: "Dummy ModelManifest"
 description: "Dummy manifest for test purposes only"
 task: classification
 stats:
