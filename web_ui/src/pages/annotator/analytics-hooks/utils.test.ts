@@ -1,10 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ImageIdDTO, SHAPE_TYPE_DTO } from '../../../core/annotations/dtos/annotation.interface';
+import { NewPredictionsDTO } from '../../../core/annotations/dtos/prediction.interface';
+import { convertPredictionsDTO, formatKeypointToAnnotationDTO } from '../../../core/annotations/services/utils';
 import { ShapeType } from '../../../core/annotations/shapetype.enum';
-import { labelFromModel } from '../../../core/annotations/utils';
+import { labelFromModel, labelFromUser } from '../../../core/annotations/utils';
 import { getMockedAnnotation } from '../../../test-utils/mocked-items-factory/mocked-annotations';
-import { labels as mockedLabels } from '../../../test-utils/mocked-items-factory/mocked-labels';
+import { getMockedLabel, labels as mockedLabels } from '../../../test-utils/mocked-items-factory/mocked-labels';
 import { ToolPerAnnotation } from '../providers/analytics-annotation-scene-provider/use-enhanced-analytics-annotation-scene.hook';
 import {
     getNumberOfNotEqualLabels,
@@ -272,4 +275,123 @@ describe('Analytics hooks utils', () => {
             });
         });
     });
+
+    it('formatKeypointToAnnotationDTO', () => {
+        const mockedTime = '2023-01-01T00:00:00Z';
+        const mockedKeypointPrediction = { id: 'keypoint-id', name: 'keypoint-name', score: 0.85, x: 100, y: 200 };
+
+        expect(formatKeypointToAnnotationDTO(mockedTime)(mockedKeypointPrediction)).toEqual(
+            expect.objectContaining({
+                shape: {
+                    x: mockedKeypointPrediction.x,
+                    y: mockedKeypointPrediction.y,
+                    is_visible: true,
+                    type: SHAPE_TYPE_DTO.KEYPOINT,
+                },
+                labels: [
+                    {
+                        id: 'keypoint-id',
+                        probability: mockedKeypointPrediction.score,
+                        source: {
+                            model_id: 'latest',
+                            user_id: null,
+                            model_storage_id: 'storage_id',
+                        },
+                    },
+                ],
+                labels_to_revisit: [],
+                modified: mockedTime,
+            })
+        );
+    });
+});
+describe('convertPredictionsDTO', () => {
+    const mockMediaId = { image_id: 'test-image-id', type: 'image' } as ImageIdDTO;
+    const mockTimeCreated = '2023-01-01T12:00:00Z';
+
+    it('convert regular predictions', () => {
+        const mockNewPredictions: NewPredictionsDTO = {
+            created: mockTimeCreated,
+            predictions: [
+                {
+                    shape: { type: SHAPE_TYPE_DTO.RECTANGLE, x: 10, y: 20, width: 100, height: 150 },
+                    labels: [{ id: 'label-1', name: 'person', probability: 0.9 }],
+                },
+            ],
+        };
+
+        const result = convertPredictionsDTO(mockNewPredictions, mockMediaId);
+
+        expect(result).toEqual(
+            expect.objectContaining({
+                kind: 'prediction',
+                maps: [],
+                media_identifier: mockMediaId,
+                modified: mockTimeCreated,
+                annotations: expect.arrayContaining([
+                    expect.objectContaining({
+                        labels: [
+                            expect.objectContaining({
+                                id: 'label-1',
+                                probability: 0.9,
+                                source: { model_id: 'latest', user_id: null, model_storage_id: 'storage_id' },
+                            }),
+                        ],
+                        shape: mockNewPredictions.predictions[0].shape,
+                        labels_to_revisit: [],
+                        modified: mockTimeCreated,
+                    }),
+                ]),
+            })
+        );
+    });
+
+    /*  it('should convert keypoint predictions correctly', () => {
+        const mockNewPredictions: NewPredictionsDTO = {
+            created: mockTimeCreated,
+            predictions: [
+                {
+                    keypoints: [{ id: 'kp-2', name: 'left_eye', score: 0.85, x: 120, y: 130 }],
+                    created: '',
+                },
+            ],
+        };
+
+        const result = convertPredictionsDTO(mockNewPredictions, mockMediaId);
+
+        expect(result).toEqual(
+            expect.objectContaining({
+                kind: 'prediction',
+                maps: [],
+                media_identifier: mockMediaId,
+                modified: mockTimeCreated,
+            })
+        );
+
+        // Verify each keypoint is converted correctly
+        const keypointData = [{ id: 'kp-2', name: 'left_eye', score: 0.85, x: 120, y: 130 }];
+        keypointData.forEach((kp, index) => {
+            // Verify each keypoint is converted correctly
+            keypointData.forEach((kp, index) => {
+                expect(result.annotations[index]).toEqual(
+                    expect.objectContaining({
+                        shape: {
+                            x: kp.x,
+                            y: kp.y,
+                            is_visible: true,
+                            type: SHAPE_TYPE_DTO.KEYPOINT,
+                        },
+                        labels: [
+                            expect.objectContaining({
+                                id: kp.id,
+                                probability: kp.score,
+                            }),
+                        ],
+                        labels_to_revisit: [],
+                        modified: mockTimeCreated,
+                    })
+                );
+            });
+        });
+    }); */
 });

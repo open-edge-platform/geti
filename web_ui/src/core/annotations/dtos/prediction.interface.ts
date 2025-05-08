@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Point } from '../shapes.interface';
 import { AnnotationDTO, ImageIdDTO, ShapeDTO, VideoFrameIdDTO } from './annotation.interface';
 
 export interface ExplanationDTO {
@@ -36,7 +35,7 @@ export interface NewPredictionDTO {
 
 export interface NewPredictionsDTO {
     created: string;
-    predictions: NewPredictionDTO[];
+    predictions: (NewPredictionDTO | NewKeypointPredictionDTO)[];
 }
 
 export interface NewTestPredictionsDTO extends NewPredictionsDTO {
@@ -92,8 +91,15 @@ export interface PipelineServerStatusDTO {
     pipeline_ready: boolean;
 }
 
+export interface NewKeypointPredictionDTO {
+    created: string;
+    keypoints: KeypointPredictionDTO[];
+}
+
 export interface KeypointPredictionDTO {
-    keypoints: Point[];
-    labels: string[];
-    scores: number[];
+    id: string;
+    name: string;
+    score: number;
+    x: number;
+    y: number;
 }

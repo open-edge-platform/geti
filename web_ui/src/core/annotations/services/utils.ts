@@ -26,6 +26,7 @@ import {
     ExplanationDTO,
     KeypointPredictionDTO,
     NewExplanationsDTO,
+    NewKeypointPredictionDTO,
     NewPredictionLabelDTO,
     NewPredictionsDTO,
     PredictionDTO,
@@ -121,24 +122,42 @@ export const convertLabelToDTO = ({ id, source }: AnnotationLabel): AnnotationLa
     },
 });
 
-export const isKeypointPredictionDTO = (obj: unknown): obj is KeypointPredictionDTO => {
+export const isKeypointPredictionDTO = (obj: unknown): obj is NewKeypointPredictionDTO => {
     return isObject(obj) && 'keypoints' in obj && Array.isArray(obj.keypoints);
 };
+
+export const formatKeypointToAnnotationDTO =
+    (modified: string) =>
+    ({ id, score, x, y }: KeypointPredictionDTO): AnnotationDTO => {
+        return {
+            id: uuidv4(),
+            shape: { x, y, is_visible: true, type: SHAPE_TYPE_DTO.KEYPOINT },
+            labels: [convertPredictionLabelDTO({ id, probability: score })],
+            labels_to_revisit: [],
+            modified,
+        };
+    };
 
 export const convertPredictionsDTO = (
     new_predictions: NewPredictionsDTO,
     media_identifier: ImageIdDTO | VideoFrameIdDTO
     // some source implementation
 ): PredictionDTO => {
-    const annotations = new_predictions.predictions.map(
-        (prediction): AnnotationDTO => ({
-            id: uuidv4(),
-            labels: prediction.labels.map(convertPredictionLabelDTO),
-            shape: prediction.shape,
-            labels_to_revisit: [],
-            modified: new_predictions.created,
-        })
-    );
+    const annotations = new_predictions.predictions.flatMap((prediction): AnnotationDTO[] => {
+        if (isKeypointPredictionDTO(prediction)) {
+            return prediction.keypoints.map(formatKeypointToAnnotationDTO(new_predictions.created));
+        }
+
+        return [
+            {
+                id: uuidv4(),
+                labels: prediction.labels.map(convertPredictionLabelDTO),
+                shape: prediction.shape,
+                labels_to_revisit: [],
+                modified: new_predictions.created,
+            },
+        ];
+    });
 
     return {
         id: uuidv4(),
