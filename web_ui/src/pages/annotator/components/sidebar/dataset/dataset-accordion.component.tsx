@@ -13,7 +13,6 @@ import { useSortingParams } from '../../../../../hooks/use-sorting-params/use-so
 import { Accordion } from '../../../../../shared/components/accordion/accordion.component';
 import { MediaViewModes } from '../../../../../shared/components/media-view-modes/media-view-modes.component';
 import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
-import { RefreshButton } from '../../../../../shared/components/refresh-button/refresh-button.component';
 import { TutorialCardBuilder } from '../../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { MediaFilterChips } from '../../../../media/components/media-filter-chips.component';
 import { MediaSearch } from '../../../../media/media-actions/media-search.component';
@@ -27,6 +26,7 @@ import { useTask } from '../../../providers/task-provider/task-provider.componen
 import { ActiveDatasetTooltipComponent } from './active-dataset-tooltip.component';
 import { AnnotatorDatasetList } from './annotator-dataset-list.component';
 import { DatasetPicker } from './dataset-picker/dataset-picker.component';
+import { RefreshButton } from './refresh-button/refresh-button.component';
 
 const DATASET_ANNOTATOR_THEME = {
     '--detailsBackground': 'var(--spectrum-global-color-gray-300)',

@@ -31,7 +31,6 @@ import {
     getGroupBasedOnRelationType,
     getNextColor,
 } from '../../../../../../shared/components/label-tree-view/utils';
-import { Label } from '../../../../../../shared/components/label/label.component';
 import { LimitedTextField } from '../../../../../../shared/components/limited-text-field/limited-text-field.component';
 import { ValidationErrorMsg } from '../../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { isYupValidationError } from '../../../../../user-management/profile-page/utils';
@@ -39,6 +38,7 @@ import { useUsedAnnotatorHotkeys } from '../../../use-used-annotator-hotkeys.hoo
 import { newLabelHotkeySchema, newLabelNameSchema } from '../../../utils';
 import { LABEL_TREE_TYPE } from '../../label-tree-type.enum';
 import { ColorPickerDialog } from '../color-picker-dialog.component';
+import { Label } from './label/label.component';
 
 interface NewLabelProps {
     type: LABEL_TREE_TYPE;

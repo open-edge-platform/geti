@@ -21,7 +21,7 @@ interface CreditBalanceTrainDialogProps {
 
 export const CreditBalanceTrainDialog = (props: CreditBalanceTrainDialogProps): JSX.Element => {
     const { projectIdentifier } = useProject();
-    const { FEATURE_FLAG_CREDIT_SYSTEM, FEATURE_FLAG_TRAINING_FLOW_REVAMP } = useFeatureFlags();
+    const { FEATURE_FLAG_CREDIT_SYSTEM, FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS } = useFeatureFlags();
     const { useGetOrganizationBalanceQuery } = useCreditsQueries();
     const { getCreditPrice } = useTotalCreditPrice();
     const { data: balance } = useGetOrganizationBalanceQuery(
@@ -29,7 +29,7 @@ export const CreditBalanceTrainDialog = (props: CreditBalanceTrainDialogProps): 
         { enabled: FEATURE_FLAG_CREDIT_SYSTEM }
     );
     const { totalCreditsToConsume } = getCreditPrice(props.task?.id);
-    const TrainModelDialog = FEATURE_FLAG_TRAINING_FLOW_REVAMP ? TrainModel : LegacyTrainModel;
+    const TrainModelDialog = FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS ? TrainModel : LegacyTrainModel;
 
     if (!FEATURE_FLAG_CREDIT_SYSTEM) {
         return <TrainModelDialog {...props} />;
