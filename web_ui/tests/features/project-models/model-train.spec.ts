@@ -163,7 +163,7 @@ test.describe('Test model train dialog pipeline', () => {
     });
 
     test.describe('Configure parameters', () => {
-        test.use({ featureFlags: { FEATURE_FLAG_TRAINING_FLOW_REVAMP: false } });
+        test.use({ featureFlags: { FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS: false } });
 
         test('Check if tiling switch hides connected configurable parameters - reconfigure active model', async ({
             configurationParametersPage,

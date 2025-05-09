@@ -7,9 +7,9 @@ import { Flex, Heading, Text } from '@adobe/react-spectrum';
 import { DateValue, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import dayjs from 'dayjs';
 
-import { MonthPicker } from '../../../shared/components/month-picker/month-picker.component';
 import { CreditConsumptionCard } from './credit-consumption-card.component';
 import { CreditConsumptionRecords } from './credit-consumption-records.component';
+import { MonthPicker } from './month-picker/month-picker.component';
 import { MonthlyCreditConsumptionCard } from './monthly-credit-consumption-card.component';
 import { ProjectsCreditConsumptionCard } from './projects-credit-consumption-card.component';
 import { TimeCreditConsumptionCard } from './time-credit-consumption-card.component';
