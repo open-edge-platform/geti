@@ -3,7 +3,7 @@
 
 import { useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';

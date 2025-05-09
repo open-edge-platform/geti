@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { MEDIA_TYPE } from '../../core/media/base-media.interface';
 import { MediaIdentifier, MediaItem } from '../../core/media/media.interface';

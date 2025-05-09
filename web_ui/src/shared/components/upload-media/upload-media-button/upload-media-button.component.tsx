@@ -4,7 +4,7 @@
 import { ComponentProps, Key, useRef } from 'react';
 
 import { isFirefox } from '@react-aria/utils';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Share } from '../../../../assets/icons';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';

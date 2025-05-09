@@ -17,8 +17,7 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@adobe/react-spectrum';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { isEqual, isNil } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { Gear } from '../../../../../assets/icons';

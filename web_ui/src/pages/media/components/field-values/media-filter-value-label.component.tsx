@@ -5,7 +5,7 @@ import { KeyboardEvent, useRef, useState } from 'react';
 
 import { TextArea, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';

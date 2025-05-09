@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-module.exports = {
+export default {
     roots: ['<rootDir>/src'],
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
     setupFiles: ['react-app-polyfill/jsdom'],
@@ -41,5 +41,5 @@ module.exports = {
             lines: 75,
         },
     },
-    globalSetup: './jest.global.js',
+    globalSetup: './jest.global.ts',
 };

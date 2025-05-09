@@ -4,8 +4,7 @@
 import { FC, FormEvent, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';

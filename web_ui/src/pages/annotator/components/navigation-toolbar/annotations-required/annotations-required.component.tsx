@@ -4,9 +4,7 @@
 import { useCallback, useRef } from 'react';
 
 import { DialogTrigger, Flex, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../../core/projects/hooks/use-project-status.hook';

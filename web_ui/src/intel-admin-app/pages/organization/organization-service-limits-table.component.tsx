@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Cell, Column, Row, TableBody, TableHeader, TableView, Text, View } from '@adobe/react-spectrum';
-import { get } from 'lodash';
+import { get } from 'lodash-es';
 
 import { useSubscriptions } from '../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { Quota } from '../../../core/credits/subscriptions/quotas.interface';

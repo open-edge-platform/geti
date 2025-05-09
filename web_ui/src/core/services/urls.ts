@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import { isEmpty, isNil } from 'lodash-es';
 
 import { PredictionCache, PredictionId } from '../annotations/services/prediction-service.interface';
 import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';

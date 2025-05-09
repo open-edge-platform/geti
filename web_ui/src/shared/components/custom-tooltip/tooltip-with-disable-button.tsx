@@ -4,7 +4,7 @@
 import { isValidElement, ReactElement } from 'react';
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Placement } from 'react-aria';
 
 import { PressableElement } from '../pressable-element/pressable-element.component';

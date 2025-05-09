@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 
 import {
     CommonTreeViewProps,

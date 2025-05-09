@@ -8,8 +8,7 @@ import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { StatusCodes } from 'http-status-codes';
 import { jwtDecode } from 'jwt-decode';
-import isEmpty from 'lodash/isEmpty';
-import isObject from 'lodash/isObject';
+import { isEmpty, isObject } from 'lodash-es';
 import { useAuth } from 'react-oidc-context';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 

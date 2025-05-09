@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 
 export const mockedOrganizationBalance = {
     incoming: 100,

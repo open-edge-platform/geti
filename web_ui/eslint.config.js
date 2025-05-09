@@ -175,7 +175,7 @@ export default [
                 'error',
                 'ignorePackages',
                 {
-                    js: 'never',
+                    js: 'always',
                     jsx: 'never',
                     ts: 'never',
                     tsx: 'never',

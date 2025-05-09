@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, ContextualHelp, Flex, useNumberFormatter } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { CreditCard } from '../../../../../../assets/icons';
 import { useCreditsQueries } from '../../../../../../core/credits/hooks/use-credits-api.hook';

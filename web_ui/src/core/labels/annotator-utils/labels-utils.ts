@@ -1,11 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import groupBy from 'lodash/groupBy';
-import isEqual from 'lodash/isEqual';
-import isString from 'lodash/isString';
-import uniq from 'lodash/uniq';
-import uniqBy from 'lodash/uniqBy';
+import { groupBy, isEqual, isString, uniq, uniqBy } from 'lodash-es';
 
 import { hasEqualId, hasEqualSize } from '../../../shared/utils';
 import { idMatchingFormat } from '../../../test-utils/id-utils';

@@ -3,9 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
-import negate from 'lodash/negate';
+import { isEqual, isNil, negate } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';

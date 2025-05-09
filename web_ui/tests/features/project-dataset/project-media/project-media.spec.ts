@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { expect } from '@playwright/test';
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { OpenApiResponseBody } from '../../../../src/core/server/types';

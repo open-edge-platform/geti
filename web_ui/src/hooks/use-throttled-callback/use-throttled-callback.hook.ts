@@ -3,8 +3,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 
-import type { DebouncedFunc } from 'lodash';
-import throttle from 'lodash/throttle';
+import { throttle, type DebouncedFunc } from 'lodash-es';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Callback = (...args: any[]) => void;

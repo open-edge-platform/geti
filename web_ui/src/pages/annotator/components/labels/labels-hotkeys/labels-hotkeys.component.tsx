@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';

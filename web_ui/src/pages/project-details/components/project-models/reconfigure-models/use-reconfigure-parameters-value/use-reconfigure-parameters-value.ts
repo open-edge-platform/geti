@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { useConfigParameters } from '../../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';

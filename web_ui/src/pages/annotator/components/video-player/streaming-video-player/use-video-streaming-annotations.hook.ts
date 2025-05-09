@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { PredictionMode } from '../../../../../core/annotations/services/prediction-service.interface';

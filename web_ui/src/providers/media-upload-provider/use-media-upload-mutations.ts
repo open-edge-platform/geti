@@ -6,8 +6,7 @@ import { Dispatch } from 'react';
 import { Query, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse, isCancel } from 'axios';
 import { StatusCodes } from 'http-status-codes';
-import isArray from 'lodash/isArray';
-import isEmpty from 'lodash/isEmpty';
+import { isArray, isEmpty } from 'lodash-es';
 
 import { AdvancedFilterOptions, SearchOptionsRule } from '../../core/media/media-filter.interface';
 import { UploadMediaMutationResponse } from '../../core/media/media.interface';

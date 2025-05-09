@@ -3,8 +3,7 @@
 
 import { ReactNode, Suspense, useEffect } from 'react';
 
-import invoke from 'lodash/invoke';
-import negate from 'lodash/negate';
+import { invoke, negate } from 'lodash-es';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 

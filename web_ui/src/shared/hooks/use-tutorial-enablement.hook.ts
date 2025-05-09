@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { FUX_NOTIFICATION_KEYS, TUTORIAL_CARD_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../core/user-settings/hooks/use-global-settings.hook';

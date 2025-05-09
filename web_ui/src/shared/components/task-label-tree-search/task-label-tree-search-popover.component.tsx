@@ -5,7 +5,7 @@ import { ComponentProps, useRef, useState } from 'react';
 
 import { TextField, View } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Label } from '../../../core/labels/label.interface';
 import { Task } from '../../../core/projects/task.interface';

@@ -13,7 +13,7 @@ import {
     useState,
 } from 'react';
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { getCenterOfTheAnnotations } from '../../../../core/annotations/math';

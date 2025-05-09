@@ -4,7 +4,7 @@
 import { Fragment } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { OrganizationAdmin } from '../../../../core/organizations/dtos/organizations.interface';
 import { Organization } from '../../../../core/organizations/organizations.interface';

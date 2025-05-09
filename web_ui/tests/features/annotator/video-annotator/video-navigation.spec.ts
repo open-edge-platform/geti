@@ -9,6 +9,7 @@ import { Page } from '@playwright/test';
 import { annotatorTest as test } from '../../../fixtures/annotator-test';
 import { expect } from '../../../fixtures/base-test';
 import { VideoPlayerPage } from '../../../fixtures/page-objects/annotator/video-player-page';
+import { getDirname } from '../../../utils/get-dirname';
 import { selectShape, translateShape } from '../utils';
 import { annotatorUrl, frameAnnotations, project, userAnnotationsResponse, videoMediaItem } from './mocks';
 
@@ -125,7 +126,7 @@ test.describe('Video annotator', () => {
     test.describe('Streaming video player', () => {
         test('Playing a video', async ({ page, registerApiResponse, browserName }) => {
             const videoPath = path.resolve(
-                __dirname,
+                getDirname(import.meta.url),
                 browserName === 'chromium'
                     ? '../../../datasets/cartoon-fish/fish_60.webm'
                     : '../../../datasets/cartoon-fish/fish_60.mp4'

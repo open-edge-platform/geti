@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import { isEmpty, isNil } from 'lodash-es';
 
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { Point } from '../../../../core/annotations/shapes.interface';

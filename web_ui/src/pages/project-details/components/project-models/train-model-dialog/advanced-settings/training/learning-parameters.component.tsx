@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { Accordion } from '../ui/accordion/accordion.component';

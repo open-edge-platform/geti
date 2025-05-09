@@ -5,8 +5,7 @@ import { MutableRefObject, useCallback, useRef } from 'react';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
+import { isEmpty, isFunction } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { getAnnotationStateForTask } from '../../../../core/annotations/utils';

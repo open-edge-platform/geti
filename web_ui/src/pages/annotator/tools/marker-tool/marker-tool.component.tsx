@@ -3,9 +3,7 @@
 
 import { PointerEvent, ReactElement, SVGProps, useCallback, useRef, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import partial from 'lodash/partial';
+import { isEmpty, isFunction, partial } from 'lodash-es';
 
 import { calculateDistance } from '../../../../core/annotations/math';
 import { Point } from '../../../../core/annotations/shapes.interface';

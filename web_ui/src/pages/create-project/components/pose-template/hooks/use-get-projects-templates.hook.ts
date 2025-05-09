@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectSortingOptions } from '../../../../../core/projects/services/project-service.interface';

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Content, DialogContainer, Flex, Header, Heading, Text, View } from '@adobe/react-spectrum';
 import { InfiniteData } from '@tanstack/react-query';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
 import { Info } from '../../../../assets/icons';

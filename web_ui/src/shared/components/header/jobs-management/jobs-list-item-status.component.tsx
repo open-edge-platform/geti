@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { motion } from 'framer-motion';
-import maxBy from 'lodash/maxBy';
+import { maxBy } from 'lodash-es';
 
 import { Alert, ChevronDownSmallLight } from '../../../../assets/icons';
 import { JobStepState } from '../../../../core/jobs/jobs.const';

@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 import { useControls, useTransformEffect } from 'react-zoom-pan-pinch';
 
 import { usePrevious } from '../../../hooks/use-previous/use-previous.hook';

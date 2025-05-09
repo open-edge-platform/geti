@@ -3,10 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import range from 'lodash/range';
-import sortBy from 'lodash/sortBy';
+import { isEmpty, isEqual, range, sortBy } from 'lodash-es';
 
 import { Annotation, TaskChainInput } from '../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../core/media/media.interface';

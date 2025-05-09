@@ -3,7 +3,7 @@
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { CloseSemiBold, EyeSolid } from '../../../../assets/icons';
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';

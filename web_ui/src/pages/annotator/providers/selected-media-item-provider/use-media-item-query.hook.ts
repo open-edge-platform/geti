@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { MediaIdentifier, MediaItem } from '../../../../core/media/media.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';

@@ -5,8 +5,7 @@ import { useCallback } from 'react';
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportToNewProjectItem } from '../../../../../core/datasets/dataset.interface';

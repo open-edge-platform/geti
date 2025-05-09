@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { DOMAIN } from '../../projects/core.interface';
 import { getDomain } from '../../projects/project.interface';

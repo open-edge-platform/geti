@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash-es';
 
 import { paths } from '../../../src/core/services/routes';
 import { DatasetTabActions } from '../../../src/pages/project-details/components/project-dataset/utils';

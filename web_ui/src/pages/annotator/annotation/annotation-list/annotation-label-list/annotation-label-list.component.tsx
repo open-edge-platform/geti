@@ -4,7 +4,7 @@
 import { Fragment } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { AiIcon, CaretRightIcon } from '../../../../../assets/icons';
 import { Annotation, AnnotationLabel } from '../../../../../core/annotations/annotation.interface';

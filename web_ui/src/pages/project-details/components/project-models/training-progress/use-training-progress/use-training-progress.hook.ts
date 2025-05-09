@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useGetRunningJobs } from '../../../../../../core/jobs/hooks/use-jobs.hook';
 import { JobState } from '../../../../../../core/jobs/jobs.const';

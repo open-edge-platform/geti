@@ -4,7 +4,7 @@
 import { Key } from 'react';
 
 import { Flex, Item, TabList, TabPanels, Tabs, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 

@@ -4,7 +4,7 @@
 import { Key, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { InfiniteQueryObserverResult } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { JobType } from '../../../../../core/jobs/jobs.const';
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';

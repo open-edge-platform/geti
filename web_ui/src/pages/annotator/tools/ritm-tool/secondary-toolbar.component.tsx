@@ -3,7 +3,7 @@
 
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { RightClick } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';

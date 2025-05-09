@@ -4,7 +4,7 @@
 import { useCallback, useState } from 'react';
 
 import { useMutation } from '@tanstack/react-query';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { getImageData } from '../../../../shared/canvas-utils';
 import { loadImage } from '../../../../shared/utils';

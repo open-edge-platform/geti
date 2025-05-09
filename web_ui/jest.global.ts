@@ -1,6 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-module.exports = async () => {
+export default async () => {
     process.env.TZ = 'UTC';
 };

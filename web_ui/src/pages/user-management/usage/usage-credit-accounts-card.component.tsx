@@ -3,7 +3,7 @@
 
 import { Content, Dialog, DialogTrigger, Divider, Flex, Heading, Link, Text, View } from '@adobe/react-spectrum';
 import { StyleProps } from '@react-types/shared';
-import take from 'lodash/take';
+import { take } from 'lodash-es';
 
 import { useCreditsQueries } from '../../../core/credits/hooks/use-credits-api.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';

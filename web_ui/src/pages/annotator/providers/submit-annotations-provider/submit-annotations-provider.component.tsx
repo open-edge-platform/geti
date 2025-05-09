@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';

@@ -4,8 +4,7 @@
 import { useMemo } from 'react';
 
 import { Grid, repeat, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import sortBy from 'lodash/sortBy';
+import { isEmpty, sortBy } from 'lodash-es';
 
 import { TaskChainInput } from '../../../../../core/annotations/annotation.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../../core/media/base.interface';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import negate from 'lodash/negate';
+import { negate } from 'lodash-es';
 
 import { idMatchingFormat } from '../../test-utils/id-utils';
 import { AnnotationLabel } from '../annotations/annotation.interface';

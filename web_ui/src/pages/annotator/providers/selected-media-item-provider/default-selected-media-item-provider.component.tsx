@@ -4,7 +4,7 @@
 import { ReactNode } from 'react';
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { PredictionResult } from '../../../../core/annotations/services/prediction-service.interface';
 import QUERY_KEYS from '../../../../core/requests/query-keys';

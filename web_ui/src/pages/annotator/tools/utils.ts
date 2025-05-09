@@ -3,9 +3,8 @@
 
 import { PointerEvent, SVGProps } from 'react';
 
-import { default as ClipperShape } from '@doodle3d/clipper-js';
-import defer from 'lodash/defer';
-import isEmpty from 'lodash/isEmpty';
+import ClipperShape from '@doodle3d/clipper-js';
+import { defer, isEmpty } from 'lodash-es';
 
 import { Annotation, RegionOfInterest } from '../../../core/annotations/annotation.interface';
 import { BoundingBox, getBoundingBox, getCenterOfShape, rotatedRectCorners } from '../../../core/annotations/math';

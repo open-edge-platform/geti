@@ -4,9 +4,7 @@
 import { useMemo } from 'react';
 
 import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import omitBy from 'lodash/omitBy';
-import sortBy from 'lodash/sortBy';
+import { isEmpty, omitBy, sortBy } from 'lodash-es';
 
 import { Close } from '../../../../../assets/icons';
 import { DatasetImportToExistingProjectItem } from '../../../../../core/datasets/dataset.interface';

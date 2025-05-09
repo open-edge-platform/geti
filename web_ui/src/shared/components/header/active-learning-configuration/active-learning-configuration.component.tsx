@@ -12,7 +12,7 @@ import {
     TooltipTrigger,
     View,
 } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { AutoTraining } from '../../../../assets/icons';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';

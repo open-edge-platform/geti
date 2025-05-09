@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import negate from 'lodash/negate';
+import duration from 'dayjs/plugin/duration.js';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
+import { negate } from 'lodash-es';
 
 import { DOMAIN } from './core.interface';
 import { isAnomalyDomain, isKeypointDetection } from './domains';

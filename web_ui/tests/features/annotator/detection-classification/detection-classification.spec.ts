@@ -28,6 +28,7 @@ import {
 import { registerFullImage, registerStoreSettings } from '../../../utils/api';
 import { waitForLoadingToBeFinished } from '../../../utils/assertions';
 import { resolveTestAssetPath } from '../../../utils/dataset';
+import { getDirname } from '../../../utils/get-dirname';
 import {
     expectAGlobalAnnotationToExist,
     expectAnnotationToHaveLabels,
@@ -231,7 +232,10 @@ test.describe(`Detection -> Classification`, () => {
             );
         });
 
-        registerFullImage(registerApiResponse, path.resolve(__dirname, './../filter-annotations/many-cards.jpeg'));
+        registerFullImage(
+            registerApiResponse,
+            path.resolve(getDirname(import.meta.url), './../filter-annotations/many-cards.jpeg')
+        );
 
         // Setup for annotation & prediction behaviour
         let storedAnnotations: OpenApiRequestBody<'CreateImageAnnotation'>['annotations'] = [];

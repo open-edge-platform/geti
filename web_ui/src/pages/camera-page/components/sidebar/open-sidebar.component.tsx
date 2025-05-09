@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading, Meter, Text, View } from '@adobe/react-spectrum';
-import countBy from 'lodash/countBy';
-import identity from 'lodash/identity';
+import { countBy, identity } from 'lodash-es';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { Divider } from '../../../../shared/components/divider/divider.component';

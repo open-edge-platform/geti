@@ -13,7 +13,7 @@ import {
     Heading,
     NumberField,
 } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { Quota } from '../../../../core/credits/subscriptions/quotas.interface';
 import { Button } from '../../../../shared/components/button/button.component';

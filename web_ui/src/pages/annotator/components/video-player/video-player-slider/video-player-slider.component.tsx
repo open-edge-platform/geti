@@ -4,8 +4,7 @@
 import { ForwardedRef, forwardRef, PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
 import { DOMRefValue } from '@react-types/shared';
-import isEmpty from 'lodash/isEmpty';
-import minBy from 'lodash/minBy';
+import { isEmpty, minBy } from 'lodash-es';
 import { useHover } from 'react-aria';
 
 import { VideoFrame } from '../../../../../core/media/video.interface';

@@ -5,8 +5,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { PredictionMode, PredictionResult } from '../../../../core/annotations/services/prediction-service.interface';

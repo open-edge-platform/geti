@@ -2,10 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { JwtPayload } from 'jwt-decode';
-import get from 'lodash/get';
-import isNumber from 'lodash/isNumber';
-import isObject from 'lodash/isObject';
-import isString from 'lodash/isString';
+import { get, isNumber, isObject, isString } from 'lodash-es';
 
 interface JwtPayloadWithMail extends Omit<JwtPayload, 'exp'> {
     mail: string;

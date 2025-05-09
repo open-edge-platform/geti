@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import { ButtonGroup } from '@adobe/react-spectrum';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { DATASET_IMPORT_DIALOG_BUTTONS, DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportDialogButton, DatasetImportItem } from '../../../../../core/datasets/dataset.interface';

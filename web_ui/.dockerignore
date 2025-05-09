@@ -1,6 +1,6 @@
 *
 !.prettierrc
-!eslint.config.mjs
+!eslint.config.js
 !.env
 !.env.production
 !tsconfig.json

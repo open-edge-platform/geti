@@ -3,8 +3,7 @@
 
 import { Key, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideo } from '../../../../../core/media/video.interface';

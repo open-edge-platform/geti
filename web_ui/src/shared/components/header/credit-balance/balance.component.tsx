@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, useNumberFormatter } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';
 import { LoadingIndicator } from '../../loading/loading-indicator.component';

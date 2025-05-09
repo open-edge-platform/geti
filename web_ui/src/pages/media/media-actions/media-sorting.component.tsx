@@ -4,7 +4,7 @@
 import { Key } from 'react';
 
 import { Icon, Item, Menu, MenuTrigger as MenuTriggerSpectrum, Section, Text } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { SortDown, SortUp, SortUpDown } from '../../../assets/icons';
 import { AdvancedFilterSortingOptions, SortMenuActionKey } from '../../../core/media/media-filter.interface';

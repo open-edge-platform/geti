@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import groupBy from 'lodash/groupBy';
+import { groupBy } from 'lodash-es';
 
 import { recursivelyAddLabel } from '../../../../../core/labels/label-resolver';
 import { Label, LABEL_BEHAVIOUR } from '../../../../../core/labels/label.interface';

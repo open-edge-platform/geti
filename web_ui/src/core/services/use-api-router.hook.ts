@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isFunction from 'lodash/isFunction';
-import isString from 'lodash/isString';
+import { isFunction, isString } from 'lodash-es';
 
 import { API_URLS } from './urls';
 import { useDeploymentConfigQuery } from './use-deployment-config-query.hook';

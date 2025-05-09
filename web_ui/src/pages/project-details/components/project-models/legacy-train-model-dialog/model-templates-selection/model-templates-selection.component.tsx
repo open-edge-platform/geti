@@ -4,7 +4,7 @@
 import { Dispatch, Key, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { Flex, Radio, RadioGroup, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { ModelsGroups } from '../../../../../../core/models/models.interface';
 import { isActiveModel } from '../../../../../../core/models/utils';

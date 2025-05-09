@@ -4,7 +4,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 
 import { StatusCodes } from 'http-status-codes';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { PreviousUpload, Upload, UploadOptions } from 'tus-js-client';
 
 import { CSRF_HEADERS } from '../../core/services/security';

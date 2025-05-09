@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { UseQueryResult } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { isNewState } from '../../../shared/components/label-tree-view/label-tree-view-item/utils';
 import { ExportStatusStateDTO } from '../../configurable-parameters/dtos/configurable-parameters.interface';
