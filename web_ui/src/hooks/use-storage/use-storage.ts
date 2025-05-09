@@ -14,22 +14,26 @@ export const useStorage = () => {
     const [isOpenDialogAccessDenied, setIsOpenDialogAccessDenied] = useState<boolean>(false);
 
     useEffect(() => {
-        const listenerCallback = () => {
-            if (localStorage.getItem(LOCAL_STORAGE_KEYS.UNAUTHORIZED) === 'true') {
-                errorHandler({ message: StatusCodes.UNAUTHORIZED });
-                removeLocalStorageKey(LOCAL_STORAGE_KEYS.UNAUTHORIZED);
-            } else if (localStorage.getItem(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE) === 'true') {
-                errorHandler({ message: StatusCodes.SERVICE_UNAVAILABLE });
-                removeLocalStorageKey(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE);
-            } else if (localStorage.getItem(LOCAL_STORAGE_KEYS.PROJECT_ACCESS_DENIED) === 'true') {
-                setIsOpenDialogAccessDenied(true);
-            }
-        };
+        const controller = new AbortController();
 
-        window.addEventListener('storage', listenerCallback);
+        window.addEventListener(
+            'storage',
+            () => {
+                if (localStorage.getItem(LOCAL_STORAGE_KEYS.UNAUTHORIZED) === 'true') {
+                    errorHandler({ message: StatusCodes.UNAUTHORIZED });
+                    removeLocalStorageKey(LOCAL_STORAGE_KEYS.UNAUTHORIZED);
+                } else if (localStorage.getItem(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE) === 'true') {
+                    errorHandler({ message: StatusCodes.SERVICE_UNAVAILABLE });
+                    removeLocalStorageKey(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE);
+                } else if (localStorage.getItem(LOCAL_STORAGE_KEYS.PROJECT_ACCESS_DENIED) === 'true') {
+                    setIsOpenDialogAccessDenied(true);
+                }
+            },
+            { signal: controller.signal }
+        );
 
         return () => {
-            window.removeEventListener('storage', listenerCallback);
+            controller.abort();
         };
     }, [errorHandler]);
 

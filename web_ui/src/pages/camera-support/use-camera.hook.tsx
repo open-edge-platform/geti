@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RefObject, useCallback, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 
 import isEmpty from 'lodash/isEmpty';
 import Webcam from 'react-webcam';
@@ -37,6 +37,7 @@ const defaultMediaConstraints: Partial<MediaTrackSettings> = {
 
 export const useCamera = (): UseCameraProps => {
     const webcamRef = useRef<Webcam>(null);
+    const controller = useRef(new AbortController());
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
     const [recordingVideo, setRecordingVideo] = useState(false);
@@ -93,7 +94,9 @@ export const useCamera = (): UseCameraProps => {
             mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
                 mimeType: 'video/webm',
             });
-            mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable);
+            mediaRecorderRef.current.addEventListener('dataavailable', handleDataAvailable, {
+                signal: controller.current.signal,
+            });
             mediaRecorderRef.current.start();
         }
     }, [handleDataAvailable]);
@@ -169,6 +172,14 @@ export const useCamera = (): UseCameraProps => {
             facingMode: mediaConstraints.facingMode === 'user' ? FacingMode.ENVIRONMENT : FacingMode.USER,
         }));
     };
+
+    useEffect(() => {
+        const abortController = controller.current;
+
+        return () => {
+            abortController.abort();
+        };
+    }, []);
 
     return {
         webcamRef,

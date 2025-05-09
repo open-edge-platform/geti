@@ -40,6 +40,7 @@ const onValidChunk = runWhen<BlobEvent>(({ data }) => data.size > 0);
 
 export const VideoRecordingProvider = ({ children }: { children: ReactNode }) => {
     const { webcamRef } = useDeviceSettings();
+    const controller = useRef(new AbortController());
     const timeoutId = useRef<ReturnType<typeof setInterval> | null>(null);
     const recordedChunks = useRef<Blob[]>([]);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -48,8 +49,11 @@ export const VideoRecordingProvider = ({ children }: { children: ReactNode }) =>
     const [recordedSeconds, setRecordedSeconds] = useState(0);
 
     useEffect(() => {
+        const abortController = controller.current;
+
         return () => {
             timeoutId.current && clearInterval(timeoutId.current);
+            abortController.abort();
         };
     }, []);
 
@@ -68,14 +72,19 @@ export const VideoRecordingProvider = ({ children }: { children: ReactNode }) =>
 
             mediaRecorderRef.current.addEventListener(
                 DataEvents.DataAvailable,
-                onValidChunk(({ data }: BlobEvent) => recordedChunks.current.push(data))
+                onValidChunk(({ data }: BlobEvent) => recordedChunks.current.push(data)),
+                { signal: controller.current.signal }
             );
 
-            mediaRecorderRef.current.addEventListener(DataEvents.Stop, () => {
-                onVideoReady(new File(recordedChunks.current, `${name}.${format}`, { type: `video/${format}` }));
+            mediaRecorderRef.current.addEventListener(
+                DataEvents.Stop,
+                () => {
+                    onVideoReady(new File(recordedChunks.current, `${name}.${format}`, { type: `video/${format}` }));
 
-                recordedChunks.current = [];
-            });
+                    recordedChunks.current = [];
+                },
+                { signal: controller.current.signal }
+            );
 
             mediaRecorderRef.current.start();
         };
