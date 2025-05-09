@@ -4,8 +4,8 @@
 import hiyapyco
 from importlib import resources
 
-from geti_supported_models import manifests
-from geti_supported_models.model_manifest import ModelManifest
+from . import manifests
+from .model_manifest import ModelManifest
 
 
 def parse_manifest(*manifest_sources, relative: bool = True) -> ModelManifest:
