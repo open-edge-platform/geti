@@ -148,8 +148,10 @@ make tests
 - `build`: Create binaries
 - `publish`: Publish artifacts to registries
 - `build-image`: Build a container image
-- `push-image`: Publish a container image
+- `build-chart`: Build a helm chart
+- `publish-image`: Publish a container image
 - `lint-chart`: Lint a helm chart
+- `clean-chart`: Clean built charts
 - `publish-chart`: Publish a helm chart
 
 ## Sign your work
