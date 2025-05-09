@@ -86,8 +86,7 @@ build-image:
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
 		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
-		-f ./Dockerfile . \
-		--no-cache
+		-f ./Dockerfile .
 
 # TODO: Move to interactive_ai/services after https://youtrack.jetbrains.com/issue/PY-79081 is fixed
 # Creates a python venv that can be used for development containing all dependencies for the interactive_ai components

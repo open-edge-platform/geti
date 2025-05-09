@@ -51,6 +51,13 @@ DOCKER_BUILD_CONTEXT              ?=
 USE_PROXY                         ?= true
 ifdef USE_PROXY
 DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
+DOCKER_PROXY                      := -e http_proxy=$(http_proxy) \
+									 -e https_proxy=$(https_proxy) \
+									 -e no_proxy=$(no_proxy)
+else
+DOCKER_EXTRA_ARGS	              ?=
+DOCKER_PROXY                      ?=
+endif
 
 
 ###
