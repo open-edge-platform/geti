@@ -15,7 +15,7 @@ from geti_supported_models.hyperparameters import (
     DatasetPreparationParameters,
     EvaluationParameters,
     Hyperparameters,
-    TrainingHyperParameters,
+    TrainingHyperParameters, CenterCrop, EarlyStopping,
 )
 from geti_supported_models.model_manifest import (
     GPUMaker,
@@ -50,12 +50,10 @@ def fxt_dummy_supported_gpu():
 def fxt_dummy_hyperparameters():
     yield Hyperparameters(
         dataset_preparation=DatasetPreparationParameters(
-            augmentation=AugmentationParameters(
-                horizontal_flip=True, vertical_flip=False, gaussian_blur=False, random_rotate=True
-            )
+            augmentation=AugmentationParameters()
         ),
         training=TrainingHyperParameters(
-            max_epochs=100, early_stopping_epochs=4, learning_rate=0.05, learning_rate_warmup_epochs=4, batch_size=32
+            max_epochs=101, learning_rate=0.05, early_stopping=EarlyStopping(patience=5)
         ),
         evaluation=EvaluationParameters(metric=None),
     )
@@ -110,18 +108,14 @@ class TestModelManifest:
             "hyperparameters": {
                 "dataset_preparation": {
                     "augmentation": {
-                        "horizontal_flip": False,
-                        "vertical_flip": False,
-                        "gaussian_blur": False,
-                        "random_rotate": False
+                        "gaussian_blur": {"kernel_size": 2},
+                        "tiling": {"adaptive_tiling": True, "tile_size": 100, "tile_overlap": 50},
                     }
                 },
                 "training": {
                     "max_epochs": 100,
                     "learning_rate": 0.01,
-                    "batch_size": 32,
-                    "early_stopping_epochs": 5,
-                    "learning_rate_warmup_epochs": 3
+                    "early_stopping": {"patience": 3}
                 },
                 "evaluation": {
                     "metric": None
@@ -154,9 +148,4 @@ class TestModelManifest:
         assert null_model_manifest.stats.gigaflops == 1
         assert null_model_manifest.stats.trainable_parameters == 1
         assert null_model_manifest.supported_gpus == {}
-        assert null_model_manifest.hyperparameters.dataset_preparation.augmentation == AugmentationParameters(
-            horizontal_flip=False,
-            vertical_flip=False,
-            gaussian_blur=False,
-            random_rotate=False,
-        )
+        assert null_model_manifest.hyperparameters.dataset_preparation.augmentation == AugmentationParameters()

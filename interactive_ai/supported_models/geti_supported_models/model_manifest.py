@@ -10,7 +10,7 @@ from .hyperparameters import (
     DatasetPreparationParameters,
     EvaluationParameters,
     Hyperparameters,
-    TrainingHyperParameters,
+    TrainingHyperParameters, EarlyStopping,
 )
 
 
@@ -103,19 +103,12 @@ class NullModelManifest(ModelManifest):
     hyperparameters: Hyperparameters = Field(
         default=Hyperparameters(
             dataset_preparation=DatasetPreparationParameters(
-                augmentation=AugmentationParameters(
-                    horizontal_flip=False,
-                    vertical_flip=False,
-                    gaussian_blur=False,
-                    random_rotate=False,
-                )
+                augmentation=AugmentationParameters()
             ),
             training=TrainingHyperParameters(
                 max_epochs=1,
-                early_stopping_epochs=1,
+                early_stopping=EarlyStopping(patience=0),
                 learning_rate=0.001,
-                learning_rate_warmup_epochs=0,
-                batch_size=1,
             ),
             evaluation=EvaluationParameters(metric=None),
         )

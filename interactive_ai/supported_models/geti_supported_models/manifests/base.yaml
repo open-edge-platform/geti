@@ -1,12 +1,3 @@
 hyperparameters:
-  dataset_preparation:
-    augmentation:
-      horizontal_flip: true
-      vertical_flip: false
-      gaussian_blur: false
-      random_rotate: true
   training:
     max_epochs: 100
-    batch_size: 32
-  evaluation:
-    batch_size: 4
