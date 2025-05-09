@@ -14,7 +14,6 @@ import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { UnClickableLink as Link } from '../../../../../../shared/components/link/unclickable-link.component';
 import { Tag } from '../../../../../../shared/components/tag/tag.component';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
@@ -111,7 +110,7 @@ export const ModelCard = ({
                     <Flex direction={'column'} width={'100%'} gap='size-100'>
                         <Flex alignItems={'center'} justifyContent={'space-between'}>
                             <Text UNSAFE_className={classes.modelInfo} data-testid={'trained-model-date-id'}>
-                                Trained: <Link to={modelUrl}>{formatDate(creationDate, 'DD MMM YYYY, hh:mm A')}</Link> |
+                                Trained: {formatDate(creationDate, 'DD MMM YYYY, hh:mm A')} |
                             </Text>
                             <Flex alignItems={'center'} gap={'size-225'} height={'size-225'}>
                                 <CountWithIcon
@@ -134,9 +133,7 @@ export const ModelCard = ({
                         </Flex>
                         <Flex alignItems={'center'} gap='size-150'>
                             <Heading id={`version-${genericId}-id`} data-testid={`version-${genericId}-id`} margin={0}>
-                                <Link to={modelUrl} viewTransition>
-                                    Version {version}
-                                </Link>
+                                Version {version}
                             </Heading>
                             <Flex gap={'size-200'} height={'size-200'}>
                                 {isActiveModel && <ActiveModelTag id={genericId} />}
