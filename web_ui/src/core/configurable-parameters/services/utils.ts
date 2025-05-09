@@ -17,6 +17,22 @@ import {
     ConfigurableParametersTaskChainDTO,
     EntityIdentifierDTO,
 } from '../dtos/configurable-parameters.interface';
+import {
+    ConfigurationParameterDTO,
+    ProjectConfigurationDTO,
+    ProjectConfigurationUploadPayloadDTO,
+    StaticParameterDTO,
+    TrainingConfigurationDTO,
+    TrainingConfigurationUpdatePayloadDTO,
+} from '../dtos/configuration.interface';
+import {
+    ConfigurationParameter,
+    ProjectConfiguration,
+    ProjectConfigurationUploadPayload,
+    StaticParameter,
+    TrainingConfiguration,
+    TrainingConfigurationUpdatePayload,
+} from './configuration.interface';
 
 const getConfigParametersField = (
     parameters: ConfigurableParametersParamsDTO[],
@@ -184,4 +200,167 @@ export const getConfigParametersEntity = (data: ConfigurableParametersDTO): Conf
     };
 
     return [newGlobal, ...taskChain];
+};
+
+export const getParameter = (parameter: ConfigurationParameterDTO): ConfigurationParameter => {
+    if (parameter.type === 'int' || parameter.type === 'float') {
+        const { type, description, key, default_value, max_value, min_value, value, name } = parameter;
+
+        return {
+            key,
+            type,
+            name,
+            value,
+            description,
+            defaultValue: default_value,
+            maxValue: max_value,
+            minValue: min_value,
+        };
+    }
+
+    if (parameter.type === 'bool') {
+        const { type, description, key, default_value, value, name } = parameter;
+
+        return {
+            key,
+            type,
+            name,
+            value,
+            description,
+            defaultValue: default_value,
+        };
+    }
+
+    if (parameter.type === 'enum') {
+        const { key, type, name, description, value, default_value, allowed_values } = parameter;
+
+        return {
+            key,
+            type,
+            name,
+            description,
+            allowedValues: allowed_values,
+            value,
+            defaultValue: default_value,
+        };
+    }
+
+    throw new Error(`${parameter.type} is not supported.`);
+};
+
+export const getStaticParameter = (parameter: StaticParameterDTO): StaticParameter => {
+    const { key, name, description, value } = parameter;
+
+    return {
+        key,
+        name,
+        description,
+        value,
+    };
+};
+
+export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigurationDTO): ProjectConfiguration => {
+    const taskConfigs = task_configs.map((taskConfig) => {
+        const { task_id, training, auto_training, predictions } = taskConfig;
+
+        return {
+            taskId: task_id,
+            training: {
+                constraints: training.constraints.map(getParameter),
+            },
+            autoTraining: auto_training.map(getParameter),
+            predictions: predictions.map(getParameter),
+        };
+    });
+    return {
+        taskConfigs,
+    };
+};
+
+export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO): TrainingConfiguration => {
+    const trainingConfiguration: TrainingConfiguration = {
+        datasetPreparation: Object.entries(config.dataset_preparation).reduce((acc, [key, value]) => {
+            const parameters = value.map(getParameter);
+            return {
+                ...acc,
+                [key]: parameters,
+            };
+        }, {}),
+        training: config.training.map(getParameter),
+        evaluation: config.evaluation.map(getParameter),
+    };
+
+    if (config.advanced_configuration !== undefined) {
+        trainingConfiguration.advancedConfiguration = config.advanced_configuration.map(getStaticParameter);
+    }
+
+    return trainingConfiguration;
+};
+
+export const getTrainingConfigurationUpdatePayloadDTO = (
+    payload: TrainingConfigurationUpdatePayload
+): TrainingConfigurationUpdatePayloadDTO => {
+    const trainingConfigurationUpdatePayloadDTO: TrainingConfigurationUpdatePayloadDTO = {};
+
+    if (payload.datasetPreparation !== undefined) {
+        trainingConfigurationUpdatePayloadDTO.dataset_preparation = Object.entries(payload.datasetPreparation).reduce(
+            (acc, [key, parameters]) => {
+                return {
+                    ...acc,
+                    [key]: parameters.map((parameter) => ({
+                        key: parameter.key,
+                        value: parameter.value,
+                    })),
+                };
+            },
+            {}
+        );
+    }
+
+    if (payload.training !== undefined) {
+        trainingConfigurationUpdatePayloadDTO.training = payload.training.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    if (payload.evaluation !== undefined) {
+        trainingConfigurationUpdatePayloadDTO.evaluation = payload.evaluation.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    return trainingConfigurationUpdatePayloadDTO;
+};
+
+export const getProjectConfigurationUploadPayloadDTO = (
+    payload: ProjectConfigurationUploadPayload
+): ProjectConfigurationUploadPayloadDTO => {
+    const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {};
+
+    if (payload.training !== undefined) {
+        projectConfigurationUploadPayloadDTO.training = {
+            constraints: payload.training.constraints.map((parameter) => ({
+                key: parameter.key,
+                value: parameter.value,
+            })),
+        };
+    }
+
+    if (payload.predictions !== undefined) {
+        projectConfigurationUploadPayloadDTO.predictions = payload.predictions.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    if (payload.autoTraining !== undefined) {
+        projectConfigurationUploadPayloadDTO.auto_training = payload.autoTraining.map((parameter) => ({
+            key: parameter.key,
+            value: parameter.value,
+        }));
+    }
+
+    return projectConfigurationUploadPayloadDTO;
 };

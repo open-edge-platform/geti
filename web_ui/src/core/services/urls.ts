@@ -700,6 +700,11 @@ const MEMBERSHIP = {
     },
 };
 
+const CONFIGURATION = {
+    TRAINING: (projectIdentifier: ProjectIdentifier) => `${PROJECT(projectIdentifier)}/training_configuration`,
+    PROJECT: (projectIdentifier: ProjectIdentifier) => `${PROJECT(projectIdentifier)}/project_configuration`,
+};
+
 export const API_URLS = {
     PREFIX,
     WORKSPACES,
@@ -808,4 +813,5 @@ export const API_URLS = {
     GLOBAL_SETTINGS,
     PROJECT_SETTINGS,
     MEMBERSHIP,
+    CONFIGURATION,
 } as const;

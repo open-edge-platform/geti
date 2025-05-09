@@ -278,6 +278,11 @@ interactive_ai/workflows/geti_domain/train:
 #  - Makefile.shared-python
 #  - Makefile.shared
 #  - .github/workflows/component.yml
+interactive_ai/tests/e2e:
+  - interactive_ai/tests/e2e/**
+  - Makefile.shared-python
+  - Makefile.shared
+  - .github/workflows/component.yml
 
 # gRPC interfaces
 grpc_interfaces:

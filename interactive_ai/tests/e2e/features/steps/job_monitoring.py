@@ -1,0 +1,90 @@
+# INTEL CONFIDENTIAL
+#
+# Copyright (C) 2025 Intel Corporation
+#
+# This software and the related documents are Intel copyrighted materials, and
+# your use of them is governed by the express license under which they were provided to
+# you ("License"). Unless the License provides otherwise, you may not use, modify, copy,
+# publish, distribute, disclose or transmit this software or the related documents
+# without Intel's prior written permission.
+#
+# This software and the related documents are provided as is,
+# with no express or implied warranties, other than those that are expressly stated
+# in the License.
+
+import logging
+import time
+from typing import TYPE_CHECKING
+
+from behave import then
+from behave.runner import Context
+from static_definitions import JobState, JobType
+
+if TYPE_CHECKING:
+    from geti_client import JobsApi
+
+
+JOB_POLLING_PERIOD = 3  # seconds
+
+logger = logging.getLogger(__name__)
+
+
+@then("a job of type '{job_type:w}' is scheduled")
+def step_then_job_scheduled(context: Context, job_type: str) -> None:
+    """Asserts that the "job_type" is scheduled"""
+    jobs_api: JobsApi = context.jobs_api
+    expected_job_type = JobType(job_type)
+
+    context.job_info = jobs_api.get_job(
+        organization_id=context.organization_id,
+        workspace_id=context.workspace_id,
+        job_id=context.job_id,
+    )
+
+    found_job_type = JobType(context.job_info.actual_instance.type)
+    assert found_job_type == expected_job_type, f"Expected job type {expected_job_type}, but found {found_job_type}"
+
+
+@then("the job completes successfully within {job_timeout:d} minutes")
+def step_then_job_finishes_before_timeout(context: Context, job_timeout: int) -> None:
+    """
+    Asserts that the jobs finishes within the passed "job_timeout". If not, raises a TimeoutError.
+    """
+    jobs_api: JobsApi = context.jobs_api
+    max_polling_attempts = job_timeout * 60 // JOB_POLLING_PERIOD
+
+    # Poll the job status until it is finished, or the timeout is reached
+    for attempt in range(max_polling_attempts):
+        logger.debug(
+            f"Waiting for job `{context.job_id}` to finish... "
+            f"(attempt {attempt + 1}/{max_polling_attempts}, {attempt * JOB_POLLING_PERIOD}s elapsed)"
+        )
+        context.job_info = jobs_api.get_job(
+            organization_id=context.organization_id,
+            workspace_id=context.workspace_id,
+            job_id=context.job_id,
+        )
+
+        if context.job_info.actual_instance.state == JobState.FINISHED:
+            logger.debug(f"Job `{context.job_id}` finished successfully")
+            break
+        if context.job_info.actual_instance.state == JobState.FAILED:
+            raise AssertionError(f"Job `{context.job_id}` failed: {context.job_info.actual_instance.steps[-1].message}")
+        if context.job_info.actual_instance.state == JobState.CANCELLED:
+            raise AssertionError(f"Job `{context.job_id}` was unexpectedly cancelled")
+
+        time.sleep(JOB_POLLING_PERIOD)
+    else:
+        logger.warning(
+            f"Job `{context.job_id}` is still '{context.job_info.actual_instance.state}' "
+            f"after {job_timeout} minutes; trying to cancel it"
+        )
+        try:
+            jobs_api.cancel_job(
+                organization_id=context.organization_id,
+                workspace_id=context.workspace_id,
+                job_id=context.job_id,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to cancel job `{context.job_id}`: {e}")
+        raise TimeoutError(f"Job `{context.job_id}` did not finish within {job_timeout} minutes")

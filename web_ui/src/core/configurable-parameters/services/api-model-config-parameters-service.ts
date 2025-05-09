@@ -11,9 +11,28 @@ import {
     ConfigurableParametersReconfigureDTO,
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
-import { getConfigParametersEntity, getModelConfigEntity } from './utils';
+import { ProjectConfigurationDTO, ProjectConfigurationUploadPayloadDTO } from '../dtos/configuration.interface';
+import {
+    ProjectConfiguration,
+    TrainingConfiguration,
+    TrainingConfigurationUpdatePayload,
+} from './configuration.interface';
+import {
+    getConfigParametersEntity,
+    getModelConfigEntity,
+    getProjectConfigurationEntity,
+    getProjectConfigurationUploadPayloadDTO,
+    getTrainingConfigurationEntity,
+    getTrainingConfigurationUpdatePayloadDTO,
+} from './utils';
+
+export type TrainingConfigurationQueryParameters = Partial<{ taskId: string; algorithmId: string; modelId: string }>;
+export type ProjectConfigurationQueryParameters = { taskId?: string };
 
 export interface CreateApiModelConfigParametersService {
+    /**
+     * @deprecated Please use getTrainingConfiguration instead
+     */
     getModelConfigParameters: (
         projectIdentifier: ProjectIdentifier,
         taskId: string,
@@ -22,11 +41,31 @@ export interface CreateApiModelConfigParametersService {
         editable?: boolean
     ) => Promise<ConfigurableParametersTaskChain>;
 
+    /**
+     * @deprecated Please use getTrainingConfiguration instead
+     */
     getConfigParameters: (projectIdentifier: ProjectIdentifier) => Promise<ConfigurableParametersTaskChain[]>;
 
     reconfigureParameters: (
         projectIdentifier: ProjectIdentifier,
         body: ConfigurableParametersReconfigureDTO
+    ) => Promise<void>;
+
+    getProjectConfiguration: (projectIdentifier: ProjectIdentifier) => Promise<ProjectConfiguration>;
+    updateProjectConfiguration: (
+        projectIdentifier: ProjectIdentifier,
+        payload: ProjectConfigurationUploadPayloadDTO,
+        queryParameters?: ProjectConfigurationQueryParameters
+    ) => Promise<void>;
+
+    getTrainingConfiguration: (
+        projectIdentifier: ProjectIdentifier,
+        queryParameters?: TrainingConfigurationQueryParameters
+    ) => Promise<TrainingConfiguration>;
+    updateTrainingConfiguration: (
+        projectIdentifier: ProjectIdentifier,
+        payload: TrainingConfigurationUpdatePayload,
+        queryParameters?: TrainingConfigurationQueryParameters
     ) => Promise<void>;
 }
 
@@ -64,9 +103,68 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
         await instance.post(router.CONFIGURATION_PARAMETERS(projectIdentifier), body);
     };
 
+    const getTrainingConfiguration: CreateApiModelConfigParametersService['getTrainingConfiguration'] = async (
+        projectIdentifier,
+        queryParameters
+    ) => {
+        const { data } = await instance.get(router.CONFIGURATION.TRAINING(projectIdentifier), {
+            params: {
+                task_id: queryParameters?.taskId,
+                model_id: queryParameters?.modelId,
+                algorithm_id: queryParameters?.algorithmId,
+            },
+        });
+
+        return getTrainingConfigurationEntity(data);
+    };
+
+    const getProjectConfiguration: CreateApiModelConfigParametersService['getProjectConfiguration'] = async (
+        projectIdentifier
+    ) => {
+        const { data } = await instance.get<ProjectConfigurationDTO>(router.CONFIGURATION.PROJECT(projectIdentifier));
+
+        return getProjectConfigurationEntity(data);
+    };
+
+    const updateTrainingConfiguration: CreateApiModelConfigParametersService['updateTrainingConfiguration'] = async (
+        projectIdentifier,
+        payload,
+        queryParameters
+    ) => {
+        const payloadDTO = getTrainingConfigurationUpdatePayloadDTO(payload);
+
+        await instance.patch(router.CONFIGURATION.TRAINING(projectIdentifier), payloadDTO, {
+            params: {
+                task_id: queryParameters?.taskId,
+                model_id: queryParameters?.modelId,
+                algorithm_id: queryParameters?.algorithmId,
+            },
+        });
+    };
+
+    const updateProjectConfiguration: CreateApiModelConfigParametersService['updateProjectConfiguration'] = async (
+        projectIdentifier,
+        payload,
+        queryParameters
+    ) => {
+        const payloadDTO = getProjectConfigurationUploadPayloadDTO(payload);
+
+        await instance.patch(router.CONFIGURATION.PROJECT(projectIdentifier), payloadDTO, {
+            params: {
+                task_id: queryParameters?.taskId,
+            },
+        });
+    };
+
     return {
         getModelConfigParameters,
         getConfigParameters,
         reconfigureParameters,
+
+        getProjectConfiguration,
+        updateProjectConfiguration,
+
+        getTrainingConfiguration,
+        updateTrainingConfiguration,
     };
 };
