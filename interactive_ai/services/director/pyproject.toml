@@ -18,7 +18,8 @@ dependencies = [
   "geti-telemetry-tools[telemetry,fastapi,grpc,logger,kafka]",
   "geti-types",
   "geti-fastapi-tools",
-  "grpc_interfaces[job_submission]"
+  "grpc_interfaces[job_submission]",
+  "geti-supported-models",
 ]
 
 [tool.uv.sources]
@@ -28,6 +29,7 @@ geti-types = { path = "../../../libs/types" , editable = true}
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools" , editable = true}
 iai_core = { path = "../../libs/iai_core_py" , editable = true}
 grpc_interfaces = { path = "../../../grpc_interfaces" , editable = true}
+geti-supported-models = { path = "../../supported_models", editable = true }
 
 [dependency-groups]
 dev = [
