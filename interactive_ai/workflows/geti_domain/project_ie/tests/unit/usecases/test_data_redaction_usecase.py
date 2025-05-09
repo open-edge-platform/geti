@@ -12,7 +12,7 @@ from zipfile import ZipFile
 import pytest
 from bson import ObjectId, UuidRepresentation
 from bson.json_util import JSONOptions, dumps, loads
-from sc_sdk.repos.mappers import MediaIdentifierToMongo
+from iai_core.repos.mappers import MediaIdentifierToMongo
 
 from job.usecases import ExportDataRedactionUseCase, ImportDataRedactionUseCase
 from job.usecases.data_redaction_usecase import BaseDataRedactionUseCase, get_random_objectid_between_dates
@@ -174,7 +174,11 @@ class TestExportDataRedactionUseCase:
         out_bson_doc_2 = data_redaction_use_case.replace_objectid_based_binary_filename_in_mongodb_doc(bson_doc_2)
         out_bson_doc_3 = data_redaction_use_case.replace_objectid_based_binary_filename_in_mongodb_doc(bson_doc_3)
 
-        out_doc_1, out_doc_2, out_doc_3 = loads(out_bson_doc_1), loads(out_bson_doc_2), loads(out_bson_doc_3)
+        out_doc_1, out_doc_2, out_doc_3 = (
+            loads(out_bson_doc_1),
+            loads(out_bson_doc_2),
+            loads(out_bson_doc_3),
+        )
         assert ObjectId.is_valid(out_doc_1["_id"])
         assert out_doc_1["binary_filename"].endswith(".jpg")
         assert ObjectId.is_valid(out_doc_1["binary_filename"].removesuffix(".jpg"))
@@ -352,10 +356,14 @@ class TestExportDataRedactionUseCase:
 
         with (
             patch.object(
-                data_redaction_use_case, "replace_objectid_in_config_json", return_value="redacted_data"
+                data_redaction_use_case,
+                "replace_objectid_in_config_json",
+                return_value="redacted_data",
             ) as mock_redact_json,
             patch.object(
-                data_redaction_use_case, "replace_objectid_in_model_xml", return_value="redacted_data"
+                data_redaction_use_case,
+                "replace_objectid_in_model_xml",
+                return_value="redacted_data",
             ) as mock_redact_xml,
         ):
             data_redaction_use_case.replace_objectid_in_exportable_code_wheel(temp_zip.name)
@@ -373,9 +381,24 @@ class TestExportDataRedactionUseCase:
         [
             ("weights_033d48b2-7fb0-4120-9816-1c21da956e4d.pth", False, False, False),
             ("openvino_91b5b988-e41d-47ff-962f-4b6cd0ff2d30.xml", True, False, False),
-            ("label_schema_41f4b824-3b6c-4411-abd7-d9992044d213.json", False, True, False),
-            ("reference_features_96f5a896-4fa7-4721-91ca-74dfae66f5df.json", False, True, False),
-            ("exportable_code_56734cb5-a6aa-4179-963e-2df288e77d57.whl", False, False, True),
+            (
+                "label_schema_41f4b824-3b6c-4411-abd7-d9992044d213.json",
+                False,
+                True,
+                False,
+            ),
+            (
+                "reference_features_96f5a896-4fa7-4721-91ca-74dfae66f5df.json",
+                False,
+                True,
+                False,
+            ),
+            (
+                "exportable_code_56734cb5-a6aa-4179-963e-2df288e77d57.whl",
+                False,
+                False,
+                True,
+            ),
         ],
         ids=[
             "regular file",
@@ -390,13 +413,19 @@ class TestExportDataRedactionUseCase:
         with (
             tempfile.TemporaryDirectory() as temp_dir,
             patch.object(
-                data_redaction_use_case, "replace_objectid_in_config_json", return_value="redacted_data"
+                data_redaction_use_case,
+                "replace_objectid_in_config_json",
+                return_value="redacted_data",
             ) as mock_redact_json,
             patch.object(
-                data_redaction_use_case, "replace_objectid_in_model_xml", return_value=b"redacted_data"
+                data_redaction_use_case,
+                "replace_objectid_in_model_xml",
+                return_value=b"redacted_data",
             ) as mock_redact_xml,
             patch.object(
-                data_redaction_use_case, "replace_objectid_in_exportable_code_wheel", return_value="redacted_data"
+                data_redaction_use_case,
+                "replace_objectid_in_exportable_code_wheel",
+                return_value="redacted_data",
             ) as mock_redact_whl,
         ):
             # Create the file
@@ -687,10 +716,14 @@ class TestImportDataRedactionUseCase:
 
         with (
             patch.object(
-                data_redaction_use_case, "recreate_objectid_in_config_json", return_value="redacted_data"
+                data_redaction_use_case,
+                "recreate_objectid_in_config_json",
+                return_value="redacted_data",
             ) as mock_redact_json,
             patch.object(
-                data_redaction_use_case, "recreate_objectid_in_model_xml", return_value="redacted_data"
+                data_redaction_use_case,
+                "recreate_objectid_in_model_xml",
+                return_value="redacted_data",
             ) as mock_redact_xml,
         ):
             data_redaction_use_case.recreate_objectid_in_exportable_code_wheel(temp_zip.name)
@@ -708,9 +741,24 @@ class TestImportDataRedactionUseCase:
         [
             ("weights_033d48b2-7fb0-4120-9816-1c21da956e4d.pth", False, False, False),
             ("openvino_91b5b988-e41d-47ff-962f-4b6cd0ff2d30.xml", True, False, False),
-            ("label_schema_41f4b824-3b6c-4411-abd7-d9992044d213.json", False, True, False),
-            ("reference_features_96f5a896-4fa7-4721-91ca-74dfae66f5df.json", False, True, False),
-            ("exportable_code_56734cb5-a6aa-4179-963e-2df288e77d57.whl", False, False, True),
+            (
+                "label_schema_41f4b824-3b6c-4411-abd7-d9992044d213.json",
+                False,
+                True,
+                False,
+            ),
+            (
+                "reference_features_96f5a896-4fa7-4721-91ca-74dfae66f5df.json",
+                False,
+                True,
+                False,
+            ),
+            (
+                "exportable_code_56734cb5-a6aa-4179-963e-2df288e77d57.whl",
+                False,
+                False,
+                True,
+            ),
         ],
         ids=[
             "regular file",
@@ -725,13 +773,19 @@ class TestImportDataRedactionUseCase:
         with (
             tempfile.TemporaryDirectory() as temp_dir,
             patch.object(
-                data_redaction_use_case, "recreate_objectid_in_config_json", return_value="redacted_data"
+                data_redaction_use_case,
+                "recreate_objectid_in_config_json",
+                return_value="redacted_data",
             ) as mock_redact_json,
             patch.object(
-                data_redaction_use_case, "recreate_objectid_in_model_xml", return_value=b"redacted_data"
+                data_redaction_use_case,
+                "recreate_objectid_in_model_xml",
+                return_value=b"redacted_data",
             ) as mock_redact_xml,
             patch.object(
-                data_redaction_use_case, "recreate_objectid_in_exportable_code_wheel", return_value="redacted_data"
+                data_redaction_use_case,
+                "recreate_objectid_in_exportable_code_wheel",
+                return_value="redacted_data",
             ) as mock_redact_whl,
         ):
             # Create the file
@@ -770,7 +824,10 @@ class TestImportDataRedactionUseCase:
     def test_update_creation_time_in_mongodb_doc(self) -> None:
         data_redaction_use_case = ImportDataRedactionUseCase()
 
-        doc_with_date = {"creation_date": "2021-01-01T00:00:00.000Z", "upload_date": "2021-01-01T00:00:00.000Z"}
+        doc_with_date = {
+            "creation_date": "2021-01-01T00:00:00.000Z",
+            "upload_date": "2021-01-01T00:00:00.000Z",
+        }
         result_doc_with_data = data_redaction_use_case.update_creation_time_in_mongodb_doc(doc_with_date)
         assert result_doc_with_data["creation_date"] == data_redaction_use_case.import_date
         assert result_doc_with_data["upload_date"] == data_redaction_use_case.import_date

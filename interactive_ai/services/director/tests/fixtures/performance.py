@@ -3,7 +3,7 @@
 
 import pytest
 
-from sc_sdk.entities.metrics import (
+from iai_core.entities.metrics import (
     AnomalyLocalizationPerformance,
     ColorPalette,
     CurveMetric,

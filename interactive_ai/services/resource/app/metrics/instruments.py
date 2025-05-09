@@ -20,9 +20,9 @@ from geti_telemetry_tools import DEBUG_METRICS, OTLP_METRICS_RECEIVER, TEST_METR
 from geti_telemetry_tools.metrics.instruments import BaseInstrumentAttributes
 from geti_telemetry_tools.metrics.instruments import MetricName as MetricNameBase
 from geti_telemetry_tools.metrics.utils import if_elected_publisher_for_metric
-from sc_sdk.repos.leader_election_repo import LeaderElectionRepo
-from sc_sdk.repos.metrics_reporting_model_storage_repo import MetricsReportingModelStorageRepo
-from sc_sdk.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
+from iai_core.repos.leader_election_repo import LeaderElectionRepo
+from iai_core.repos.metrics_reporting_model_storage_repo import MetricsReportingModelStorageRepo
+from iai_core.repos.metrics_reporting_project_repo import MetricsReportingProjectRepo
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,10 @@ if OTLP_METRICS_RECEIVER:  # Enable OTLP exporter
             export_interval_millis=3600000,  # once an hour
         )
         metric_readers.append(periodic_metric_reader)
-        logger.info("Telemetry OTLP metric exporter enabled. Endpoint: `%s`", OTLP_METRICS_RECEIVER)
+        logger.info(
+            "Telemetry OTLP metric exporter enabled. Endpoint: `%s`",
+            OTLP_METRICS_RECEIVER,
+        )
     except Exception:
         # Log exception and do not initialize the exporter
         logger.exception(
@@ -78,7 +81,9 @@ meter = meter_provider.get_meter("geti.resource_microservice.metrics")
 
 
 @if_elected_publisher_for_metric(
-    metric_name=MetricName.PROJECT_TOTAL_GAUGE, validity_in_seconds=3540, election_manager_cls=LeaderElectionRepo
+    metric_name=MetricName.PROJECT_TOTAL_GAUGE,
+    validity_in_seconds=3540,
+    election_manager_cls=LeaderElectionRepo,
 )
 def total_projects_per_type(options: CallbackOptions) -> list[Observation]:  # noqa: ARG001
     """
@@ -107,7 +112,9 @@ projects_total_per_type_gauge = meter.create_observable_gauge(
 
 
 @if_elected_publisher_for_metric(
-    metric_name=MetricName.MODELS_PER_ARCH, validity_in_seconds=3540, election_manager_cls=LeaderElectionRepo
+    metric_name=MetricName.MODELS_PER_ARCH,
+    validity_in_seconds=3540,
+    election_manager_cls=LeaderElectionRepo,
 )
 def total_models_per_arch_callback(options: CallbackOptions) -> list[Observation]:  # noqa: ARG001
     """
@@ -136,7 +143,9 @@ models_total_per_arch_gauge = meter.create_observable_gauge(
 
 
 @if_elected_publisher_for_metric(
-    metric_name=MetricName.MODELS_PER_TASK_TYPE, validity_in_seconds=3540, election_manager_cls=LeaderElectionRepo
+    metric_name=MetricName.MODELS_PER_TASK_TYPE,
+    validity_in_seconds=3540,
+    election_manager_cls=LeaderElectionRepo,
 )
 def total_models_per_task_type_callback(options: CallbackOptions) -> list[Observation]:  # noqa: ARG001
     """

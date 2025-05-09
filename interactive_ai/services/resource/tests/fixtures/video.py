@@ -12,13 +12,13 @@ from _pytest.fixtures import FixtureRequest
 from tests.fixtures.values import DummyValues
 
 from geti_types import VideoFrameIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import Video
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelSchemaRepo, VideoRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label import Label
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.project import Project
+from iai_core.entities.video import Video
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelSchemaRepo, VideoRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
 
 
 @pytest.fixture

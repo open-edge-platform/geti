@@ -9,11 +9,11 @@ from typing import Any
 
 import datumaro as dm
 from geti_telemetry_tools import unified_tracing
+from iai_core.entities.model_template import TaskType
+from iai_core.factories import ProjectParser
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.factories import ProjectParser
 
 from job.utils.exceptions import DatasetParsingException
 from job.utils.import_utils import ImportUtils
@@ -86,7 +86,9 @@ class DatumaroProjectParser(ProjectParser):
         )
 
         self._keypoint_structure: dict[str, list] = self._extract_keypoint_structure_from_dm_dataset(
-            dm_categories=dm_categories, selected_labels=valid_labels, include_all_labels=include_all_labels
+            dm_categories=dm_categories,
+            selected_labels=valid_labels,
+            include_all_labels=include_all_labels,
         )
 
         self._validate()
@@ -284,11 +286,15 @@ class DatumaroProjectParser(ProjectParser):
             return {}
 
         return ConvertUtils.get_keypoint_structure(
-            dm_categories=dm_categories, selected_labels=selected_labels, include_all_labels=include_all_labels
+            dm_categories=dm_categories,
+            selected_labels=selected_labels,
+            include_all_labels=include_all_labels,
         )
 
     @staticmethod
-    def _process_task_types(project_type: GetiProjectType) -> tuple[tuple[str, ...], dict[str, TaskType]]:
+    def _process_task_types(
+        project_type: GetiProjectType,
+    ) -> tuple[tuple[str, ...], dict[str, TaskType]]:
         """
         Assign task_name to task_type
 

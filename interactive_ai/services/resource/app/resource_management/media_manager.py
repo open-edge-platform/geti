@@ -42,6 +42,19 @@ from geti_telemetry_tools.metrics import (
     videos_resolution_histogram,
 )
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaType
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter, StreamBinaryInterpreter
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.image import Image, NullImage
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.project import Project
+from iai_core.entities.video import NullVideo, Video, VideoFrame
+from iai_core.repos import ImageRepo, ProjectRepo, VideoRepo
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo, VideoBinaryRepo
+from iai_core.repos.storage.storage_client import BytesStream
+from iai_core.utils.constants import DEFAULT_THUMBNAIL_SIZE
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.media_factory import Media2DFactory
 from media_utils import (
     VideoDecoder,
     VideoFileRepair,
@@ -51,19 +64,6 @@ from media_utils import (
     get_image_numpy,
     get_media_roi_numpy,
 )
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter, StreamBinaryInterpreter
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import NullVideo, Video, VideoFrame
-from sc_sdk.repos import ImageRepo, ProjectRepo, VideoRepo
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo, VideoBinaryRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.utils.constants import DEFAULT_THUMBNAIL_SIZE
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.media_factory import Media2DFactory
 
 IMAGES = "images"
 VIDEOS = "videos"
@@ -257,7 +257,9 @@ class MediaManager:
 
     @staticmethod
     def get_single_thumbnail_frame_numpy(
-        dataset_storage_identifier: DatasetStorageIdentifier, video: Video, frame_index: int
+        dataset_storage_identifier: DatasetStorageIdentifier,
+        video: Video,
+        frame_index: int,
     ) -> np.ndarray:
         """
         Get the thumbnail of a specific frame as a numpy array. Since the thumbnail video
@@ -314,7 +316,9 @@ class MediaManager:
             frame_index = video.total_frames // 2
         try:
             frame_numpy = MediaManager.get_single_thumbnail_frame_numpy(
-                video=video, dataset_storage_identifier=dataset_storage_identifier, frame_index=frame_index
+                video=video,
+                dataset_storage_identifier=dataset_storage_identifier,
+                frame_index=frame_index,
             )
         except FileNotFoundError:
             publish_event(
@@ -488,7 +492,8 @@ class MediaManager:
                 height=bgr_image.shape[0],
                 size=size,
                 preprocessing=MediaPreprocessing(
-                    status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=datetime.datetime.now()
+                    status=MediaPreprocessingStatus.IN_PROGRESS,
+                    start_timestamp=datetime.datetime.now(),
                 ),
             )
             image_repo.save(image)
@@ -705,7 +710,8 @@ class MediaManager:
             total_frames=info.total_frames,
             size=video_binary_repo.get_object_size(binary_filename),
             preprocessing=MediaPreprocessing(
-                status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=datetime.datetime.now()
+                status=MediaPreprocessingStatus.IN_PROGRESS,
+                start_timestamp=datetime.datetime.now(),
             ),
         )
 

@@ -10,13 +10,15 @@ from communication.controllers.supported_algorithm_controller import SupportedAl
 
 from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi
 from geti_types import ProjectIdentifier
-from sc_sdk.repos import TaskNodeRepo
+from iai_core.repos import TaskNodeRepo
 
 logger = logging.getLogger(__name__)
 
 project_api_prefix_url = "/api/v1/organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}"
 supported_algorithms_router = APIRouter(
-    prefix=project_api_prefix_url, tags=["Model"], dependencies=[Depends(setup_session_fastapi)]
+    prefix=project_api_prefix_url,
+    tags=["Model"],
+    dependencies=[Depends(setup_session_fastapi)],
 )
 
 

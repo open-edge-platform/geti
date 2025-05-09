@@ -12,8 +12,8 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 from usecases.auto_train import AutoTrainUseCase
 
 from geti_types import CTX_SESSION_VAR, DatasetStorageIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.repos import ConfigurableParametersRepo, DatasetRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.repos import ConfigurableParametersRepo, DatasetRepo
 
 
 class TestAutoTrainUseCase:
@@ -35,7 +35,9 @@ class TestAutoTrainUseCase:
         fxt_db_project_service.create_empty_project()
         with (
             patch.object(
-                AutoTrainUseCase, "_check_conditions_and_set_auto_train_readiness", return_value=None
+                AutoTrainUseCase,
+                "_check_conditions_and_set_auto_train_readiness",
+                return_value=None,
             ) as mock_check_auto_train,
             patch.dict(os.environ, {"AUTO_TRAIN_DEBOUNCE_TIME": "0.5"}),
         ):
@@ -119,7 +121,9 @@ class TestAutoTrainUseCase:
 
         # Step 3: let the AutoTrainUseCase scan for ready tasks and set their readiness
         with patch.object(
-            ProjectBasedAutoTrainActivationRepo, "set_auto_train_readiness_by_task_id", return_value=None
+            ProjectBasedAutoTrainActivationRepo,
+            "set_auto_train_readiness_by_task_id",
+            return_value=None,
         ) as mock_set_readiness:
             AutoTrainUseCase._check_conditions_and_set_auto_train_readiness(
                 session=CTX_SESSION_VAR.get(), project_identifier=project.identifier
@@ -127,10 +131,16 @@ class TestAutoTrainUseCase:
             mock_set_readiness.assert_has_calls(
                 [
                     call(
-                        task_node_id=task_node_1.id_, readiness=True, bypass_debouncer=True, raise_exc_on_missing=False
+                        task_node_id=task_node_1.id_,
+                        readiness=True,
+                        bypass_debouncer=True,
+                        raise_exc_on_missing=False,
                     ),
                     call(
-                        task_node_id=task_node_2.id_, readiness=True, bypass_debouncer=True, raise_exc_on_missing=False
+                        task_node_id=task_node_2.id_,
+                        readiness=True,
+                        bypass_debouncer=True,
+                        raise_exc_on_missing=False,
                     ),
                 ]
             )
@@ -141,7 +151,9 @@ class TestAutoTrainUseCase:
         second_task_dataset_item_count.n_dataset_items = 0
         dataset_item_count_repo.save(second_task_dataset_item_count)
         with patch.object(
-            ProjectBasedAutoTrainActivationRepo, "set_auto_train_readiness_by_task_id", return_value=None
+            ProjectBasedAutoTrainActivationRepo,
+            "set_auto_train_readiness_by_task_id",
+            return_value=None,
         ) as mock_set_readiness:
             AutoTrainUseCase._check_conditions_and_set_auto_train_readiness(
                 session=CTX_SESSION_VAR.get(), project_identifier=project.identifier
@@ -149,10 +161,16 @@ class TestAutoTrainUseCase:
             mock_set_readiness.assert_has_calls(
                 [
                     call(
-                        task_node_id=task_node_1.id_, readiness=True, bypass_debouncer=True, raise_exc_on_missing=False
+                        task_node_id=task_node_1.id_,
+                        readiness=True,
+                        bypass_debouncer=True,
+                        raise_exc_on_missing=False,
                     ),
                     call(
-                        task_node_id=task_node_2.id_, readiness=False, bypass_debouncer=True, raise_exc_on_missing=False
+                        task_node_id=task_node_2.id_,
+                        readiness=False,
+                        bypass_debouncer=True,
+                        raise_exc_on_missing=False,
                     ),
                 ]
             )
@@ -166,7 +184,9 @@ class TestAutoTrainUseCase:
         task_configuration.data.auto_training = False
         config_param_repo.save(task_configuration)
         with patch.object(
-            ProjectBasedAutoTrainActivationRepo, "set_auto_train_readiness_by_task_id", return_value=None
+            ProjectBasedAutoTrainActivationRepo,
+            "set_auto_train_readiness_by_task_id",
+            return_value=None,
         ) as mock_set_readiness:
             AutoTrainUseCase._check_conditions_and_set_auto_train_readiness(
                 session=CTX_SESSION_VAR.get(), project_identifier=project.identifier
@@ -174,10 +194,16 @@ class TestAutoTrainUseCase:
             mock_set_readiness.assert_has_calls(
                 [
                     call(
-                        task_node_id=task_node_1.id_, readiness=False, bypass_debouncer=True, raise_exc_on_missing=False
+                        task_node_id=task_node_1.id_,
+                        readiness=False,
+                        bypass_debouncer=True,
+                        raise_exc_on_missing=False,
                     ),
                     call(
-                        task_node_id=task_node_2.id_, readiness=False, bypass_debouncer=True, raise_exc_on_missing=False
+                        task_node_id=task_node_2.id_,
+                        readiness=False,
+                        bypass_debouncer=True,
+                        raise_exc_on_missing=False,
                     ),
                 ]
             )

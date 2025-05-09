@@ -16,10 +16,10 @@ from service.project_service import ProjectService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import NullVideo
-from sc_sdk.repos import VideoRepo
-from sc_sdk.services import ModelService
+from iai_core.entities.project import Project
+from iai_core.entities.video import NullVideo
+from iai_core.repos import VideoRepo
+from iai_core.services import ModelService
 
 
 class PredictionController:
@@ -71,7 +71,10 @@ class PredictionController:
             raise VideoNotFoundException(video_id=video_id, dataset_storage_id=dataset_storage.id_)
 
         filtering_model_ids = PredictionController._get_model_ids(
-            model_id=model_id, prediction_type=prediction_type, project=project, task_id=task_id
+            model_id=model_id,
+            prediction_type=prediction_type,
+            project=project,
+            task_id=task_id,
         )
 
         (
@@ -147,7 +150,10 @@ class PredictionController:
         dataset_storage = ProjectService.get_dataset_storage_by_id(project, dataset_storage_id)
 
         filtering_model_ids = PredictionController._get_model_ids(
-            model_id=model_id, prediction_type=prediction_type, project=project, task_id=task_id
+            model_id=model_id,
+            prediction_type=prediction_type,
+            project=project,
+            task_id=task_id,
         )
 
         if prediction_id is not None:
@@ -184,7 +190,10 @@ class PredictionController:
 
     @staticmethod
     def _get_model_ids(
-        model_id: ID | None, prediction_type: PredictionType | None, project: Project, task_id: ID | None
+        model_id: ID | None,
+        prediction_type: PredictionType | None,
+        project: Project,
+        task_id: ID | None,
     ) -> set[ID]:
         """
         Return the set of model ids to filter predictions on.

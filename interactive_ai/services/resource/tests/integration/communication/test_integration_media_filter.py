@@ -9,7 +9,7 @@ import pytest
 
 from managers.project_manager import ProjectManager
 
-from sc_sdk.repos import DatasetRepo, VideoRepo
+from iai_core.repos import DatasetRepo, VideoRepo
 
 
 class TestMediaFilterRESTEndpoint:

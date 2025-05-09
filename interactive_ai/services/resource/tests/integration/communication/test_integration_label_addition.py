@@ -10,8 +10,8 @@ from geti_spicedb_tools import SpiceDB
 
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.repos import SuspendedAnnotationScenesRepo
+from iai_core.algorithms import ModelTemplateList
+from iai_core.repos import SuspendedAnnotationScenesRepo
 
 logger = logging.getLogger(__name__)
 

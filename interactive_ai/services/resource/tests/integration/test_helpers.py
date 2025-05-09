@@ -9,19 +9,19 @@ from tests.utils.test_helpers import register_model_template_from_dict
 
 from geti_kafka_tools import publish_event
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo, ProjectRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.media_factory import Media2DFactory
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, LabelSchemaRepo, ProjectRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.media_factory import Media2DFactory
 
 logger = logging.getLogger(__name__)
 

@@ -8,12 +8,12 @@ from communication.views.annotation_rest_views import RestShapeType
 from tests.fixtures.values import DummyValues
 
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.entities import shapes
-from sc_sdk.entities.annotation import Annotation, AnnotationScene
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Keypoint, Rectangle
-from sc_sdk.repos import AnnotationSceneStateRepo
+from iai_core.entities import shapes
+from iai_core.entities.annotation import Annotation, AnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Keypoint, Rectangle
+from iai_core.repos import AnnotationSceneStateRepo
 
 
 @pytest.fixture

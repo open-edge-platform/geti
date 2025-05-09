@@ -12,6 +12,11 @@ import cv2
 import numpy as np
 from bson import ObjectId
 from geti_types import ID
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
 from model_api.models import SegmentationModel
 from model_api.models.utils import (
     AnomalyResult,
@@ -22,11 +27,6 @@ from model_api.models.utils import (
     InstanceSegmentationResult,
     ZSLVisualPromptingResult,
 )
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle, Shape
 
 from jobs_common_extras.evaluation.utils.detection_utils import detection2array
 from jobs_common_extras.evaluation.utils.segmentation_utils import create_annotation_from_segmentation_map
@@ -92,7 +92,7 @@ class ClassificationToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: ClassificationResult, **kwargs) -> list[Annotation]:  # noqa: ARG002
         """
-        Converts ModelAPI ClassificationResult predictions to sc_sdk annotations.
+        Converts ModelAPI ClassificationResult predictions to iai_core annotations.
 
         :param predictions: classification labels represented in ModelAPI format (label_index, label_name, confidence)
         :return: list of full box annotations objects with corresponding label
@@ -118,13 +118,18 @@ class DetectionToAnnotationConverter(IPredictionToAnnotationConverter):
     :param configuration: optional model configuration setting
     """
 
-    def __init__(self, label_schema: LabelSchema, model_api_labels: list[str], configuration: dict[str, Any] = {}):
+    def __init__(
+        self,
+        label_schema: LabelSchema,
+        model_api_labels: list[str],
+        configuration: dict[str, Any] = {},
+    ):
         super().__init__(label_schema=label_schema, model_api_labels=model_api_labels)
         self.use_ellipse_shapes = configuration.get("use_ellipse_shapes", False)
 
     def convert_to_annotations(self, predictions: DetectionResult, **kwargs) -> list[Annotation]:
         """
-        Convert ModelAPI DetectionResult predictions to sc_sdk annotations.
+        Convert ModelAPI DetectionResult predictions to iai_core annotations.
 
         :param predictions: detection represented in ModelAPI format (x1, y1, x2, y2, label, confidence).
             Note:
@@ -187,11 +192,22 @@ class RotatedRectToAnnotationConverter(DetectionToAnnotationConverter):
         for obj in predictions.segmentedObjects:
             label = self.get_label_by_idx(obj.id)
             if self.use_ellipse_shapes:
-                shape = Ellipse(obj.xmin / width, obj.ymin / height, obj.xmax / width, obj.ymax / height)
+                shape = Ellipse(
+                    obj.xmin / width,
+                    obj.ymin / height,
+                    obj.xmax / width,
+                    obj.ymax / height,
+                )
                 annotations.append(
                     Annotation(
                         shape,
-                        labels=[ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=float(obj.score))],
+                        labels=[
+                            ScoredLabel(
+                                label_id=label.id_,
+                                is_empty=label.is_empty,
+                                probability=float(obj.score),
+                            )
+                        ],
                     )
                 )
             else:
@@ -214,7 +230,11 @@ class RotatedRectToAnnotationConverter(DetectionToAnnotationConverter):
                         Annotation(
                             shape,
                             labels=[
-                                ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=float(obj.score))
+                                ScoredLabel(
+                                    label_id=label.id_,
+                                    is_empty=label.is_empty,
+                                    probability=float(obj.score),
+                                )
                             ],
                         )
                     )
@@ -238,7 +258,7 @@ class SemanticSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
         **kwargs,  # noqa: ARG002
     ) -> list[Annotation]:
         """
-        Converts ModelAPI semantic segmentation predictions to sc_sdk annotations.
+        Converts ModelAPI semantic segmentation predictions to iai_core annotations.
 
         :param predictions: semantic segmentation represented in ModelAPI format
         :return: list of annotations object containing the contour polygon obtained from the segmentation
@@ -261,7 +281,9 @@ class SemanticSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
                             shape=Polygon(points=points),
                             labels=[
                                 ScoredLabel(
-                                    label_id=label.id_, is_empty=label.is_empty, probability=contour.probability
+                                    label_id=label.id_,
+                                    is_empty=label.is_empty,
+                                    probability=contour.probability,
                                 )
                             ],
                             id_=ID(ObjectId()),
@@ -279,7 +301,12 @@ class InstanceSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
     :param configuration: optional model configuration setting
     """
 
-    def __init__(self, label_schema: LabelSchema, model_api_labels: list[str], configuration: dict[str, Any] = {}):
+    def __init__(
+        self,
+        label_schema: LabelSchema,
+        model_api_labels: list[str],
+        configuration: dict[str, Any] = {},
+    ):
         super().__init__(label_schema=label_schema, model_api_labels=model_api_labels)
         self.use_ellipse_shapes = configuration.get("use_ellipse_shapes", False)
 
@@ -288,7 +315,7 @@ class InstanceSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
 
     def convert_to_annotations(self, predictions: InstanceSegmentationResult, **kwargs) -> list[Annotation]:
         """
-        Converts ModelAPI instance segmentation predictions to sc_sdk annotations.
+        Converts ModelAPI instance segmentation predictions to iai_core annotations.
 
         :param predictions: instance segmentation represented in ModelAPI format
         :return: list of annotations object containing the contour polygon obtained from the segmentation
@@ -303,10 +330,21 @@ class InstanceSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
         for obj in predictions.segmentedObjects:
             label = self.get_label_by_idx(obj.id)
             if self.use_ellipse_shapes:
-                shape = Ellipse(obj.xmin / width, obj.ymin / height, obj.xmax / width, obj.ymax / height)
+                shape = Ellipse(
+                    obj.xmin / width,
+                    obj.ymin / height,
+                    obj.xmax / width,
+                    obj.ymax / height,
+                )
                 annotation = Annotation(
                     shape,
-                    labels=[ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=float(obj.score))],
+                    labels=[
+                        ScoredLabel(
+                            label_id=label.id_,
+                            is_empty=label.is_empty,
+                            probability=float(obj.score),
+                        )
+                    ],
                 )
                 annotations.append(annotation)
             else:
@@ -329,7 +367,13 @@ class InstanceSegmentationToAnnotationConverter(IPredictionToAnnotationConverter
                     shape = Polygon(points=points)
                     annotation = Annotation(
                         shape,
-                        labels=[ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=float(obj.score))],
+                        labels=[
+                            ScoredLabel(
+                                label_id=label.id_,
+                                is_empty=label.is_empty,
+                                probability=float(obj.score),
+                            )
+                        ],
                     )
                     annotations.append(annotation)
         return annotations
@@ -350,7 +394,7 @@ class AnomalyToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: AnomalyResult, **kwargs) -> list[Annotation]:  # noqa: ARG002
         """
-        Converts ModelAPI AnomalyResult predictions to sc_sdk annotations.
+        Converts ModelAPI AnomalyResult predictions to iai_core annotations.
 
         :param predictions: anomaly result represented in ModelAPI format (same for all anomaly tasks)
         :return: list of annotation objects based on the specific anomaly task:
@@ -362,7 +406,9 @@ class AnomalyToAnnotationConverter(IPredictionToAnnotationConverter):
         label = self.normal_label if pred_label.lower() == "normal" else self.anomalous_label
         # Add global full box label ["Anomalous", "Normal"]
         scored_label = ScoredLabel(
-            label_id=label.id_, is_empty=label.is_empty, probability=float(predictions.pred_score)
+            label_id=label.id_,
+            is_empty=label.is_empty,
+            probability=float(predictions.pred_score),
         )
         annotations: list[Annotation] = [Annotation(Rectangle.generate_full_box(), labels=[scored_label])]
         match self.domain:
@@ -382,7 +428,12 @@ class AnomalyToAnnotationConverter(IPredictionToAnnotationConverter):
                 for box in predictions.pred_boxes:
                     annotations.append(
                         Annotation(
-                            Rectangle(box[0] / image_w, box[1] / image_h, box[2] / image_w, box[3] / image_h),
+                            Rectangle(
+                                box[0] / image_w,
+                                box[1] / image_h,
+                                box[2] / image_w,
+                                box[3] / image_h,
+                            ),
                             labels=[
                                 ScoredLabel(
                                     label_id=self.anomalous_label.id_,
@@ -404,7 +455,7 @@ class KeypointToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: DetectedKeypoints, **kwargs) -> list[Annotation]:
         """
-        Converts ModelAPI DetectedKeypoints predictions to sc_sdk annotations.
+        Converts ModelAPI DetectedKeypoints predictions to iai_core annotations.
 
         :param predictions: detected keypoints represented in ModelAPI format
         :return: list of annotation objects containing the keypoint coordinates and its label
@@ -418,7 +469,13 @@ class KeypointToAnnotationConverter(IPredictionToAnnotationConverter):
             annotations.append(
                 Annotation(
                     Keypoint(x=keypoint[0] / width, y=keypoint[1] / height, is_visible=True),
-                    labels=[ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=score)],
+                    labels=[
+                        ScoredLabel(
+                            label_id=label.id_,
+                            is_empty=label.is_empty,
+                            probability=score,
+                        )
+                    ],
                 )
             )
 
@@ -430,7 +487,7 @@ class VisualPromptingToAnnotationConverter(IPredictionToAnnotationConverter):
 
     def convert_to_annotations(self, predictions: ZSLVisualPromptingResult, **kwargs) -> list[Annotation]:
         """
-        Converts ModelAPI VisualPromptingResult predictions to sc_sdk annotations.
+        Converts ModelAPI VisualPromptingResult predictions to iai_core annotations.
 
         :param predictions: visual prompting represented in ModelAPI format
         :return: list of annotations object containing the shapes obtained from the raw predictions
@@ -450,7 +507,14 @@ class VisualPromptingToAnnotationConverter(IPredictionToAnnotationConverter):
             for contour, score in zip(self._generate_object_contours(masks), scores):
                 shape = self._contour_to_shape(contour, height, width, label)
                 annotation = Annotation(
-                    shape=shape, labels=[ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=score)]
+                    shape=shape,
+                    labels=[
+                        ScoredLabel(
+                            label_id=label.id_,
+                            is_empty=label.is_empty,
+                            probability=score,
+                        )
+                    ],
                 )
                 annotations.append(annotation)
         return annotations
@@ -508,7 +572,15 @@ class VisualPromptingToAnnotationConverter(IPredictionToAnnotationConverter):
         masks = np.array(segmentation_masks).astype(np.uint8)
         for mask in masks:
             # adding a border to the mask to avoid edge cases
-            _mask = cv2.copyMakeBorder(mask, top=1, bottom=1, left=1, right=1, borderType=cv2.BORDER_CONSTANT, value=0)  # type: ignore[call-overload]
+            _mask = cv2.copyMakeBorder(
+                mask,
+                top=1,
+                bottom=1,
+                left=1,
+                right=1,
+                borderType=cv2.BORDER_CONSTANT,
+                value=0,
+            )  # type: ignore[call-overload]
             mask_area = _mask.shape[0] * _mask.shape[1]
             min_contour_size_threshold = mask_area * 0.001  # 0.1% of the image size
             max_contour_area_threshold = mask_area * 0.9  # 90% of the image size

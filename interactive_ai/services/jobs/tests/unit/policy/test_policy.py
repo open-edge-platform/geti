@@ -10,7 +10,7 @@ from policies import GpuPolicy, MaxRunningJobsPolicy, Prioritizer, QuotaPolicy, 
 from policies.job_repo import SessionBasedPolicyJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.mappers import IDToMongo
+from iai_core.repos.mappers import IDToMongo
 
 ORG = ID("000000000000000000000001")
 WORK = ID("000000000000000000000002")
@@ -102,7 +102,13 @@ def test_mark_next_jobs_as_ready_for_scheduling_from_submitted_queue(
     request.addfinalizer(reset_singletons)
 
     # Arrange
-    mock_get_submitted_job_types.return_value = ["train", "optimize", "test", "quota1", "quota2"]
+    mock_get_submitted_job_types.return_value = [
+        "train",
+        "optimize",
+        "test",
+        "quota1",
+        "quota2",
+    ]
     ResourceManager().gpu_capacity = [5]
 
     def side_effect(type):
@@ -126,7 +132,13 @@ def test_mark_next_jobs_as_ready_for_scheduling_from_submitted_queue(
     # Assert
     mock_get_submitted_job_types.assert_called_once_with()
     mock_get_job_type_policy.assert_has_calls(
-        [call(type="train"), call(type="optimize"), call(type="test"), call(type="quota1"), call(type="quota2")],
+        [
+            call(type="train"),
+            call(type="optimize"),
+            call(type="test"),
+            call(type="quota1"),
+            call(type="quota2"),
+        ],
     )
     mock_mark_next_regular_jobs_as_ready_for_scheduling_from_submitted_queue.assert_has_calls(
         [

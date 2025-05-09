@@ -7,7 +7,7 @@ This module implements rest views for keypoint structure entities
 
 from typing import Any
 
-from sc_sdk.entities.keypoint_structure import KeypointStructure
+from iai_core.entities.keypoint_structure import KeypointStructure
 
 EDGES = "edges"
 KEYPOINT_STRUCTURE = "keypoint_structure"
@@ -20,7 +20,9 @@ Y = "y"
 
 class KeypointStructureRESTViews:
     @staticmethod
-    def keypoint_structure_to_rest(keypoint_structure: KeypointStructure) -> dict[str, Any]:
+    def keypoint_structure_to_rest(
+        keypoint_structure: KeypointStructure,
+    ) -> dict[str, Any]:
         """
         Converts a KeypointStructure object to a dictionary representation suitable for REST API responses.
 

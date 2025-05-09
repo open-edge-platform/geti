@@ -38,7 +38,7 @@ from grpc_interfaces.job_submission.pb.job_service_pb2 import (
     SubmitJobRequest,
 )
 from grpc_interfaces.job_submission.pb.job_service_pb2_grpc import JobServiceServicer, add_JobServiceServicer_to_server
-from sc_sdk.session.session_propagation import setup_session_grpc
+from iai_core.session.session_propagation import setup_session_grpc
 
 logger = logging.getLogger(__name__)
 
@@ -224,7 +224,10 @@ class GRPCJobService(JobServiceServicer):
             if author_uid is not None and request.all_permitted_jobs
             else None
         )
-        acl = JobsAcl(permitted_projects=permitted_projects, workspace_jobs_author=workspace_jobs_author)
+        acl = JobsAcl(
+            permitted_projects=permitted_projects,
+            workspace_jobs_author=workspace_jobs_author,
+        )
 
         count = self.job_manager.get_jobs_count(
             workspace_id=workspace_id,
@@ -314,7 +317,10 @@ class GRPCJobService(JobServiceServicer):
             if author_uid is not None and request.all_permitted_jobs
             else None
         )
-        acl = JobsAcl(permitted_projects=permitted_projects, workspace_jobs_author=workspace_jobs_author)
+        acl = JobsAcl(
+            permitted_projects=permitted_projects,
+            workspace_jobs_author=workspace_jobs_author,
+        )
 
         total_count = self.job_manager.get_jobs_count(
             job_types=job_types,

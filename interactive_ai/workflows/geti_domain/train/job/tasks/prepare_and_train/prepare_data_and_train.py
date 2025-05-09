@@ -11,6 +11,7 @@ import typing
 
 from geti_telemetry_tools.tracing.common import tracer
 from geti_types import CTX_SESSION_VAR, ID
+from iai_core.utils.type_helpers import str2bool
 from jobs_common.jobs.helpers.project_helpers import lock_project
 from jobs_common.k8s_helpers.k8s_resources_calculation import ComputeResources, EphemeralStorageResources
 from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo
@@ -21,7 +22,6 @@ from jobs_common.tasks.utils.progress import publish_consumed_resources, report_
 from jobs_common.tasks.utils.secrets import SECRETS, JobMetadata, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.shard_dataset.tasks.shard_dataset import SHARD_DATASET_TASK_POD_SPEC
-from sc_sdk.utils.type_helpers import str2bool
 
 from job.tasks.prepare_and_train.create_task_train_dataset import create_task_train_dataset
 from job.tasks.prepare_and_train.get_train_data import get_train_data

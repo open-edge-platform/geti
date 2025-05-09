@@ -7,20 +7,20 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 from geti_types import DatasetStorageIdentifier, ImageIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import (
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -28,9 +28,9 @@ from sc_sdk.repos import (
     ImageRepo,
     LabelSchemaRepo,
 )
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.project_factory import ProjectFactory
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.project_factory import ProjectFactory
 from testfixtures import compare
 
 from jobs_common.utils.dataset_helpers import DatasetHelpers
@@ -57,7 +57,11 @@ class TestSubsetManager:
         task_label = {label.name: label for label in project_labels}
         for label in labels:
             generated_labels.append(
-                ScoredLabel(label_id=task_label[label].id_, is_empty=task_label[label].is_empty, probability=1.0)
+                ScoredLabel(
+                    label_id=task_label[label].id_,
+                    is_empty=task_label[label].is_empty,
+                    probability=1.0,
+                )
             )
         generated_annotation = Annotation(shape=shape, labels=generated_labels)
         return generated_annotation
@@ -89,7 +93,9 @@ class TestSubsetManager:
                 annotations=[annotation],
             )
             test_dataset_item = DatasetItem(
-                id_=DatasetRepo.generate_id(), media=image, annotation_scene=test_annotation
+                id_=DatasetRepo.generate_id(),
+                media=image,
+                annotation_scene=test_annotation,
             )
             items.append(test_dataset_item)
         return Dataset(items=items, id=DatasetRepo.generate_id())

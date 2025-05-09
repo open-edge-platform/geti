@@ -7,10 +7,10 @@ from unittest.mock import patch
 
 import pytest
 from geti_types import ID
+from iai_core.entities.label import Domain
+from iai_core.entities.model_template import TaskType
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.model_template import TaskType
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks.import_tasks.parse_dataset_new_project import _parse_dataset_for_import_to_new_project
@@ -128,7 +128,10 @@ class TestParseDatasetNewProject:
         # set re-import case (src=dst)
         if FeatureFlagProvider.is_enabled(feature_flag=FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION):
             # Handle an anomaly dataset as if it was exported from an anomaly classification task.
-            if src_project_type in [GetiProjectType.ANOMALY_DETECTION, GetiProjectType.ANOMALY_SEGMENTATION]:
+            if src_project_type in [
+                GetiProjectType.ANOMALY_DETECTION,
+                GetiProjectType.ANOMALY_SEGMENTATION,
+            ]:
                 # src_project_type = GetiProjectType.ANOMALY_CLASSIFICATION
                 expected_labels.pop(GetiProjectType.ANOMALY_DETECTION, None)
             else:
@@ -158,7 +161,9 @@ class TestParseDatasetNewProject:
 
             expected_groups[dst_project_type] = group_names
         warnings = self._get_expected_warnings(
-            expected_labels.keys(), dataset_info.warnings, exported_project_type=dataset_info.exported_project_type
+            expected_labels.keys(),
+            dataset_info.warnings,
+            exported_project_type=dataset_info.exported_project_type,
         )
         return expected_labels, expected_groups, warnings
 
@@ -320,7 +325,10 @@ class TestParseDatasetNewProject:
         fxt_dataset_id, dataset_info = fxt_dataset_id__public
         warnings = self._get_expected_warnings(dataset_info.label_names_by_ann_based_project, dataset_info.warnings)
         self._check_projects_from_parse_dataset_for_import_to_new_project(
-            fxt_import_data_repo, ID(fxt_dataset_id), dataset_info.label_names_by_ann_based_project, warnings
+            fxt_import_data_repo,
+            ID(fxt_dataset_id),
+            dataset_info.label_names_by_ann_based_project,
+            warnings,
         )
 
     def test_parse_dataset_for_import_to_new_project__by_annotation_types(
@@ -349,5 +357,8 @@ class TestParseDatasetNewProject:
         warnings = self._get_expected_warnings(dataset_info.label_names_by_ann_based_project, dataset_info.warnings)
 
         self._check_projects_from_parse_dataset_for_import_to_new_project(
-            fxt_import_data_repo, dataset_id, dataset_info.label_names_by_ann_based_project, warnings
+            fxt_import_data_repo,
+            dataset_id,
+            dataset_info.label_names_by_ann_based_project,
+            warnings,
         )

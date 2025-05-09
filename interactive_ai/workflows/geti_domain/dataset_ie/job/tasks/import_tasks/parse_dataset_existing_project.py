@@ -6,6 +6,7 @@
 import logging
 from enum import IntEnum, auto
 
+from iai_core.entities.model_template import task_type_to_label_domain
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
@@ -13,7 +14,6 @@ from jobs_common.tasks.utils.progress import publish_metadata_update, task_progr
 from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.model_template import task_type_to_label_domain
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks import IMPORT_EXPORT_TASK_POD_SPEC
@@ -92,7 +92,8 @@ def _parse_dataset_for_import_to_existing_project(import_id: str, project_id: st
     ImportUtils.check_max_number_of_media(dm_dataset, project)
 
     progress_reporter.reset_step(
-        step_index=_Steps.IDX_MAP_LABELS, step_message="Finding labels mapping between dataset and project"
+        step_index=_Steps.IDX_MAP_LABELS,
+        step_message="Finding labels mapping between dataset and project",
     )
     label_to_ann_types = ImportUtils.get_label_to_ann_types(
         dm_dataset=dm_dataset,
@@ -132,7 +133,10 @@ def _parse_dataset_for_import_to_existing_project(import_id: str, project_id: st
     progress_reporter.finish_step()
 
     # Collect and parse validation warnings
-    progress_reporter.reset_step(step_index=_Steps.IDX_COLLECT_WARNINGS, step_message="Collecting validation warnings")
+    progress_reporter.reset_step(
+        step_index=_Steps.IDX_COLLECT_WARNINGS,
+        step_message="Collecting validation warnings",
+    )
     error_details = ImportUtils.collect_validation_warnings(
         dm_dataset=dm_dataset,
         possible_domains={task_type_to_label_domain(task_type)},

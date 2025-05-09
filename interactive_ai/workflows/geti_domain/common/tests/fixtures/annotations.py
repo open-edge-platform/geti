@@ -2,10 +2,10 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.repos import AnnotationSceneStateRepo
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState
+from iai_core.entities.shapes import Rectangle
+from iai_core.repos import AnnotationSceneStateRepo
 
 from tests.fixtures.values import DummyValues
 

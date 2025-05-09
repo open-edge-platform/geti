@@ -11,11 +11,11 @@ from configuration import ConfigurationValidator
 from geti_fastapi_tools.exceptions import BadRequestException, BodyMissingRequiredParameters
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo
-from sc_sdk.services import ModelService
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ConfigurableParametersRepo
+from iai_core.services import ModelService
 
 
 @dataclass

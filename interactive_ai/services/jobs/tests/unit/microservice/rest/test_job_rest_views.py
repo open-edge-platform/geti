@@ -10,7 +10,7 @@ from microservice.rest.job_rest_views import FindJobsQuery, JobRestViews
 from model.job_state import JobStateGroup
 
 from geti_types import ID
-from sc_sdk.utils.time_utils import now
+from iai_core.utils.time_utils import now
 
 DUMMY_JOB_KEY = json.dumps({"job_key": "job_value"})
 DUMMY_AUTHOR = ID("author_uid")

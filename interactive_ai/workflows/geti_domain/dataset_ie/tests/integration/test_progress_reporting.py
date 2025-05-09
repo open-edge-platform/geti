@@ -6,9 +6,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
+from iai_core.entities.project import Project
+from iai_core.utils.deletion_helpers import DeletionHelpers
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.project import Project
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
 
 from job.tasks.export_tasks.export_dataset_task import STEPS_PROGRESS_RATIO as STEPS_RATIO_EXPORT
 from job.tasks.export_tasks.export_dataset_task import export_dataset_task
@@ -118,8 +118,14 @@ class TestProgressReporting:
             project_id = metadata["project_id"]
 
         with (
-            patch("job.tasks.import_tasks.parse_dataset_new_project.publish_metadata_update", new=MagicMock),
-            patch("job.tasks.import_tasks.parse_dataset_new_project.ImportDataRepo", return_value=fxt_import_data_repo),
+            patch(
+                "job.tasks.import_tasks.parse_dataset_new_project.publish_metadata_update",
+                new=MagicMock,
+            ),
+            patch(
+                "job.tasks.import_tasks.parse_dataset_new_project.ImportDataRepo",
+                return_value=fxt_import_data_repo,
+            ),
             patch("job.utils.progress_utils.MIN_INTERVAL_IN_SEC", 0),
             patch(
                 "job.utils.progress_utils.report_task_step_progress",
@@ -132,17 +138,27 @@ class TestProgressReporting:
             for step_index in [1, 2]:
                 assert (
                     progress_checker_prepare.call_count[step_index]
-                    == self._get_expected_iteration(n_items, progress_checker_prepare.interval_in_percent(step_index))
+                    == self._get_expected_iteration(
+                        n_items,
+                        progress_checker_prepare.interval_in_percent(step_index),
+                    )
                     + 1
                 )  # iterations + 1 finish_step
 
         with (
-            patch("job.tasks.import_tasks.create_project_from_dataset.publish_metadata_update", new=_get_metadat),
             patch(
-                "job.tasks.import_tasks.create_project_from_dataset.ImportDataRepo", return_value=fxt_import_data_repo
+                "job.tasks.import_tasks.create_project_from_dataset.publish_metadata_update",
+                new=_get_metadat,
+            ),
+            patch(
+                "job.tasks.import_tasks.create_project_from_dataset.ImportDataRepo",
+                return_value=fxt_import_data_repo,
             ),
             patch("job.utils.progress_utils.MIN_INTERVAL_IN_SEC", 0),
-            patch("job.utils.progress_utils.report_progress", new=progress_checker_perform.check_progress_is_increased),
+            patch(
+                "job.utils.progress_utils.report_progress",
+                new=progress_checker_perform.check_progress_is_increased,
+            ),
         ):
             create_project_from_dataset(
                 import_id=str(fxt_coco_dataset_id),
@@ -158,7 +174,10 @@ class TestProgressReporting:
             for step_index in [1, 2]:
                 assert (
                     progress_checker_perform.call_count[step_index]
-                    == self._get_expected_iteration(n_items, progress_checker_perform.interval_in_percent(step_index))
+                    == self._get_expected_iteration(
+                        n_items,
+                        progress_checker_perform.interval_in_percent(step_index),
+                    )
                     + 2
                 )  # iterations + 1 start_step + 1 finish_step
 
@@ -179,7 +198,10 @@ class TestProgressReporting:
         label_names = ["person", "car"]
 
         with (
-            patch("job.tasks.import_tasks.parse_dataset_existing_project.publish_metadata_update", new=MagicMock),
+            patch(
+                "job.tasks.import_tasks.parse_dataset_existing_project.publish_metadata_update",
+                new=MagicMock,
+            ),
             patch(
                 "job.tasks.import_tasks.parse_dataset_existing_project.ImportDataRepo",
                 return_value=fxt_import_data_repo,
@@ -191,14 +213,18 @@ class TestProgressReporting:
             ),
         ):
             parse_dataset_for_import_to_existing_project(
-                import_id=str(fxt_coco_dataset_id), project_id=str(fxt_annotated_detection_project.id_)
+                import_id=str(fxt_coco_dataset_id),
+                project_id=str(fxt_annotated_detection_project.id_),
             )
 
             assert progress_checker_prepare.call_count[0] >= 2  # 1 start_step + 1 finish_step + unknown iteration
             for step_index in [1, 2]:
                 assert (
                     progress_checker_prepare.call_count[step_index]
-                    == self._get_expected_iteration(n_items, progress_checker_prepare.interval_in_percent(step_index))
+                    == self._get_expected_iteration(
+                        n_items,
+                        progress_checker_prepare.interval_in_percent(step_index),
+                    )
                     + 1
                 )  # iterations + 1 finish_step
 
@@ -208,10 +234,19 @@ class TestProgressReporting:
 
         dataset_storage = fxt_annotated_detection_project.get_training_dataset_storage()
         with (
-            patch("job.tasks.import_tasks.import_dataset_to_project.publish_metadata_update", new=MagicMock),
-            patch("job.tasks.import_tasks.import_dataset_to_project.ImportDataRepo", return_value=fxt_import_data_repo),
+            patch(
+                "job.tasks.import_tasks.import_dataset_to_project.publish_metadata_update",
+                new=MagicMock,
+            ),
+            patch(
+                "job.tasks.import_tasks.import_dataset_to_project.ImportDataRepo",
+                return_value=fxt_import_data_repo,
+            ),
             patch("job.utils.progress_utils.MIN_INTERVAL_IN_SEC", 0),
-            patch("job.utils.progress_utils.report_progress", new=progress_checker_perform.check_progress_is_increased),
+            patch(
+                "job.utils.progress_utils.report_progress",
+                new=progress_checker_perform.check_progress_is_increased,
+            ),
         ):
             import_dataset_to_project(
                 import_id=str(fxt_coco_dataset_id),
@@ -253,11 +288,18 @@ class TestProgressReporting:
         dataset_storage = project.get_training_dataset_storage()
         with (
             patch(
-                "job.tasks.export_tasks.export_dataset_task.publish_metadata_update", new=MagicMock()
+                "job.tasks.export_tasks.export_dataset_task.publish_metadata_update",
+                new=MagicMock(),
             ) as mocked_publish,
-            patch("job.tasks.export_tasks.export_dataset_task.ExportDataRepo", return_value=fxt_export_data_repo),
+            patch(
+                "job.tasks.export_tasks.export_dataset_task.ExportDataRepo",
+                return_value=fxt_export_data_repo,
+            ),
             patch("job.utils.progress_utils.MIN_INTERVAL_IN_SEC", 0),
-            patch("job.utils.progress_utils.report_progress", new=progress_checker.check_progress_is_increased),
+            patch(
+                "job.utils.progress_utils.report_progress",
+                new=progress_checker.check_progress_is_increased,
+            ),
         ):
             _ = export_dataset_task(
                 organization_id=str(fxt_organization_id),

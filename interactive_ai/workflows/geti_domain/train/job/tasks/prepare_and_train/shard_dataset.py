@@ -7,8 +7,8 @@ import logging
 from collections.abc import Callable
 
 from geti_telemetry_tools import unified_tracing
+from iai_core.entities.datasets import Dataset
 from jobs_common_extras.shard_dataset.tasks.shard_dataset import shard_dataset
-from sc_sdk.entities.datasets import Dataset
 
 from job.utils.train_workflow_data import TrainWorkflowData
 

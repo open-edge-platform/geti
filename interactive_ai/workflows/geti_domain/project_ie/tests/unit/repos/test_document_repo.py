@@ -3,8 +3,8 @@
 from unittest.mock import patch
 
 import pytest
-from sc_sdk.repos.base.mongo_connector import MongoConnector
-from sc_sdk.repos.mappers import IDToMongo
+from iai_core.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.mappers import IDToMongo
 
 from job.repos.document_repo import DocumentRepo
 
@@ -12,7 +12,11 @@ from job.repos.document_repo import DocumentRepo
 @pytest.mark.ProjectIEMsComponent
 class TestDocumentRepo:
     def test_get_project_document_from_db(
-        self, request, fxt_organization_id, fxt_project_identifier_1, fxt_project_identifier_2
+        self,
+        request,
+        fxt_organization_id,
+        fxt_project_identifier_1,
+        fxt_project_identifier_2,
     ) -> None:
         # Insert some project documents in the db
         org_id = IDToMongo.forward(fxt_organization_id)
@@ -39,7 +43,13 @@ class TestDocumentRepo:
 
     @pytest.mark.parametrize("collection_name", ["project", "task_node"])
     def test_get_all_documents_from_db_collection(
-        self, request, collection_name, fxt_ote_id, fxt_organization_id, fxt_workspace_id, fxt_project_identifier
+        self,
+        request,
+        collection_name,
+        fxt_ote_id,
+        fxt_organization_id,
+        fxt_workspace_id,
+        fxt_project_identifier,
     ) -> None:
         document_repo = DocumentRepo(fxt_project_identifier)
         # Insert some project documents in the db
@@ -81,7 +91,9 @@ class TestDocumentRepo:
         with (
             patch.object(DocumentRepo, "_get_project_document_from_db", return_value=iter([])) as mock_get_project_doc,
             patch.object(
-                DocumentRepo, "_get_all_documents_from_db_collection", return_value=iter([])
+                DocumentRepo,
+                "_get_all_documents_from_db_collection",
+                return_value=iter([]),
             ) as mock_get_docs_from_collection,
         ):
             collection_names = ("project", "task_node")
@@ -93,7 +105,13 @@ class TestDocumentRepo:
 
     @pytest.mark.parametrize("collection_name", ["project", "other"])
     def test_insert_documents_to_db_collection(
-        self, request, collection_name, fxt_ote_id, fxt_organization_id, fxt_workspace_id, fxt_project_identifier
+        self,
+        request,
+        collection_name,
+        fxt_ote_id,
+        fxt_organization_id,
+        fxt_workspace_id,
+        fxt_project_identifier,
     ) -> None:
         document_repo = DocumentRepo(fxt_project_identifier)
         org_id = IDToMongo.forward(fxt_organization_id)

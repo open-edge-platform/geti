@@ -18,8 +18,8 @@ from policies.regular import mark_next_regular_jobs_as_ready_for_scheduling_from
 from policies.resource_manager import ResourceManager
 
 from geti_types import CTX_SESSION_VAR, ID, Singleton
-from sc_sdk.repos.base.constants import ORGANIZATION_ID_FIELD_NAME, WORKSPACE_ID_FIELD_NAME
-from sc_sdk.repos.mappers import IDToMongo
+from iai_core.repos.base.constants import ORGANIZATION_ID_FIELD_NAME, WORKSPACE_ID_FIELD_NAME
+from iai_core.repos.mappers import IDToMongo
 
 logger = logging.getLogger(__name__)
 

@@ -15,7 +15,7 @@ dependencies = [
     "geti_spicedb_tools",
     "geti-telemetry-tools[telemetry,fastapi,logger,kafka,grpc]",
     "geti-types",
-    "sc_sdk",
+    "iai_core",
     "media_utils",
     "grpc_interfaces"
 ]
@@ -27,7 +27,7 @@ geti-kafka-tools = { path = "../../../libs/kafka_tools", editable = true }
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
 geti-types = { path = "../../../libs/types", editable = true }
 geti_spicedb_tools = { path = "../../../libs/spicedb_tools", editable = true }
-sc_sdk = { path = "../../libs/sc_sdk", editable = true }
+iai_core = { path = "../../libs/iai_core_py", editable = true }
 media_utils = { path = "../../libs/media_utils", editable = true }
 grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
 
@@ -74,7 +74,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
-known-local-folder = ["geti_types", "geti_kafka_tools",  "geti_feature_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "sc_sdk", "media_utils"]
+known-local-folder = ["geti_types", "geti_kafka_tools",  "geti_feature_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "iai_core", "media_utils"]
 
 [tool.ruff.lint.pylint]
 max-args=7

@@ -10,12 +10,12 @@ import logging
 from collections.abc import Sequence
 
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import DatasetRepo, ProjectRepo, SuspendedAnnotationScenesRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetRepo, ProjectRepo, SuspendedAnnotationScenesRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 logger = logging.getLogger(__name__)
 

@@ -13,14 +13,14 @@ from collections.abc import Iterable, Iterator, Sequence
 import numpy as np
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.label import Label
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ConfigurableParametersRepo
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.type_helpers import SequenceOrSet
 
 from .subset_manager_config import SubsetManagerConfig
 
@@ -105,7 +105,9 @@ class _SubsetHelper:
         if subsets_to_reset:
             # Remove any items assigned to the subsets that need to be reset
             dataset_items = self.reset_subsets_and_shuffle_items(
-                dataset_items=dataset_items, eligible_subsets=subsets_to_reset, shuffle_items=True
+                dataset_items=dataset_items,
+                eligible_subsets=subsets_to_reset,
+                shuffle_items=True,
             )
 
         for item in dataset_items:
@@ -121,7 +123,10 @@ class _SubsetHelper:
         if len(new_training_items) >= BATCH_SIZE_THRESHOLD:
             new_training_items = self.reorder_by_priority(training_dataset_items=new_training_items)
         for item in new_training_items:
-            self.assign_item_to_subset(item=item, target_subsets=subsets_to_reset if subsets_to_reset else SUBSETS)
+            self.assign_item_to_subset(
+                item=item,
+                target_subsets=subsets_to_reset if subsets_to_reset else SUBSETS,
+            )
 
     @staticmethod
     def reset_subsets_and_shuffle_items(
@@ -486,7 +491,9 @@ class ITaskSubsetManager(metaclass=abc.ABCMeta):
     @staticmethod
     @abc.abstractmethod
     def split(
-        dataset_items: Iterator[DatasetItem], task_node: TaskNode, subsets_to_reset: tuple[Subset, ...] | None = None
+        dataset_items: Iterator[DatasetItem],
+        task_node: TaskNode,
+        subsets_to_reset: tuple[Subset, ...] | None = None,
     ) -> None:
         """
         Split the training dataset to subsets such as train, val and test.

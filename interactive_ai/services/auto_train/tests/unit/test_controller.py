@@ -16,14 +16,14 @@ from repo import SessionBasedAutoTrainActivationRepo
 from geti_types import Session
 from grpc_interfaces.job_submission.client import GRPCJobsClient
 from grpc_interfaces.job_submission.pb.job_service_pb2 import SubmitJobRequest
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
-from sc_sdk.entities.model_storage import NullModelStorage
-from sc_sdk.entities.model_template import ModelTemplateDeprecationStatus, TaskFamily, TaskType
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_node import TaskNode, TaskProperties
-from sc_sdk.repos import ConfigurableParametersRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
-from sc_sdk.utils.time_utils import now
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core.entities.model_storage import NullModelStorage
+from iai_core.entities.model_template import ModelTemplateDeprecationStatus, TaskFamily, TaskType
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.repos import ConfigurableParametersRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
+from iai_core.utils.time_utils import now
 
 MOCK_JOBS_CLIENT = MagicMock()
 
@@ -36,7 +36,9 @@ def return_none(*args, **kwargs) -> None:
 def fxt_auto_train_controller():
     with patch.object(GRPCJobsClient, "__init__", new=return_none):
         controller = AutoTrainController(
-            debouncing_period=10, jobs_grpc_client_address="clientaddress", job_submission_cooldown=60
+            debouncing_period=10,
+            jobs_grpc_client_address="clientaddress",
+            job_submission_cooldown=60,
         )
         controller._jobs_client = MOCK_JOBS_CLIENT
         yield controller
@@ -131,7 +133,9 @@ class TestAutoTrainController:
         # Act
         with (
             patch.object(
-                ConfigurableParametersRepo, "get_or_create_component_parameters", return_value=dummy_dataset_config
+                ConfigurableParametersRepo,
+                "get_or_create_component_parameters",
+                return_value=dummy_dataset_config,
             ) as mock_get_dataset_config,
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project) as mock_get_project,
             patch.object(
@@ -140,7 +144,11 @@ class TestAutoTrainController:
             patch.object(ModelStorageRepo, "get_by_id", return_value=fxt_model_storage),
             patch.object(TrainTaskJobData, "create_key", return_value=dummy_train_job_key),
             patch.object(TrainTaskJobData, "create_payload", return_value=dummy_train_job_payload),
-            patch.object(TrainTaskJobData, "create_metadata", return_value=dummy_train_job_metadata),
+            patch.object(
+                TrainTaskJobData,
+                "create_metadata",
+                return_value=dummy_train_job_metadata,
+            ),
             patch.object(AutoTrainController, "get_num_dataset_items", return_value=0),
         ):
             fxt_auto_train_controller.submit_train_job(fxt_auto_train_activation_request)
@@ -175,7 +183,9 @@ class TestAutoTrainController:
         dummy_dataset_config = MagicMock()
         with (
             patch.object(
-                ConfigurableParametersRepo, "get_or_create_component_parameters", return_value=dummy_dataset_config
+                ConfigurableParametersRepo,
+                "get_or_create_component_parameters",
+                return_value=dummy_dataset_config,
             ),
             patch.object(ProjectRepo, "get_by_id", return_value=NullProject()),
             pytest.raises(InvalidAutoTrainRequestError),
@@ -191,7 +201,9 @@ class TestAutoTrainController:
         dummy_dataset_config = MagicMock()
         with (
             patch.object(
-                ConfigurableParametersRepo, "get_or_create_component_parameters", return_value=dummy_dataset_config
+                ConfigurableParametersRepo,
+                "get_or_create_component_parameters",
+                return_value=dummy_dataset_config,
             ),
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
             patch.object(Project, "get_trainable_task_node_by_id", return_value=fxt_task_node),
@@ -210,7 +222,9 @@ class TestAutoTrainController:
         fxt_auto_train_activation_request.model_storage_id = None
         with (
             patch.object(
-                ConfigurableParametersRepo, "get_or_create_component_parameters", return_value=dummy_dataset_config
+                ConfigurableParametersRepo,
+                "get_or_create_component_parameters",
+                return_value=dummy_dataset_config,
             ),
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
             patch.object(Project, "get_trainable_task_node_by_id", return_value=fxt_task_node),
@@ -231,7 +245,9 @@ class TestAutoTrainController:
         # Act
         with (
             patch.object(
-                ConfigurableParametersRepo, "get_or_create_component_parameters", return_value=dummy_dataset_config
+                ConfigurableParametersRepo,
+                "get_or_create_component_parameters",
+                return_value=dummy_dataset_config,
             ),
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
             patch.object(Project, "get_trainable_task_node_by_id", return_value=fxt_task_node),
@@ -253,14 +269,20 @@ class TestAutoTrainController:
         dummy_train_job_metadata = "dummy_job_metadata"
         with (
             patch.object(
-                ConfigurableParametersRepo, "get_or_create_component_parameters", return_value=dummy_dataset_config
+                ConfigurableParametersRepo,
+                "get_or_create_component_parameters",
+                return_value=dummy_dataset_config,
             ),
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
             patch.object(Project, "get_trainable_task_node_by_id", return_value=fxt_task_node),
             patch.object(ModelStorageRepo, "get_by_id", return_value=fxt_model_storage),
             patch.object(TrainTaskJobData, "create_key", return_value=dummy_train_job_key),
             patch.object(TrainTaskJobData, "create_payload", return_value=dummy_train_job_payload),
-            patch.object(TrainTaskJobData, "create_metadata", return_value=dummy_train_job_metadata),
+            patch.object(
+                TrainTaskJobData,
+                "create_metadata",
+                return_value=dummy_train_job_metadata,
+            ),
             patch.object(AutoTrainController, "get_num_dataset_items", return_value=0),
             patch.object(fxt_auto_train_controller._jobs_client, "submit", side_effect=RpcError),
             pytest.raises(JobSubmissionError),

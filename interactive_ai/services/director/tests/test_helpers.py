@@ -15,7 +15,7 @@ from testfixtures import compare
 
 from communication.constants import MAX_UNANNOTATED_DATASET_SIZE
 
-import sc_sdk.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_kafka_tools import publish_event
 from geti_types import (
     CTX_SESSION_VAR,
@@ -25,29 +25,29 @@ from geti_types import (
     ProjectIdentifier,
     VideoFrameIdentifier,
 )
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.entities.persistent_entity import PersistentEntity
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from sc_sdk.entities.task_graph import TaskEdge, TaskGraph
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.entities.video import Video
-from sc_sdk.repos import (
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.entities.persistent_entity import PersistentEntity
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.task_graph import TaskEdge, TaskGraph
+from iai_core.entities.task_node import TaskNode
+from iai_core.entities.video import Video
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -56,7 +56,7 @@ from sc_sdk.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from sc_sdk.repos.mappers.mongodb_mapper_interface import (
+from iai_core.repos.mappers.mongodb_mapper_interface import (
     IMapperBackward,
     IMapperDatasetStorageBackward,
     IMapperDatasetStorageForward,
@@ -70,12 +70,12 @@ from sc_sdk.repos.mappers.mongodb_mapper_interface import (
     MappableEntityType,
     MapperClassT,
 )
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo
-from sc_sdk.services.model_service import ModelService
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.media_factory import Media2DFactory
-from sc_sdk.utils.project_factory import ProjectFactory
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.services.model_service import ModelService
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.media_factory import Media2DFactory
+from iai_core.utils.project_factory import ProjectFactory
 
 logger = logging.getLogger(__name__)
 
@@ -230,7 +230,8 @@ def generate_random_annotated_image(
     for label_name in img_labels:
         rx, ry = rng.integers(low=[1, 1], high=[image_width - min_size, image_height - min_size])
         rw, rh = rng.integers(
-            low=[min_size, min_size], high=[min(max_size, image_width - rx), min(max_size, image_height - ry)]
+            low=[min_size, min_size],
+            high=[min(max_size, image_width - rx), min(max_size, image_height - ry)],
         )
         y_min, y_max = float(ry / image_height), float((ry + rh) / image_height)
         x_min, x_max = float(rx / image_width), float((rx + rw) / image_width)
@@ -424,7 +425,7 @@ def generate_random_annotated_project(
             {"name": "ellipse", "color": "#0000ffff"},
             {"name": "triangle", "color": "#ff0000ff"},
         ]
-    from sc_sdk.repos import AnnotationSceneRepo, ImageRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo
 
     if isinstance(model_template_id, ModelTemplate):
         model_template_id = model_template_id.model_template_id

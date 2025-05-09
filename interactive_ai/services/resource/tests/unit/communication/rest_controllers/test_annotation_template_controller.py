@@ -8,8 +8,8 @@ import pytest
 from communication.rest_controllers.annotation_template_controller import AnnotationTemplateRESTController
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.annotation_template import AnnotationTemplate
-from sc_sdk.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core.entities.annotation_template import AnnotationTemplate
+from iai_core.repos.annotation_template_repo import AnnotationTemplateRepo
 
 
 @pytest.fixture
@@ -74,7 +74,11 @@ class TestAnnotationTemplateRESTController:
     ) -> None:
         with (
             patch.object(AnnotationTemplateRepo, "save") as mock_save_annotation_template,
-            patch.object(AnnotationTemplateRepo, "generate_id", return_value=fxt_annotation_template_1.id_),
+            patch.object(
+                AnnotationTemplateRepo,
+                "generate_id",
+                return_value=fxt_annotation_template_1.id_,
+            ),
         ):
             annotation_template = AnnotationTemplateRESTController.make_annotation_template(
                 project_identifier=fxt_project_identifier,
@@ -94,7 +98,9 @@ class TestAnnotationTemplateRESTController:
     ) -> None:
         with (
             patch.object(
-                AnnotationTemplateRepo, "get_by_id", return_value=fxt_annotation_template_1
+                AnnotationTemplateRepo,
+                "get_by_id",
+                return_value=fxt_annotation_template_1,
             ) as mock_get_annotation_template,
         ):
             annotation_template = AnnotationTemplateRESTController.get_annotation_template(
@@ -127,6 +133,9 @@ class TestAnnotationTemplateRESTController:
             )
 
         assert annotation_templates == {
-            "annotation_templates": [fxt_annotation_template_1_mapped, fxt_annotation_template_2_mapped]
+            "annotation_templates": [
+                fxt_annotation_template_1_mapped,
+                fxt_annotation_template_2_mapped,
+            ]
         }
         mock_get_annotation_templates.assert_called_once()

@@ -6,8 +6,8 @@ import logging
 import numpy as np
 
 from geti_telemetry_tools import unified_tracing
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.metrics import (
+from iai_core.entities.label import Label
+from iai_core.entities.metrics import (
     BarMetricsGroup,
     ColorPalette,
     CountMetric,

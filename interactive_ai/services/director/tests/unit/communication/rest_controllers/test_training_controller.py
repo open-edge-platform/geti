@@ -20,15 +20,15 @@ from service.project_service import ProjectService
 
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_types import ID, ImageIdentifier
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneStateRepo, DatasetRepo, ModelStorageRepo, TaskNodeRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.services import ModelService
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import AnnotationSceneStateRepo, DatasetRepo, ModelStorageRepo, TaskNodeRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.services import ModelService
 
 DUMMY_USER = ID("dummy_user")
 
@@ -49,9 +49,15 @@ class TestTrainingController:
                 TrainingConfig, "generate_training_config", return_value=train_config
             ) as mock_parse_train_config,
             patch.object(
-                TrainingController, "_is_task_ready_for_manual_training", return_value=(True, None)
+                TrainingController,
+                "_is_task_ready_for_manual_training",
+                return_value=(True, None),
             ) as mock_is_task_ready,
-            patch.object(TrainingController, "get_annotations_and_dataset_items", return_value=(20, 20)),
+            patch.object(
+                TrainingController,
+                "get_annotations_and_dataset_items",
+                return_value=(20, 20),
+            ),
             patch.object(TrainingController, "_submit_train_job", return_value=job_id) as mock_submit_job,
         ):
             train_response_json = TrainingController.train_task(
@@ -73,11 +79,17 @@ class TestTrainingController:
     def test_train_task_invalid_json(self, fxt_project) -> None:
         raw_train_config = {"key1": "val1"}
         with (
-            patch.object(TrainingRestValidator, "validate_train_request", side_effect=ValidationError("test")),
+            patch.object(
+                TrainingRestValidator,
+                "validate_train_request",
+                side_effect=ValidationError("test"),
+            ),
             pytest.raises(ValidationError),
         ):
             TrainingController.train_task(
-                project_id=fxt_project.id_, author=DUMMY_USER, raw_train_config=raw_train_config
+                project_id=fxt_project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
             )
 
     def test_train_task_chain_without_task_id(self, fxt_detection_segmentation_chain_project) -> None:
@@ -88,7 +100,11 @@ class TestTrainingController:
             patch.object(ProjectService, "get_by_id", return_value=project),
             pytest.raises(BadRequestException),
         ):
-            TrainingController.train_task(project_id=project.id_, author=DUMMY_USER, raw_train_config=raw_train_config)
+            TrainingController.train_task(
+                project_id=project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
+            )
 
     def test_train_task_non_existing_task(self, fxt_project) -> None:
         raw_train_config = {"task_id": "non_existing_task_id"}
@@ -98,7 +114,9 @@ class TestTrainingController:
             pytest.raises(BadRequestException),
         ):
             TrainingController.train_task(
-                project_id=fxt_project.id_, author=DUMMY_USER, raw_train_config=raw_train_config
+                project_id=fxt_project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
             )
 
     def test_train_task_no_disk_space(self, fxt_project) -> None:
@@ -113,7 +131,9 @@ class TestTrainingController:
             pytest.raises(NotEnoughSpaceHTTPException),
         ):
             TrainingController.train_task(
-                project_id=fxt_project.id_, author=DUMMY_USER, raw_train_config=raw_train_config
+                project_id=fxt_project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
             )
 
     def test_train_task_obsolete_algorithm(self, fxt_project, fxt_model_template_obsolete) -> None:
@@ -132,7 +152,9 @@ class TestTrainingController:
             pytest.raises(ObsoleteTrainingAlgorithmException),
         ):
             TrainingController.train_task(
-                project_id=fxt_project.id_, author=DUMMY_USER, raw_train_config=raw_train_config
+                project_id=fxt_project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
             )
 
     def test_train_task_not_enough_annotations(self, fxt_project) -> None:
@@ -146,11 +168,17 @@ class TestTrainingController:
                 "communication.controllers.training_controller.check_free_space_for_operation",
             ),
             patch.object(TrainingConfig, "generate_training_config", return_value=train_config),
-            patch.object(TrainingController, "_is_task_ready_for_manual_training", return_value=(False, "test")),
+            patch.object(
+                TrainingController,
+                "_is_task_ready_for_manual_training",
+                return_value=(False, "test"),
+            ),
             pytest.raises(NotReadyForTrainingException),
         ):
             TrainingController.train_task(
-                project_id=fxt_project.id_, author=DUMMY_USER, raw_train_config=raw_train_config
+                project_id=fxt_project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
             )
 
     def test_train_task_not_enough_dataset_items(self, fxt_project, fxt_enable_feature_flag_name) -> None:
@@ -167,12 +195,22 @@ class TestTrainingController:
                 "communication.controllers.training_controller.check_free_space_for_operation",
             ),
             patch.object(TrainingConfig, "generate_training_config", return_value=train_config),
-            patch.object(TrainingController, "_is_task_ready_for_manual_training", return_value=(True, None)),
-            patch.object(TrainingController, "get_annotations_and_dataset_items", return_value=(20, 0)),
+            patch.object(
+                TrainingController,
+                "_is_task_ready_for_manual_training",
+                return_value=(True, None),
+            ),
+            patch.object(
+                TrainingController,
+                "get_annotations_and_dataset_items",
+                return_value=(20, 0),
+            ),
             pytest.raises(NotEnoughDatasetItemsException),
         ):
             TrainingController.train_task(
-                project_id=fxt_project.id_, author=DUMMY_USER, raw_train_config=raw_train_config
+                project_id=fxt_project.id_,
+                author=DUMMY_USER,
+                raw_train_config=raw_train_config,
             )
 
     def test_submit_train_jobs_model_storage_exists(
@@ -197,7 +235,9 @@ class TestTrainingController:
         # Act
         with (
             patch.object(
-                ModelStorageRepo, "get_by_task_node_id", return_value=[fxt_model_storage_detection]
+                ModelStorageRepo,
+                "get_by_task_node_id",
+                return_value=[fxt_model_storage_detection],
             ) as patched_get_by_task_node_id,
             patch.object(ModelTrainingJobSubmitter, "execute", return_value=fxt_ote_id()) as mock_training_job_submit,
         ):
@@ -222,7 +262,7 @@ class TestTrainingController:
         patched_get_by_task_node_id.assert_called_once_with(task_node_id=fxt_detection_task.id_)
         assert train_jobs_per_task == fxt_ote_id()
 
-    @patch("sc_sdk.entities.model_storage.now", return_value="now")
+    @patch("iai_core.entities.model_storage.now", return_value="now")
     def test_submit_train_jobs_new_model_storage(
         self,
         fxt_project,
@@ -310,7 +350,11 @@ class TestTrainingController:
         )
         ds_storage = fxt_project.get_training_dataset_storage()
         AnnotationSceneStateRepo(ds_storage.identifier).save_many(
-            [annotation_scene_state_1, annotation_scene_state_2, annotation_scene_state_3]
+            [
+                annotation_scene_state_1,
+                annotation_scene_state_2,
+                annotation_scene_state_3,
+            ]
         )
 
         with patch.object(TaskNodeRepo, "get_trainable_task_ids", return_value=[task_id]):
@@ -320,7 +364,9 @@ class TestTrainingController:
 
             # Create and save dataset item
             ds_item_1 = DatasetItem(
-                id_=DatasetRepo.generate_id(), media=fxt_image_entity, annotation_scene=fxt_annotation_scene
+                id_=DatasetRepo.generate_id(),
+                media=fxt_image_entity,
+                annotation_scene=fxt_annotation_scene,
             )
             dataset = Dataset(id=task_dataset_entity.dataset_id, items=[ds_item_1])
             dataset_repo = DatasetRepo(ds_storage.identifier)

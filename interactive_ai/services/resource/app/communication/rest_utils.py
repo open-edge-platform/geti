@@ -15,7 +15,7 @@ from starlette.responses import FileResponse, RedirectResponse, Response, Stream
 from communication.constants import DEFAULT_N_PROJECTS_RETURNED, MAX_N_PROJECTS_RETURNED
 
 from geti_telemetry_tools import unified_tracing
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection, SortDirection
+from iai_core.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection, SortDirection
 
 API_GATEWAY_VERSION = 10
 CACHE_CONTROL_HEADER = {"Cache-Control": "private, max-age=3600"}

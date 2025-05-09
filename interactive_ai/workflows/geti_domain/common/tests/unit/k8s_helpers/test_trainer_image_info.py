@@ -5,7 +5,7 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
-from sc_sdk.entities.model import TrainingFramework, TrainingFrameworkType
+from iai_core.entities.model import TrainingFramework, TrainingFrameworkType
 
 from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo
 

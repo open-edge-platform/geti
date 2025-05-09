@@ -6,10 +6,10 @@ from itertools import chain
 
 import datumaro as dm
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation, AnnotationScene
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
+from iai_core.entities.annotation import Annotation, AnnotationScene
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
 
 
 class LabelMap:
@@ -66,7 +66,9 @@ class AnnotationSceneMapper:
                 # For task-chain, annotations that only contain labels from other tasks will return None and are removed
                 if (
                     dm_ann := self._forward_ann(
-                        annotation=sc_ann, width=instance.media_width, height=instance.media_height
+                        annotation=sc_ann,
+                        width=instance.media_width,
+                        height=instance.media_height,
                     )
                 ) is not None:
                     dm_anns.append(dm_ann)
