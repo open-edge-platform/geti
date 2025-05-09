@@ -23,6 +23,7 @@ COPY --link --from=libs . libs
 COPY --link --from=sc_sdk . interactive_ai/libs/sc_sdk
 COPY --link --from=media_utils . interactive_ai/libs/media_utils
 COPY --link --from=grpc_interfaces . grpc_interfaces
+COPY --link --from=supported_models . interactive_ai/suppoerted_models
 
 WORKDIR /builder/interactive_ai/services/resource
 
