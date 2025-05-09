@@ -62,7 +62,7 @@ func (ctrl *ImageController) GetImage(c *gin.Context) {
 		params.ImageID)
 	ctx := c.Request.Context()
 
-	logger.TracingLog(ctx).Infof("GetImage called for imageID %s", fullImageID)
+	logger.TracingLog(ctx).Infof("GetImage called for imageID %s", fullImageID.ImageID)
 
 	loadedImage, metadata, err := ctrl.imageRepo.LoadImageByID(ctx, fullImageID)
 	if err != nil {
@@ -86,7 +86,7 @@ func (ctrl *ImageController) GetThumbnail(c *gin.Context) {
 		params.ImageID)
 	ctx := c.Request.Context()
 
-	logger.TracingLog(ctx).Infof("GetThumbnail called for imageID %s", fullImageID)
+	logger.TracingLog(ctx).Infof("GetThumbnail called for imageID %s", fullImageID.ImageID)
 
 	thumbnail, metadata, err := ctrl.getThumbUseCase.Execute(ctx, fullImageID)
 	if err != nil {

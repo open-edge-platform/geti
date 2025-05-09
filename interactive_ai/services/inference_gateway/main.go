@@ -72,6 +72,7 @@ func createRouter(maxMultipartLimit int64, modelAccessSrv service.ModelAccessSer
 	r.MaxMultipartMemory = maxMultipartLimit << 20
 
 	r.Use(gin.Recovery())
+	r.Use(middleware.ZapRequestLogger(logger.Log().Desugar()))
 	r.Use(middleware.ErrorHandler())
 	r.Use(telemetry.Middleware())
 
