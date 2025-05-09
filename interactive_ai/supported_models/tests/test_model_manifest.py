@@ -18,10 +18,11 @@ from geti_supported_models.hyperparameters import (
     TrainingHyperParameters,
 )
 from geti_supported_models.model_manifest import (
+    GPUMaker,
     ModelManifest,
     ModelStats,
     NullModelManifest,
-    SupportedStatus,
+    ModelManifestDeprecationStatus,
 )
 from geti_supported_models.parser import parse_manifest
 from geti_supported_models import manifests
@@ -42,7 +43,7 @@ def fxt_dummy_model_stats():
 
 @pytest.fixture
 def fxt_dummy_supported_gpu():
-    yield {"intel": True, "nvidia": True}
+    yield {GPUMaker.INTEL: True, GPUMaker.NVIDIA: True}
 
 
 @pytest.fixture
@@ -70,7 +71,7 @@ def fxt_dummy_model_manifest(
         description="Dummy manifest for test purposes only",
         task="classification",
         stats=fxt_dummy_model_stats,
-        support_status=SupportedStatus.OBSOLETE,
+        support_status=ModelManifestDeprecationStatus.OBSOLETE,
         supported_gpus=fxt_dummy_supported_gpu,
         hyperparameters=fxt_dummy_hyperparameters,
     )
@@ -104,7 +105,7 @@ class TestModelManifest:
             "task": "detection",
             "stats": {"gigaflops": 1.0, "trainable_parameters": 1000},
             "support_status": "active",
-            "supported_gpus": {},
+            "supported_gpus": {"intel": True},
             "hyperparameters": {
                 "dataset_preparation": {
                     "augmentation": {
@@ -144,7 +145,7 @@ class TestModelManifest:
         null_model_manifest = NullModelManifest()
 
         assert null_model_manifest.id == "null"
-        assert null_model_manifest.support_status == SupportedStatus.OBSOLETE
+        assert null_model_manifest.support_status == ModelManifestDeprecationStatus.OBSOLETE
         assert null_model_manifest.stats.gigaflops == 1
         assert null_model_manifest.stats.trainable_parameters == 1
         assert null_model_manifest.supported_gpus == {}
