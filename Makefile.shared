@@ -8,8 +8,8 @@ CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 ###
 # version
 ###
-PRODUCT_VERSION                    ?= 2.9.0
-TAG                                ?= $(PRODUCT_VERSION)-local-$(shell git rev-parse --short HEAD)
+PRODUCT_VERSION                    ?= $(shell cat VERSION)
+TAG                                ?= $(PRODUCT_VERSION)-$(shell git branch --show-current)-$(shell git rev-parse --short HEAD)
 
 ###
 # registries
