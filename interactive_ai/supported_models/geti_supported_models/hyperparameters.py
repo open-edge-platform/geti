@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 class CenterCrop(BaseModel):
     ratio: float = Field(
+        gt=0,
         title="Crop ratio",
         description="Ratio of original dimensions to keep when cropping"
     )
@@ -13,6 +14,7 @@ class CenterCrop(BaseModel):
 
 class RandomResizeCrop(BaseModel):
     ratio: float = Field(
+        gt=0,
         title="Resize ratio",
         description="Ratio of original dimensions to apply during resize operation"
     )
@@ -20,6 +22,7 @@ class RandomResizeCrop(BaseModel):
 
 class RandomAffine(BaseModel):
     degrees: float = Field(
+        gt=0,
         title="Rotation degrees",
         description="Maximum rotation angle in degrees"
     )
@@ -42,6 +45,7 @@ class RandomAffine(BaseModel):
 
 class GaussianBlur(BaseModel):
     kernel_size: int = Field(
+        gt=0,
         title="Kernel size",
         description="Size of the Gaussian kernel"
     )
@@ -52,10 +56,12 @@ class Tiling(BaseModel):
         description="Whether to use adaptive tiling based on image content"
     )
     tile_size: int = Field(
+        gt=0,
         title="Tile size",
         description="Size of each tile in pixels"
     )
     tile_overlap: int = Field(
+        gt=0,
         title="Tile overlap",
         description="Overlap between adjacent tiles in pixels"
     )
@@ -104,6 +110,7 @@ class DatasetPreparationParameters(BaseModel):
 
 class EarlyStopping(BaseModel):
     patience: int = Field(
+        gt=0,
         title="Patience",
         description="Number of epochs with no improvement after which training will be stopped"
     )
@@ -121,6 +128,7 @@ class TrainingHyperParameters(BaseModel):
     learning_rate: float = Field(gt=0, lt=1, title="Learning rate", description="Base learning rate for the optimizer")
     max_detection_per_image: int | None = Field(
         default=None,
+        gt=0,
         title="Maximum number of detections per image",
         description="Maximum number of objects that can be detected in a single image, only applicable for instance segmentation models"
     )

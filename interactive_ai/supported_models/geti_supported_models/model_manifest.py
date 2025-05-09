@@ -107,7 +107,7 @@ class NullModelManifest(ModelManifest):
             ),
             training=TrainingHyperParameters(
                 max_epochs=1,
-                early_stopping=EarlyStopping(patience=0),
+                early_stopping=EarlyStopping(patience=1),
                 learning_rate=0.001,
             ),
             evaluation=EvaluationParameters(metric=None),
