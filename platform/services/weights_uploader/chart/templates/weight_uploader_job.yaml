@@ -34,7 +34,7 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
       containers:
       - name: weight-uploader
-        image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/weights-uploader:{{ .Values.global.tag | default .Chart.Version }}"
+        image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/weights_uploader:{{ .Values.global.tag | default .Chart.Version }}"
         command: ["/bin/sh", "-c"]
         args:
           - >-
