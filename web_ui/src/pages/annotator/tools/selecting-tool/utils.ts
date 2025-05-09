@@ -3,7 +3,7 @@
 
 import { PointerEvent, RefObject } from 'react';
 
-import { default as ClipperShape } from '@doodle3d/clipper-js';
+import { featureCollection, intersect } from '@turf/turf';
 import isEmpty from 'lodash/isEmpty';
 
 import { Annotation, RegionOfInterest } from '../../../../core/annotations/annotation.interface';
@@ -11,9 +11,8 @@ import { Point, Shape } from '../../../../core/annotations/shapes.interface';
 import { getTheTopShapeAt, isPolygon } from '../../../../core/annotations/utils';
 import { hasEqualSize } from '../../../../shared/utils';
 import { getRelativePoint } from '../../../utils';
-import { transformToClipperShape } from '../utils';
+import { shapeToTurfPolygon } from '../utils';
 
-// We set min to 3px because clipper-js does not work with properly with value less than 3px.
 export const MIN_BRUSH_SIZE = 3;
 
 export const getBrushMaxSize = (size: RegionOfInterest): number => Math.round(Math.max(size.width, size.height) * 0.15);
@@ -37,8 +36,9 @@ export const pointInShape = (annotations: Annotation[], point: Point, shiftKey: 
 };
 
 export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: Shape): string[] => {
-    const subject: ClipperShape = transformToClipperShape(shape);
-    let clip: ClipperShape | null = null;
+    const subject = shapeToTurfPolygon(shape);
+    let clip = null;
+
     return annotations.reduce<string[]>((prev, annotation: Annotation) => {
         const { shape: annotationShape, isHidden } = annotation;
 
@@ -46,11 +46,12 @@ export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: S
             return prev;
         }
 
-        clip = transformToClipperShape(annotationShape);
+        clip = shapeToTurfPolygon(annotationShape);
 
         if (clip) {
-            const result: ClipperShape = subject.intersect(clip);
-            if (!isEmpty(result.paths)) {
+            const result = intersect(featureCollection([subject, clip]));
+
+            if (!isEmpty(result)) {
                 return [...prev, annotation.id];
             }
         }

@@ -83,8 +83,8 @@ export const abs = (value: Vec2): Vec2 => {
     };
 };
 
-export const toClipperPoint = ({ x, y }: Vec2): { X: number; Y: number } => {
-    return { X: x, Y: y };
+export const toTurfPoint = ({ x, y }: Vec2): number[] => {
+    return [x, y];
 };
 
 export const getAngle = (direction: Vec2): number => {

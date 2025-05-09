@@ -92,7 +92,7 @@ describe('CircleTool', (): void => {
         expect(circle).toHaveAttribute('r', `${defaultCircleSize}`);
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
     });
 
     it('draws a circle of fixed size even when moving the mouse a little bit', async (): Promise<void> => {
@@ -105,7 +105,7 @@ describe('CircleTool', (): void => {
         fireEvent.pointerMove(svg, { buttons: 1, clientX: 10, clientY: 20 });
         fireEvent.pointerUp(svg, { buttons: 1, clientX: 10, clientY: 20 });
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
     });
 
     it('draws a circle of larger size', async (): Promise<void> => {
@@ -128,7 +128,7 @@ describe('CircleTool', (): void => {
 
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 40, y: 80, r: 30 }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 40, y: 80, r: 30 }]);
     });
 
     it('allows changing the default circle radius', async (): Promise<void> => {
@@ -141,8 +141,8 @@ describe('CircleTool', (): void => {
         fireEvent.pointerMove(svg, { clientX: 50, clientY: 20 });
         fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: 50, clientY: 20 });
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: 40 }]);
-        expect(annotationToolContext.updateToolSettings).toBeCalledWith(ToolType.CircleTool, { size: 40 });
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: 40 }]);
+        expect(annotationToolContext.updateToolSettings).toHaveBeenCalledWith(ToolType.CircleTool, { size: 40 });
     });
 
     it('uses the default circle radius size when stamping', async (): Promise<void> => {
@@ -190,7 +190,7 @@ describe('CircleTool', (): void => {
 
         // Completing the circle should have been cancelled
         fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: 50, clientY: 20 });
-        expect(onComplete).not.toBeCalled();
+        expect(onComplete).not.toHaveBeenCalled();
     });
 
     it('allows pressing esc to reset the tool after moving the cursor', async () => {
@@ -209,10 +209,10 @@ describe('CircleTool', (): void => {
 
         // Completing the circle should have been cancelled
         fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: 50, clientY: 20 });
-        expect(onComplete).not.toBeCalled();
+        expect(onComplete).not.toHaveBeenCalled();
     });
 
-    it('add circles partially drew inside the roi', async () => {
+    it('add circles partially drawn inside the roi', async () => {
         const onComplete = annotationToolContext.scene.addShapes;
         await renderApp(annotationToolContext);
 
@@ -220,17 +220,19 @@ describe('CircleTool', (): void => {
         fireEvent.pointerDown(svg, { button: 2, buttons: 2, clientX: -10, clientY: 0 });
         fireEvent.pointerMove(svg, { clientX: 10, clientY: 0 });
         fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: 10, clientY: 0 });
-        expect(onComplete).toBeCalled();
+        expect(onComplete).toHaveBeenCalled();
     });
 
-    it('does not add circles drew outside the roi', async () => {
+    it('does not add circles drawn outside the roi', async () => {
         const onComplete = annotationToolContext.scene.addShapes;
         await renderApp(annotationToolContext);
 
         const svg = screen.getByRole('editor');
-        fireEvent.pointerDown(svg, { button: 2, buttons: 2, clientX: -10, clientY: -10 });
-        fireEvent.pointerMove(svg, { clientX: -9, clientY: 0 });
-        fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: -9, clientY: 0 });
-        expect(onComplete).not.toBeCalled();
+
+        fireEvent.pointerDown(svg, { button: 2, buttons: 2, clientX: -50, clientY: -50 });
+        fireEvent.pointerMove(svg, { clientX: -30, clientY: -50 });
+        fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: -30, clientY: -50 });
+
+        expect(onComplete).not.toHaveBeenCalled();
     });
 });

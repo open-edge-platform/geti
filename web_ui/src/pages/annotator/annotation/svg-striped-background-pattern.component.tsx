@@ -3,8 +3,10 @@
 
 import { useMemo } from 'react';
 
+import { length } from '@turf/length';
+
 import { Annotation } from '../../../core/annotations/annotation.interface';
-import { transformToClipperShape } from '../tools/utils';
+import { shapeToTurfPolygon } from '../tools/utils';
 
 export const SvgStripedBackgroundPattern = ({
     annotation,
@@ -16,9 +18,8 @@ export const SvgStripedBackgroundPattern = ({
     color: string;
 }) => {
     const shapePerimeter = useMemo(() => {
-        const clipperShape = transformToClipperShape(annotation.shape);
-
-        return Math.abs(clipperShape.totalPerimeter());
+        const polygon = shapeToTurfPolygon(annotation.shape);
+        return Math.abs(length(polygon));
     }, [annotation.shape]);
 
     const width = shapePerimeter * 0.01;

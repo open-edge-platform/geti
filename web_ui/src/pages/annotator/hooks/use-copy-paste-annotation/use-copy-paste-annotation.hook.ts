@@ -3,7 +3,6 @@
 
 import { useEffect, useRef } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -172,13 +171,13 @@ export const useCopyPasteAnnotation = ({
                 };
             });
 
-            if (!isEmpty(newAnnotations)) {
+            if (newAnnotations.length > 0) {
                 scene.addAnnotations(newAnnotations);
             }
 
             if (intersectedAnnotations.length < translatedAnnotations.length) {
                 addNotification({
-                    message: `One ore more annotations were outside the region of the interest haven't been pasted.`,
+                    message: `One or more annotations outside the region of interest haven't been pasted.`,
                     type: NOTIFICATION_TYPE.INFO,
                 });
             }

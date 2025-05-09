@@ -4,6 +4,7 @@
 import '@wessberg/pointer-events';
 
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { area } from '@turf/turf';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { Polygon } from '../../../../../core/annotations/shapes.interface';
@@ -16,7 +17,7 @@ import { getMockedImage, getMockedROI } from '../../../../../test-utils/utils';
 import { ProjectProvider } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { TaskProvider } from '../../../providers/task-provider/task-provider.component';
-import { transformToClipperShape } from '../../utils';
+import { shapeToTurfPolygon } from '../../utils';
 import { BrushTool } from './brush-tool.component';
 
 const mockROI = getMockedROI();
@@ -122,9 +123,7 @@ describe('BrushTool', () => {
 
         const newPolygon = (spyUpdateAnnotation.mock.calls[0][0] as Annotation).shape;
 
-        expect(transformToClipperShape(newPolygon).totalArea()).toBeGreaterThan(
-            transformToClipperShape(testPolygon).totalArea()
-        );
+        expect(area(shapeToTurfPolygon(newPolygon))).toBeGreaterThan(area(shapeToTurfPolygon(testPolygon)));
     });
 
     it('shape decreases its size when the user clicks outside and touches the polygon', async () => {
@@ -153,8 +152,6 @@ describe('BrushTool', () => {
 
         const newPolygon = (spyUpdateAnnotation.mock.calls[0][0] as Annotation).shape;
 
-        expect(transformToClipperShape(testPolygon).totalArea()).toBeGreaterThan(
-            transformToClipperShape(newPolygon).totalArea()
-        );
+        expect(area(shapeToTurfPolygon(testPolygon))).toBeGreaterThan(area(shapeToTurfPolygon(newPolygon)));
     });
 });
