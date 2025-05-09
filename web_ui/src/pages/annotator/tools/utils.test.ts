@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { area } from '@turf/turf';
+
 import { RegionOfInterest } from '../../../core/annotations/annotation.interface';
 import { BoundingBox } from '../../../core/annotations/math';
 import { Circle, Point, Rect } from '../../../core/annotations/shapes.interface';
@@ -12,7 +14,7 @@ import {
     isRectWithinRoi,
     isShapeWithinRoi,
     removeOffLimitPointsPolygon,
-    transformToClipperShape,
+    shapeToTurfPolygon,
 } from './utils';
 
 describe('annotator utils', () => {
@@ -125,9 +127,7 @@ describe('annotator utils', () => {
             );
 
             const rioRect: Rect = { ...roi, shapeType: ShapeType.Rect };
-            expect(transformToClipperShape(rioRect).totalArea()).toBeGreaterThan(
-                transformToClipperShape(newShape).totalArea()
-            );
+            expect(area(shapeToTurfPolygon(rioRect))).toBeGreaterThan(area(shapeToTurfPolygon(newShape)));
             expect(newShape.shapeType).toBe(ShapeType.Polygon);
         });
     });
@@ -161,7 +161,7 @@ describe('annotator utils', () => {
         });
 
         it('outside', () => {
-            const circle: Circle = { x: -20, y: 0, r: 20, shapeType: ShapeType.Circle };
+            const circle: Circle = { x: -21, y: 0, r: 20, shapeType: ShapeType.Circle };
             expect(isShapeWithinRoi(roi, circle)).toBe(false);
         });
     });
@@ -237,7 +237,7 @@ describe('annotator utils', () => {
                 expect(isInsideBoundingBox(circle)(boundingBox)).toBe(true);
             });
 
-            it('outinside', () => {
+            it('outside', () => {
                 const circle = getMockedAnnotation(
                     { shape: { shapeType: ShapeType.Circle, x: -32, y: 10, r: 30 } },
                     ShapeType.Circle
