@@ -1,6 +1,6 @@
 ---
 name: auth-proxy
-version: 0.1.0
-appVersion: v0.0.1
+version: '{{VERSION}}'
+appVersion: '{{VERSION}}'
 apiVersion: v2
 description: A Helm chart for Kubernetes

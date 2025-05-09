@@ -1,6 +1,6 @@
 ---
 name: jobs-scheduler
-version: 0.0.10
+version: '{{VERSION}}'
 apiVersion: v2
 description: jobs-scheduler
-appVersion: v0.0.1
+appVersion: '{{VERSION}}'
