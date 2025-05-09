@@ -20,9 +20,9 @@ import { useOrganizationIdentifier } from '../../../../hooks/use-organization-id
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { ONE_MINUTE } from '../../../utils';
-import { FuxNotification } from '../../fux-notification/fux-notification.component';
 import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { CreditsToConsume } from './credits-to-consume.component';
+import { FuxNotification } from './fux-notification/fux-notification.component';
 import { isBalanceLow } from './util';
 
 import classes from './credit-balance.module.scss';

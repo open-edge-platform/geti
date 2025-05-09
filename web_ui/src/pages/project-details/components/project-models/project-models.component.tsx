@@ -26,7 +26,7 @@ export const ProjectModels = (): JSX.Element => {
     const { useProjectModelsQuery } = useModels();
     const { tasksWithSupportedAlgorithms } = useTasksWithSupportedAlgorithms();
     const isTraining = useIsTraining();
-    const { FEATURE_FLAG_TRAINING_FLOW_REVAMP } = useFeatureFlags();
+    const { FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS } = useFeatureFlags();
 
     const {
         project: { tasks },
@@ -45,7 +45,7 @@ export const ProjectModels = (): JSX.Element => {
                 breadcrumbs={[{ id: 'models-id', breadcrumb: 'Models' }]}
                 header={
                     <Flex alignItems={'center'} gap={'size-150'}>
-                        {!FEATURE_FLAG_TRAINING_FLOW_REVAMP && <ReconfigureModels />}
+                        {!FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS && <ReconfigureModels />}
                         {!isLoadingModels && <TrainModel models={formattedModelsGroups} />}
                     </Flex>
                 }

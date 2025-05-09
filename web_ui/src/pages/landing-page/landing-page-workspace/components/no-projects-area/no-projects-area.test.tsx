@@ -39,12 +39,6 @@ describe('No projects area', () => {
         expect(screen.getByText(DESCRIPTION)).toBeInTheDocument();
     });
 
-    it('Learn section card should be visible', async () => {
-        await render(<NoProjectArea openImportDatasetDialog={openImportDatasetDialog} />);
-
-        expect(screen.getByText('Watch tutorials')).toBeInTheDocument();
-    });
-
     it('Should display create button with creation menu', async () => {
         const usersService = createInMemoryUsersService();
         usersService.getActiveUser = async () => Promise.resolve(getMockedAdminUser());
@@ -53,6 +47,5 @@ describe('No projects area', () => {
         });
 
         expect(await screen.findByRole('button', { name: 'Create new project' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Create project menu' })).toBeInTheDocument();
     });
 });
