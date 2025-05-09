@@ -27,9 +27,11 @@ BASE_OTE_V2_IMAGE_TAG             ?= 12.8.1.1.30
 ###
 # component
 ###
-CHART_DIR                         := ./chart
+CHART_DIR_TEMPLATE                := ./chart
+CHART_YAML_TEMPLATE               := ${CHART_DIR_TEMPLATE}/Chart.yaml.template
+CHART_DIR                         := ${CHART_DIR_TEMPLATE}/.build
 CHART_YAML                        := ${CHART_DIR}/Chart.yaml
-COMPONENT_NAME                    := $(shell grep '^name:' ${CHART_YAML} | sed 's/^name: //')
+COMPONENT_NAME                    := $(shell grep '^name:' ${CHART_YAML_TEMPLATE} | sed 's/^name: //')
 ###
 # docker configuration
 ###
@@ -80,13 +82,24 @@ push-image:
 # helm charts
 ###
 lint-chart-default:
+	mkdir -p ${CHART_DIR}
+	cp ${CHART_YAML_TEMPLATE} ${CHART_YAML}
+	yq e '.version = "${TAG}"' -i ${CHART_YAML}
+	yq e '.appVersion = "${TAG}"' -i ${CHART_YAML}
 	@echo "Running chart linter for component: ${COMPONENT_NAME}"
 	helm lint --with-subcharts $(dir ${CHART_YAML})
 
 publish-chart:
+	mkdir -p ${CHART_DIR}
+	cp ${CHART_YAML_TEMPLATE} ${CHART_YAML}
+	yq e '.version = "${TAG}"' -i ${CHART_YAML}
+	yq e '.appVersion = "${TAG}"' -i ${CHART_YAML}
 	@echo "Publishing chart for component: ${COMPONENT_NAME}"
 	helm package $(dir ${CHART_YAML}) --version ${TAG}
 	helm push ${COMPONENT_NAME}-${TAG}.tgz oci://${CHARTS_REGISTRY}
+
+clean-chart:
+	rm -rf ${CHART_DIR}
 
 # To suppress warnings when overriding Makefile targets, declare the abstract targets as <name>-default
 %:  %-default

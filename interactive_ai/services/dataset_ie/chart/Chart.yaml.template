@@ -1,6 +1,6 @@
 ---
 name: dataset-ie
-version: 0.0.11
+version: '{{VERSION}}'
 apiVersion: v2
 description: dataset import and export
-appVersion: v0.0.1
+appVersion: '{{VERSION}}'
