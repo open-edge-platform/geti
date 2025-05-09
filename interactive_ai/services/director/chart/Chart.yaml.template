@@ -1,6 +1,6 @@
 ---
 name: director
-version: 0.0.8
+version: '{{VERSION}}'
 apiVersion: v2
 description: director
-appVersion: v0.0.1
+appVersion: '{{VERSION}}'
