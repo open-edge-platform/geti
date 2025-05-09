@@ -1,0 +1,14 @@
+{
+  "name": "@geti/test-config",
+  "version": "1.0.0",
+  "main": "jest.config.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "peerDependencies": {
+    "jest": "^29.7.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

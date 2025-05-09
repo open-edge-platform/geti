@@ -80,9 +80,7 @@
     "workbox-core": "^7.3.0",
     "yup": "^1.6.1",
     "zipson": "^0.2.12",
-    "@geti/ui": "*",
-    "@geti/typescript-config": "*",
-    "@geti/eslint-config": "*"
+    "@geti/ui": "*"
   },
   "scripts": {
     "build": "rsbuild build --environment geti --environment admin",
@@ -173,7 +171,10 @@
     "openapi-typescript-fetch": "^2.1.0",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@geti/typescript-config": "*",
+    "@geti/eslint-config": "*",
+    "@geti/test-config": "*"
   },
   "overrides": {
     "lz-string": "github:pieroxy/lz-string#573d8e6ab49cab839143953f0970930c57bc0782"
@@ -181,6 +182,7 @@
   "workspaces": [
     "packages/ui",
     "packages/eslint-config",
-    "packages/typescript-config"
+    "packages/typescript-config",
+    "packages/test-config"
   ]
 }
