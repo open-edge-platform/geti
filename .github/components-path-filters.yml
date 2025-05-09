@@ -65,7 +65,7 @@ platform/services/platform_cleaner:
 # IAI Services
 interactive_ai/services/auto_train:
   - interactive_ai/services/auto_train/**
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
