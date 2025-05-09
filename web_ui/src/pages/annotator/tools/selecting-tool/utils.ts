@@ -3,7 +3,7 @@
 
 import { PointerEvent, RefObject } from 'react';
 
-import { default as ClipperShape } from '@doodle3d/clipper-js';
+import ClipperShape from '@doodle3d/clipper-js';
 import { isEmpty } from 'lodash-es';
 
 import { Annotation, RegionOfInterest } from '../../../../core/annotations/annotation.interface';
