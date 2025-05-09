@@ -15,8 +15,8 @@ jest.mock('react-router-dom', () => ({
         organizationId: 'organization-123',
     }),
 }));
-jest.mock('../../../hooks/use-tasks-with-supported-algorithms', () => ({
-    ...jest.requireActual('../../../hooks/use-tasks-with-supported-algorithms'),
+jest.mock('../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms', () => ({
+    ...jest.requireActual('../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms'),
     useTasksWithSupportedAlgorithms: () => ({
         tasksWithSupportedAlgorithms: {
             '321': [

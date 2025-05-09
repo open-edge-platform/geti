@@ -92,7 +92,6 @@ export const toggleShowPredictions = async (page: Page, newChecked: boolean) => 
     }
 };
 
-// More details: https://github.com/microsoft/playwright/issues/13855#issuecomment-1144645091
 export const dragAndDrop = async (page: Page, subjectSelector: string, targetSelector: string) => {
     const subjectElement = await page.waitForSelector(subjectSelector);
     const targetElement = await page.waitForSelector(targetSelector);
@@ -100,29 +99,14 @@ export const dragAndDrop = async (page: Page, subjectSelector: string, targetSel
     const subjectElementBound = (await subjectElement.boundingBox()) as DOMRect;
     const targetElementBound = (await targetElement.boundingBox()) as DOMRect;
 
-    await page.mouse.move(
-        subjectElementBound.x,
-        subjectElementBound.y,
-        { steps: 10 } // this is the most important part!
-    );
+    const targetX = targetElementBound.x + targetElementBound.width / 2;
+    const targetY = targetElementBound.y + targetElementBound.height / 2;
 
-    await page.dispatchEvent(subjectSelector, 'mousedown', {
-        button: 0,
-        force: true,
-    });
+    await page.mouse.move(subjectElementBound.x, subjectElementBound.y);
+    await page.mouse.down();
 
-    // the x and y below is up to you to determine, in my case it was a checkers game so I needed to calculate a bit
-    // if you are using with lists, you might try and consider the numbers below..
-
-    const x = targetElementBound.x + targetElementBound.width / 2;
-    const y = targetElementBound.y + targetElementBound.height / 2;
-
-    // steps are needed here as well
-    await page.mouse.move(x, y, { steps: 10 });
-
-    await page.dispatchEvent(targetSelector, 'mouseup', {
-        button: 0,
-    });
+    await page.mouse.move(targetX, targetY, { steps: 10 });
+    await page.mouse.up();
 };
 
 export type RangesRowType = string | RegExp;

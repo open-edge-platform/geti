@@ -9,12 +9,12 @@ import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-
 import { TrainingBodyDTO } from '../../../../../../core/models/dtos/train-model.interface';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../../../core/projects/task.interface';
+import { useTasksWithSupportedAlgorithms } from '../../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { AnimationDirections } from '../../../../../../shared/animation-parameters/animation-parameters';
 import { ConfigurableParametersTaskChain } from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { updateSelectedParameter } from '../../../../../../shared/components/configurable-parameters/utils';
 import { isNotCropTask } from '../../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
-import { useTasksWithSupportedAlgorithms } from '../../../../hooks/use-tasks-with-supported-algorithms';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { ModelTemplatesSelection } from '../model-templates-selection/model-templates-selection.component';
 import { ModelConfigurationOption } from '../model-templates-selection/utils';

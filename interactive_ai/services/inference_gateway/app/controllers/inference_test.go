@@ -10,8 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	sdkentities "geti.com/go_sdk/entities"
-	httperrors "geti.com/go_sdk/errors"
+	sdkentities "geti.com/iai_core/entities"
+	httperrors "geti.com/iai_core/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 

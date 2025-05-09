@@ -14,8 +14,8 @@ import (
 	"inference_gateway/app/entities"
 	"inference_gateway/app/service"
 
-	sdkentities "geti.com/go_sdk/entities"
-	"geti.com/go_sdk/logger"
+	sdkentities "geti.com/iai_core/entities"
+	"geti.com/iai_core/logger"
 	"github.com/gin-gonic/gin"
 )
 

@@ -7,10 +7,10 @@ import (
 	"bytes"
 	"context"
 
-	sdkentities "geti.com/go_sdk/entities"
-	"geti.com/go_sdk/frames"
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/storage"
+	sdkentities "geti.com/iai_core/entities"
+	"geti.com/iai_core/frames"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/storage"
 )
 
 type MediaService interface {

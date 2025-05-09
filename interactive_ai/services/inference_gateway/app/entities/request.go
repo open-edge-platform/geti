@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	sdkentities "geti.com/go_sdk/entities"
-	httperrors "geti.com/go_sdk/errors"
+	sdkentities "geti.com/iai_core/entities"
+	httperrors "geti.com/iai_core/errors"
 )
 
 // InferenceRequest represents a minimal payload required for inference requests.

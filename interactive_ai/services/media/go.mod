@@ -4,10 +4,10 @@ go 1.23.3
 
 toolchain go1.23.8
 
-replace geti.com/go_sdk => ./../../libs/go_sdk
+replace geti.com/iai_core => ./../../libs/iai_core_go
 
 require (
-	geti.com/go_sdk v1.0.0
+	geti.com/iai_core v1.0.0
 	github.com/gin-contrib/pprof v1.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646

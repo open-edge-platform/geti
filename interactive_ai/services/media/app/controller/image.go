@@ -7,10 +7,10 @@ import (
 	"io"
 	"net/http"
 
-	sdkentities "geti.com/go_sdk/entities"
-	httperrors "geti.com/go_sdk/errors"
-	"geti.com/go_sdk/logger"
-	"geti.com/go_sdk/storage"
+	sdkentities "geti.com/iai_core/entities"
+	httperrors "geti.com/iai_core/errors"
+	"geti.com/iai_core/logger"
+	"geti.com/iai_core/storage"
 	"github.com/gin-gonic/gin"
 
 	"media/app/usecase"

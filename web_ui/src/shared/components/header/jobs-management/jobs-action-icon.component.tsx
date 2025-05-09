@@ -12,9 +12,9 @@ import { JobState } from '../../../../core/jobs/jobs.const';
 import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { JobsIconWithNumber } from '../../jobs-icon-with-number/jobs-icon-with-number.component';
 import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { JobsDialog } from './jobs-dialog.component';
+import { JobsIconWithNumber } from './jobs-icon-with-number/jobs-icon-with-number.component';
 
 interface JobsActionIconProps {
     isDarkMode?: boolean;

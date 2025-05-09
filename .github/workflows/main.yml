@@ -12,13 +12,17 @@ on:
       - main
 
 concurrency:
-    group: ${{ github.head_ref || github.ref_name }}
-    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions: {} # No permissions by default on workflow level
 
 jobs:
   get-vars:
     name: Get variables
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     timeout-minutes: 10
     outputs:
       image-tag: "${{ steps.image-tag.outputs.image-tag }}"
@@ -58,7 +62,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
         with:
           files_yaml_from_source_file: "./.github/components-path-filters.yml"
 
@@ -75,7 +79,7 @@ jobs:
 
       - name: Get changed libs
         id: changed-libs
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
         with:
           files_yaml_from_source_file: "./.github/libs-path-filters.yml"
 
@@ -102,6 +106,8 @@ jobs:
   lib_test_workflow:
     name: Lib test workflow
     needs: get-vars
+    permissions:
+      contents: read
     secrets: inherit
     uses: ./.github/workflows/libs_test.yml
     if: ${{ !contains(needs.get-vars.outputs.libs-list, '[]') }}
@@ -115,6 +121,9 @@ jobs:
   component-workflow:
     name: Component workflow
     needs: get-vars
+    permissions:
+      contents: read
+      id-token: write # is required by nested component-check
     secrets: inherit
     uses: ./.github/workflows/component.yml
     if: ${{ !contains(needs.get-vars.outputs.filtered-components-list, '[]') }}
@@ -131,6 +140,9 @@ jobs:
   web-ui-workflow:
     name: Web UI workflow
     needs: get-vars
+    permissions:
+      contents: read
+      id-token: write # is required by nested component-check
     secrets: inherit
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}

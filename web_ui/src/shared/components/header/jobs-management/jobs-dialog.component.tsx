@@ -11,13 +11,13 @@ import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { JobCount } from '../../../../core/jobs/jobs.interface';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { NumberBadge } from '../../number-badge/number-badge.component';
 import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { Tabs } from '../../tabs/tabs.component';
 import { TabItem } from '../../tabs/tabs.interface';
 import { Fullscreen } from './jobs-actions/fullscreen.component';
 import { JobsFiltering } from './jobs-actions/jobs-filtering.component';
 import { JobsList } from './jobs-list.component';
+import { NumberBadge } from './number-badge/number-badge.component';
 import { getAllJobs } from './utils';
 
 interface JobsDialogProps {

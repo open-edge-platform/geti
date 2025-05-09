@@ -24,3 +24,6 @@ test-integration:
 
 static-code-analysis:
 	@echo "Not applicable"
+
+builder:
+	@echo "Not applicable"

@@ -102,7 +102,7 @@ jest.mock('react-router-dom', () => ({
     }),
 }));
 
-jest.mock('../../hooks/use-tasks-with-supported-algorithms', () => ({
+jest.mock('../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms', () => ({
     useTasksWithSupportedAlgorithms: jest.fn(() => ({
         tasksWithSupportedAlgorithms: mockTasksWithSupportedAlgorithms,
     })),
