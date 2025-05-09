@@ -79,7 +79,10 @@
     "web-vitals": "^4.2.4",
     "workbox-core": "^7.3.0",
     "yup": "^1.6.1",
-    "zipson": "^0.2.12"
+    "zipson": "^0.2.12",
+    "@geti/ui": "*",
+    "@geti/typescript-config": "*",
+    "@geti/eslint-config": "*"
   },
   "scripts": {
     "build": "rsbuild build --environment geti --environment admin",
@@ -174,5 +177,10 @@
   },
   "overrides": {
     "lz-string": "github:pieroxy/lz-string#573d8e6ab49cab839143953f0970930c57bc0782"
-  }
+  },
+  "workspaces": [
+    "packages/ui",
+    "packages/eslint-config",
+    "packages/typescript-config"
+  ]
 }

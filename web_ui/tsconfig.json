@@ -1,25 +1,6 @@
 {
+  "extends": "@geti/typescript-config/tsconfig.base.json",
   "compilerOptions": {
-    "target": "esnext",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "types": ["jest"],
     "paths": {
       "opencv": ["./public/assets/opencv/4.9.0/opencv.js"]
     }
@@ -28,7 +9,7 @@
     "src",
     "tests",
     "rsbuild.config.ts",
-    "dev-proxy.ts",
+    "dev-proxy.ts"
   ],
   "exclude": [
     "./src/opencv-types/**"
