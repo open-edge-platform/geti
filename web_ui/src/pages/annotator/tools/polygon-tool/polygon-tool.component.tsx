@@ -25,7 +25,7 @@ import { useZoom } from '../../zoom/zoom-provider.component';
 import { PolygonDraw } from '../polygon-draw.component';
 import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { ToolAnnotationContextProps } from '../tools.interface';
-import { drawingStyles, isPolygonValid, removeOffLimitPointsPolygon } from '../utils';
+import { drawingStyles, isPolygonValid } from '../utils';
 import { usePolygonState } from './polygon-state-provider.component';
 import { PointerIcons, PointerIconsOffset, PolygonMode } from './polygon-tool.enum';
 import { isCloseMode, START_POINT_FIELD_DEFAULT_RADIUS, START_POINT_FIELD_FOCUS_RADIUS } from './utils';
@@ -172,7 +172,7 @@ export const PolygonTool = ({ annotationToolContext }: ToolAnnotationContextProp
 
                 const optimizedPolygon = await optimizePolygonOrSegments(polygon);
 
-                onComplete(removeOffLimitPointsPolygon(optimizedPolygon, roi));
+                onComplete(optimizedPolygon);
                 setIsOptimizingPolygons(false);
             }
 

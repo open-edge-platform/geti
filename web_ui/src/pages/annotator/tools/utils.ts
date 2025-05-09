@@ -3,9 +3,9 @@
 
 import { PointerEvent, SVGProps } from 'react';
 
-import { default as ClipperShape } from '@doodle3d/clipper-js';
+import { area, booleanIntersects, difference, featureCollection, polygon, union } from '@turf/turf';
+import { Feature, GeoJsonProperties, Polygon as GeoPolygon, MultiPolygon, Position } from 'geojson';
 import defer from 'lodash/defer';
-import isEmpty from 'lodash/isEmpty';
 
 import { Annotation, RegionOfInterest } from '../../../core/annotations/annotation.interface';
 import { BoundingBox, getBoundingBox, getCenterOfShape, rotatedRectCorners } from '../../../core/annotations/math';
@@ -18,10 +18,7 @@ import { isLeftButton, isWheelButton } from '../../buttons-utils';
 import { ToolLabel, ToolType } from '../core/annotation-tool-context.interface';
 import { PolygonMode } from './polygon-tool/polygon-tool.enum';
 
-export interface ClipperPoint {
-    X: number;
-    Y: number;
-}
+type TurfPolygon = Feature<GeoPolygon, GeoJsonProperties>;
 
 const POLYGON_VALID_AREA = 4;
 
@@ -92,105 +89,241 @@ export const blurActiveInput = (isFocused: boolean): void => {
     }
 };
 
-const calculateRectanglePoints = (shape: BoundingBox): ClipperPoint[] => {
+const calculateRectanglePoints = (shape: BoundingBox): Position[] => {
     const { x: X, y: Y, width, height } = shape;
-    const topLeftPoint = { X, Y };
-    const topRightPoint = { X: X + width, Y };
-    const bottomLeftPoint = { X, Y: Y + height };
-    const bottomRightPoint = { X: X + width, Y: Y + height };
+    const topLeftPoint = [X, Y];
+    const topRightPoint = [X + width, Y];
+    const bottomLeftPoint = [X, Y + height];
+    const bottomRightPoint = [X + width, Y + height];
 
     return [topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint];
 };
 
-const calculateRotatedRectanglePoints = (shape: RotatedRect): ClipperPoint[] => {
-    return rotatedRectCorners(shape).map(Vec2.toClipperPoint);
+const calculateRotatedRectanglePoints = (shape: RotatedRect): Position[] => {
+    return rotatedRectCorners(shape).map(Vec2.toTurfPoint);
 };
 
-const calculateCirclePoints = (shape: Circle): ClipperPoint[] => {
+const calculateCirclePoints = (shape: Circle): Position[] => {
     const stepAngle = 5;
     const endAngle = 360;
     const { x: centerX, y: centerY, r } = shape;
 
-    let points: ClipperPoint[] = [];
+    let points: Position[] = [];
 
     for (let i = 0; i <= endAngle; i += stepAngle) {
         const X = centerX + r * Math.cos((i * Math.PI) / 180);
         const Y = centerY + r * Math.sin((i * Math.PI) / 180);
 
-        points = [...points, { X, Y }];
+        points = [...points, [X, Y]];
     }
 
     return points;
 };
 
-const convertPolygonPoints = (shape: Polygon): ClipperPoint[] => {
-    return shape.points.map(({ x, y }: Point) => ({ X: x, Y: y }));
+const convertPolygonPoints = (shape: Polygon): Position[] => {
+    return shape.points.map(({ x, y }: Point) => [x, y]);
 };
 
-export const transformToClipperShape = (shape: Shape): ClipperShape => {
+export const shapeToTurfPolygon = (shape: Shape): TurfPolygon => {
     switch (true) {
-        case isRect(shape):
-            return new ClipperShape([calculateRectanglePoints(shape)], true);
-        case isRotatedRect(shape):
-            return new ClipperShape([calculateRotatedRectanglePoints(shape)], true);
-        case isCircle(shape):
-            return new ClipperShape([calculateCirclePoints(shape)], true);
-        case isPoseShape(shape):
-            return new ClipperShape([calculateRectanglePoints(getBoundingBox(shape))], true);
-        default:
-            return new ClipperShape([convertPolygonPoints(shape)], true);
+        case isRect(shape): {
+            const points = calculateRectanglePoints(shape);
+            // Ensure the polygon is closed by adding the first point at the end
+            return polygon([[...points, points[0]]]);
+        }
+        case isRotatedRect(shape): {
+            const points = calculateRotatedRectanglePoints(shape);
+            // Ensure the polygon is closed by adding the first point at the end
+            return polygon([[...points, points[0]]]);
+        }
+        case isCircle(shape): {
+            const points = calculateCirclePoints(shape);
+            // Ensure the polygon is closed by adding the first point at the end
+            return polygon([[...points, points[0]]]);
+        }
+        case isPoseShape(shape): {
+            const points = calculateRectanglePoints(getBoundingBox(shape));
+            // Ensure the polygon is closed by adding the first point at the end
+            return polygon([[...points, points[0]]]);
+        }
+        default: {
+            // Polygon
+            const points = convertPolygonPoints(shape);
+            // For polygons, ensure it's closed by comparing first and last points
+            const isAlreadyClosed =
+                points.length > 0 &&
+                points[0][0] === points[points.length - 1][0] &&
+                points[0][1] === points[points.length - 1][1];
+
+            // If not closed, add the first point to the end
+            return polygon([isAlreadyClosed ? points : [...points, points[0]]]);
+        }
     }
 };
 
-export const isPolygonValid = (polygon: Polygon | null): boolean => {
-    if (!polygon) return false;
+export const isPolygonValid = (pol: Polygon | null): boolean => {
+    if (!pol) return false;
 
-    const sPolygon = transformToClipperShape(polygon);
+    // Check if polygon has enough points first
+    if (pol.points.length < 3) {
+        return false;
+    }
 
-    return Math.abs(sPolygon.totalArea()) > POLYGON_VALID_AREA;
+    try {
+        const turfPolygon = shapeToTurfPolygon(pol);
+
+        return Math.abs(area(turfPolygon)) > POLYGON_VALID_AREA;
+    } catch (error) {
+        console.error('Error validating polygon:', error);
+        return false;
+    }
 };
+const turfToPolygon = (turfPolygon: TurfPolygon): Polygon => {
+    const coordinates = turfPolygon.geometry.coordinates[0];
+    // Remove the last point which is a duplicate of the first (to close the polygon)
+    const points = coordinates.slice(0, -1).map(([x, y]: number[]) => ({ x, y }));
 
-const clipperShapeToPolygon = (path: ClipperPoint[]): Polygon => ({
-    shapeType: ShapeType.Polygon,
-    points: path.map(({ X, Y }) => ({ x: X, y: Y })),
-});
-
-const filterIntersectedPathsWithRoi = (roi: RegionOfInterest, shape: ClipperShape): ClipperShape => {
-    const newPath = shape.clone();
-    const roiRect = transformToClipperShape({ ...roi, shapeType: ShapeType.Rect });
-
-    newPath.paths = newPath.paths.filter((subPath) => hasIntersection(roiRect, new ClipperShape([subPath])));
-
-    return newPath;
-};
-
-const findBiggerSubPath = (shape: ClipperShape): ClipperPoint[] => {
-    const areas = shape.areas();
-    const { index: shapeIndex } = areas.reduce(
-        (accum: { value: number; index: number }, value, index) => {
-            return value > accum.value ? { value, index } : accum;
-        },
-        { value: 0, index: 0 }
-    );
-
-    return shape.paths.length ? shape.paths[shapeIndex] : [];
-};
-
-const runUnionOrDifference =
-    <T>(algorithm: 'union' | 'difference', formatTo: (path: ClipperPoint[]) => T) =>
-    (roi: RegionOfInterest, subj: Shape, clip: Shape): T => {
-        const subjShape = transformToClipperShape(subj);
-        const clipShape = transformToClipperShape(clip);
-        const solutionPath = subjShape[algorithm](clipShape);
-        const filteredPath = filterIntersectedPathsWithRoi(roi, solutionPath);
-        const biggestPath = findBiggerSubPath(filteredPath);
-
-        return formatTo(biggestPath);
+    return {
+        shapeType: ShapeType.Polygon,
+        points,
     };
+};
 
-export const getShapesUnion = runUnionOrDifference<Polygon>('union', clipperShapeToPolygon);
+const findLargestPolygon = (multiPolygon: Feature<GeoPolygon | MultiPolygon>): Feature<GeoPolygon> => {
+    if (!multiPolygon || !multiPolygon.geometry) {
+        return polygon([[]]);
+    }
 
-export const getShapesDifference = runUnionOrDifference<Polygon>('difference', clipperShapeToPolygon);
+    // If it's a simple polygon, return it
+    if (multiPolygon.geometry.type === 'Polygon') {
+        return multiPolygon as Feature<GeoPolygon>;
+    }
+
+    // If it's a multipolygon, find the largest one
+    if (multiPolygon.geometry.type === 'MultiPolygon') {
+        let maxArea = 0;
+        let largestPoly = multiPolygon.geometry.coordinates[0];
+
+        multiPolygon.geometry.coordinates.forEach((polyCoords: Position[][]) => {
+            const poly = polygon(polyCoords);
+            const polyArea = area(poly);
+
+            if (polyArea > maxArea) {
+                maxArea = polyArea;
+                largestPoly = polyCoords;
+            }
+        });
+
+        return polygon(largestPoly);
+    }
+
+    return polygon([[]]);
+};
+
+const filterIntersectedPolygonsWithRoi = (
+    roi: RegionOfInterest,
+    turfPolygon: Feature<GeoPolygon | MultiPolygon>
+): Feature<GeoPolygon> => {
+    const roiPoly = shapeToTurfPolygon({ ...roi, shapeType: ShapeType.Rect });
+
+    // If this is a multipolygon, filter out parts that don't intersect with ROI
+    if (turfPolygon.geometry.type === 'MultiPolygon') {
+        const intersectingPolys = turfPolygon.geometry.coordinates
+            .filter((polyCoords: Position[][]) => {
+                const poly = polygon(polyCoords);
+                return booleanIntersects(poly, roiPoly);
+            })
+            .map((polyCoords: Position[][]) => polygon(polyCoords));
+
+        if (intersectingPolys.length === 0) {
+            return polygon([[]]);
+        }
+
+        if (intersectingPolys.length === 1) {
+            return intersectingPolys[0];
+        }
+
+        // Find the largest among intersecting polygons
+        return intersectingPolys.reduce((largest, current) => {
+            return area(current) > area(largest) ? current : largest;
+        }, intersectingPolys[0]);
+    }
+
+    return booleanIntersects(turfPolygon, roiPoly) ? (turfPolygon as Feature<GeoPolygon>) : polygon([[]]);
+};
+
+export const getShapesUnion = (roi: RegionOfInterest, subj: Shape, clip: Shape): Polygon => {
+    const subjPoly = shapeToTurfPolygon(subj);
+    const clipPoly = shapeToTurfPolygon(clip);
+
+    try {
+        const result = union(featureCollection([subjPoly, clipPoly]));
+        const filtered = result ? filterIntersectedPolygonsWithRoi(roi, result) : polygon([[]]);
+        const largest = findLargestPolygon(filtered);
+
+        return turfToPolygon(largest);
+    } catch (error) {
+        console.error('Error in getShapesUnion:', error);
+        return turfToPolygon(subjPoly); // Fallback to original shape
+    }
+};
+
+export const getShapesDifference = (roi: RegionOfInterest, subj: Shape, clip: Shape): Polygon => {
+    const subjPoly = shapeToTurfPolygon(subj);
+    const clipPoly = shapeToTurfPolygon(clip);
+
+    try {
+        const result = difference(featureCollection([subjPoly, clipPoly]));
+        const filtered = result ? filterIntersectedPolygonsWithRoi(roi, result) : polygon([[]]);
+        const largest = findLargestPolygon(filtered);
+
+        return turfToPolygon(largest);
+    } catch (error) {
+        console.error('Error in getShapesDifference:', error);
+        return turfToPolygon(subjPoly); // Fallback to original shape
+    }
+};
+
+export const isShapeWithinRoi = (roi: RegionOfInterest, shape: Shape): boolean => {
+    if (isRect(shape)) {
+        return isRectWithinRoi(roi, shape);
+    }
+
+    if (isCircle(shape)) {
+        const { r, x, y } = shape;
+        const isCirclePartiallyWithinRoi =
+            x + r >= roi.x && x - r <= roi.x + roi.width && y + r >= roi.y && y - r <= roi.y + roi.height;
+
+        return isCirclePartiallyWithinRoi;
+    }
+
+    const shapePoly = shapeToTurfPolygon(shape);
+    const roiPoly = shapeToTurfPolygon({ ...roi, shapeType: ShapeType.Rect });
+
+    return booleanIntersects(roiPoly, shapePoly);
+};
+
+export const isShapePartiallyWithinROI = (roi: RegionOfInterest, shape: Shape): boolean => {
+    if (isRect(shape)) {
+        const rect = shape as Rect;
+        // If any of these conditions is true, the rectangles don't intersect
+        if (
+            rect.x + rect.width <= roi.x || // Rectangle is completely to the left of ROI
+            rect.x >= roi.x + roi.width || // Rectangle is completely to the right of ROI
+            rect.y + rect.height <= roi.y || // Rectangle is completely above ROI
+            rect.y >= roi.y + roi.height
+        ) {
+            // Rectangle is completely below ROI
+            return false;
+        }
+        return true;
+    }
+
+    const shapePoly = shapeToTurfPolygon(shape);
+    const roiPoly = shapeToTurfPolygon({ ...roi, shapeType: ShapeType.Rect });
+
+    return booleanIntersects(roiPoly, shapePoly);
+};
 
 const removeOffPointsRect = (rect: Rect, roi: RegionOfInterest): Rect => {
     const { x, y, width, height } = roi;
@@ -275,12 +408,6 @@ export const removeOffLimitPoints = (shape: Shape, roi: RegionOfInterest): Shape
     return isRect(shape) ? removeOffPointsRect(shape, roi) : removeOffLimitPointsPolygon(shape, roi);
 };
 
-const hasIntersection = (clip: ClipperShape, subj: ClipperShape) => {
-    const { paths } = clip.intersect(subj);
-
-    return !isEmpty(paths);
-};
-
 export const isPointWithinRoi = (roi: RegionOfInterest, point: Point): boolean => {
     const isValidX = point.x >= roi.x && point.x <= roi.x + roi.width;
     const isValidY = point.y >= roi.y && point.y <= roi.y + roi.height;
@@ -294,33 +421,6 @@ export const isRectWithinRoi = (roi: RegionOfInterest, rect: Omit<Rect, 'shapeTy
     const isValidHeight = isPointWithinRoi(roi, { x: rect.x, y: rect.y + rect.height });
 
     return isValidPosition && isValidWidth && isValidHeight;
-};
-
-export const isShapePartiallyWithinROI = (roi: RegionOfInterest, shape: Shape): boolean => {
-    const clipperShape = transformToClipperShape(shape);
-    const roiShape = transformToClipperShape({ ...roi, shapeType: ShapeType.Rect });
-
-    return hasIntersection(roiShape, clipperShape);
-};
-
-export const isShapeWithinRoi = (roi: RegionOfInterest, shape: Shape): boolean => {
-    if (isRect(shape)) {
-        return isRectWithinRoi(roi, shape);
-    }
-
-    // hasIntersection returns false for circle with radius < 3
-    if (isCircle(shape) && shape.r < 3) {
-        const { r, x, y } = shape;
-        const isCirclePartiallyWithinRoi =
-            x + r >= roi.x || x + r <= roi.width || y + r >= roi.y || y + r <= roi.height;
-
-        return isCirclePartiallyWithinRoi;
-    }
-
-    const clipperShape = transformToClipperShape(shape);
-    const roiShape = transformToClipperShape({ ...roi, shapeType: ShapeType.Rect });
-
-    return hasIntersection(roiShape, clipperShape);
 };
 
 export const isInsideBoundingBox =

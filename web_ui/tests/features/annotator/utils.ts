@@ -2,11 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { expect, Locator, Page } from '@playwright/test';
+import { area } from '@turf/turf';
 
 import { SHAPE_TYPE_DTO, ShapeDTO } from '../../../src/core/annotations/dtos/annotation.interface';
 import { Point, Rect } from '../../../src/core/annotations/shapes.interface';
 import { ShapeType } from '../../../src/core/annotations/shapetype.enum';
-import { transformToClipperShape } from '../../../src/pages/annotator/tools/utils';
+import { shapeToTurfPolygon } from '../../../src/pages/annotator/tools/utils';
 import { clickAndMove, withRelative } from '../../utils/mouse';
 
 export const selectShape = async (page: Page, shape: ShapeDTO) => {
@@ -56,9 +57,9 @@ export const getPolylinePoints = async (polyline: Locator): Promise<Point[]> => 
 export const getPolylineArea = async (polyline: Locator): Promise<number> => {
     const polylinePoints = await getPolylinePoints(polyline);
 
-    const polylineClipperShape = transformToClipperShape({ points: polylinePoints, shapeType: ShapeType.Polygon });
+    const polylineShape = shapeToTurfPolygon({ points: polylinePoints, shapeType: ShapeType.Polygon });
 
-    return Math.abs(polylineClipperShape.totalArea());
+    return Math.abs(area(polylineShape));
 };
 
 export const getAnnotationsCount = async (page: Page) => {

@@ -199,7 +199,7 @@ describe('useCopyPasteAnnotation', () => {
             await waitFor(() => {
                 expect(mockedScene.addAnnotations).not.toHaveBeenCalled();
                 expect(mockedAddNotification).toHaveBeenCalledWith({
-                    message: "One ore more annotations were outside the region of the interest haven't been pasted.",
+                    message: "One or more annotations outside the region of interest haven't been pasted.",
                     type: NOTIFICATION_TYPE.INFO,
                 });
             });
