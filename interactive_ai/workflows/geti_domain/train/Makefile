@@ -7,6 +7,7 @@ DOCKER_BUILD_CONTEXT := --build-context common=../common \
 						--build-context sc_sdk=../../../../interactive_ai/libs/sc_sdk \
 						--build-context media_utils=../../../../interactive_ai/libs/media_utils \
 						--build-context grpc_interfaces=../../../../grpc_interfaces \
+						--build-context supported_models=../../../interactive_ai/supported_models \
 
 test-unit: venv
 	uv run pytest tests/unit --disable-warnings -v
