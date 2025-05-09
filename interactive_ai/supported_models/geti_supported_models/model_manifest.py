@@ -14,17 +14,6 @@ from .hyperparameters import (
 )
 
 
-class ModelStats(BaseModel):
-    """Information about a machine learning model."""
-
-    gigaflops: float = Field(
-        gt=0, title="Gigaflops", description="Billions of floating-point operations per second required by the model"
-    )
-    trainable_parameters: int = Field(
-        gt=0, title="Trainable parameters", description="Number of trainable parameters in the model"
-    )
-
-
 class GPUMaker(str, Enum):
     """GPU maker names."""
 
@@ -48,6 +37,32 @@ class ModelManifestDeprecationStatus(str, Enum):
         return str(self.name)
 
 
+class ModelStats(BaseModel):
+    """Information about a machine learning model."""
+
+    gigaflops: float = Field(
+        gt=0, title="Gigaflops", description="Billions of floating-point operations per second required by the model"
+    )
+    trainable_parameters: int = Field(
+        gt=0, title="Trainable parameters", description="Number of trainable parameters in the model"
+    )
+
+
+class Capabilities(BaseModel):
+    """Model capabilities configuration."""
+
+    xai: bool = Field(
+        default=False,
+        title="Explainable AI Support",
+        description="Whether the model supports explainable AI features"
+    )
+    tiling: bool = Field(
+        default=False,
+        title="Tiling Support",
+        description="Whether the model supports image tiling for processing large images"
+    )
+
+
 class ModelManifest(BaseModel):
     """ModelManifest contains the necessary information for training a specific machine learning model."""
 
@@ -64,6 +79,10 @@ class ModelManifest(BaseModel):
     )
     hyperparameters: Hyperparameters = Field(
         title="Hyperparameters", description="Configuration parameters for model training"
+    )
+    capabilities: Capabilities = Field(
+        title="Model Capabilities",
+        description="Special capabilities supported by the model"
     )
 
 
@@ -101,3 +120,4 @@ class NullModelManifest(ModelManifest):
             evaluation=EvaluationParameters(metric=None),
         )
     )
+    capabilities: Capabilities = Field(default=Capabilities(xai=False, tiling=False))

@@ -22,7 +22,7 @@ from geti_supported_models.model_manifest import (
     ModelManifest,
     ModelStats,
     NullModelManifest,
-    ModelManifestDeprecationStatus,
+    ModelManifestDeprecationStatus, Capabilities,
 )
 from geti_supported_models.parser import parse_manifest
 from geti_supported_models import manifests
@@ -74,6 +74,7 @@ def fxt_dummy_model_manifest(
         support_status=ModelManifestDeprecationStatus.OBSOLETE,
         supported_gpus=fxt_dummy_supported_gpu,
         hyperparameters=fxt_dummy_hyperparameters,
+        capabilities=Capabilities(xai=True, tiling=False),
     )
 
 
@@ -125,6 +126,10 @@ class TestModelManifest:
                 "evaluation": {
                     "metric": None
                 }
+            },
+            "capabilities": {
+                "xai": True,
+                "tiling": False,
             }
         }
 
