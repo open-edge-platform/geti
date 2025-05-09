@@ -19,13 +19,11 @@ dependencies = [
     "urllib3>=1.26",
     "geti-types",
     "geti-feature-tools",
-    "geti-supported-models",
 ]
 
 [tool.uv.sources]
 geti-types = { path = "../../../libs/types", editable = true }
 geti-feature-tools = { path = "../../../libs/feature_tools", editable = true }
-geti-supported-models = { path = "../../supported_models", editable = true }
 
 [dependency-groups]
 dev = [

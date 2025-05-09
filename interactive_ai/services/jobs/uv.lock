@@ -1042,32 +1042,6 @@ dev = [
 ]
 
 [[package]]
-name = "geti-supported-models"
-version = "1.0.0"
-source = { editable = "../../supported_models" }
-dependencies = [
-    { name = "hiyapyco" },
-    { name = "pydantic" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "hiyapyco", specifier = "==0.7.0" },
-    { name = "pydantic", specifier = "==2.5.3" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = "~=1.15" },
-    { name = "pre-commit", specifier = "~=4.1" },
-    { name = "pytest", specifier = "~=8.3" },
-    { name = "ruff", specifier = "~=0.11" },
-    { name = "testfixtures", specifier = "~=7.2" },
-    { name = "types-cachetools" },
-    { name = "types-pyyaml" },
-]
-
-[[package]]
 name = "geti-telemetry-tools"
 version = "1.0.3"
 source = { editable = "../../../libs/telemetry_tools" }
@@ -1393,20 +1367,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f5/38/3af3d3633a34a3316095b39c8e8fb4853a28a536e55d347bd8d8e9a14b03/h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d", size = 100418 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/95/04/ff642e65ad6b90db43e668d70ffb6736436c7ce41fcc549f4e9472234127/h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761", size = 58259 },
-]
-
-[[package]]
-name = "hiyapyco"
-version = "0.7.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "jinja2" },
-    { name = "markupsafe" },
-    { name = "pyyaml" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/4c/48999f3383f99a4bb49723983147b2b4ef62f29fdeca81ec87cb0cc70d8c/HiYaPyCo-0.7.0.tar.gz", hash = "sha256:83387c217e109956af61a23884cf8cc9ba5f19241b3ac68141e3ad1153fc4597", size = 33358 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/3d/3f847839e28e354873c81ebc3d3322d6e73d0d386971e84c178b45e82ff4/HiYaPyCo-0.7.0-py2.py3-none-any.whl", hash = "sha256:d56ae0f746506955c6b0072f7338f1cd50661bfd07c7ee9b49175a085fcbaf41", size = 24720 },
 ]
 
 [[package]]
@@ -3024,7 +2984,6 @@ dependencies = [
     { name = "attrs" },
     { name = "cachetools" },
     { name = "geti-feature-tools" },
-    { name = "geti-supported-models" },
     { name = "geti-types" },
     { name = "minio" },
     { name = "networkx" },
@@ -3043,7 +3002,6 @@ requires-dist = [
     { name = "attrs", specifier = "~=24.3" },
     { name = "cachetools", specifier = "~=5.5" },
     { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
-    { name = "geti-supported-models", editable = "../../supported_models" },
     { name = "geti-types", editable = "../../../libs/types" },
     { name = "minio", specifier = "~=7.1.0" },
     { name = "networkx", specifier = ">=2.6,<=2.8" },
