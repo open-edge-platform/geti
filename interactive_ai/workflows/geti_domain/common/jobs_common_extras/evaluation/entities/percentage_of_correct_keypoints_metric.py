@@ -233,7 +233,9 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             a keypoint: [x1: float, y1: float, label: str, is_visible: bool]
         :return: list of correct keypoints
         """
-
+        logger.error(
+            msg=f"gt_keypoint: {gt_keypoints}, pred_keypoint: {pred_keypoints}"
+        )
         if not gt_keypoints or not pred_keypoints:
             return []
 
