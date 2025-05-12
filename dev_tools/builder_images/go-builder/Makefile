@@ -3,5 +3,4 @@
 
 include ../Makefile.shared-builders
 
-BUILDER_IMAGE_NAME = go-builder
-BUILDER_TAG = v1.0.0
+.PHONY: build-image

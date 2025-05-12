@@ -1,13 +1,52 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
-include $(CWD)/../../Makefile.shared
+.PHONY: build-image-default
+
+###
+# builder image
+###
+BUILDER_IMAGE_NAME          ?= $(notdir $(CURDIR))
+BUILDER_TAG                 ?= latest
+
+###
+# docker configuration
+###
+BUILDER_PROXY               := --build-arg HTTP_PROXY=$(http_proxy) \
+							 --build-arg HTTPS_PROXY=$(https_proxy) \
+							 --build-arg NO_PROXY=$(no_proxy) \
+							 --build-arg http_proxy=$(http_proxy) \
+							 --build-arg https_proxy=$(https_proxy) \
+							 --build-arg no_proxy=$(no_proxy)
+
+###
+# Unset USE_PROXY variable if there is no proxy
+###
+USE_PROXY                   ?= true
+ifdef USE_PROXY
+BUILDER_DOCKER_EXTRA_ARGS   ?= ${BUILDER_PROXY}
+else
+BUILDER_DOCKER_EXTRA_ARGS   ?=
+endif
+
+###
+# docker images
+###
+build-image-default:
+	@echo "Building docker image for component: ${BUILDER_IMAGE_NAME}"
+	@docker build \
+		${BUILDER_DOCKER_EXTRA_ARGS} \
+		-t ${BUILDER_IMAGE_NAME}:${BUILDER_TAG} \
+		-f ./Dockerfile .
+
+# To suppress warnings when overriding Makefile targets, declare the abstract targets as <name>-default
+%:  %-default
+	@  true
 
 build-image:
 	@echo "Building docker image for: ${BUILDER_IMAGE_NAME}"
-	@echo ${DOCKER_EXTRA_ARGS}
+	@echo ${BUILDER_DOCKER_EXTRA_ARGS}
 	@docker build \
-		${DOCKER_EXTRA_ARGS} \
+		${BUILDER_DOCKER_EXTRA_ARGS} \
 		-t ${BUILDER_IMAGE_NAME}:${BUILDER_TAG} \
 		-f ./Dockerfile .

@@ -30,31 +30,35 @@ BASE_OTE_V2_IMAGE_TAG             ?= 12.8.1.1.30
 CHART_DIR                         := ./chart
 CHART_YAML                        := ${CHART_DIR}/Chart.yaml
 COMPONENT_NAME                    := $(shell grep '^name:' ${CHART_YAML} | sed 's/^name: //')
+###
+# docker configuration
+###
 
-###
-# docker extra arguments
-###
+PROXY                             := --build-arg HTTP_PROXY=$(http_proxy) \
+									 --build-arg HTTPS_PROXY=$(https_proxy) \
+									 --build-arg NO_PROXY=$(no_proxy) \
+									 --build-arg http_proxy=$(http_proxy) \
+									 --build-arg https_proxy=$(https_proxy) \
+									 --build-arg no_proxy=$(no_proxy)
+
+DOCKER_REGISTRY					  := $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY),)
+
 DOCKER_BUILD_CONTEXT              ?=
 
-DOCKER_EXTRA_ARGS                 := \
-    $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY)) \
-    $(if $(http_proxy),--build-arg HTTP_PROXY=$(http_proxy)) \
-    $(if $(https_proxy),--build-arg HTTPS_PROXY=$(https_proxy)) \
-    $(if $(no_proxy),--build-arg HTTPS_PROXY=$(NO_PROXY)) \
-    $(if $(HTTP_PROXY),--build-arg HTTP_PROXY=$(HTTP_PROXY)) \
-    $(if $(HTTPS_PROXY),--build-arg HTTPS_PROXY=$(HTTPS_PROXY)) \
-    $(if $(NO_PROXY),--build-arg HTTPS_PROXY=$(NO_PROXY))
+###
+# Unset USE_PROXY variable if there is no proxy
+###
+USE_PROXY                         ?= true
+ifdef USE_PROXY
+DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
+DOCKER_PROXY                      := -e http_proxy=$(http_proxy) \
+									 -e https_proxy=$(https_proxy) \
+									 -e no_proxy=$(no_proxy)
+else
+DOCKER_EXTRA_ARGS	              ?=
+DOCKER_PROXY                      ?=
+endif
 
-###
-# docker builder extra arguments
-###
-DOCKER_PROXY                      := \
-    $(if $(http_proxy),-e http_proxy=$(http_proxy)) \
-    $(if $(https_proxy),-e http_proxy=$(https_proxy)) \
-    $(if $(no_proxy),-e http_proxy=$(no_proxy)) \
-    $(if $(HTTP_PROXY),-e http_proxy=$(HTTP_PROXY)) \
-    $(if $(HTTPS_PROXY),-e http_proxy=$(HTTPS_PROXY)) \
-    $(if $(NO_PROXY),-e http_proxy=$(NO_PROXY))
 
 ###
 # docker images
