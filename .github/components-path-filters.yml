@@ -285,7 +285,7 @@ interactive_ai/tests/e2e:
   - .github/workflows/component.yml
 
 # gRPC interfaces
-grpc_interfaces:
+libs/grpc_interfaces:
   - libs/grpc_interfaces/**
   - libs/types/**
 
