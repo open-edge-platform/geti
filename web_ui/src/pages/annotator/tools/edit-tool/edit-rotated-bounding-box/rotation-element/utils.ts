@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { RegionOfInterest } from '../../../../../../core/annotations/annotation.interface';
-import { isPointWithinRoi } from '../../../utils';
+import { isPointWithinRoi } from '../../../geometry-utils';
 import { SideAnchorLocationsProps } from '../location';
 
 export enum Direction {

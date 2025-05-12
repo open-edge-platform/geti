@@ -7,8 +7,9 @@ import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';
 import { useZoom } from '../../zoom/zoom-provider.component';
+import { isCenterOfShapeWithinROI } from '../geometry-utils';
 import { ToolAnnotationContextProps } from '../tools.interface';
-import { drawingStyles, isShapeWithinRoi } from '../utils';
+import { drawingStyles } from '../utils';
 import { useCircleState } from './circle-state-provider.component';
 import { DrawingCircle } from './drawing-circle.component';
 
@@ -28,7 +29,7 @@ export const CircleTool = ({ annotationToolContext }: ToolAnnotationContextProps
     };
 
     const onComplete = (circle: Circle) => {
-        isShapeWithinRoi(roi, circle) && scene.addShapes([circle]);
+        isCenterOfShapeWithinROI(roi, circle) && scene.addShapes([circle]);
     };
 
     return (

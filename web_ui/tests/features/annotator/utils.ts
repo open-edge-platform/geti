@@ -2,12 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { expect, Locator, Page } from '@playwright/test';
-import { area } from '@turf/turf';
 
 import { SHAPE_TYPE_DTO, ShapeDTO } from '../../../src/core/annotations/dtos/annotation.interface';
 import { Point, Rect } from '../../../src/core/annotations/shapes.interface';
 import { ShapeType } from '../../../src/core/annotations/shapetype.enum';
-import { shapeToTurfPolygon } from '../../../src/pages/annotator/tools/utils';
+import { calculatePolygonArea, shapeToTurfPolygon } from '../../../src/pages/annotator/tools/geometry-utils';
 import { clickAndMove, withRelative } from '../../utils/mouse';
 
 export const selectShape = async (page: Page, shape: ShapeDTO) => {
@@ -59,7 +58,7 @@ export const getPolylineArea = async (polyline: Locator): Promise<number> => {
 
     const polylineShape = shapeToTurfPolygon({ points: polylinePoints, shapeType: ShapeType.Polygon });
 
-    return Math.abs(area(polylineShape));
+    return Math.abs(calculatePolygonArea(polylineShape));
 };
 
 export const getAnnotationsCount = async (page: Page) => {

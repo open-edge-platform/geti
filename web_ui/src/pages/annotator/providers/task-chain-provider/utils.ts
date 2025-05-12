@@ -22,7 +22,7 @@ import {
 } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
 import { hasEqualId } from '../../../../shared/utils';
-import { isInsideBoundingBox } from '../../tools/utils';
+import { isInsideBoundingBox } from '../../tools/geometry-utils';
 import { hasValidLabels } from '../../utils';
 import { TaskChainContextProps } from './task-chain.interface';
 

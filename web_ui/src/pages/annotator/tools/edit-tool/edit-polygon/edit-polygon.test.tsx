@@ -18,7 +18,7 @@ import { ProjectProvider } from '../../../../project-details/providers/project-p
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { AnnotatorContextMenuProvider } from '../../../providers/annotator-context-menu-provider/annotator-context-menu-provider.component';
 import { TaskProvider } from '../../../providers/task-provider/task-provider.component';
-import { removeOffLimitPointsPolygon } from '../../utils';
+import { removeOffLimitPointsPolygon } from '../../geometry-utils';
 import { EditPolygon as EditPolygonTool } from './edit-polygon.component';
 
 const mockROI = getMockedROI({ x: 0, y: 0, width: 1000, height: 1000 });
@@ -35,8 +35,8 @@ jest.mock('../../../providers/region-of-interest-provider/region-of-interest-pro
     })),
 }));
 
-jest.mock('../../utils', () => ({
-    ...jest.requireActual('../../utils'),
+jest.mock('../../geometry-utils', () => ({
+    ...jest.requireActual('../../geometry-utils'),
     removeOffLimitPointsPolygon: jest.fn((shape) => shape),
 }));
 
@@ -137,7 +137,7 @@ describe('EditPolygonTool', () => {
         };
 
         expect(removeOffLimitPointsPolygon).toHaveBeenCalledWith(finalShape, mockROI);
-        expect(onComplete).toBeCalledWith({
+        expect(onComplete).toHaveBeenCalledWith({
             ...annotation,
             shape: finalShape,
         });
@@ -166,7 +166,7 @@ describe('EditPolygonTool', () => {
             ],
         };
         expect(removeOffLimitPointsPolygon).toHaveBeenCalledWith(finalShape, mockROI);
-        expect(onComplete).toBeCalledWith({
+        expect(onComplete).toHaveBeenCalledWith({
             ...annotation,
             shape: finalShape,
         });
@@ -205,7 +205,7 @@ describe('EditPolygonTool', () => {
                 points: [mockShape.points[0], expectedProjectedPoint, mockShape.points[1], mockShape.points[2]],
             };
             expect(removeOffLimitPointsPolygon).not.toHaveBeenCalled();
-            expect(onComplete).toBeCalledWith({
+            expect(onComplete).toHaveBeenCalledWith({
                 ...mockAnnotation,
                 shape: finalShape,
             });
@@ -241,7 +241,7 @@ describe('EditPolygonTool', () => {
                 ],
             };
             expect(removeOffLimitPointsPolygon).toHaveBeenCalled();
-            expect(onComplete).toBeCalledWith({
+            expect(onComplete).toHaveBeenCalledWith({
                 ...mockAnnotation,
                 shape: finalShape,
             });
@@ -278,7 +278,7 @@ describe('EditPolygonTool', () => {
                 points: [mockShape.points[1], mockShape.points[2], mockShape.points[3], mockShape.points[4]],
             };
             expect(removeOffLimitPointsPolygon).toHaveBeenCalledWith(finalShape, mockROI);
-            expect(onComplete).toBeCalledWith({
+            expect(onComplete).toHaveBeenCalledWith({
                 ...mockAnnotation,
                 shape: finalShape,
             });
@@ -316,7 +316,7 @@ describe('EditPolygonTool', () => {
                 points: [mockShape.points[1], mockShape.points[3], mockShape.points[4]],
             };
             expect(removeOffLimitPointsPolygon).toHaveBeenCalledWith(finalShape, mockROI);
-            expect(onComplete).toBeCalledWith({
+            expect(onComplete).toHaveBeenCalledWith({
                 ...mockAnnotation,
                 shape: finalShape,
             });
@@ -355,7 +355,7 @@ describe('EditPolygonTool', () => {
                 points: [mockShape.points[0], mockShape.points[1], mockShape.points[3], mockShape.points[4]],
             };
             expect(removeOffLimitPointsPolygon).toHaveBeenCalledWith(finalShape, mockROI);
-            expect(onComplete).toBeCalledWith({
+            expect(onComplete).toHaveBeenCalledWith({
                 ...mockAnnotation,
                 shape: finalShape,
             });

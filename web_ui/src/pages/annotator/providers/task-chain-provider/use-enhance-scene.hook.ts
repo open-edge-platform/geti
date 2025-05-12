@@ -25,7 +25,7 @@ import { Task } from '../../../../core/projects/task.interface';
 import { getIds, hasEqualId, isNonEmptyArray } from '../../../../shared/utils';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { useImageROI } from '../../hooks/use-image-roi.hook';
-import { isPointWithinRoi } from '../../tools/utils';
+import { isPointWithinRoi } from '../../tools/geometry-utils';
 import {
     containsGlobalAnnotationWithLabel,
     getAnnotationsWithSelectedInput,

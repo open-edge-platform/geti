@@ -22,6 +22,7 @@ import { useAnnotator } from '../../providers/annotator-provider/annotator-provi
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { TaskProvider } from '../../providers/task-provider/task-provider.component';
+import { removeOffLimitPointsPolygon } from '../geometry-utils';
 import { PolygonStateProvider, usePolygonState } from './polygon-state-provider.component';
 import { PolygonTool } from './polygon-tool.component';
 import { PolygonMode } from './polygon-tool.enum';
@@ -177,7 +178,7 @@ describe('PolygonTool', () => {
         const { shape, editor } = await drawShape();
         fireEvent.pointerUp(editor, { buttons: 1, clientX: 50, clientY: 50 });
 
-        await waitFor(() => expect(onComplete).toHaveBeenCalledWith([shape]));
+        await waitFor(() => expect(onComplete).toHaveBeenCalledWith([removeOffLimitPointsPolygon(shape, mockROI)]));
         expect(mockOptimizeSegments).toHaveBeenCalledWith(shape.points.map((point) => [point]));
     });
 
@@ -219,7 +220,7 @@ describe('PolygonTool', () => {
         fireEvent.click(screen.getByText('change mode to MagneticLasso'));
         fireEvent.pointerUp(editor, { buttons: 1, clientX: 50, clientY: 50 });
 
-        await waitFor(() => expect(onComplete).toHaveBeenCalledWith([shape]));
+        await waitFor(() => expect(onComplete).toHaveBeenCalledWith([removeOffLimitPointsPolygon(shape, mockROI)]));
         expect(mockOptimizePolygon).toHaveBeenCalledWith(shape);
     });
 

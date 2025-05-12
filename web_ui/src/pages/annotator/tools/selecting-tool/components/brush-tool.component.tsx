@@ -16,15 +16,10 @@ import { getOutputFromTask } from '../../../providers/task-chain-provider/utils'
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { useZoom } from '../../../zoom/zoom-provider.component';
 import { pointsToCircle } from '../../circle-tool/utils';
+import { getShapesDifference, getShapesUnion, isPolygonValid, removeOffLimitPointsPolygon } from '../../geometry-utils';
 import { PolygonDraw } from '../../polygon-draw.component';
 import { SvgToolCanvas } from '../../svg-tool-canvas.component';
-import {
-    drawingStyles,
-    getShapesDifference,
-    getShapesUnion,
-    isPolygonValid,
-    removeOffLimitPointsPolygon,
-} from '../../utils';
+import { drawingStyles } from '../../utils';
 import { BrushToolProps, GhostPolygon } from '../selecting.interface';
 import { calcRelativePoint, getSelectedPolygonAnnotations } from '../utils';
 import { BrushCircleTool } from './brush-circle-tool.component';

@@ -12,13 +12,13 @@ import OpenCVTypes from 'OpenCVTypes';
 import { RegionOfInterest } from '../core/annotations/annotation.interface';
 import { Point, Shape } from '../core/annotations/shapes.interface';
 import { ShapeType } from '../core/annotations/shapetype.enum';
+import { isPolygonValid } from '../pages/annotator/tools/geometry-utils';
 import {
     RITMContour,
     RITMMethods,
     RITMPoint,
     TEMPLATE_SIZE,
 } from '../pages/annotator/tools/ritm-tool/ritm-tool.interface';
-import { isPolygonValid } from '../pages/annotator/tools/utils';
 import { sessionParams } from '../pages/annotator/tools/wasm-utils';
 import cv from './opencv-loader';
 import { approximateShape, concatFloat32Arrays, loadSource, stackPlanes } from './utils';

@@ -15,11 +15,11 @@ import { ToolType } from '../../core/annotation-tool-context.interface';
 import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
+import { removeOffLimitPointsPolygon } from '../geometry-utils';
 import { Marker } from '../marker-tool/marker-tool.interface';
 import { StateProviderProps } from '../tools.interface';
 import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';
 import useUndoRedoState, { SetStateWrapper } from '../undo-redo/use-undo-redo-state';
-import { removeOffLimitPointsPolygon } from '../utils';
 import { RunWatershedProps, WatershedMethods, WatershedPolygon } from './watershed-tool.interface';
 
 interface WatershedState {

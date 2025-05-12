@@ -11,10 +11,10 @@ import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useGrabcut } from '../../hooks/use-grabcut.hook';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
+import { isPolygonValid } from '../geometry-utils';
 import { StateProviderProps } from '../tools.interface';
 import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';
 import useUndoRedoState, { SetStateWrapper } from '../undo-redo/use-undo-redo-state';
-import { isPolygonValid } from '../utils';
 import { GrabcutToolType } from './grabcut-tool.enums';
 
 export interface GrabcutStateContextProps {

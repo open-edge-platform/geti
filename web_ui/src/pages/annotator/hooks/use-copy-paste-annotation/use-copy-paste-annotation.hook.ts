@@ -24,7 +24,8 @@ import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { HOTKEY_OPTIONS } from '../../hot-keys/utils';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';
-import { isShapePartiallyWithinROI, removeOffLimitPoints, translateAnnotation } from '../../tools/utils';
+import { isShapePartiallyWithinROI, isShapeWithinRoi, removeOffLimitPoints } from '../../tools/geometry-utils';
+import { translateAnnotation } from '../../tools/utils';
 import { createAnnotation } from '../../utils';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { useAnnotatorHotkeys } from '../use-hotkeys-configuration.hook';
@@ -151,8 +152,8 @@ export const useCopyPasteAnnotation = ({
                 return translateAnnotation(annotation, translateVector);
             });
 
-            const annotationsInsideROI = translatedAnnotations.filter(({ shape }) =>
-                isShapePartiallyWithinROI(roi, shape)
+            const annotationsInsideROI = translatedAnnotations.filter(
+                ({ shape }) => isShapePartiallyWithinROI(roi, shape) || isShapeWithinRoi(roi, shape)
             );
 
             const intersectedAnnotations = annotationsInsideROI.map((annotation) => ({

@@ -7,7 +7,7 @@ import { getBoundingBox } from '../../../../core/annotations/math';
 import { Rect, Shape } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { isShapeWithinRoi } from '../utils';
+import { isShapeWithinRoi } from '../geometry-utils';
 import { SSIMMatch } from './ssim-tool.interface';
 
 export const MAX_NUMBER_ITEMS = 500;

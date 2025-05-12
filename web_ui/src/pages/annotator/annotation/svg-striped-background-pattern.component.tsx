@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { length } from '@turf/length';
 
 import { Annotation } from '../../../core/annotations/annotation.interface';
-import { shapeToTurfPolygon } from '../tools/utils';
+import { shapeToTurfPolygon } from '../tools/geometry-utils';
 
 export const SvgStripedBackgroundPattern = ({
     annotation,
@@ -19,6 +19,7 @@ export const SvgStripedBackgroundPattern = ({
 }) => {
     const shapePerimeter = useMemo(() => {
         const polygon = shapeToTurfPolygon(annotation.shape);
+
         return Math.abs(length(polygon));
     }, [annotation.shape]);
 

@@ -12,7 +12,7 @@ import { AnnotationToolContext } from '../../../core/annotation-tool-context.int
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useZoom } from '../../../zoom/zoom-provider.component';
 import { getMaxCircleRadius, MIN_RADIUS } from '../../circle-tool/utils';
-import { isShapeWithinRoi } from '../../utils';
+import { isShapeWithinRoi } from '../../geometry-utils';
 import { ANCHOR_SIZE, ResizeAnchor } from '../resize-anchor.component';
 import { ResizeAnchorType } from '../resize-anchor.enum';
 import { TranslateShape } from '../translate-shape.component';

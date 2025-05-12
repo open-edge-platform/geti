@@ -82,7 +82,7 @@ describe('EditCircleTool', () => {
         const rect = screen.getByLabelText('Drag to move shape');
         moveShape(rect, startPoint, endPoint);
 
-        expect(updateAnnotation).toBeCalledWith({
+        expect(updateAnnotation).toHaveBeenCalledWith({
             ...annotation,
             shape: {
                 ...shape,
@@ -126,7 +126,7 @@ describe('EditCircleTool', () => {
         expect(radiusLine).toHaveAttribute('x2', anchorPoint.x);
         expect(radiusLine).toHaveAttribute('y2', anchorPoint.y);
 
-        expect(updateAnnotation).toBeCalledWith({
+        expect(updateAnnotation).toHaveBeenCalledWith({
             ...annotation,
             shape: { ...shape, r: expectedRadius },
         });
@@ -142,7 +142,7 @@ describe('EditCircleTool', () => {
         const anchor = screen.getByLabelText('Resize circle anchor');
         moveShape(anchor, startPoint, endPoint);
 
-        expect(updateAnnotation).toBeCalledWith({
+        expect(updateAnnotation).toHaveBeenCalledWith({
             ...annotation,
             shape: { ...shape, r: expectedRadius },
         });
@@ -159,7 +159,7 @@ describe('EditCircleTool', () => {
         const anchor = screen.getByLabelText('Resize circle anchor');
         moveShape(anchor, startPoint, endPoint);
 
-        expect(updateAnnotation).toBeCalledWith({
+        expect(updateAnnotation).toHaveBeenCalledWith({
             ...annotation,
             shape: { ...shape, r: expectedRadius },
         });
@@ -169,18 +169,18 @@ describe('EditCircleTool', () => {
         await renderApp(annotation, annotationToolContext);
 
         const startPoint = { x: 0, y: 0 };
-        const endPoint = { x: mockROI.width * 2, y: 0 };
+        const endPoint = { x: mockROI.width * 2, y: mockROI.height };
         const rect = screen.getByLabelText('Drag to move shape');
         moveShape(rect, startPoint, endPoint);
 
-        expect(updateAnnotation).not.toBeCalled();
-        expect(removeAnnotations).toBeCalledWith([
+        expect(updateAnnotation).not.toHaveBeenCalled();
+        expect(removeAnnotations).toHaveBeenCalledWith([
             {
                 ...annotation,
                 shape: {
                     ...shape,
-                    x: shape.x,
-                    y: shape.y + endPoint.y - startPoint.y,
+                    x: 100,
+                    y: 100,
                 },
             },
         ]);

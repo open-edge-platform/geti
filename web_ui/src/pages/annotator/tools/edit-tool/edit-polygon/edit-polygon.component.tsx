@@ -11,8 +11,8 @@ import { AnnotationScene } from '../../../core/annotation-scene.interface';
 import { AnnotationToolContext, ToolType } from '../../../core/annotation-tool-context.interface';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useZoom } from '../../../zoom/zoom-provider.component';
+import { isPolygonValid, removeOffLimitPointsPolygon } from '../../geometry-utils';
 import { SelectingToolType } from '../../selecting-tool/selecting-tool.enums';
-import { isPolygonValid, removeOffLimitPointsPolygon } from '../../utils';
 import { TranslateShape } from '../translate-shape.component';
 import { EditPoints } from './edit-points.component';
 

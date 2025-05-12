@@ -159,7 +159,7 @@ describe('CircleTool', (): void => {
         expect(circle).toHaveAttribute('r', `${defaultRadius}`);
     });
 
-    it('not draws smaller circle than MIN_RADIUS', async (): Promise<void> => {
+    it('does not draw a smaller circle than MIN_RADIUS', async (): Promise<void> => {
         const { container } = await renderApp(annotationToolContext);
 
         const svg = screen.getByRole('editor');
@@ -217,7 +217,7 @@ describe('CircleTool', (): void => {
         await renderApp(annotationToolContext);
 
         const svg = screen.getByRole('editor');
-        fireEvent.pointerDown(svg, { button: 2, buttons: 2, clientX: -10, clientY: 0 });
+        fireEvent.pointerDown(svg, { button: 2, buttons: 2, clientX: 1, clientY: 1 });
         fireEvent.pointerMove(svg, { clientX: 10, clientY: 0 });
         fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: 10, clientY: 0 });
         expect(onComplete).toHaveBeenCalled();

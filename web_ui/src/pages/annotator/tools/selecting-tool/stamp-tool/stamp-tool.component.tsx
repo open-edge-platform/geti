@@ -10,9 +10,10 @@ import { Annotation } from '../../../annotation/annotation.component';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { createAnnotation } from '../../../utils';
 import { useZoom } from '../../../zoom/zoom-provider.component';
+import { isPointWithinRoi, removeOffLimitPoints } from '../../geometry-utils';
 import { SvgToolCanvas } from '../../svg-tool-canvas.component';
 import { ToolAnnotationContextProps } from '../../tools.interface';
-import { isPointWithinRoi, removeOffLimitPoints, translateAnnotation } from '../../utils';
+import { translateAnnotation } from '../../utils';
 import { useSelectingState } from '../selecting-state-provider.component';
 
 // NOTE: We allow stamping only one annotation. Below implementation supports also multiple annotations (that's why

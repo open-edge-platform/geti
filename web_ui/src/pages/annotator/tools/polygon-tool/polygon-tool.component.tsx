@@ -22,10 +22,11 @@ import { useAnnotationScene } from '../../providers/annotation-scene-provider/an
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';
 import { useZoom } from '../../zoom/zoom-provider.component';
+import { isPolygonValid, removeOffLimitPointsPolygon } from '../geometry-utils';
 import { PolygonDraw } from '../polygon-draw.component';
 import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { ToolAnnotationContextProps } from '../tools.interface';
-import { drawingStyles, isPolygonValid } from '../utils';
+import { drawingStyles } from '../utils';
 import { usePolygonState } from './polygon-state-provider.component';
 import { PointerIcons, PointerIconsOffset, PolygonMode } from './polygon-tool.enum';
 import { isCloseMode, START_POINT_FIELD_DEFAULT_RADIUS, START_POINT_FIELD_FOCUS_RADIUS } from './utils';
@@ -172,7 +173,7 @@ export const PolygonTool = ({ annotationToolContext }: ToolAnnotationContextProp
 
                 const optimizedPolygon = await optimizePolygonOrSegments(polygon);
 
-                onComplete(optimizedPolygon);
+                onComplete(removeOffLimitPointsPolygon(optimizedPolygon, roi));
                 setIsOptimizingPolygons(false);
             }
 

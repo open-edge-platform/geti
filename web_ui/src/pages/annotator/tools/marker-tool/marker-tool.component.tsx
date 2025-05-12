@@ -12,9 +12,9 @@ import { Point } from '../../../../core/annotations/shapes.interface';
 import { isLeftButton } from '../../../buttons-utils';
 import { getRelativePoint } from '../../../utils';
 import { Line } from '../../annotation/shapes/line.component';
+import { isPointWithinRoi } from '../geometry-utils';
 import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { PointerType } from '../tools.interface';
-import { isPointWithinRoi } from '../utils';
 import { MarkerToolProps } from './marker-tool.interface';
 
 const DEFAULT_STROKE_WIDTH = 1.5;

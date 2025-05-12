@@ -15,7 +15,7 @@ import * as Vec2 from '../../../../../core/annotations/vec2';
 import { AnnotationToolContext } from '../../../core/annotation-tool-context.interface';
 import { useROI } from '../../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useZoom } from '../../../zoom/zoom-provider.component';
-import { isShapeWithinRoi } from '../../utils';
+import { isCenterOfShapeWithinROI } from '../../geometry-utils';
 import { ANCHOR_SIZE, ResizeAnchor } from '../resize-anchor.component';
 import { ResizeAnchorType } from '../resize-anchor.enum';
 import { TranslateShape } from '../translate-shape.component';
@@ -48,7 +48,7 @@ export const EditRotatedBoundingBox = ({
     const { roi, image } = useROI();
 
     const onComplete = () => {
-        if (isShapeWithinRoi(roi, shape)) {
+        if (isCenterOfShapeWithinROI(roi, shape)) {
             scene.updateAnnotation({ ...annotation, shape });
         } else {
             scene.removeAnnotations([annotation]);

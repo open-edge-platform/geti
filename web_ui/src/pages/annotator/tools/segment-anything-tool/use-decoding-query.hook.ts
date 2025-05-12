@@ -7,7 +7,7 @@ import { Shape } from '../../../../core/annotations/shapes.interface';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
-import { removeOffLimitPoints } from '../utils';
+import { removeOffLimitPoints } from '../geometry-utils';
 import { InteractiveAnnotationPoint } from './segment-anything.interface';
 
 export const useDecodingQueryOptions = (

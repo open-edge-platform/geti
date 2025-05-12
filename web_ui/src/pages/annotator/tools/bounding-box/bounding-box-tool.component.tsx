@@ -11,8 +11,9 @@ import { useROI } from '../../providers/region-of-interest-provider/region-of-in
 import { useTask } from '../../providers/task-provider/task-provider.component';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { DrawingBox } from '../drawing-box/drawing-box.component';
+import { isShapeWithinRoi } from '../geometry-utils';
 import { ToolAnnotationContextProps } from '../tools.interface';
-import { drawingStyles, isShapeWithinRoi } from '../utils';
+import { drawingStyles } from '../utils';
 
 export const BoundingBoxTool = ({ annotationToolContext }: ToolAnnotationContextProps): JSX.Element => {
     const { scene } = annotationToolContext;

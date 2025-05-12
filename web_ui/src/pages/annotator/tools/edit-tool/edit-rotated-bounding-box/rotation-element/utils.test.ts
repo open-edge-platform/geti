@@ -4,7 +4,7 @@
 import { SideAnchorLocationsProps } from '../location';
 import { Direction, getDirection } from './utils';
 
-describe('rotation-elemet utils', () => {
+describe('rotation-element utils', () => {
     describe('getDirection', () => {
         const rio = { x: 0, y: 0, width: 20, height: 20 };
         const offsidePoint = { x: rio.x - 1, y: rio.y - 1 };

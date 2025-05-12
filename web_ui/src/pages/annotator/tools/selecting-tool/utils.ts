@@ -11,7 +11,7 @@ import { Point, Shape } from '../../../../core/annotations/shapes.interface';
 import { getTheTopShapeAt, isPolygon } from '../../../../core/annotations/utils';
 import { hasEqualSize } from '../../../../shared/utils';
 import { getRelativePoint } from '../../../utils';
-import { shapeToTurfPolygon } from '../utils';
+import { shapeToTurfPolygon } from '../geometry-utils';
 
 export const MIN_BRUSH_SIZE = 3;
 

@@ -178,7 +178,12 @@ describe('useCopyPasteAnnotation', () => {
             const annotation = {
                 ...mockedAnnotation,
                 labels: [mockedLabel],
-                shape: { ...mockedAnnotation.shape, shapeType: ShapeType.Rect, x: -mockedShape.width },
+                shape: {
+                    ...mockedAnnotation.shape,
+                    shapeType: ShapeType.Rect,
+                    x: -mockedShape.width * 2,
+                    y: -mockedShape.height * 2,
+                },
             } as unknown as Annotation;
 
             const mockedScene = fakeAnnotationToolContext({}).scene;
