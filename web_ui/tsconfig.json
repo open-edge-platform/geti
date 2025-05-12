@@ -1,5 +1,5 @@
 {
-  "extends": "@geti/typescript-config/tsconfig.base.json",
+  "extends": "@geti/config/typescript",
   "compilerOptions": {
     "paths": {
       "opencv": ["./public/assets/opencv/4.9.0/opencv.js"]

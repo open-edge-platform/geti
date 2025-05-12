@@ -4,9 +4,7 @@
   "description": "Contains UI representative components",
   "main": "index.js",
   "devDependencies": {
-    "@geti/typescript-config": "*",
-    "@geti/eslint-config": "*",
-    "@geti/test-config": "*",
+    "@geti/config": "*",
     "jest": "^29.7.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^15.0.7",
@@ -16,11 +14,10 @@
     "typescript": "^5.7.2"
   },
   "scripts": {
-    "test": "jest --config jest.config.mjs --watchAll=false",
+    "test:unit": "jest --config jest.config.mjs --watchAll=false",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint --config eslint.config.mjs \"src/**/*.ts*\" --max-warnings 0",
     "lint:fix": "eslint --fix --config eslint.config.mjs \"./src/**/*.ts*\""
   },
-  "author": "",
-  "license": "ISC"
+  "author": ""
 }

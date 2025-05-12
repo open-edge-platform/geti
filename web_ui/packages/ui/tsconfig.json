@@ -1,4 +1,4 @@
 {
-  "extends": "@geti/typescript-config/tsconfig.base.json",
+  "extends": "@geti/config/typescript",
   "include": ["./src"]
 }

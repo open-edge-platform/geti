@@ -1,3 +1,3 @@
-import sharedConfig from '@geti/eslint-config';
+import sharedConfig from '@geti/config/lint';
 
 export default sharedConfig;

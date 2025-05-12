@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
-import sharedEslintConfig from '@geti/eslint-config';
+import sharedEslintConfig from '@geti/config/lint';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
