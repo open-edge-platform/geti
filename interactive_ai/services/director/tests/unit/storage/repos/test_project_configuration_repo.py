@@ -1,11 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-import pytest
+
+from entities.project_configuration import NullProjectConfiguration, TaskConfig
+from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
 from geti_types import ID
-
-from entities.project_configuration import TaskConfig, NullProjectConfiguration
-from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
 
 class TestProjectConfigurationRepo:

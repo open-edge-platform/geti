@@ -1,20 +1,18 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from collections.abc import Callable, Sequence
-from typing import Any
+from collections.abc import Callable
 
 from pymongo import DESCENDING, IndexModel
-from pymongo.client_session import ClientSession
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
-from entities.training_configuration import TrainingConfiguration, NullTrainingConfiguration
-from iai_core.repos.mappers import IDToMongo
+from entities.training_configuration import NullTrainingConfiguration, TrainingConfiguration
 from storage.mappers.training_configuration_mapper import TrainingConfigurationToMongo
-from geti_types import ProjectIdentifier, Session, ID
 
+from geti_types import ID, ProjectIdentifier, Session
 from iai_core.repos.base import ProjectBasedSessionRepo
+from iai_core.repos.mappers import IDToMongo
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
 
 

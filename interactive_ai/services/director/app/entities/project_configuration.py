@@ -82,7 +82,7 @@ class ProjectConfiguration(BaseModel, PersistentEntity):
         title="Task configurations", description="List of configurations for all tasks in this project"
     )
 
-    def __eq__(self, other):
+    def __eq__(self, other: "ProjectConfiguration") -> bool:
         """
         Compares two ProjectConfiguration instances.
 
@@ -96,10 +96,7 @@ class ProjectConfiguration(BaseModel, PersistentEntity):
             return False
 
         # Compare task configurations
-        if self.task_configs != other.task_configs:
-            return False
-
-        return True
+        return self.task_configs == other.task_configs
 
 
 class NullProjectConfiguration(ProjectConfiguration):

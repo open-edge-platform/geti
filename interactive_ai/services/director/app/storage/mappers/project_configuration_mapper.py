@@ -1,11 +1,10 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from entities.project_configuration import ProjectConfiguration, TaskConfig, TrainingParameters, AutoTrainingParameters
+from entities.project_configuration import AutoTrainingParameters, ProjectConfiguration, TaskConfig, TrainingParameters
 
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-
 
 
 class TaskConfigToMongo(IMapperSimple[TaskConfig, dict]):
@@ -33,11 +32,10 @@ class ProjectConfigurationToMongo(IMapperSimple[ProjectConfiguration, dict]):
 
     @staticmethod
     def forward(instance: ProjectConfiguration) -> dict:
-        doc = {
+        return {
             "_id": IDToMongo.forward(instance.id_),
             "task_configs": [TaskConfigToMongo.forward(task_config) for task_config in instance.task_configs],
         }
-        return doc
 
     @staticmethod
     def backward(instance: dict) -> ProjectConfiguration:

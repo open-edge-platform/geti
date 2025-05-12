@@ -2,7 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from geti_types import ID
 
 from entities.project_configuration import (
     AutoTrainingParameters,
@@ -11,6 +10,8 @@ from entities.project_configuration import (
     TrainConstraints,
     TrainingParameters,
 )
+
+from geti_types import ID
 
 
 class TestProjectConfiguration:
@@ -30,7 +31,7 @@ class TestProjectConfiguration:
                                 "min_images_per_label": 5,
                             },
                         },
-                    ]
+                    ],
                 },
                 ProjectConfiguration(
                     project_id=ID("test_id_1"),
@@ -44,7 +45,7 @@ class TestProjectConfiguration:
                                 min_images_per_label=5,
                             ),
                         )
-                    ]
+                    ],
                 ),
             ),
             (
@@ -69,7 +70,7 @@ class TestProjectConfiguration:
                                 "min_images_per_label": None,
                             },
                         },
-                    ]
+                    ],
                 },
                 ProjectConfiguration(
                     project_id=ID("test_id_2"),
@@ -92,7 +93,7 @@ class TestProjectConfiguration:
                                 min_images_per_label=None,
                             ),
                         ),
-                    ]
+                    ],
                 ),
             ),
         ],

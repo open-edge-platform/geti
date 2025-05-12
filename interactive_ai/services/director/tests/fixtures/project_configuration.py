@@ -4,11 +4,11 @@
 import pytest
 
 from entities.project_configuration import (
+    AutoTrainingParameters,
     ProjectConfiguration,
     TaskConfig,
-    TrainingParameters,
     TrainConstraints,
-    AutoTrainingParameters,
+    TrainingParameters,
 )
 
 
@@ -34,6 +34,6 @@ def fxt_project_configuration(fxt_project_identifier):
                     enable_dynamic_required_annotations=True,
                     min_images_per_label=8,
                 ),
-            )
-        ]
+            ),
+        ],
     )

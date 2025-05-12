@@ -1,8 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from entities.training_configuration import NullTrainingConfiguration
-from geti_types import ID
 from storage.repos.training_configuration_repo import TrainingConfigurationRepo
+
+from geti_types import ID
 
 
 class TestTrainingConfigurationRepo:

@@ -2,17 +2,19 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
+from interactive_ai.services.director.tests.fixtures.configuration import fxt_hyperparameters
 from pydantic import ValidationError
 
-from geti_types import ID
-from interactive_ai.services.director.tests.fixtures.configuration import fxt_hyperparameters
 from entities.training_configuration import (
-    TrainingConfiguration,
-    GlobalParameters,
+    Filtering,
     GlobalDatasetPreparationParameters,
+    GlobalParameters,
     SubsetSplit,
-    Filtering
+    TrainingConfiguration,
 )
+
+from geti_types import ID
+
 
 class TestTrainingConfiguration:
     def test_valid_training_configuration(self, ftx_hyperparameters):
@@ -33,7 +35,7 @@ class TestTrainingConfiguration:
                         min_annotation_pixels=10,
                         max_annotation_pixels=1000,
                         max_annotation_objects=100,
-                    )
+                    ),
                 )
             ),
             hyperparameters=ftx_hyperparameters,
@@ -59,7 +61,7 @@ class TestTrainingConfiguration:
                             auto_selection=True,
                             remixing=False,
                         ),
-                        filtering=Filtering()
+                        filtering=Filtering(),
                     )
                 ),
                 hyperparameters=fxt_hyperparameters,
@@ -77,7 +79,7 @@ class TestTrainingConfiguration:
                         subset_split=SubsetSplit(),
                         filtering=Filtering(
                             min_annotation_pixels=0,  # Invalid: must be > 0
-                        )
+                        ),
                     )
                 ),
                 hyperparameters=fxt_hyperparameters,

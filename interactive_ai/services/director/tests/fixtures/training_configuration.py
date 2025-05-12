@@ -2,21 +2,21 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-
 from geti_supported_models.hyperparameters import (
-    Hyperparameters,
     AugmentationParameters,
     CenterCrop,
     DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
     TrainingHyperParameters,
-    EvaluationParameters
 )
+
 from entities.training_configuration import (
-    TrainingConfiguration,
-    GlobalParameters,
+    Filtering,
     GlobalDatasetPreparationParameters,
+    GlobalParameters,
     SubsetSplit,
-    Filtering
+    TrainingConfiguration,
 )
 
 
@@ -38,6 +38,7 @@ def ftx_hyperparameters():
         evaluation=EvaluationParameters(),
     )
 
+
 @pytest.fixture
 def fxt_global_parameters():
     yield GlobalParameters(
@@ -53,7 +54,7 @@ def fxt_global_parameters():
                 min_annotation_pixels=10,
                 max_annotation_pixels=1000,
                 max_annotation_objects=100,
-            )
+            ),
         )
     )
 
