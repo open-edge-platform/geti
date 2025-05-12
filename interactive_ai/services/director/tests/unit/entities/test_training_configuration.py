@@ -63,7 +63,7 @@ class TestTrainingConfiguration:
                         filtering=Filtering(),
                     )
                 ),
-                hyperparameters=fxt_hyperparameters,
+                hyperparameters=ftx_hyperparameters,
             )
 
         assert "Sum of subsets should be equal to 100" in str(excinfo.value)
@@ -81,5 +81,5 @@ class TestTrainingConfiguration:
                         ),
                     )
                 ),
-                hyperparameters=fxt_hyperparameters,
+                hyperparameters=ftx_hyperparameters,
             )
