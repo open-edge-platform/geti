@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FC, Key, useState } from 'react';
+import { FC, Key } from 'react';
 
 import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 
