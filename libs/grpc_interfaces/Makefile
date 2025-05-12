@@ -1,7 +1,7 @@
 include ../Makefile.shared-python-libs
 
 # Variables
-PROTO_ROOT  	:= grpc_interfaces
+PROTO_ROOT  	:= src/grpc_interfaces
 PB_DIR          := pb
 GO_OUT_BASE 	:= go/$(PB_DIR)
 PY_OUT_BASE 	:= $(PB_DIR)

@@ -50,7 +50,7 @@ dev = [
 only-packages = true
 
 [tool.hatch.build.targets.wheel]
-packages = [ "grpc_interfaces" ]
+packages = [ "src/grpc_interfaces" ]
 
 [tool.ruff]
 target-version = "py310"
