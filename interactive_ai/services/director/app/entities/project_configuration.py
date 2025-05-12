@@ -56,6 +56,10 @@ class TaskConfig(BaseModel):
         title="Auto-training parameters", description="Parameters controlling auto-training"
     )
 
+    @property
+    def task_id(self) -> ID:
+        return ID(self.task_id)
+
 
 class ProjectConfiguration(BaseModel, PersistentEntity):
     """
@@ -82,7 +86,7 @@ class ProjectConfiguration(BaseModel, PersistentEntity):
         title="Task configurations", description="List of configurations for all tasks in this project"
     )
 
-    def __eq__(self, other: "ProjectConfiguration") -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compares two ProjectConfiguration instances.
 

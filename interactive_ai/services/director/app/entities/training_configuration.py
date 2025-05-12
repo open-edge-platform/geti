@@ -33,7 +33,7 @@ class SubsetSplit(BaseModel):
     remixing: bool = Field(default=False, title="Remixing", description="Whether to remix data between subsets")
 
     @model_validator(mode="after")
-    def validate_subsets(self) -> BaseModel:
+    def validate_subsets(self) -> "SubsetSplit":
         if (self.training + self.validation + self.test) != 100:
             raise ValueError("Sum of subsets should be equal to 100")
         return self
@@ -97,7 +97,7 @@ class TrainingConfiguration(BaseModel, PersistentEntity):
     )
     hyperparameters: Hyperparameters = Field(title="Hyperparameters", description="Hyperparameters for training")
 
-    def __eq__(self, other: "TrainingConfiguration") -> bool:
+    def __eq__(self, other: object) -> bool:
         """
         Compares two ProjectConfiguration instances.
 
