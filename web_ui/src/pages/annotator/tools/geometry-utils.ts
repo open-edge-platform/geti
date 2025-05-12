@@ -7,7 +7,6 @@ import {
     booleanIntersects,
     booleanPointInPolygon,
     centroid,
-    circle,
     difference,
     featureCollection,
     point,
@@ -18,7 +17,7 @@ import { Feature, Polygon as GeoPolygon, MultiPolygon, Position } from 'geojson'
 
 import { RegionOfInterest } from '../../../core/annotations/annotation.interface';
 import { BoundingBox, getBoundingBox, getCenterOfShape, rotatedRectCorners } from '../../../core/annotations/math';
-import { Point, Polygon, Rect, RotatedRect, Shape } from '../../../core/annotations/shapes.interface';
+import { Circle, Point, Polygon, Rect, RotatedRect, Shape } from '../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../core/annotations/shapetype.enum';
 import { isCircle, isPoseShape, isRect, isRotatedRect } from '../../../core/annotations/utils';
 import { Vec2 } from '../../../core/annotations/vec2';
@@ -61,6 +60,23 @@ export const calculateRotatedRectanglePoints = (shape: RotatedRect): Position[] 
     return rotatedRectCorners(shape).map(toTurfPoint);
 };
 
+export const calculateCirclePoints = (shape: Circle): Position[] => {
+    const stepAngle = 5;
+    const endAngle = 360;
+    const { x: centerX, y: centerY, r } = shape;
+
+    let points: Position[] = [];
+
+    for (let i = 0; i <= endAngle; i += stepAngle) {
+        const X = centerX + r * Math.cos((i * Math.PI) / 180);
+        const Y = centerY + r * Math.sin((i * Math.PI) / 180);
+
+        points = [...points, [X, Y]];
+    }
+
+    return points;
+};
+
 export const shapeToTurfPolygon = (shape: Shape): TurfPolygon => {
     switch (true) {
         case isRect(shape): {
@@ -74,7 +90,9 @@ export const shapeToTurfPolygon = (shape: Shape): TurfPolygon => {
             return polygon([[...points, points[0]]]);
         }
         case isCircle(shape): {
-            return circle([shape.x, shape.y], shape.r, { steps: 0 });
+            const points = calculateCirclePoints(shape);
+            // Ensure the polygon is closed by adding the first point at the end
+            return polygon([[...points, points[0]]]);
         }
         case isPoseShape(shape): {
             const points = calculateRectanglePoints(getBoundingBox(shape));
@@ -104,6 +122,7 @@ export const calculatePolygonArea = (turfPolygon: TurfPolygon): number => {
     for (let i = 0; i < points.length; i++) {
         const [x1, y1] = points[i];
         const [x2, y2] = points[(i + 1) % points.length];
+
         totalArea += x1 * y2;
         totalArea -= y1 * x2;
     }

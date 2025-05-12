@@ -49,12 +49,7 @@ test.describe('Polygon', () => {
 
         const shapeLocator = getPolygonShape(page);
 
-        // The algorithm that we use to optimize polygons shuffles the polygon's points, which
-        // isn't handled by our expect call
-        await expectPolygonShape(shapeLocator, {
-            ...shape,
-            points: [...shape.points].reverse(),
-        });
+        await expectPolygonShape(shapeLocator, shape);
     });
 
     test('Drawing a polygon partially outside of the image', async ({ page, polygonTool }) => {

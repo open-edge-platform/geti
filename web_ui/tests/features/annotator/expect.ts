@@ -28,12 +28,19 @@ const getPointsFromPolygon = async (shapeLocator: Locator) => {
 };
 
 export const expectPolygonShape = async (shapeLocator: Locator, polygon: Omit<Polygon, 'shapeType'>) => {
-    const points = await getPointsFromPolygon(shapeLocator);
+    const actualPoints = await getPointsFromPolygon(shapeLocator);
+    const expectedPoints = polygon.points;
+    const tolerance = 2;
 
-    expect(points).toHaveLength(polygon.points.length);
-    points.forEach(({ x, y }, idx) => {
-        expectToBeEqualToPixelAccuracy(x, polygon.points[idx].x);
-        expectToBeEqualToPixelAccuracy(y, polygon.points[idx].y);
+    expect(actualPoints).toHaveLength(expectedPoints.length);
+
+    const arePointsClose = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+        Math.abs(a.x - b.x) <= tolerance && Math.abs(a.y - b.y) <= tolerance;
+
+    expectedPoints.forEach((exp) => {
+        const match = actualPoints.some((act) => arePointsClose(exp, act));
+
+        expect(match).toBeTruthy();
     });
 };
 

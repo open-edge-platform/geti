@@ -7,6 +7,7 @@ import { RegionOfInterest } from '../../../core/annotations/annotation.interface
 import { Circle, Point, Polygon, Rect, RotatedRect } from '../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../core/annotations/shapetype.enum';
 import {
+    calculateCirclePoints,
     calculatePolygonArea,
     calculateRectanglePoints,
     calculateRotatedRectanglePoints,
@@ -414,6 +415,44 @@ describe('geometry-utils', () => {
             const largestArea = calculatePolygonArea(largestPolygon);
 
             expect(largestArea).toBe(100); // 10x10 square
+        });
+    });
+
+    describe('calculateCirclePoints', () => {
+        it('should generate points forming a circle with correct count and closure', () => {
+            const circle: Circle = { x: 0, y: 0, r: 10, shapeType: ShapeType.Circle };
+            const points = calculateCirclePoints(circle);
+
+            // 360/5 = 72 steps, plus the initial point at 0, so 73 points
+            expect(points.length).toHaveLength(73);
+
+            // First and last points should be the same (circle closure)
+            expect(points[0][0]).toBeCloseTo(points[points.length - 1][0], 5);
+            expect(points[0][1]).toBeCloseTo(points[points.length - 1][1], 5);
+        });
+
+        it('should generate all points at the correct radius from center', () => {
+            const circle: Circle = { x: 5, y: -3, r: 7, shapeType: ShapeType.Circle };
+            const points = calculateCirclePoints(circle);
+
+            for (let i = 0; i < points.length; i++) {
+                const [x, y] = points[i];
+                const dx = x - circle.x;
+                const dy = y - circle.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                expect(distance).toBeCloseTo(circle.r, 5);
+            }
+        });
+
+        it('should handle zero radius', () => {
+            const circle: Circle = { x: 2, y: 2, r: 0, shapeType: ShapeType.Circle };
+            const points = calculateCirclePoints(circle);
+
+            expect(points.length).toHaveLength(73);
+            points.forEach(([x, y]) => {
+                expect(x).toBeCloseTo(2, 5);
+                expect(y).toBeCloseTo(2, 5);
+            });
         });
     });
 });
