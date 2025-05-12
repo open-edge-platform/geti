@@ -37,7 +37,6 @@ jobs:
     env:
       TAG: ${{ inputs.image-tag || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
-      USE_PROXY: true
       PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
       GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
     steps:
