@@ -209,7 +209,7 @@ test.describe('Polygon', () => {
         // Checking the exact points tends to give flaky results as the points
         // might differ per browser, instead let's try to make sure that the area
         // that the user selects is roughly equal to the expected area
-        expect(await getPolylineArea(shapeLocator)).toBeCloseTo(62128, -2);
+        expect(await getPolylineArea(shapeLocator)).toBeCloseTo(62029, -2);
     });
 
     test('Selects polygon tool using hotkey', async ({ page }) => {

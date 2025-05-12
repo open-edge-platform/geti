@@ -434,7 +434,7 @@ describe('SelectingTool', () => {
             fireEvent.pointerUp(svg, point);
 
             // Verify that we don't remove annotations that are not selectable
-            expect(screen.getByText(`Selected 2 of 6 annotations`)).toBeInTheDocument();
+            expect(screen.getByText('Selected 2 of 6 annotations')).toBeInTheDocument();
             expect(screen.getAllByLabelText(/Annotation/, { exact: false })).toHaveLength(2);
 
             const secondAnnotation = { clientX: 10, clientY: 10, shiftKey: true };

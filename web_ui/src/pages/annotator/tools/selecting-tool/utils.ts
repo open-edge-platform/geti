@@ -3,8 +3,7 @@
 
 import { PointerEvent, RefObject } from 'react';
 
-import { featureCollection, intersect } from '@turf/turf';
-import isEmpty from 'lodash/isEmpty';
+import { booleanIntersects } from '@turf/turf';
 
 import { Annotation, RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { Point, Shape } from '../../../../core/annotations/shapes.interface';
@@ -49,9 +48,9 @@ export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: S
         clip = shapeToTurfPolygon(annotationShape);
 
         if (clip) {
-            const result = intersect(featureCollection([subject, clip]));
+            const intersects = booleanIntersects(subject, clip);
 
-            if (!isEmpty(result)) {
+            if (!intersects) {
                 return [...prev, annotation.id];
             }
         }

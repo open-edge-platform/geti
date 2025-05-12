@@ -172,12 +172,12 @@ describe('geometry-utils', () => {
         const roi = { x: 0, y: 0, width: 100, height: 100 };
 
         it('inside', () => {
-            const circle: Circle = { x: 10, y: 10, r: 20, shapeType: ShapeType.Circle };
+            const circle: Circle = { x: 30, y: 30, r: 20, shapeType: ShapeType.Circle };
             expect(isShapeWithinRoi(roi, circle)).toBe(true);
         });
 
         it('outside', () => {
-            const circle: Circle = { x: -21, y: 0, r: 20, shapeType: ShapeType.Circle };
+            const circle: Circle = { x: -20, y: 0, r: 20, shapeType: ShapeType.Circle };
             expect(isShapeWithinRoi(roi, circle)).toBe(false);
         });
     });
@@ -424,7 +424,7 @@ describe('geometry-utils', () => {
             const points = calculateCirclePoints(circle);
 
             // 360/5 = 72 steps, plus the initial point at 0, so 73 points
-            expect(points.length).toHaveLength(73);
+            expect(points).toHaveLength(73);
 
             // First and last points should be the same (circle closure)
             expect(points[0][0]).toBeCloseTo(points[points.length - 1][0], 5);
@@ -448,7 +448,7 @@ describe('geometry-utils', () => {
             const circle: Circle = { x: 2, y: 2, r: 0, shapeType: ShapeType.Circle };
             const points = calculateCirclePoints(circle);
 
-            expect(points.length).toHaveLength(73);
+            expect(points).toHaveLength(73);
             points.forEach(([x, y]) => {
                 expect(x).toBeCloseTo(2, 5);
                 expect(y).toBeCloseTo(2, 5);

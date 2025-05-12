@@ -215,32 +215,22 @@ export const getShapesUnion = (roi: RegionOfInterest, main: Shape, sub: Shape): 
     const mainPolygon = shapeToTurfPolygon(main);
     const subPolygon = shapeToTurfPolygon(sub);
 
-    try {
-        const result = union(featureCollection([mainPolygon, subPolygon]));
-        const filtered = result ? filterIntersectedPolygonsWithRoi(roi, result) : polygon([[]]);
-        const largest = findLargestPolygon(filtered);
+    const result = union(featureCollection([mainPolygon, subPolygon]));
+    const filtered = result ? filterIntersectedPolygonsWithRoi(roi, result) : polygon([[]]);
+    const largest = findLargestPolygon(filtered);
 
-        return convertTurfToPolygon(largest);
-    } catch (error) {
-        console.error('Error in getShapesUnion:', error);
-        return convertTurfToPolygon(subPolygon); // Fallback to original shape
-    }
+    return convertTurfToPolygon(largest);
 };
 
 export const getShapesDifference = (roi: RegionOfInterest, main: Shape, sub: Shape): Polygon => {
     const mainPolygon = shapeToTurfPolygon(main);
     const subPolygon = shapeToTurfPolygon(sub);
 
-    try {
-        const result = difference(featureCollection([mainPolygon, subPolygon]));
-        const filtered = result ? filterIntersectedPolygonsWithRoi(roi, result) : polygon([[]]);
-        const largest = findLargestPolygon(filtered);
+    const result = difference(featureCollection([mainPolygon, subPolygon]));
+    const filtered = result ? filterIntersectedPolygonsWithRoi(roi, result) : polygon([[]]);
+    const largest = findLargestPolygon(filtered);
 
-        return convertTurfToPolygon(largest);
-    } catch (error) {
-        console.error('Error in getShapesDifference:', error);
-        return convertTurfToPolygon(subPolygon); // Fallback to original shape
-    }
+    return convertTurfToPolygon(largest);
 };
 
 export const isShapeWithinRoi = (roi: RegionOfInterest, shape: Shape): boolean => {
