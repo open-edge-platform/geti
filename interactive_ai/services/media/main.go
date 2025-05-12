@@ -53,6 +53,7 @@ func createRouter() *gin.Engine {
 	router := gin.New()
 
 	router.Use(gin.Recovery())
+	router.Use(middleware.ZapRequestLogger(logger.Log().Desugar()))
 	router.Use(middleware.ErrorHandler())
 	router.Use(telemetry.Middleware())
 	router.Use(middleware.CacheControl())
