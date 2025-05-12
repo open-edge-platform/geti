@@ -246,6 +246,10 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             pred_keypoint = pred_keypoints_dict.get(class_)
             if pred_keypoint:
                 distance = np.sqrt((gt_keypoint[0] - pred_keypoint[0]) ** 2 + (gt_keypoint[1] - pred_keypoint[1]) ** 2)
+                logger.error(
+                    msg=f"Distance: {distance}, threshold: {threshold}, "
+                    f"gt_keypoint: {gt_keypoint}, pred_keypoint: {pred_keypoint}"
+                )
                 if distance <= threshold:
                     correct_keypoints.append(class_)
 
