@@ -2,7 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from interactive_ai.services.director.tests.fixtures.configuration import fxt_hyperparameters
 from pydantic import ValidationError
 
 from entities.training_configuration import (
