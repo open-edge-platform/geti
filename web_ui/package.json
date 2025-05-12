@@ -97,17 +97,17 @@
     "find-deadcode": "npx knip",
     "format": "prettier --write --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\"",
     "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\"",
-    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0",
-    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\"",
+    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0 && npm run lint --workspace=@geti/ui",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\" && npm run lint:fix --workspace=@geti/ui",
     "preview": "rsbuild preview",
     "start": "rsbuild dev --environment dev",
     "test:component": "npx playwright test --config=playwright.config.ts",
     "test:component:ui": "npm run test:component -- --ui",
     "test:coverage": "npm test -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
-    "test:unit": "jest --config jest.config.ts --watchAll=false",
+    "test:unit": "jest --config jest.config.ts --watchAll=false && npm run test:unit --workspace=@geti/ui",
     "test:unit:watch": "jest --config jest.config.ts --watch",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit && npm run type-check --workspace=@geti/ui"
   },
   "browserslist": {
     "production": [
