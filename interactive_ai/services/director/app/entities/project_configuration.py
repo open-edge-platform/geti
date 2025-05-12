@@ -56,10 +56,6 @@ class TaskConfig(BaseModel):
         title="Auto-training parameters", description="Parameters controlling auto-training"
     )
 
-    @property
-    def task_id(self) -> ID:
-        return ID(self.task_id)
-
 
 class ProjectConfiguration(BaseModel, PersistentEntity):
     """

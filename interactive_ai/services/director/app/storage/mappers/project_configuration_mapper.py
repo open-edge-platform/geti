@@ -3,6 +3,7 @@
 
 from entities.project_configuration import AutoTrainingParameters, ProjectConfiguration, TaskConfig, TrainingParameters
 
+from geti_types import ID
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
@@ -13,7 +14,7 @@ class TaskConfigToMongo(IMapperSimple[TaskConfig, dict]):
     @staticmethod
     def forward(instance: TaskConfig) -> dict:
         return {
-            "task_id": IDToMongo.forward(instance.task_id),
+            "task_id": IDToMongo.forward(ID(instance.task_id)),
             "training": instance.training.model_dump_json(),
             "auto_training": instance.auto_training.model_dump_json(),
         }
@@ -21,7 +22,7 @@ class TaskConfigToMongo(IMapperSimple[TaskConfig, dict]):
     @staticmethod
     def backward(instance: dict) -> TaskConfig:
         return TaskConfig(
-            task_id=IDToMongo.backward(instance["task_id"]),
+            task_id=str(IDToMongo.backward(instance["task_id"])),
             training=TrainingParameters.model_validate_json(instance["training"]),
             auto_training=AutoTrainingParameters.model_validate_json(instance["auto_training"]),
         )
