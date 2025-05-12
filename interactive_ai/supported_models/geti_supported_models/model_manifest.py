@@ -77,12 +77,12 @@ class ModelManifest(BaseModel):
     supported_gpus: dict[GPUMaker, bool] = Field(
         title="Supported GPUs", description="Dictionary mapping GPU types to compatibility status"
     )
-    hyperparameters: Hyperparameters = Field(
-        title="Hyperparameters", description="Configuration parameters for model training"
-    )
     capabilities: Capabilities = Field(
         title="Model Capabilities",
         description="Special capabilities supported by the model"
+    )
+    hyperparameters: Hyperparameters = Field(
+        title="Hyperparameters", description="Configuration parameters for model training"
     )
 
 

@@ -57,6 +57,43 @@ wheels = [
 ]
 
 [[package]]
+name = "geti-supported-models"
+version = "1.0.0"
+source = { editable = "." }
+dependencies = [
+    { name = "hiyapyco" },
+    { name = "pydantic" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "ruff" },
+    { name = "testfixtures" },
+    { name = "types-cachetools" },
+    { name = "types-pyyaml" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "hiyapyco", specifier = "==0.7.0" },
+    { name = "pydantic", specifier = "==2.5.3" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = "~=1.15" },
+    { name = "pre-commit", specifier = "~=4.1" },
+    { name = "pytest", specifier = "~=8.3" },
+    { name = "ruff", specifier = "~=0.11" },
+    { name = "testfixtures", specifier = "~=7.2" },
+    { name = "types-cachetools" },
+    { name = "types-pyyaml" },
+]
+
+[[package]]
 name = "hiyapyco"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -412,43 +449,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/de/7e/fff70b02e57852fda17bd43f99dda37b9bcf3e1af3d97c5834ff48d04715/ruff-0.11.8-py3-none-win32.whl", hash = "sha256:5b18caa297a786465cc511d7f8be19226acf9c0a1127e06e736cd4e1878c3ea2", size = 10451102 },
     { url = "https://files.pythonhosted.org/packages/7b/a9/eaa571eb70648c9bde3120a1d5892597de57766e376b831b06e7c1e43945/ruff-0.11.8-py3-none-win_amd64.whl", hash = "sha256:6e70d11043bef637c5617297bdedec9632af15d53ac1e1ba29c448da9341b0c4", size = 11597410 },
     { url = "https://files.pythonhosted.org/packages/cd/be/f6b790d6ae98f1f32c645f8540d5c96248b72343b0a56fab3a07f2941897/ruff-0.11.8-py3-none-win_arm64.whl", hash = "sha256:304432e4c4a792e3da85b7699feb3426a0908ab98bf29df22a31b0cdd098fac2", size = 10713129 },
-]
-
-[[package]]
-name = "supported-models"
-version = "1.0.0"
-source = { editable = "." }
-dependencies = [
-    { name = "hiyapyco" },
-    { name = "pydantic" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "ruff" },
-    { name = "testfixtures" },
-    { name = "types-cachetools" },
-    { name = "types-pyyaml" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "hiyapyco", specifier = "==0.7.0" },
-    { name = "pydantic", specifier = "==2.5.3" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = "~=1.15" },
-    { name = "pre-commit", specifier = "~=4.1" },
-    { name = "pytest", specifier = "~=8.3" },
-    { name = "ruff", specifier = "~=0.11" },
-    { name = "testfixtures", specifier = "~=7.2" },
-    { name = "types-cachetools" },
-    { name = "types-pyyaml" },
 ]
 
 [[package]]
