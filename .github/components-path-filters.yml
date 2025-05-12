@@ -1,9 +1,9 @@
 # Platform services
 platform/services/credit:
   - platform/services/credit/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/credit_system/**
-  - grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/account_service/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
@@ -15,9 +15,9 @@ platform/services/observability:
 platform/services/onboarding:
   - platform/services/onboarding/**
   - libs/telemetry_tools/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/credit_system/**
-  - grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/account_service/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
@@ -30,16 +30,16 @@ platform/services/user_directory:
   - platform/services/user_directory/**
   - libs/telemetry_tools/**
   - libs/spicedb_tools/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/account:
   - platform/services/account/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/account_service/**
-  - grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/credit_system/**
   - Makefile.shared-go
   - Makefile.shared
   - .github/workflows/component.yml
@@ -48,16 +48,16 @@ platform/services/initial_user:
   - platform/libs/users_handler/**
   - libs/telemetry_tools/**
   - libs/spicedb_tools/**
-  - grpc_interfaces/account_service/**
-  - grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/platform_cleaner:
   - platform/services/platform_cleaner/**
   - libs/telemetry_tools/**
-  - grpc_interfaces/account_service/**
-  - grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
@@ -75,8 +75,8 @@ interactive_ai/services/auto_train:
 interactive_ai/services/dataset_ie:
   - interactive_ai/services/dataset_ie/**
   - interactive_ai/libs/iai_core_py/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/job_submission/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/job_submission/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -88,8 +88,8 @@ interactive_ai/services/dataset_ie:
 interactive_ai/services/director:
   - interactive_ai/services/director/**
   - interactive_ai/libs/iai_core_py/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/job_submission/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/job_submission/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -102,20 +102,20 @@ interactive_ai/services/director:
 interactive_ai/services/inference_gateway:
   - interactive_ai/services/inference_gateway/**
   - interactive_ai/libs/iai_core_go/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/model_mesh/**
-  - grpc_interfaces/model_registration/**
-  - grpc_interfaces/predict/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/model_mesh/**
+  - libs/grpc_interfaces/model_registration/**
+  - libs/grpc_interfaces/predict/**
   - Makefile.shared-go
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/jobs:
   - interactive_ai/services/jobs/**
   - interactive_ai/libs/iai_core_py/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/credit_system/**
-  - grpc_interfaces/job_submission/**
-  - grpc_interfaces/job_update/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/job_submission/**
+  - libs/grpc_interfaces/job_update/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/kafka_tools/**
@@ -139,16 +139,16 @@ interactive_ai/services/mlflow_geti_store:
   - .github/workflows/component.yml
 interactive_ai/services/model_registration:
   - interactive_ai/services/model_registration/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/model_registration/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/model_registration/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/project_ie:
   - interactive_ai/services/project_ie/**
   - interactive_ai/libs/iai_core_py/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/job_submission/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/job_submission/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -286,7 +286,7 @@ interactive_ai/tests/e2e:
 
 # gRPC interfaces
 grpc_interfaces:
-  - grpc_interfaces/**
+  - libs/grpc_interfaces/**
   - libs/types/**
 
 # Web UI
