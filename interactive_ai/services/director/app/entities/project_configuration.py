@@ -3,6 +3,9 @@
 
 from pydantic import BaseModel, Field
 
+from geti_types import ID
+from iai_core.entities.persistent_entity import PersistentEntity
+
 
 class TrainConstraints(BaseModel):
     """Constraints applied for model training."""
@@ -54,9 +57,63 @@ class TaskConfig(BaseModel):
     )
 
 
-class ProjectConfiguration(BaseModel):
-    """Configurable parameters for a project."""
+class ProjectConfiguration(BaseModel, PersistentEntity):
+    """
+    Configurable parameters for a project.
+
+    Each project has exactly one configuration entity. The ID of this entity
+    matches the project ID, as there is a one-to-one relationship between
+    projects and their configurations.
+    """
+
+    def __init__(self, project_id: ID, ephemeral: bool = True, **data):
+        # first initialize the Pydantic BaseModel with all arguments
+        BaseModel.__init__(self, **data)
+
+        # then initialize PersistentEntity with id and ephemeral parameters
+        PersistentEntity.__init__(self, id_=project_id, ephemeral=ephemeral)
+
+    @property
+    def project_id(self) -> ID:
+        """Returns the project ID of this configuration."""
+        return self.id_
 
     task_configs: list[TaskConfig] = Field(
         title="Task configurations", description="List of configurations for all tasks in this project"
     )
+
+    def __eq__(self, other):
+        """
+        Compares two ProjectConfiguration instances.
+
+        Checks if both objects have the same ID and task configurations.
+        """
+        if not isinstance(other, ProjectConfiguration):
+            return False
+
+        # Compare IDs
+        if self.id_ != other.id_:
+            return False
+
+        # Compare task configurations
+        if self.task_configs != other.task_configs:
+            return False
+
+        return True
+
+
+class NullProjectConfiguration(ProjectConfiguration):
+    """
+    Null object implementation for ProjectConfiguration.
+
+    This class implements the Null Object Pattern to represent a "non-existent" project configuration.
+    It is used when a project configuration cannot be found.
+    """
+
+    def __init__(self) -> None:
+        ProjectConfiguration.__init__(
+            self,
+            project_id=ID(),
+            task_configs=[],
+            ephemeral=True,
+        )

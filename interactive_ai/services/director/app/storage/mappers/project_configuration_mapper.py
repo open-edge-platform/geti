@@ -1,0 +1,47 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+from entities.project_configuration import ProjectConfiguration, TaskConfig, TrainingParameters, AutoTrainingParameters
+
+from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+
+
+
+class TaskConfigToMongo(IMapperSimple[TaskConfig, dict]):
+    """MongoDB mapper for `TaskConfig` entities"""
+
+    @staticmethod
+    def forward(instance: TaskConfig) -> dict:
+        return {
+            "task_id": IDToMongo.forward(instance.task_id),
+            "training": instance.training.model_dump_json(),
+            "auto_training": instance.auto_training.model_dump_json(),
+        }
+
+    @staticmethod
+    def backward(instance: dict) -> TaskConfig:
+        return TaskConfig(
+            task_id=IDToMongo.backward(instance["task_id"]),
+            training=TrainingParameters.model_validate_json(instance["training"]),
+            auto_training=AutoTrainingParameters.model_validate_json(instance["auto_training"]),
+        )
+
+
+class ProjectConfigurationToMongo(IMapperSimple[ProjectConfiguration, dict]):
+    """MongoDB mapper for `TrainingConfiguration` entities"""
+
+    @staticmethod
+    def forward(instance: ProjectConfiguration) -> dict:
+        doc = {
+            "_id": IDToMongo.forward(instance.id_),
+            "task_configs": [TaskConfigToMongo.forward(task_config) for task_config in instance.task_configs],
+        }
+        return doc
+
+    @staticmethod
+    def backward(instance: dict) -> ProjectConfiguration:
+        return ProjectConfiguration(
+            project_id=IDToMongo.backward(instance["_id"]),
+            task_configs=[TaskConfigToMongo.backward(task_config) for task_config in instance["task_configs"]],
+        )
