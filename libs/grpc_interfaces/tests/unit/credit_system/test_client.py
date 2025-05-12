@@ -6,7 +6,6 @@ from unittest.mock import MagicMock, patch
 import grpc
 import pytest
 from grpc._channel import _InactiveRpcError, _RPCState
-
 from grpc_interfaces.credit_system.client import (
     CreditSystemClient,
     InsufficientCreditsException,

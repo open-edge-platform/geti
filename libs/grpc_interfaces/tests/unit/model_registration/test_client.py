@@ -6,7 +6,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
 from grpc_interfaces.model_registration.pb.service_pb2 import (
     Chunk,
