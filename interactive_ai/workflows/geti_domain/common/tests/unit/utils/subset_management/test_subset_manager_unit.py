@@ -5,9 +5,9 @@ from unittest.mock import call, patch
 
 import numpy as np
 import pytest
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.subset import Subset
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.subset import Subset
 
 from jobs_common.utils.subset_management.subset_manager import (
     BATCH_SIZE_THRESHOLD,
@@ -57,7 +57,8 @@ class TestSubsetHelper:
             mock_count_items.assert_has_calls([call(item=item) for item in fxt_dataset if item.subset in SUBSETS])
             mock_reorder.assert_not_called()
             mock_assign.assert_called_once_with(
-                item=dataset_item, target_subsets=(Subset.TRAINING, Subset.VALIDATION, Subset.TESTING)
+                item=dataset_item,
+                target_subsets=(Subset.TRAINING, Subset.VALIDATION, Subset.TESTING),
             )
 
     def test_split_large_dataset(
@@ -392,7 +393,9 @@ class TestSubsetHelper:
         with (
             patch.object(_SubsetHelper, "__init__", new=do_nothing),
             patch.object(
-                _SubsetHelper, "get_item_label_ids", return_value={fxt_label.id_, fxt_label_2.id_}
+                _SubsetHelper,
+                "get_item_label_ids",
+                return_value={fxt_label.id_, fxt_label_2.id_},
             ) as mock_get_item_labels,
         ):
             subset_helper = _SubsetHelper(
@@ -452,7 +455,10 @@ class TestAnomalySubsetHelper:
             subset_helper.subset_label_counter = np.array([[0, 0, 0], [0, 0, 0]])
             subset_helper.latest_task_labels = [fxt_label, fxt_anomalous_label]
             subset_helper.latest_task_label_map = {label.id_: label for label in subset_helper.latest_task_labels}
-            subset_helper.latest_task_label_ids = [fxt_label.id_, fxt_anomalous_label.id_]
+            subset_helper.latest_task_label_ids = [
+                fxt_label.id_,
+                fxt_anomalous_label.id_,
+            ]
             subset_helper.labels_to_index = {
                 fxt_label.id_: 0,
                 fxt_anomalous_label.id_: 1,
@@ -489,7 +495,10 @@ class TestAnomalySubsetHelper:
             subset_helper.subset_label_counter = np.array([[0, 0, 0], [0, 0, 0]])
             subset_helper.latest_task_labels = [fxt_label, fxt_anomalous_label]
             subset_helper.latest_task_label_map = {label.id_: label for label in subset_helper.latest_task_labels}
-            subset_helper.latest_task_label_ids = [fxt_label.id_, fxt_anomalous_label.id_]
+            subset_helper.latest_task_label_ids = [
+                fxt_label.id_,
+                fxt_anomalous_label.id_,
+            ]
             subset_helper.labels_to_index = {
                 fxt_label.id_: 0,
                 fxt_anomalous_label.id_: 1,
@@ -531,7 +540,10 @@ class TestAnomalySubsetHelper:
             subset_helper.subset_label_counter = np.array([[10, 2, 10], [10, 2, 10]])
             subset_helper.latest_task_labels = [fxt_label, fxt_anomalous_label]
             subset_helper.latest_task_label_map = {label.id_: label for label in subset_helper.latest_task_labels}
-            subset_helper.latest_task_label_ids = [fxt_label.id_, fxt_anomalous_label.id_]
+            subset_helper.latest_task_label_ids = [
+                fxt_label.id_,
+                fxt_anomalous_label.id_,
+            ]
             subset_helper.labels_to_index = {
                 fxt_label.id_: 0,
                 fxt_anomalous_label.id_: 1,

@@ -3,8 +3,8 @@
 import pytest
 from _pytest.fixtures import FixtureRequest
 
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.model_template import (
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.model_template import (
     EntryPoints,
     HyperParameterData,
     InstantiationType,

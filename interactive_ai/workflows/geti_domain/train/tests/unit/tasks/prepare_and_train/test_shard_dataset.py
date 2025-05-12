@@ -8,10 +8,10 @@ import cv2
 import numpy as np
 import pytest
 from geti_types import make_session, session_context
+from iai_core.repos import CompiledDatasetShardsRepo
+from iai_core.repos.storage.binary_repo import StorageClientFactory
+from iai_core.repos.storage.storage_client import BinaryObjectType
 from media_utils import VideoFrameReader
-from sc_sdk.repos import CompiledDatasetShardsRepo
-from sc_sdk.repos.storage.binary_repo import StorageClientFactory
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
 
 from job.tasks.prepare_and_train.shard_dataset import shard_dataset_for_train
 from job.utils.train_workflow_data import TrainWorkflowData
@@ -71,11 +71,16 @@ class TestShardDatasetTasks:
         # Act
         with (
             patch.object(
-                StorageClientFactory, "acquire_storage_client", return_value=mock_storage_client
+                StorageClientFactory,
+                "acquire_storage_client",
+                return_value=mock_storage_client,
             ) as mock_acquire_storage_client,
             patch.object(VideoFrameReader, "get_frame_numpy", return_value=img),
             patch.object(CompiledDatasetShardsRepo, "save") as mock_db,
-            patch("jobs_common_extras.datumaro_conversion.sc_extractor.get_image_bytes", return_value=img_bytes),
+            patch(
+                "jobs_common_extras.datumaro_conversion.sc_extractor.get_image_bytes",
+                return_value=img_bytes,
+            ),
         ):
             compiled_dataset_shards_id = shard_dataset_for_train(
                 train_data=fxt_mocked_train_data,

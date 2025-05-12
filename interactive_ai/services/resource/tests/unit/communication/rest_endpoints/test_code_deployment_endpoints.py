@@ -12,7 +12,7 @@ from testfixtures import compare
 from communication.rest_controllers import CodeDeploymentRESTController, DeploymentPackageRESTController
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 MODEL_IDENTIFIER_LIST = [
     {
@@ -53,8 +53,14 @@ API_CODE_DEPLOYMENT_PATTERN = f"{API_CODE_DEPLOYMENTS_PATTERN}/<deployment_id>"
 
 API_DEPLOYMENT_PACKAGE_PATTERN = f"{API_BASE_PATTERN}/deployment_package"
 
-DEPLOYMENT_PACKAGE_OVMS_REQUEST = {"package_type": "ovms", "models": [{"model_id": "6138af293b7b11505c43f7ef"}]}
-DEPLOYMENT_PACKAGE_CODE_REQUEST = {"package_type": "geti_sdk", "models": [{"model_id": "6138af293b7b11505c43f7ef"}]}
+DEPLOYMENT_PACKAGE_OVMS_REQUEST = {
+    "package_type": "ovms",
+    "models": [{"model_id": "6138af293b7b11505c43f7ef"}],
+}
+DEPLOYMENT_PACKAGE_CODE_REQUEST = {
+    "package_type": "geti_sdk",
+    "models": [{"model_id": "6138af293b7b11505c43f7ef"}],
+}
 DEPLOYMENT_PACKAGE_INVALID_TYPE_REQUEST = {
     "package_type": "invalid",
     "models": [{"model_id": "6138af293b7b11505c43f7ef"}],
@@ -149,7 +155,9 @@ class TestCodeDeploymentRESTEndpoint:
                 "dummy_code_deployment.zip",
             )
             with patch.object(
-                CodeDeploymentRESTController, "get_filepath_by_deployment_id", return_value=code_deployment_response
+                CodeDeploymentRESTController,
+                "get_filepath_by_deployment_id",
+                return_value=code_deployment_response,
             ) as mock_get_filepath_by_deployment_id:
                 # Act
                 result = fxt_resource_rest.get(endpoint)

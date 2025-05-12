@@ -19,7 +19,7 @@ from communication.helpers.http_exceptions import (
 from domain.entities.dataset_ie_file_metadata import ImportMetadata
 
 from geti_types import ID
-from sc_sdk.entities.model_template import TaskType
+from iai_core.entities.model_template import TaskType
 
 logger = logging.getLogger(__name__)
 
@@ -182,7 +182,8 @@ class TestImportEndpoints:
 
         with (
             patch(
-                "communication.endpoints.import_endpoints.get_validated_project", return_value=fxt_project
+                "communication.endpoints.import_endpoints.get_validated_project",
+                return_value=fxt_project,
             ) as mock_get_validated_project,
             patch(
                 "communication.helpers.import_utils.ImportUtils.get_validated_task_type",
@@ -252,7 +253,8 @@ class TestImportEndpoints:
 
         with (
             patch(
-                "communication.endpoints.import_endpoints.get_validated_project", return_value=fxt_project
+                "communication.endpoints.import_endpoints.get_validated_project",
+                return_value=fxt_project,
             ) as mock_get_validated_project,
             patch(
                 "communication.helpers.import_utils.ImportUtils.get_validated_task_type",
@@ -287,7 +289,8 @@ class TestImportEndpoints:
 
         with (
             patch(
-                "communication.endpoints.import_endpoints.get_validated_project", return_value=fxt_project
+                "communication.endpoints.import_endpoints.get_validated_project",
+                return_value=fxt_project,
             ) as mock_get_validated_project,
             patch(
                 "communication.helpers.import_utils.ImportUtils.get_validated_task_type",
@@ -295,7 +298,11 @@ class TestImportEndpoints:
             ) as mock_get_validated_task_type,
         ):
             response = self._call_import_dataset_to_existing_project(
-                client, fxt_url_prefix, fxt_project_id, fxt_dataset_id, fxt_dataset_storage_id
+                client,
+                fxt_url_prefix,
+                fxt_project_id,
+                fxt_dataset_id,
+                fxt_dataset_storage_id,
             )
             mock_get_validated_project.assert_called()
             mock_get_validated_task_type.assert_called()
@@ -320,7 +327,11 @@ class TestImportEndpoints:
         import_manager.get_validated_file_metadata.side_effect = side_effect
 
         response = self._call_import_dataset_to_existing_project(
-            client, fxt_url_prefix, fxt_project_id, fxt_dataset_id, fxt_dataset_storage_id
+            client,
+            fxt_url_prefix,
+            fxt_project_id,
+            fxt_dataset_id,
+            fxt_dataset_storage_id,
         )
 
         assert response.status_code == error_code
@@ -343,7 +354,8 @@ class TestImportEndpoints:
 
         with (
             patch(
-                "communication.endpoints.import_endpoints.get_validated_project", return_value=fxt_project
+                "communication.endpoints.import_endpoints.get_validated_project",
+                return_value=fxt_project,
             ) as mock_get_validated_project,
             patch(
                 "communication.helpers.import_utils.ImportUtils.get_validated_task_type",
@@ -351,7 +363,11 @@ class TestImportEndpoints:
             ) as mock_get_validated_task_type,
         ):
             response = self._call_import_dataset_to_existing_project(
-                client, fxt_url_prefix, fxt_project_id, fxt_dataset_id, fxt_dataset_storage_id
+                client,
+                fxt_url_prefix,
+                fxt_project_id,
+                fxt_dataset_id,
+                fxt_dataset_storage_id,
             )
             mock_get_validated_project.assert_called()
             mock_get_validated_task_type.assert_called()
@@ -374,7 +390,8 @@ class TestImportEndpoints:
 
         with (
             patch(
-                "communication.endpoints.import_endpoints.get_validated_project", return_value=fxt_project
+                "communication.endpoints.import_endpoints.get_validated_project",
+                return_value=fxt_project,
             ) as mock_get_validated_project,
             patch(
                 "communication.helpers.import_utils.ImportUtils.get_validated_task_type",
@@ -382,7 +399,11 @@ class TestImportEndpoints:
             ) as mock_get_validated_task_type,
         ):
             response = self._call_import_dataset_to_existing_project(
-                client, fxt_url_prefix, fxt_project_id, fxt_dataset_id, fxt_dataset_storage_id
+                client,
+                fxt_url_prefix,
+                fxt_project_id,
+                fxt_dataset_id,
+                fxt_dataset_storage_id,
             )
             mock_get_validated_project.assert_called()
             mock_get_validated_task_type.assert_called()
@@ -408,7 +429,8 @@ class TestImportEndpoints:
 
         with (
             patch(
-                "communication.endpoints.import_endpoints.get_validated_project", return_value=fxt_project
+                "communication.endpoints.import_endpoints.get_validated_project",
+                return_value=fxt_project,
             ) as mock_get_validated_project,
             patch(
                 "communication.helpers.import_utils.ImportUtils.get_validated_task_type",
@@ -416,7 +438,11 @@ class TestImportEndpoints:
             ) as mock_get_validated_task_type,
         ):
             response = self._call_import_dataset_to_existing_project(
-                client, fxt_url_prefix, fxt_project_id, fxt_dataset_id, fxt_dataset_storage_id
+                client,
+                fxt_url_prefix,
+                fxt_project_id,
+                fxt_dataset_id,
+                fxt_dataset_storage_id,
             )
             mock_get_validated_project.assert_called()
             mock_get_validated_task_type.assert_called()

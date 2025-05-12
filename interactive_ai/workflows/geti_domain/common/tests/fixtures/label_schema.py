@@ -3,12 +3,12 @@
 
 import pytest
 from _pytest.fixtures import FixtureRequest
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import LabelRepo, LabelSchemaRepo
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import LabelRepo, LabelSchemaRepo
 
 from tests.fixtures.values import IDOffsets
 
@@ -61,7 +61,12 @@ class LabelSchemaExample:
         self.label_schema = label_schema
 
     def new_label_by_name(self, name: str) -> Label:
-        label = Label(name=name, domain=self.label_domain, color=Color.random(), id_=LabelRepo.generate_id())
+        label = Label(
+            name=name,
+            domain=self.label_domain,
+            color=Color.random(),
+            id_=LabelRepo.generate_id(),
+        )
         if self.save_to_repo:
             label_repo = LabelRepo(self.project.identifier)
             label_repo.save(label)
@@ -196,4 +201,9 @@ def fxt_label_schema_example_persisted(
     fxt_empty_project,
     fxt_classification_task,
 ):
-    yield LabelSchemaExample(request, project=fxt_empty_project, task_node=fxt_classification_task, save_to_repo=True)
+    yield LabelSchemaExample(
+        request,
+        project=fxt_empty_project,
+        task_node=fxt_classification_task,
+        save_to_repo=True,
+    )

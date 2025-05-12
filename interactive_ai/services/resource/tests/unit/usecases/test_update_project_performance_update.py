@@ -5,22 +5,22 @@ from unittest.mock import patch
 
 from usecases.update_project_performance_usecase import UpdateProjectPerformanceUseCase
 
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.project_performance import (
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.project_performance import (
     GlobalLocalTaskPerformance,
     ProjectPerformance,
     TaskPerformance,
     TaskPerformanceScore,
 )
-from sc_sdk.repos import EvaluationResultRepo, ProjectRepo
+from iai_core.repos import EvaluationResultRepo, ProjectRepo
 
 
 @patch(
-    "sc_sdk.repos.project_repo.ProjectRepo.__init__",
+    "iai_core.repos.project_repo.ProjectRepo.__init__",
     return_value=None,
 )
 @patch(
-    "sc_sdk.repos.evaluation_result_repo.EvaluationResultRepo.__init__",
+    "iai_core.repos.evaluation_result_repo.EvaluationResultRepo.__init__",
     return_value=None,
 )
 class TestUpdateProjectPerformanceUseCase:
@@ -55,7 +55,9 @@ class TestUpdateProjectPerformanceUseCase:
         ):
             # Act
             UpdateProjectPerformanceUseCase.update_project_performance(
-                project_id=fxt_project.id_, task_node_id=task_node_id, inference_model_id=fxt_optimized_model.id_
+                project_id=fxt_project.id_,
+                task_node_id=task_node_id,
+                inference_model_id=fxt_optimized_model.id_,
             )
 
         # Assert
@@ -121,7 +123,9 @@ class TestUpdateProjectPerformanceUseCase:
         ):
             # Act
             UpdateProjectPerformanceUseCase.update_project_performance(
-                project_id=project.id_, task_node_id=task_node_id_1, inference_model_id=fxt_optimized_model.id_
+                project_id=project.id_,
+                task_node_id=task_node_id_1,
+                inference_model_id=fxt_optimized_model.id_,
             )
 
         # Assert

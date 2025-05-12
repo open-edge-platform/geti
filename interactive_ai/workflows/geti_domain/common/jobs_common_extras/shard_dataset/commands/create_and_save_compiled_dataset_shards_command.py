@@ -7,9 +7,9 @@ import logging
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.compiled_dataset_shards import CompiledDatasetShard, CompiledDatasetShards
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.repos import CompiledDatasetShardsRepo
+from iai_core.entities.compiled_dataset_shards import CompiledDatasetShard, CompiledDatasetShards
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.repos import CompiledDatasetShardsRepo
 
 from jobs_common.commands.interfaces.command import ICommand
 from jobs_common.exceptions import DataShardCreationFailedException

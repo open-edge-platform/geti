@@ -6,8 +6,8 @@ from communication.rest_views.annotation_rest_views import ID_
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from sc_sdk.repos import VideoAnnotationRangeRepo
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.repos import VideoAnnotationRangeRepo
 
 START_FRAME = "start_frame"
 END_FRAME = "end_frame"
@@ -53,7 +53,9 @@ class VideoAnnotationRangeRESTViews:
 
     @staticmethod
     @unified_tracing
-    def video_annotation_range_to_rest(video_annotation_range: VideoAnnotationRange) -> dict[str, Any]:
+    def video_annotation_range_to_rest(
+        video_annotation_range: VideoAnnotationRange,
+    ) -> dict[str, Any]:
         """
         Maps a VideoAnnotationRange entity to a REST View
 

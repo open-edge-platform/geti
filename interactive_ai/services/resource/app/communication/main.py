@@ -36,8 +36,8 @@ from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_fastapi_tools.responses import error_response_rest
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry, KafkaTelemetry
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.utils.exceptions import InvalidProjectDataException
+from iai_core.algorithms import ModelTemplateList
+from iai_core.utils.exceptions import InvalidProjectDataException
 
 
 @asynccontextmanager
@@ -109,7 +109,9 @@ def handle_not_found(request, exception) -> JSONResponse:  # noqa: ANN001, ARG00
     logger.info(message)
     headers = {"Cache-Control": "no-cache"}  # always revalidate
     return JSONResponse(
-        {"endpoint_not_found_response": message}, status_code=status.HTTP_404_NOT_FOUND, headers=headers
+        {"endpoint_not_found_response": message},
+        status_code=status.HTTP_404_NOT_FOUND,
+        headers=headers,
     )
 
 

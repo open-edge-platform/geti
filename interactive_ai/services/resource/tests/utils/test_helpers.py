@@ -22,40 +22,40 @@ from testfixtures import compare
 
 from tests.utils.segmentation_utils import create_annotation_from_segmentation_map
 
-import sc_sdk.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from sc_sdk.configuration.elements.primitive_parameters import (
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_float,
     configurable_integer,
     string_attribute,
 )
-from sc_sdk.configuration.enums.model_lifecycle import ModelLifecycle
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, NullLabelSchema
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.model import ModelConfiguration
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.entities.persistent_entity import PersistentEntity
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.repos import (
+from iai_core.configuration.enums.model_lifecycle import ModelLifecycle
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.color import Color
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, NullLabelSchema
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.model import ModelConfiguration
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.entities.persistent_entity import PersistentEntity
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     ConfigurableParametersRepo,
@@ -64,7 +64,7 @@ from sc_sdk.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from sc_sdk.repos.mappers.mongodb_mapper_interface import (
+from iai_core.repos.mappers.mongodb_mapper_interface import (
     IMapperBackward,
     IMapperDatasetStorageBackward,
     IMapperDatasetStorageForward,
@@ -78,13 +78,13 @@ from sc_sdk.repos.mappers.mongodb_mapper_interface import (
     MappableEntityType,
     MapperClassT,
 )
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo
-from sc_sdk.services.model_service import ModelService
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.identifier_factory import IdentifierFactory
-from sc_sdk.utils.media_factory import Media2DFactory
-from sc_sdk.utils.project_factory import ProjectFactory
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo
+from iai_core.services.model_service import ModelService
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.identifier_factory import IdentifierFactory
+from iai_core.utils.media_factory import Media2DFactory
+from iai_core.utils.project_factory import ProjectFactory
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +131,8 @@ def generate_random_annotated_image(
     for label_name in img_labels:
         rx, ry = rng.integers(low=[1, 1], high=[image_width - min_size, image_height - min_size])
         rw, rh = rng.integers(
-            low=[min_size, min_size], high=[min(max_size, image_width - rx), min(max_size, image_height - ry)]
+            low=[min_size, min_size],
+            high=[min(max_size, image_width - rx), min(max_size, image_height - ry)],
         )
         y_min, y_max = float(ry / image_height), float((ry + rh) / image_height)
         x_min, x_max = float(rx / image_width), float((rx + rw) / image_width)
@@ -325,7 +326,7 @@ def generate_random_annotated_project(
             {"name": "ellipse", "color": "#0000ffff"},
             {"name": "triangle", "color": "#ff0000ff"},
         ]
-    from sc_sdk.repos import AnnotationSceneRepo, ImageRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo
 
     if isinstance(model_template_id, ModelTemplate):
         model_template_id = model_template_id.model_template_id
@@ -435,7 +436,7 @@ def generate_inference_dataset_of_all_media_in_project(project: Project) -> Data
     :param project: Project to generate inference Dataset for
     :return: Dataset
     """
-    from sc_sdk.repos import ImageRepo, VideoRepo
+    from iai_core.repos import ImageRepo, VideoRepo
 
     dataset_storage = project.get_training_dataset_storage()
     image_identifiers = [i.media_identifier for i in ImageRepo(dataset_storage.identifier).get_all()]
@@ -481,7 +482,7 @@ def generate_training_dataset_of_all_annotated_media_in_project(
     :param ignore_some_labels: If True, mark some labels within the item as ignored
     :return: generated Dataset
     """
-    from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, VideoRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo, VideoRepo
 
     dataset_storage = project.get_training_dataset_storage()
     ann_scene_repo = AnnotationSceneRepo(dataset_storage.identifier)
@@ -563,7 +564,7 @@ def generate_and_save_random_simple_segmentation_project(
     :param request: pytest Request
     :param projectname: Name of the project that is created
     """
-    from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo
+    from iai_core.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo
 
     register_model_template(request, type(None), "segmentation", "SEGMENTATION", trainable=True)
     project = ProjectFactory().create_project_single_task(
@@ -914,7 +915,13 @@ class LabelSchemaExample:
         self.vegetative = self.new_label_by_name("vegetative")
 
     def new_label_by_name(self, name: str, is_empty: bool = False) -> Label:
-        label = Label(id_=ID(name), name=name, domain=self.label_domain, color=Color.random(), is_empty=is_empty)
+        label = Label(
+            id_=ID(name),
+            name=name,
+            domain=self.label_domain,
+            color=Color.random(),
+            is_empty=is_empty,
+        )
         label.id_ = ID(ObjectId())
         return label
 

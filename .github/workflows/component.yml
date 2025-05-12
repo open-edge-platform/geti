@@ -4,22 +4,24 @@ on:
   workflow_call:
     inputs:
       component-dir:
-        description: 'Dir in root directory'
+        description: "Dir in root directory"
         type: string
         required: true
       image-tag:
-        description: 'Docker image tag'
+        description: "Docker image tag"
         type: string
         required: true
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to checkout'
+        description: "Branch to checkout"
         required: true
-        default: 'main'
+        default: "main"
       component-dir:
-        description: 'Path to the component (relative to the root of the repository)'
+        description: "Path to the component (relative to the root of the repository)"
         required: true
+
+permissions: {} # No permissions by default on workflow level
 
 env:
   COMPONENT_DIR: ${{ inputs.component-dir }}
@@ -68,35 +70,35 @@ jobs:
           fi
 
       - name: Static code analysis
-        run: make builder -C ${COMPONENT_DIR} static-code-analysis
+        run: make builder -C "${COMPONENT_DIR}" static-code-analysis
 
       - name: Unit testing
-        run: make builder -C ${COMPONENT_DIR} test-unit
+        run: make builder -C "${COMPONENT_DIR}" test-unit
 
       - name: Integration testing
         run: |
           if [[ "${COMPONENT_DIR}" == "interactive_ai/workflows/geti_domain/project_ie" ]]; then
-            make -C ${COMPONENT_DIR} test-integration
+            make -C "${COMPONENT_DIR}" test-integration
           else
-            make builder -C ${COMPONENT_DIR} test-integration
+            make builder -C "${COMPONENT_DIR}" test-integration
           fi
 
       - name: Build image
         id: build-image
         run: |
-          OUTPUT=$(make -C ${COMPONENT_DIR} build-image)
+          OUTPUT=$(make -C "${COMPONENT_DIR}" build-image)
           if echo "$OUTPUT" | grep -q "Skipping"; then
             echo "SKIP_IMAGE=true" >> $GITHUB_OUTPUT
           fi
-        
+
       - name: Push image
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        run: make -C ${COMPONENT_DIR} push-image
+        run: make -C "${COMPONENT_DIR}" push-image
 
       - name: Lint chart
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        run: make -C ${COMPONENT_DIR} lint-chart
+        run: make -C "${COMPONENT_DIR}" lint-chart
 
       - name: Publish chart
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        run: make -C ${COMPONENT_DIR} publish-chart
+        run: make -C "${COMPONENT_DIR}" publish-chart

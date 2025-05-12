@@ -5,7 +5,7 @@ import pytest
 
 from tests.fixtures.values import DummyValues
 
-from sc_sdk.entities.metrics import (
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     ColorPalette,

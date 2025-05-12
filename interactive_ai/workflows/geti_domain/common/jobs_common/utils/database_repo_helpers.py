@@ -4,9 +4,9 @@
 Database repo helpers
 """
 
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import NullTaskNode, TaskNode
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import NullTaskNode, TaskNode
 
 
 def get_task_node_for_model_storage(model_storage: ModelStorage, project: Project) -> TaskNode:

@@ -17,7 +17,7 @@ on:
         description: 'Path to the component (relative to the root of the repository)'
         required: true
 
-permissions: {}
+permissions: {} # No permissions by default on workflow level
 
 env:
   COMPONENT_DIR: ${{ inputs.component-dir  }}
@@ -45,12 +45,12 @@ jobs:
         uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
 
       - name: Setup GO
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # v5.4.0
         with:
           go-version: '1.23'
 
       - name: Static code analysis
-        run: make -C ${COMPONENT_DIR} static-code-analysis
+        run: make -C "${COMPONENT_DIR}" static-code-analysis
 
       - name: Tests
-        run: make -C ${COMPONENT_DIR} tests
+        run: make -C "${COMPONENT_DIR}" tests

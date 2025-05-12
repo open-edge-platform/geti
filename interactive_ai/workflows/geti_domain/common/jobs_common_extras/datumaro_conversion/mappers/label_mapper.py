@@ -7,9 +7,9 @@ from dataclasses import dataclass
 import datumaro as dm
 from datumaro.components.annotation import GroupType as DmGroupType
 from geti_types import ID
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelGroupType, LabelSchema
+from iai_core.entities.color import Color
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelGroupType, LabelSchema
 
 from jobs_common_extras.datumaro_conversion.mappers.datetime_mapper import DatetimeMapper
 from jobs_common_extras.datumaro_conversion.mappers.id_mapper import IDMapper
@@ -26,7 +26,10 @@ class LabelGroupsMapper:
 
     @classmethod
     def update(
-        cls, label_categories: dm.LabelCategories, label_schema: LabelSchema, include_empty: bool
+        cls,
+        label_categories: dm.LabelCategories,
+        label_schema: LabelSchema,
+        include_empty: bool,
     ) -> dm.LabelCategories:
         """Update SC LabelGroups info to Datumaro LabelCategories"""
         label_groups = label_schema.get_groups(include_empty)
@@ -91,7 +94,11 @@ class LabelTreeMapper:
             if label.is_anomalous:
                 attributes.add(cls.anomalous_key)
 
-            label_cat.add(name=str(label.id_), parent=str(parent.id_) if parent else None, attributes=attributes)
+            label_cat.add(
+                name=str(label.id_),
+                parent=str(parent.id_) if parent else None,
+                attributes=attributes,
+            )
 
         return label_cat, point_cat
 
@@ -130,7 +137,10 @@ class LabelSchemaMapper:
         )
 
         return DmLabelSchemaInfo(
-            label_schema_id=label_schema_id, label_cat=label_cat, mask_cat=mask_cat, point_cat=point_cat
+            label_schema_id=label_schema_id,
+            label_cat=label_cat,
+            mask_cat=mask_cat,
+            point_cat=point_cat,
         )
 
 

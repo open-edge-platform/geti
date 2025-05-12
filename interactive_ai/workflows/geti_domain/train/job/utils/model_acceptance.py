@@ -11,10 +11,10 @@ import logging
 import numpy as np
 import scipy
 from geti_types import ProjectIdentifier
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model import Model, NullModel
 from jobs_common.jobs.helpers.model_helpers import get_model_accuracy
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.model import Model, NullModel
 
 logger = logging.getLogger(__name__)
 

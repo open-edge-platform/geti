@@ -36,25 +36,21 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES, GetiProjectType
-from jobs_common_extras.datumaro_conversion.mappers.id_mapper import VideoNameIDMapper
-from jobs_common_extras.datumaro_conversion.sc_extractor import RangeIdentifier
-from pytest import FixtureRequest
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
-from sc_sdk.repos import (
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.entities.project import Project
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -64,9 +60,13 @@ from sc_sdk.repos import (
     VideoAnnotationRangeRepo,
     VideoRepo,
 )
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo, ThumbnailBinaryRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES, GetiProjectType
+from jobs_common_extras.datumaro_conversion.mappers.id_mapper import VideoNameIDMapper
+from jobs_common_extras.datumaro_conversion.sc_extractor import RangeIdentifier
+from pytest import FixtureRequest
 
 from job.repos.data_repo import ImportDataRepo
 from job.utils.constants import MIN_VIDEO_SIZE
@@ -105,7 +105,8 @@ def generate_random_annotated_image(  # noqa: C901
     for label_name in img_labels:
         rx, ry = rng.integers(low=[1, 1], high=[image_width - min_size, image_height - min_size])
         rw, rh = rng.integers(
-            low=[min_size, min_size], high=[min(max_size, image_width - rx), min(max_size, image_height - ry)]
+            low=[min_size, min_size],
+            high=[min(max_size, image_width - rx), min(max_size, image_height - ry)],
         )
         y_min, y_max = float(ry / image_height), float((ry + rh) / image_height)
         x_min, x_max = float(rx / image_width), float((rx + rw) / image_width)
@@ -245,7 +246,11 @@ def generate_images_and_annotation_scenes(
         if labels is not None:
             label_idx = i % len(labels)
             scored_labels = [
-                ScoredLabel(label_id=labels[label_idx].id_, is_empty=labels[label_idx].is_empty, probability=1.0)
+                ScoredLabel(
+                    label_id=labels[label_idx].id_,
+                    is_empty=labels[label_idx].is_empty,
+                    probability=1.0,
+                )
             ]
         elif label_groups is not None:
             label_idx = i % len(label_groups)
@@ -534,7 +539,9 @@ def get_datumaro_exportor_version(dm_dataset_path: str) -> str:
 
 
 def get_sc_labels(
-    dataset_storage: DatasetStorage, dataset: list[ScDatasetItem], include_empty: bool = False
+    dataset_storage: DatasetStorage,
+    dataset: list[ScDatasetItem],
+    include_empty: bool = False,
 ) -> list[Label]:
     project_identifier = ProjectIdentifier(
         project_id=dataset_storage.project_id, workspace_id=dataset_storage.workspace_id

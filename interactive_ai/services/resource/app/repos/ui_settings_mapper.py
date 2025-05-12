@@ -5,8 +5,8 @@
 
 from entities.ui_settings import UISettings
 
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 
 class UISettingsToMongo(IMapperSimple[UISettings, dict]):

@@ -9,7 +9,7 @@ from unittest.mock import patch
 import pytest
 from testcontainers.mongodb import MongoDbContainer
 
-from sc_sdk.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.mongo_connector import MongoConnector
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

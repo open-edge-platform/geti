@@ -8,22 +8,22 @@ import os
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetRepo, LabelSchemaRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.flow_control import FlowControl
-from sc_sdk.utils.iteration import grouper
-from sc_sdk.utils.media_factory import Media2DFactory
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetRepo, LabelSchemaRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.flow_control import FlowControl
+from iai_core.utils.iteration import grouper
+from iai_core.utils.media_factory import Media2DFactory
 
 from jobs_common.tasks.utils.progress import report_progress
 from jobs_common.utils.subset_management.subset_manager import TaskSubsetManager
@@ -236,7 +236,8 @@ class DatasetHelpers:
         dataset = task_dataset_entity.get_dataset(dataset_storage=dataset_storage)
 
         training_dataset_size = min(
-            max_training_dataset_size if max_training_dataset_size is not None else len(dataset), len(dataset)
+            max_training_dataset_size if max_training_dataset_size is not None else len(dataset),
+            len(dataset),
         )
         if MAX_TRAINING_DATASET_SIZE is not None and training_dataset_size > MAX_TRAINING_DATASET_SIZE:
             report_progress(warning=MAX_TRAINING_DATASET_SIZE_WARNING)

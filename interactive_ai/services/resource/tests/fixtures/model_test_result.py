@@ -6,9 +6,9 @@ import pytest
 
 from tests.fixtures.values import DummyValues, IDOffsets
 
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.entities.metrics import MultiScorePerformance, ScoreMetric
-from sc_sdk.entities.model_test_result import ModelTestResult, TestState
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.entities.metrics import MultiScorePerformance, ScoreMetric
+from iai_core.entities.model_test_result import ModelTestResult, TestState
 
 
 @pytest.fixture

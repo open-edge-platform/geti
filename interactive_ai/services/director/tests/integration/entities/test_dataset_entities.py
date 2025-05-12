@@ -3,9 +3,9 @@
 
 
 from geti_types import ID
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import AnnotationSceneRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.entities.subset import Subset
+from iai_core.repos import AnnotationSceneRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
 
 
 class TestDataset:

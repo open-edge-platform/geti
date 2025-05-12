@@ -6,13 +6,13 @@ import { Flex, View } from '@adobe/react-spectrum';
 import { NoTrainedModels } from '../../../../assets/images';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
+import { useTasksWithSupportedAlgorithms } from '../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { EmptyData } from '../../../../shared/components/empty-data/empty-data.component';
 import { Loading } from '../../../../shared/components/loading/loading.component';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { isNonEmptyArray, isNotCropTask } from '../../../../shared/utils';
-import { useTasksWithSupportedAlgorithms } from '../../hooks/use-tasks-with-supported-algorithms';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { EmptyDataTrainingProgress } from './empty-data-training-progress.componen';
 import { useIsTraining } from './hooks/use-is-training.hook';
@@ -26,7 +26,7 @@ export const ProjectModels = (): JSX.Element => {
     const { useProjectModelsQuery } = useModels();
     const { tasksWithSupportedAlgorithms } = useTasksWithSupportedAlgorithms();
     const isTraining = useIsTraining();
-    const { FEATURE_FLAG_TRAINING_FLOW_REVAMP } = useFeatureFlags();
+    const { FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS } = useFeatureFlags();
 
     const {
         project: { tasks },
@@ -45,7 +45,7 @@ export const ProjectModels = (): JSX.Element => {
                 breadcrumbs={[{ id: 'models-id', breadcrumb: 'Models' }]}
                 header={
                     <Flex alignItems={'center'} gap={'size-150'}>
-                        {!FEATURE_FLAG_TRAINING_FLOW_REVAMP && <ReconfigureModels />}
+                        {!FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS && <ReconfigureModels />}
                         {!isLoadingModels && <TrainModel models={formattedModelsGroups} />}
                     </Flex>
                 }

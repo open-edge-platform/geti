@@ -5,15 +5,15 @@
 #
 
 import attr
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
-from sc_sdk.configuration.elements.primitive_parameters import (
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.parameter_group import ParameterGroup, add_parameter_group
+from iai_core.configuration.elements.primitive_parameters import (
     configurable_boolean,
     configurable_float,
     string_attribute,
 )
-from sc_sdk.configuration.enums.model_lifecycle import ModelLifecycle
-from sc_sdk.configuration.ui_rules.rules import Action, Operator, Rule, UIRules
+from iai_core.configuration.enums.model_lifecycle import ModelLifecycle
+from iai_core.configuration.ui_rules.rules import Action, Operator, Rule, UIRules
 
 
 @attr.s

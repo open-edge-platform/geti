@@ -13,6 +13,18 @@ import pkg_resources
 import pytest
 from datumaro.components.annotation import GroupType, LabelCategories
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema, NullLabelSchema
+from iai_core.entities.media import ImageExtensions
+from iai_core.entities.model_template import NullModelTemplate, TaskType
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.shapes import Ellipse, Polygon, Rectangle
+from iai_core.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo, ProjectRepo
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_builder import ModelTemplateError
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common.tasks.utils.secrets import JobMetadata
 from jobs_common_extras.datumaro_conversion.definitions import (
@@ -20,18 +32,6 @@ from jobs_common_extras.datumaro_conversion.definitions import (
     SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES,
     GetiProjectType,
 )
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema, NullLabelSchema
-from sc_sdk.entities.media import ImageExtensions
-from sc_sdk.entities.model_template import NullModelTemplate, TaskType
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.shapes import Ellipse, Polygon, Rectangle
-from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo, ProjectRepo
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.project_builder import ModelTemplateError
 
 from job.repos.data_repo import ImportDataRepo
 from job.repos.object_storage_repo import ObjectStorageRepo
@@ -160,7 +160,10 @@ class TestImportDataset:
             ],
         }
         dm_dataset = self._get_dm_dataset_from_definition(
-            request, dm_dataset_definition, label_names={dm.AnnotationType.label: label_categories}, dm_infos=dm_infos
+            request,
+            dm_dataset_definition,
+            label_names={dm.AnnotationType.label: label_categories},
+            dm_infos=dm_infos,
         )
         return label_names, dm_dataset, global_group_name
 
@@ -170,11 +173,20 @@ class TestImportDataset:
 
         def _get_metadata(metadata: dict):
             nonlocal supported_project_types, warnings
-            supported_project_types, warnings = metadata["supported_project_types"], metadata["warnings"]
+            supported_project_types, warnings = (
+                metadata["supported_project_types"],
+                metadata["warnings"],
+            )
 
         with (
-            patch("job.tasks.import_tasks.parse_dataset_new_project.publish_metadata_update", new=_get_metadata),
-            patch("job.tasks.import_tasks.parse_dataset_new_project.ImportDataRepo", return_value=data_repo),
+            patch(
+                "job.tasks.import_tasks.parse_dataset_new_project.publish_metadata_update",
+                new=_get_metadata,
+            ),
+            patch(
+                "job.tasks.import_tasks.parse_dataset_new_project.ImportDataRepo",
+                return_value=data_repo,
+            ),
         ):
             parse_dataset_for_import_to_new_project(import_id=str(dataset_id))
 
@@ -197,8 +209,14 @@ class TestImportDataset:
             project_id = metadata["project_id"]
 
         with (
-            patch("job.tasks.import_tasks.create_project_from_dataset.publish_metadata_update", new=_get_metadata),
-            patch("job.tasks.import_tasks.create_project_from_dataset.ImportDataRepo", return_value=data_repo),
+            patch(
+                "job.tasks.import_tasks.create_project_from_dataset.publish_metadata_update",
+                new=_get_metadata,
+            ),
+            patch(
+                "job.tasks.import_tasks.create_project_from_dataset.ImportDataRepo",
+                return_value=data_repo,
+            ),
         ):
             colors_by_label = {}
             for label in label_names:
@@ -232,7 +250,10 @@ class TestImportDataset:
                 "job.tasks.import_tasks.parse_dataset_existing_project.publish_metadata_update",
                 new=_get_labels_warnings,
             ),
-            patch("job.tasks.import_tasks.parse_dataset_existing_project.ImportDataRepo", return_value=data_repo),
+            patch(
+                "job.tasks.import_tasks.parse_dataset_existing_project.ImportDataRepo",
+                return_value=data_repo,
+            ),
         ):
             parse_dataset_for_import_to_existing_project(
                 import_id=str(dataset_id),
@@ -253,7 +274,10 @@ class TestImportDataset:
         labels_map_str = {key: str(label.id_) for key, label in labels_map.items()}
 
         with (
-            patch("job.tasks.import_tasks.import_dataset_to_project.ImportDataRepo", return_value=data_repo),
+            patch(
+                "job.tasks.import_tasks.import_dataset_to_project.ImportDataRepo",
+                return_value=data_repo,
+            ),
             patch("job.tasks.import_tasks.import_dataset_to_project.publish_metadata_update"),
         ):
             import_dataset_to_project(
@@ -443,7 +467,10 @@ class TestImportDataset:
         """
         mocked_object_storage_repo_init.return_value = MagicMock()
         project = self._import_two_labels_project_from_dataset(
-            request=request, file_id=fxt_coco_dataset_id, project_type=project_type, data_repo=fxt_import_data_repo
+            request=request,
+            file_id=fxt_coco_dataset_id,
+            project_type=project_type,
+            data_repo=fxt_import_data_repo,
         )
         labels = get_latest_labels_for_project(project_id=project.id_, include_empty=True)
         assert not isinstance(project, NullProject)
@@ -684,7 +711,9 @@ class TestImportDataset:
             for label_name in label_names:
                 label_categories.add(label_name, parent="")
                 label_categories.add_label_group(
-                    name=f"Classification labels___{label_name}", labels=[label_name], group_type=GroupType.EXCLUSIVE
+                    name=f"Classification labels___{label_name}",
+                    labels=[label_name],
+                    group_type=GroupType.EXCLUSIVE,
                 )
             label_categories = {dm.AnnotationType.label: label_categories}
         elif project_type == GetiProjectType.ROTATED_DETECTION:
@@ -766,7 +795,11 @@ class TestImportDataset:
     @patch("jobs_common.tasks.utils.secrets.set_env_vars", new=return_none)
     @patch("jobs_common.tasks.utils.secrets.setup_session_from_env", new=return_none)
     def test_import_dataset_for_keypoint_detection(
-        self, fxt_dataumaro_dataset_keypoint_id, fxt_import_data_repo, fxt_enable_feature_flag_name, request
+        self,
+        fxt_dataumaro_dataset_keypoint_id,
+        fxt_import_data_repo,
+        fxt_enable_feature_flag_name,
+        request,
     ) -> None:
         """
         Is is possible to create a chained projects from chained datasets.
@@ -912,7 +945,10 @@ class TestImportDataset:
             # check names in pipeline (need "anomaly" instead of "anomaly_classification")
             for project_meta in supported_project_types:
                 ptype = ImportUtils.rest_task_type_to_project_type(project_meta["project_type"])
-                assert ptype not in [GetiProjectType.ANOMALY_DETECTION, GetiProjectType.ANOMALY_SEGMENTATION]
+                assert ptype not in [
+                    GetiProjectType.ANOMALY_DETECTION,
+                    GetiProjectType.ANOMALY_SEGMENTATION,
+                ]
                 if ptype == GetiProjectType.ANOMALY_CLASSIFICATION:
                     assert project_meta["project_type"] == "anomaly"
                     pipeline = project_meta["pipeline"]
@@ -1108,7 +1144,10 @@ class TestImportDataset:
         """
         Test importing geti-exported anomaly datasets into impt projects of different domains.
         """
-        anomaly_det_seg = [GetiProjectType.ANOMALY_DETECTION, GetiProjectType.ANOMALY_SEGMENTATION]
+        anomaly_det_seg = [
+            GetiProjectType.ANOMALY_DETECTION,
+            GetiProjectType.ANOMALY_SEGMENTATION,
+        ]
         if fxt_anomaly_reduction and project_type_to in anomaly_det_seg:
             pytest.skip(
                 f"Mapping from '{project_type_from.name}' to '{project_type_to.name}' deosn't exist "
@@ -1221,7 +1260,11 @@ class TestImportDataset:
         return dataset_id
 
     def _import_two_labels_project_from_dataset(
-        self, request, file_id: ID, project_type: GetiProjectType, data_repo: ImportDataRepo
+        self,
+        request,
+        file_id: ID,
+        project_type: GetiProjectType,
+        data_repo: ImportDataRepo,
     ) -> Project:
         """
         Import project with two labels ['car', 'person'] from a given dataset which includes these
@@ -1954,7 +1997,10 @@ class TestImportDataset:
             dm_dataset_definition = dataset_definition
 
         dm_label_names, dm_dataset = self._create_geti_exported_dataset_from_definition(
-            request, project_type_from, dm_dataset_definition, is_multi_label=is_multi_label_dataset
+            request,
+            project_type_from,
+            dm_dataset_definition,
+            is_multi_label=is_multi_label_dataset,
         )
         dataset_id = save_dataset(import_data_repo, dm_dataset, "datumaro")
 
@@ -2358,7 +2404,10 @@ class TestImportDataset:
         ("video_dataset_path", "project_type"),
         [
             ("fxt_datumaro_video_dataset_path", GetiProjectType.DETECTION),
-            ("fxt_datumaro_video_dataset_with_ranges_path", GetiProjectType.CLASSIFICATION),
+            (
+                "fxt_datumaro_video_dataset_with_ranges_path",
+                GetiProjectType.CLASSIFICATION,
+            ),
         ],
     )
     def test_import_video_dataset(
@@ -2377,7 +2426,8 @@ class TestImportDataset:
 
         video_dataset_path_value = request.getfixturevalue(video_dataset_path)
         fxt_datumaro_dataset_path = download_file(
-            URL_DATASETS + video_dataset_path_value, Path(fxt_temp_directory) / video_dataset_path_value
+            URL_DATASETS + video_dataset_path_value,
+            Path(fxt_temp_directory) / video_dataset_path_value,
         )
         dataset_id = save_dataset_with_path(fxt_import_data_repo, str(fxt_datumaro_dataset_path))
         fmt = "datumaro"
@@ -2419,7 +2469,11 @@ class TestImportDataset:
         )
 
         dataset_storage = ProjectRepo().get_by_id(project_id).get_training_dataset_storage()
-        check_video_annotation_ranges(dm_dataset=dm_dataset, dataset_storage=dataset_storage, label_names=label_names)
+        check_video_annotation_ranges(
+            dm_dataset=dm_dataset,
+            dataset_storage=dataset_storage,
+            label_names=label_names,
+        )
 
         # import a dataset again (import to exising project)
         request.addfinalizer(lambda: DeletionHelpers.delete_project_by_id(project_id=project_id))
@@ -2471,7 +2525,9 @@ class TestImportDataset:
                     dm_item.wrap(
                         id=f"{splits[0]}__1_range_{splits[1]}",
                         media=dm.Video(
-                            new_video_path, start_frame=dm_item.media._start_frame, end_frame=dm_item.media._end_frame
+                            new_video_path,
+                            start_frame=dm_item.media._start_frame,
+                            end_frame=dm_item.media._end_frame,
                         ),
                     )
                 )
@@ -2551,7 +2607,10 @@ class TestImportDataset:
 
         dataset_storage = ProjectRepo().get_by_id(project_id).get_training_dataset_storage()
         check_video_annotation_ranges(
-            dm_dataset=dm_dataset, dataset_storage=dataset_storage, label_names=label_names, restored=False
+            dm_dataset=dm_dataset,
+            dataset_storage=dataset_storage,
+            label_names=label_names,
+            restored=False,
         )
 
         # import a dataset again (import to exising project)

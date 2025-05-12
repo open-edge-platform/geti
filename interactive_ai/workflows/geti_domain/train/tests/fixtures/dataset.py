@@ -3,17 +3,17 @@
 
 import pytest
 from geti_types import ID
-from sc_sdk.entities.compiled_dataset_shards import (
+from iai_core.entities.compiled_dataset_shards import (
     CompiledDatasetShard,
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import VideoFrame
-from sc_sdk.repos import DatasetRepo
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import VideoFrame
+from iai_core.repos import DatasetRepo
 
 
 @pytest.fixture

@@ -45,6 +45,10 @@ DOCKER_REGISTRY					  := $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY),)
 
 DOCKER_BUILD_CONTEXT              ?=
 
+###
+# Unset USE_PROXY variable if there is no proxy
+###
+USE_PROXY                         ?= true
 ifdef USE_PROXY
 DOCKER_EXTRA_ARGS                 ?= ${PROXY} ${DOCKER_REGISTRY}
 DOCKER_PROXY                      := -e http_proxy=$(http_proxy) \

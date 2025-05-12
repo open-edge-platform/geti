@@ -7,9 +7,9 @@ import clsx from 'clsx';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideo, isVideoFrame } from '../../../../core/media/video.interface';
-import { FitImageToScreenButton } from '../../../../shared/components/fit-image-to-screen-button/fit-image-to-screen-button.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useZoom } from '../../zoom/zoom-provider.component';
+import { FitImageToScreenButton } from '../fit-image-to-screen-button/fit-image-to-screen-button.component';
 import { MediaItemImageMetadata } from './media-item-image-metadata.component';
 import { MediaItemVideoMetadata } from './media-item-video-metadata.component';
 import { ProjectName } from './project-name.component';

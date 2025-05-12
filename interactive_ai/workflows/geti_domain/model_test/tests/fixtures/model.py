@@ -4,9 +4,9 @@
 from copy import copy
 
 import pytest
-from sc_sdk.entities.model import Model, ModelConfiguration, ModelStatus, NullModel
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import (
+from iai_core.entities.model import Model, ModelConfiguration, ModelStatus, NullModel
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,

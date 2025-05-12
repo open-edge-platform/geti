@@ -7,7 +7,7 @@ This module implements rest views for dataset storage entities
 
 from typing import Any
 
-from sc_sdk.entities.dataset_storage import DatasetStorage
+from iai_core.entities.dataset_storage import DatasetStorage
 
 ID_ = "id"
 NAME = "name"
@@ -31,7 +31,9 @@ class DatasetStorageRESTViews:
         }
 
     @staticmethod
-    def dataset_storages_to_rest(dataset_storages: tuple[DatasetStorage, ...]) -> dict[str, Any]:
+    def dataset_storages_to_rest(
+        dataset_storages: tuple[DatasetStorage, ...],
+    ) -> dict[str, Any]:
         """
         :param dataset_storages: list of dataset storages
         :return: dict containing list of dataset storage REST representations

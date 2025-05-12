@@ -13,7 +13,7 @@ dependencies = [
   "scipy~=1.14",
   "uvicorn~=0.17",
   "scikit-learn~=1.6",
-  "sc_sdk",
+  "iai_core",
   "geti-kafka-tools",
   "geti-telemetry-tools[telemetry,fastapi,grpc,logger,kafka]",
   "geti-types",
@@ -27,7 +27,7 @@ geti-kafka-tools = { path = "../../../libs/kafka_tools" , editable = true}
 geti-fastapi-tools = { path = "../../../libs/fastapi_tools" , editable = true}
 geti-types = { path = "../../../libs/types" , editable = true}
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools" , editable = true}
-sc_sdk = { path = "../../libs/sc_sdk" , editable = true}
+iai_core = { path = "../../libs/iai_core_py" , editable = true}
 grpc_interfaces = { path = "../../../grpc_interfaces" , editable = true}
 geti-supported-models = { path = "../../supported_models", editable = true }
 
@@ -75,7 +75,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
-known-local-folder = ["geti_types", "geti_kafka_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "sc_sdk"]
+known-local-folder = ["geti_types", "geti_kafka_tools", "geti_telemetry_tools", "geti_fastapi_tools", "grpc_interfaces", "iai_core"]
 
 [tool.ruff.lint.pylint]
 max-args=7

@@ -20,9 +20,9 @@ from scheduler.job_repo import SessionBasedSchedulerJobRepo
 from geti_kafka_tools import publish_event
 from geti_spicedb_tools import SpiceDB
 from geti_types import CTX_SESSION_VAR, ID, Singleton
-from sc_sdk.repos.base.constants import ORGANIZATION_ID_FIELD_NAME, WORKSPACE_ID_FIELD_NAME
-from sc_sdk.repos.mappers import IDToMongo
-from sc_sdk.utils.time_utils import now
+from iai_core.repos.base.constants import ORGANIZATION_ID_FIELD_NAME, WORKSPACE_ID_FIELD_NAME
+from iai_core.repos.mappers import IDToMongo
+from iai_core.utils.time_utils import now
 
 logger = logging.getLogger(__name__)
 

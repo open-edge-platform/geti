@@ -6,8 +6,8 @@ from communication.rest_data_validator.annotation_template_rest_validator import
 from communication.rest_views.annotation_template_rest_views import AnnotationTemplateRESTViews
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.annotation_template import AnnotationTemplate
-from sc_sdk.repos.annotation_template_repo import AnnotationTemplateRepo
+from iai_core.entities.annotation_template import AnnotationTemplate
+from iai_core.repos.annotation_template_repo import AnnotationTemplateRepo
 
 
 class AnnotationTemplateRESTController:
@@ -45,7 +45,9 @@ class AnnotationTemplateRESTController:
         return AnnotationTemplateRESTViews.annotation_template_to_rest(annotation_template)
 
     @staticmethod
-    def get_annotation_templates(project_identifier: ProjectIdentifier) -> dict[str, list[dict]]:
+    def get_annotation_templates(
+        project_identifier: ProjectIdentifier,
+    ) -> dict[str, list[dict]]:
         """
         Get all annotation templates for a project
 

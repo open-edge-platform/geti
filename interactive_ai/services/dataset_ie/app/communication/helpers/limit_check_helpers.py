@@ -5,7 +5,7 @@
 from communication.constants import MAX_NUMBER_OF_LABELS, MAX_NUMBER_OF_PROJECTS_PER_ORGANIZATION
 from communication.helpers.http_exceptions import MaxLabelsReachedGetiBaseException, MaxProjectsReachedGetiBaseException
 
-from sc_sdk.repos import ProjectRepo
+from iai_core.repos import ProjectRepo
 
 
 def check_max_number_of_projects(include_hidden: bool = False) -> None:

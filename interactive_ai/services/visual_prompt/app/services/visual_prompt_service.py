@@ -34,19 +34,18 @@ from geti_types import (
     ProjectIdentifier,
     VideoFrameIdentifier,
 )
-from media_utils import get_media_numpy
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.metrics import MultiScorePerformance, ScoreMetric
-from sc_sdk.entities.model import (
+from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
+from iai_core.entities.image import Image, NullImage
+from iai_core.entities.label import Domain
+from iai_core.entities.metrics import MultiScorePerformance, ScoreMetric
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelFormat,
@@ -54,13 +53,13 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import NullModelTemplate
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import NullVideo, VideoFrame
-from sc_sdk.repos import (
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import NullModelTemplate
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import NullVideo, VideoFrame
+from iai_core.repos import (
     AnnotationSceneRepo,
     DatasetRepo,
     EvaluationResultRepo,
@@ -71,7 +70,8 @@ from sc_sdk.repos import (
     ProjectRepo,
     VideoRepo,
 )
-from sc_sdk.repos.storage.s3_connector import S3Connector
+from iai_core.repos.storage.s3_connector import S3Connector
+from media_utils import get_media_numpy
 
 SAM_ENCODER_XML_PATH_ENV = "SAM_ENCODER_XML_PATH"
 SAM_ENCODER_BIN_PATH_ENV = "SAM_ENCODER_BIN_PATH"
@@ -178,7 +178,11 @@ class VisualPromptService:
         missing_labels = compatible_label_ids - learned_label_ids
 
         if missing_labels:
-            self.one_shot_learn(project_identifier=project_identifier, label_ids=list(missing_labels), task_id=task_id)
+            self.one_shot_learn(
+                project_identifier=project_identifier,
+                label_ids=list(missing_labels),
+                task_id=task_id,
+            )
 
         # Stage 2: fetch latest reference features and infer on media
         reference_features = reference_features_repo.get_all_by_task_id(task_id=task_id)
@@ -228,15 +232,21 @@ class VisualPromptService:
             match label.domain:
                 case Domain.DETECTION:
                     predicted_bboxes += AnnotationConverter.convert_to_bboxes(
-                        predicted_mask=predicted_mask, predicted_label=label, label_source=label_source
+                        predicted_mask=predicted_mask,
+                        predicted_label=label,
+                        label_source=label_source,
                     )
                 case Domain.ROTATED_DETECTION:
                     predicted_rotated_bboxes += AnnotationConverter.convert_to_rotated_bboxes(
-                        predicted_mask=predicted_mask, predicted_label=label, label_source=label_source
+                        predicted_mask=predicted_mask,
+                        predicted_label=label,
+                        label_source=label_source,
                     )
                 case Domain.SEGMENTATION | Domain.INSTANCE_SEGMENTATION:
                     predicted_polygons += AnnotationConverter.convert_to_polygons(
-                        predicted_mask=predicted_mask, predicted_label=label, label_source=label_source
+                        predicted_mask=predicted_mask,
+                        predicted_label=label,
+                        label_source=label_source,
                     )
                 case _:
                     raise ValueError(
@@ -327,7 +337,10 @@ class VisualPromptService:
                 media_identifier=annotation_scene.media_identifier,
             )
             reference_dataset_item = DatasetItem(
-                id_=DatasetRepo.generate_id(), media=media, annotation_scene=annotation_scene, subset=Subset.TRAINING
+                id_=DatasetRepo.generate_id(),
+                media=media,
+                annotation_scene=annotation_scene,
+                subset=Subset.TRAINING,
             )
             dataset_items.append(reference_dataset_item)
 
@@ -335,10 +348,14 @@ class VisualPromptService:
             image_height = resized_image.shape[0]
             image_width = resized_image.shape[1]
             bbox_prompts = prompt_converter.extract_bbox_prompts(
-                annotation_scene=annotation_scene, height=image_height, width=image_width
+                annotation_scene=annotation_scene,
+                height=image_height,
+                width=image_width,
             )
             polygon_prompts = prompt_converter.extract_polygon_prompts(
-                annotation_scene=annotation_scene, height=image_height, width=image_width
+                annotation_scene=annotation_scene,
+                height=image_height,
+                width=image_width,
             )
 
             with lock:
@@ -360,7 +377,9 @@ class VisualPromptService:
 
             with lock:
                 results = self.visual_prompter_model.infer(
-                    image=resized_image, reference_features=visual_prompting_features, apply_masks_refinement=False
+                    image=resized_image,
+                    reference_features=visual_prompting_features,
+                    apply_masks_refinement=False,
                 )
             dice_generator = self._generate_intersection_and_cardinalities(
                 image_height=resized_image.shape[0],
@@ -391,7 +410,8 @@ class VisualPromptService:
         if filename is None:
             raise ValueError("Cannot load file from S3. Filename is not provided.")
         obj = self.s3_client.get_object(
-            bucket_name=VisualPromptService.pretrained_weights_bucket_name, object_name=filename
+            bucket_name=VisualPromptService.pretrained_weights_bucket_name,
+            object_name=filename,
         )
         return RAWBinaryInterpreter().interpret(io.BytesIO(obj.data), filename=filename)
 
@@ -491,7 +511,10 @@ class VisualPromptService:
         reference_dataset: Dataset
         ds_identifier = project.get_training_dataset_storage().identifier
         if isinstance(sam, NullModel):
-            logger.info("No SAM model found for task ID `%s`; creating one with a new reference dataset.", task_id)
+            logger.info(
+                "No SAM model found for task ID `%s`; creating one with a new reference dataset.",
+                task_id,
+            )
             reference_dataset = Dataset(
                 id=DatasetRepo.generate_id(),
                 items=dataset_items,
@@ -520,7 +543,10 @@ class VisualPromptService:
                 training_duration=learning_duration,
             )
         else:
-            logger.info("SAM model already exists for task ID `%s`; updating its reference dataset.", task_id)
+            logger.info(
+                "SAM model already exists for task ID `%s`; updating its reference dataset.",
+                task_id,
+            )
             # Update model's label schema and dataset
             # The new reference dataset keeps the id of the old one (to avoid breaking references from other entities)
             # but it also includes the new dataset items.
@@ -555,7 +581,10 @@ class VisualPromptService:
                 "numpy_filename": numpy_filename,
             }
 
-        sam.set_data(key=REFERENCE_FEATURES_JSON, data=json.dumps(reference_feature_dict, indent=4).encode())
+        sam.set_data(
+            key=REFERENCE_FEATURES_JSON,
+            data=json.dumps(reference_feature_dict, indent=4).encode(),
+        )
         ModelRepo(sam_model_storage.identifier).save(sam)
 
         logger.info(f"Saved SAM model with ID `{sam.id_}`.")
@@ -688,11 +717,15 @@ class VisualPromptService:
             # replace existing score metrics with new values
             if label.id_ in dice_intersection_per_label:
                 intersection_score_metric_per_label[label.id_] = ScoreMetric(
-                    label_id=label.id_, name=DICE_INTERSECTION, value=dice_intersection_per_label[label.id_]
+                    label_id=label.id_,
+                    name=DICE_INTERSECTION,
+                    value=dice_intersection_per_label[label.id_],
                 )
             if label.id_ in dice_cardinality_per_label:
                 cardinality_score_metric_per_label[label.id_] = ScoreMetric(
-                    label_id=label.id_, name=DICE_CARDINALITY, value=dice_cardinality_per_label[label.id_]
+                    label_id=label.id_,
+                    name=DICE_CARDINALITY,
+                    value=dice_cardinality_per_label[label.id_],
                 )
             if label.id_ in intersection_score_metric_per_label and label.id_ in cardinality_score_metric_per_label:
                 performance.add_score(intersection_score_metric_per_label[label.id_])

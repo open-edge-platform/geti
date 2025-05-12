@@ -17,14 +17,14 @@ from resource_management.media_manager import MediaManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_types import CTX_SESSION_VAR, ID, ImageIdentifier
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label_schema import LabelSchemaView, NullLabelSchema
-from sc_sdk.entities.media import ImageExtensions, VideoExtensions
-from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, LabelRepo, LabelSchemaRepo, ProjectRepo, VideoRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.utils.project_builder import PersistedProjectBuilder, ProjectBuilder
+from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label_schema import LabelSchemaView, NullLabelSchema
+from iai_core.entities.media import ImageExtensions, VideoExtensions
+from iai_core.repos import AnnotationSceneRepo, ImageRepo, LabelRepo, LabelSchemaRepo, ProjectRepo, VideoRepo
+from iai_core.repos.storage.storage_client import BytesStream
+from iai_core.utils.project_builder import PersistedProjectBuilder, ProjectBuilder
 
 
 @pytest.fixture(scope="function")

@@ -6,7 +6,7 @@ from testfixtures import compare
 from communication.rest_views.annotation_template_rest_views import AnnotationTemplateRESTViews
 
 from geti_types import ID
-from sc_sdk.entities.annotation_template import AnnotationTemplate
+from iai_core.entities.annotation_template import AnnotationTemplate
 
 
 class TestAnnotationTemplateRESTViews:

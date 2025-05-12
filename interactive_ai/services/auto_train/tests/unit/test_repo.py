@@ -12,7 +12,7 @@ from entities import NullAutoTrainActivationRequest
 from mapper import AutoTrainActivationToMongo
 from repo import SessionBasedAutoTrainActivationRepo
 
-from sc_sdk.repos.mappers import DatetimeToMongo
+from iai_core.repos.mappers import DatetimeToMongo
 
 
 @pytest.mark.AutoTrainControllerComponent

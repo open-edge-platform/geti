@@ -11,12 +11,12 @@ from communication.exceptions import NoModelTrainedException
 from service.project_service import ProjectService
 
 from geti_types import ID, VideoFrameIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.model import NullModel
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.repos import AnnotationSceneRepo
-from sc_sdk.services import ModelService
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label import Label
+from iai_core.entities.model import NullModel
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.repos import AnnotationSceneRepo
+from iai_core.services import ModelService
 
 
 @pytest.fixture
@@ -30,7 +30,11 @@ def fxt_annotation_with_model_id(fxt_rectangle_annotation, fxt_ote_id):
         return Annotation(
             shape=fxt_rectangle_annotation.shape,
             labels=[
-                ScoredLabel(label_id=label.id_, is_empty=label.is_empty, label_source=LabelSource(model_id=model_id))
+                ScoredLabel(
+                    label_id=label.id_,
+                    is_empty=label.is_empty,
+                    label_source=LabelSource(model_id=model_id),
+                )
             ],
             id_=AnnotationSceneRepo.generate_id(),
         )

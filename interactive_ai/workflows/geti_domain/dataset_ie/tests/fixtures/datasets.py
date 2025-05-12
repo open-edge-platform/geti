@@ -9,9 +9,9 @@ import datumaro as dm
 import numpy as np
 import pytest
 from datumaro.components.annotation import GroupType, LabelCategories
+from iai_core.entities.label import Domain
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.label import Domain
 
 from job.utils.constants import MIN_IMAGE_SIZE
 
@@ -189,7 +189,12 @@ def _make_dataset_item(
         elif shape_type == "points":
             # label in points means visibility. Its label is always 0.
             points = [i for i in label for _ in range(2)]
-            shape = dm.Points(points=points, visibility=list(label), label=0, group=len(annotations) + group_offset)
+            shape = dm.Points(
+                points=points,
+                visibility=list(label),
+                label=0,
+                group=len(annotations) + group_offset,
+            )
         else:
             raise ValueError("shape_type not in supported types: [bbox, polygon, label, ellipse, mask]")
         annotations.append(shape)
@@ -197,7 +202,9 @@ def _make_dataset_item(
         id=item_id,
         subset=subset,
         media=dm.Image.from_numpy(
-            np.ones((MIN_IMAGE_SIZE, MIN_IMAGE_SIZE, 3)), ext=".jpg", size=(MIN_IMAGE_SIZE, MIN_IMAGE_SIZE)
+            np.ones((MIN_IMAGE_SIZE, MIN_IMAGE_SIZE, 3)),
+            ext=".jpg",
+            size=(MIN_IMAGE_SIZE, MIN_IMAGE_SIZE),
         ),
         annotations=annotations,
     )
@@ -223,7 +230,8 @@ def fxt_dm_dataset_item_generator() -> Callable[[str, str | None, Any], dm.Datas
 
 @pytest.fixture
 def fxt_dm_dataset_generator() -> Callable[
-    [Sequence[str] | dm.CategoriesInfo, Mapping[str, Sequence[tuple[str, Any]]]], dm.Dataset
+    [Sequence[str] | dm.CategoriesInfo, Mapping[str, Sequence[tuple[str, Any]]]],
+    dm.Dataset,
 ]:
     """
     Generates dm dataset from a dataset definition and list of labels
@@ -418,9 +426,21 @@ _test_dataset_id__datumaro = {
     "fxt_datumaro_dataset_hierarchical_id": DatasetInfo(
         exported_project_type=GetiProjectType.HIERARCHICAL_CLASSIFICATION,
         fxt_corresponding_project="fxt_annotated_hierarchical_classification_project",
-        label_names={"non_square", "rectangle", "square", "equilateral", "triangle", "right"},
+        label_names={
+            "non_square",
+            "rectangle",
+            "square",
+            "equilateral",
+            "triangle",
+            "right",
+        },
         label_names_by_ann_based_project={  # label
-            GetiProjectType.CLASSIFICATION: {"non_square", "square", "equilateral", "right"},
+            GetiProjectType.CLASSIFICATION: {
+                "non_square",
+                "square",
+                "equilateral",
+                "right",
+            },
         },
         num_items=4,
     ),
@@ -468,7 +488,11 @@ _test_dataset_id__datumaro = {
         label_names_by_cross_project={
             GetiProjectType.DETECTION: {"label0", "label1"},
             GetiProjectType.INSTANCE_SEGMENTATION: {"label0", "label1"},
-            GetiProjectType.CHAINED_DETECTION_SEGMENTATION: {"label0", "label1", "detection label"},
+            GetiProjectType.CHAINED_DETECTION_SEGMENTATION: {
+                "label0",
+                "label1",
+                "detection label",
+            },
         },
         warnings={
             Domain.DETECTION: {_warning_missing_ann_det(1)},
@@ -488,7 +512,11 @@ _test_dataset_id__datumaro = {
         label_names_by_cross_project={
             GetiProjectType.DETECTION: {"label0", "label1"},
             GetiProjectType.SEGMENTATION: {"label0", "label1"},
-            GetiProjectType.CHAINED_DETECTION_SEGMENTATION: {"label0", "label1", "detection label"},
+            GetiProjectType.CHAINED_DETECTION_SEGMENTATION: {
+                "label0",
+                "label1",
+                "detection label",
+            },
         },
         warnings={
             Domain.DETECTION: {_warning_missing_ann_det(1)},
@@ -715,7 +743,8 @@ def fxt_dataset_definition(request: pytest.FixtureRequest):
 
 
 @pytest.fixture(
-    scope="function", params=[info.fxt_corresponding_project for info in _test_dataset_id__datumaro.values()]
+    scope="function",
+    params=[info.fxt_corresponding_project for info in _test_dataset_id__datumaro.values()],
 )
 def fxt_project(request: pytest.FixtureRequest):
     return request.param, request.getfixturevalue(request.param)

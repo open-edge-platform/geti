@@ -9,14 +9,14 @@ from unittest.mock import patch
 
 import pytest
 from geti_types import CTX_SESSION_VAR, ID, make_session
-from jobs_common.k8s_helpers.k8s_resources_calculation import ComputeResources, EphemeralStorageResources
-from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo
-from sc_sdk.entities.compiled_dataset_shards import (
+from iai_core.entities.compiled_dataset_shards import (
     CompiledDatasetShard,
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
-from sc_sdk.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.mongo_connector import MongoConnector
+from jobs_common.k8s_helpers.k8s_resources_calculation import ComputeResources, EphemeralStorageResources
+from jobs_common.k8s_helpers.trainer_image_info import TrainerImageInfo
 from testcontainers.mongodb import MongoDbContainer
 
 from job.models import OptimizationTrainerContext
@@ -93,7 +93,11 @@ def fxt_compiled_dataset_shards(request):
 
 @pytest.fixture
 def fxt_project(fxt_empty_project, fxt_dataset_storage):
-    with patch.object(fxt_empty_project, "get_training_dataset_storage", return_value=fxt_dataset_storage):
+    with patch.object(
+        fxt_empty_project,
+        "get_training_dataset_storage",
+        return_value=fxt_dataset_storage,
+    ):
         yield fxt_empty_project
 
 

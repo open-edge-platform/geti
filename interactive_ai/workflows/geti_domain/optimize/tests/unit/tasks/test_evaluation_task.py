@@ -4,11 +4,18 @@ from unittest.mock import MagicMock, patch
 
 import jobs_common.tasks.utils.secrets
 import pytest
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.repos import (
+    DatasetRepo,
+    DatasetStorageRepo,
+    EvaluationResultRepo,
+    ModelRepo,
+    ModelStorageRepo,
+    ProjectRepo,
+)
+from iai_core.utils.dataset_helper import DatasetHelper
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.repos import DatasetRepo, DatasetStorageRepo, EvaluationResultRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
 
 from tests.unit.tasks.mock_utils import mock_decorator
 
@@ -79,10 +86,15 @@ class TestEvaluationTask:
         with (
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_project),
             patch.object(DatasetStorageRepo, "get_by_id", return_value=fxt_dataset_storage),
-            patch("job.tasks.evaluation_task._find_task_node_for_model", return_value=mock_task_node),
+            patch(
+                "job.tasks.evaluation_task._find_task_node_for_model",
+                return_value=mock_task_node,
+            ),
             patch("job.tasks.evaluation_task.infer_and_evaluate", return_value=None) as mock_infer_and_evaluate_task,
             patch.object(
-                DatasetHelper, "create_dataset_with_filtered_annotations_up_to_task", return_value=mock_dataset
+                DatasetHelper,
+                "create_dataset_with_filtered_annotations_up_to_task",
+                return_value=mock_dataset,
             ),
             patch.object(Dataset, "get_subset", return_value=mock_testing_dataset),
             patch.object(DatasetRepo, "save_deep", return_value=None),

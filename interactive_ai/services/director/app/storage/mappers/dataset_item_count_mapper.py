@@ -8,8 +8,8 @@ a serialized representation compatible with MongoDB
 
 from entities.dataset_item_count import DatasetItemCount, LabelData
 
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 
 class DatasetItemCountToMongo(IMapperSimple[DatasetItemCount, dict]):

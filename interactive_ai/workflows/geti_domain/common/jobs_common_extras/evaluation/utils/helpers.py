@@ -4,7 +4,7 @@ import logging
 
 import cv2
 import numpy as np
-from sc_sdk.entities.model import Model, TrainingFrameworkType
+from iai_core.entities.model import Model, TrainingFrameworkType
 
 logger = logging.getLogger(__name__)
 

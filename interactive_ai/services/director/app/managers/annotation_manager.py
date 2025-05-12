@@ -8,16 +8,16 @@ from service.label_schema_service import LabelSchemaService
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, VideoRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.iteration import grouper
-from sc_sdk.utils.label_resolver import LabelResolver
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.project import Project
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, VideoRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.iteration import grouper
+from iai_core.utils.label_resolver import LabelResolver
 
 logger = logging.getLogger(__name__)
 

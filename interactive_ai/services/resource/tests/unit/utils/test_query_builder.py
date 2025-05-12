@@ -12,20 +12,20 @@ from usecases.dataset_filter import DatasetFilter, DatasetFilterField, MediaScor
 from usecases.query_builder import MediaQueryResult, QueryBuilder, QueryResults
 
 from geti_types import ID, ImageIdentifier, ProjectIdentifier, VideoFrameIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.dataset_storage_filter_data import (
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
 )
-from sc_sdk.entities.datasets import Dataset, DatasetIdentifier, DatasetPurpose
-from sc_sdk.entities.media import MediaPreprocessingStatus
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.video_annotation_statistics import VideoAnnotationStatistics
-from sc_sdk.repos import (
+from iai_core.entities.datasets import Dataset, DatasetIdentifier, DatasetPurpose
+from iai_core.entities.media import MediaPreprocessingStatus
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -33,9 +33,9 @@ from sc_sdk.repos import (
     ImageRepo,
     VideoRepo,
 )
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.utils.constants import DEFAULT_USER_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -62,19 +62,22 @@ class TestQueryBuilder:
 
         # First time query is much slower so before timing we get rid of this overhead
         QueryBuilder.get_media_results_for_dataset_storage_filter(
-            dataset_filter=dataset_filter, dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier
+            dataset_filter=dataset_filter,
+            dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier,
         )
 
         t1 = datetime.datetime.now()
         QueryBuilder.get_media_results_for_dataset_storage_filter(
-            dataset_filter=dataset_filter, dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier
+            dataset_filter=dataset_filter,
+            dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier,
         )
         time_first_page = datetime.datetime.now() - t1
 
         dataset_filter.skip = 199
         t2 = datetime.datetime.now()
         query_results = QueryBuilder.get_media_results_for_dataset_storage_filter(
-            dataset_filter=dataset_filter, dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier
+            dataset_filter=dataset_filter,
+            dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier,
         )
         time_last_page = datetime.datetime.now() - t2
 
@@ -100,10 +103,12 @@ class TestQueryBuilder:
             sort_by=DatasetFilterField.MEDIA_UPLOAD_DATE,
         )
         query_result_1 = QueryBuilder.get_media_results_for_dataset_storage_filter(
-            dataset_filter=dataset_filter, dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier
+            dataset_filter=dataset_filter,
+            dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier,
         )
         query_result_2 = QueryBuilder.get_media_results_for_dataset_storage_filter(
-            dataset_filter=dataset_filter, dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier
+            dataset_filter=dataset_filter,
+            dataset_storage_identifier=fxt_filled_image_dataset_storage.identifier,
         )
         assert query_result_1.media_identifiers == query_result_2.media_identifiers
 
@@ -474,7 +479,9 @@ class TestQueryBuilder:
         assert result_annotated_video.matching_video_frames_count == 3
         assert result_annotated_video.media_query_results[0].media_identifier.media_id == fxt_video_entity.id_
         assert result_annotated_video.media_query_results[0].video_annotation_statistics == VideoAnnotationStatistics(
-            annotated=3, partially_annotated=0, unannotated=(fxt_video_entity.total_frames - 3)
+            annotated=3,
+            partially_annotated=0,
+            unannotated=(fxt_video_entity.total_frames - 3),
         )
 
     def test_media_score_filter_deterministic_scores(
@@ -840,7 +847,11 @@ class TestQueryBuilder:
             label_schema_id=fxt_label_schema.id_,
         )
         dataset.append(
-            DatasetItem(id_=DatasetRepo.generate_id(), media=fxt_image_entity, annotation_scene=fxt_annotation_scene)
+            DatasetItem(
+                id_=DatasetRepo.generate_id(),
+                media=fxt_image_entity,
+                annotation_scene=fxt_annotation_scene,
+            )
         )
         dataset_repo.save_deep(dataset)
         ds_filter = DatasetFilter.from_dict(query={}, limit=100)

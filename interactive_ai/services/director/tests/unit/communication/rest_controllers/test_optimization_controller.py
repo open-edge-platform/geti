@@ -14,9 +14,9 @@ from communication.views.job_rest_views import JobRestViews
 from service.job_submission import ModelOptimizationJobSubmitter
 
 from geti_types import ID
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_template import ModelTemplate
-from sc_sdk.repos import ConfigurableParametersRepo, ModelRepo, ProjectRepo
+from iai_core.entities.model import Model
+from iai_core.entities.model_template import ModelTemplate
+from iai_core.repos import ConfigurableParametersRepo, ModelRepo, ProjectRepo
 
 DUMMY_USER = ID("dummy_user")
 

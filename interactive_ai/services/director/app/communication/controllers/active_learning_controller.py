@@ -9,12 +9,12 @@ from communication.views.active_set_views import ActiveSetRESTViews
 from service.project_service import ProjectService
 
 from geti_types import ID, MediaIdentifierEntity, MediaType
-from sc_sdk.repos import ImageRepo, VideoRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.repos import ImageRepo, VideoRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.image import Image
-    from sc_sdk.entities.video import Video
+    from iai_core.entities.image import Image
+    from iai_core.entities.video import Video
 
 
 class ActiveLearningController:
