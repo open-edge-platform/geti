@@ -5,12 +5,14 @@ import { Flex, Heading, Item, Key, Picker, View } from '@adobe/react-spectrum';
 import { orderBy } from 'lodash-es';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';
+import { Switch } from '../../../../shared/components/switch/switch.component';
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
 import { applySettings } from '../../providers/util';
 import { SettingOption } from './setting-option.component';
 
 export const DeviceSettings = () => {
-    const { webcamRef, videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId } = useDeviceSettings();
+    const { webcamRef, videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId, isMirrored, setIsMirrored } =
+        useDeviceSettings();
     const sortedByOptions = orderBy(deviceConfig, ['config.options'], 'desc');
 
     return (
@@ -32,6 +34,10 @@ export const DeviceSettings = () => {
             </Picker>
 
             <Divider size={'S'} marginTop={'size-250'} marginBottom={'size-250'} />
+
+            <Switch isSelected={isMirrored} onChange={(value) => setIsMirrored(value)}>
+                Mirrored
+            </Switch>
 
             {sortedByOptions.map(({ name, config }) => (
                 <SettingOption

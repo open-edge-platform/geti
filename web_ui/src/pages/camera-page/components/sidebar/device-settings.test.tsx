@@ -59,6 +59,18 @@ describe('Settings', () => {
         expect(mockedSetSelectedDeviceId).toHaveBeenCalledWith(cameraTwo.deviceId);
     });
 
+    it('Allows to mirror the camera feed', async () => {
+        const setIsMirrored = jest.fn();
+
+        renderApp({ setIsMirrored });
+
+        const mirrorSwitch = screen.getByRole('switch', { name: 'Mirrored' });
+
+        expect(mirrorSwitch).not.toBeChecked();
+        fireEvent.click(mirrorSwitch);
+        expect(setIsMirrored).toHaveBeenCalledWith(true);
+    });
+
     it('apply settings', () => {
         const mockedStream = {} as MediaStream;
         const mockedDeviceConfig = {
