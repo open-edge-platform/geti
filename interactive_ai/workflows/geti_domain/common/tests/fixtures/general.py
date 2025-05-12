@@ -3,16 +3,16 @@
 
 import pytest
 from geti_types import ID, ProjectIdentifier
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label_schema import NullLabelSchema
+from iai_core.entities.model import Model, ModelConfiguration, ModelStatus
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.repos import DatasetRepo, DatasetStorageRepo, LabelSchemaRepo, ModelRepo, ProjectRepo
+from iai_core.services.model_service import ModelService
 from pytest import FixtureRequest
-from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label_schema import NullLabelSchema
-from sc_sdk.entities.model import Model, ModelConfiguration, ModelStatus
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskGraph
-from sc_sdk.repos import DatasetRepo, DatasetStorageRepo, LabelSchemaRepo, ModelRepo, ProjectRepo
-from sc_sdk.services.model_service import ModelService
 
 from tests.test_helpers import (
     generate_and_save_random_simple_segmentation_project,

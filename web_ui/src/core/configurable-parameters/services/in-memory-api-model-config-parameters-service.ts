@@ -26,9 +26,33 @@ export const createInMemoryApiModelConfigParametersService = (): CreateApiModelC
         return Promise.resolve();
     };
 
+    const getProjectConfiguration: CreateApiModelConfigParametersService['getProjectConfiguration'] = async () => {
+        return Promise.resolve({
+            taskConfigs: [],
+        });
+    };
+
+    const getTrainingConfiguration: CreateApiModelConfigParametersService['getTrainingConfiguration'] = async () => {
+        return Promise.resolve({ training: [], datasetPreparation: {}, evaluation: [] });
+    };
+
+    const updateProjectConfiguration: CreateApiModelConfigParametersService['updateProjectConfiguration'] =
+        async () => {
+            return Promise.resolve();
+        };
+
+    const updateTrainingConfiguration: CreateApiModelConfigParametersService['updateTrainingConfiguration'] =
+        async () => {
+            return Promise.resolve();
+        };
+
     return {
         getModelConfigParameters,
         getConfigParameters,
         reconfigureParameters,
+        getProjectConfiguration,
+        getTrainingConfiguration,
+        updateProjectConfiguration,
+        updateTrainingConfiguration,
     };
 };

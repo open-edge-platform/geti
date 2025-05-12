@@ -13,14 +13,14 @@ from service.label_schema_service import LabelSchemaService
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.metrics import (
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult, NullEvaluationResult
+from iai_core.entities.label import Domain
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.metrics import (
     BarChartInfo,
     BarMetricsGroup,
     CountMetric,
@@ -32,10 +32,10 @@ from sc_sdk.entities.metrics import (
     TextChartInfo,
     TextMetricsGroup,
 )
-from sc_sdk.entities.model import Model, NullModel
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import (
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.project import Project
+from iai_core.entities.subset import Subset
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,

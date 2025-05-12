@@ -1,6 +1,6 @@
 in: query
 name: start_time_from
 style: form
-description: Timestamp used to filter jobs which started after the given time (inclusive)
+description: Filter jobs which started after this time. If time is not specified (only date), it defaults to the beginning of the day.
 schema:
   $ref: "../../../../interactive_ai/services/api/schemas/parameters/timestamp.yaml"

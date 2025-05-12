@@ -11,10 +11,10 @@ from datumaro.components.annotation import GroupType
 from datumaro.components.dataset_base import DatasetInfo
 from datumaro.components.transformer import ItemTransform
 from geti_types import ProjectIdentifier
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
 
 from job.utils.datumaro_parser import DatumaroProjectParser
 from job.utils.exceptions import ResearvedLabelException, UnsupportedMappingException
@@ -79,7 +79,10 @@ class CrossProjectConverterDetToRot(CrossProjectConverterBase):
     ) -> LabelInfo:
         """Update label_to_ann_types mapping from detection to rotated detection."""
         label_info = super().get_converted_label_info(
-            dm_infos=dm_infos, dm_categories=dm_categories, dst=dst, label_to_ann_types=label_to_ann_types
+            dm_infos=dm_infos,
+            dm_categories=dm_categories,
+            dst=dst,
+            label_to_ann_types=label_to_ann_types,
         )
         if label_to_ann_types:
             for _, ann_types in label_info.label_to_ann_types.items():
@@ -118,7 +121,10 @@ class CrossProjectConverterDetToCls(CrossProjectConverterBase):
     ) -> LabelInfo:
         """Update label_to_ann_types mapping from segmentation to detection."""
         label_info = super().get_converted_label_info(
-            dm_infos=dm_infos, dm_categories=dm_categories, dst=dst, label_to_ann_types=label_to_ann_types
+            dm_infos=dm_infos,
+            dm_categories=dm_categories,
+            dst=dst,
+            label_to_ann_types=label_to_ann_types,
         )
 
         # make label_groups for multi-label classification
@@ -162,7 +168,10 @@ class CrossProjectConverterSegToDet(CrossProjectConverterBase):
     ) -> LabelInfo:
         """Update label_to_ann_types mapping from segmentation to detection."""
         label_info = super().get_converted_label_info(
-            dm_infos=dm_infos, dm_categories=dm_categories, dst=dst, label_to_ann_types=label_to_ann_types
+            dm_infos=dm_infos,
+            dm_categories=dm_categories,
+            dst=dst,
+            label_to_ann_types=label_to_ann_types,
         )
         if label_to_ann_types:
             for _, ann_types in label_info.label_to_ann_types.items():
@@ -238,8 +247,14 @@ class CrossProjectConverterSegToDetSeg(CrossProjectConverterBase):
                 )
             label_info.label_to_ann_types[detection_label] = {dm.AnnotationType.bbox}
         label_info.info["GetiTaskTypeLabels"] = [
-            [ImportUtils.task_type_to_rest_api_string(TaskType.DETECTION), [detection_label]],
-            [ImportUtils.task_type_to_rest_api_string(TaskType.SEGMENTATION), segmentation_labels],
+            [
+                ImportUtils.task_type_to_rest_api_string(TaskType.DETECTION),
+                [detection_label],
+            ],
+            [
+                ImportUtils.task_type_to_rest_api_string(TaskType.SEGMENTATION),
+                segmentation_labels,
+            ],
         ]
 
         return label_info
@@ -546,7 +561,10 @@ class CrossProjectMapper:
             # we do not support cross-project mapping here.
             return True
 
-        if project_type in [GetiProjectType.CLASSIFICATION, GetiProjectType.HIERARCHICAL_CLASSIFICATION]:
+        if project_type in [
+            GetiProjectType.CLASSIFICATION,
+            GetiProjectType.HIERARCHICAL_CLASSIFICATION,
+        ]:
             # we do not support cross-project mapping among
             # single-label, multi-label, and hierarchical classification.
             is_dataset_hierarchical = ImportUtils.is_dataset_from_hierarchical_classification(

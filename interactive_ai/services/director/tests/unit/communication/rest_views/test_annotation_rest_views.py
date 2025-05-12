@@ -10,8 +10,8 @@ from communication.views.annotation_rest_views import AnnotationRESTViews, RestS
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
 from features.feature_flag_provider import FeatureFlag
 
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.shapes import Point, Polygon
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.shapes import Point, Polygon
 
 
 class TestAnnotationRESTViews:

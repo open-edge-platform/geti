@@ -6,13 +6,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode, TaskProperties
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode, TaskProperties
 
 from job.utils.export_utils import ExportUtils
 
@@ -25,7 +25,12 @@ class TestExportUtils:
         labels = [
             Label(name="label1", domain=Domain.DETECTION, color=Color(0, 0, 0), id_=ID()),
             Label(name="label2", domain=Domain.DETECTION, color=Color(0, 0, 0), id_=ID()),
-            Label(name="label3", domain=Domain.CLASSIFICATION, color=Color(0, 0, 0), id_=ID()),
+            Label(
+                name="label3",
+                domain=Domain.CLASSIFICATION,
+                color=Color(0, 0, 0),
+                id_=ID(),
+            ),
         ]
         label_schema.get_labels.return_value = labels
 
@@ -43,7 +48,12 @@ class TestExportUtils:
         # Arrange
         label_schema = MagicMock()
         label1 = Label(name="label1", domain=Domain.CLASSIFICATION, color=Color(0, 0, 0), id_=ID())
-        label2 = Label(name="label2", domain=Domain.CLASSIFICATION, color=Color(120, 120, 120), id_=ID())
+        label2 = Label(
+            name="label2",
+            domain=Domain.CLASSIFICATION,
+            color=Color(120, 120, 120),
+            id_=ID(),
+        )
 
         label_schema.get_labels.return_value = [label1, label2]
 

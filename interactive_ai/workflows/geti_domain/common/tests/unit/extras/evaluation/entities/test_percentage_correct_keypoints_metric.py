@@ -4,16 +4,16 @@
 import numpy as np
 import pytest
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import BarMetricsGroup, Performance, ScoreMetric, TextMetricsGroup
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Keypoint
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metrics import BarMetricsGroup, Performance, ScoreMetric, TextMetricsGroup
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Keypoint
 
 from jobs_common_extras.evaluation.entities.percentage_of_correct_keypoints_metric import (
     PercentageCorrectKeypointsMetric,
@@ -106,7 +106,9 @@ def fxt_keypoints_dataset_item_factory(fxt_labels, fxt_annotation_factory):
     """
 
     def keypoints_item_factory(
-        media: Image, coordinates: list[tuple[float, float]], is_visible: list[int] = [0, 1, 2, 3]
+        media: Image,
+        coordinates: list[tuple[float, float]],
+        is_visible: list[int] = [0, 1, 2, 3],
     ) -> DatasetItem:
         label_top_left, label_top_right, label_bottom_left, label_bottom_right = fxt_labels
 
@@ -253,7 +255,13 @@ def fxt_true_scores(fxt_labels):
 
 @pytest.mark.JobsComponent
 class TestPercentageCorrectKeypointsMetric:
-    def test_get_performance(self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_true_scores):
+    def test_get_performance(
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_true_scores,
+    ):
         """
         Validate if the average percentage of correct keypoints is computed correctly over given images.
         """
@@ -283,7 +291,12 @@ class TestPercentageCorrectKeypointsMetric:
         assert isinstance(acc_per_label, BarMetricsGroup)
 
     def test_get_per_label_scores(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_labels, fxt_true_scores
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_labels,
+        fxt_true_scores,
     ):
         """
         Validate if the accuracy computed per unique keypoint (label) is correct.
@@ -315,7 +328,11 @@ class TestPercentageCorrectKeypointsMetric:
             assert score.value == pytest.approx(true_score_per_id[score.label_id], 0.01)
 
     def test_get_per_media_scores(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_true_scores
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_true_scores,
     ):
         """
         Validate if the percentage of correct keypoints is computed correctly for each image.

@@ -3,16 +3,16 @@
 
 import pytest
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import AnomalyLocalizationPerformance
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metrics import AnomalyLocalizationPerformance
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
 
 from jobs_common_extras.evaluation.entities.accuracy_metric import AccuracyMetric
 from jobs_common_extras.evaluation.entities.anomaly_metrics import (
@@ -43,8 +43,18 @@ def create_full_box_dataset_item(media: Image, scored_label: ScoredLabel, kind: 
 @pytest.fixture
 def fxt_labels():
     yield [
-        Label(name="label_a", domain=Domain.ANOMALY_DETECTION, id_=ID("label_a_id"), is_anomalous=True),
-        Label(name="label_b", domain=Domain.ANOMALY_DETECTION, id_=ID("label_b_id"), is_anomalous=False),
+        Label(
+            name="label_a",
+            domain=Domain.ANOMALY_DETECTION,
+            id_=ID("label_a_id"),
+            is_anomalous=True,
+        ),
+        Label(
+            name="label_b",
+            domain=Domain.ANOMALY_DETECTION,
+            id_=ID("label_b_id"),
+            is_anomalous=False,
+        ),
     ]
 
 
@@ -131,7 +141,12 @@ def fxt_ground_truth_dataset(fxt_labels, fxt_media_factory):
 
 
 @pytest.fixture
-def fxt_prediction_dataset(fxt_media_factory, fxt_ground_truth_dataset, fxt_labels, fxt_generate_prediction_bbox):
+def fxt_prediction_dataset(
+    fxt_media_factory,
+    fxt_ground_truth_dataset,
+    fxt_labels,
+    fxt_generate_prediction_bbox,
+):
     """
     Prediction dataset contains corresponding predictions to fxt_ground_truth_dataset with fixed probability.
     Anomaly metrics is composed of a global and local metric, depending on the local task we have the following:

@@ -11,11 +11,11 @@ import { paths } from '../../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { MenuItemImage } from '../../../shared/components/menu-item-image/menu-item-image.component';
 import { MenuOption } from '../../../shared/components/menu-option.interface';
-import { OrganizationsPicker } from '../../../shared/components/organizations-picker/organizations-picker.component';
 import { ShowForOnPrem } from '../../../shared/components/show-for-onprem/show-for-onprem.component';
 import { SidebarMenu } from '../../../shared/components/sidebar-menu/sidebar-menu.component';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../theme/queries';
+import { OrganizationsPicker } from './organizations-picker/organizations-picker.component';
 import { StorageUsage } from './storage-usage/storage-usage.component';
 
 import classes from './landing-page-sidebar.module.scss';

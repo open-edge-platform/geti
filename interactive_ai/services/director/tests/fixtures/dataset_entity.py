@@ -3,7 +3,7 @@
 
 import pytest
 
-from sc_sdk.entities.dataset_entities import PipelineDataset, TaskDataset
+from iai_core.entities.dataset_entities import PipelineDataset, TaskDataset
 
 
 @pytest.fixture

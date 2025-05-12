@@ -9,7 +9,6 @@ import isEmpty from 'lodash/isEmpty';
 
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { Divider } from '../../../../shared/components/divider/divider.component';
-import { FitImageToScreenButton } from '../../../../shared/components/fit-image-to-screen-button/fit-image-to-screen-button.component';
 import { hasEqualId } from '../../../../shared/utils';
 import {
     TOGGLE_VISIBILITY_COLOR_MODE,
@@ -20,6 +19,7 @@ import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';
 import { getOutputFromTask } from '../../providers/task-chain-provider/utils';
 import { useTask } from '../../providers/task-provider/task-provider.component';
+import { FitImageToScreenButton } from '../fit-image-to-screen-button/fit-image-to-screen-button.component';
 import { CanvasAdjustments } from './canvas-adjustments/canvas-adjustments.component';
 import { HotKeysButton } from './hot-keys-button/hot-keys-button.component';
 

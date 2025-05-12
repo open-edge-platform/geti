@@ -8,11 +8,11 @@ import pytest
 from tests.fixtures.values import DummyValues, IDOffsets
 
 from geti_types import ID
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView, LabelTree
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.repos import LabelRepo, LabelSchemaRepo
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView, LabelTree
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.repos import LabelRepo, LabelSchemaRepo
 
 
 def label_schema_from_labels(labels: Sequence[Label]) -> LabelSchema:

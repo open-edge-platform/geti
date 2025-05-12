@@ -5,7 +5,7 @@ FROM golang:1.23.8 AS build
 
 WORKDIR /build/interactive_ai/service
 
-COPY --link --from=go_sdk . ../../libs/go_sdk
+COPY --link --from=iai_core . ../../libs/iai_core_go
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.sum,target=go.sum \

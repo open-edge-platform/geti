@@ -9,7 +9,7 @@ import pytest
 from microservice.job_repo import WorkspaceBasedMicroserviceJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.base.session_repo import QueryAccessMode
 
 project_id = ID("project")
 
@@ -28,7 +28,10 @@ def test_update(request, num_updated_docs, expected_updated) -> None:
 
     # Act
     with patch.object(
-        WorkspaceBasedMicroserviceJobRepo, "_collection", new_callable=PropertyMock, return_value=collection
+        WorkspaceBasedMicroserviceJobRepo,
+        "_collection",
+        new_callable=PropertyMock,
+        return_value=collection,
     ):
         updated = job_repo.update(id, update)
 
@@ -53,7 +56,10 @@ def test_update_many(request) -> None:
 
     # Act
     with patch.object(
-        WorkspaceBasedMicroserviceJobRepo, "_collection", new_callable=PropertyMock, return_value=collection
+        WorkspaceBasedMicroserviceJobRepo,
+        "_collection",
+        new_callable=PropertyMock,
+        return_value=collection,
     ):
         job_repo.update_many(job_filter, update)
 

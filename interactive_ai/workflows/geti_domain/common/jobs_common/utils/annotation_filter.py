@@ -4,8 +4,8 @@
 import logging
 
 from geti_telemetry_tools import unified_tracing
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,9 @@ class AnnotationFilter:
     @staticmethod
     @unified_tracing
     def apply_annotation_filters(
-        dataset: Dataset, max_number_of_annotations: float | None = None, min_annotation_size: int | None = None
+        dataset: Dataset,
+        max_number_of_annotations: float | None = None,
+        min_annotation_size: int | None = None,
     ) -> Dataset:
         """
         WARNING: This replaces the annotations referenced in the dataset. Using this with methods such as

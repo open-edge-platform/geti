@@ -1008,7 +1008,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../../libs/grpc_interfaces" }
+source = { editable = "../../../../grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -1066,6 +1066,60 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7c/d7/013ef01c5a1c2fd0932c27c904934162f69f41ca0f28396d3ffe4d386123/grpcio-status-1.62.3.tar.gz", hash = "sha256:289bdd7b2459794a12cf95dc0cb727bd4a1742c37bd823f760236c937e53a485", size = 13063 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/90/40/972271de05f9315c0d69f9f7ebbcadd83bc85322f538637d11bb8c67803d/grpcio_status-1.62.3-py3-none-any.whl", hash = "sha256:f9049b762ba8de6b1086789d8315846e094edac2c50beaf462338b301a8fd4b8", size = 14448 },
+]
+
+[[package]]
+name = "iai-core"
+version = "1.0.0"
+source = { editable = "../../../libs/iai_core_py" }
+dependencies = [
+    { name = "attrs" },
+    { name = "cachetools" },
+    { name = "geti-feature-tools" },
+    { name = "geti-types" },
+    { name = "minio" },
+    { name = "networkx" },
+    { name = "numpy" },
+    { name = "omegaconf" },
+    { name = "opencv-python-headless" },
+    { name = "pycountry" },
+    { name = "pymongo", extra = ["aws"] },
+    { name = "scipy" },
+    { name = "shapely" },
+    { name = "urllib3" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "attrs", specifier = "~=24.3" },
+    { name = "cachetools", specifier = "~=5.5" },
+    { name = "geti-feature-tools", editable = "../../../../libs/feature_tools" },
+    { name = "geti-types", editable = "../../../../libs/types" },
+    { name = "minio", specifier = "~=7.1.0" },
+    { name = "networkx", specifier = ">=2.6,<=2.8" },
+    { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },
+    { name = "omegaconf", specifier = "~=2.3" },
+    { name = "opencv-python-headless", specifier = "~=4.10" },
+    { name = "pycountry", specifier = "==22.3.*" },
+    { name = "pymongo", extras = ["aws"], specifier = "~=4.10" },
+    { name = "scipy", specifier = "~=1.14" },
+    { name = "shapely", specifier = "~=2.0" },
+    { name = "urllib3", specifier = ">=1.26" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = "~=1.15" },
+    { name = "pre-commit", specifier = "~=4.1" },
+    { name = "pytest", specifier = "~=8.3" },
+    { name = "pytest-freezegun" },
+    { name = "requests", specifier = "~=2.32" },
+    { name = "ruff", specifier = "~=0.11" },
+    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
+    { name = "testfixtures", specifier = "~=7.2" },
+    { name = "types-cachetools" },
+    { name = "types-pyyaml" },
+    { name = "types-requests" },
 ]
 
 [[package]]
@@ -2305,60 +2359,6 @@ wheels = [
 ]
 
 [[package]]
-name = "sc-sdk"
-version = "1.0.0"
-source = { editable = "../../../libs/sc_sdk" }
-dependencies = [
-    { name = "attrs" },
-    { name = "cachetools" },
-    { name = "geti-feature-tools" },
-    { name = "geti-types" },
-    { name = "minio" },
-    { name = "networkx" },
-    { name = "numpy" },
-    { name = "omegaconf" },
-    { name = "opencv-python-headless" },
-    { name = "pycountry" },
-    { name = "pymongo", extra = ["aws"] },
-    { name = "scipy" },
-    { name = "shapely" },
-    { name = "urllib3" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "attrs", specifier = "~=24.3" },
-    { name = "cachetools", specifier = "~=5.5" },
-    { name = "geti-feature-tools", editable = "../../../../libs/feature_tools" },
-    { name = "geti-types", editable = "../../../../libs/types" },
-    { name = "minio", specifier = "~=7.1.0" },
-    { name = "networkx", specifier = ">=2.6,<=2.8" },
-    { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },
-    { name = "omegaconf", specifier = "~=2.3" },
-    { name = "opencv-python-headless", specifier = "~=4.10" },
-    { name = "pycountry", specifier = "==22.3.*" },
-    { name = "pymongo", extras = ["aws"], specifier = "~=4.10" },
-    { name = "scipy", specifier = "~=1.14" },
-    { name = "shapely", specifier = "~=2.0" },
-    { name = "urllib3", specifier = ">=1.26" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = "~=1.15" },
-    { name = "pre-commit", specifier = "~=4.1" },
-    { name = "pytest", specifier = "~=8.3" },
-    { name = "pytest-freezegun" },
-    { name = "requests", specifier = "~=2.32" },
-    { name = "ruff", specifier = "~=0.11" },
-    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
-    { name = "testfixtures", specifier = "~=7.2" },
-    { name = "types-cachetools" },
-    { name = "types-pyyaml" },
-    { name = "types-requests" },
-]
-
-[[package]]
 name = "scipy"
 version = "1.15.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2570,9 +2570,9 @@ dependencies = [
     { name = "geti-telemetry-tools", extra = ["grpc", "kafka", "logger", "telemetry"] },
     { name = "geti-types" },
     { name = "grpc-interfaces" },
+    { name = "iai-core" },
     { name = "kubernetes-asyncio" },
     { name = "s3fs" },
-    { name = "sc-sdk" },
 ]
 
 [package.metadata]
@@ -2586,13 +2586,13 @@ requires-dist = [
     { name = "geti-kafka-tools", editable = "../../../../libs/kafka_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "grpc", "kafka", "logger"], editable = "../../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../../libs/types" },
-    { name = "grpc-interfaces", editable = "../../../../libs/grpc_interfaces" },
+    { name = "grpc-interfaces", editable = "../../../../grpc_interfaces" },
+    { name = "iai-core", editable = "../../../libs/iai_core_py" },
     { name = "kubernetes-asyncio", specifier = "==29.0.0" },
     { name = "media-utils", marker = "extra == 'datumaro-conversion'", editable = "../../../libs/media_utils" },
     { name = "media-utils", marker = "extra == 'evaluation'", editable = "../../../libs/media_utils" },
     { name = "openvino-model-api", marker = "extra == 'evaluation'", specifier = "==0.2.5.2" },
     { name = "s3fs", specifier = "==2023.9.2" },
-    { name = "sc-sdk", editable = "../../../libs/sc_sdk" },
     { name = "scikit-learn", marker = "extra == 'evaluation'", specifier = "==1.6.1" },
 ]
 provides-extras = ["evaluation", "shard-dataset", "datumaro-conversion"]

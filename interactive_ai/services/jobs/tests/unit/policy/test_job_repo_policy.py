@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, PropertyMock, patch
 from policies.job_repo import SessionBasedPolicyJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.base.session_repo import QueryAccessMode
 
 project_id = ID("project")
 
@@ -23,7 +23,12 @@ def test_update_many(request) -> None:
     query_filter.update(job_filter)
 
     # Act
-    with patch.object(SessionBasedPolicyJobRepo, "_collection", new_callable=PropertyMock, return_value=collection):
+    with patch.object(
+        SessionBasedPolicyJobRepo,
+        "_collection",
+        new_callable=PropertyMock,
+        return_value=collection,
+    ):
         job_repo.update_many(job_filter, update)
 
     # Assert

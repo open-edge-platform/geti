@@ -17,7 +17,7 @@ from geti_fastapi_tools.exceptions import (
     PayloadTooLargeException,
 )
 from geti_fastapi_tools.validation import RestApiValidator
-from sc_sdk.entities.media import ImageExtensions, VideoExtensions
+from iai_core.entities.media import ImageExtensions, VideoExtensions
 
 
 class MediaRestValidator(RestApiValidator):

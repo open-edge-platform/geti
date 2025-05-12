@@ -8,6 +8,7 @@ from enum import IntEnum, auto
 from typing import TYPE_CHECKING, cast
 
 from geti_spicedb_tools import SpiceDB
+from iai_core.utils.project_builder import PersistedProjectBuilder
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
 from jobs_common.tasks.utils.progress import publish_metadata_update, task_progress
@@ -15,7 +16,6 @@ from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
-from sc_sdk.utils.project_builder import PersistedProjectBuilder
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks import IMPORT_EXPORT_TASK_POD_SPEC
@@ -25,7 +25,7 @@ from job.utils.import_utils import ImportUtils
 from job.utils.progress_utils import WeightedProgressReporter
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core.entities.label import Label
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,9 @@ def create_project_from_dataset(
         "color_by_label": color_by_label if color_by_label else None,
     }
     project, label_schema, _ = PersistedProjectBuilder.build_full_project(
-        creator_id=user_id, parser_class=DatumaroProjectParser, parser_kwargs=parser_kwargs
+        creator_id=user_id,
+        parser_class=DatumaroProjectParser,
+        parser_kwargs=parser_kwargs,
     )
     logger.info(
         "Created project with id %s; domain %s; labels %s",
@@ -125,13 +127,18 @@ def create_project_from_dataset(
     )
     progress_reporter.finish_step()
 
-    progress_reporter.reset_step(step_index=_Steps.IDX_POPULATE_ITEMS, step_message="Populating media and annotations")
+    progress_reporter.reset_step(
+        step_index=_Steps.IDX_POPULATE_ITEMS,
+        step_message="Populating media and annotations",
+    )
     # Chained project can include all label types (label, bbox, polygon, ellipse)
     label_domain = ImportUtils.project_type_to_label_domain(project_type=project_type)
     if project_type not in CHAINED_PROJECT_TYPES:
         # transform dataset, filter out labels that do not fit the label domain and convert masks if needed
         ConvertUtils.filter_dataset(
-            dm_dataset, label_domain, label_names if project_type != GetiProjectType.KEYPOINT_DETECTION else None
+            dm_dataset,
+            label_domain,
+            label_names if project_type != GetiProjectType.KEYPOINT_DETECTION else None,
         )
         logger.info(
             "Filtered datumaro dataset with id %s to only keep labels %s",

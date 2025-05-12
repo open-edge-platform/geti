@@ -8,12 +8,12 @@ from unittest.mock import MagicMock, patch
 import datumaro as dm
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper, LabelMap
 from jobs_common_extras.datumaro_conversion.mappers.dataset_item_mapper import (
@@ -31,7 +31,9 @@ from jobs_common_extras.datumaro_conversion.mappers.label_mapper import LabelSch
 class TestLabelSchemaMapper:
     @pytest.mark.parametrize("include_empty", [True, False])
     def test_label_schema_mapper(
-        self, fxt_dataset_and_label_schema: tuple[DatasetStorageIdentifier, Dataset, LabelSchema], include_empty: bool
+        self,
+        fxt_dataset_and_label_schema: tuple[DatasetStorageIdentifier, Dataset, LabelSchema],
+        include_empty: bool,
     ) -> None:
         _, _, expect = fxt_dataset_and_label_schema
         label_schema_info = LabelSchemaMapper.forward(label_schema=expect, include_empty=include_empty)
@@ -100,12 +102,17 @@ class TestPolygonMapper:
     def test_forward(self) -> None:
         modification_date = datetime.datetime.now(tz=datetime.timezone.utc)
         polygon = Polygon(
-            points=[Point(0.1, 0.2), Point(0.3, 0.4), Point(0.5, 0.2)], modification_date=modification_date
+            points=[Point(0.1, 0.2), Point(0.3, 0.4), Point(0.5, 0.2)],
+            modification_date=modification_date,
         )
         expected_mapped_polygon = {
             "type": "POLYGON",
             "modification_date": modification_date.strftime("%Y-%m-%dT%H:%M:%S.%f"),
-            "points": [{"x": 0.1, "y": 0.2}, {"x": 0.3, "y": 0.4}, {"x": 0.5, "y": 0.2}],
+            "points": [
+                {"x": 0.1, "y": 0.2},
+                {"x": 0.3, "y": 0.4},
+                {"x": 0.5, "y": 0.2},
+            ],
         }
 
         mapped_polygon = PolygonMapper.forward(polygon)

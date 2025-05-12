@@ -8,9 +8,9 @@ from datetime import datetime, timezone
 import pytest
 
 from geti_types import ProjectIdentifier
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskGraph
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskGraph
 
 
 @pytest.fixture

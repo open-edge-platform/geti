@@ -8,9 +8,9 @@ from collections.abc import Callable
 from enum import Enum, auto
 
 from geti_types import MediaIdentifierEntity
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.metrics import Performance, ScoreMetric
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metrics import Performance, ScoreMetric
 
 from jobs_common.utils.progress_helper import noop_progress_callback
 

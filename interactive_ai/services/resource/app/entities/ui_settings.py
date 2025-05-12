@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 
 from geti_types import ID
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from iai_core.entities.persistent_entity import PersistentEntity
 
 
 @dataclass

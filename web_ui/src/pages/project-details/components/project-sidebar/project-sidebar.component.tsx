@@ -15,13 +15,13 @@ import { useCheckPermission } from '../../../../shared/components/has-permission
 import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
 import { MenuItemImage } from '../../../../shared/components/menu-item-image/menu-item-image.component';
 import { MenuOption, MenuOptionTextAndIcon } from '../../../../shared/components/menu-option.interface';
-import { ProjectNameDomain } from '../../../../shared/components/project-name-domain/project-name-domain.component';
 import { SidebarMenu } from '../../../../shared/components/sidebar-menu/sidebar-menu.component';
 import { isNotCropDomain } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { ProjectThumbnail } from '../../../landing-page/landing-page-workspace/components/projects-list/components/project/project-thumbnail.component';
 import { Performance } from './performance.component';
+import { ProjectNameDomain } from './project-name-domain/project-name-domain.component';
 
 import classes from './project-sidebar.module.scss';
 

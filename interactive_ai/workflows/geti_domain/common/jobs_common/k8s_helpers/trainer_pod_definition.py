@@ -7,7 +7,7 @@ import logging
 import os
 
 from flytekit import ContainerTask, PodTemplate, current_context
-from kubernetes.client import V1PodSpec
+from kubernetes.client import V1Capabilities, V1PodSpec, V1SecurityContext
 from kubernetes.client.models import (
     V1ConfigMapEnvSource,
     V1ConfigMapKeySelector,
@@ -200,6 +200,16 @@ def create_flyte_container_task(  # noqa: PLR0913
     runtime_class_name = "nvidia" if accelerator_name == "nvidia.com/gpu" else None
     logger.info(f"Create runtime_class_name={runtime_class_name}")
 
+    security_context = None
+    if trainer_image_info.render_gid != 0:
+        security_context = V1SecurityContext(
+            run_as_group=trainer_image_info.render_gid,
+            allow_privilege_escalation=False,
+            read_only_root_filesystem=False,
+            run_as_non_root=True,
+            run_as_user=10001,
+            capabilities=V1Capabilities(drop=["ALL"]),
+        )
     role = "flyte_workflows"
 
     pod_spec = V1PodSpec(
@@ -296,6 +306,7 @@ def create_flyte_container_task(  # noqa: PLR0913
                     V1VolumeMount(mount_path="/dev/shm", name="shared-memory"),  # noqa : S108 # nosec: B108
                     V1VolumeMount(mount_path="/shard_files", name="shard-files-dir"),
                 ],
+                security_context=security_context,
             )
         ],
         init_containers=[

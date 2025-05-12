@@ -10,7 +10,6 @@ import { CustomWell } from '../../../../../shared/components/custom-well/custom-
 import { HasPermission } from '../../../../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../../../../shared/components/has-permission/has-permission.interface';
 import { NewProjectDialog } from '../../../../create-project/new-project-dialog.component';
-import { LearnSectionCard } from './learn-section-card.component';
 
 import workspaceClasses from '../../landing-page-workspace.module.scss';
 import classes from './no-project-area.module.scss';
@@ -66,8 +65,6 @@ export const NoProjectArea = ({ openImportDatasetDialog }: NoProjectsAreaProps):
                     </Flex>
                 </Flex>
             </CustomWell>
-
-            <LearnSectionCard />
         </Flex>
     );
 };

@@ -4,9 +4,9 @@ import copy
 
 import pytest
 from geti_types import ID
-from sc_sdk.entities.annotation import Annotation
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.shapes import Rectangle
+from iai_core.entities.annotation import Annotation
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.shapes import Rectangle
 
 from jobs_common.utils.annotation_filter import AnnotationFilter
 

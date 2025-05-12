@@ -13,9 +13,9 @@ from communication.constants import (
 
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import DatasetStorageIdentifier, MediaIdentifierEntity
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo, VideoRepo
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.project import Project
+from iai_core.repos import AnnotationSceneRepo, ImageRepo, ProjectRepo, VideoRepo
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,8 @@ def check_max_number_of_media_files(project: Project) -> None:
 
 
 def check_max_number_of_annotations_and_delete_extra(
-    dataset_storage_identifier: DatasetStorageIdentifier, media_identifier: MediaIdentifierEntity
+    dataset_storage_identifier: DatasetStorageIdentifier,
+    media_identifier: MediaIdentifierEntity,
 ) -> None:
     """
     Check if the number of annotations for the media has exceeded the maximum allowed, and if it has then delete any

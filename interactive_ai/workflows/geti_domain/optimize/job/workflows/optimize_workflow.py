@@ -8,7 +8,7 @@ import logging
 from typing import Optional
 
 from flytekit import workflow
-from sc_sdk.entities.model import ModelOptimizationType
+from iai_core.entities.model import ModelOptimizationType
 
 from job.tasks.evaluation_task import evaluate_optimized_model_pot
 from job.tasks.optimization_task import shard_dataset_prepare_models_and_start_optimization

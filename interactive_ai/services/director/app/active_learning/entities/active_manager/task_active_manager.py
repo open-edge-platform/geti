@@ -34,16 +34,16 @@ from communication.exceptions import (
 )
 
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import ModelTemplate, TaskType
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo, ModelStorageRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model import Model
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import ModelTemplate, TaskType
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ConfigurableParametersRepo, ModelStorageRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 logger = logging.getLogger(__name__)
 
@@ -219,11 +219,13 @@ class TaskActiveManager(BaseActiveManager[ActiveLearningTaskConfig]):
             # For instance, in the second task of det->cls chain, we are interested also in
             # media where some boxes do not have cls label while other ones do.
             media_identifiers = dataset_storage_filter_repo.get_media_identifiers_by_annotation_state(
-                annotation_state=AnnotationState.PARTIALLY_ANNOTATED, sample_size=MAX_UNANNOTATED_DATASET_SIZE
+                annotation_state=AnnotationState.PARTIALLY_ANNOTATED,
+                sample_size=MAX_UNANNOTATED_DATASET_SIZE,
             )
         else:
             media_identifiers = dataset_storage_filter_repo.get_media_identifiers_by_annotation_state(
-                annotation_state=AnnotationState.NONE, sample_size=MAX_UNANNOTATED_DATASET_SIZE
+                annotation_state=AnnotationState.NONE,
+                sample_size=MAX_UNANNOTATED_DATASET_SIZE,
             )
 
         return media_identifiers

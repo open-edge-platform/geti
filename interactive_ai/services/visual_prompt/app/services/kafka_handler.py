@@ -7,11 +7,11 @@ from repos.reference_feature_repo import ReferenceFeatureRepo
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, Singleton
-from sc_sdk.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
-from sc_sdk.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
-from sc_sdk.entities.model import NullModel
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.repos import (
+from iai_core.algorithms.visual_prompting import VISUAL_PROMPTING_MODEL_TEMPLATE_ID
+from iai_core.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
+from iai_core.entities.model import NullModel
+from iai_core.entities.model_template import TaskType
+from iai_core.repos import (
     DatasetRepo,
     EvaluationResultRepo,
     LabelSchemaRepo,
@@ -20,7 +20,7 @@ from sc_sdk.repos import (
     ProjectRepo,
     TaskNodeRepo,
 )
-from sc_sdk.session.session_propagation import setup_session_kafka
+from iai_core.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,8 @@ class VPSKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         for model_storage in model_storages:
             if model_storage.model_template.task_type is not TaskType.VISUAL_PROMPTING:
                 logger.warning(
-                    "Skipping model storage `%s` as it is not a visual prompting model storage", model_storage.id_
+                    "Skipping model storage `%s` as it is not a visual prompting model storage",
+                    model_storage.id_,
                 )
                 continue
 
@@ -114,7 +115,10 @@ class VPSKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         )
         ref_feat_repo = ReferenceFeatureRepo(project_identifier)
         ref_feat_repo.delete_all()
-        logger.info("Removed all reference features for deleted project ID %s", project_identifier.project_id)
+        logger.info(
+            "Removed all reference features for deleted project ID %s",
+            project_identifier.project_id,
+        )
 
     @staticmethod
     @lru_cache(maxsize=8)

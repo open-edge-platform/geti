@@ -21,10 +21,10 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.repos.base import DatasetStorageBasedSessionRepo
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
+from iai_core.repos.base import DatasetStorageBasedSessionRepo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
 
 
 class ActiveSuggestionRepo(DatasetStorageBasedSessionRepo[ActiveSuggestion]):

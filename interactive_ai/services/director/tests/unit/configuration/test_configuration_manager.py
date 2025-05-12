@@ -11,14 +11,14 @@ import pytest
 from configuration import ConfigurableComponentRegister
 from configuration.configuration_manager import ConfigurationManager
 
-import sc_sdk.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_fastapi_tools.exceptions import ModelNotFoundException
 from geti_types import ID
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.entities.model import NullModel
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.repos import ConfigurableParametersRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.services.model_service import ModelService
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.entities.model import NullModel
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.repos import ConfigurableParametersRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core.services.model_service import ModelService
 
 WORKSPACE_ID = ID("workspace_id")
 

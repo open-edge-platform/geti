@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
-from sc_sdk.entities.model_template import ModelTemplate
+from iai_core.entities.model_template import ModelTemplate
 
 APPLICATION = "application"
 CAPABILITIES = "capabilities"

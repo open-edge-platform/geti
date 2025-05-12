@@ -13,24 +13,24 @@ from active_learning.storage.repos import ActiveScoreRepo
 from active_learning.usecases import ActiveScoresUpdateUseCase, ActiveSetRetrievalUseCase
 
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.algorithms.crop.task import CropTask
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.metadata import FloatMetadata, FloatType, MetadataItem
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_environment import TaskEnvironment
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.entities.tensor import Tensor
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, EvaluationResultRepo, MetadataRepo
+from iai_core.algorithms.crop.task import CropTask
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core.entities.image import Image
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.metadata import FloatMetadata, FloatType, MetadataItem
+from iai_core.entities.model import Model
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_environment import TaskEnvironment
+from iai_core.entities.task_node import TaskNode
+from iai_core.entities.tensor import Tensor
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, EvaluationResultRepo, MetadataRepo
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +135,13 @@ class TestActiveLearning:
                 annotations=[
                     Annotation(
                         shape=shape,
-                        labels=[ScoredLabel(label_id=labels[0].id_, is_empty=labels[0].is_empty, probability=0.8)],
+                        labels=[
+                            ScoredLabel(
+                                label_id=labels[0].id_,
+                                is_empty=labels[0].is_empty,
+                                probability=0.8,
+                            )
+                        ],
                     )
                 ],
                 task_id=task_node.id_,

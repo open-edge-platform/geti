@@ -7,15 +7,15 @@ from typing import TYPE_CHECKING
 import pytest
 
 from geti_types import ImageIdentifier, MediaType, ProjectIdentifier, VideoFrameIdentifier
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.repos import (
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -23,13 +23,13 @@ from sc_sdk.repos import (
     ImageRepo,
     VideoRepo,
 )
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
-from sc_sdk.utils.time_utils import now
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.utils.time_utils import now
 
 if TYPE_CHECKING:
     from geti_types import ID
-    from sc_sdk.entities.dataset_storage import DatasetStorage
+    from iai_core.entities.dataset_storage import DatasetStorage
 
 
 @pytest.fixture

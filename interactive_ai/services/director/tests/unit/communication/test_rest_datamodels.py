@@ -11,8 +11,8 @@ from communication.views.performance_rest_views import PerformanceRESTViews
 from features.feature_flag_provider import FeatureFlag
 
 from geti_types import ID
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.repos import DatasetStorageRepo, ModelRepo
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.repos import DatasetStorageRepo, ModelRepo
 
 
 class TestRestDataModels:
@@ -32,10 +32,18 @@ class TestRestDataModels:
             ("fxt_anomaly_performance", "fxt_anomaly_performance_rest"),
             ("fxt_anomaly_performance", "fxt_anomaly_reduced_performance_rest"),
         ],
-        ids=["Performance", "Anomaly localization performance", "Reduced Anomaly localization performance"],
+        ids=[
+            "Performance",
+            "Anomaly localization performance",
+            "Reduced Anomaly localization performance",
+        ],
     )
     def test_performance_to_rest(
-        self, lazyfxt_performance, lazyfxt_performance_rest, fxt_enable_feature_flag_name, request
+        self,
+        lazyfxt_performance,
+        lazyfxt_performance_rest,
+        fxt_enable_feature_flag_name,
+        request,
     ):
         if lazyfxt_performance_rest == "fxt_anomaly_reduced_performance_rest":
             fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
@@ -61,7 +69,12 @@ class TestRestDataModels:
         ],
     )
     def test_model_test_result_to_rest(
-        self, request, model_test_result, model_test_result_rest, fxt_model, fxt_dataset_storage
+        self,
+        request,
+        model_test_result,
+        model_test_result_rest,
+        fxt_model,
+        fxt_dataset_storage,
     ) -> None:
         # Arrange
         model_test_result = request.getfixturevalue(model_test_result)
@@ -82,7 +95,8 @@ class TestRestDataModels:
             patch.object(DatasetStorageRepo, "get_by_id", return_value=dataset_storage) as mock_get_dataset_storage,
         ):
             result = ModelTestResultRestViews.model_test_result_to_rest(
-                model_test_result=model_test_result, datasets_counts=dummy_datasets_counts
+                model_test_result=model_test_result,
+                datasets_counts=dummy_datasets_counts,
             )
 
         # Assert

@@ -3,10 +3,10 @@
 
 from tests.fixtures.database import DETECTION_CLASSIFICATION_PIPELINE_DATA  # type: ignore[attr-defined]
 
-from sc_sdk.entities.datasets import DatasetPurpose
-from sc_sdk.entities.label import Domain
-from sc_sdk.repos import DatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core.entities.datasets import DatasetPurpose
+from iai_core.entities.label import Domain
+from iai_core.repos import DatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 
 class TestDatasetCreation:

@@ -25,22 +25,22 @@ from geti_telemetry_tools.metrics import (
     videos_resolution_histogram,
 )
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaIdentifierEntity
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.image import Image
+from iai_core.entities.label import Label, NullLabel
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.project import Project
+from iai_core.entities.video import NullVideo, Video
+from iai_core.entities.video_annotation_range import RangeLabels
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, ImageRepo, VideoRepo
+from iai_core.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.media_factory import Media2DFactory
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils, MediaInfo
 from media_utils import VideoFrameOutOfRangeInternalException, VideoFrameReader
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Label, NullLabel
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.video import NullVideo, Video
-from sc_sdk.entities.video_annotation_range import RangeLabels
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, ImageRepo, VideoRepo
-from sc_sdk.repos.storage.binary_repos import ImageBinaryRepo, VideoBinaryRepo
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.media_factory import Media2DFactory
 
 from job.utils.constants import (
     MAX_IMAGE_SIZE,
@@ -177,7 +177,8 @@ class ImageUploadManager(UploadManager):
                 height=numpy.shape[0],
                 size=size,
                 preprocessing=MediaPreprocessing(
-                    status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=datetime.datetime.now()
+                    status=MediaPreprocessingStatus.IN_PROGRESS,
+                    start_timestamp=datetime.datetime.now(),
                 ),
             )
             self._image_repo.save(image)
@@ -323,7 +324,8 @@ class VideoUploadManager(UploadManager):
             raise InvalidMediaException(" ".join(error_messages))
 
         video.preprocessing = MediaPreprocessing(
-            status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=datetime.datetime.now()
+            status=MediaPreprocessingStatus.IN_PROGRESS,
+            start_timestamp=datetime.datetime.now(),
         )
         self._video_repo.save(video)
         logger.info(

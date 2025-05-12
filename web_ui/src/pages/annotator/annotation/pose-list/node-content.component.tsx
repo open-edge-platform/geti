@@ -39,7 +39,6 @@ export const NodeContent = ({ point, isLast, onUpdate }: NodeContentProps) => {
     return (
         <ListItemGrid
             isLast={isLast}
-            isDragging={false}
             isSelected={isPointSelected}
             id={`keypoint-list-item-${point.label.id}`}
             ariaLabel={`Keypoint with id ${point.label.id}`}

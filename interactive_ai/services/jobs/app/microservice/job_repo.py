@@ -16,9 +16,9 @@ from model.job import Job, NullJob
 from model.job_state import JobState
 from model.mapper.job_mapper import JobMapper
 
-from sc_sdk.repos.base.session_repo import QueryAccessMode, SessionBasedRepo
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.base.session_repo import QueryAccessMode, SessionBasedRepo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -40,7 +40,10 @@ class WorkspaceBasedMicroserviceJobRepo(SessionBasedRepo[Job]):
     collection_name = "job"
 
     def __init__(self, session: Session | None = None) -> None:
-        super().__init__(collection_name=WorkspaceBasedMicroserviceJobRepo.collection_name, session=session)
+        super().__init__(
+            collection_name=WorkspaceBasedMicroserviceJobRepo.collection_name,
+            session=session,
+        )
 
     @property
     def indexes(self) -> list[IndexModel]:
@@ -273,7 +276,10 @@ class SessionBasedMicroserviceJobRepo(SessionBasedRepo[Job]):
     collection_name = "job"
 
     def __init__(self, session: Session | None = None) -> None:
-        super().__init__(session=session, collection_name=SessionBasedMicroserviceJobRepo.collection_name)
+        super().__init__(
+            session=session,
+            collection_name=SessionBasedMicroserviceJobRepo.collection_name,
+        )
 
     @property
     def forward_map(self) -> Callable[[Job], dict]:

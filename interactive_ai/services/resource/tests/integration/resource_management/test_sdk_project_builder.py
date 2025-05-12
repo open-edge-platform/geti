@@ -23,14 +23,14 @@ from managers.project_manager import ProjectManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_types import ID
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.label_schema import LabelGroupType
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import LabelSchemaRepo, ProjectRepo
-from sc_sdk.utils.project_builder import ProjectBuilder, ProjectUpdateError
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.label_schema import LabelGroupType
+from iai_core.entities.project import NullProject
+from iai_core.repos import LabelSchemaRepo, ProjectRepo
+from iai_core.utils.project_builder import ProjectBuilder, ProjectUpdateError
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core.entities.label import Label
 
 
 class TestProjectCRUD:
@@ -321,7 +321,12 @@ class TestProjectCRUD:
         ],
     )
     def test_update_task_chain_project(  # noqa: C901
-        self, fxt_db_project_service, update_operation, updated_task_index, updated_property, updated_property_value
+        self,
+        fxt_db_project_service,
+        update_operation,
+        updated_task_index,
+        updated_property,
+        updated_property_value,
     ) -> None:
         """
         <b>Description:</b>

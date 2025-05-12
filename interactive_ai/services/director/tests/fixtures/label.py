@@ -9,11 +9,11 @@ from pytest import FixtureRequest
 from tests.fixtures.values import DummyValues, IDOffsets
 
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView, LabelTree
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.repos import LabelRepo, LabelSchemaRepo
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView, LabelTree
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.repos import LabelRepo, LabelSchemaRepo
 
 
 @pytest.fixture
@@ -295,7 +295,10 @@ def fxt_classification_labels_good_bad():
             id_=LabelRepo.generate_id(),
         ),
         Label(
-            name="bad", domain=Domain.CLASSIFICATION, color=Color(red=255, green=0, blue=0), id_=LabelRepo.generate_id()
+            name="bad",
+            domain=Domain.CLASSIFICATION,
+            color=Color(red=255, green=0, blue=0),
+            id_=LabelRepo.generate_id(),
         ),
     ]
 
@@ -451,7 +454,11 @@ def fxt_detection_classification_label_schema(
     label_tree = LabelTree()
     for cls_label in cls_labels:
         label_tree.add_child(non_empty_det_label, cls_label)
-    yield LabelSchema(id_=fxt_mongo_id(11), label_tree=label_tree, label_groups=[det_label_group, cls_label_group])
+    yield LabelSchema(
+        id_=fxt_mongo_id(11),
+        label_tree=label_tree,
+        label_groups=[det_label_group, cls_label_group],
+    )
 
 
 @pytest.fixture
@@ -509,7 +516,11 @@ def fxt_detection_classification_label_schema_factory(
         else:
             for cls_label in cls_labels:
                 label_tree.add_child(non_empty_det_label, cls_label)
-        return LabelSchema(id_=LabelSchemaRepo.generate_id(), label_tree=label_tree, label_groups=groups)
+        return LabelSchema(
+            id_=LabelSchemaRepo.generate_id(),
+            label_tree=label_tree,
+            label_groups=groups,
+        )
 
     yield _build_schema
 
@@ -532,7 +543,10 @@ def fxt_detection_segmentation_label_schema_factory(
             labels=cls_labels,
             group_type=LabelGroupType.EXCLUSIVE,
         )
-        return LabelSchema(id_=LabelSchemaRepo.generate_id(), label_groups=[det_label_group, seg_label_group])
+        return LabelSchema(
+            id_=LabelSchemaRepo.generate_id(),
+            label_groups=[det_label_group, seg_label_group],
+        )
 
     yield _build_schema
 

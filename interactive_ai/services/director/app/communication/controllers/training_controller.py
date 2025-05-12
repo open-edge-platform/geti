@@ -27,14 +27,14 @@ from geti_fastapi_tools.exceptions import BadRequestException
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
 from grpc_interfaces.job_submission.client import InsufficientBalanceException
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetRepo, LabelSchemaRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.services import ModelService
-from sc_sdk.utils.filesystem import check_free_space_for_operation
+from iai_core.algorithms import ModelTemplateList
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, DatasetRepo, LabelSchemaRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.services import ModelService
+from iai_core.utils.filesystem import check_free_space_for_operation
 
 logger = logging.getLogger(__name__)
 
@@ -203,7 +203,9 @@ class TrainingController:
             raise JobInsufficientBalanceException("Insufficient balance for job execution")
 
     @staticmethod
-    def _get_task_readiness_status_by_project(project: Project) -> list[TaskTrainReadiness]:
+    def _get_task_readiness_status_by_project(
+        project: Project,
+    ) -> list[TaskTrainReadiness]:
         """
         Returns the TaskTrainReadiness statuses for all tasks in the project. These statuses
         can be used to determine whether a task is ready to accept a manual training trigger or not.
@@ -294,7 +296,9 @@ class TrainingController:
         else:
             # There are additional annotations required for specific labels
             task_labels = LabelSchemaService.get_latest_labels_for_task(
-                project_identifier=project.identifier, task_node_id=task.id_, include_empty=True
+                project_identifier=project.identifier,
+                task_node_id=task.id_,
+                include_empty=True,
             )
             missing_per_label_string = ""
             for (

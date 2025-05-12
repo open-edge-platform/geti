@@ -13,7 +13,7 @@ WORKDIR /builder
 COPY --link --from=common . interactive_ai/workflows/geti_domain/common
 COPY --link --from=libs . libs
 COPY --link --from=data_migration . interactive_ai/data_migration
-COPY --link --from=sc_sdk . interactive_ai/libs/sc_sdk
+COPY --link --from=iai_core . interactive_ai/libs/iai_core_py
 COPY --link --from=media_utils . interactive_ai/libs/media_utils
 
 WORKDIR /builder/interactive_ai/workflows/geti_domain/workflow

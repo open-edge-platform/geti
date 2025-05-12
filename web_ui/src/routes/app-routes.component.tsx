@@ -1,42 +1,28 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ReactNode, Suspense, useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
-import invoke from 'lodash/invoke';
 import negate from 'lodash/negate';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';
-import { useLocalStorage } from 'usehooks-ts';
 
 import { AnalyticsProvider } from '../analytics/analytics-provider.component';
 import { useFeatureFlags } from '../core/feature-flags/hooks/use-feature-flags.hook';
-import { Task } from '../core/projects/task.interface';
 import { isKeypointTask } from '../core/projects/utils';
-import { useDeploymentConfigQuery } from '../core/services/use-deployment-config-query.hook';
-import { useWorkspacesApi } from '../core/workspaces/hooks/use-workspaces.hook';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
 import { useIsSaasEnv } from '../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { useModelIdentifier } from '../hooks/use-model-identifier/use-model-identifier.hook';
-import { useOrganizationIdentifier } from '../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useStorage } from '../hooks/use-storage/use-storage';
 import { Notifications, useNotification } from '../notification/notification.component';
-import { useDatasetIdentifier } from '../pages/annotator/hooks/use-dataset-identifier.hook';
 import { TaskProvider } from '../pages/annotator/providers/task-provider/task-provider.component';
-import { ErrorLayout } from '../pages/errors/error-layout/error-layout.component';
-import { ResourceNotFound } from '../pages/errors/resource-not-found/resource-not-found.component';
 import { RouterErrorBoundary } from '../pages/errors/router-error-boundary.component';
 import { WelcomeTrialModal } from '../pages/landing-page/welcome-trial-modal/welcome-trial-modal.component';
 import { ProjectDataset } from '../pages/project-details/components/project-dataset/project-dataset.component';
-import { useProject } from '../pages/project-details/providers/project-provider/project-provider.component';
 import { RequestAccessConfirmation } from '../pages/sign-up/request-access-confirmation.component';
 import { SignUp } from '../pages/sign-up/sign-up.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';
-import { useWorkspaceIdentifier } from '../providers/workspaces-provider/use-workspace-identifier.hook';
 import { AccessDeniedDialog } from '../shared/components/access-denied-dialog/access-denied-dialog.component';
-import { LastLoginNotification } from '../shared/components/last-login-notification/last-login-notification';
 import { LicenseModal } from '../shared/components/license-modal/license-modal.component';
 import { IntelBrandedLoading } from '../shared/components/loading/intel-branded-loading.component';
-import { LOCAL_STORAGE_KEYS } from '../shared/local-storage-keys';
 import { ForgotPassword } from '../sign-up/pages/forgot-password/forgot-password.component';
 import { InvalidLink } from '../sign-up/pages/invalid-link/invalid-link.component';
 import { Registration } from '../sign-up/pages/registration/registration.component';
@@ -52,6 +38,7 @@ import { CameraScreenRoute } from './camera.route';
 import { MediaGalleryRoute } from './captured-media-gallery.route';
 import { IndexRoute } from './index.route';
 import { LandingPageLayout } from './landing-page.layout';
+import { LastLoginNotification } from './last-login-notification/last-login-notification';
 import { OrganizationsContext } from './organizations/organizations-context.component';
 import { UserManagementRoute } from './profile/index.route';
 import { AnnotatorRoute } from './projects/annotator.route';
@@ -66,6 +53,16 @@ import { TemplateRoute } from './projects/template.route';
 import { TestsRoute } from './projects/tests/index.route';
 import { TestRoute } from './projects/tests/test.route';
 import { ProjectUsersRoute } from './projects/users';
+import {
+    CallbackRedirect,
+    RedirectIfSaaS,
+    RedirectIfTaskIs,
+    RedirectToDatasetMedia,
+    RedirectToOpenVino,
+    RedirectToOptimizedModel,
+    RedirectToUsersProfile,
+    RedirectToWorkspace,
+} from './redirect.component';
 import { RoutesCollector } from './routes-collector.component';
 import { UsersRoute } from './users/index.route';
 
@@ -126,91 +123,6 @@ const AppProviders = (): JSX.Element => {
             <ErrorsHandler />
         </Suspense>
     );
-};
-
-const RedirectToOptimizedModel = () => {
-    const modelIdentifier = useModelIdentifier();
-
-    return <Navigate to={paths.project.models.model.modelVariants.index(modelIdentifier)} replace />;
-};
-
-const RedirectToOpenVino = () => {
-    const modelIdentifier = useModelIdentifier();
-
-    return <Navigate to={paths.project.models.model.modelVariants.openVino(modelIdentifier)} replace />;
-};
-
-const RedirectToWorkspace = () => {
-    const { organizationId } = useOrganizationIdentifier();
-
-    // Redirect to the first available workspace
-    const { useWorkspacesQuery } = useWorkspacesApi(organizationId);
-    const { data: workspaces } = useWorkspacesQuery();
-    const workspaceId = workspaces.at(0)?.id;
-
-    // Show an error if we are unable to load workspaces
-    if (workspaceId === undefined) {
-        return (
-            <ErrorLayout>
-                <ResourceNotFound />
-            </ErrorLayout>
-        );
-    }
-
-    return <Navigate to={paths.workspace({ organizationId, workspaceId })} replace />;
-};
-
-const RedirectToDatasetMedia = () => {
-    const datasetIdentifier = useDatasetIdentifier();
-
-    return <Navigate to={paths.project.dataset.media(datasetIdentifier)} replace />;
-};
-
-const RedirectToUsersProfile = () => {
-    const { organizationId } = useOrganizationIdentifier();
-    return <Navigate to={paths.account.profile({ organizationId })} replace />;
-};
-
-const CallbackRedirect = () => {
-    const [redirectLocation] = useLocalStorage(LOCAL_STORAGE_KEYS.INTENDED_PATH_BEFORE_AUTHENTICATION, paths.root({}));
-
-    // We don't want the user to remain on the /callback route as this does not render anything
-    if (redirectLocation === paths.authProviderCallback({})) {
-        return <Navigate to={paths.root({})} />;
-    }
-
-    return <Navigate to={redirectLocation ?? paths.root({})} />;
-};
-
-const RedirectIfSaaS = ({ children }: { children: ReactNode }) => {
-    const config = useDeploymentConfigQuery();
-
-    if (config.data?.auth.type !== 'dex') {
-        return <Navigate to={paths.root({})} replace />;
-    }
-
-    return <>{children}</>;
-};
-
-const RedirectIfTaskIs = ({
-    to,
-    children,
-    predicate,
-}: {
-    to: keyof typeof paths.project;
-    children: ReactNode;
-    predicate: (task: Task) => boolean;
-}) => {
-    const { project } = useProject();
-    const { organizationId, workspaceId } = useWorkspaceIdentifier();
-
-    if (project.tasks.some(predicate)) {
-        return (
-            <Navigate to={invoke(paths.project, to, { organizationId, workspaceId, projectId: project.id })} replace />
-        );
-    }
-
-    return <>{children}</>;
 };
 
 export const appRoutes = () => {

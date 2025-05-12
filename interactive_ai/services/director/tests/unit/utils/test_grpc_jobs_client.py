@@ -19,7 +19,7 @@ from grpc_interfaces.job_submission.pb.job_service_pb2 import (
     JobIdResponse,
     SubmitJobRequest,
 )
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
+from iai_core.utils.constants import DEFAULT_USER_NAME
 
 job_id = ID(ObjectId())
 job_key = json.dumps({"key": "value"})

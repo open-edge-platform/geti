@@ -12,8 +12,8 @@ import {
     TransactionsAggregatesKey,
 } from '../../../core/credits/transactions/transactions.interface';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { TextWithLabel } from '../../../shared/components/text-with-label/text-with-label.component';
 import { pluralize } from '../../../shared/utils';
+import { TextWithLabel } from './text-with-label/text-with-label.component';
 
 export const MonthlyCreditConsumptionCard = (props: StyleProps): JSX.Element => {
     const { useGetTransactionsAggregates } = useTransactionsQueries();

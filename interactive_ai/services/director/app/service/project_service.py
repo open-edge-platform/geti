@@ -15,10 +15,10 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.repos import ConfigurableParametersRepo, ProjectRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core.entities.project import NullProject, Project
+from iai_core.repos import ConfigurableParametersRepo, ProjectRepo
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +107,11 @@ class ProjectService:
         :param project_id: The ID of the project to unlock
         """
         lock_owner = job_type
-        logger.info("Unlocking project with ID '%s' for lock owner '%s'.", project_id, lock_owner)
+        logger.info(
+            "Unlocking project with ID '%s' for lock owner '%s'.",
+            project_id,
+            lock_owner,
+        )
         ProjectRepo().mark_unlocked(owner=lock_owner, project_id=project_id)
 
     @staticmethod

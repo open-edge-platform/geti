@@ -61,17 +61,10 @@ test('Annotations with pre defined filter from url', async ({ page, annotationLi
     // Check that the annotations have been filtered
     await annotationListPage.expectTotalAnnotationsToBe(4);
 
-    await page
-        .getByLabel(/Filter Spades/i)
-        .getByRole('button')
-        .click();
+    await page.getByRole('button', { name: 'Remove label filter for Spades' }).click();
     await annotationListPage.expectTotalAnnotationsToBe(2);
 
-    await page
-        .getByLabel(/Filter 8/i)
-        .getByRole('button')
-        .click();
-
+    await page.getByRole('button', { name: 'Remove label filter for 8' }).click();
     await annotationListPage.expectTotalAnnotationsToBe(12);
 });
 

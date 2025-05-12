@@ -6,7 +6,7 @@ from collections import defaultdict
 from enum import Enum, auto
 
 import datumaro as dm
-from sc_sdk.entities.label import Domain
+from iai_core.entities.label import Domain
 
 FORMAT_NAME_MAP: dict[str, str] = {
     "coco_instances": "coco_instances",

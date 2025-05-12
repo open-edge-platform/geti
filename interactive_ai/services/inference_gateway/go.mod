@@ -5,14 +5,14 @@ go 1.23.3
 toolchain go1.23.8
 
 replace (
-	geti.com/go_sdk => ./../../libs/go_sdk
+	geti.com/iai_core => ./../../libs/iai_core_go
 	geti.com/modelmesh => ./../../../libs/grpc_interfaces/grpc_interfaces/model_mesh/go/pb
 	geti.com/modelregistration => ./../../../libs/grpc_interfaces/grpc_interfaces/model_registration/go/pb
 	geti.com/predict => ./../../../libs/grpc_interfaces/grpc_interfaces/predict/go/pb
 )
 
 require (
-	geti.com/go_sdk v1.0.0
+	geti.com/iai_core v1.0.0
 	geti.com/modelmesh v1.0.0
 	geti.com/modelregistration v1.0.0
 	geti.com/predict v1.0.0

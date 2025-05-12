@@ -21,18 +21,18 @@ from usecases.query_builder import MediaQueryResult, QueryResults
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_types import ID
+from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core.entities.image import Image, NullImage
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.video import NullVideo, Video, VideoFrame
+from iai_core.repos import ImageRepo, ProjectRepo, VideoRepo
+from iai_core.repos.storage.binary_repos import ThumbnailBinaryRepo, VideoBinaryRepo
+from iai_core.repos.storage.storage_client import BytesStream
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.media_factory import Media2DFactory
 from media_utils import VideoFileRepair, VideoFrameOutOfRangeInternalException, VideoFrameReader, VideoFrameReadingError
 from media_utils.video_decoder import _VideoDecoderOpenCV
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
-from sc_sdk.entities.image import Image, NullImage
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.video import NullVideo, Video, VideoFrame
-from sc_sdk.repos import ImageRepo, ProjectRepo, VideoRepo
-from sc_sdk.repos.storage.binary_repos import ThumbnailBinaryRepo, VideoBinaryRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.media_factory import Media2DFactory
 
 
 class TestMediaManager:
@@ -113,7 +113,8 @@ class TestMediaManager:
                         height=50,
                         size=ANY,
                         preprocessing=MediaPreprocessing(
-                            status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=ANY
+                            status=MediaPreprocessingStatus.IN_PROGRESS,
+                            start_timestamp=ANY,
                         ),
                     )
                 ),
@@ -127,7 +128,9 @@ class TestMediaManager:
                         height=50,
                         size=ANY,
                         preprocessing=MediaPreprocessing(
-                            status=MediaPreprocessingStatus.FINISHED, start_timestamp=ANY, end_timestamp=ANY
+                            status=MediaPreprocessingStatus.FINISHED,
+                            start_timestamp=ANY,
+                            end_timestamp=ANY,
                         ),
                     )
                 ),
@@ -154,7 +157,10 @@ class TestMediaManager:
             test_image = bytes(0)
         else:
             test_image = fxt_solid_color_image_bytes(width=img_width, height=img_height)
-        with patch.object(ImageRepo, "save") as mock_save, pytest.raises(InvalidMediaException):
+        with (
+            patch.object(ImageRepo, "save") as mock_save,
+            pytest.raises(InvalidMediaException),
+        ):
             MediaManager().upload_image(
                 dataset_storage_identifier=fxt_dataset_storage_identifier,
                 basename="test_image",
@@ -183,7 +189,8 @@ class TestMediaManager:
         )
 
         video_data = video_binary_repo.get_by_filename(
-            filename=video.data_binary_filename, binary_interpreter=RAWBinaryInterpreter()
+            filename=video.data_binary_filename,
+            binary_interpreter=RAWBinaryInterpreter(),
         )
         with patch.object(VideoRepo, "save") as mock_video_save:
             # Temporarily save the video bytes to the BinaryRepo and use this URL
@@ -230,7 +237,8 @@ class TestMediaManager:
                         total_frames=number_of_frames,
                         size=ANY,
                         preprocessing=MediaPreprocessing(
-                            status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=ANY
+                            status=MediaPreprocessingStatus.IN_PROGRESS,
+                            start_timestamp=ANY,
                         ),
                     )
                 ),
@@ -246,7 +254,9 @@ class TestMediaManager:
                         total_frames=number_of_frames,
                         size=ANY,
                         preprocessing=MediaPreprocessing(
-                            status=MediaPreprocessingStatus.FINISHED, start_timestamp=ANY, end_timestamp=ANY
+                            status=MediaPreprocessingStatus.FINISHED,
+                            start_timestamp=ANY,
+                            end_timestamp=ANY,
                         ),
                     )
                 ),
@@ -278,7 +288,8 @@ class TestMediaManager:
         # as mock url when the BinaryRepo is called
         video_binary_repo = VideoBinaryRepo(dataset_storage.identifier)
         video_data = video_binary_repo.get_by_filename(
-            filename=video.data_binary_filename, binary_interpreter=RAWBinaryInterpreter()
+            filename=video.data_binary_filename,
+            binary_interpreter=RAWBinaryInterpreter(),
         )
         temp_filename = video_binary_repo.save(
             dst_file_name="file.mp4",
@@ -318,7 +329,8 @@ class TestMediaManager:
         # as mock url when the BinaryRepo is called
         video_binary_repo = VideoBinaryRepo(dataset_storage.identifier)
         video_data = video_binary_repo.get_by_filename(
-            filename=video.data_binary_filename, binary_interpreter=RAWBinaryInterpreter()
+            filename=video.data_binary_filename,
+            binary_interpreter=RAWBinaryInterpreter(),
         )
         temp_filename = video_binary_repo.save(
             dst_file_name="file.mp4",
@@ -337,7 +349,10 @@ class TestMediaManager:
             ),
             patch.object(VideoFileRepair, "check_and_repair_video", return_value=True),
             patch.object(Video, "duration", 1000000),
-            pytest.raises(InvalidMediaException, match="Video too long: the maximum duration is 3 hours"),
+            pytest.raises(
+                InvalidMediaException,
+                match="Video too long: the maximum duration is 3 hours",
+            ),
         ):
             MediaManager().upload_video(
                 dataset_storage_identifier=dataset_storage.identifier,
@@ -402,7 +417,10 @@ class TestMediaManager:
         IMAGE_ID = ID("image_id_124")
 
         # Act
-        with patch.object(ImageRepo, "get_by_id", return_value=NullImage()), pytest.raises(ImageNotFoundException):
+        with (
+            patch.object(ImageRepo, "get_by_id", return_value=NullImage()),
+            pytest.raises(ImageNotFoundException),
+        ):
             MediaManager.get_image_by_id(
                 dataset_storage_identifier=fxt_dataset_storage.identifier,
                 image_id=IMAGE_ID,
@@ -582,7 +600,9 @@ class TestMediaManager:
         with (
             patch.object(MediaManager, "get_video_by_id", return_value=video) as mock_get_video,
             patch.object(
-                VideoFrameReader, "get_frame_numpy", side_effect=VideoFrameOutOfRangeInternalException
+                VideoFrameReader,
+                "get_frame_numpy",
+                side_effect=VideoFrameOutOfRangeInternalException,
             ) as mock_get_frame_numpy,
             pytest.raises(VideoFrameOutOfRangeException),
         ):
@@ -612,7 +632,9 @@ class TestMediaManager:
         with (
             patch.object(VideoRepo, "get_by_id", return_value=video),
             patch.object(
-                MediaManager, "get_single_thumbnail_frame_numpy", side_effect=VideoFrameOutOfRangeInternalException
+                MediaManager,
+                "get_single_thumbnail_frame_numpy",
+                side_effect=VideoFrameOutOfRangeInternalException,
             ) as mock_get_single_thumbnail_frame_numpy,
             pytest.raises(VideoFrameOutOfRangeException),
         ):
@@ -624,7 +646,9 @@ class TestMediaManager:
 
         # Assert
         mock_get_single_thumbnail_frame_numpy.assert_called_once_with(
-            video=video, dataset_storage_identifier=fxt_dataset_storage.identifier, frame_index=FRAME_INDEX
+            video=video,
+            dataset_storage_identifier=fxt_dataset_storage.identifier,
+            frame_index=FRAME_INDEX,
         )
 
     def test_get_video_thumbnail_frame_by_id_not_ready(
@@ -640,7 +664,11 @@ class TestMediaManager:
         # Act
         with (
             patch.object(VideoRepo, "get_by_id", return_value=video),
-            patch.object(MediaManager, "get_single_thumbnail_frame_numpy", side_effect=VideoFrameReadingError),
+            patch.object(
+                MediaManager,
+                "get_single_thumbnail_frame_numpy",
+                side_effect=VideoFrameReadingError,
+            ),
             patch.object(VideoFrameReader, "get_frame_numpy", return_value=video_frame),
             patch.object(Media2DFactory, "crop_to_thumbnail", return_value=return_frame),
         ):
@@ -690,7 +718,11 @@ class TestMediaManager:
 
     def test_delete_media_project_locked(self, fxt_empty_project_persisted, fxt_image_entity, fxt_video_entity) -> None:
         dataset_storage = fxt_empty_project_persisted.get_training_dataset_storage()
-        ProjectRepo().mark_locked(owner="test", project_id=fxt_empty_project_persisted.id_, duration_seconds=1000)
+        ProjectRepo().mark_locked(
+            owner="test",
+            project_id=fxt_empty_project_persisted.id_,
+            duration_seconds=1000,
+        )
         with pytest.raises(ProjectLockedException):
             MediaManager.delete_image_by_id(
                 project=fxt_empty_project_persisted,
