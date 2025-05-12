@@ -284,11 +284,6 @@ interactive_ai/tests/e2e:
   - Makefile.shared
   - .github/workflows/component.yml
 
-# gRPC interfaces
-libs/grpc_interfaces:
-  - libs/grpc_interfaces/**
-  - libs/types/**
-
 # Web UI
 web_ui:
   - web_ui/**
