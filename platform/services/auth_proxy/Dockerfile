@@ -5,7 +5,7 @@ FROM golang:1.23.8 AS build
 
 WORKDIR /build/control_plane/auth_proxy
 
-COPY --link --from=account_service_client . ../../../libs/grpc_interfaces/grpc_interfaces/account_service/go
+COPY --link --from=account_service_client . ../../../libs/grpc_interfaces/src/grpc_interfaces/account_service/go
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.sum,target=go.sum \
