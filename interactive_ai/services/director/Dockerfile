@@ -21,6 +21,7 @@ ENV UV_PYTHON_DOWNLOADS=0
 WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=iai_core . interactive_ai/libs/iai_core_py
+COPY --link --from=supported_models . interactive_ai/supported_models
 
 WORKDIR /builder/interactive_ai/services/director
 
