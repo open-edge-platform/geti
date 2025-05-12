@@ -38,23 +38,23 @@ DOCKER_BUILD_CONTEXT              ?=
 
 DOCKER_EXTRA_ARGS                 := \
     $(if $(REGISTRY),--build-arg REGISTRY=$(REGISTRY)) \
-    $(if $(http_proxy),--build-arg HTTP_PROXY=$(http_proxy)) \
-    $(if $(https_proxy),--build-arg HTTPS_PROXY=$(https_proxy)) \
-    $(if $(no_proxy),--build-arg HTTPS_PROXY=$(NO_PROXY)) \
+    $(if $(http_proxy),--build-arg http_proxy=$(http_proxy)) \
+    $(if $(https_proxy),--build-arg https_proxy=$(https_proxy)) \
+    $(if $(no_proxy),--build-arg no_proxy=$(no_proxy)) \
     $(if $(HTTP_PROXY),--build-arg HTTP_PROXY=$(HTTP_PROXY)) \
     $(if $(HTTPS_PROXY),--build-arg HTTPS_PROXY=$(HTTPS_PROXY)) \
-    $(if $(NO_PROXY),--build-arg HTTPS_PROXY=$(NO_PROXY))
+    $(if $(NO_PROXY),--build-arg NO_PROXY=$(NO_PROXY))
 
 ###
 # docker builder extra arguments
 ###
 DOCKER_PROXY                      := \
     $(if $(http_proxy),-e http_proxy=$(http_proxy)) \
-    $(if $(https_proxy),-e http_proxy=$(https_proxy)) \
-    $(if $(no_proxy),-e http_proxy=$(no_proxy)) \
-    $(if $(HTTP_PROXY),-e http_proxy=$(HTTP_PROXY)) \
-    $(if $(HTTPS_PROXY),-e http_proxy=$(HTTPS_PROXY)) \
-    $(if $(NO_PROXY),-e http_proxy=$(NO_PROXY))
+    $(if $(https_proxy),-e https_proxy=$(https_proxy)) \
+    $(if $(no_proxy),-e no_proxy=$(no_proxy)) \
+    $(if $(HTTP_PROXY),-e HTTP_PROXY=$(HTTP_PROXY)) \
+    $(if $(HTTPS_PROXY),-e HTTPS_PROXY=$(HTTPS_PROXY)) \
+    $(if $(NO_PROXY),-e NO_PROXY=$(NO_PROXY))
 
 ###
 # docker images
