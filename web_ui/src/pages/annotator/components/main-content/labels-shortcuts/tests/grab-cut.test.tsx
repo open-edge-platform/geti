@@ -75,7 +75,7 @@ describe('Label shortcuts', () => {
         });
 
         await userEvent.click(screen.getByRole('button', { name: localLabel.name }));
-        expect(updateToolSettingsMock).toBeCalledWith(ToolType.GrabcutTool, {
+        expect(updateToolSettingsMock).toHaveBeenCalledWith(ToolType.GrabcutTool, {
             selectedLabel: localLabel,
         });
     });

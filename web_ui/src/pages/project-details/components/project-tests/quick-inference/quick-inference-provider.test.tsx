@@ -193,7 +193,7 @@ describe('Quick Inference Provider', () => {
             result.current.handleUploadImage([file]);
 
             await waitFor(() => {
-                expect(validateMedia).toBeCalledWith(file);
+                expect(validateMedia).toHaveBeenCalledWith(file);
             });
         });
     });

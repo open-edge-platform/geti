@@ -100,7 +100,7 @@ describe('SecondaryToolbar', () => {
 
         fireEvent.click(acceptButton);
 
-        expect(context.scene.addShapes).toBeCalledWith([shape], undefined);
+        expect(context.scene.addShapes).toHaveBeenCalledWith([shape], undefined);
         expect(reset).toBeCalled();
     });
 

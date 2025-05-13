@@ -155,7 +155,7 @@ describe('DatasetImportPanelMenu', () => {
 
             !!menuActionButton && fireEvent.click(menuActionButton);
 
-            expect(mockAbortActiveUpload).toBeCalledWith(mockDatasetImportItem.id);
+            expect(mockAbortActiveUpload).toHaveBeenCalledWith(mockDatasetImportItem.id);
         });
 
         it.each([

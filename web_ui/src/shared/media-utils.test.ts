@@ -54,19 +54,19 @@ describe('Check media item download', () => {
     it('Image download - should download item from src', () => {
         downloadMediaItem(getMockedImageMediaItem({ name: 'Test image', src: '/v1/media/image/image-id' }));
 
-        expect(mockedDownloadFile).toBeCalledWith('/v1/media/image/image-id', 'Test image');
+        expect(mockedDownloadFile).toHaveBeenCalledWith('/v1/media/image/image-id', 'Test image');
     });
 
     it('Image download - should replace all "." in the file name', () => {
         downloadMediaItem(getMockedImageMediaItem({ name: 'Test.image', src: '/v1/media/image/image-id' }));
 
-        expect(mockedDownloadFile).toBeCalledWith('/v1/media/image/image-id', 'Test_image');
+        expect(mockedDownloadFile).toHaveBeenCalledWith('/v1/media/image/image-id', 'Test_image');
 
         downloadMediaItem(
             getMockedImageMediaItem({ name: 'Test.image.wow.lots.of.points', src: '/v1/media/image/image-id' })
         );
 
-        expect(mockedDownloadFile).toBeCalledWith('/v1/media/image/image-id', 'Test_image_wow_lots_of_points');
+        expect(mockedDownloadFile).toHaveBeenCalledWith('/v1/media/image/image-id', 'Test_image_wow_lots_of_points');
     });
 
     it('VideoFrame download - should download full video', () => {
@@ -77,7 +77,7 @@ describe('Check media item download', () => {
             })
         );
 
-        expect(mockedDownloadFile).toBeCalledWith('/v1/media/video/video-id/display/stream', 'Test frame file');
+        expect(mockedDownloadFile).toHaveBeenCalledWith('/v1/media/video/video-id/display/stream', 'Test frame file');
     });
 
     it('VideoFrame download - not proper url - should download item from src', () => {
@@ -88,7 +88,7 @@ describe('Check media item download', () => {
             })
         );
 
-        expect(mockedDownloadFile).toBeCalledWith(
+        expect(mockedDownloadFile).toHaveBeenCalledWith(
             '/v1/media/video/video-id/something_wrong/0/display/full',
             'Test frame file'
         );

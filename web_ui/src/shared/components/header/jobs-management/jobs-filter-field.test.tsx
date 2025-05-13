@@ -68,6 +68,6 @@ describe('jobs-filter-field', (): void => {
         await renderComponent();
         fireEvent.click(screen.getByRole('button', { name: /Test aria label/ }));
         fireEvent.click(screen.getByRole('option', { name: 'Test Value 2' }));
-        expect(onSelectionChange).toBeCalledWith('test_value_2');
+        expect(onSelectionChange).toHaveBeenCalledWith('test_value_2');
     });
 });
