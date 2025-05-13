@@ -159,13 +159,17 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
         :param dataset: dataset with keypoints or list of DatasetItems
         :return: list of keypoints for each image in the dataset
         """
+        logger.error(f"Dataset before {dataset}")
         keypoints_per_item = []
         dataset_items = (item for item in dataset) if isinstance(dataset, Dataset) else dataset
         for item in dataset_items:
+            logger.error(f"item {item}")
             keypoints: list[tuple[float, float, str, bool]] = []
             for annotation in item.get_annotations():
+                logger.error(f"annotation {annotation}")
                 if isinstance(annotation.shape, Keypoint):
                     label = annotation.get_labels()[0]  # always contains a list with one label
+                    logger.error(f"label {label}")
                     keypoints.append(
                         (
                             annotation.shape.x,
@@ -177,6 +181,7 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
                 else:
                     raise ValueError(f"Unexpected shape of type {annotation.shape.type}")
             keypoints_per_item.append(keypoints)
+        logger.error(f"Keypoints per item {keypoints_per_item}")
         return keypoints_per_item
 
     def calculate_metrics(self) -> tuple[list[float], dict[str, float], int, int]:
@@ -233,9 +238,7 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             a keypoint: [x1: float, y1: float, label: str, is_visible: bool]
         :return: list of correct keypoints
         """
-        logger.error(
-            msg=f"gt_keypoint: {gt_keypoints}, pred_keypoint: {pred_keypoints}"
-        )
+        logger.error(msg=f"gt_keypoint: {gt_keypoints}, pred_keypoint: {pred_keypoints}")
         if not gt_keypoints or not pred_keypoints:
             return []
 
