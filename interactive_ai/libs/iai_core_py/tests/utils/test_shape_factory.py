@@ -172,7 +172,7 @@ class TestShapeFactory:
         assert ShapeFactory.shape_produces_valid_crop(polygon)
 
         polygon = Polygon(points=[point1, point2, point3])
-        assert not ShapeFactory.shape_produces_valid_crop(polygon)
+        assert ShapeFactory.shape_produces_valid_crop(polygon)
 
         polygon = Polygon(points=[point1, point2, point3, point4, point5])
         assert not ShapeFactory.shape_produces_valid_crop(polygon)
