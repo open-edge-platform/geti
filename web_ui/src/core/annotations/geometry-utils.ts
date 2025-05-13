@@ -7,7 +7,6 @@ import {
     booleanIntersects,
     booleanPointInPolygon,
     center,
-    centroid,
     difference,
     featureCollection,
     point,
@@ -252,9 +251,9 @@ export const isCenterOfShapeWithinROI = (roi: RegionOfInterest, shape: Shape) =>
     const shapePoly = shapeToTurfPolygon(shape);
     const roiPoly = shapeToTurfPolygon({ ...roi, shapeType: ShapeType.Rect });
 
-    const shapeCentroid = centroid(shapePoly);
+    const shapeCenter = center(shapePoly);
 
-    return booleanPointInPolygon(shapeCentroid, roiPoly);
+    return booleanPointInPolygon(shapeCenter, roiPoly);
 };
 
 const removeOffPointsRect = (rect: Rect, roi: RegionOfInterest): Rect => {
@@ -350,9 +349,9 @@ export const isPointWithinRoi = (roi: RegionOfInterest, _point: Point): boolean 
 
 export const getCenterOfShape = (shape: Shape): Point => {
     const shapePolygon = shapeToTurfPolygon(shape);
-    const shapeCentroid = centroid(shapePolygon);
+    const shapeCenter = center(shapePolygon);
 
-    return { x: shapeCentroid.geometry.coordinates[0], y: shapeCentroid.geometry.coordinates[1] };
+    return { x: shapeCenter.geometry.coordinates[0], y: shapeCenter.geometry.coordinates[1] };
 };
 
 export const getCenterOfMultipleAnnotations = (shapes: Shape[]): Point => {
