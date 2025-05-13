@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';

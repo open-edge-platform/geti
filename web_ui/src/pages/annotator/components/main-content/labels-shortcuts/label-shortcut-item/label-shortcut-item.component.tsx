@@ -3,7 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Label } from '../../../../../../core/labels/label.interface';
 import { LabelColorThumb } from '../../../../../../shared/components/label-color-thumb/label-color-thumb.component';

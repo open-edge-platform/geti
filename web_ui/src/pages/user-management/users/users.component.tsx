@@ -5,7 +5,7 @@ import { ComponentProps, useState } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
 import { motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE, User, UsersQueryParams } from '../../../core/users/users.interface';

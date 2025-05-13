@@ -4,7 +4,7 @@
 import { Key } from 'react';
 
 import { Divider, Flex, Item, Picker, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';

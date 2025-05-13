@@ -4,7 +4,7 @@
 import { useMemo } from 'react';
 
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { MediaAdvancedFilterResponse, MediaItem, MediaItemResponse } from '../../../../../core/media/media.interface';
 import { TestMediaAdvancedFilter, TestMediaItem } from '../../../../../core/tests/test-media.interface';

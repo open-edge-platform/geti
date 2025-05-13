@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 
 import { QueryKey, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import {
     PredictionCache,

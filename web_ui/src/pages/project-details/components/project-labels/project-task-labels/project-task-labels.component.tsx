@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 
 import { LabelTreeItem, LabelTreeLabelProps, Readonly } from '../../../../../core/labels/label-tree-view.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';

@@ -8,7 +8,7 @@ import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutl
 import DeleteOutline from '@spectrum-icons/workflow/DeleteOutline';
 import RemoveCircle from '@spectrum-icons/workflow/RemoveCircle';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 

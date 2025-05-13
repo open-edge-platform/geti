@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useDurationText } from '../../../../../shared/hooks/data-format/use-duration-text.hook';
 import { useFramesText } from '../../../../../shared/hooks/data-format/use-frames-text.hook';

@@ -3,10 +3,7 @@
 
 import { cloneElement, createContext, ReactChild, ReactElement, ReactNode, useCallback, useContext } from 'react';
 
-import isFunction from 'lodash/isFunction';
-import isNumber from 'lodash/isNumber';
-import isString from 'lodash/isString';
-import isUndefined from 'lodash/isUndefined';
+import { isFunction, isNumber, isString, isUndefined } from 'lodash-es';
 import {
     iNotificationDismiss as DismissOptions,
     iNotification,

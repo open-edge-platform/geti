@@ -3,7 +3,7 @@
 
 import { ReactNode, useState } from 'react';
 
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { CANVAS_ADJUSTMENTS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { initialCanvasConfig } from '../../../../core/user-settings/utils';

@@ -4,8 +4,7 @@
 import { FC } from 'react';
 
 import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import { useGetRunningJobs } from '../../../../../core/jobs/hooks/use-jobs.hook';

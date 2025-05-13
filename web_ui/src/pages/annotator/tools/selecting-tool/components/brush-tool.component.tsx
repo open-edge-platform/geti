@@ -3,8 +3,7 @@
 
 import { PointerEventHandler, useRef, useState } from 'react';
 
-import flow from 'lodash/flow';
-import isEmpty from 'lodash/isEmpty';
+import { flow, isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { Point, Polygon } from '../../../../../core/annotations/shapes.interface';

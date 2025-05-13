@@ -3,7 +3,7 @@
 
 import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import {
     isJobCancel,

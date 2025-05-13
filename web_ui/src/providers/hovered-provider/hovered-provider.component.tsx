@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 const HoveredIdContext = createContext<{
     hoveredId: string | null;

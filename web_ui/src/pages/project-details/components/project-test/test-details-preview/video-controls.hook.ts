@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame } from '../../../../../core/media/video.interface';

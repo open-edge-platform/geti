@@ -14,7 +14,7 @@ import {
     Heading,
     Text,
 } from '@adobe/react-spectrum';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';

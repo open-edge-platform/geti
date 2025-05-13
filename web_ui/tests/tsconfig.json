@@ -6,9 +6,14 @@
         "allowSyntheticDefaultImports": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
+        "moduleResolution": "node",
         "isolatedModules": true,
-        "target": "es5",
-        "lib": ["es5", "dom"]
+        "target": "esnext",
+        "lib": [
+            "dom",
+            "dom.iterable",
+            "esnext"
+        ]
     },
     "include": ["**/*", "../src/**/*"],
     "exclude": ["./datasets/**/*", "../src/opencv-types/**"]

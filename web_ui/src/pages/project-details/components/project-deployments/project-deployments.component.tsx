@@ -4,8 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { DialogContainer, Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import uniqBy from 'lodash/uniqBy';
+import { isEmpty, uniqBy } from 'lodash-es';
 
 import { DeploymentImg } from '../../../../assets/images';
 import { isVisualPromptModelGroup } from '../../../../core/annotations/services/visual-prompt-service';

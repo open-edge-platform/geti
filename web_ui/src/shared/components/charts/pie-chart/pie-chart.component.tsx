@@ -3,7 +3,7 @@
 
 import { useNumberFormatter } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Cell, Label, Pie, PieChart as RePieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { SvgLegend } from '../../download-graph-menu/export-svg-utils';

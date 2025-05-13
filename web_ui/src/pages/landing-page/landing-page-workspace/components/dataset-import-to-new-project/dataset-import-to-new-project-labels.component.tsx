@@ -5,10 +5,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { Flex, Heading, IllustratedMessage, Text, View } from '@adobe/react-spectrum';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
-import differenceBy from 'lodash/differenceBy';
-import intersectionBy from 'lodash/intersectionBy';
-import isEmpty from 'lodash/isEmpty';
-import uniqBy from 'lodash/uniqBy';
+import { differenceBy, intersectionBy, isEmpty, uniqBy } from 'lodash-es';
 
 import { ChevronRightSmallLight, LabelGroup } from '../../../../../assets/icons';
 import { DATASET_IMPORT_TASK_TYPE } from '../../../../../core/datasets/dataset.enum';

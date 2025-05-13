@@ -4,7 +4,7 @@
 import { CSSProperties } from 'react';
 
 import { ButtonGroup, Flex, Heading, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { MoreMenu } from '../../../assets/icons';
 import { TUTORIAL_CARD_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';

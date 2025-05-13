@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../assets/icons';
 import { isVideo } from '../../../../core/media/video.interface';

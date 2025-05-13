@@ -16,7 +16,7 @@ import {
 } from '@adobe/react-spectrum';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import dayjs from 'dayjs';
-import get from 'lodash/get';
+import { get } from 'lodash-es';
 
 import { CreditAccount } from '../../../core/credits/credits.interface';
 import { getBalanceUsedCredits } from '../../../core/credits/services/utils';

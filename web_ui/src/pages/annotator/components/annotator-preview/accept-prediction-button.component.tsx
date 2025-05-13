@@ -3,7 +3,7 @@
 
 import { CSSProperties, ReactNode } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { useIsPredictionRejected } from '../../providers/annotation-threshold-provider/annotation-threshold-provider.component';
 import { usePrediction } from '../../providers/prediction-provider/prediction-provider.component';

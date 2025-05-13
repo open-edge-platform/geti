@@ -4,7 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { Grid, Item, Picker, repeat, Slider, View } from '@adobe/react-spectrum';
-import uniqBy from 'lodash/uniqBy';
+import { uniqBy } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Label } from '../../../../core/labels/label.interface';

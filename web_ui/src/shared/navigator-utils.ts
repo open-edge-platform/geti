@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isNil from 'lodash/isNil';
-import uniqBy from 'lodash/uniqBy';
+import { isNil, uniqBy } from 'lodash-es';
 
 export const isVideoInput = (mediaDevice: MediaDeviceInfo) => mediaDevice.kind === 'videoinput';
 

@@ -8,9 +8,7 @@ import { dimensionValue, useUnwrapDOMRef } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
 import Close from '@spectrum-icons/workflow/Close';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash/isEmpty';
-import isNumber from 'lodash/isNumber';
-import orderBy from 'lodash/orderBy';
+import { isEmpty, isNumber, orderBy } from 'lodash-es';
 import { Bar, BarChart, Rectangle, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts';
 
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';

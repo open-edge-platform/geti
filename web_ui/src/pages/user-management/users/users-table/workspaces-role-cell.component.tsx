@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { RESOURCE_TYPE, Role } from '../../../../core/users/users.interface';
 import { Workspace } from '../../../../core/workspaces/services/workspaces.interface';

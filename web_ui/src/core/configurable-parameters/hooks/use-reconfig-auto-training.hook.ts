@@ -3,8 +3,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import cloneDeep from 'lodash/cloneDeep';
-import isNil from 'lodash/isNil';
+import { cloneDeep, isNil } from 'lodash-es';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';

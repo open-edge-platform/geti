@@ -5,7 +5,7 @@ import { ComponentProps, forwardRef, ReactNode } from 'react';
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { clsx } from 'clsx';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { Placement } from 'react-aria';
 
 import { Button } from '../button/button.component';
