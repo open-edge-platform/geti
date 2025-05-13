@@ -287,7 +287,7 @@ describe('useIntelligentScissors', () => {
 
             expect(polygonState.setSegments).not.toHaveBeenCalled();
             expect(hookProps.setLassoSegment).not.toHaveBeenCalled();
-            expect(hookProps.complete).toBeCalledWith(PolygonMode.MagneticLasso);
+            expect(hookProps.complete).toHaveBeenCalledWith(PolygonMode.MagneticLasso);
         });
     });
 });

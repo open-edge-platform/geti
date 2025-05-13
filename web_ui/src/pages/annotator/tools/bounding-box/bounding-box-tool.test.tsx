@@ -74,7 +74,7 @@ describe('BoundingBoxTool', () => {
 
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Rect, x: 10, y: 30, width: 30, height: 50 }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Rect, x: 10, y: 30, width: 30, height: 50 }]);
     });
 
     it('creates rotated bounding boxs when in a rotated detection task', async () => {
@@ -94,7 +94,7 @@ describe('BoundingBoxTool', () => {
         fireEvent.pointerMove(svg, { clientX: 10, clientY: 30 });
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([
+        expect(onComplete).toHaveBeenCalledWith([
             { shapeType: ShapeType.RotatedRect, x: 25, y: 55, width: 30, height: 50, angle: 0 },
         ]);
     });

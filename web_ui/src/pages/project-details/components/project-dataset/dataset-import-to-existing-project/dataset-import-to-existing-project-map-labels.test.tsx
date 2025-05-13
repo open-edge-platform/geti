@@ -88,11 +88,11 @@ describe(DatasetImportToExistingProjectMapLabels, () => {
         expect(screen.getAllByRole('listitem')[1]).toHaveTextContent('Kinology');
 
         fireEvent.click(screen.getAllByRole('listitem')[0]);
-        expect(mockPatchActiveDatasetImport).toBeCalledWith({ labelsMap: { cat: '1' } });
+        expect(mockPatchActiveDatasetImport).toHaveBeenCalledWith({ labelsMap: { cat: '1' } });
 
         await userEvent.type(screen.getByRole('textbox', { name: 'Select label' }), 'nology');
         fireEvent.click(screen.getAllByRole('listitem')[1]);
-        expect(mockPatchActiveDatasetImport).toBeCalledWith({ labelsMap: { cat: '2' } });
+        expect(mockPatchActiveDatasetImport).toHaveBeenCalledWith({ labelsMap: { cat: '2' } });
     });
 
     it('should allow clearing labels mapping', () => {
@@ -108,7 +108,7 @@ describe(DatasetImportToExistingProjectMapLabels, () => {
         );
 
         fireEvent.click(screen.getByLabelText('clear-mapping-button'));
-        expect(mockPatchActiveDatasetImport).toBeCalledWith({ labelsMap: {} });
+        expect(mockPatchActiveDatasetImport).toHaveBeenCalledWith({ labelsMap: {} });
     });
 
     it('labels should be sorted alphabetically', () => {

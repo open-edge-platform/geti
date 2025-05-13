@@ -226,7 +226,7 @@ test.describe('Copy paste annotations', () => {
             await pasteAnnotations(page);
 
             await expect(
-                page.getByText("One ore more annotations were outside the region of the interest haven't been pasted.")
+                page.getByText("One or more annotations outside the region of interest haven't been pasted.")
             ).toBeVisible();
             await expect(getAnnotationsList(page)).toHaveCount(annotationsCount);
         });

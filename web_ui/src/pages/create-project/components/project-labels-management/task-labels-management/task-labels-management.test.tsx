@@ -85,7 +85,7 @@ describe('Task label management', () => {
         await userEvent.type(input, 'Test label');
 
         await userEvent.keyboard('{Enter}');
-        expect(nextMock).toBeCalledWith();
+        expect(nextMock).toHaveBeenCalledWith();
     });
 
     it('should disabled the "add" button after adding a label', async () => {
@@ -400,7 +400,7 @@ describe('Task label management', () => {
             await userEvent.type(screen.getByPlaceholderText('Label name'), 'label 1');
             await userEvent.click(screen.getByRole('button', { name: 'Create label' }));
 
-            expect(setTaskLabelsMock).toBeCalledWith([
+            expect(setTaskLabelsMock).toHaveBeenCalledWith([
                 expect.objectContaining({ group: `Classification labels${GROUP_SEPARATOR}label 1` }),
             ]);
         });
