@@ -7,7 +7,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
-import { getCenterOfShape } from '../../../../core/annotations/math';
 import { labelFromUser } from '../../../../core/annotations/utils';
 import { Label } from '../../../../core/labels/label.interface';
 import { isPrediction } from '../../../../core/labels/utils';
@@ -24,7 +23,12 @@ import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { HOTKEY_OPTIONS } from '../../hot-keys/utils';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useTask } from '../../providers/task-provider/task-provider.component';
-import { isShapePartiallyWithinROI, isShapeWithinRoi, removeOffLimitPoints } from '../../tools/geometry-utils';
+import {
+    getCenterOfShape,
+    isShapePartiallyWithinROI,
+    isShapeWithinRoi,
+    removeOffLimitPoints,
+} from '../../tools/geometry-utils';
 import { translateAnnotation } from '../../tools/utils';
 import { createAnnotation } from '../../utils';
 import { useZoom } from '../../zoom/zoom-provider.component';

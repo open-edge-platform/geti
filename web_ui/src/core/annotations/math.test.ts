@@ -11,11 +11,9 @@ import {
     clampPointBetweenImage,
     degreesToRadians,
     getBoundingBox,
-    getCenterOfShape,
     getIntersectionPoint,
     getShapesBoundingBox,
     hasEqualBoundingBox,
-    isInsideOfBoundingBox,
     isPointInShape,
     isPointOverPoint,
     isValueBetween,
@@ -427,143 +425,6 @@ describe('getBoundingBox functions', () => {
                 height: 300,
             });
         });
-    });
-});
-
-describe('isInsideOfBoundingBox', () => {
-    it.each([
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 0, y: 0, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 90, y: 90, width: 10, height: 10 },
-        ],
-    ])('%s contains %s', (first, second) => {
-        expect(isInsideOfBoundingBox(first, second)).toEqual(true);
-    });
-
-    it.each([
-        // Outside of corners,
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: -20, y: -20, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 0, y: -20, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 120, y: -20, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 120, y: 0, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 120, y: 120, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 0, y: 120, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: -20, y: 120, width: 10, height: 10 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: -20, y: 0, width: 10, height: 10 },
-        ],
-        // Partially outside, partially inside
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: -10, y: -10, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 0, y: -10, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 110, y: -10, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 110, y: 0, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 110, y: 110, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: 0, y: 110, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: -10, y: 110, width: 20, height: 20 },
-        ],
-        [
-            { x: 0, y: 0, width: 100, height: 100 },
-            { x: -10, y: 0, width: 20, height: 20 },
-        ],
-    ])('%s does not contain %s', (first, second) => {
-        expect(isInsideOfBoundingBox(first, second)).toEqual(false);
-    });
-});
-
-describe('getCenterOfShape', () => {
-    const testData: [Shape, Point][] = [
-        [
-            {
-                shapeType: ShapeType.Polygon,
-                points: [
-                    { x: 0, y: 0 },
-                    { x: 50, y: 0 },
-                    { x: 50, y: 50 },
-                    { x: 0, y: 50 },
-                ],
-            },
-            { x: 25, y: 25 },
-        ],
-        [
-            {
-                shapeType: ShapeType.Circle,
-                x: 25,
-                y: 25,
-                r: 100,
-            },
-            { x: 25, y: 25 },
-        ],
-        [
-            {
-                shapeType: ShapeType.Rect,
-                x: 100,
-                y: 0,
-                width: 100,
-                height: 100,
-            },
-            { x: 150, y: 50 },
-        ],
-        [
-            {
-                shapeType: ShapeType.RotatedRect,
-                x: 100,
-                y: 100,
-                width: 200,
-                height: 100,
-                angle: 90,
-            },
-            { x: 100, y: 100 },
-        ],
-    ];
-
-    test.each(testData)('returns shape %s center of %s', (shape, expectedCenter) => {
-        expect(getCenterOfShape(shape)).toEqual(expectedCenter);
     });
 });
 

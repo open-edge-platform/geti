@@ -16,12 +16,12 @@ import {
 import isNil from 'lodash/isNil';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
-import { getCenterOfTheAnnotations } from '../../../../core/annotations/math';
 import { Point } from '../../../../core/annotations/shapes.interface';
 import { MissingProviderError } from '../../../../shared/missing-provider-error';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
+import { getCenterOfMultipleAnnotations } from '../geometry-utils';
 import { StateProviderProps } from '../tools.interface';
 import { SelectingToolType } from './selecting-tool.enums';
 import { MIN_BRUSH_SIZE } from './utils';
@@ -63,7 +63,7 @@ export const SelectingStateProvider = ({ children }: StateProviderProps): JSX.El
     const centerOfTheStampAnnotations = useRef<Point>(
         isNil(selectionSettings.stampedAnnotation)
             ? INITIAL_POINT
-            : getCenterOfTheAnnotations([selectionSettings.stampedAnnotation.shape])
+            : getCenterOfMultipleAnnotations([selectionSettings.stampedAnnotation.shape])
     );
 
     const setActiveTool = useCallback((tool: SelectingToolType) => {
@@ -75,7 +75,9 @@ export const SelectingStateProvider = ({ children }: StateProviderProps): JSX.El
     const handleCreateStamp = useCallback((selectedAnnotations: Annotation[]): void => {
         setActiveTool(SelectingToolType.StampTool);
 
-        centerOfTheStampAnnotations.current = getCenterOfTheAnnotations(selectedAnnotations.map(({ shape }) => shape));
+        centerOfTheStampAnnotations.current = getCenterOfMultipleAnnotations(
+            selectedAnnotations.map(({ shape }) => shape)
+        );
         setStampAnnotations(selectedAnnotations);
         updateToolSettings(ToolType.SelectTool, { stampedAnnotation: selectedAnnotations[0] });
 

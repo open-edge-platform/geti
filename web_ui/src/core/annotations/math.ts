@@ -1,8 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import polylabel from 'polylabel';
-
 import { RegionOfInterest } from './annotation.interface';
 import { Circle, Point, Polygon, Rect, RotatedRect, Shape } from './shapes.interface';
 import { ShapeType } from './shapetype.enum';
@@ -275,57 +273,6 @@ export const getShapesBoundingBox = (shapes: Shape[]): BoundingBox => {
     const height = extremePoints.maxY - extremePoints.minY;
 
     return { x, y, width, height };
-};
-
-export const getCenterOfTheAnnotations = (shapes: Shape[]): Point => {
-    const { x, y, width, height } = getShapesBoundingBox(shapes);
-
-    const centerX = x + width / 2;
-    const centerY = y + height / 2;
-
-    return {
-        x: centerX,
-        y: centerY,
-    };
-};
-
-export const isInsideOfBoundingBox = (parentBoundingBox: BoundingBox, shape: BoundingBox): boolean => {
-    const { x, y, width, height } = parentBoundingBox;
-
-    const boundingBox = shape;
-
-    return (
-        boundingBox.x >= x &&
-        boundingBox.x <= x + width &&
-        boundingBox.x + boundingBox.width <= x + width &&
-        boundingBox.y >= y &&
-        boundingBox.y <= y + height &&
-        boundingBox.y + boundingBox.height <= y + height
-    );
-};
-
-export const getCenterOfShape = (shape: Shape): Point => {
-    switch (shape.shapeType) {
-        case ShapeType.Pose: {
-            const [x, y] = polylabel([shape.points.map((point) => [point.x, point.y])]);
-
-            return { x, y };
-        }
-        case ShapeType.Polygon: {
-            const [x, y] = polylabel([shape.points.map((point) => [point.x, point.y])]);
-
-            return { x, y };
-        }
-        case ShapeType.Rect: {
-            return { x: shape.x + shape.width / 2, y: shape.y + shape.height / 2 };
-        }
-        case ShapeType.RotatedRect: {
-            return { x: shape.x, y: shape.y };
-        }
-        case ShapeType.Circle: {
-            return { x: shape.x, y: shape.y };
-        }
-    }
 };
 
 export const hasEqualBoundingBox = (first: BoundingBox, second: BoundingBox): boolean => {

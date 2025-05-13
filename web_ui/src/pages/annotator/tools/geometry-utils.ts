@@ -6,6 +6,7 @@ import {
     booleanContains,
     booleanIntersects,
     booleanPointInPolygon,
+    center,
     centroid,
     difference,
     featureCollection,
@@ -16,7 +17,7 @@ import {
 import { Feature, Polygon as GeoPolygon, MultiPolygon, Position } from 'geojson';
 
 import { RegionOfInterest } from '../../../core/annotations/annotation.interface';
-import { BoundingBox, getBoundingBox, getCenterOfShape, rotatedRectCorners } from '../../../core/annotations/math';
+import { BoundingBox, getBoundingBox, rotatedRectCorners } from '../../../core/annotations/math';
 import { Circle, Point, Polygon, Rect, RotatedRect, Shape } from '../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../core/annotations/shapetype.enum';
 import { isCircle, isPoseShape, isRect, isRotatedRect } from '../../../core/annotations/utils';
@@ -345,6 +346,21 @@ export const isPointWithinRoi = (roi: RegionOfInterest, _point: Point): boolean 
     const roiPoly = shapeToTurfPolygon({ ...roi, shapeType: ShapeType.Rect });
 
     return booleanPointInPolygon(turfPoint, roiPoly);
+};
+
+export const getCenterOfShape = (shape: Shape): Point => {
+    const shapePolygon = shapeToTurfPolygon(shape);
+    const shapeCentroid = centroid(shapePolygon);
+
+    return { x: shapeCentroid.geometry.coordinates[0], y: shapeCentroid.geometry.coordinates[1] };
+};
+
+export const getCenterOfMultipleAnnotations = (shapes: Shape[]): Point => {
+    const shapePolygons = shapes.map(shapeToTurfPolygon);
+    const centerFeature = center(featureCollection(shapePolygons));
+    const [x, y] = centerFeature.geometry.coordinates;
+
+    return { x, y };
 };
 
 export const isInsideBoundingBox =

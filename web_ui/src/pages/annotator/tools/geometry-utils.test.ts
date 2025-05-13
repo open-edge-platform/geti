@@ -4,7 +4,7 @@
 import { Feature, MultiPolygon } from 'geojson';
 
 import { RegionOfInterest } from '../../../core/annotations/annotation.interface';
-import { Circle, Point, Polygon, Rect, RotatedRect } from '../../../core/annotations/shapes.interface';
+import { Circle, Point, Polygon, Rect, RotatedRect, Shape } from '../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../core/annotations/shapetype.enum';
 import {
     calculateCirclePoints,
@@ -12,6 +12,7 @@ import {
     calculateRectanglePoints,
     calculateRotatedRectanglePoints,
     findLargestPolygon,
+    getCenterOfShape,
     getShapesUnion,
     isPointWithinRoi,
     isPolygonValid,
@@ -453,6 +454,57 @@ describe('geometry-utils', () => {
                 expect(x).toBeCloseTo(2, 5);
                 expect(y).toBeCloseTo(2, 5);
             });
+        });
+    });
+
+    describe('getCenterOfShape', () => {
+        const testData: [Shape, Point][] = [
+            [
+                {
+                    shapeType: ShapeType.Polygon,
+                    points: [
+                        { x: 0, y: 0 },
+                        { x: 50, y: 0 },
+                        { x: 50, y: 50 },
+                        { x: 0, y: 50 },
+                    ],
+                },
+                { x: 25, y: 25 },
+            ],
+            [
+                {
+                    shapeType: ShapeType.Circle,
+                    x: 25,
+                    y: 25,
+                    r: 100,
+                },
+                { x: 25, y: 25 },
+            ],
+            [
+                {
+                    shapeType: ShapeType.Rect,
+                    x: 100,
+                    y: 0,
+                    width: 100,
+                    height: 100,
+                },
+                { x: 150, y: 50 },
+            ],
+            [
+                {
+                    shapeType: ShapeType.RotatedRect,
+                    x: 100,
+                    y: 100,
+                    width: 200,
+                    height: 100,
+                    angle: 90,
+                },
+                { x: 100, y: 100 },
+            ],
+        ];
+
+        test.each(testData)('returns shape %s center of %s', (shape, expectedCenter) => {
+            expect(getCenterOfShape(shape)).toEqual(expectedCenter);
         });
     });
 });

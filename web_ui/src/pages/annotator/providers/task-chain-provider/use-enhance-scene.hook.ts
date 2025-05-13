@@ -15,7 +15,7 @@ import negate from 'lodash/negate';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
-import { getBoundingBox, getCenterOfShape, hasEqualBoundingBox } from '../../../../core/annotations/math';
+import { getBoundingBox, hasEqualBoundingBox } from '../../../../core/annotations/math';
 import { Rect, Shape } from '../../../../core/annotations/shapes.interface';
 import { isRect, labelFromUser } from '../../../../core/annotations/utils';
 import { Label } from '../../../../core/labels/label.interface';
@@ -25,7 +25,7 @@ import { Task } from '../../../../core/projects/task.interface';
 import { getIds, hasEqualId, isNonEmptyArray } from '../../../../shared/utils';
 import { AnnotationScene } from '../../core/annotation-scene.interface';
 import { useImageROI } from '../../hooks/use-image-roi.hook';
-import { isPointWithinRoi } from '../../tools/geometry-utils';
+import { getCenterOfShape, isPointWithinRoi } from '../../tools/geometry-utils';
 import {
     containsGlobalAnnotationWithLabel,
     getAnnotationsWithSelectedInput,
