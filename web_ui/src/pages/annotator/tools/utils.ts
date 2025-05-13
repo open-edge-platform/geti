@@ -3,7 +3,7 @@
 
 import { PointerEvent, SVGProps } from 'react';
 
-import ClipperShape from '@doodle3d/clipper-js';
+import Clipper from '@doodle3d/clipper-js';
 import { defer, isEmpty } from 'lodash-es';
 
 import { Annotation, RegionOfInterest } from '../../../core/annotations/annotation.interface';
@@ -16,6 +16,10 @@ import { Label } from '../../../core/labels/label.interface';
 import { isLeftButton, isWheelButton } from '../../buttons-utils';
 import { ToolLabel, ToolType } from '../core/annotation-tool-context.interface';
 import { PolygonMode } from './polygon-tool/polygon-tool.enum';
+
+// @ts-expect-error `default` actually exists in the module
+const ClipperJS = Clipper.default || Clipper;
+type ClipperShape = InstanceType<typeof Clipper>;
 
 export interface ClipperPoint {
     X: number;
@@ -129,15 +133,15 @@ const convertPolygonPoints = (shape: Polygon): ClipperPoint[] => {
 export const transformToClipperShape = (shape: Shape): ClipperShape => {
     switch (true) {
         case isRect(shape):
-            return new ClipperShape([calculateRectanglePoints(shape)], true);
+            return new ClipperJS([calculateRectanglePoints(shape)], true);
         case isRotatedRect(shape):
-            return new ClipperShape([calculateRotatedRectanglePoints(shape)], true);
+            return new ClipperJS([calculateRotatedRectanglePoints(shape)], true);
         case isCircle(shape):
-            return new ClipperShape([calculateCirclePoints(shape)], true);
+            return new ClipperJS([calculateCirclePoints(shape)], true);
         case isPoseShape(shape):
-            return new ClipperShape([calculateRectanglePoints(getBoundingBox(shape))], true);
+            return new ClipperJS([calculateRectanglePoints(getBoundingBox(shape))], true);
         default:
-            return new ClipperShape([convertPolygonPoints(shape)], true);
+            return new ClipperJS([convertPolygonPoints(shape)], true);
     }
 };
 
@@ -158,7 +162,7 @@ const filterIntersectedPathsWithRoi = (roi: RegionOfInterest, shape: ClipperShap
     const newPath = shape.clone();
     const roiRect = transformToClipperShape({ ...roi, shapeType: ShapeType.Rect });
 
-    newPath.paths = newPath.paths.filter((subPath) => hasIntersection(roiRect, new ClipperShape([subPath])));
+    newPath.paths = newPath.paths.filter((subPath) => hasIntersection(roiRect, new ClipperJS([subPath])));
 
     return newPath;
 };
