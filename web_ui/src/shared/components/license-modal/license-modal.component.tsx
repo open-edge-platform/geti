@@ -58,15 +58,15 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                     <Heading marginBottom={'size-300'}>LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT</Heading>
                     <Content>
                         <Flex direction={'column'} gap={'size-100'}>
+                            <Text>Limited Edge Software Distribution License Agreement [v2025.05.06]</Text>
                             <Text>
-                                Limited Edge Software Distribution License Agreement [v2025.05.06] This LIMITED EDGE
-                                SOFTWARE DISTRIBUTION LICENSE AGREEMENT (“Agreement”) is a contract between you and
-                                Intel Corporation and its affiliates (“Intel”) and governs use of Material. If you use
-                                Material on behalf of or in connection with your employment, you represent and warrant
-                                that you have the authority to bind your employer (and its affiliates) to this
-                                Agreement. By downloading, installing, or using Material, you accept these terms on your
-                                own behalf or on behalf of your employer, as applicable. If you do not accept these
-                                terms, do not use any Material and destroy all copies of Material.
+                                This LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT (“Agreement”) is a contract
+                                between you and Intel Corporation and its affiliates (“Intel”) and governs use of
+                                Material. If you use Material on behalf of or in connection with your employment, you
+                                represent and warrant that you have the authority to bind your employer (and its
+                                affiliates) to this Agreement. By downloading, installing, or using Material, you accept
+                                these terms on your own behalf or on behalf of your employer, as applicable. If you do
+                                not accept these terms, do not use any Material and destroy all copies of Material.
                             </Text>
                             <Divider marginTop={'size-100'} size={'S'} />
                             <Text>1 DEFINITIONS.</Text>
