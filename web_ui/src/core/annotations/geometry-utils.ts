@@ -247,6 +247,13 @@ export const isShapePartiallyWithinROI = (roi: RegionOfInterest, shape: Shape): 
     return !booleanContains(roiPoly, shapePoly) && booleanIntersects(roiPoly, shapePoly);
 };
 
+export const shapesIntersect = (firstShape: Shape, secondShape: Shape): boolean => {
+    const firstShapePoly = shapeToTurfPolygon(firstShape);
+    const secondShapePoly = shapeToTurfPolygon(secondShape);
+
+    return booleanIntersects(firstShapePoly, secondShapePoly);
+};
+
 export const isCenterOfShapeWithinROI = (roi: RegionOfInterest, shape: Shape) => {
     const shapePoly = shapeToTurfPolygon(shape);
     const roiPoly = shapeToTurfPolygon({ ...roi, shapeType: ShapeType.Rect });

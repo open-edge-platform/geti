@@ -3,10 +3,8 @@
 
 import { PointerEvent, RefObject } from 'react';
 
-import { booleanIntersects } from '@turf/turf';
-
 import { Annotation, RegionOfInterest } from '../../../../core/annotations/annotation.interface';
-import { shapeToTurfPolygon } from '../../../../core/annotations/geometry-utils';
+import { shapesIntersect } from '../../../../core/annotations/geometry-utils';
 import { Point, Shape } from '../../../../core/annotations/shapes.interface';
 import { getTheTopShapeAt, isPolygon } from '../../../../core/annotations/utils';
 import { hasEqualSize } from '../../../../shared/utils';
@@ -36,9 +34,6 @@ export const pointInShape = (annotations: Annotation[], point: Point, shiftKey: 
 };
 
 export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: Shape): string[] => {
-    const mainPolygon = shapeToTurfPolygon(shape);
-    let subPolygon = null;
-
     return annotations.reduce<string[]>((prev, annotation: Annotation) => {
         const { shape: annotationShape, isHidden } = annotation;
 
@@ -46,12 +41,8 @@ export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: S
             return prev;
         }
 
-        subPolygon = shapeToTurfPolygon(annotationShape);
-
-        if (subPolygon) {
-            if (booleanIntersects(mainPolygon, subPolygon)) {
-                return [...prev, annotation.id];
-            }
+        if (shapesIntersect(shape, annotationShape)) {
+            return [...prev, annotation.id];
         }
 
         return prev;
