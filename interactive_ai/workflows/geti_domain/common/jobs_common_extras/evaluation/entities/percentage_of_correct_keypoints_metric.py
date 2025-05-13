@@ -166,7 +166,6 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             for annotation in item.get_annotations():
                 if isinstance(annotation.shape, Keypoint):
                     label = annotation.get_labels()[0]  # always contains a list with one label
-                    logger.error(f"label {label}")
                     keypoints.append(
                         (
                             annotation.shape.x,
@@ -234,7 +233,6 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             a keypoint: [x1: float, y1: float, label: str, is_visible: bool]
         :return: list of correct keypoints
         """
-        logger.error(msg=f"gt_keypoint: {gt_keypoints}, pred_keypoint: {pred_keypoints}")
         if not gt_keypoints or not pred_keypoints:
             return []
 
@@ -247,10 +245,6 @@ class PercentageCorrectKeypointsMetric(PerformanceMetric):
             pred_keypoint = pred_keypoints_dict.get(class_)
             if pred_keypoint:
                 distance = np.sqrt((gt_keypoint[0] - pred_keypoint[0]) ** 2 + (gt_keypoint[1] - pred_keypoint[1]) ** 2)
-                logger.error(
-                    msg=f"Distance: {distance}, threshold: {threshold}, "
-                    f"gt_keypoint: {gt_keypoint}, pred_keypoint: {pred_keypoint}"
-                )
                 if distance <= threshold:
                     correct_keypoints.append(class_)
 
