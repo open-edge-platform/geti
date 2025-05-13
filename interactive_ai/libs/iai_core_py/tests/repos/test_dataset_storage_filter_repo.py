@@ -359,6 +359,56 @@ class TestDatasetStorageFilterRepo:
         assert to_revisit_media_identifiers == expected_to_revisit_media_identifiers
         assert annotated_media_identifiers == expected_annotated_media_identifiers
 
+    def test_update_preprocessing_status(
+        self,
+        request,
+        fxt_dataset_storage_persisted,
+        fxt_dataset_storage_filter_data,
+        fxt_mongo_id,
+    ) -> None:
+        """
+        <b>Description:</b>
+        Check that the preprocessing can be set to proper value based on the media preprocessing status.
+
+        <b>Input data:</b>
+        Two images
+
+        <b>Expected results:</b>
+        Test passes if preprocessing is updated for the correct entries
+
+        <b>Steps</b>
+        1. Create test data
+        2. Save test data to the repo
+        3. Check if preprocessing is SCHEDULED for all
+        4. Update preprocessing of image entries to FINISHED
+        5. Check that the correct entries are updated
+        """
+        repo = DatasetStorageFilterRepo(fxt_dataset_storage_persisted.identifier)
+        repo.delete_all()
+        request.addfinalizer(lambda: repo.delete_all())
+
+        image_id_1 = ID(fxt_mongo_id(12))
+        image_id_2 = ID(fxt_mongo_id(13))
+        media_identifiers = [ImageIdentifier(image_id=image_id_1), ImageIdentifier(image_id=image_id_2)]
+
+        for media_identifier in media_identifiers:
+            fxt_dataset_storage_filter_data.media_identifier = media_identifier
+            fxt_dataset_storage_filter_data.preprocessing = MediaPreprocessingStatus.SCHEDULED
+            repo.upsert_dataset_storage_filter_data(fxt_dataset_storage_filter_data)
+
+        assert {data.preprocessing for data in repo.get_all()} == {MediaPreprocessingStatus.SCHEDULED}
+
+        repo.update_preprocessing_status(
+            media_identifier=ImageIdentifier(image_id=image_id_1), status=MediaPreprocessingStatus.FINISHED
+        )
+        retrieved_preprocessings = {data.media_identifier.media_id: data.preprocessing for data in repo.get_all()}
+        expected_preprocessings = {
+            image_id_1: MediaPreprocessingStatus.FINISHED,
+            image_id_2: MediaPreprocessingStatus.SCHEDULED,
+        }
+
+        assert retrieved_preprocessings == expected_preprocessings
+
     def test_get_media_identifiers_by_annotation_state(
         self,
         request,

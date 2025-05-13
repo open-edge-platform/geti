@@ -17,7 +17,6 @@ from communication.exceptions import (
     NoMediaInProjectException,
     TrainingRevisionNotFoundException,
     UnexpectedDatasetPurposeException,
-    VideoThumbnailNotFoundException,
 )
 from communication.limit_check_helpers import check_max_number_of_media_files
 from communication.rest_utils import T
@@ -192,33 +191,10 @@ class MediaRESTController(metaclass=Singleton):
         :return: Path or presigned S3 URL pointing to the thumbnail in the storage if it exists, else None
         :raises: VideoThumbnailNotFoundException if the video thumbnail does not exist
         """
-        thumbnail_binary_filename = Video.thumbnail_video_filename_by_video_id(str(video_id))
-        thumbnail_repo = VideoRepo(dataset_storage_identifier).thumbnail_binary_repo
-
-        if thumbnail_repo.exists(filename=thumbnail_binary_filename):
-            return thumbnail_repo.get_path_or_presigned_url(filename=thumbnail_binary_filename)
-
-        # Check if a temporary file has already been created
-        thumbnail_temp_path = thumbnail_repo.create_path_for_temporary_file(
-            filename=thumbnail_binary_filename, make_unique=False
+        return MediaManager.get_video_thumbnail_stream_location(
+            dataset_storage_identifier=dataset_storage_identifier,
+            video_id=video_id,
         )
-        if not os.path.exists(thumbnail_temp_path):
-            video = MediaManager.get_video_by_id(
-                dataset_storage_identifier=dataset_storage_identifier,
-                video_id=video_id,
-            )
-            publish_event(
-                topic="thumbnail_video_missing",
-                body={
-                    "video_id": video.id_,
-                    "workspace_id": dataset_storage_identifier.workspace_id,
-                    "project_id": dataset_storage_identifier.project_id,
-                    "dataset_storage_id": dataset_storage_identifier.dataset_storage_id,
-                },
-                key=str(video.id_).encode(),
-                headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
-            )
-        raise VideoThumbnailNotFoundException(video_id=video_id)
 
     @staticmethod
     def download_video_frame(
@@ -685,7 +661,7 @@ class MediaRESTController(metaclass=Singleton):
         :param dataset_storage_identifier: Identifier of the dataset storage
         :return: thumbnail BinaryIO content
         """
-        thumbnail_media = MediaManager.get_first_media(dataset_storage_identifier)
+        thumbnail_media = MediaManager.get_first_media(dataset_storage_identifier, only_preprocessed=True)
 
         if thumbnail_media is None:
             raise NoMediaInProjectException("There is no media available in this project.")
