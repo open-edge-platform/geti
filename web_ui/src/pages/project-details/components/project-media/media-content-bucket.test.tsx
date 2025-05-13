@@ -55,7 +55,7 @@ describe('MediaContentBucket', () => {
         },
         controlPlaneUrl: null,
         dataPlaneUrl: null,
-        docsUrl: 'https://docs.geti.intel.com/on-prem/2.6/',
+        docsUrl: 'https://docs.geti.intel.com/',
     } as const;
 
     beforeEach(() => {

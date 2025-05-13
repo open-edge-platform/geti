@@ -150,7 +150,7 @@ const mockConfig = {
     },
     controlPlaneUrl: null,
     dataPlaneUrl: null,
-    docsUrl: 'https://docs.geti.intel.com/on-prem/2.6/',
+    docsUrl: 'https://docs.geti.intel.com/',
     configUrl: 'https://config.geti.example.com',
 };
 jest.mock('./core/services/use-deployment-config-query.hook', () => ({
