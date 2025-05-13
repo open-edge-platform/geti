@@ -22,13 +22,14 @@ import {
 import { MediaDropBoxHeader } from '../../../../shared/components/media-drop/media-drop-box-header.component';
 import { MediaDropBox } from '../../../../shared/components/media-drop/media-drop-box.component';
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
-import { INITIAL_VIEW_MODE } from '../../../../shared/components/media-view-modes/utils';
+import { INITIAL_VIEW_MODE, ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { VALID_MEDIA_TYPES_DISPLAY } from '../../../../shared/media-utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { MediaFilterChips } from '../../../media/components/media-filter-chips.component';
 import { useMedia } from '../../../media/providers/media-provider.component';
+import { getMediaItemId } from '../../../utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { getMatchedMediaCounts, getTotalMediaCounts } from '../../utils';
 import { AnomalyMediaHeaderInformation } from './anomaly-media-header-information.component';
@@ -59,6 +60,13 @@ export interface MediaContentBucketProps {
     showExportImportButton?: boolean;
     footerInfo?: ReactNode;
 }
+
+const viewModeSettings = {
+    [ViewModes.SMALL]: { minItemSize: 112, gap: 4, maxColumns: 11 },
+    [ViewModes.MEDIUM]: { minItemSize: 150, gap: 8, maxColumns: 8 },
+    [ViewModes.LARGE]: { minItemSize: 300, gap: 12, maxColumns: 4 },
+    [ViewModes.DETAILS]: { size: 81, gap: 0 },
+};
 
 export const MediaContentBucket = ({
     header,
@@ -195,11 +203,13 @@ export const MediaContentBucket = ({
                             <MediaItemsList
                                 id={`media-${bucketId}-dataset-list`}
                                 endReached={() => loadNextMedia(false)}
-                                totalCount={media.length}
+                                idFormatter={getMediaItemId}
+                                mediaItems={media}
                                 viewMode={viewMode}
-                                itemContent={(index) => (
+                                viewModeSettings={viewModeSettings}
+                                itemContent={(item) => (
                                     <MediaItemFactory
-                                        mediaItem={media[index]}
+                                        mediaItem={item}
                                         viewMode={viewMode}
                                         isLargeSize={isLargeSize}
                                         mediaSelection={mediaSelection}

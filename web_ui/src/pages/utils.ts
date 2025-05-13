@@ -9,6 +9,8 @@ import { Annotation, RegionOfInterest } from '../core/annotations/annotation.int
 import { clampBetween } from '../core/annotations/math';
 import { Point } from '../core/annotations/shapes.interface';
 import { isEmptyLabel } from '../core/labels/utils';
+import { isImage } from '../core/media/image.interface';
+import { MediaItem } from '../core/media/media.interface';
 import { VALID_IMAGE_TYPES_SINGLE_UPLOAD } from '../shared/media-utils';
 import { PointerType } from './annotator/tools/tools.interface';
 import { isEraserOrRightButton, isLeftButton, MouseButton } from './buttons-utils';
@@ -133,4 +135,12 @@ export const projectPointOnLine = ([startPoint, endPoint]: ProjectLine, point: P
         x: b.x * scale + startPoint.x,
         y: b.y * scale + startPoint.y,
     };
+};
+
+export const getMediaItemId = (item: MediaItem) => {
+    if (isImage(item)) {
+        return item.identifier.imageId;
+    }
+
+    return item.identifier.videoId;
 };

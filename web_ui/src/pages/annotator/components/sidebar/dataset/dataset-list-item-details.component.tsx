@@ -44,7 +44,7 @@ export const DatasetListItemDetails = ({
     const id = getMediaId(mediaItem);
 
     const columns: ComponentProps<typeof Grid>['columns'] = useMemo(() => {
-        const initialColumns = ['var(--width)', minmax('size-1000', '1fr')];
+        const initialColumns = ['size-800', minmax('size-1000', '1fr')];
 
         if (datasetItemMenu !== undefined) {
             initialColumns.push('max-content');
@@ -64,7 +64,7 @@ export const DatasetListItemDetails = ({
                 <Grid
                     columns={columns}
                     width={'100%'}
-                    gap={'var(--gap)'}
+                    gap={'size-100'}
                     alignItems={'center'}
                     justifyContent={'center'}
                     rows={['size-800']}

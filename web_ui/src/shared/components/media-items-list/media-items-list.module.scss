@@ -1,75 +1,15 @@
-.gridWrapper {
-    position: relative;
-    height: 100%;
+.mainContainer {
     width: 100%;
-}
-
-.gridItem {
-    aspect-ratio: 1;
-
-    & > div {
-        height: 100%;
-    }
-}
-
-.gridListContainer {
+    height: 100%;
+    position: relative;
     container-type: inline-size;
     container-name: gridList;
 }
 
-.gridList {
-    // factor is increased per container width. It uses modeFactor to make difference of with more significant per mode
-    --factor: 0;
-    // ratio value is used to increase the min width (to leverage usage of 1fr)
-    --ratio: calc((var(--maxWidth) - var(--minWidth)) / (var(--gap)));
-    --newMinWidth: calc((var(--minWidth) + (var(--ratio) * var(--factor))) * 1px);
-    --newGap: calc(var(--gap) * 1px);
-
-    display: grid;
-    gap: var(--newGap);
-    grid-template-columns: repeat(auto-fill, minmax(var(--newMinWidth), 1fr));
-
-    @container gridList (max-width: 200px) {
-        grid-template-columns: 1fr;
-    }
-
-    // these container queries work together with container type and name defined in the assets/index.scss
-    @container gridList (min-width: 250px) {
-        --newMinWidth: calc((var(--minWidth) + (var(--ratio) * var(--factor))) * 1px);
-        --factor: 0;
-        --ratio: 0;
-        grid-template-columns: repeat(auto-fill, minmax(var(--newMinWidth), 1fr));
-        --newGap: calc(var(--gap) * 0.55 * 1px);
-    }
-
-    @container gridList (min-width: 400px) {
-        // we have to repeat factor, ratio and new gap to override vars declared for min-width: 250px
-        --factor: calc(1 * var(--modeFactor));
-        --ratio: calc((var(--maxWidth) - var(--minWidth)) / (var(--gap)));
-        --newGap: calc(var(--gap) * 1px);
-    }
-
-    @container gridList (min-width: 500px) {
-        --factor: calc(2 * var(--modeFactor));
-    }
-
-    @container gridList (min-width: 600px) {
-        --factor: calc(3 * var(--modeFactor));
-    }
-
-    @container gridList (min-width: 750px) {
-        --factor: calc(4 * var(--modeFactor));
-    }
-
-    @container gridList (min-width: 1000px) {
-        --factor: calc(5 * var(--modeFactor));
-    }
-
-    @container gridList (min-width: 1300px) {
-        --factor: calc(6 * var(--modeFactor));
-    }
-
-    @container gridList (min-width: 1450px) {
-        --factor: calc(8 * var(--modeFactor));
-    }
+.container {
+    width: 100%;
+    max-height: 100%;
+    overflow-x: auto;
+    position: absolute;
+    scrollbar-gutter: stable;
 }

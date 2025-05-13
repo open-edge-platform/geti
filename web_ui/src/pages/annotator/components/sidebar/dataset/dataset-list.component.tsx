@@ -18,6 +18,7 @@ import { useGroupedMediaItems } from '../../../../../shared/hooks/use-grouped-me
 import { useSelectedMediaItemIndex } from '../../../../../shared/hooks/use-selected-media-item-index.hook';
 import { MediaItemTooltipMessage } from '../../../../project-details/components/project-media/media-item-tooltip-message/media-item-tooltip-message';
 import { getMediaItemTooltipProps } from '../../../../project-details/components/project-media/media-item-tooltip-message/utils';
+import { getMediaItemId } from '../../../../utils';
 import { DatasetItemFactory } from './dataset-item-factory.component';
 import { EmptyDataSet } from './empty-dataset.component';
 
@@ -36,6 +37,13 @@ interface DatasetListProps {
     shouldShowAnnotationIndicator: boolean;
     hasTooltip?: boolean;
 }
+
+const viewModeSettings = {
+    [ViewModes.SMALL]: { minItemSize: 70, gap: 4, maxColumns: 11 },
+    [ViewModes.MEDIUM]: { minItemSize: 100, gap: 4, maxColumns: 8 },
+    [ViewModes.LARGE]: { minItemSize: 120, gap: 4, maxColumns: 4 },
+    [ViewModes.DETAILS]: { size: 85, gap: 0 },
+};
 
 export const DatasetList = ({
     viewMode,
@@ -122,13 +130,13 @@ export const DatasetList = ({
             <MediaItemsList
                 id='annotator-dataset-list'
                 ariaLabel={'Annotator dataset list'}
-                ref={ref}
+                //ref={ref}
                 viewMode={viewMode}
-                totalCount={groupedMediaItems.length}
+                idFormatter={getMediaItemId}
+                mediaItems={groupedMediaItems}
                 endReached={loadNextMedia}
-                itemContent={(index) => {
-                    const mediaItem = groupedMediaItems[index];
-
+                viewModeSettings={viewModeSettings}
+                itemContent={(mediaItem) => {
                     return (
                         <DatasetItemFactory
                             viewMode={viewMode}

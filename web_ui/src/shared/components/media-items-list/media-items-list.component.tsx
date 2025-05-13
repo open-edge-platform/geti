@@ -1,52 +1,82 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { forwardRef, ReactNode, useMemo } from 'react';
+import { ReactNode, useRef } from 'react';
 
 import { View } from '@adobe/react-spectrum';
-import { StyleProps } from '@react-types/shared';
-import { VirtuosoGrid, VirtuosoGridHandle } from 'react-virtuoso';
+import { useLoadMore } from '@react-aria/utils';
+import clsx from 'clsx';
+import {
+    ListBox as AriaComponentsListBox,
+    GridLayout,
+    ListBoxItem,
+    ListLayout,
+    Size,
+    Virtualizer,
+} from 'react-aria-components';
 
-import { VIEW_MODE_SETTINGS, ViewModes } from '../media-view-modes/utils';
+import { ViewModes } from '../media-view-modes/utils';
 
 import classes from './media-items-list.module.scss';
 
-interface MediaItemsListProps extends StyleProps {
+type ViewModeSettings = Record<ViewModes, { size?: number; gap: number; maxColumns?: number; minItemSize?: number }>;
+interface MediaItemsListProps<T> {
     id?: string;
     ariaLabel?: string;
     viewMode: ViewModes;
-    totalCount: number;
     endReached: () => void;
-    itemContent: (index: number) => ReactNode;
+    itemContent: (item: T) => ReactNode;
+    idFormatter: (item: T) => string;
+    mediaItems: T[];
+    viewModeSettings: ViewModeSettings;
 }
 
-// Each thumbnail has approximately 150 pixel height (this differs per resolution
-// as well as the large/medium/small thumbnails).
-// We want to overscan a few (4) rows of thumbnails so that when the user scrolls
-// they won't have to wait for loading the images of the next rows
-const OVERSCAN = 150 * 4;
+export const MediaItemsList = <T,>({
+    id,
+    viewMode,
+    ariaLabel,
+    mediaItems,
+    viewModeSettings,
+    itemContent,
+    endReached,
+    idFormatter,
+}: MediaItemsListProps<T>): JSX.Element => {
+    const config = viewModeSettings[viewMode];
+    const isDetails = viewMode === ViewModes.DETAILS;
+    const formattedMediaItems = mediaItems?.map((item) => ({ id: idFormatter(item), ...item })) ?? [];
 
-export const MediaItemsList = forwardRef<VirtuosoGridHandle | null, MediaItemsListProps>(
-    ({ id, viewMode, totalCount, itemContent, endReached, ariaLabel, ...styleProps }, ref): JSX.Element => {
-        const style = useMemo(() => {
-            return { ...VIEW_MODE_SETTINGS[viewMode] };
-        }, [viewMode]);
+    const ref = useRef(null);
+    useLoadMore({ onLoadMore: endReached }, ref);
 
-        return (
-            <View id={id} height={'100%'} width={'100%'} {...styleProps}>
-                <VirtuosoGrid
-                    aria-label={ariaLabel}
+    const layoutOptions = isDetails
+        ? {
+              gap: config.gap,
+              rowHeight: config.size,
+          }
+        : {
+              minSpace: new Size(config.gap, config.gap),
+              minItemSize: new Size(config.minItemSize, config.minItemSize),
+              maxColumns: config.maxColumns,
+              preserveAspectRatio: true,
+          };
+
+    return (
+        <View id={id} UNSAFE_className={classes.mainContainer}>
+            <Virtualizer layout={isDetails ? ListLayout : GridLayout} layoutOptions={layoutOptions}>
+                <AriaComponentsListBox
                     ref={ref}
-                    totalCount={totalCount}
-                    overscan={OVERSCAN}
-                    style={style}
-                    className={classes.gridListContainer}
-                    listClassName={viewMode === ViewModes.DETAILS ? undefined : classes.gridList}
-                    itemClassName={viewMode === ViewModes.DETAILS ? undefined : classes.gridItem}
-                    itemContent={itemContent}
-                    endReached={endReached}
-                />
-            </View>
-        );
-    }
-);
+                    layout={isDetails ? 'stack' : 'grid'}
+                    aria-label={ariaLabel}
+                    items={formattedMediaItems}
+                    className={clsx(classes.container)}
+                >
+                    {(item) => (
+                        <ListBoxItem textValue={item.id} style={{ background: 'green', height: '100%' }}>
+                            {itemContent(item)}
+                        </ListBoxItem>
+                    )}
+                </AriaComponentsListBox>
+            </Virtualizer>
+        </View>
+    );
+};
