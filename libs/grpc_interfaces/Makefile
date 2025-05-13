@@ -172,7 +172,7 @@ add-license-go-%:
 	done
 
 mypy: venv
-	uv run mypy ./grpc_interfaces ./tests --config-file=pyproject.toml
+	uv run mypy ./src/grpc_interfaces ./tests --config-file=pyproject.toml
 
 build-image:
 	@echo "No build-image target defined. Skipping..."
