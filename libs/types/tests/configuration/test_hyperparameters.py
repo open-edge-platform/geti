@@ -2,17 +2,17 @@ import pytest
 from pydantic import ValidationError
 
 from geti_types.configuration import (
-    Hyperparameters,
-    TrainingHyperParameters,
-    DatasetPreparationParameters,
-    EvaluationParameters,
-    EarlyStopping,
     AugmentationParameters,
     CenterCrop,
-    RandomResizeCrop,
-    RandomAffine,
+    DatasetPreparationParameters,
+    EarlyStopping,
+    EvaluationParameters,
     GaussianBlur,
+    Hyperparameters,
+    RandomAffine,
+    RandomResizeCrop,
     Tiling,
+    TrainingHyperParameters,
 )
 
 
