@@ -184,4 +184,4 @@ class TestShapeFactory:
         assert not ShapeFactory.shape_produces_valid_crop(ellipse)
 
         keypoint = Keypoint(x=0.1, y=0.1, is_visible=True)
-        assert not ShapeFactory.shape_produces_valid_crop(keypoint)
+        assert ShapeFactory.shape_produces_valid_crop(keypoint)

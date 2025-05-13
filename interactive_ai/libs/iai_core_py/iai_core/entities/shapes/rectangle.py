@@ -92,7 +92,7 @@ class Rectangle(Shape):
         """
         if (
             (self.x1 < 0 and self.x2 < 0)
-            or (self.x1 > 1 and self.y2 > 1)
+            or (self.x1 > 1 and self.x2 > 1)
             or (self.y1 < 0 and self.y2 < 0)
             or (self.y1 > 1 and self.y2 > 1)
         ):
