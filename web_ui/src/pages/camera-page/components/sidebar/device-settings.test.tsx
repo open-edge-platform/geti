@@ -64,10 +64,8 @@ describe('Settings', () => {
 
         renderApp({ setIsMirrored });
 
-        const mirrorSwitch = screen.getByRole('switch', { name: 'Mirrored' });
-
-        expect(mirrorSwitch).not.toBeChecked();
-        fireEvent.click(mirrorSwitch);
+        fireEvent.click(screen.getByRole('button', { name: /Mirror camera selection/ }));
+        await userEvent.selectOptions(screen.getByRole('listbox'), screen.getByRole('option', { name: 'On' }));
         expect(setIsMirrored).toHaveBeenCalledWith(true);
     });
 

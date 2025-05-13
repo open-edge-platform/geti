@@ -5,7 +5,6 @@ import { Flex, Heading, Item, Key, Picker, View } from '@adobe/react-spectrum';
 import { orderBy } from 'lodash-es';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
 import { applySettings } from '../../providers/util';
 import { SettingOption } from './setting-option.component';
@@ -35,9 +34,13 @@ export const DeviceSettings = () => {
 
             <Divider size={'S'} marginTop={'size-250'} marginBottom={'size-250'} />
 
-            <Switch isSelected={isMirrored} onChange={(value) => setIsMirrored(value)}>
-                Mirrored
-            </Switch>
+            <SettingOption
+                label='Mirror camera'
+                config={{ type: 'selection', options: ['Off', 'On'], value: isMirrored ? 'On' : 'Off' }}
+                onChange={(value) => {
+                    setIsMirrored(value == 'On');
+                }}
+            />
 
             {sortedByOptions.map(({ name, config }) => (
                 <SettingOption
