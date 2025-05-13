@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { decode, decodeImage, toRGBA8 } from 'utif';
+import * as UTIF from 'utif';
 
 export const drawImageOnCanvas = (img: HTMLImageElement, filter = ''): HTMLCanvasElement => {
     const canvas: HTMLCanvasElement = document.createElement('canvas');
@@ -57,15 +57,15 @@ export const getImageDataFromTiffFile = async (file: File): Promise<ImageData> =
     try {
         // Get the file buffer and decode it
         const fileBuffer = await file.arrayBuffer();
-        const ifds = decode(fileBuffer);
+        const ifds = UTIF.decode(fileBuffer);
 
         if (ifds.length !== 0) {
             const tiff = ifds[0];
 
             // Decode the image and convert into RGBA format
-            decodeImage(fileBuffer, tiff);
+            UTIF.decodeImage(fileBuffer, tiff);
 
-            const rgbaData = toRGBA8(tiff);
+            const rgbaData = UTIF.toRGBA8(tiff);
 
             canvas.width = tiff.width;
             canvas.height = tiff.height;
