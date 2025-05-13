@@ -473,7 +473,7 @@ class KeypointToAnnotationConverter(IPredictionToAnnotationConverter):
                         ScoredLabel(
                             label_id=label.id_,
                             is_empty=label.is_empty,
-                            probability=score,
+                            probability=float(score),
                         )
                     ],
                 )
