@@ -18,6 +18,7 @@ import { isLeftButton, isWheelButton } from '../../buttons-utils';
 import { ToolLabel, ToolType } from '../core/annotation-tool-context.interface';
 import { PolygonMode } from './polygon-tool/polygon-tool.enum';
 
+// TODO: this will be removed when https://github.com/open-edge-platform/geti/pull/185 is merged
 // @ts-expect-error `default` actually exists in the module
 const ClipperJS = Clipper.default || Clipper;
 

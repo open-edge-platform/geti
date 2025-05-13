@@ -63,9 +63,6 @@ jest.mock('screenfull', () => ({
 // More info at https://github.com/facebook/jest/issues/12183
 jest.mock('./hooks/use-load-ai-webworker/utils', () => ({ getWorker: jest.fn() }));
 
-jest.mock('./hooks/use-load-ai-webworker/use-load-ai-webworker.hook', () => ({
-    useLoadAIWebworker: jest.fn(() => ({ worker: null })),
-}));
 jest.mock('./pages/camera-page/hooks/use-load-camera-webworker', () => ({
     useLoadCameraWebworker: jest.fn(() => ({ current: null })),
 }));

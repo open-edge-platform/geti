@@ -15,6 +15,7 @@ import { Task } from '../core/projects/task.interface';
 import { KeyMap } from './keyboard-events/keyboard.interface';
 import { LOCAL_STORAGE_KEYS } from './local-storage-keys';
 
+// TODO: Update dayjs imports once they support ESM https://github.com/iamkun/dayjs/issues/1765
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 
