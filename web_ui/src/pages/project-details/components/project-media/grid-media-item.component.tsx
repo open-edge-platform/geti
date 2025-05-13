@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useRef, useState } from 'react';
+import { Key, useRef, useState } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { View } from '@react-spectrum/view';
@@ -38,6 +38,7 @@ export const GridMediaItem = ({
     shouldShowAnnotationIndicator,
 }: GridMediaItemProps): JSX.Element => {
     const triggerRef = useRef(null);
+    const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -61,7 +62,7 @@ export const GridMediaItem = ({
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
         >
-            {(isHovered || isSelected) && (
+            {(isHovered || isSelected || selectedMediaItemAction !== undefined) && (
                 <Flex
                     wrap
                     ref={triggerRef}
@@ -103,7 +104,11 @@ export const GridMediaItem = ({
                         height={'size-500'}
                         zIndex={10}
                     >
-                        <MediaItemActions mediaItem={mediaItem} />
+                        <MediaItemActions
+                            mediaItem={mediaItem}
+                            onSelectedMediaItemActionChange={setSelectedMediaItemAction}
+                            selectedMediaItemAction={selectedMediaItemAction}
+                        />
                     </View>
                 </Flex>
             )}

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useRef } from 'react';
+import { Key, useRef, useState } from 'react';
 
 import { Divider, Flex, Grid, minmax, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import dayjs from 'dayjs';
@@ -51,6 +51,7 @@ export const MediaItemDetails = ({
     const { organizationId } = useOrganizationIdentifier();
     const { useGetUserQuery } = useUsers();
     const uploaderQuery = useGetUserQuery(organizationId, uploaderId);
+    const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
 
     const preventSingleClick = useRef<boolean>(false);
     const { pressProps } = usePress({
@@ -186,7 +187,11 @@ export const MediaItemDetails = ({
                         <Tooltip>{`${UPLOADER_TOOLTIP}: ${getFullNameFromUser(uploaderQuery.data)}`}</Tooltip>
                     </TooltipTrigger>
 
-                    <MediaItemActions mediaItem={mediaItem} />
+                    <MediaItemActions
+                        mediaItem={mediaItem}
+                        selectedMediaItemAction={selectedMediaItemAction}
+                        onSelectedMediaItemActionChange={setSelectedMediaItemAction}
+                    />
                 </Grid>
             </div>
             <Divider size={'S'} width={'100%'} />
