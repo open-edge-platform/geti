@@ -42,7 +42,7 @@ class ScoredLabel:
 
         self.label_id = label_id
         self.is_empty = is_empty
-        self.probability = probability
+        self.probability = float(probability)  # cast to float since it can be a numpy.float32 which is not supported
         self.label_source = label_source if label_source is not None else LabelSource()
 
     @property
