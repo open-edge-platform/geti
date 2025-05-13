@@ -3,7 +3,7 @@
 
 import { CSSProperties, PointerEvent, ReactNode, useState } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Point } from '../../../../core/annotations/shapes.interface';
 import { isLeftButton } from '../../../buttons-utils';

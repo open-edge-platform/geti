@@ -7,7 +7,6 @@ from unittest.mock import Mock
 
 import pytest
 from google.protobuf.json_format import ParseDict
-
 from grpc_interfaces.account_service.client import AccountServiceClient, UserByIDResponse
 from grpc_interfaces.account_service.pb.organization_pb2 import ListOrganizationsResponse, OrganizationDataWithAdmins
 from grpc_interfaces.account_service.pb.user_common_pb2 import UserData

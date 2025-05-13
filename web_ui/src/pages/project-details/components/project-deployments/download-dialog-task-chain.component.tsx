@@ -4,7 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, Divider, Flex, Heading } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useCodeDeployment } from '../../../../core/code-deployment/hooks/use-code-deployment.hook';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

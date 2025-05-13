@@ -11,7 +11,7 @@ import { useCalendarState } from '@react-stately/calendar';
 import { DOMRefValue, StyleProps } from '@react-types/shared';
 import ChevronLeft from '@spectrum-icons/workflow/ChevronLeft';
 import ChevronRight from '@spectrum-icons/workflow/ChevronRight';
-import range from 'lodash/range';
+import { range } from 'lodash-es';
 
 import { ActionButton } from '../../../../shared/components/button/button.component';
 import { CalendarCell } from './calendar-cell.component';

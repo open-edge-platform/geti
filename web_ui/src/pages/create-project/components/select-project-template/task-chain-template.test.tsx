@@ -21,7 +21,7 @@ describe('chain template', () => {
             />
         );
 
-        expect(setSelectedDomains).toBeCalledWith(
+        expect(setSelectedDomains).toHaveBeenCalledWith(
             [DOMAIN.DETECTION, DOMAIN.CLASSIFICATION],
             [LabelsRelationType.SINGLE_SELECTION, LabelsRelationType.MIXED]
         );
@@ -56,7 +56,7 @@ describe('chain template', () => {
 
         detectionSegmentationWell && fireEvent.click(detectionSegmentationWell);
 
-        expect(setSelectedDomains).toBeCalledWith(
+        expect(setSelectedDomains).toHaveBeenCalledWith(
             [DOMAIN.DETECTION, DOMAIN.CLASSIFICATION],
             [LabelsRelationType.SINGLE_SELECTION, LabelsRelationType.MIXED]
         );

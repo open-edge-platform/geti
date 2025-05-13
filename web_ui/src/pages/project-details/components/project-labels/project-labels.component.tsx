@@ -4,7 +4,7 @@
 import { Fragment, useCallback, useEffect, useState } from 'react';
 
 import { DialogContainer, Divider, Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import {
     LabelItemEditionState,

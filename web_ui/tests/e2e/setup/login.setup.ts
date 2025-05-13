@@ -3,6 +3,7 @@
 
 import path from 'path';
 
+import { getDirname } from '../../utils/get-dirname';
 import { setup } from './fixture';
 
 setup('Login as user', async ({ page, loginPage, account }) => {
@@ -10,6 +11,6 @@ setup('Login as user', async ({ page, loginPage, account }) => {
     await loginPage.login(account.email, account.password);
 
     // Store cookie and localstorage state so that we can reuse it in other tests
-    const authFile = path.join(__dirname, '../.auth/user.json');
+    const authFile = path.join(getDirname(import.meta.url), '../.auth/user.json');
     await page.context().storageState({ path: authFile });
 });

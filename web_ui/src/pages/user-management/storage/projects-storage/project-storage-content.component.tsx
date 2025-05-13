@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
 import {

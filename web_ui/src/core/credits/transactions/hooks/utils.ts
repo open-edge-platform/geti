@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import groupBy from 'lodash/groupBy';
-import isEmpty from 'lodash/isEmpty';
+import { groupBy, isEmpty } from 'lodash-es';
 
 import { ProjectName } from '../../../projects/project.interface';
 import { Transaction, TransactionsAggregate, TransactionsAggregatesKey } from '../transactions.interface';

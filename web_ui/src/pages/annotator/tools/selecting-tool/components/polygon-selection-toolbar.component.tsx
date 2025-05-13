@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Slider, Tooltip } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { PointPushPull } from '../../../../../assets/icons';
 import BrushImg from '../../../../../assets/primary-tools/brush.webp';

@@ -1,10 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import intersectionBy from 'lodash/intersectionBy';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { intersectionBy, isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { Annotation, TaskChainInput } from '../../../../core/annotations/annotation.interface';
 import { BoundingBox, getBoundingBox, hasEqualBoundingBox } from '../../../../core/annotations/math';

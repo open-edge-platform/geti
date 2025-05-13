@@ -5,7 +5,6 @@ import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from grpc_interfaces.job_update.client import JobUpdateClient
 from grpc_interfaces.job_update.pb.job_update_service_pb2 import (
     Empty,

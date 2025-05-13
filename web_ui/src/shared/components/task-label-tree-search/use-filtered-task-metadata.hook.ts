@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useFilter } from 'react-aria';
 
 import { findLabelParents, uniqueLabels } from '../../../core/labels/annotator-utils/labels-utils';

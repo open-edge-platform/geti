@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useQueryClient } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
-import sortBy from 'lodash/sortBy';
+import { isEmpty, sortBy } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Explanation } from '../../../../core/annotations/prediction.interface';

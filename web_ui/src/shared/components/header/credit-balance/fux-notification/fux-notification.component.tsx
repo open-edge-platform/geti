@@ -5,7 +5,7 @@ import { ComponentProps, MutableRefObject, ReactNode } from 'react';
 
 import { Divider, Flex, Text } from '@adobe/react-spectrum';
 import { Popover } from '@react-spectrum/overlays';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Close } from '../../../../../assets/icons';
 import { openNewTab } from '../../../../utils';

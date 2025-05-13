@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { Text, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Virtuoso } from 'react-virtuoso';
 
 import { JobState } from '../../../../core/jobs/jobs.const';

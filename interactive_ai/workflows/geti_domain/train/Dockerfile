@@ -22,7 +22,6 @@ COPY --link --from=common . interactive_ai/workflows/geti_domain/common
 COPY --link --from=libs . libs
 COPY --link --from=iai_core . interactive_ai/libs/iai_core_py
 COPY --link --from=media_utils . interactive_ai/libs/media_utils
-COPY --link --from=grpc_interfaces . grpc_interfaces
 
 WORKDIR /builder/interactive_ai/workflows/geti_domain/workflow
 

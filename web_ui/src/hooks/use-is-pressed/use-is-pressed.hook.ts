@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { KeyMap } from '../../shared/keyboard-events/keyboard.interface';

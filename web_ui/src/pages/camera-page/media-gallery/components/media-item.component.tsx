@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { View } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { Label } from '../../../../core/labels/label.interface';

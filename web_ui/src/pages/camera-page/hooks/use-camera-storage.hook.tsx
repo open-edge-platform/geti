@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';

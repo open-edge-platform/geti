@@ -3,9 +3,7 @@
 
 import { PointerEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import differenceWith from 'lodash/differenceWith';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { differenceWith, isEmpty, isEqual } from 'lodash-es';
 
 import { clampPointBetweenImage, isPointOverPoint } from '../../../../core/annotations/math';
 import { Point, Polygon } from '../../../../core/annotations/shapes.interface';

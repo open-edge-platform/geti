@@ -15,8 +15,7 @@ import {
 
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
 import {

@@ -150,7 +150,7 @@ describe('RITMTool', () => {
             fireEvent.mouseUp(editor, { buttons: 0, clientX: 50, clientY: 50 });
 
             await waitFor(() => {
-                expect(mockedRITMState.execute).toBeCalledWith(
+                expect(mockedRITMState.execute).toHaveBeenCalledWith(
                     { x: 0, y: 0, width: 300, height: 300 },
                     [{ x: 50, y: 50, positive: true }],
                     ShapeType.Polygon
@@ -227,7 +227,7 @@ describe('RITMTool', () => {
                 fireEvent.mouseUp(editor, { buttons: 0, ...point });
 
                 await waitFor(() => {
-                    expect(mockedRITMState.execute).toBeCalledWith(
+                    expect(mockedRITMState.execute).toHaveBeenCalledWith(
                         { x: 100, y: 50, width: 100, height: 100 },
                         [{ x: 150, y: 100, positive: true }],
                         ShapeType.Polygon
@@ -249,7 +249,7 @@ describe('RITMTool', () => {
                 fireEvent.mouseUp(editor, { buttons: 0, ...point });
 
                 await waitFor(() => {
-                    expect(mockedRITMState.execute).toBeCalledWith(
+                    expect(mockedRITMState.execute).toHaveBeenCalledWith(
                         taskChainROI,
                         [{ x: 150, y: 100, positive: true }],
                         ShapeType.Polygon
@@ -347,7 +347,7 @@ describe('RITMTool', () => {
             fireEvent.mouseUp(editor, { buttons: 0, ...outside });
 
             await waitFor(() => {
-                expect(mockedRITMState.execute).toBeCalledWith(
+                expect(mockedRITMState.execute).toHaveBeenCalledWith(
                     { x: 0, y: 0, width: 360, height: 300 },
                     [
                         { x: 30, y: 50, positive: true },
@@ -375,7 +375,7 @@ describe('RITMTool', () => {
             fireEvent.mouseUp(editor, { buttons: 0, ...center });
 
             await waitFor(() => {
-                expect(mockedRITMState.execute).toBeCalledWith(
+                expect(mockedRITMState.execute).toHaveBeenCalledWith(
                     { x: 0, y: 0, width: 300, height: 300 },
                     [
                         { x: 30, y: 50, positive: true },
@@ -405,7 +405,7 @@ describe('RITMTool', () => {
             fireEvent.mouseUp(editor, { buttons: 0, ...outside });
 
             await waitFor(() => {
-                expect(mockedRITMState.execute).toBeCalledWith(
+                expect(mockedRITMState.execute).toHaveBeenCalledWith(
                     { x: 0, y: 0, width: 360, height: 300 },
                     [
                         { x: 30, y: 50, positive: true },
@@ -435,7 +435,7 @@ describe('RITMTool', () => {
             fireEvent.pointerUp(editor, { buttons: 0, ...pointTwo });
 
             await waitFor(() => {
-                expect(mockedRITMState.setBox).toBeCalledWith(expectedBox);
+                expect(mockedRITMState.setBox).toHaveBeenCalledWith(expectedBox);
             });
         });
 
@@ -454,7 +454,7 @@ describe('RITMTool', () => {
             fireEvent.mouseDown(editor, { buttons: 0, ...pointOne });
             fireEvent.mouseUp(editor, { buttons: 0, ...pointOne });
 
-            expect(mockedRITMState.setBox).toBeCalledWith(null);
+            expect(mockedRITMState.setBox).toHaveBeenCalledWith(null);
         });
     });
 

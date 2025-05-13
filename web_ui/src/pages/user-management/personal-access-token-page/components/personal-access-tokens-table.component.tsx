@@ -5,8 +5,7 @@ import { FC, useState } from 'react';
 
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, useCollator, View } from '@adobe/react-spectrum';
 import { SortDescriptor } from '@react-types/shared';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
+import { get, isEmpty } from 'lodash-es';
 
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
 import { CasualCell } from '../../../../shared/components/table/components/casual-cell/casual-cell.component';

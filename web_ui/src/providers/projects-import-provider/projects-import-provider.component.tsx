@@ -3,8 +3,7 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 import { DetailedError, Upload } from 'tus-js-client';
 
 import { useImportProject } from '../../core/projects/hooks/use-import-project.hook';

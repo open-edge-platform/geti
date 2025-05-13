@@ -4,7 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useProjectActions } from '../../../../../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';

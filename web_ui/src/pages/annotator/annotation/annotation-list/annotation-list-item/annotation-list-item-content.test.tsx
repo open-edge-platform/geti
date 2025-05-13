@@ -362,7 +362,7 @@ describe('Annotations list item content', () => {
         });
 
         fireEvent.click(screen.getByLabelText(`Select annotation ${annotation.id}`));
-        expect(context.scene.selectAnnotation).toBeCalledWith(annotation.id);
+        expect(context.scene.selectAnnotation).toHaveBeenCalledWith(annotation.id);
     });
 
     it('unselect annotation when clicking the checkbox', async () => {
@@ -383,7 +383,7 @@ describe('Annotations list item content', () => {
         });
 
         fireEvent.click(screen.getByLabelText(`Select annotation ${annotation.id}`));
-        expect(context.scene.unselectAnnotation).toBeCalledWith(annotation.id);
+        expect(context.scene.unselectAnnotation).toHaveBeenCalledWith(annotation.id);
     });
 
     it('show unlock icon and change lock', async () => {
@@ -405,6 +405,6 @@ describe('Annotations list item content', () => {
 
         fireEvent.mouseEnter(screen.getByLabelText(`Select annotation ${annotation.id}`));
         fireEvent.click(screen.getByRole('button', { name: 'unlock annotation' }));
-        expect(context.scene.toggleLock).toBeCalledWith(false, annotation.id);
+        expect(context.scene.toggleLock).toHaveBeenCalledWith(false, annotation.id);
     });
 });

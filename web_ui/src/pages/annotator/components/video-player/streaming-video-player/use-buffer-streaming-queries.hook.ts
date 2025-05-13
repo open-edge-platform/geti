@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash-es';
 
 import { PredictionMode } from '../../../../../core/annotations/services/prediction-service.interface';
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';

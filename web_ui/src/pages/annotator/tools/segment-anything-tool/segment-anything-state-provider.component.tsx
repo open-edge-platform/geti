@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect } from 'react';
 
 import { useQueryClient, UseQueryResult } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';

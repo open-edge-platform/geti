@@ -35,6 +35,6 @@ describe('OrganizationAdminsCopyText', () => {
         expect(screen.getByTestId(testId)).toBeInTheDocument();
         fireEvent.click(screen.getByRole('button', { name: 'Copy email' }));
 
-        expect(mockedCopy).toBeCalledWith(mockedAdmin.email, confirmationMessage);
+        expect(mockedCopy).toHaveBeenCalledWith(mockedAdmin.email, confirmationMessage);
     });
 });

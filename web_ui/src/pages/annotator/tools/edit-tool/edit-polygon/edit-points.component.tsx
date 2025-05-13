@@ -3,8 +3,7 @@
 
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { isEmpty, noop } from 'lodash-es';
 
 import { Delete } from '../../../../../assets/icons';
 import { Point, Polygon } from '../../../../../core/annotations/shapes.interface';

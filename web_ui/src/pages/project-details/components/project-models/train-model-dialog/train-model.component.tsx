@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../../core/models/models.interface';
 import { Button } from '../../../../../shared/components/button/button.component';

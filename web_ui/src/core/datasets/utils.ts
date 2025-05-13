@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { isNonEmptyString } from '../../shared/utils';
 import { JobStep } from '../jobs/jobs.interface';

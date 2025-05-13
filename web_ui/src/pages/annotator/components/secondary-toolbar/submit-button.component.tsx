@@ -4,9 +4,7 @@
 import { CSSProperties, useEffect } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import isNil from 'lodash/isNil';
+import { isEmpty, isFunction, isNil } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';

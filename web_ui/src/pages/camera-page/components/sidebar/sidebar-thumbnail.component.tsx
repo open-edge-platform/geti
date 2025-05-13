@@ -3,7 +3,7 @@
 
 import { Flex, Link as SpectrumLink, Text, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import useVirtual from 'react-cool-virtual';
 import { Link } from 'react-router-dom';
 
