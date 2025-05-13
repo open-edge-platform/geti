@@ -94,15 +94,15 @@ export enum DocsUrl {
     DETECTION = 'user-guide/geti-fundamentals/project-management#labels-creation',
     CLASSIFICATION = 'user-guide/geti-fundamentals/project-management#labels-creation',
     SEGMENTATION = 'user-guide/geti-fundamentals/project-management#labels-creation',
-    REVISIT_LABELS = 'user-guide/geti-fundamentals/labels/labels-management' 
-        + '#dealing-with-new-labels-and-concept-drift-in-the-intel-geti-platform',
+    REVISIT_LABELS = 'user-guide/geti-fundamentals/labels/labels-management' +
+        '#dealing-with-new-labels-and-concept-drift-in-the-intel-geti-platform',
     DATASET = 'user-guide/geti-fundamentals/datasets/dataset-management',
     MODELS = 'user-guide/geti-fundamentals/model-training-and-optimization',
     TESTS = 'user-guide/geti-fundamentals/tests-management/tests',
     DEPLOYMENT = 'user-guide/geti-fundamentals/deployments/',
     MAIN_PAGE = 'user-guide/getting-started/introduction',
-    ANNOTATIONS_VS_PREDICTIONS = 'user-guide/geti-fundamentals/annotations/annotation-editor'
-        + '#annotations-vs-predictions',
+    ANNOTATIONS_VS_PREDICTIONS = 'user-guide/geti-fundamentals/annotations/annotation-editor' +
+        '#annotations-vs-predictions',
     ACTIVE_LEARNING = 'user-guide/learn-geti/active-learning',
     MEDIA_GALLERY = 'user-guide/geti-fundamentals/annotations/annotation-mode#media-gallery',
     ANNOTATION_TOOLS = 'user-guide/geti-fundamentals/annotations/annotation-tools',
