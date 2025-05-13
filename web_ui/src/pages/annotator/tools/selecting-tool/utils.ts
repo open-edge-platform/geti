@@ -3,15 +3,14 @@
 
 import { PointerEvent, RefObject } from 'react';
 
-import ClipperShape from '@doodle3d/clipper-js';
-import { isEmpty } from 'lodash-es';
+import { booleanIntersects } from '@turf/turf';
 
 import { Annotation, RegionOfInterest } from '../../../../core/annotations/annotation.interface';
+import { shapeToTurfPolygon } from '../../../../core/annotations/geometry-utils';
 import { Point, Shape } from '../../../../core/annotations/shapes.interface';
 import { getTheTopShapeAt, isPolygon } from '../../../../core/annotations/utils';
 import { hasEqualSize } from '../../../../shared/utils';
 import { getRelativePoint } from '../../../utils';
-import { transformToClipperShape } from '../utils';
 
 // We set min to 3px because clipper-js does not work with properly with value less than 3px.
 export const MIN_BRUSH_SIZE = 3;
@@ -37,8 +36,9 @@ export const pointInShape = (annotations: Annotation[], point: Point, shiftKey: 
 };
 
 export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: Shape): string[] => {
-    const subject: ClipperShape = transformToClipperShape(shape);
-    let clip: ClipperShape | null = null;
+    const mainPolygon = shapeToTurfPolygon(shape);
+    let subPolygon = null;
+
     return annotations.reduce<string[]>((prev, annotation: Annotation) => {
         const { shape: annotationShape, isHidden } = annotation;
 
@@ -46,11 +46,10 @@ export const getIntersectedAnnotationsIds = (annotations: Annotation[], shape: S
             return prev;
         }
 
-        clip = transformToClipperShape(annotationShape);
+        subPolygon = shapeToTurfPolygon(annotationShape);
 
-        if (clip) {
-            const result: ClipperShape = subject.intersect(clip);
-            if (!isEmpty(result.paths)) {
+        if (subPolygon) {
+            if (booleanIntersects(mainPolygon, subPolygon)) {
                 return [...prev, annotation.id];
             }
         }
