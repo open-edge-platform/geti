@@ -4,6 +4,7 @@
 import { PointerEvent, SVGProps } from 'react';
 
 import Clipper from '@doodle3d/clipper-js';
+import type ClipperShape from '@doodle3d/clipper-js';
 import { defer, isEmpty } from 'lodash-es';
 
 import { Annotation, RegionOfInterest } from '../../../core/annotations/annotation.interface';
@@ -19,7 +20,6 @@ import { PolygonMode } from './polygon-tool/polygon-tool.enum';
 
 // @ts-expect-error `default` actually exists in the module
 const ClipperJS = Clipper.default || Clipper;
-type ClipperShape = InstanceType<typeof Clipper>;
 
 export interface ClipperPoint {
     X: number;
