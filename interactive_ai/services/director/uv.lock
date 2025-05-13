@@ -296,7 +296,7 @@ requires-dist = [
     { name = "geti-supported-models", editable = "../../supported_models" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "fastapi", "grpc", "logger", "kafka"], editable = "../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
-    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../libs/grpc_interfaces" },
     { name = "iai-core", editable = "../../libs/iai_core_py" },
     { name = "jsonschema", specifier = ">=4.18.0a10" },
     { name = "pyyaml", specifier = "==6.0.1" },
@@ -605,7 +605,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]

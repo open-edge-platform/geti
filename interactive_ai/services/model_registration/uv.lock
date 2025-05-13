@@ -508,7 +508,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -789,7 +789,7 @@ requires-dist = [
     { name = "asynctest", specifier = "==0.13.0" },
     { name = "defusedxml", specifier = "==0.7.1" },
     { name = "dpath", specifier = "==2.0.1" },
-    { name = "grpc-interfaces", extras = ["model-registration"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["model-registration"], editable = "../../../libs/grpc_interfaces" },
     { name = "httpx", specifier = "~=0.26" },
     { name = "kubernetes-asyncio", specifier = "==29.0.0" },
     { name = "moto", specifier = "==5.0.2" },

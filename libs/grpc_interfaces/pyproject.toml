@@ -8,7 +8,6 @@ version = "1.0.0"
 description = "Geti GRPC interfaces with clients"
 authors = [{ name = "Intel" }]
 license = { text = "Copyright (c) Intel - All Rights Reserved. Unauthorized copying of any part of the software via any medium is strictly prohibited. Proprietary and confidential." }
-readme = "README.md"
 requires-python = ">=3.10, <3.14"
 
 dependencies = [
@@ -34,7 +33,7 @@ all = [
 ]
 
 [tool.uv.sources]
-geti-types = { path = "../libs/types", editable = true }
+geti-types = { path = "../types", editable = true }
 
 [dependency-groups]
 dev = [
@@ -51,7 +50,7 @@ dev = [
 only-packages = true
 
 [tool.hatch.build.targets.wheel]
-packages = [ "grpc_interfaces" ]
+packages = [ "src/grpc_interfaces" ]
 
 [tool.ruff]
 target-version = "py310"
