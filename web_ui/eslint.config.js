@@ -25,24 +25,37 @@ export default [
                 {
                     name: '@adobe/react-spectrum',
                     importNames: ['Button'],
-                    message: "Use 'Button' from shared folder instead.",
+                    message: "Use 'Button' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['SpectrumButtonProps'],
+                    message: "Use 'SpectrumButtonProps' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@react-types/button',
+                    importNames: ['SpectrumButtonProps'],
+                    message: "Use 'SpectrumButtonProps' from @geti/ui folder instead.",
                 },
                 {
                     name: '@adobe/react-spectrum',
                     importNames: ['ActionButton'],
-                    message: "Use 'ActionButton' from shared folder instead.",
+                    message: "Use 'ActionButton' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['SpectrumActionButtonProps'],
+                    message: "Use 'SpectrumActionButtonProps' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@react-types/button',
+                    importNames: ['SpectrumActionButtonProps'],
+                    message: "Use 'SpectrumActionButtonProps' from @geti/ui folder instead.",
                 },
                 {
                     name: '@adobe/react-spectrum',
                     importNames: ['Checkbox'],
-                    message: "Use 'Checkbox' from shared folder instead.",
-                },
-            ],
-
-            'import/no-unresolved': [
-                2,
-                {
-                    ignore: ['opencv-types', 'OpenCVTypes', '^@.*', 'csstype', 'opencv'],
+                    message: "Use 'Checkbox' from @geti/ui folder instead.",
                 },
             ],
         },

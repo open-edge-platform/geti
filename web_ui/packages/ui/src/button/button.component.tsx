@@ -1,8 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-/* eslint-disable no-restricted-imports */
-
 import { forwardRef, Ref } from 'react';
 
 import {

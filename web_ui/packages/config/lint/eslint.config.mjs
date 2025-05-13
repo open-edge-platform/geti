@@ -184,6 +184,13 @@ export default [
 
             'import/order': ['off'],
 
+            'import/no-unresolved': [
+                2,
+                {
+                    ignore: ['opencv-types', 'OpenCVTypes', 'csstype', 'opencv'],
+                },
+            ],
+
             'header/header': [
                 'warn',
                 'line',
