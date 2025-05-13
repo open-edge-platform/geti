@@ -3,8 +3,9 @@
 
 from pydantic import BaseModel, Field
 
-from geti_types import ID
 from iai_core.entities.persistent_entity import PersistentEntity
+
+from geti_types import ID
 
 
 class TrainConstraints(BaseModel):

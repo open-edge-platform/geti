@@ -8,12 +8,12 @@ from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
 from iai_core.entities.training_configuration import NullTrainingConfiguration, TrainingConfiguration
-from iai_core.repos.mappers.training_configuration_mapper import TrainingConfigurationToMongo
-
-from geti_types import ID, ProjectIdentifier, Session
 from iai_core.repos.base import ProjectBasedSessionRepo
 from iai_core.repos.mappers import IDToMongo
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.mappers.training_configuration_mapper import TrainingConfigurationToMongo
+
+from geti_types import ID, ProjectIdentifier, Session
 
 
 class TrainingConfigurationRepo(ProjectBasedSessionRepo[TrainingConfiguration]):

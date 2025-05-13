@@ -2,14 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from geti_types.configuration import (
-    AugmentationParameters,
-    CenterCrop,
-    DatasetPreparationParameters,
-    EvaluationParameters,
-    Hyperparameters,
-    TrainingHyperParameters,
-)
 
 from iai_core.entities.training_configuration import (
     Filtering,
@@ -17,6 +9,15 @@ from iai_core.entities.training_configuration import (
     GlobalParameters,
     SubsetSplit,
     TrainingConfiguration,
+)
+
+from geti_types.configuration import (
+    AugmentationParameters,
+    CenterCrop,
+    DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
+    TrainingHyperParameters,
 )
 
 

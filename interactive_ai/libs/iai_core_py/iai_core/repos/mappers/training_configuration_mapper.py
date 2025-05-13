@@ -1,12 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from geti_types.configuration import Hyperparameters
-
 from iai_core.entities.training_configuration import GlobalParameters, TrainingConfiguration
-
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+
+from geti_types.configuration import Hyperparameters
 
 
 class TrainingConfigurationToMongo(IMapperSimple[TrainingConfiguration, dict]):

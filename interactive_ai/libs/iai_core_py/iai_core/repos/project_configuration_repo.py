@@ -6,12 +6,12 @@ from collections.abc import Callable
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
-
-from geti_types import ProjectIdentifier, Session
+from iai_core.entities.project_configuration import NullProjectConfiguration, ProjectConfiguration, TaskConfig
 from iai_core.repos.base import ProjectBasedSessionRepo
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
-from iai_core.entities.project_configuration import NullProjectConfiguration, ProjectConfiguration, TaskConfig
 from iai_core.repos.mappers.project_configuration_mapper import ProjectConfigurationToMongo
+
+from geti_types import ProjectIdentifier, Session
 
 
 class ProjectConfigurationRepo(ProjectBasedSessionRepo[ProjectConfiguration]):

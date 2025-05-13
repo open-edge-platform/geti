@@ -1,6 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from iai_core.entities.persistent_entity import PersistentEntity
+
+from geti_types import ID
 from geti_types.configuration import (
     AugmentationParameters,
     DatasetPreparationParameters,
@@ -8,10 +13,6 @@ from geti_types.configuration import (
     Hyperparameters,
     TrainingHyperParameters,
 )
-from pydantic import BaseModel, ConfigDict, Field, model_validator
-
-from geti_types import ID
-from iai_core.entities.persistent_entity import PersistentEntity
 
 
 class SubsetSplit(BaseModel):
