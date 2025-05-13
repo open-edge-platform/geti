@@ -4,6 +4,7 @@
 import { FC, PropsWithChildren, useRef } from 'react';
 
 import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import Alert from '@spectrum-icons/workflow/Alert';
 import { noop } from 'lodash-es';
@@ -27,7 +28,6 @@ import { useNotification } from '../../../notification/notification.component';
 import { matchStatus } from '../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { onValidFileList } from '../../utils';
-import { ActionButton } from '../button/button.component';
 import { JobListItemProgressStatus } from '../header/jobs-management/jobs-list-item-progress.component';
 import { LoadingIndicator } from '../loading/loading-indicator.component';
 import { ThinProgressBar } from '../thin-progress-bar/thin-progress-bar.component';

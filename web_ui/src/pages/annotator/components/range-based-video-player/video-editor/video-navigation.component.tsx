@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 
 import { Redo, Scope, Undo } from '../../../../../assets/icons';
 import { VideoFrame } from '../../../../../core/media/video.interface';
 import { Controls } from '../../../../../pages/annotator/components/video-player/video-controls/video-controls.component';
 import { VideoControls } from '../../../../../pages/annotator/components/video-player/video-controls/video-controls.interface';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { useDurationText } from '../../../../../shared/hooks/data-format/use-duration-text.hook';
 import { useUndoRedo } from '../../../tools/undo-redo/undo-redo-provider.component';
 

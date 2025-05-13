@@ -16,12 +16,12 @@ import {
     TextField,
     View,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { isVisualPromptModel } from '../../../../../core/annotations/services/visual-prompt-service';
 import { paths } from '../../../../../core/services/routes';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { WarningMessage } from '../../../../../shared/components/warning-message/warning-message.component';
 import {
     DEFAULT_DATASET_MESSAGE,

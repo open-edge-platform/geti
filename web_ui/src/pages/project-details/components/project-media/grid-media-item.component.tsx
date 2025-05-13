@@ -4,10 +4,10 @@
 import { Key, useRef, useState } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Checkbox } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 
 import { MediaItem } from '../../../../core/media/media.interface';
-import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
 import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';

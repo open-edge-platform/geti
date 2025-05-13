@@ -17,6 +17,7 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { isEqual, isNil } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -30,7 +31,6 @@ import {
 import { UserProjectSettings, UseSettings } from '../../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
 import {
     ColorMode,
     QuietActionButton,

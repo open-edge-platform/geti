@@ -16,9 +16,9 @@ import {
     NumberField,
     TextField,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { CreditAccountBalance, NewCreditAccountBalance } from '../../../../core/credits/credits.interface';
-import { Button } from '../../../../shared/components/button/button.component';
 
 import classes from './dialogs.module.scss';
 

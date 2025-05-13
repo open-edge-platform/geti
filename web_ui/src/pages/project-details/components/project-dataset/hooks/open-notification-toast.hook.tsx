@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 
+import { ActionButton } from '@geti/ui';
 import { isEmpty, noop } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +16,6 @@ import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-a
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { addAlgorithmDetails } from '../../project-models/utils';
 

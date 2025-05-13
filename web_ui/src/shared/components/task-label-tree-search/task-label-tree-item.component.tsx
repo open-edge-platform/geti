@@ -4,6 +4,7 @@
 import { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode, useState } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isFunction } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';
@@ -12,7 +13,6 @@ import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../assets/i
 import { LabelItemType, LabelTreeItem, LabelTreeLabelProps } from '../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../core/labels/label.interface';
 import { getLabelId } from '../../../core/labels/utils';
-import { ActionButton } from '../button/button.component';
 import { LabelColorThumb } from '../label-color-thumb/label-color-thumb.component';
 import { PressableElement } from '../pressable-element/pressable-element.component';
 import { groupTitleStyles, LABEL_GAP, VIEW_GAP } from './utils';

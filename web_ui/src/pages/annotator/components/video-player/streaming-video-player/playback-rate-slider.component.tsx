@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { DialogTrigger, Flex, Slider, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 
 import { PlaybackRate } from '../../../../../assets/icons';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { useStreamingVideoPlayer } from './streaming-video-player-provider.component';
 
 interface PlaybackRate {

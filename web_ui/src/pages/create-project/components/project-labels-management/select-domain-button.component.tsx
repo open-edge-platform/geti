@@ -2,14 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@adobe/react-spectrum';
-import { SpectrumActionButtonProps } from '@react-types/button';
+import { ActionButton, type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
-
-import { ActionButton } from '../../../../shared/components/button/button.component';
 
 import classes from './select-domain-button.module.scss';
 
-interface SelectDomainButtonProps extends SpectrumActionButtonProps {
+interface SelectDomainButtonProps extends ActionButtonProps {
     id: string;
     text: string;
     select: () => void;
