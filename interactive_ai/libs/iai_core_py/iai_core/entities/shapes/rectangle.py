@@ -59,7 +59,8 @@ class Rectangle(Shape):
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
-        if self.width <= 0 or self.height <= 0:
+        # Accept Rectangle with width and height of 0 for keypoints.
+        if self.width < 0 or self.height < 0:
             raise ValueError(
                 f"Invalid rectangle with coordinates: x1={self.x1}, y1={self.y1}, x2={self.x2}, y2={self.y2}"
             )
