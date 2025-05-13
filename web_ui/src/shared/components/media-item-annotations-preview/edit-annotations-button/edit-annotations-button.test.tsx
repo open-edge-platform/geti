@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { fireEvent, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { useNavigate } from 'react-router-dom';
 
 import { MediaItem } from '../../../../core/media/media.interface';
@@ -33,9 +33,9 @@ describe('EditAnnotationsButton Component', () => {
         });
 
         render(<EditAnnotationsButton datasetIdentifier={datasetIdentifier} mediaItem={mediaItem} />);
-        fireEvent.click(screen.getByRole('button', { name: 'Edit annotations' }));
 
-        expect(useNavigateMock).toHaveBeenCalledWith(
+        expect(screen.getByRole('button', { name: 'Edit annotations' })).toHaveAttribute(
+            'href',
             '/organizations/organization-id/workspaces/test-workspace/projects/test-project/datasets/test-dataset/annotator/image/test-image'
         );
     });

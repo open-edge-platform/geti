@@ -55,24 +55,18 @@ const mediaPath = ({
     return paths.project.annotator.index({ organizationId, workspaceId, projectId, datasetId });
 };
 
-export type NavigateToAnnotatorRoute = ({
-    datasetId,
-    mediaItem,
-    active,
-    taskId,
-}: {
+type AnnotatorTarget = {
     datasetId: string;
     mediaItem?: Pick<MediaItem, 'identifier'>;
     active?: boolean;
     taskId?: string | null;
-}) => void;
+};
 
-export const useNavigateToAnnotatorRoute = (projectIdentifier: ProjectIdentifier): NavigateToAnnotatorRoute => {
+export const useAnnotatorRoutePath = (projectIdentifier: ProjectIdentifier) => {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
 
     return useCallback(
-        ({ datasetId, mediaItem, active, taskId }) => {
+        ({ datasetId, mediaItem, active, taskId }: AnnotatorTarget): string => {
             const { workspaceId, projectId, organizationId } = projectIdentifier;
 
             if (active !== undefined) {
@@ -96,11 +90,23 @@ export const useNavigateToAnnotatorRoute = (projectIdentifier: ProjectIdentifier
             const search = searchParams.toString();
 
             if (search !== '') {
-                navigate(`${mediaPath({ organizationId, workspaceId, projectId, datasetId, mediaItem })}?${search}`);
+                return `${mediaPath({ organizationId, workspaceId, projectId, datasetId, mediaItem })}?${search}`;
             } else {
-                navigate(`${mediaPath({ organizationId, workspaceId, projectId, datasetId, mediaItem })}`);
+                return `${mediaPath({ organizationId, workspaceId, projectId, datasetId, mediaItem })}`;
             }
         },
-        [navigate, projectIdentifier, searchParams]
+        [projectIdentifier, searchParams]
+    );
+};
+
+export const useNavigateToAnnotatorRoute = (projectIdentifier: ProjectIdentifier) => {
+    const navigate = useNavigate();
+    const annotatorRoutePath = useAnnotatorRoutePath(projectIdentifier);
+
+    return useCallback(
+        ({ datasetId, mediaItem, active, taskId }: AnnotatorTarget) => {
+            navigate(annotatorRoutePath({ datasetId, mediaItem, active, taskId }));
+        },
+        [navigate, annotatorRoutePath]
     );
 };
