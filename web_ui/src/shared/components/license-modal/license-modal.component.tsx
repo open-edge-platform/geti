@@ -59,13 +59,14 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                     <Content>
                         <Flex direction={'column'} gap={'size-100'}>
                             <Text>
-                                This LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT (“Agreement”) is a contract
-                                between you and Intel Corporation and its affiliates (“Intel”) and governs use of
-                                Material. If you use Material on behalf of or in connection with your employment, you
-                                represent and warrant that you have the authority to bind your employer (and its
-                                affiliates) to this Agreement. By downloading, installing, or using Material, you accept
-                                these terms on your own behalf or on behalf of your employer, as applicable. If you do
-                                not accept these terms, do not use any Material and destroy all copies of Material.
+                                Limited Edge Software Distribution License Agreement [v2025.05.06] This LIMITED EDGE
+                                SOFTWARE DISTRIBUTION LICENSE AGREEMENT (“Agreement”) is a contract between you and
+                                Intel Corporation and its affiliates (“Intel”) and governs use of Material. If you use
+                                Material on behalf of or in connection with your employment, you represent and warrant
+                                that you have the authority to bind your employer (and its affiliates) to this
+                                Agreement. By downloading, installing, or using Material, you accept these terms on your
+                                own behalf or on behalf of your employer, as applicable. If you do not accept these
+                                terms, do not use any Material and destroy all copies of Material.
                             </Text>
                             <Divider marginTop={'size-100'} size={'S'} />
                             <Text>1 DEFINITIONS.</Text>
@@ -74,8 +75,8 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 limited to.
                             </Text>
                             <Text>
-                                1.2 “Intel Component” means a hardware component or product designed, developed, sold,
-                                or distributed by Intel.
+                                1.2 “Intel Component” means a hardware component designed, developed, sold, or
+                                distributed by Intel.
                             </Text>
                             <Text>
                                 1.3 “Material” means software, hardware description language code, or other computer
@@ -93,13 +94,13 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                             <Text>2 LICENSES.</Text>
                             <Text>
                                 2.1 License. Subject to the terms of this Agreement, Intel grants to you, for the Term,
-                                a personal, limited, non-transferable, non-exclusive, worldwide, revocable, fully
-                                paid-up license under Intel&apos;s intellectual property rights in the Material, without
-                                the right to sublicense, to: a) develop Your Product; b) modify Material delivered by
-                                Intel as source code (or its equivalent); and c) distribute Material, as delivered by
-                                Intel or as modified by you (where expressly permitted), as object code (or its
-                                equivalent), in Your Product, provided your distribution is subject to terms and
-                                conditions consistent with your rights and obligations under this Agreement.
+                                a personal, limited, non-transferable, nonexclusive, worldwide, revocable, fully paid-up
+                                license under Intel&apos;s intellectual property rights in the Material, without the
+                                right to sublicense, to: a) develop Your Product; b) modify Material delivered by Intel
+                                as source code (or its equivalent); and c) distribute Material, as delivered by Intel or
+                                as modified by you (where expressly permitted), as object code (or its equivalent), in
+                                Your Product, provided your distribution is subject to terms and conditions consistent
+                                with your rights and obligations under this Agreement.
                             </Text>
                             <Text>
                                 2.2 Subcontractor. You may disclose Material to your subcontractor for its work on Your
@@ -176,7 +177,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 information related to your use of Material (see https://www.intel.com/privacy). Intel
                                 may collect identifying information during registration and information on your use of
                                 Material (see “Information You Provide to Intel Voluntarily” and “Device and Product
-                                Operation” sections).
+                                Operation” sections). Limited Edge Software Distribution License Agreement [v2025.05.06]
                             </Text>
                             <Text>
                                 8.2 Data Collection. Some Material may generate, collect, and transmit to Intel
