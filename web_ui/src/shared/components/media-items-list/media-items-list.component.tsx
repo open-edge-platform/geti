@@ -3,9 +3,9 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { DimensionValue, View } from '@adobe/react-spectrum';
 import { useLoadMore } from '@react-aria/utils';
-import clsx from 'clsx';
+import { Responsive } from '@react-types/shared';
 import {
     ListBox as AriaComponentsListBox,
     GridLayout,
@@ -15,7 +15,7 @@ import {
     Virtualizer,
 } from 'react-aria-components';
 
-import { ViewModes } from '../media-view-modes/utils';
+import { VIEW_MODE_SETTINGS, ViewModes } from '../media-view-modes/utils';
 
 import classes from './media-items-list.module.scss';
 
@@ -24,19 +24,21 @@ interface MediaItemsListProps<T> {
     id?: string;
     ariaLabel?: string;
     viewMode: ViewModes;
-    endReached: () => void;
+    mediaItems: T[];
+    height?: Responsive<DimensionValue>;
+    viewModeSettings?: ViewModeSettings;
+    endReached?: () => void;
     itemContent: (item: T) => ReactNode;
     idFormatter: (item: T) => string;
-    mediaItems: T[];
-    viewModeSettings: ViewModeSettings;
 }
 
 export const MediaItemsList = <T,>({
     id,
+    height,
     viewMode,
     ariaLabel,
     mediaItems,
-    viewModeSettings,
+    viewModeSettings = VIEW_MODE_SETTINGS,
     itemContent,
     endReached,
     idFormatter,
@@ -61,17 +63,17 @@ export const MediaItemsList = <T,>({
           };
 
     return (
-        <View id={id} UNSAFE_className={classes.mainContainer}>
+        <View id={id} UNSAFE_className={classes.mainContainer} height={height}>
             <Virtualizer layout={isDetails ? ListLayout : GridLayout} layoutOptions={layoutOptions}>
                 <AriaComponentsListBox
                     ref={ref}
                     layout={isDetails ? 'stack' : 'grid'}
                     aria-label={ariaLabel}
                     items={formattedMediaItems}
-                    className={clsx(classes.container)}
+                    className={classes.container}
                 >
                     {(item) => (
-                        <ListBoxItem textValue={item.id} style={{ background: 'green', height: '100%' }}>
+                        <ListBoxItem textValue={item.id} style={{ height: '100%' }}>
                             {itemContent(item)}
                         </ListBoxItem>
                     )}

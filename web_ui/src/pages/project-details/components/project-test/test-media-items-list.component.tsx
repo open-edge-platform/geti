@@ -36,18 +36,20 @@ interface TestMediaItemsListProps {
 }
 
 const viewModeSettings = {
-    [ViewModes.SMALL]: { minItemSize: 90, gap: 4, maxColumns: 6 },
+    [ViewModes.SMALL]: { minItemSize: 70, gap: 4, maxColumns: 6 },
     [ViewModes.MEDIUM]: { minItemSize: 90, gap: 4, maxColumns: 4 },
-    [ViewModes.LARGE]: { minItemSize: 90, gap: 4, maxColumns: 2 },
+    [ViewModes.LARGE]: { minItemSize: 100, gap: 4, maxColumns: 2 },
     [ViewModes.DETAILS]: { size: 85, gap: 0 },
 };
 
 const getTestMediaItemId = (item: TestMediaItem) => {
+    const annotationId = 'testResult' in item ? item.testResult.annotationId : '';
+
     if (item.type === MEDIA_TYPE.IMAGE) {
-        return item.media.identifier.imageId;
+        return `${item.media.identifier.imageId}-${annotationId}`;
     }
 
-    return item.media.identifier.videoId;
+    return `${item.media.identifier.videoId}-${annotationId}`;
 };
 
 export const TestMediaItemsList = ({
@@ -120,10 +122,7 @@ export const TestMediaItemsList = ({
                             endReached={loadNextMedia}
                             mediaItems={mediaItems}
                             viewModeSettings={viewModeSettings}
-                            idFormatter={(item) => {
-                                const annotationId = 'testResult' in item ? item.testResult.annotationId : '';
-                                return `${getTestMediaItemId(item)}-${annotationId}`;
-                            }}
+                            idFormatter={getTestMediaItemId}
                             itemContent={(mediaItem) => {
                                 const mediaImageItem = mediaItem as unknown as TestImageMediaItem;
                                 const handleSelectMediaItem = () => selectMediaItem(mediaItem);

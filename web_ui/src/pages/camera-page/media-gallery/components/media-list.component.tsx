@@ -3,23 +3,23 @@
 
 import { useState } from 'react';
 
-import { isEmpty, isNil, noop } from 'lodash-es';
+import { isEmpty, isNil } from 'lodash-es';
 import { useOverlayTriggerState } from 'react-stately';
 
-import { MediaItemsList as MediaListVirtuoso } from '../../../../shared/components/media-items-list/media-items-list.component';
+import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
-import { getIds } from '../../../../shared/utils';
+import { getIds, hasEqualId } from '../../../../shared/utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { ImageOverlay } from '../../components/image-overlay.component';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { MediaItem } from './media-item.component';
 
-interface MediaItemsListProps {
+interface MediaListProps {
     viewMode: ViewModes;
     screenshots: Screenshot[];
 }
 
-export const MediaItemsList = ({ viewMode, screenshots }: MediaItemsListProps): JSX.Element => {
+export const MediaList = ({ viewMode, screenshots }: MediaListProps): JSX.Element => {
     const dialogState = useOverlayTriggerState({});
     const [previewIndex, setPreviewIndex] = useState<null | number>(0);
     const { deleteMany, updateMany } = useCameraStorage();
@@ -30,23 +30,23 @@ export const MediaItemsList = ({ viewMode, screenshots }: MediaItemsListProps): 
 
     return (
         <>
-            <MediaListVirtuoso
-                endReached={noop}
+            <MediaItemsList
+                idFormatter={(item) => item.id}
                 viewMode={viewMode}
-                marginTop={'size-115'}
-                totalCount={screenshots.length}
+                mediaItems={screenshots}
                 height={`calc(100% - size-550)`}
-                itemContent={(index) => {
-                    const { id, ...itemData } = screenshots[index];
+                itemContent={(screenshot) => {
+                    const { id, ...itemData } = screenshot;
 
                     return (
                         <MediaItem
                             id={id}
                             key={id}
                             onPress={() => {
-                                setPreviewIndex(index);
+                                setPreviewIndex(screenshots.findIndex(hasEqualId(id)));
                                 dialogState.open();
                             }}
+                            height={'100%'}
                             viewMode={viewMode}
                             mediaFile={itemData.file}
                             url={String(itemData.dataUrl)}

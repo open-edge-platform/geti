@@ -130,7 +130,6 @@ export const DatasetList = ({
             <MediaItemsList
                 id='annotator-dataset-list'
                 ariaLabel={'Annotator dataset list'}
-                //ref={ref}
                 viewMode={viewMode}
                 idFormatter={getMediaItemId}
                 mediaItems={groupedMediaItems}

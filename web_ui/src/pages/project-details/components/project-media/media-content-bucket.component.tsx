@@ -22,7 +22,7 @@ import {
 import { MediaDropBoxHeader } from '../../../../shared/components/media-drop/media-drop-box-header.component';
 import { MediaDropBox } from '../../../../shared/components/media-drop/media-drop-box.component';
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
-import { INITIAL_VIEW_MODE, ViewModes } from '../../../../shared/components/media-view-modes/utils';
+import { INITIAL_VIEW_MODE } from '../../../../shared/components/media-view-modes/utils';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { VALID_MEDIA_TYPES_DISPLAY } from '../../../../shared/media-utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
@@ -60,13 +60,6 @@ export interface MediaContentBucketProps {
     showExportImportButton?: boolean;
     footerInfo?: ReactNode;
 }
-
-const viewModeSettings = {
-    [ViewModes.SMALL]: { minItemSize: 112, gap: 4, maxColumns: 11 },
-    [ViewModes.MEDIUM]: { minItemSize: 150, gap: 8, maxColumns: 8 },
-    [ViewModes.LARGE]: { minItemSize: 300, gap: 12, maxColumns: 4 },
-    [ViewModes.DETAILS]: { size: 81, gap: 0 },
-};
 
 export const MediaContentBucket = ({
     header,
@@ -206,7 +199,6 @@ export const MediaContentBucket = ({
                                 idFormatter={getMediaItemId}
                                 mediaItems={media}
                                 viewMode={viewMode}
-                                viewModeSettings={viewModeSettings}
                                 itemContent={(item) => (
                                     <MediaItemFactory
                                         mediaItem={item}

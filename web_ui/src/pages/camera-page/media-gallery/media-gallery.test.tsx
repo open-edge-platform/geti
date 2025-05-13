@@ -62,7 +62,10 @@ describe('MediaGallery', () => {
     });
 
     it('render item elements', async () => {
-        const filesData = [mockedScreenshot, mockedScreenshot];
+        const filesData = [
+            { ...mockedScreenshot, id: 'id-1' },
+            { ...mockedScreenshot, id: 'id-2' },
+        ];
         await renderApp({ filesData });
 
         expect(screen.queryByText('No media items')).not.toBeInTheDocument();
