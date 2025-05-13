@@ -58,7 +58,6 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                     <Heading marginBottom={'size-300'}>LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT</Heading>
                     <Content>
                         <Flex direction={'column'} gap={'size-100'}>
-                            <Text>Limited Edge Software Distribution License Agreement [v2025.05.06]</Text>
                             <Text>
                                 This LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE AGREEMENT (“Agreement”) is a contract
                                 between you and Intel Corporation and its affiliates (“Intel”) and governs use of
@@ -177,7 +176,7 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 information related to your use of Material (see https://www.intel.com/privacy). Intel
                                 may collect identifying information during registration and information on your use of
                                 Material (see “Information You Provide to Intel Voluntarily” and “Device and Product
-                                Operation” sections). Limited Edge Software Distribution License Agreement [v2025.05.06]
+                                Operation” sections).
                             </Text>
                             <Text>
                                 8.2 Data Collection. Some Material may generate, collect, and transmit to Intel
