@@ -18,6 +18,35 @@ const compat = new FlatCompat({
 
 export default [
     ...sharedEslintConfig,
+    {
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['Button'],
+                    message: "Use 'Button' from shared folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['ActionButton'],
+                    message: "Use 'ActionButton' from shared folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['Checkbox'],
+                    message: "Use 'Checkbox' from shared folder instead.",
+                },
+            ],
+
+            'import/no-unresolved': [
+                2,
+                {
+                    ignore: ['opencv-types', 'OpenCVTypes', '^@.*', 'csstype', 'opencv'],
+                },
+            ],
+        },
+    },
     ...compat.extends('plugin:playwright/playwright-test').map((config) => ({
         ...config,
         files: ['tests/features/**/*.ts', 'tests/utils/**/*.ts', 'tests/fixtures/**/*.ts', 'tests/e2e/**/*.ts'],

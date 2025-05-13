@@ -2,10 +2,9 @@
   "name": "@geti/ui",
   "version": "1.0.0",
   "description": "Contains UI representative components",
-  "main": "index.js",
+  "main": "index.ts",
   "type": "module",
   "devDependencies": {
-    "@types/node": "^22.15.3",
     "@geti/config": "*",
     "jest": "^29.7.0",
     "@testing-library/jest-dom": "^5.16.5",
