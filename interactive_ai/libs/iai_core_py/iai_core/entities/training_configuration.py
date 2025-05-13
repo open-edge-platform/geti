@@ -1,7 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from geti_supported_models.hyperparameters import (
+from geti_types.configuration import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,

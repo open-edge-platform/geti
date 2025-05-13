@@ -6,8 +6,11 @@ requires-python = ">=3.10, <3.14"
 
 dependencies = [
     "hiyapyco==0.7.0",
-    "pydantic==2.5.3",
+    "geti-types[configuration]",
 ]
+
+[tool.uv.sources]
+geti-types = { path = "../../libs/types", editable = true }
 
 [dependency-groups]
 dev = [

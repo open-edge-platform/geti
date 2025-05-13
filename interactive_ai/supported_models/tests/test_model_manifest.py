@@ -10,12 +10,12 @@ import hiyapyco
 
 import pytest
 
-from geti_supported_models.hyperparameters import (
+from geti_types.configuration import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,
     Hyperparameters,
-    TrainingHyperParameters, CenterCrop, EarlyStopping,
+    TrainingHyperParameters, EarlyStopping,
 )
 from geti_supported_models.model_manifest import (
     GPUMaker,

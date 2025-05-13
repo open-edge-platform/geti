@@ -492,14 +492,14 @@ name = "geti-supported-models"
 version = "1.0.0"
 source = { editable = "../../supported_models" }
 dependencies = [
+    { name = "geti-types", extra = ["configuration"] },
     { name = "hiyapyco" },
-    { name = "pydantic" },
 ]
 
 [package.metadata]
 requires-dist = [
+    { name = "geti-types", extras = ["configuration"], editable = "../../../libs/types" },
     { name = "hiyapyco", specifier = "==0.7.0" },
-    { name = "pydantic", specifier = "==2.5.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -577,13 +577,21 @@ name = "geti-types"
 version = "1.0.2"
 source = { editable = "../../../libs/types" }
 
+[package.optional-dependencies]
+configuration = [
+    { name = "pydantic" },
+]
+
 [package.metadata]
-requires-dist = [{ name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" }]
-provides-extras = ["bson"]
+requires-dist = [
+    { name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" },
+    { name = "pydantic", marker = "extra == 'configuration'", specifier = "==2.5.3" },
+]
+provides-extras = ["bson", "configuration"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "geti-types", extras = ["bson"] },
+    { name = "geti-types", extras = ["bson", "configuration"] },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
@@ -795,7 +803,7 @@ dependencies = [
     { name = "attrs" },
     { name = "cachetools" },
     { name = "geti-feature-tools" },
-    { name = "geti-types" },
+    { name = "geti-types", extra = ["configuration"] },
     { name = "minio" },
     { name = "networkx" },
     { name = "numpy" },
@@ -813,7 +821,7 @@ requires-dist = [
     { name = "attrs", specifier = "~=24.3" },
     { name = "cachetools", specifier = "~=5.5" },
     { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
-    { name = "geti-types", editable = "../../../libs/types" },
+    { name = "geti-types", extras = ["configuration"], editable = "../../../libs/types" },
     { name = "minio", specifier = "~=7.1.0" },
     { name = "networkx", specifier = ">=2.6,<=2.8" },
     { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },

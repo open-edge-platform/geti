@@ -1,8 +1,8 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from entities.project_configuration import NullProjectConfiguration, TaskConfig
-from storage.repos.project_configuration_repo import ProjectConfigurationRepo
+from iai_core.entities.project_configuration import NullProjectConfiguration, TaskConfig
+from iai_core.repos.project_configuration_repo import ProjectConfigurationRepo
 
 from geti_types import ID
 

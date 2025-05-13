@@ -1,7 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from entities.project_configuration import AutoTrainingParameters, ProjectConfiguration, TaskConfig, TrainingParameters
+from iai_core.entities.project_configuration import AutoTrainingParameters, ProjectConfiguration, TaskConfig, TrainingParameters
 
 from geti_types import ID
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple

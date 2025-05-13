@@ -4,7 +4,7 @@
 import pytest
 from pydantic import ValidationError
 
-from entities.training_configuration import (
+from iai_core.entities.training_configuration import (
     Filtering,
     GlobalDatasetPreparationParameters,
     GlobalParameters,

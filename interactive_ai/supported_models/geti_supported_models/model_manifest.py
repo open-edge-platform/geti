@@ -5,7 +5,7 @@ from enum import Enum, auto
 
 from pydantic import BaseModel, Field
 
-from .hyperparameters import (
+from geti_types.configuration import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,

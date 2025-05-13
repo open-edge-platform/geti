@@ -17,7 +17,7 @@ dependencies = [
     "scipy~=1.14",
     "shapely~=2.0",
     "urllib3>=1.26",
-    "geti-types",
+    "geti-types[configuration]",
     "geti-feature-tools",
 ]
 
