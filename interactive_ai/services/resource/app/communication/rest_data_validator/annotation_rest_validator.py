@@ -23,14 +23,14 @@ from geti_fastapi_tools.validation import RestApiValidator
 from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
-from sc_sdk.entities.label import Label
-from sc_sdk.entities.label_schema import LabelGroupType, LabelSchema, LabelSchemaView
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.shapes import Ellipse, Point, Polygon, Rectangle
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.utils.constants import MAX_POLYGON_POINTS
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core.entities.label import Label
+from iai_core.entities.label_schema import LabelGroupType, LabelSchema, LabelSchemaView
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.project import Project
+from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.task_node import TaskNode
+from iai_core.utils.constants import MAX_POLYGON_POINTS
+from iai_core.utils.type_helpers import SequenceOrSet
 
 ANNOTATIONS = "annotations"
 ID_ = "id"
@@ -123,7 +123,10 @@ class AnnotationRestValidator(RestApiValidator):
         )
 
     def validate_video_annotation_range(
-        self, video_annotation_range_rest: dict, label_schema: LabelSchema, video_total_frames: int
+        self,
+        video_annotation_range_rest: dict,
+        label_schema: LabelSchema,
+        video_total_frames: int,
     ) -> None:
         """
         Validation video annotation range JSON data. Steps:
@@ -770,7 +773,9 @@ class AnnotationRestValidator(RestApiValidator):
                 )
 
     @staticmethod
-    def __get_label_ids_from_video_annotation_range(video_annotation_range_rest: dict) -> set[ID]:
+    def __get_label_ids_from_video_annotation_range(
+        video_annotation_range_rest: dict,
+    ) -> set[ID]:
         """
         Get the set of label IDs contained in a video annotation range.
 

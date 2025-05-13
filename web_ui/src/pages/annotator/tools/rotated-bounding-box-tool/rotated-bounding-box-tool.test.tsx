@@ -66,7 +66,7 @@ describe('RotatedBoundingBoxTool', () => {
         fireEvent.pointerMove(svg, { clientX: 80, clientY: 80 });
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([
+        expect(onComplete).toHaveBeenCalledWith([
             { shapeType: ShapeType.RotatedRect, x: 60, y: 80, width: 40, height: 40, angle: -90 },
         ]);
     });

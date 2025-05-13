@@ -18,7 +18,6 @@ RUN apt-get update && \
 
 # Copy the service dependencies
 COPY --link --from=libs . libs
-COPY --link --from=grpc_interfaces . grpc_interfaces
 
 WORKDIR /platform/services/platform_cleaner
 

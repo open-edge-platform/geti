@@ -7,7 +7,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
 from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from iai_core.entities.persistent_entity import PersistentEntity
 
 
 class TaskActiveScore:

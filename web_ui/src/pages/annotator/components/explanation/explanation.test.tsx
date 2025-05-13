@@ -52,13 +52,13 @@ describe('Explanation', () => {
     it('loads image when given explanation with url', async () => {
         await render(<ExplanationMap explanation={{ ...explanation, url: 'test-url' }} opacity={1} enabled />);
 
-        expect(load).toBeCalledWith('test-url?raw=true');
+        expect(load).toHaveBeenCalledWith('test-url?raw=true');
     });
 
     it('shows image when given explanation with binary', async () => {
         await render(<ExplanationMap explanation={{ ...explanation, binary: 'a-binary' }} opacity={1} enabled />);
 
-        expect(load).toBeCalledWith('data:image/jpeg;base64, a-binary');
+        expect(load).toHaveBeenCalledWith('data:image/jpeg;base64, a-binary');
     });
 
     it('shows nothing when not enabled', async () => {

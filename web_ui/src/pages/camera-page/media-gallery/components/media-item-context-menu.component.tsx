@@ -5,7 +5,7 @@ import { Key, RefObject, useRef, useState } from 'react';
 
 import { Item, Menu } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
 import { Button } from '../../../../shared/components/button/button.component';

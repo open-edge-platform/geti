@@ -9,8 +9,8 @@ import pytest
 from scheduler.job_repo import SessionBasedSchedulerJobRepo
 
 from geti_types import ID
-from sc_sdk.repos.base import SessionBasedRepo
-from sc_sdk.repos.base.session_repo import QueryAccessMode
+from iai_core.repos.base import SessionBasedRepo
+from iai_core.repos.base.session_repo import QueryAccessMode
 
 project_id = ID("project")
 
@@ -28,7 +28,12 @@ def test_update(request, num_updated_docs, expected_updated) -> None:
     query_filter.update({"_id": "test_id"})
 
     # Act
-    with patch.object(SessionBasedSchedulerJobRepo, "_collection", new_callable=PropertyMock, return_value=collection):
+    with patch.object(
+        SessionBasedSchedulerJobRepo,
+        "_collection",
+        new_callable=PropertyMock,
+        return_value=collection,
+    ):
         updated = job_repo.update(id, update)
 
     # Assert
@@ -51,7 +56,12 @@ def test_update_many(request) -> None:
     query_filter.update(job_filter)
 
     # Act
-    with patch.object(SessionBasedSchedulerJobRepo, "_collection", new_callable=PropertyMock, return_value=collection):
+    with patch.object(
+        SessionBasedSchedulerJobRepo,
+        "_collection",
+        new_callable=PropertyMock,
+        return_value=collection,
+    ):
         job_repo.update_many(job_filter, update)
 
     # Assert
@@ -67,7 +77,12 @@ def test_find_one_and_update(request) -> None:
     query_filter.update(filter)
 
     # Act
-    with patch.object(SessionBasedSchedulerJobRepo, "_collection", new_callable=PropertyMock, return_value=collection):
+    with patch.object(
+        SessionBasedSchedulerJobRepo,
+        "_collection",
+        new_callable=PropertyMock,
+        return_value=collection,
+    ):
         job_repo.find_one_and_update(filter, update)
 
     # Assert

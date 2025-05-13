@@ -3,7 +3,7 @@
 
 import { AlertDialog } from '@adobe/react-spectrum';
 import { useQueryClient } from '@tanstack/react-query';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';

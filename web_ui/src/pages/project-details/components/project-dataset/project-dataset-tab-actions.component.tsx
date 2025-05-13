@@ -5,7 +5,7 @@ import { Key, useCallback, useMemo } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { Dataset } from '../../../../core/projects/dataset.interface';

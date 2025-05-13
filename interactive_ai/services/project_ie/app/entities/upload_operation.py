@@ -4,7 +4,7 @@
 from enum import Enum
 
 from geti_types import ID
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from iai_core.entities.persistent_entity import PersistentEntity
 
 
 class FileType(str, Enum):

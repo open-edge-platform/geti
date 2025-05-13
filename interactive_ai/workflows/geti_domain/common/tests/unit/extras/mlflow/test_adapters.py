@@ -8,11 +8,11 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-from sc_sdk.adapters.model_adapter import DataSource
-from sc_sdk.configuration.helper import convert
-from sc_sdk.entities.metrics import CurveMetric, LineChartInfo, LineMetricsGroup, Performance, ScoreMetric
-from sc_sdk.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus
-from sc_sdk.repos.model_repo import ModelRepo
+from iai_core.adapters.model_adapter import DataSource
+from iai_core.configuration.helper import convert
+from iai_core.entities.metrics import CurveMetric, LineChartInfo, LineMetricsGroup, Performance, ScoreMetric
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus
+from iai_core.repos.model_repo import ModelRepo
 
 from jobs_common_extras.mlflow.adapters.definitions import OPENVINO_BIN_KEY, OPENVINO_XML_KEY, ClsSubTaskType
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
@@ -62,7 +62,13 @@ class TestGetiOTXInterfaceAdapter:
             os.path.join("jobs", fxt_job_metadata.id, "inputs", ".placeholder"),
             os.path.join("jobs", fxt_job_metadata.id, "live_metrics", ".placeholder"),
             os.path.join("jobs", fxt_job_metadata.id, "outputs", "models", ".placeholder"),
-            os.path.join("jobs", fxt_job_metadata.id, "outputs", "exportable_codes", ".placeholder"),
+            os.path.join(
+                "jobs",
+                fxt_job_metadata.id,
+                "outputs",
+                "exportable_codes",
+                ".placeholder",
+            ),
             os.path.join("jobs", fxt_job_metadata.id, "outputs", "configurations", ".placeholder"),
             os.path.join("jobs", fxt_job_metadata.id, "outputs", "logs", ".placeholder"),
         }
@@ -441,7 +447,14 @@ class TestGetiOTXInterfaceAdapter:
         performance_dict = {
             "dashboard_metrics": [
                 {
-                    "metrics": [{"name": "dummy", "type": "curve", "xs": [1.0, 2.0, 3.0], "ys": [1.0, 2.0, 3.0]}],
+                    "metrics": [
+                        {
+                            "name": "dummy",
+                            "type": "curve",
+                            "xs": [1.0, 2.0, 3.0],
+                            "ys": [1.0, 2.0, 3.0],
+                        }
+                    ],
                     "visualization_info": {
                         "name": "dummy",
                         "palette": "DEFAULT",
@@ -475,7 +488,11 @@ class TestGetiOTXInterfaceAdapter:
 
     @patch("jobs_common_extras.mlflow.adapters.geti_otx_interface.MLFlowExperimentBinaryRepo")
     def test_pull_metrics_exception(
-        self, mock_experiments_repo, fxt_organization_id, fxt_project_identifier, fxt_job_metadata
+        self,
+        mock_experiments_repo,
+        fxt_organization_id,
+        fxt_project_identifier,
+        fxt_job_metadata,
     ) -> None:
         # Arrange
         mock_experiments_repo.return_value.organization_id = fxt_organization_id
@@ -483,7 +500,10 @@ class TestGetiOTXInterfaceAdapter:
         adapter = GetiOTXInterfaceAdapter(project_identifier=fxt_project_identifier, job_metadata=fxt_job_metadata)
 
         # Act
-        with patch("jobs_common_extras.mlflow.adapters.geti_otx_interface.json.loads", side_effect=RuntimeError):
+        with patch(
+            "jobs_common_extras.mlflow.adapters.geti_otx_interface.json.loads",
+            side_effect=RuntimeError,
+        ):
             performance = adapter.pull_metrics()
 
         # Assert

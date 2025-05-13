@@ -8,10 +8,7 @@
 
 import { useMemo } from 'react';
 
-import intersectionBy from 'lodash/intersectionBy';
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
-import negate from 'lodash/negate';
+import { intersectionBy, isEmpty, isNil, negate } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';

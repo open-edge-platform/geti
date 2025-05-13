@@ -29,7 +29,7 @@ from model.mapper.job_mapper import (
 from model.telemetry import Telemetry
 
 from geti_types import ID, Session
-from sc_sdk.utils.time_utils import now
+from iai_core.utils.time_utils import now
 
 
 class TestJobTaskExecutionBranchMapper:
@@ -215,7 +215,12 @@ class TestJobConsumedResourceMapper:
     def test_backward_full(self) -> None:
         consuming_date = now()
         job_consumed_resource = JobConsumedResourceMapper.backward(
-            {"amount": 100, "unit": "images", "consuming_date": consuming_date, "service": "training"}
+            {
+                "amount": 100,
+                "unit": "images",
+                "consuming_date": consuming_date,
+                "service": "training",
+            }
         )
         assert job_consumed_resource == JobConsumedResource(
             amount=100, unit="images", consuming_date=consuming_date, service="training"
@@ -224,9 +229,19 @@ class TestJobConsumedResourceMapper:
     def test_forward_full(self) -> None:
         consuming_date = now()
         dict = JobConsumedResourceMapper.forward(
-            JobConsumedResource(amount=100, unit="images", consuming_date=consuming_date, service="training")
+            JobConsumedResource(
+                amount=100,
+                unit="images",
+                consuming_date=consuming_date,
+                service="training",
+            )
         )
-        assert dict == {"amount": 100, "unit": "images", "consuming_date": consuming_date, "service": "training"}
+        assert dict == {
+            "amount": 100,
+            "unit": "images",
+            "consuming_date": consuming_date,
+            "service": "training",
+        }
 
 
 class TestJobCostMapper:
@@ -264,7 +279,12 @@ class TestJobCostMapper:
                 "requests": [{"amount": 100, "unit": "images"}],
                 "lease_id": "7d227a60-96f7-4294-bc0a-2fd07debe9d2",
                 "consumed": [
-                    {"amount": 100, "unit": "images", "consuming_date": consuming_date, "service": "training"}
+                    {
+                        "amount": 100,
+                        "unit": "images",
+                        "consuming_date": consuming_date,
+                        "service": "training",
+                    }
                 ],
                 "reported": False,
             }
@@ -273,7 +293,12 @@ class TestJobCostMapper:
             requests=(JobResource(amount=100, unit="images"),),
             lease_id="7d227a60-96f7-4294-bc0a-2fd07debe9d2",
             consumed=(
-                JobConsumedResource(amount=100, unit="images", consuming_date=consuming_date, service="training"),
+                JobConsumedResource(
+                    amount=100,
+                    unit="images",
+                    consuming_date=consuming_date,
+                    service="training",
+                ),
             ),
             reported=False,
         )
@@ -285,7 +310,12 @@ class TestJobCostMapper:
                 requests=(JobResource(amount=100, unit="images"),),
                 lease_id="7d227a60-96f7-4294-bc0a-2fd07debe9d2",
                 consumed=(
-                    JobConsumedResource(amount=100, unit="images", consuming_date=consuming_date, service="training"),
+                    JobConsumedResource(
+                        amount=100,
+                        unit="images",
+                        consuming_date=consuming_date,
+                        service="training",
+                    ),
                 ),
                 reported=True,
             )
@@ -293,7 +323,14 @@ class TestJobCostMapper:
         assert dict == {
             "requests": [{"amount": 100, "unit": "images"}],
             "lease_id": "7d227a60-96f7-4294-bc0a-2fd07debe9d2",
-            "consumed": [{"amount": 100, "unit": "images", "consuming_date": consuming_date, "service": "training"}],
+            "consumed": [
+                {
+                    "amount": 100,
+                    "unit": "images",
+                    "consuming_date": consuming_date,
+                    "service": "training",
+                }
+            ],
             "reported": True,
         }
 
@@ -697,7 +734,12 @@ class TestJobMapper:
                     "requests": [{"amount": 100, "unit": "images"}],
                     "lease_id": "7d227a60-96f7-4294-bc0a-2fd07debe9d2",
                     "consumed": [
-                        {"amount": 100, "unit": "images", "consuming_date": current_timestamp, "service": "training"}
+                        {
+                            "amount": 100,
+                            "unit": "images",
+                            "consuming_date": current_timestamp,
+                            "service": "training",
+                        }
                     ],
                     "reported": False,
                 },
@@ -751,7 +793,10 @@ class TestJobMapper:
                     lease_id="7d227a60-96f7-4294-bc0a-2fd07debe9d2",
                     consumed=(
                         JobConsumedResource(
-                            amount=100, unit="images", consuming_date=current_timestamp, service="training"
+                            amount=100,
+                            unit="images",
+                            consuming_date=current_timestamp,
+                            service="training",
                         ),
                     ),
                     reported=False,

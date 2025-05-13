@@ -7,13 +7,13 @@ import pytest
 
 from coordination.dataset_manager.dataset_suspender import DatasetSuspender
 
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState
-from sc_sdk.entities.dataset_entities import PipelineDataset, TaskDataset
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from sc_sdk.repos import ProjectRepo, SuspendedAnnotationScenesRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core.entities.annotation_scene_state import AnnotationSceneState
+from iai_core.entities.dataset_entities import PipelineDataset, TaskDataset
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core.repos import ProjectRepo, SuspendedAnnotationScenesRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 
 def do_nothing(*args, **kwargs):
@@ -65,7 +65,9 @@ class TestDatasetSuspender:
             ) as mock_get_descriptor,
             patch.object(SuspendedAnnotationScenesRepo, "delete_by_id") as mock_delete_descriptor,
             patch.object(
-                PipelineDatasetRepo, "get_or_create", return_value=pipeline_dataset_entity
+                PipelineDatasetRepo,
+                "get_or_create",
+                return_value=pipeline_dataset_entity,
             ) as mock_get_pipeline_dataset,
             patch.object(
                 DatasetSuspender, "suspend_items_by_annotation_scene_ids_for_task"

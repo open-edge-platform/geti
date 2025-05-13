@@ -4,7 +4,7 @@
 import { Key } from 'react';
 
 import { Flex, Item, Picker } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Explanation } from '../../../../core/annotations/prediction.interface';

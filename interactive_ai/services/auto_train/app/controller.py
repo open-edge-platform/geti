@@ -17,15 +17,15 @@ from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, session_context
 from grpc_interfaces.job_submission.client import GRPCJobsClient
 from grpc_interfaces.job_submission.pb.job_service_pb2 import SubmitJobRequest
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
-from sc_sdk.entities.model_storage import NullModelStorage
-from sc_sdk.entities.model_template import ModelTemplateDeprecationStatus
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import ConfigurableParametersRepo, DatasetRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
-from sc_sdk.utils.feature_flags import FeatureFlagProvider
-from sc_sdk.utils.time_utils import now
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.configuration.elements.dataset_manager_parameters import DatasetManagementConfig
+from iai_core.entities.model_storage import NullModelStorage
+from iai_core.entities.model_template import ModelTemplateDeprecationStatus
+from iai_core.entities.project import NullProject
+from iai_core.repos import ConfigurableParametersRepo, DatasetRepo, ModelStorageRepo, ProjectRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.utils.feature_flags import FeatureFlagProvider
+from iai_core.utils.time_utils import now
 
 logger = logging.getLogger(__name__)
 

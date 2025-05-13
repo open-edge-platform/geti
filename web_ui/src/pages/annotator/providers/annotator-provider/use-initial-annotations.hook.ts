@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import isEqual from 'lodash/isEqual';
+import { isEqual } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Task } from '../../../../core/projects/task.interface';

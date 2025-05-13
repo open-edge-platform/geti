@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../../../core/labels/label-resolver';
 import { Label } from '../../../../../core/labels/label.interface';

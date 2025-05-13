@@ -5,9 +5,7 @@ import { useMemo } from 'react';
 
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { AxiosError, isAxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import negate from 'lodash/negate';
+import { isEmpty, isEqual, negate } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';

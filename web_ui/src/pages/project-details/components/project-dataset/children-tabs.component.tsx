@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { GraphChart, Image } from '../../../../assets/icons';
 import { TabItem } from '../../../../shared/components/tabs/tabs.interface';

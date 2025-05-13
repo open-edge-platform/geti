@@ -316,7 +316,7 @@ describe('Label shortcuts', () => {
         await renderApp({ annotations, labels: labels10, addLabel: annotationToolContext.scene.addLabel });
 
         fireEvent.click(screen.getByRole('button', { name: labels3[0].name }));
-        expect(annotationToolContext.scene.addLabel).toBeCalledWith(labels3[0], ['1', '2', '3']);
+        expect(annotationToolContext.scene.addLabel).toHaveBeenCalledWith(labels3[0], ['1', '2', '3']);
     });
 
     it('Select 3 annotations and click label shortcut (one of annotations has that label already) - all of them should have label set', async () => {
@@ -337,7 +337,7 @@ describe('Label shortcuts', () => {
         await renderApp({ annotations, labels: labels3, addLabel: annotationToolContext.scene.addLabel });
 
         fireEvent.click(screen.getByRole('button', { name: labels3[0].name }));
-        expect(annotationToolContext.scene.addLabel).toBeCalledWith(labels3[0], ['1', '2', '3']);
+        expect(annotationToolContext.scene.addLabel).toHaveBeenCalledWith(labels3[0], ['1', '2', '3']);
     });
 
     it('Select 3 annotations and click label shortcut (all of annotations has that label already) - all of them should have label removed', async () => {
@@ -372,7 +372,7 @@ describe('Label shortcuts', () => {
         await renderApp({ annotations, labels: labels3, removeLabels: annotationToolContext.scene.removeLabels });
 
         fireEvent.click(screen.getByRole('button', { name: labels3[0].name }));
-        expect(annotationToolContext.scene.removeLabels).toBeCalledWith([labels3[0]], ['1', '2', '3']);
+        expect(annotationToolContext.scene.removeLabels).toHaveBeenCalledWith([labels3[0]], ['1', '2', '3']);
     });
 
     it('Clicking multiple times on "Anomalous" labels does not removes it', async () => {

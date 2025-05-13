@@ -3,7 +3,7 @@
 
 import { Key, useMemo } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useControls } from 'react-zoom-pan-pinch';
 
 import { FitScreen, Invisible, NoStamp, Redo, Undo, Visible } from '../../../../assets/icons';

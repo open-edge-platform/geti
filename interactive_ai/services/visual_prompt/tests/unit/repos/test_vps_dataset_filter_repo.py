@@ -8,15 +8,15 @@ from freezegun import freeze_time
 from repos.vps_dataset_filter_repo import VPSDatasetFilterRepo
 
 from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_storage_filter_data import (
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage_filter_data import (
     AnnotationSceneFilterData,
     DatasetStorageFilterData,
     MediaFilterData,
 )
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.utils.time_utils import now
+from iai_core.entities.media import ImageExtensions, MediaPreprocessingStatus, VideoExtensions
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.utils.time_utils import now
 
 
 @pytest.fixture
@@ -124,7 +124,13 @@ class TestVPSDatesetFilterRepo:
             ),
         ],
     )
-    def test_get_all(self, dataset_filter_data, request, fxt_project_identifier, fxt_construct_filter_data) -> None:
+    def test_get_all(
+        self,
+        dataset_filter_data,
+        request,
+        fxt_project_identifier,
+        fxt_construct_filter_data,
+    ) -> None:
         # Arrange
         for ds_identifier, filter_data in fxt_construct_filter_data(dataset_filter_data):
             dsf_repo = DatasetStorageFilterRepo(ds_identifier)
@@ -136,8 +142,14 @@ class TestVPSDatesetFilterRepo:
 
         # Assert
         assert len(filter_data) == 2
-        assert filter_data[0].annotation_scene_filter_data.label_ids == [ID("b"), ID("c")]
-        assert filter_data[1].annotation_scene_filter_data.label_ids == [ID("a"), ID("b")]
+        assert filter_data[0].annotation_scene_filter_data.label_ids == [
+            ID("b"),
+            ID("c"),
+        ]
+        assert filter_data[1].annotation_scene_filter_data.label_ids == [
+            ID("a"),
+            ID("b"),
+        ]
 
     @pytest.mark.parametrize(
         "dataset_filter_data, expected_samples, target_dataset_storage",
@@ -282,7 +294,11 @@ class TestVPSDatesetFilterRepo:
             assert set(sample.label_ids) == {ID(lab) for lab in expected_sample["label_ids"]}
 
     def test_write_operation_error(
-        self, fxt_session_ctx, fxt_project_identifier, fxt_dataset_filter_data_factory, fxt_ote_id
+        self,
+        fxt_session_ctx,
+        fxt_project_identifier,
+        fxt_dataset_filter_data_factory,
+        fxt_ote_id,
     ) -> None:
         # Arrange
         repo = VPSDatasetFilterRepo(fxt_project_identifier)

@@ -14,18 +14,18 @@ from geti_fastapi_tools.exceptions import BadRequestException, ProjectNotFoundEx
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID
-from sc_sdk.adapters.adapter import ReferenceAdapter
-from sc_sdk.entities.dataset_storage import DatasetStorage, NullDatasetStorage
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
-from sc_sdk.entities.model_template import TaskFamily, TaskType
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_graph import TaskGraph
-from sc_sdk.factories import ProjectParser, ProjectUpdateParser
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
-from sc_sdk.utils.project_builder import PersistedProjectBuilder, ProjectUpdateError
+from iai_core.adapters.adapter import ReferenceAdapter
+from iai_core.entities.dataset_storage import DatasetStorage, NullDatasetStorage
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelSchema, LabelSchemaView, NullLabelSchema
+from iai_core.entities.model_template import TaskFamily, TaskType
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.factories import ProjectParser, ProjectUpdateParser
+from iai_core.repos import ProjectRepo
+from iai_core.repos.project_repo_helpers import ProjectQueryData
+from iai_core.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.project_builder import PersistedProjectBuilder, ProjectUpdateError
 
 CONNECTIONS = "connections"
 FROM = "from"
@@ -83,11 +83,17 @@ class ProjectManager:
             project_schema,
             tasks_schema,
         ) = PersistedProjectBuilder.build_full_project(
-            creator_id=creator_id, parser_class=project_parser, parser_kwargs=parser_kwargs
+            creator_id=creator_id,
+            parser_class=project_parser,
+            parser_kwargs=parser_kwargs,
         )
 
         # TODO: CVS-89772 call spicedb before storing a project in database
-        SpiceDB().create_project(workspace_id=str(workspace_id), project_id=str(project.id_), creator=creator_id)
+        SpiceDB().create_project(
+            workspace_id=str(workspace_id),
+            project_id=str(project.id_),
+            creator=creator_id,
+        )
         publish_event(
             topic="project_creations",
             body={
@@ -180,7 +186,12 @@ class ProjectManager:
                 # In case of task chain, it's necessary to revisit the local parents too (if any)
                 # because there may be missing shapes (ROIs).
                 label_pointer = label
-                while (parent := cast("Label", new_project_label_schema.get_parent(label=label_pointer))) is not None:
+                while (
+                    parent := cast(
+                        "Label",
+                        new_project_label_schema.get_parent(label=label_pointer),
+                    )
+                ) is not None:
                     if parent.domain != Domain.CLASSIFICATION:
                         affected_labels_local.append(cast("Label", parent))
                     label_pointer = parent
@@ -246,7 +257,11 @@ class ProjectManager:
         if labels_structure_changed:
             # If the label schema changed, then it is necessary to revisit the annotations affected by it
             new_labels = label_schema.get_labels(include_empty=True)
-            logger.info("Label structure changed in project with ID %s: %s", project.id_, new_labels)
+            logger.info(
+                "Label structure changed in project with ID %s: %s",
+                project.id_,
+                new_labels,
+            )
             affected_labels = ProjectManager.compute_labels_affected_by_schema_change(
                 new_project_label_schema=label_schema,
                 new_tasks_label_schemas=tasks_schemas,
@@ -265,7 +280,8 @@ class ProjectManager:
             any_scene_to_revisit = any(scenes_to_revisit_ids_by_storage.values())
             if any_scene_to_revisit:
                 AnnotationManager.publish_annotation_scenes_to_revisit(
-                    project_id=project.id_, scenes_to_revisit_ids_by_storage=scenes_to_revisit_ids_by_storage
+                    project_id=project.id_,
+                    scenes_to_revisit_ids_by_storage=scenes_to_revisit_ids_by_storage,
                 )
 
             # Notify the other microservice about modified annotation scenes
@@ -371,7 +387,9 @@ class ProjectManager:
         permitted_project_ids = tuple(ID(project_id) for project_id in permitted_projects)
         project_repo = ProjectRepo()
         projects = project_repo.get_by_page(
-            query_data=query_data, include_hidden=include_hidden, permitted_projects=permitted_project_ids
+            query_data=query_data,
+            include_hidden=include_hidden,
+            permitted_projects=permitted_project_ids,
         )
         count = project_repo.count_all(include_hidden=include_hidden, permitted_projects=permitted_project_ids)
         return projects, count

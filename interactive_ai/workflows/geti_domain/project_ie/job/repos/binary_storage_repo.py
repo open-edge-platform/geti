@@ -8,8 +8,8 @@ import os
 from collections.abc import Iterable, Iterator
 
 from geti_types import ID
+from iai_core.repos.storage.storage_client import BinaryObjectType
 from minio.deleteobjects import DeleteObject
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
 
 from .base.storage_repo import StorageRepo
 
@@ -35,7 +35,9 @@ class BinaryStorageRepo(StorageRepo):
     def __init__(self, organization_id: ID, workspace_id: ID, project_id: ID) -> None:
         super().__init__()
         self.s3_project_root = self.__get_s3_project_root(
-            organization_id=organization_id, workspace_id=workspace_id, project_id=project_id
+            organization_id=organization_id,
+            workspace_id=workspace_id,
+            project_id=project_id,
         )
 
     @staticmethod
@@ -120,7 +122,9 @@ class BinaryStorageRepo(StorageRepo):
                 os.remove(local_path)
 
     def store_objects_by_type(
-        self, object_type: BinaryObjectType, local_and_remote_paths: Iterable[tuple[str, str]]
+        self,
+        object_type: BinaryObjectType,
+        local_and_remote_paths: Iterable[tuple[str, str]],
     ) -> None:
         """
         Iterates over local files and stores them at the specified remote path.
@@ -140,7 +144,11 @@ class BinaryStorageRepo(StorageRepo):
             # The rest of the structure will be the object name from the project root onward.
             object_name = os.path.join(self.s3_project_root, object_name_from_project_root)
             try:
-                self.minio_client.fput_object(bucket_name=bucket_name, object_name=object_name, file_path=local_path)
+                self.minio_client.fput_object(
+                    bucket_name=bucket_name,
+                    object_name=object_name,
+                    file_path=local_path,
+                )
             except Exception:
                 logger.exception(
                     "Failed to store object at %s to location %s in bucket %s.",
@@ -160,9 +168,15 @@ class BinaryStorageRepo(StorageRepo):
         objects_to_delete = (
             DeleteObject(x.object_name)
             for x in self.minio_client.list_objects(
-                bucket_name=bucket_name, prefix=self.s3_project_root + "/", recursive=True
+                bucket_name=bucket_name,
+                prefix=self.s3_project_root + "/",
+                recursive=True,
             )
         )
         errors = self.minio_client.remove_objects(bucket_name=bucket_name, delete_object_list=objects_to_delete)
         for error in errors:
-            logger.error("Error while deleting object of type '%s' from S3: %s", object_type.name, error)
+            logger.error(
+                "Error while deleting object of type '%s' from S3: %s",
+                object_type.name,
+                error,
+            )

@@ -21,7 +21,7 @@ from communication.helpers.validation_helpers import get_validated_mongo_id
 
 from geti_fastapi_tools.dependencies import setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException
-from sc_sdk.utils.filesystem import MIN_FREE_SPACE_GIB, check_free_space_for_upload
+from iai_core.utils.filesystem import MIN_FREE_SPACE_GIB, check_free_space_for_upload
 
 logger = logging.getLogger(__name__)
 

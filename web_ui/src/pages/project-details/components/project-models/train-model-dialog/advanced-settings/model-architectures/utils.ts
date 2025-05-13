@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import partition from 'lodash/partition';
+import { partition } from 'lodash-es';
 
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';
 

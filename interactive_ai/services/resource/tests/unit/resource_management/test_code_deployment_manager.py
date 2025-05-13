@@ -13,9 +13,9 @@ from repos.code_deployment_repo import CodeDeploymentRepo
 from resource_management.code_deployment_manager import CodeDeploymentManager
 
 from geti_types import ProjectIdentifier
-from sc_sdk.entities.model import Model, ModelFormat
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos.storage.binary_repos import CodeDeploymentBinaryRepo
+from iai_core.entities.model import Model, ModelFormat
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos.storage.binary_repos import CodeDeploymentBinaryRepo
 
 
 class TestCodeDeploymentManager:

@@ -4,7 +4,7 @@
 import { ComponentProps, useMemo } from 'react';
 
 import { Divider, Flex, Grid, minmax, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../../core/media/video.interface';

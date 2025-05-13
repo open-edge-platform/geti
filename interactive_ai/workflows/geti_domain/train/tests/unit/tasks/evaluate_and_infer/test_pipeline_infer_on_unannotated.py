@@ -7,19 +7,19 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose, NullDataset
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.entities.model_template import TaskFamily
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import DatasetRepo, LabelSchemaRepo, ModelRepo
+from iai_core.services import ModelService
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.flow_control import FlowControl
 from jobs_common.utils.dataset_helpers import DatasetHelpers
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import BATCH_INFERENCE_NUM_ASYNC_REQUESTS
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose, NullDataset
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.entities.model_template import TaskFamily
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import DatasetRepo, LabelSchemaRepo, ModelRepo
-from sc_sdk.services import ModelService
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.flow_control import FlowControl
 
 from job.tasks.evaluate_and_infer.pipeline_infer_on_unannotated import (
     MAX_UNANNOTATED_MEDIA,
@@ -72,7 +72,11 @@ class TestPipelineInferenceTask:
             MagicMock(spec=TaskNode),
         )
         mock_tasks_schemas = MagicMock()
-        inferred_dataset_1, cropped_dataset, inferred_dataset_2 = (MagicMock(), MagicMock(), MagicMock())
+        inferred_dataset_1, cropped_dataset, inferred_dataset_2 = (
+            MagicMock(),
+            MagicMock(),
+            MagicMock(),
+        )
         mock_project = MagicMock(tasks=[mock_task_1, mock_crop_task, mock_task_2])
         train_data = fxt_train_data()
 
@@ -106,8 +110,14 @@ class TestPipelineInferenceTask:
         mocked_get_entities.assert_called_once_with()
         mocked_get_active_model.assert_has_calls(
             [
-                call(project_identifier=mock_project.identifier, task_node_id=mock_task_1.id_),
-                call(project_identifier=mock_project.identifier, task_node_id=mock_task_2.id_),
+                call(
+                    project_identifier=mock_project.identifier,
+                    task_node_id=mock_task_1.id_,
+                ),
+                call(
+                    project_identifier=mock_project.identifier,
+                    task_node_id=mock_task_2.id_,
+                ),
             ]
         )
         mocked_get_dataset.assert_called_once_with(
@@ -240,8 +250,14 @@ class TestPipelineInferenceTask:
         mocked_get_entities.assert_called_once_with()
         mocked_get_active_model.assert_has_calls(
             [
-                call(project_identifier=mock_project.identifier, task_node_id=mock_task_1.id_),
-                call(project_identifier=mock_project.identifier, task_node_id=mock_task_2.id_),
+                call(
+                    project_identifier=mock_project.identifier,
+                    task_node_id=mock_task_1.id_,
+                ),
+                call(
+                    project_identifier=mock_project.identifier,
+                    task_node_id=mock_task_2.id_,
+                ),
             ]
         )
         mocked_get_dataset.assert_called_once_with(
@@ -278,7 +294,8 @@ class TestPipelineInferenceTask:
         # Assert
         mocked_get_entities.assert_called_once_with()
         progress_callback.assert_called_once_with(
-            100, "Skipping generation of task-chain predictions because the project has only one task."
+            100,
+            "Skipping generation of task-chain predictions because the project has only one task.",
         )
 
     @pytest.mark.parametrize("first_task", [True, False])
@@ -335,7 +352,9 @@ class TestPipelineInferenceTask:
         mock_batch_inference.run.assert_called_once_with(use_async=True)
         if first_task:
             mocked_clone.assert_called_once_with(
-                dataset=mock_task_output_dataset, dataset_storage=mock_dataset_storage, save_db=True
+                dataset=mock_task_output_dataset,
+                dataset_storage=mock_dataset_storage,
+                save_db=True,
             )
             assert output_dataset == mock_cloned_dataset
         else:

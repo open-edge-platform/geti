@@ -32,14 +32,14 @@ from geti_fastapi_tools.responses import success_response_rest
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
 from grpc_interfaces.job_submission.client import CommunicationError
-from sc_sdk.entities.annotation import NullAnnotationScene
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.entities.model import Model, ModelFormat, NullModel
-from sc_sdk.entities.model_storage import ModelStorageIdentifier
-from sc_sdk.entities.model_test_result import ModelTestResult, NullModelTestResult
-from sc_sdk.entities.project import NullProject
-from sc_sdk.repos import (
+from iai_core.entities.annotation import NullAnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.entities.model import Model, ModelFormat, NullModel
+from iai_core.entities.model_storage import ModelStorageIdentifier
+from iai_core.entities.model_test_result import ModelTestResult, NullModelTestResult
+from iai_core.entities.project import NullProject
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,
@@ -48,7 +48,7 @@ from sc_sdk.repos import (
     ModelTestResultRepo,
     ProjectRepo,
 )
-from sc_sdk.utils.deletion_helpers import DeletionHelpers
+from iai_core.utils.deletion_helpers import DeletionHelpers
 
 logger = logging.getLogger(__name__)
 
@@ -204,7 +204,10 @@ class ModelTestController:
             raise DatasetStorageNotFoundException(dataset_storage_id)
         ann_scene_state_repo = AnnotationSceneStateRepo(dataset_storage_identifier)
 
-        annotation_states = [AnnotationState.ANNOTATED, AnnotationState.PARTIALLY_ANNOTATED]
+        annotation_states = [
+            AnnotationState.ANNOTATED,
+            AnnotationState.PARTIALLY_ANNOTATED,
+        ]
         annotated_image_count = ann_scene_state_repo.count_images_state_for_task(annotation_states, task_node.id_)
         annotated_video_frame_count = ann_scene_state_repo.count_video_frames_state_for_task(
             annotation_states, task_node.id_

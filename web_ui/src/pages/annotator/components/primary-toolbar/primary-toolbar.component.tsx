@@ -4,7 +4,7 @@
 import { Provider } from '@adobe/react-spectrum';
 import { Flex } from '@react-spectrum/layout';
 import { View } from '@react-spectrum/view';
-import partition from 'lodash/partition';
+import { partition } from 'lodash-es';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';
 import { HelpActions } from '../../../../shared/components/header/header-actions/help-actions/help-actions.component';

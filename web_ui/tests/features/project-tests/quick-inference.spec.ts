@@ -3,14 +3,15 @@
 
 import * as path from 'path';
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash-es';
 
 import { expect, test } from '../../fixtures/base-test';
 import { predictionAnnotationsResponse, project } from '../../mocks/classification/mocks';
 import { annotatorUrl } from '../../mocks/segmentation/mocks';
+import { getDirname } from '../../utils/get-dirname';
 import { expectAGlobalAnnotationToExist } from './expect';
 
-const imagePath = path.resolve(__dirname, '../../../src/assets/tests-assets/antelope.png');
+const imagePath = path.resolve(getDirname(import.meta.url), '../../../src/assets/tests-assets/antelope.png');
 const explanationLabel = { name: 'saddled', id: '6101254defba22ca453f11c8' };
 const explanation = {
     // eslint-disable-next-line max-len

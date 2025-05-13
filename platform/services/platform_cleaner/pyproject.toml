@@ -15,7 +15,7 @@ dependencies = [
 
 [tool.uv.sources]
 geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
-grpc_interfaces = { path = "../../../grpc_interfaces", editable = true }
+grpc_interfaces = { path = "../../../libs/grpc_interfaces", editable = true }
 
 [dependency-groups]
 dev = [
@@ -85,7 +85,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 known-first-party = [
     "geti_logger_tools", "datumaro_helper", "jobs_common",
     "k8s_custom_resources", "load_tests", "microservices", "nodes_resource",
-    "platform_models", "sc_sdk", "geti_telemetry_tools", "users_handler", "account_service_client", "migration", "geti_kafka_tools"
+    "platform_models", "iai_core", "geti_telemetry_tools", "users_handler", "account_service_client", "migration", "geti_kafka_tools"
 ]
 # Local folder = Geti folder that often appears as base in import statements, but that doesn't qualify as a package logically
 known-local-folder = [

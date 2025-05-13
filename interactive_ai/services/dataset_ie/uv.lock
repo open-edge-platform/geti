@@ -236,8 +236,8 @@ dependencies = [
     { name = "geti-types" },
     { name = "grpc-interfaces", extra = ["job-submission"] },
     { name = "httpx" },
+    { name = "iai-core" },
     { name = "python-multipart" },
-    { name = "sc-sdk" },
     { name = "uvicorn" },
 ]
 
@@ -257,10 +257,10 @@ requires-dist = [
     { name = "geti-kafka-tools", editable = "../../../libs/kafka_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "logger", "grpc", "fastapi", "kafka"], editable = "../../../libs/telemetry_tools" },
     { name = "geti-types", editable = "../../../libs/types" },
-    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["job-submission"], editable = "../../../libs/grpc_interfaces" },
     { name = "httpx", specifier = "~=0.23" },
+    { name = "iai-core", editable = "../../libs/iai_core_py" },
     { name = "python-multipart", specifier = "==0.0.20" },
-    { name = "sc-sdk", editable = "../../libs/sc_sdk" },
     { name = "uvicorn", specifier = "~=0.27.1" },
 ]
 
@@ -504,7 +504,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -608,6 +608,60 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517 },
+]
+
+[[package]]
+name = "iai-core"
+version = "1.0.0"
+source = { editable = "../../libs/iai_core_py" }
+dependencies = [
+    { name = "attrs" },
+    { name = "cachetools" },
+    { name = "geti-feature-tools" },
+    { name = "geti-types" },
+    { name = "minio" },
+    { name = "networkx" },
+    { name = "numpy" },
+    { name = "omegaconf" },
+    { name = "opencv-python-headless" },
+    { name = "pycountry" },
+    { name = "pymongo", extra = ["aws"] },
+    { name = "scipy" },
+    { name = "shapely" },
+    { name = "urllib3" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "attrs", specifier = "~=24.3" },
+    { name = "cachetools", specifier = "~=5.5" },
+    { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
+    { name = "geti-types", editable = "../../../libs/types" },
+    { name = "minio", specifier = "~=7.1.0" },
+    { name = "networkx", specifier = ">=2.6,<=2.8" },
+    { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },
+    { name = "omegaconf", specifier = "~=2.3" },
+    { name = "opencv-python-headless", specifier = "~=4.10" },
+    { name = "pycountry", specifier = "==22.3.*" },
+    { name = "pymongo", extras = ["aws"], specifier = "~=4.10" },
+    { name = "scipy", specifier = "~=1.14" },
+    { name = "shapely", specifier = "~=2.0" },
+    { name = "urllib3", specifier = ">=1.26" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy", specifier = "~=1.15" },
+    { name = "pre-commit", specifier = "~=4.1" },
+    { name = "pytest", specifier = "~=8.3" },
+    { name = "pytest-freezegun" },
+    { name = "requests", specifier = "~=2.32" },
+    { name = "ruff", specifier = "~=0.11" },
+    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
+    { name = "testfixtures", specifier = "~=7.2" },
+    { name = "types-cachetools" },
+    { name = "types-pyyaml" },
+    { name = "types-requests" },
 ]
 
 [[package]]
@@ -1407,60 +1461,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0f/ec/aa1a215e5c126fe5decbee2e107468f51d9ce190b9763cb649f76bb45938/s3transfer-0.11.4.tar.gz", hash = "sha256:559f161658e1cf0a911f45940552c696735f5c74e64362e515f333ebed87d679", size = 148419 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/86/62/8d3fc3ec6640161a5649b2cddbbf2b9fa39c92541225b33f117c37c5a2eb/s3transfer-0.11.4-py3-none-any.whl", hash = "sha256:ac265fa68318763a03bf2dc4f39d5cbd6a9e178d81cc9483ad27da33637e320d", size = 84412 },
-]
-
-[[package]]
-name = "sc-sdk"
-version = "1.0.0"
-source = { editable = "../../libs/sc_sdk" }
-dependencies = [
-    { name = "attrs" },
-    { name = "cachetools" },
-    { name = "geti-feature-tools" },
-    { name = "geti-types" },
-    { name = "minio" },
-    { name = "networkx" },
-    { name = "numpy" },
-    { name = "omegaconf" },
-    { name = "opencv-python-headless" },
-    { name = "pycountry" },
-    { name = "pymongo", extra = ["aws"] },
-    { name = "scipy" },
-    { name = "shapely" },
-    { name = "urllib3" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "attrs", specifier = "~=24.3" },
-    { name = "cachetools", specifier = "~=5.5" },
-    { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
-    { name = "geti-types", editable = "../../../libs/types" },
-    { name = "minio", specifier = "~=7.1.0" },
-    { name = "networkx", specifier = ">=2.6,<=2.8" },
-    { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },
-    { name = "omegaconf", specifier = "~=2.3" },
-    { name = "opencv-python-headless", specifier = "~=4.10" },
-    { name = "pycountry", specifier = "==22.3.*" },
-    { name = "pymongo", extras = ["aws"], specifier = "~=4.10" },
-    { name = "scipy", specifier = "~=1.14" },
-    { name = "shapely", specifier = "~=2.0" },
-    { name = "urllib3", specifier = ">=1.26" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "mypy", specifier = "~=1.15" },
-    { name = "pre-commit", specifier = "~=4.1" },
-    { name = "pytest", specifier = "~=8.3" },
-    { name = "pytest-freezegun" },
-    { name = "requests", specifier = "~=2.32" },
-    { name = "ruff", specifier = "~=0.11" },
-    { name = "testcontainers", extras = ["mongodb"], specifier = "~=4.9" },
-    { name = "testfixtures", specifier = "~=7.2" },
-    { name = "types-cachetools" },
-    { name = "types-pyyaml" },
-    { name = "types-requests" },
 ]
 
 [[package]]

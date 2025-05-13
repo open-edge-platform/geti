@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Item, Menu, MenuTrigger as MenuTriggerSpectrum, Text, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
+import { isEmpty, isFunction } from 'lodash-es';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { MenuTriggerProps } from '../upload-media/upload-media-button/upload-media-button.interface';

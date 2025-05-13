@@ -13,8 +13,8 @@ from active_learning.algorithms.interface import IScoringFunction, ScoringFuncti
 from active_learning.utils import NullableDataset
 
 from geti_telemetry_tools import unified_tracing
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.utils.classes import classproperty
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.utils.classes import classproperty
 
 
 class FeatureReconstructionError(IScoringFunction):

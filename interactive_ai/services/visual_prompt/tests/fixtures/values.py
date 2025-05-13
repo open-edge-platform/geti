@@ -7,9 +7,9 @@ import numpy as np
 import pytest
 
 from geti_types import ID
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.color import Color
-from sc_sdk.entities.label import Domain
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.color import Color
+from iai_core.entities.label import Domain
 
 
 class DummyValues:

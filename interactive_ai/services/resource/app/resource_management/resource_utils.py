@@ -9,7 +9,7 @@ from communication.kafka_handlers.miscellaneous_kafka_handler import Miscellaneo
 from communication.kafka_handlers.thumb_video_kafka_handler import ThumbVideoKafkaHandler
 
 from geti_kafka_tools import EventProducer
-from sc_sdk.repos.base.database_client import DatabaseClient
+from iai_core.repos.base.database_client import DatabaseClient
 
 logger = logging.getLogger(__name__)
 

@@ -6,11 +6,11 @@ import pytest
 from tests.fixtures.values import DummyValues, IDOffsets
 
 from geti_types import ProjectIdentifier
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_graph import TaskGraph
-from sc_sdk.repos import ProjectRepo
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.project import Project
+from iai_core.entities.task_graph import TaskGraph
+from iai_core.repos import ProjectRepo
+from iai_core.repos.project_repo_helpers import ProjectQueryData, ProjectSortBy, ProjectSortDirection
 
 
 @pytest.fixture

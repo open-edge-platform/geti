@@ -15,9 +15,9 @@ from geti_telemetry_tools.metrics import (
     videos_resolution_histogram,
 )
 from geti_types import DatasetStorageIdentifier, ProjectIdentifier
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.video import Video
-from sc_sdk.repos import ImageRepo, ProjectRepo, VideoRepo
+from iai_core.entities.image import Image
+from iai_core.entities.video import Video
+from iai_core.repos import ImageRepo, ProjectRepo, VideoRepo
 
 logger = logging.getLogger(__name__)
 

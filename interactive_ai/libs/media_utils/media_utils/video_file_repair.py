@@ -4,7 +4,7 @@
 import logging
 import os
 
-from sc_sdk.repos.storage.binary_repos import VideoBinaryRepo
+from iai_core.repos.storage.binary_repos import VideoBinaryRepo
 
 from media_utils.video_decoder import VideoDecoder
 from media_utils.video_frame_reader import VideoFrameReader
@@ -42,7 +42,11 @@ class VideoFileRepair:
         is_valid_video_file = False
         try:
             # Read last frame
-            VideoFileRepair._get_frame(video_binary_repo=video_binary_repo, filename=filename, frame_index=frame_index)
+            VideoFileRepair._get_frame(
+                video_binary_repo=video_binary_repo,
+                filename=filename,
+                frame_index=frame_index,
+            )
             is_valid_video_file = True
         except Exception:
             # Ignore exception. This function will return false if the video is not valid
@@ -108,7 +112,9 @@ class VideoFileRepair:
             # Retry reading last frame again:
             video_info = VideoDecoder.get_video_information(str(video_binary_repo.get_path_or_presigned_url(filename)))
             VideoFileRepair._get_frame(
-                video_binary_repo=video_binary_repo, filename=filename, frame_index=video_info.total_frames - 1
+                video_binary_repo=video_binary_repo,
+                filename=filename,
+                frame_index=video_info.total_frames - 1,
             )
             logger.info(f"Repairing video at {filename} was successful.")
 

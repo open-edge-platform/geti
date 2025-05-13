@@ -12,7 +12,7 @@ data:
             "authority": "/dex",
             "clientId": "web_ui"
         },
-        "docsUrl": "https://docs.geti.intel.com/on-prem/2.6/",
+        "docsUrl": "https://docs.geti.intel.com/",
         "dataPlaneUrl": null,
         "controlPlaneUrl": null
     }
@@ -24,7 +24,7 @@ data:
             "authority": "/dex",
             "clientId": "web_ui"
         },
-        "docsUrl": "https://docs.geti.intel.com/on-prem/2.6/",
+        "docsUrl": "https://docs.geti.intel.com/",
         "dataPlaneUrl": null,
         "controlPlaneUrl": null
     }

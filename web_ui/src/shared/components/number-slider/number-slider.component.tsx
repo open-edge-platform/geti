@@ -5,7 +5,7 @@ import { ComponentProps } from 'react';
 
 import { DialogTrigger, Flex, Slider, View } from '@adobe/react-spectrum';
 import { Text } from '@react-spectrum/text';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { ChevronDownLight } from '../../../assets/icons';
 import { ActionButton } from '../button/button.component';

@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';

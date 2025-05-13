@@ -4,8 +4,7 @@
 import { useMemo } from 'react';
 
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
-import range from 'lodash/range';
+import { isEmpty, range } from 'lodash-es';
 
 import { AdvancedFilterOptions } from '../../../../../core/media/media-filter.interface';
 import { MediaItem } from '../../../../../core/media/media.interface';

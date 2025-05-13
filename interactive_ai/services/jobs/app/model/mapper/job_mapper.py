@@ -25,10 +25,10 @@ from model.job import (
 from model.job_state import JobGpuRequestState, JobState, JobStateGroup, JobTaskState
 from model.telemetry import Telemetry
 
-from sc_sdk.repos.mappers.mongodb_mapper_interface import IMapperSimple
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
+from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.primitive_mapper import DatetimeToMongo
+from iai_core.repos.mappers.mongodb_mappers.session_mapper import SessionToMongo
 
 
 def _opt(document: dict, key: str) -> Any | None:
@@ -339,7 +339,10 @@ class JobGpuRequestMapper(IMapperSimple[JobGpuRequest, dict]):
         :param instance: MongoDB dict
         :return JobGpuRequest entity
         """
-        return JobGpuRequest(num_required=instance["num_required"], state=JobGpuRequestState(instance["state"]))
+        return JobGpuRequest(
+            num_required=instance["num_required"],
+            state=JobGpuRequestState(instance["state"]),
+        )
 
 
 class JobResourceMapper(IMapperSimple[JobResource, dict]):

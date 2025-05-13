@@ -9,8 +9,8 @@ import itertools
 from typing import Any
 
 from geti_types import ID
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.factories.project_parser import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
+from iai_core.entities.model_template import TaskType
+from iai_core.factories.project_parser import ProjectParser, ProjectParserInternalError, ProjectUpdateParser
 
 
 class CustomTestProjectParser(ProjectParser):
@@ -98,7 +98,12 @@ class CustomTestProjectUpdateParser(CustomTestProjectParser, ProjectUpdateParser
         connections = []
         tasks_names = tuple(self.tasks_dict.keys())
         for task_from, task_to in tuple(itertools.pairwise(tasks_names)):
-            connections.append((ID(self.tasks_dict[task_from]["id"]), ID(self.tasks_dict[task_to]["id"])))
+            connections.append(
+                (
+                    ID(self.tasks_dict[task_from]["id"]),
+                    ID(self.tasks_dict[task_to]["id"]),
+                )
+            )
         return tuple(connections)
 
     def get_task_id_by_name(self, task_name: str) -> ID:

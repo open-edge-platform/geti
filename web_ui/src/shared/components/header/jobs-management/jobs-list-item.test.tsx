@@ -155,7 +155,7 @@ describe('jobs list item', (): void => {
 
         fireEvent.click(screen.getByRole('button', { name: 'download dataset' }));
 
-        expect(downloadFile).toBeCalledWith(downloadUrl, 'export_dataset');
+        expect(downloadFile).toHaveBeenCalledWith(downloadUrl, 'export_dataset');
     });
 
     it('correctly downloads project', async (): Promise<void> => {
@@ -176,7 +176,7 @@ describe('jobs list item', (): void => {
 
         fireEvent.click(screen.getByRole('button', { name: 'download project' }));
 
-        expect(downloadFile).toBeCalledWith(downloadUrl, 'some_name.zip');
+        expect(downloadFile).toHaveBeenCalledWith(downloadUrl, 'some_name.zip');
     });
 
     it('should properly render a skeleton loader if the user is cancelling or deleting the job', async (): Promise<void> => {

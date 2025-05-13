@@ -29,7 +29,7 @@ from grpc_interfaces.job_submission.pb.job_service_pb2 import (
     ListJobsResponse,
     SubmitJobRequest,
 )
-from sc_sdk.utils.constants import DEFAULT_USER_NAME
+from iai_core.utils.constants import DEFAULT_USER_NAME
 
 DUMMY_USER = ID("dummy_user")
 DUMMY_KEY = json.dumps({"key2": "value2", "key1": "value1"})
@@ -77,14 +77,26 @@ class TestGRPCJobService:
     )
     @pytest.mark.parametrize(
         "cost, cost_requests",
-        [(None, None), ([SubmitJobRequest.CostRequest(unit="images", amount=100)], {"images": 100})],
+        [
+            (None, None),
+            (
+                [SubmitJobRequest.CostRequest(unit="images", amount=100)],
+                {"images": 100},
+            ),
+        ],
     )
     @pytest.mark.parametrize(
         "cancellable",
         [True, False],
     )
     def test_submit(
-        self, fxt_grpc_job_service, fxt_grpc_context, duplicate_policy, cost, cost_requests, cancellable
+        self,
+        fxt_grpc_job_service,
+        fxt_grpc_context,
+        duplicate_policy,
+        cost,
+        cost_requests,
+        cancellable,
     ) -> None:
         priority = 1
         dummy_workspace_id = ID("dummy_workspace_id")
@@ -355,7 +367,8 @@ class TestGRPCJobService:
             author_uid=None,
             start_time=time_filter,
             acl=JobsAcl(
-                permitted_projects=[], workspace_jobs_author=None if view_all_workspace_jobs else dummy_author_uid
+                permitted_projects=[],
+                workspace_jobs_author=None if view_all_workspace_jobs else dummy_author_uid,
             ),
             workspace_id=dummy_workspace_id,
         )
@@ -481,7 +494,8 @@ class TestGRPCJobService:
             sort_by=sort_by,
             sort_direction=sort_direction,
             acl=JobsAcl(
-                permitted_projects=[], workspace_jobs_author=None if view_all_workspace_jobs else dummy_author_uid
+                permitted_projects=[],
+                workspace_jobs_author=None if view_all_workspace_jobs else dummy_author_uid,
             ),
         )
         mock_count.assert_called_with(
@@ -492,7 +506,8 @@ class TestGRPCJobService:
             start_time=time_filter,
             project_id=dummy_project_id,
             acl=JobsAcl(
-                permitted_projects=[], workspace_jobs_author=None if view_all_workspace_jobs else dummy_author_uid
+                permitted_projects=[],
+                workspace_jobs_author=None if view_all_workspace_jobs else dummy_author_uid,
             ),
         )
         mock_spice_db_get_user_projects.assert_called_once_with(

@@ -7,7 +7,7 @@ import logging
 import os
 
 from geti_types import ID
-from sc_sdk.repos import ProjectRepo
+from iai_core.repos import ProjectRepo
 
 PROJECT_LOCK_TIME = int(os.environ.get("PROJECT_LOCK_TIME", 8 * 60 * 60))
 logger = logging.getLogger(__name__)
@@ -24,7 +24,9 @@ def lock_project(job_type: str, project_id: ID) -> None:
         ProjectRepo().mark_locked(owner=job_type, project_id=project_id, duration_seconds=PROJECT_LOCK_TIME)
     except ValueError:
         logger.debug(
-            "Project with ID '%s' is already locked for '%s' job. Cannot decrease the lock time.", project_id, job_type
+            "Project with ID '%s' is already locked for '%s' job. Cannot decrease the lock time.",
+            project_id,
+            job_type,
         )
         return
     logger.debug(

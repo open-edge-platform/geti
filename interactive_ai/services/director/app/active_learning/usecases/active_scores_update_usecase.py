@@ -11,8 +11,8 @@ from active_learning.interactors import ActiveMapper
 from geti_fastapi_tools.exceptions import DatasetStorageNotFoundException
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, ProjectIdentifier
-from sc_sdk.entities.dataset_storage import NullDatasetStorage
-from sc_sdk.repos import DatasetStorageRepo
+from iai_core.entities.dataset_storage import NullDatasetStorage
+from iai_core.repos import DatasetStorageRepo
 
 logger = logging.getLogger(__name__)
 

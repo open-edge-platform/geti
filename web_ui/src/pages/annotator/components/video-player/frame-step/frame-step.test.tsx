@@ -4,7 +4,7 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { annotatorRender as render } from '../../../test-utils/annotator-render';
 import { FrameStep } from './frame-step.component';

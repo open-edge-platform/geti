@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { formatJobsCreationTime, isNonEmptyString, pluralize } from '../../../utils';

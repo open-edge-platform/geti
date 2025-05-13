@@ -1,9 +1,9 @@
 # Platform services
 platform/services/credit:
   - platform/services/credit/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/credit_system/**
-  - grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/account_service/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
@@ -15,9 +15,9 @@ platform/services/observability:
 platform/services/onboarding:
   - platform/services/onboarding/**
   - libs/telemetry_tools/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/credit_system/**
-  - grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/account_service/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
@@ -30,16 +30,16 @@ platform/services/user_directory:
   - platform/services/user_directory/**
   - libs/telemetry_tools/**
   - libs/spicedb_tools/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/account:
   - platform/services/account/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/account_service/**
-  - grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/credit_system/**
   - Makefile.shared-go
   - Makefile.shared
   - .github/workflows/component.yml
@@ -48,16 +48,16 @@ platform/services/initial_user:
   - platform/libs/users_handler/**
   - libs/telemetry_tools/**
   - libs/spicedb_tools/**
-  - grpc_interfaces/account_service/**
-  - grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 platform/services/platform_cleaner:
   - platform/services/platform_cleaner/**
   - libs/telemetry_tools/**
-  - grpc_interfaces/account_service/**
-  - grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/account_service/**
+  - libs/grpc_interfaces/pyproject.toml
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
@@ -65,7 +65,7 @@ platform/services/platform_cleaner:
 # IAI Services
 interactive_ai/services/auto_train:
   - interactive_ai/services/auto_train/**
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -74,9 +74,9 @@ interactive_ai/services/auto_train:
   - .github/workflows/component.yml
 interactive_ai/services/dataset_ie:
   - interactive_ai/services/dataset_ie/**
-  - interactive_ai/libs/sc_sdk/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/job_submission/**
+  - interactive_ai/libs/iai_core_py/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/job_submission/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -87,9 +87,9 @@ interactive_ai/services/dataset_ie:
   - .github/workflows/component.yml
 interactive_ai/services/director:
   - interactive_ai/services/director/**
-  - interactive_ai/libs/sc_sdk/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/job_submission/**
+  - interactive_ai/libs/iai_core_py/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/job_submission/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -102,20 +102,20 @@ interactive_ai/services/director:
 interactive_ai/services/inference_gateway:
   - interactive_ai/services/inference_gateway/**
   - interactive_ai/libs/iai_core_go/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/model_mesh/**
-  - grpc_interfaces/model_registration/**
-  - grpc_interfaces/predict/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/model_mesh/**
+  - libs/grpc_interfaces/model_registration/**
+  - libs/grpc_interfaces/predict/**
   - Makefile.shared-go
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/jobs:
   - interactive_ai/services/jobs/**
-  - interactive_ai/libs/sc_sdk/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/credit_system/**
-  - grpc_interfaces/job_submission/**
-  - grpc_interfaces/job_update/**
+  - interactive_ai/libs/iai_core_py/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/credit_system/**
+  - libs/grpc_interfaces/job_submission/**
+  - libs/grpc_interfaces/job_update/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/kafka_tools/**
@@ -139,16 +139,16 @@ interactive_ai/services/mlflow_geti_store:
   - .github/workflows/component.yml
 interactive_ai/services/model_registration:
   - interactive_ai/services/model_registration/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/model_registration/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/model_registration/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
 interactive_ai/services/project_ie:
   - interactive_ai/services/project_ie/**
-  - interactive_ai/libs/sc_sdk/**
-  - grpc_interfaces/pyproject.toml
-  - grpc_interfaces/job_submission/**
+  - interactive_ai/libs/iai_core_py/**
+  - libs/grpc_interfaces/pyproject.toml
+  - libs/grpc_interfaces/job_submission/**
   - libs/types/**
   - libs/telemetry_tools/**
   - libs/feature_tools/**
@@ -158,7 +158,7 @@ interactive_ai/services/project_ie:
   - .github/workflows/component.yml
 interactive_ai/services/resource:
   - interactive_ai/services/resource/**
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/types/**
   - libs/telemetry_tools/**
@@ -170,7 +170,7 @@ interactive_ai/services/resource:
   - .github/workflows/component.yml
 interactive_ai/services/visual_prompt:
   - interactive_ai/services/visual_prompt/**
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/types/**
   - libs/telemetry_tools/**
@@ -193,7 +193,7 @@ interactive_ai/migration_job:
 # Workflows
 interactive_ai/workflows/geti_domain/common:
   - interactive_ai/workflows/geti_domain/common/**
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/k8s_tools/**
   - libs/kafka_tools/**
@@ -206,7 +206,7 @@ interactive_ai/workflows/geti_domain/dataset_ie:
   - interactive_ai/workflows/geti_domain/dataset_ie/**
   - interactive_ai/workflows/geti_domain/common/jobs_common
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/datumaro_conversion
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/k8s_tools/**
   - libs/kafka_tools/**
@@ -221,7 +221,7 @@ interactive_ai/workflows/geti_domain/project_ie:
   - interactive_ai/workflows/geti_domain/common/jobs_common
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/datumaro_conversion
   - interactive_ai/data_migration/**
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/k8s_tools/**
   - libs/kafka_tools/**
@@ -235,7 +235,7 @@ interactive_ai/workflows/geti_domain/model_test:
   - interactive_ai/workflows/geti_domain/model_test/**
   - interactive_ai/workflows/geti_domain/common/jobs_common
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/evaluation
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/k8s_tools/**
   - libs/telemetry_tools/**
@@ -248,7 +248,7 @@ interactive_ai/workflows/geti_domain/optimize:
   - interactive_ai/workflows/geti_domain/common/jobs_common
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/evaluation
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/shard_dataset
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/k8s_tools/**
   - libs/telemetry_tools/**
@@ -262,7 +262,7 @@ interactive_ai/workflows/geti_domain/train:
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/evaluation
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/mlflow
   - interactive_ai/workflows/geti_domain/common/jobs_common_extras/shard_dataset
-  - interactive_ai/libs/sc_sdk/**
+  - interactive_ai/libs/iai_core_py/**
   - interactive_ai/libs/media_utils/**
   - libs/k8s_tools/**
   - libs/telemetry_tools/**
@@ -283,11 +283,6 @@ interactive_ai/tests/e2e:
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
-
-# gRPC interfaces
-grpc_interfaces:
-  - grpc_interfaces/**
-  - libs/types/**
 
 # Web UI
 web_ui:

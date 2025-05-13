@@ -10,7 +10,6 @@ ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
 COPY --link --from=libs . libs
-COPY --link --from=grpc_interfaces . grpc_interfaces
 
 WORKDIR /platform/services/onboarding_service
 

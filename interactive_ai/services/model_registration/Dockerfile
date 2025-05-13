@@ -9,7 +9,7 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-COPY --link --from=grpc_interfaces . grpc_interfaces
+COPY --link --from=libs . libs
 
 WORKDIR /interactive_ai/services/model_registration
 

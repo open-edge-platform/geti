@@ -9,8 +9,8 @@ from usecases.query_builder import MatchedFramesVideoIdentifier, MediaQueryResul
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, MediaIdentifierEntity, MediaType
-from sc_sdk.entities.video import Video
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationStatePerTask
+from iai_core.entities.video import Video
+from iai_core.utils.annotation_scene_state_helper import AnnotationStatePerTask
 
 
 class FilteredDatasetRESTView:

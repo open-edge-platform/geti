@@ -8,14 +8,14 @@ from enum import IntEnum, auto
 from typing import TYPE_CHECKING, cast
 
 from geti_types import ID
+from iai_core.entities.model_template import task_type_to_label_domain
+from iai_core.repos import LabelSchemaRepo
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
 from jobs_common.tasks.utils.progress import publish_metadata_update, task_progress
 from jobs_common.tasks.utils.secrets import SECRETS, env_vars
 from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common_extras.datumaro_conversion.convert_utils import ConvertUtils
-from sc_sdk.entities.model_template import task_type_to_label_domain
-from sc_sdk.repos import LabelSchemaRepo
 
 from job.repos.data_repo import ImportDataRepo
 from job.tasks import IMPORT_EXPORT_TASK_POD_SPEC
@@ -25,7 +25,7 @@ from job.utils.import_utils import ImportUtils
 from job.utils.progress_utils import WeightedProgressReporter
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core.entities.label import Label
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,10 @@ def import_dataset_to_project(
     # Handle mapping to the empty label
     ConvertUtils.filter_empty_label(dm_dataset, labels_map)
 
-    progress_reporter.reset_step(step_index=_Steps.IDX_POPULATE_ITEMS, step_message="Populating media and annotations")
+    progress_reporter.reset_step(
+        step_index=_Steps.IDX_POPULATE_ITEMS,
+        step_message="Populating media and annotations",
+    )
 
     # init util funcs
     get_sc_label = ConvertUtils.get_labels_mapper_from_labels_map(dm_dataset.categories(), labels_map)

@@ -3,8 +3,7 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { isEqual, isNil } from 'lodash-es';
 
 import { getShapesBoundingBox } from '../../../core/annotations/math';
 import { useAnnotationScene } from '../providers/annotation-scene-provider/annotation-scene-provider.component';

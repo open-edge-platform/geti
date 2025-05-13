@@ -13,9 +13,9 @@ from typing import Any
 import datumaro as dm
 from datumaro import ImportErrorPolicy, errors
 from datumaro.components.errors import AnnotationImportError, ItemImportError, MultipleFormatsMatchError
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.model_template import TaskType, task_type_to_label_domain
-from sc_sdk.entities.project import Project
+from iai_core.entities.label import Domain
+from iai_core.entities.model_template import TaskType, task_type_to_label_domain
+from iai_core.entities.project import Project
 
 from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import (
@@ -188,7 +188,9 @@ class ImportUtils:
         return has_tree_structure or (len(dm_label_groups) > 1 and not is_multi_label_classification)
 
     @staticmethod
-    def _create_import_error_details(parsing_errors: list[Exception]) -> ImportErrorDetail:
+    def _create_import_error_details(
+        parsing_errors: list[Exception],
+    ) -> ImportErrorDetail:
         """
         Create import error details data object and initialize it with the number of parsing errors
         encountered when parsing dataset
@@ -216,11 +218,14 @@ class ImportUtils:
                     str(type(parse_error)),
                 )
         return ImportErrorDetail(
-            n_item_parsing_errors=n_item_parse_error, n_annotation_parsing_errors=n_annotation_parse_errors
+            n_item_parsing_errors=n_item_parse_error,
+            n_annotation_parsing_errors=n_annotation_parse_errors,
         )
 
     @staticmethod
-    def _get_label_name_to_group(label_groups: list[dm.LabelCategories.LabelGroup]) -> dict[str, str]:
+    def _get_label_name_to_group(
+        label_groups: list[dm.LabelCategories.LabelGroup],
+    ) -> dict[str, str]:
         """
         Get a mapping between label names and label group names
 
@@ -261,7 +266,11 @@ class ImportUtils:
                 number_of_labels["label"] += 1
             elif ann.type == dm.AnnotationType.bbox:
                 number_of_labels["bbox"] += 1
-            elif ann.type in [dm.AnnotationType.mask, dm.AnnotationType.polygon, dm.AnnotationType.ellipse]:
+            elif ann.type in [
+                dm.AnnotationType.mask,
+                dm.AnnotationType.polygon,
+                dm.AnnotationType.ellipse,
+            ]:
                 number_of_labels["mask"] += 1
 
         return number_of_labels, multi_label_flag

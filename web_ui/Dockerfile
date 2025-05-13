@@ -30,7 +30,7 @@ COPY --link package.json ./
 COPY --link package-lock.json ./
 RUN npm ci --audit=false
 
-COPY --link ./eslint.config.mjs ./
+COPY --link ./eslint.config.js ./
 COPY --link ./.prettierrc ./
 COPY --link ./tsconfig.json ./
 COPY --link ./rsbuild.config.ts ./

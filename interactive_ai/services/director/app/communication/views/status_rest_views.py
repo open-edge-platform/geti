@@ -14,15 +14,17 @@ from coordination.dataset_manager.missing_annotations_helper import MissingAnnot
 
 from geti_types import ID
 from grpc_interfaces.job_submission.pb.job_service_pb2 import JobResponse
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
 
 logger = logging.getLogger(__name__)
 
 
 class StatusRestViews:
     @staticmethod
-    def incremental_learning_status_to_rest(incremental_learning_status: dict[ID, MissingAnnotations]) -> dict:
+    def incremental_learning_status_to_rest(
+        incremental_learning_status: dict[ID, MissingAnnotations],
+    ) -> dict:
         """
         Returns REST view of a dictionary containing the MissingAnnotations for every task
 

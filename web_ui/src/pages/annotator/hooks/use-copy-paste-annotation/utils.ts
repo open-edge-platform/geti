@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import intersectionBy from 'lodash/intersectionBy';
-import isEmpty from 'lodash/isEmpty';
-import isObject from 'lodash/isObject';
+import { intersectionBy, isEmpty, isObject } from 'lodash-es';
 
 import { Annotation, AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { Point } from '../../../../core/annotations/shapes.interface';

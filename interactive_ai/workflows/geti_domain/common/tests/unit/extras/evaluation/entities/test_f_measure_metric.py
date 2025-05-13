@@ -3,23 +3,28 @@
 
 import pytest
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import BarMetricsGroup, MultiScorePerformance, ScoreMetric
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metrics import BarMetricsGroup, MultiScorePerformance, ScoreMetric
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
 
 from jobs_common_extras.evaluation.entities.f_measure_metric import FMeasureMetric
 
 
 @pytest.fixture
 def fxt_empty_label():
-    yield Label(name="label_empty", domain=Domain.DETECTION, is_empty=True, id_=ID("label_empty_id"))
+    yield Label(
+        name="label_empty",
+        domain=Domain.DETECTION,
+        is_empty=True,
+        id_=ID("label_empty_id"),
+    )
 
 
 @pytest.fixture
@@ -38,7 +43,9 @@ def fxt_label_schema(fxt_labels):
     label_group = LabelGroup(labels=[label_a, label_b], name="dummy detection label group")
     label_schema.add_group(label_group)
     empty_label_group = LabelGroup(
-        labels=[empty_label], name="dummy detection empty group", group_type=LabelGroupType.EMPTY_LABEL
+        labels=[empty_label],
+        name="dummy detection empty group",
+        group_type=LabelGroupType.EMPTY_LABEL,
     )
     label_schema.add_group(empty_label_group)
     yield label_schema
@@ -221,7 +228,11 @@ def fxt_prediction_dataset(fxt_media_factory, fxt_predicted_bbox):
 @pytest.mark.JobsComponent
 class TestFMeasureMetric:
     def test_f_measure_metric_basic(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_overall_scores
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_overall_scores,
     ) -> None:
         metric = FMeasureMetric(
             ground_truth_dataset=fxt_ground_truth_dataset,
@@ -231,7 +242,12 @@ class TestFMeasureMetric:
         assert metric.f_measure.score == pytest.approx(fxt_overall_scores["f_measure"], 0.01)
 
     def test_get_performance(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_labels, fxt_overall_scores
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_labels,
+        fxt_overall_scores,
     ) -> None:
         # Arrange
         label_a, label_b, _ = fxt_labels
@@ -265,7 +281,12 @@ class TestFMeasureMetric:
         assert f_measure_label_b.score == pytest.approx(fxt_overall_scores[label_b], 0.01)
 
     def test_get_per_media_scores(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_labels, fxt_media_factory
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_labels,
+        fxt_media_factory,
     ) -> None:
         # Arrange
         metric = FMeasureMetric(
@@ -304,7 +325,12 @@ class TestFMeasureMetric:
 
         # Check incorrect predictions (indices [4, 8, 9])
         incorrect_pred_media_scores = [per_media_scores[fxt_media_factory(i).media_identifier] for i in [4, 8, 9]]
-        for media_f_measure, label_a_score, label_b_score, empty_label_score in incorrect_pred_media_scores:
+        for (
+            media_f_measure,
+            label_a_score,
+            label_b_score,
+            empty_label_score,
+        ) in incorrect_pred_media_scores:
             assert media_f_measure.value == 0
             assert label_a_score.value == 0
             assert label_b_score.value == 0
@@ -341,7 +367,11 @@ class TestFMeasureMetric:
         assert empty_label_score.score == pytest.approx(fxt_overall_scores[empty_label], 0.01)
 
     def test_score_with_no_object_class(
-        self, fxt_no_object_dataset_item_factory, fxt_media_factory, fxt_label_schema, fxt_empty_label
+        self,
+        fxt_no_object_dataset_item_factory,
+        fxt_media_factory,
+        fxt_label_schema,
+        fxt_empty_label,
     ) -> None:
         # Arrange
         # Create ground truth and prediction datasets with 10 items with no objects class

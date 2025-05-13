@@ -1,11 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+import iai_core.configuration.helper as otx_config_helper
 import pytest
-import sc_sdk.configuration.helper as otx_config_helper
 from _pytest.fixtures import FixtureRequest
-from sc_sdk.algorithms import ModelTemplateList
-from sc_sdk.configuration.elements.default_model_parameters import DefaultModelParameters
-from sc_sdk.entities.model_template import (
+from iai_core.algorithms import ModelTemplateList
+from iai_core.configuration.elements.default_model_parameters import DefaultModelParameters
+from iai_core.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,

@@ -5,8 +5,8 @@ from unittest.mock import patch
 import pytest
 from bson import ObjectId
 from geti_types import ID
+from iai_core.versioning.data_version import DataVersion
 from migration.utils import ChangesetMetadata, IMigrationScript, MongoDBConnection, VersionManager
-from sc_sdk.versioning.data_version import DataVersion
 
 from job.entities.exceptions import ProjectUpgradeFailedException
 from job.usecases.data_migration_usecase import DataMigrationUseCase
@@ -105,7 +105,11 @@ class TestDataMigrationUseCase:
 
         # Act
         with (
-            patch.object(VersionManager, "find_all_minor_releases_in_range", return_value=intermedia_versions),
+            patch.object(
+                VersionManager,
+                "find_all_minor_releases_in_range",
+                return_value=intermedia_versions,
+            ),
             patch.object(
                 VersionManager,
                 "get_migration_script_cls_by_version",
@@ -141,6 +145,10 @@ class TestDataMigrationUseCase:
         with (
             pytest.raises(ProjectUpgradeFailedException),
             patch.object(VersionManager, "find_all_minor_releases_in_range", return_value=["1.0"]),
-            patch.object(VersionManager, "get_changeset_metadata_by_version", side_effect=ValueError),
+            patch.object(
+                VersionManager,
+                "get_changeset_metadata_by_version",
+                side_effect=ValueError,
+            ),
         ):
             DataMigrationUseCase.upgrade_project_to_current_version(project_id=project_id, version=import_version)
