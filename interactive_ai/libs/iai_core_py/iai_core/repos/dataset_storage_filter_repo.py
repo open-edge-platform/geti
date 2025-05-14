@@ -172,7 +172,7 @@ class DatasetStorageFilterRepo(DatasetStorageBasedSessionRepo[DatasetStorageFilt
         data_filter = self.preliminary_query_match_filter(access_mode=QueryAccessMode.WRITE)
         data_filter["media_identifier.media_id"] = IDToMongo.forward(media_id)
 
-        self._collection.update_one(filter=data_filter, update={"$set": {"preprocessing": status.value}}, upsert=False)
+        self._collection.update_many(filter=data_filter, update={"$set": {"preprocessing": status.value}}, upsert=False)
 
     def delete_all_by_media_id(self, media_id: ID) -> None:
         """
