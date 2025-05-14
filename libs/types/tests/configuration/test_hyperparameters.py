@@ -112,9 +112,7 @@ class TestHyperparameters:
             == expected_params.dataset_preparation.augmentation.random_horizontal_flip
         )
 
-        if params.training.early_stopping:
-            assert params.training.early_stopping.patience == expected_params.training.early_stopping.patience
-
+        assert params.training.early_stopping == expected_params.training.early_stopping
         assert params.training.max_epochs == expected_params.training.max_epochs
         assert params.training.learning_rate == expected_params.training.learning_rate
 
