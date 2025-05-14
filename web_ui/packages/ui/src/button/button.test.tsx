@@ -1,11 +1,17 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ReactNode } from 'react';
+
+import { darkTheme, Provider } from '@adobe/react-spectrum';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter as Router, useLocation } from 'react-router-dom';
 
-import { ThemeProvider } from '../../../theme/theme-provider.component';
 import { Button } from './button.component';
+
+const ThemeProvider = ({ children }: { children: ReactNode }) => {
+    return <Provider theme={darkTheme}>{children}</Provider>;
+};
 
 describe('Button', () => {
     it('renders a button', async () => {
