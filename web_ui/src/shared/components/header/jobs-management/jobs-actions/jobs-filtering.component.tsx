@@ -18,7 +18,7 @@ import { JobsFilterField } from '../jobs-filter-field.component';
 import { JobsTypeFilterField } from './job-types-filter-field.component';
 import { FiltersType } from './jobs-dialog.interface';
 
-interface JobsFilteringDefaultValuesProps {
+export interface JobsFilteringDefaultValuesProps {
     projectId: string | undefined;
     userId: string | undefined;
     jobTypes: JobType[];

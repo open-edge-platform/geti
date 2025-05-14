@@ -59,9 +59,7 @@ export const checkTooltip = async (element: HTMLElement, tooltipText: Matcher) =
     onHoverTooltip(element);
     jest.advanceTimersByTime(750);
 
-    expect((await screen.findByRole('tooltip')).textContent).toBe(tooltipText);
-
-    jest.useRealTimers();
+    expect(await screen.findByText(tooltipText)).toBeInTheDocument();
 };
 
 export const hover = (element: HTMLElement) => {

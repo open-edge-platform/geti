@@ -44,7 +44,7 @@ const DEFAULT_JOBS_COUNT: JobCount = {
 
 export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialogProps): JSX.Element => {
     const RANGE_FILTER_TOOLTIP =
-        'This component filters jobs by start date of the job. For example in you select range' +
+        'This component filters jobs by start date. For example if you select a range' +
         ' between yesterday and today it will show jobs started yesterday or today.';
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
     const { useGetJobs } = useJobs({ organizationId, workspaceId });
