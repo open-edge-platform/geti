@@ -16,8 +16,8 @@ class TrainingConfigurationToMongo(IMapperSimple[TrainingConfiguration, dict]):
         doc = {
             "_id": IDToMongo.forward(instance.id_),
             "task_id": IDToMongo.forward(instance.task_id),
-            "global_parameters": instance.global_parameters.model_dump_json(),
-            "hyperparameters": instance.hyperparameters.model_dump_json(),
+            "global_parameters": instance.global_parameters.model_dump(),
+            "hyperparameters": instance.hyperparameters.model_dump(),
         }
         if instance.model_manifest_id:
             doc["model_manifest_id"] = instance.model_manifest_id
@@ -29,6 +29,6 @@ class TrainingConfigurationToMongo(IMapperSimple[TrainingConfiguration, dict]):
             id_=IDToMongo.backward(instance["_id"]),
             task_id=IDToMongo.backward(instance["task_id"]),
             model_manifest_id=instance.get("model_manifest_id"),
-            global_parameters=GlobalParameters.model_validate_json(instance["global_parameters"]),
-            hyperparameters=Hyperparameters.model_validate_json(instance["hyperparameters"]),
+            global_parameters=GlobalParameters.model_validate(instance["global_parameters"]),
+            hyperparameters=Hyperparameters.model_validate(instance["hyperparameters"]),
         )
