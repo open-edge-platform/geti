@@ -6,10 +6,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import IntEnum
 
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.constants import DEFAULT_USER_NAME
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 
 class CompiledDatasetShardsDeleteFlag(IntEnum):

@@ -4,9 +4,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from iai_core.entities.metrics import ScoreMetric
-from iai_core.entities.persistent_entity import PersistentEntity
 
-from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier
+from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, PersistentEntity
 
 
 class MediaScore(PersistentEntity):
