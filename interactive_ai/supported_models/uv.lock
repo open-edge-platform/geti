@@ -61,15 +61,20 @@ name = "geti-configuration-tools"
 version = "1.0.0"
 source = { editable = "../../libs/configuration_tools" }
 dependencies = [
+    { name = "geti-types" },
     { name = "pydantic" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pydantic", specifier = "==2.5.3" }]
+requires-dist = [
+    { name = "geti-types", editable = "../../libs/types" },
+    { name = "pydantic", specifier = "==2.5.3" },
+]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "geti-configuration-tools" },
+    { name = "geti-types", extras = ["bson"], editable = "../../libs/types" },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
@@ -111,6 +116,24 @@ dev = [
     { name = "testfixtures", specifier = "~=7.2" },
     { name = "types-cachetools" },
     { name = "types-pyyaml" },
+]
+
+[[package]]
+name = "geti-types"
+version = "1.0.2"
+source = { editable = "../../libs/types" }
+
+[package.metadata]
+requires-dist = [{ name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" }]
+provides-extras = ["bson"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "geti-types", extras = ["bson"] },
+    { name = "mypy", specifier = "~=1.15" },
+    { name = "pre-commit", specifier = "~=4.1" },
+    { name = "pytest", specifier = "~=8.3" },
+    { name = "ruff", specifier = "~=0.11" },
 ]
 
 [[package]]
