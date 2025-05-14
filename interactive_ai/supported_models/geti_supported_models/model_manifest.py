@@ -3,15 +3,15 @@
 
 from enum import Enum
 
-from pydantic import BaseModel, Field
-
 from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,
+    EarlyStopping,
     EvaluationParameters,
     Hyperparameters,
-    TrainingHyperParameters, EarlyStopping,
+    TrainingHyperParameters,
 )
+from pydantic import BaseModel, Field
 
 
 class GPUMaker(str, Enum):
@@ -29,7 +29,7 @@ class ModelManifestDeprecationStatus(str, Enum):
     """Status of a model architecture with respect to the deprecation process."""
 
     ACTIVE = "active"  # Model architecture is fully supported, models can be trained
-    DEPRECATED = "deprecated"  # Model architecture is deprecated, models can be still viewed and trained but it's discouraged
+    DEPRECATED = "deprecated"  # Model architecture is deprecated, can still view and train but it's discouraged
     OBSOLETE = "obsolete"  # Model architecture is no longer supported, models can be still viewed but not trained
 
     def __str__(self) -> str:
@@ -52,14 +52,12 @@ class Capabilities(BaseModel):
     """Model capabilities configuration."""
 
     xai: bool = Field(
-        default=False,
-        title="Explainable AI Support",
-        description="Whether the model supports explainable AI features"
+        default=False, title="Explainable AI Support", description="Whether the model supports explainable AI features"
     )
     tiling: bool = Field(
         default=False,
         title="Tiling Support",
-        description="Whether the model supports image tiling for processing large images"
+        description="Whether the model supports image tiling for processing large images",
     )
 
 
@@ -78,8 +76,7 @@ class ModelManifest(BaseModel):
         title="Supported GPUs", description="Dictionary mapping GPU types to compatibility status"
     )
     capabilities: Capabilities = Field(
-        title="Model Capabilities",
-        description="Special capabilities supported by the model"
+        title="Model Capabilities", description="Special capabilities supported by the model"
     )
     hyperparameters: Hyperparameters = Field(
         title="Hyperparameters", description="Configuration parameters for model training"
@@ -102,9 +99,7 @@ class NullModelManifest(ModelManifest):
     supported_gpus: dict[str, bool] = Field(default={})
     hyperparameters: Hyperparameters = Field(
         default=Hyperparameters(
-            dataset_preparation=DatasetPreparationParameters(
-                augmentation=AugmentationParameters()
-            ),
+            dataset_preparation=DatasetPreparationParameters(augmentation=AugmentationParameters()),
             training=TrainingHyperParameters(
                 max_epochs=1,
                 early_stopping=EarlyStopping(patience=1),

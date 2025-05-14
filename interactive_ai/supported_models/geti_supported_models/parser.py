@@ -1,8 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import hiyapyco
 from importlib import resources
+
+import hiyapyco
 
 from . import manifests
 from .model_manifest import ModelManifest
