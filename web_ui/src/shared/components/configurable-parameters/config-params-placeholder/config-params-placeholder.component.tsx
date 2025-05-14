@@ -5,7 +5,10 @@ import { Skeleton } from '../../skeleton/skeleton.component';
 
 export const ConfigParamsPlaceholder = (): JSX.Element => {
     return (
-        <div style={{ display: 'flex', width: '100%', height: '100%', gap: 32 }}>
+        <div
+            style={{ display: 'flex', width: '100%', height: '100%', gap: 32 }}
+            data-testid={'config-params-placeholder-id'}
+        >
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
                 <Skeleton UNSAFE_style={{ height: 50, width: '40%' }} />
                 <Skeleton UNSAFE_style={{ height: 50, width: '40%' }} />
