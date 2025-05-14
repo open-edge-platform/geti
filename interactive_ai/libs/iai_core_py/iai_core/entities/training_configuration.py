@@ -138,10 +138,7 @@ class NullTrainingConfiguration(TrainingConfiguration):
                 ),
                 training=TrainingHyperParameters(
                     max_epochs=1,
-                    early_stopping_epochs=1,
                     learning_rate=0.001,
-                    learning_rate_warmup_epochs=0,
-                    batch_size=1,
                 ),
                 evaluation=EvaluationParameters(metric=None),
             ),
