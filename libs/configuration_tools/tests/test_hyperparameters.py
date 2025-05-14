@@ -2,8 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from pydantic import ValidationError
-
 from geti_types.configuration import (
     AugmentationParameters,
     CenterCrop,
@@ -17,6 +15,7 @@ from geti_types.configuration import (
     Tiling,
     TrainingHyperParameters,
 )
+from pydantic import ValidationError
 
 
 class TestHyperparameters:

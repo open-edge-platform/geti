@@ -2,6 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
+from geti_types import ID
 from pydantic import ValidationError
 
 from geti_configuration_tools.training_configuration import (
@@ -11,8 +12,6 @@ from geti_configuration_tools.training_configuration import (
     SubsetSplit,
     TrainingConfiguration,
 )
-
-from geti_types import ID
 
 
 class TestTrainingConfiguration:

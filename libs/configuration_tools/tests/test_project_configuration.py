@@ -2,6 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
+from geti_types import ID
 
 from geti_configuration_tools.project_configuration import (
     AutoTrainingParameters,
@@ -10,8 +11,6 @@ from geti_configuration_tools.project_configuration import (
     TrainConstraints,
     TrainingParameters,
 )
-
-from geti_types import ID
 
 
 class TestProjectConfiguration:

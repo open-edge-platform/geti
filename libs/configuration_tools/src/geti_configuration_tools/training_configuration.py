@@ -1,9 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+from geti_types import ID, PersistentEntity
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from geti_types import ID, PersistentEntity
 from .hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,

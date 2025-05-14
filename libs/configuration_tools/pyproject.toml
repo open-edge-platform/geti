@@ -31,7 +31,7 @@ ignore = [
 fixable = ["ALL"]
 
 [tool.ruff.lint.per-file-ignores]
-"*test*.py" = ["S"]
+"*test*.py" = ["S", "ANN", "D103"]
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
