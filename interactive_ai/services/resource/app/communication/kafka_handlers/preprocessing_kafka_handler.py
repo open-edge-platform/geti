@@ -85,7 +85,7 @@ class PreprocessingKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         image_repo.save(image)
 
         DatasetStorageFilterRepo(dataset_storage_identifier=dataset_storage_identifier).update_preprocessing_status(
-            media_identifier=image.media_identifier,
+            media_id=image.id_,
             status=image.preprocessing.status,
         )
 
@@ -102,6 +102,6 @@ class PreprocessingKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         video_repo.save(video)
 
         DatasetStorageFilterRepo(dataset_storage_identifier=dataset_storage_identifier).update_preprocessing_status(
-            media_identifier=video.media_identifier,
+            media_id=video.id_,
             status=video.preprocessing.status,
         )

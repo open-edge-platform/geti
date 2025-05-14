@@ -162,15 +162,15 @@ class DatasetStorageFilterRepo(DatasetStorageBasedSessionRepo[DatasetStorageFilt
             )
 
     def update_preprocessing_status(
-        self, media_identifier: MediaIdentifierEntity, status: MediaPreprocessingStatus
+        self, media_id: ID, status: MediaPreprocessingStatus
     ) -> None:
         """
         Updates a DatasetStorageFilterData entity in the database with new media preprocessing status.
-        :param media_identifier: media identifier
+        :param media_id: media ID
         :param status: media preprocessing status
         """
         data_filter = self.preliminary_query_match_filter(access_mode=QueryAccessMode.WRITE)
-        data_filter["_id"] = IDToMongo.forward(media_identifier.as_id())
+        data_filter["media_identifier.media_id"] = IDToMongo.forward(media_id)
 
         self._collection.update_one(filter=data_filter, update={"$set": {"preprocessing": status.value}}, upsert=False)
 

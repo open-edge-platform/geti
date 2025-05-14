@@ -163,7 +163,7 @@ class TestPreprocessingKafkaHandler:
         assert image.preprocessing.status == status
         if preprocessing and "message" in preprocessing:
             assert image.preprocessing.message == preprocessing["message"]
-        mock_update_preprocessing_status.assert_called_once_with(media_identifier=image.media_identifier, status=status)
+        mock_update_preprocessing_status.assert_called_once_with(media_id=image.id_, status=status)
 
     @pytest.mark.parametrize(
         "event, status, preprocessing",
@@ -205,4 +205,4 @@ class TestPreprocessingKafkaHandler:
         assert video.preprocessing.status == status
         if preprocessing and "message" in preprocessing:
             assert video.preprocessing.message == preprocessing["message"]
-        mock_update_preprocessing_status.assert_called_once_with(media_identifier=video.media_identifier, status=status)
+        mock_update_preprocessing_status.assert_called_once_with(media_id=video.id_, status=status)
