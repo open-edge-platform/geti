@@ -96,7 +96,7 @@ class NullModelManifest(ModelManifest):
     task: str = Field(default="null")
     stats: ModelStats = Field(default=ModelStats(gigaflops=1, trainable_parameters=1))
     support_status: ModelManifestDeprecationStatus = Field(default=ModelManifestDeprecationStatus.OBSOLETE)
-    supported_gpus: dict[str, bool] = Field(default={})
+    supported_gpus: dict[GPUMaker, bool] = Field(default={})
     hyperparameters: Hyperparameters = Field(
         default=Hyperparameters(
             dataset_preparation=DatasetPreparationParameters(augmentation=AugmentationParameters()),
