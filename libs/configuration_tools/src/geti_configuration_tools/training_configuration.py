@@ -3,10 +3,8 @@
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from iai_core.entities.persistent_entity import PersistentEntity
-
-from geti_types import ID
-from geti_types.configuration import (
+from geti_types import ID, PersistentEntity
+from .hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,
