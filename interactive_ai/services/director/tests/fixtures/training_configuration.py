@@ -3,7 +3,7 @@
 
 import pytest
 
-from iai_core.entities.training_configuration import (
+from geti_configuration_tools.training_configuration import (
     Filtering,
     GlobalDatasetPreparationParameters,
     GlobalParameters,
@@ -11,7 +11,7 @@ from iai_core.entities.training_configuration import (
     TrainingConfiguration,
 )
 
-from geti_types.configuration import (
+from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     CenterCrop,
     DatasetPreparationParameters,

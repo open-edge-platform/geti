@@ -3,7 +3,7 @@
 
 import pytest
 
-from iai_core.entities.project_configuration import (
+from geti_configuration_tools.project_configuration import (
     AutoTrainingParameters,
     ProjectConfiguration,
     TaskConfig,
