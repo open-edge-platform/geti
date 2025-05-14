@@ -145,15 +145,12 @@ version = "1.0.2"
 source = { editable = "../types" }
 
 [package.metadata]
-requires-dist = [
-    { name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" },
-    { name = "pydantic", marker = "extra == 'configuration'", specifier = "==2.5.3" },
-]
-provides-extras = ["bson", "configuration"]
+requires-dist = [{ name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" }]
+provides-extras = ["bson"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "geti-types", extras = ["bson", "configuration"] },
+    { name = "geti-types", extras = ["bson"] },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },

@@ -2,7 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-
 from geti_configuration_tools.project_configuration import (
     AutoTrainingParameters,
     ProjectConfiguration,

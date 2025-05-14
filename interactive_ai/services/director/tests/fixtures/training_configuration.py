@@ -2,15 +2,6 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-
-from geti_configuration_tools.training_configuration import (
-    Filtering,
-    GlobalDatasetPreparationParameters,
-    GlobalParameters,
-    SubsetSplit,
-    TrainingConfiguration,
-)
-
 from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     CenterCrop,
@@ -18,6 +9,13 @@ from geti_configuration_tools.hyperparameters import (
     EvaluationParameters,
     Hyperparameters,
     TrainingHyperParameters,
+)
+from geti_configuration_tools.training_configuration import (
+    Filtering,
+    GlobalDatasetPreparationParameters,
+    GlobalParameters,
+    SubsetSplit,
+    TrainingConfiguration,
 )
 
 
