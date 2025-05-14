@@ -38,7 +38,7 @@ export const DeviceSettings = () => {
                 label='Mirror camera'
                 config={{ type: 'selection', options: ['Off', 'On'], value: isMirrored ? 'On' : 'Off' }}
                 onChange={(value) => {
-                    setIsMirrored(value == 'On');
+                    setIsMirrored(value === 'On');
                 }}
             />
 
