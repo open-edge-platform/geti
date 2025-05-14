@@ -1,27 +1,29 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import ContentLoader from 'react-content-loader';
+import { Skeleton } from '../../skeleton/skeleton.component';
 
 export const ConfigParamsPlaceholder = (): JSX.Element => {
     return (
-        <ContentLoader
-            speed={2}
-            width={'100%'}
-            height={'100%'}
-            backgroundColor='var(--spectrum-global-color-gray-75)'
-            foregroundColor='var(--spectrum-global-color-gray-200)'
-            data-testid={'config-params-placeholder-id'}
-        >
-            <rect x='20' y='10' rx={10} ry={10} width='40%' height='50' />
-            <rect x='20' y='70' rx={10} ry={10} width='40%' height='50' />
-            <rect x='20' y='130' rx={10} ry={10} width='40%' height='50' />
-
-            <rect x={'45%'} y={10} width={1} height={400} />
-
-            <rect x='48%' y='10' rx={10} ry={10} width='50%' height='100' />
-            <rect x='48%' y='120' rx={10} ry={10} width='50%' height='100' />
-            <rect x='48%' y='230' rx={10} ry={10} width='50%' height='100' />
-        </ContentLoader>
+        <div style={{ display: 'flex', width: '100%', height: '100%', gap: 32 }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <Skeleton UNSAFE_style={{ height: 50, width: '40%' }} />
+                <Skeleton UNSAFE_style={{ height: 50, width: '40%' }} />
+                <Skeleton UNSAFE_style={{ height: 50, width: '40%' }} />
+            </div>
+            <div
+                style={{
+                    width: 1,
+                    background: 'var(--spectrum-global-color-gray-200)',
+                    height: 400,
+                    alignSelf: 'flex-start',
+                }}
+            />
+            <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <Skeleton UNSAFE_style={{ height: 100, width: '100%' }} />
+                <Skeleton UNSAFE_style={{ height: 100, width: '100%' }} />
+                <Skeleton UNSAFE_style={{ height: 100, width: '100%' }} />
+            </div>
+        </div>
     );
 };
