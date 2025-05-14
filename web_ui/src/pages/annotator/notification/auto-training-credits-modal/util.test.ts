@@ -98,7 +98,10 @@ describe('auto-training-credits-modal utils', () => {
 
         it('no scheduled jobs', () => {
             jest.mocked(getFuxSetting).mockReturnValue(true);
-            onFirstScheduledOrRunningAutoTrainingJob(getMockedUserGlobalSettingsObject(), mockedCallback)(getJobResponse());
+            onFirstScheduledOrRunningAutoTrainingJob(
+                getMockedUserGlobalSettingsObject(),
+                mockedCallback
+            )(getJobResponse());
             expect(mockedCallback).toHaveBeenCalledTimes(0);
         });
 
