@@ -9,7 +9,7 @@ import { FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-sett
 import { UserGlobalSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 
-export const onFirstScheduledAutoTrainingJob =
+export const onFirstScheduledOrRunningAutoTrainingJob =
     (settings: UseSettings<UserGlobalSettings>, callback: (jobId: string) => void) =>
     ({ pages }: InfiniteData<JobsResponse>) => {
         if (!pages[0]) {

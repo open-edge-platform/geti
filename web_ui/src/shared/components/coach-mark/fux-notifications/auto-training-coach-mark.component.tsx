@@ -14,7 +14,7 @@ import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { useFuxNotifications } from '../../../../hooks/use-fux-notifications/use-fux-notifications.hook';
 import { useIsAutoTrainingOn } from '../../../../pages/annotator/hooks/use-is-auto-training-on.hook';
-import { onFirstScheduledAutoTrainingJob } from '../../../../pages/annotator/notification/auto-training-credits-modal/util';
+import { onFirstScheduledOrRunningAutoTrainingJob } from '../../../../pages/annotator/notification/auto-training-credits-modal/util';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { getFuxSetting } from '../../tutorials/utils';
 import { CoachMark } from '../coach-mark.component';
@@ -32,7 +32,7 @@ const useAutoTrainingCoachMarkJobs = () => {
 
     const handleSuccess = useCallback(
         (jobs: InfiniteData<JobsResponse>) =>
-            onFirstScheduledAutoTrainingJob(settings, (jobId: string) => {
+            onFirstScheduledOrRunningAutoTrainingJob(settings, (jobId: string) => {
                 if (isQueryEnabled) {
                     handleFirstAutoTraining(project.id, jobId);
                 }
