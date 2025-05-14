@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Key, useCallback, useEffect, useMemo } from 'react';
+import { Key, useCallback, useMemo, useState } from 'react';
 
 import { InfiniteQueryObserverResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
@@ -13,26 +13,26 @@ import { ProjectSortingOptions } from '../../../../../core/projects/services/pro
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE, User } from '../../../../../core/users/users.interface';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { hasEqualId, isNonEmptyArray } from '../../../../utils';
+import { isNonEmptyArray } from '../../../../utils';
 import { JobsFilterField } from '../jobs-filter-field.component';
 import { JobsTypeFilterField } from './job-types-filter-field.component';
 import { FiltersType } from './jobs-dialog.interface';
 
-export interface JobsFilteringDefaultValuesProps {
-    projectId: string | undefined;
-    userId: string | undefined;
-    jobTypes: JobType[];
-}
-
 interface JobsFilteringProps {
-    values: JobsFilteringDefaultValuesProps;
+    values: FiltersType;
     onChange: (newFilters: FiltersType) => void;
 }
 
 export const JobsFiltering = ({ values, onChange }: JobsFilteringProps): JSX.Element => {
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
 
-    const { projectId, userId, jobTypes } = values;
+    const [jobFilters, setJobFilters] = useState<FiltersType>(values);
+    const { projectId, userId, jobTypes } = jobFilters;
+
+    const updateJobsFilters = (newFilters: FiltersType): void => {
+        onChange(newFilters);
+        setJobFilters(newFilters);
+    };
 
     const { useGetProjects } = useProjectActions();
     const {
@@ -92,24 +92,18 @@ export const JobsFiltering = ({ values, onChange }: JobsFilteringProps): JSX.Ele
     const setSelectedProjectHandler = (key: Key | null): void => {
         const newFilterValue: undefined | string = isEmpty(key) ? undefined : (key as string);
 
-        onChange({ ...values, projectId: newFilterValue });
+        updateJobsFilters({ ...jobFilters, projectId: newFilterValue });
     };
 
     const setSelectedUserHandler = (key: Key | null): void => {
         const newFilterValue: undefined | string = isEmpty(key) ? undefined : (key as string);
 
-        onChange({ ...values, userId: newFilterValue });
+        updateJobsFilters({ ...jobFilters, userId: newFilterValue });
     };
 
-    useEffect(() => {
-        if (isLoadingUsers) return;
-
-        const isSelectedUserInProject: boolean | undefined = users?.some(hasEqualId(userId));
-
-        if (!!isSelectedUserInProject) return;
-
-        onChange({ ...values, userId: undefined });
-    }, [isLoadingUsers, onChange, users, userId, values]);
+    const setSelectedJobTypesHandler = (newJobTypes: JobType[]): void => {
+        updateJobsFilters({ ...jobFilters, jobTypes: newJobTypes });
+    };
 
     return (
         <>
@@ -132,10 +126,7 @@ export const JobsFiltering = ({ values, onChange }: JobsFilteringProps): JSX.Ele
                 onSelectionChange={setSelectedUserHandler}
                 isLoading={isLoadingUsers}
             />
-            <JobsTypeFilterField
-                selectedJobTypes={jobTypes}
-                setSelectedJobTypes={(newJobTypes) => onChange({ ...values, jobTypes: newJobTypes })}
-            />
+            <JobsTypeFilterField selectedJobTypes={jobTypes} setSelectedJobTypes={setSelectedJobTypesHandler} />
         </>
     );
 };

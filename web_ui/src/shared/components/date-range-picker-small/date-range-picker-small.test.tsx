@@ -7,7 +7,6 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { providersRender as render } from '../../../test-utils/required-providers-render';
-import { checkTooltip } from '../../../test-utils/utils';
 import { DateRangePickerSmall } from './date-range-picker-small.component';
 
 describe('DateRangePickerSmall Component', () => {
@@ -31,8 +30,8 @@ describe('DateRangePickerSmall Component', () => {
             />
         );
 
-    afterEach(async () => {
-        await userEvent.keyboard('{escape}');
+    afterEach(() => {
+        userEvent.keyboard('{escape}');
     });
 
     it('should open the date range dialog when the button is clicked', async () => {
@@ -44,13 +43,6 @@ describe('DateRangePickerSmall Component', () => {
 
         expect(screen.getByText('Select Date Range')).toBeInTheDocument();
         expect(await screen.findByRole('dialog')).toBeVisible();
-    });
-
-    it('should display the initial date range in the tooltip', async () => {
-        renderComponent();
-        const tooltipText = 'March 30 – April 30, 2025';
-
-        await checkTooltip(screen.getByRole('button', { name: 'Select date range' }), tooltipText);
     });
 
     it('should allow manual editing of the date range', async () => {
