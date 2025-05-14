@@ -1,10 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from geti_configuration_tools.project_configuration import (
-    ProjectConfiguration,
-    TaskConfig,
-)
+from geti_configuration_tools.project_configuration import ProjectConfiguration, TaskConfig
 
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
