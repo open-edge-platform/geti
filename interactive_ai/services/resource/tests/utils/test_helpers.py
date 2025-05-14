@@ -23,7 +23,9 @@ from testfixtures import compare
 from tests.utils.segmentation_utils import create_annotation_from_segmentation_map
 
 import iai_core.configuration.helper as otx_config_helper
-from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
+from geti_types import (
+    ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier, PersistentEntity
+)
 from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
 from iai_core.algorithms import ModelTemplateList
 from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
@@ -49,7 +51,6 @@ from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPr
 from iai_core.entities.model import ModelConfiguration
 from iai_core.entities.model_storage import ModelStorage
 from iai_core.entities.model_template import ModelTemplate
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.project import Project
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle

@@ -10,13 +10,12 @@ from enum import Enum
 from bson import ObjectId
 
 from iai_core.entities.label import Label
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.entities.shapes import Rectangle, Shape
 from iai_core.utils.constants import DEFAULT_USER_NAME
 from iai_core.utils.time_utils import now
 
-from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier
+from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, PersistentEntity
 
 
 class Annotation:

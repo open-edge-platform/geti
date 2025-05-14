@@ -7,6 +7,7 @@ from .media_identifier import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
+from .persistent_entity import PersistentEntity
 from .session import (
     CTX_SESSION_VAR,
     SESSION_LOGGING_FORMAT_HEADER,
@@ -39,4 +40,5 @@ __all__ = [
     "enhance_log_records_with_session_info",
     "make_session",
     "session_context",
+    "PersistentEntity",
 ]

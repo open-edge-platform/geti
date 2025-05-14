@@ -7,10 +7,9 @@ from collections import defaultdict
 from collections.abc import Mapping
 from enum import Enum
 
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.type_helpers import SequenceOrSet
 
-from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, VideoIdentifier
+from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, VideoIdentifier, PersistentEntity
 
 
 class AnnotationState(Enum):

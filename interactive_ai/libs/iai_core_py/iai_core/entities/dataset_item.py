@@ -15,7 +15,6 @@ from iai_core.entities.label import Label
 from iai_core.entities.media_2d import Media2D
 from iai_core.entities.metadata import IMetadata, MetadataItem
 from iai_core.entities.model import Model
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.entities.shapes import Rectangle
 from iai_core.entities.subset import Subset
@@ -23,7 +22,7 @@ from iai_core.utils.shape_factory import ShapeFactory
 from iai_core.utils.type_helpers import SequenceOrSet
 from iai_core.utils.uid_generator import generate_uid
 
-from geti_types import ID, MediaIdentifierEntity
+from geti_types import ID, MediaIdentifierEntity, PersistentEntity
 
 logger = logging.getLogger(__name__)
 

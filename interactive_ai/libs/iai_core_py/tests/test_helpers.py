@@ -44,7 +44,6 @@ from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPr
 from iai_core.entities.model import ModelConfiguration
 from iai_core.entities.model_storage import ModelStorage
 from iai_core.entities.model_template import ModelTemplate
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.project import Project
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
@@ -82,7 +81,9 @@ from iai_core.utils.media_factory import Media2DFactory
 from iai_core.utils.project_factory import ProjectFactory
 
 from .segmentation_utils import create_annotation_from_segmentation_map
-from geti_types import ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
+from geti_types import (
+    ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier, PersistentEntity
+)
 
 logger = logging.getLogger(__name__)
 

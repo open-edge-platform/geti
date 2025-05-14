@@ -24,6 +24,7 @@ from geti_types import (
     ImageIdentifier,
     ProjectIdentifier,
     VideoFrameIdentifier,
+    PersistentEntity,
 )
 from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
 from iai_core.algorithms import ModelTemplateList
@@ -40,7 +41,6 @@ from iai_core.entities.label_schema import LabelSchema
 from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
 from iai_core.entities.model_storage import ModelStorage
 from iai_core.entities.model_template import ModelTemplate
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.project import Project
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle

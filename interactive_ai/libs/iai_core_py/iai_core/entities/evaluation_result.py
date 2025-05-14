@@ -10,10 +10,9 @@ from iai_core.entities.datasets import Dataset
 from iai_core.entities.metrics import NullPerformance, Performance
 from iai_core.entities.model import Model
 from iai_core.entities.model_storage import ModelStorageIdentifier
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.time_utils import now
 
-from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
+from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, PersistentEntity
 
 
 class EvaluationPurpose(Enum):
