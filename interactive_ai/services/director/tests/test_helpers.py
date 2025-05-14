@@ -22,9 +22,9 @@ from geti_types import (
     ID,
     DatasetStorageIdentifier,
     ImageIdentifier,
+    PersistentEntity,
     ProjectIdentifier,
     VideoFrameIdentifier,
-    PersistentEntity,
 )
 from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
 from iai_core.algorithms import ModelTemplateList

@@ -82,7 +82,12 @@ from iai_core.utils.project_factory import ProjectFactory
 
 from .segmentation_utils import create_annotation_from_segmentation_map
 from geti_types import (
-    ID, DatasetStorageIdentifier, ImageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier, PersistentEntity
+    ID,
+    DatasetStorageIdentifier,
+    ImageIdentifier,
+    MediaIdentifierEntity,
+    PersistentEntity,
+    VideoFrameIdentifier,
 )
 
 logger = logging.getLogger(__name__)

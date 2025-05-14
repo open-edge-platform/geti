@@ -20,7 +20,7 @@ from iai_core.entities.subset import Subset
 from iai_core.utils.time_utils import now
 from iai_core.utils.uid_generator import generate_uid
 
-from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier, PersistentEntity
+from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, PersistentEntity, VideoFrameIdentifier
 
 logger = logging.getLogger(__name__)
 

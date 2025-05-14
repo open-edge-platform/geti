@@ -17,7 +17,7 @@ from iai_core.repos.mappers.cursor_iterator import CursorIterator
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
-from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, Session, PersistentEntity
+from geti_types import ID, DatasetStorageIdentifier, PersistentEntity, ProjectIdentifier, Session
 
 
 class Foo(PersistentEntity):

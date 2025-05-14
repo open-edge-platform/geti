@@ -9,7 +9,7 @@ from enum import Enum
 
 from iai_core.utils.type_helpers import SequenceOrSet
 
-from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, VideoIdentifier, PersistentEntity
+from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, PersistentEntity, VideoIdentifier
 
 
 class AnnotationState(Enum):

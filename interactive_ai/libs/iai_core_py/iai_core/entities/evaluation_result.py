@@ -12,7 +12,7 @@ from iai_core.entities.model import Model
 from iai_core.entities.model_storage import ModelStorageIdentifier
 from iai_core.utils.time_utils import now
 
-from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, PersistentEntity
+from geti_types import ID, DatasetStorageIdentifier, PersistentEntity, ProjectIdentifier
 
 
 class EvaluationPurpose(Enum):

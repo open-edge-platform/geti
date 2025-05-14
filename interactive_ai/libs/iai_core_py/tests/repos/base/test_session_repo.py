@@ -11,7 +11,7 @@ from iai_core.repos.base.session_repo import QueryAccessMode
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
-from geti_types import ID, make_session, PersistentEntity
+from geti_types import ID, PersistentEntity, make_session
 from geti_types.session import DEFAULT_ORGANIZATION_ID, DEFAULT_WORKSPACE_ID
 
 

@@ -26,7 +26,7 @@ from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 from .constants import ID_FIELD_NAME, LOCATION_FIELD_NAME, ORGANIZATION_ID_FIELD_NAME, WORKSPACE_ID_FIELD_NAME
 from .mongo_connector import MongoConnector
-from geti_types import CTX_SESSION_VAR, ID, Session, make_session, PersistentEntity
+from geti_types import CTX_SESSION_VAR, ID, PersistentEntity, Session, make_session
 
 PersistedEntityT = TypeVar("PersistedEntityT", bound=PersistentEntity)
 logger = logging.getLogger(__name__)

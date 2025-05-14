@@ -9,7 +9,7 @@ import logging
 from iai_core.entities.media import Media, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
 from iai_core.utils.time_utils import now
 
-from geti_types import ID, VideoFrameIdentifier, VideoIdentifier, PersistentEntity
+from geti_types import ID, PersistentEntity, VideoFrameIdentifier, VideoIdentifier
 
 logger = logging.getLogger(__name__)
 

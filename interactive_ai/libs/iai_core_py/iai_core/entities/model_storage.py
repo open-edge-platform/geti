@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from iai_core.entities.model_template import ModelTemplate, NullModelTemplate
 from iai_core.utils.time_utils import now
 
-from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, PersistentEntity
+from geti_types import CTX_SESSION_VAR, ID, PersistentEntity, ProjectIdentifier
 
 
 class ModelStorage(PersistentEntity):

@@ -13,7 +13,7 @@ from datetime import datetime
 from model.job_state import JobGpuRequestState, JobState, JobStateGroup, JobTaskState
 from model.telemetry import Telemetry
 
-from geti_types import ID, Session, make_session, PersistentEntity
+from geti_types import ID, PersistentEntity, Session, make_session
 from iai_core.utils.time_utils import now
 
 
