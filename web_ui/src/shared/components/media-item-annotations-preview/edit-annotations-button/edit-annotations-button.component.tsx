@@ -12,7 +12,7 @@ interface EditAnnotationsButtonProps {
 }
 
 export const EditAnnotationsButton = ({ datasetIdentifier, mediaItem }: EditAnnotationsButtonProps): JSX.Element => {
-    const href = useAnnotatorRoutePath(datasetIdentifier)({ ...datasetIdentifier, mediaItem });
+    const href = useAnnotatorRoutePath()({ datasetIdentifier, mediaItem });
 
     return (
         <Button variant='secondary' href={href} id='edit-annotations' aria-label='Edit annotations' key='edit'>
