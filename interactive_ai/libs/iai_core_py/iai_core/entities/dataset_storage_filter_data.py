@@ -10,11 +10,10 @@ from iai_core.entities.annotation import AnnotationScene
 from iai_core.entities.annotation_scene_state import AnnotationState
 from iai_core.entities.image import Image
 from iai_core.entities.media import ImageExtensions, MediaIdentifierEntity, MediaPreprocessingStatus, VideoExtensions
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.shapes import Shape, ShapeType
 from iai_core.entities.video import Video
 
-from geti_types import ID, NullMediaIdentifier
+from geti_types import ID, NullMediaIdentifier, PersistentEntity
 
 
 @dataclass

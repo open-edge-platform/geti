@@ -18,10 +18,9 @@ from iai_core.entities.label_schema import LabelSchema, NullLabelSchema
 from iai_core.entities.metrics import NullPerformance, Performance
 from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier, NullModelStorage
 from iai_core.entities.model_template import TargetDevice
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.time_utils import now
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 if TYPE_CHECKING:
     from iai_core.entities.datasets import Dataset

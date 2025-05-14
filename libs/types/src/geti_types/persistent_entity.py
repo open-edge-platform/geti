@@ -1,6 +1,5 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-"""This module implements the PersistentEntity base class"""
 
 from geti_types import ID
 
@@ -80,8 +79,8 @@ class PersistentEntity:
         Mark the entity as 'volatile', i.e. not persisted to the database.
 
         This method must be used cautiously, only in specific situations like:
-         - creation of an in-memory clone of a persisted entity, but with a different ID
-         - deletion of the entity from the database while keeping the object in-memory
+            - creation of an in-memory clone of a persisted entity, but with a different ID
+            - deletion of the entity from the database while keeping the object in-memory
         """
         self._ephemeral = True
 
