@@ -30,6 +30,7 @@ __all__ = [
     "MediaType",
     "ModelStorageIdentifier",
     "NullMediaIdentifier",
+    "PersistentEntity",
     "ProjectIdentifier",
     "RequestSource",
     "Session",
@@ -40,5 +41,4 @@ __all__ = [
     "enhance_log_records_with_session_info",
     "make_session",
     "session_context",
-    "PersistentEntity",
 ]
