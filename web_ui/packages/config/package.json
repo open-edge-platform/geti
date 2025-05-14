@@ -1,9 +1,14 @@
 {
   "name": "@geti/config",
   "version": "1.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "typescript": "^5.7.2"
+  },
   "exports": {
-    "./test": "./test/jest.config.mjs",
-    "./lint": "./lint/eslint.config.mjs",
+    "./test": "./test/jest.config.ts",
+    "./lint": "./lint/eslint.config.js",
     "./typescript": "./typescript/tsconfig.base.json"
   }
 }
