@@ -1,8 +1,0 @@
-{
-  "extends": "../typescript/tsconfig.base.json",
-  "compilerOptions": {
-    "baseUrl": "./",
-    "types": ["node"]
-  },
-  "include": ["./jest.config.ts"]
-}

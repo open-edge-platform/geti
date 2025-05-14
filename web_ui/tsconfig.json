@@ -10,7 +10,6 @@
     "tests",
     "rsbuild.config.ts",
     "dev-proxy.ts",
-    "jest.config.ts"
   ],
   "exclude": [
     "./src/opencv-types/**"

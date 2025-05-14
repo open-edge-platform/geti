@@ -47,5 +47,5 @@ export default {
             lines: 75,
         },
     },
-    globalSetup: path.resolve(dirname, './jest.global.ts'),
+    globalSetup: path.resolve(dirname, './jest.global.js'),
 };

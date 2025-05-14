@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Contains UI representative components",
   "main": "index.js",
+  "type": "module",
   "devDependencies": {
     "@types/node": "^22.15.3",
     "@geti/config": "*",
@@ -15,7 +16,7 @@
     "typescript": "^5.7.2"
   },
   "scripts": {
-    "test:unit": "jest --config jest.config.ts --watchAll=false",
+    "test:unit": "jest --config jest.config.js --watchAll=false",
     "type-check": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",
     "lint:fix": "eslint --fix \"./src/**/*.ts*\""
