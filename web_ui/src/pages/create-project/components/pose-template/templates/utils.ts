@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Key } from '@adobe/react-spectrum';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { isEqual, isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { RegionOfInterest } from '../../../../../core/annotations/annotation.interface';

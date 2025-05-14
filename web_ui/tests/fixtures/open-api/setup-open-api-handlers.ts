@@ -4,12 +4,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import isString from 'lodash/isString';
+import { isString } from 'lodash-es';
 import { DefaultBodyType, ResponseComposition, RestContext } from 'msw';
-import OpenAPIBackend, { type Context, type Document, type Options } from 'openapi-backend';
+import { OpenAPIBackend, type Context, type Document, type Options } from 'openapi-backend';
 
-import definition from './../../../src/core/server/generated/api-spec.json';
+import definition from './../../../src/core/server/generated/api-spec.json' assert { type: 'json' };
 import { settings, supportedAlgorithms } from './mocks';
+import { getDirname } from '../../utils/get-dirname';
 
 const SHOW_UNIMPLEMENTED_OPERATIONS = false;
 
@@ -184,7 +185,9 @@ const registerDefaultHandlers = (api: OpenAPIBackend) => {
     api.register('notFound', notFoundHandler);
 
     const returnImage: OperationHandler = async (_: Context<Document>, res, ctx) => {
-        const imageBuffer = fs.readFileSync(path.resolve(__dirname, '../../../src/assets/tests-assets/antelope.webp'));
+        const imageBuffer = fs.readFileSync(
+            path.resolve(getDirname(import.meta.url), '../../../src/assets/tests-assets/antelope.webp')
+        );
 
         return res(
             ctx.set('Content-Length', imageBuffer.byteLength.toString()),

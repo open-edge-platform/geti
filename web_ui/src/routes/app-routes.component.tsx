@@ -3,7 +3,7 @@
 
 import { Suspense, useEffect } from 'react';
 
-import negate from 'lodash/negate';
+import { negate } from 'lodash-es';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';
 
 import { AnalyticsProvider } from '../analytics/analytics-provider.component';

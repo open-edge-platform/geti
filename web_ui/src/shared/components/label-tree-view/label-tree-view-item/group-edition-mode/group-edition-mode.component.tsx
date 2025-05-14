@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Flex, Switch, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
 import { TextFieldRef } from '@react-types/textfield';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 
 import { LabelItemType, LabelTreeGroupProps } from '../../../../../core/labels/label-tree-view.interface';

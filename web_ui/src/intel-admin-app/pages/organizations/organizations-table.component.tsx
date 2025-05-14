@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
 import { useQueryClient } from '@tanstack/react-query';
-import get from 'lodash/get';
+import { get } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { Organization } from '../../../core/organizations/organizations.interface';

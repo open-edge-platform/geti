@@ -126,6 +126,11 @@ export default [
                     paths: ['src'],
                     extensions: ['.js', '.jsx', '.ts', '.tsx'],
                 },
+
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: './tsconfig.json',
+                },
             },
 
             react: {
@@ -175,7 +180,7 @@ export default [
                 'error',
                 'ignorePackages',
                 {
-                    js: 'never',
+                    js: 'always',
                     jsx: 'never',
                     ts: 'never',
                     tsx: 'never',
@@ -201,7 +206,7 @@ export default [
             'import/no-unresolved': [
                 2,
                 {
-                    ignore: ['opencv-types', 'OpenCVTypes', '^@.*', 'csstype', 'opencv'],
+                    ignore: ['opencv-types', 'OpenCVTypes', 'csstype', 'opencv'],
                 },
             ],
 

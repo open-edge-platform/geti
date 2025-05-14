@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 
 import { ButtonGroup } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useSearchParams } from 'react-router-dom';
 
 import { AICPUIcon, Human } from '../../../../assets/icons';

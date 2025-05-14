@@ -12,8 +12,7 @@ import {
     Text,
     View,
 } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import overSome from 'lodash/overSome';
+import { isEmpty, overSome } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';

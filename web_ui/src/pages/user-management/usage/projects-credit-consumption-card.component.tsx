@@ -5,9 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { Flex, Heading, Link, View } from '@adobe/react-spectrum';
 import { StyleProps } from '@react-types/shared';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
-import take from 'lodash/take';
+import { isEmpty, isString, take } from 'lodash-es';
 import { Bar, BarChart, Legend, Rectangle, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts';
 
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';

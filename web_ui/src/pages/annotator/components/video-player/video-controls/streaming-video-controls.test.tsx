@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { fireEvent, renderHook, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
-import partial from 'lodash/partial';
+import { partial } from 'lodash-es';
 
 import { createInMemoryInferenceService } from '../../../../../core/annotations/services/in-memory-inference-service';
 import { createInMemoryModelsService } from '../../../../../core/models/services/in-memory-models-service';

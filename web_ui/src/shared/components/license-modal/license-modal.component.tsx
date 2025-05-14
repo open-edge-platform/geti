@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';
 import { useUsers } from '../../../core/users/hook/use-users.hook';
@@ -74,8 +74,8 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                                 limited to.
                             </Text>
                             <Text>
-                                1.2 “Intel Component” means a hardware component or product designed, developed, sold,
-                                or distributed by Intel.
+                                1.2 “Intel Component” means a hardware component designed, developed, sold, or
+                                distributed by Intel.
                             </Text>
                             <Text>
                                 1.3 “Material” means software, hardware description language code, or other computer
@@ -93,13 +93,13 @@ export const LicenseModal = ({ onClose, forceOpen }: LicenseModalProps) => {
                             <Text>2 LICENSES.</Text>
                             <Text>
                                 2.1 License. Subject to the terms of this Agreement, Intel grants to you, for the Term,
-                                a personal, limited, non-transferable, non-exclusive, worldwide, revocable, fully
-                                paid-up license under Intel&apos;s intellectual property rights in the Material, without
-                                the right to sublicense, to: a) develop Your Product; b) modify Material delivered by
-                                Intel as source code (or its equivalent); and c) distribute Material, as delivered by
-                                Intel or as modified by you (where expressly permitted), as object code (or its
-                                equivalent), in Your Product, provided your distribution is subject to terms and
-                                conditions consistent with your rights and obligations under this Agreement.
+                                a personal, limited, non-transferable, nonexclusive, worldwide, revocable, fully paid-up
+                                license under Intel&apos;s intellectual property rights in the Material, without the
+                                right to sublicense, to: a) develop Your Product; b) modify Material delivered by Intel
+                                as source code (or its equivalent); and c) distribute Material, as delivered by Intel or
+                                as modified by you (where expressly permitted), as object code (or its equivalent), in
+                                Your Product, provided your distribution is subject to terms and conditions consistent
+                                with your rights and obligations under this Agreement.
                             </Text>
                             <Text>
                                 2.2 Subcontractor. You may disclose Material to your subcontractor for its work on Your

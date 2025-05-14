@@ -3,7 +3,7 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useMemo, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { Explanation } from '../../../../../core/annotations/prediction.interface';

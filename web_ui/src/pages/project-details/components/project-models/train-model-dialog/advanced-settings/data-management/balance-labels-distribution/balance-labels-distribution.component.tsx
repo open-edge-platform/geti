@@ -4,7 +4,7 @@
 import { FC, useState } from 'react';
 
 import { Flex, Grid, Heading, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
 import { Switch } from '../../../../../../../../shared/components/switch/switch.component';

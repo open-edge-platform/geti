@@ -105,7 +105,7 @@ describe('EditRectangleTool', (): void => {
             y: (startPoint.y - endPoint.y) / zoom,
         };
 
-        expect(onComplete).toBeCalledWith({
+        expect(onComplete).toHaveBeenCalledWith({
             ...annotation,
             shape: {
                 ...shape,
@@ -161,7 +161,7 @@ describe('EditRectangleTool', (): void => {
             clientY: endPoint.y,
         });
 
-        expect(iAnnotationToolContext.scene.updateAnnotation).toBeCalledWith(iAnnotation);
+        expect(iAnnotationToolContext.scene.updateAnnotation).toHaveBeenCalledWith(iAnnotation);
     });
 
     test.each([
@@ -209,7 +209,7 @@ describe('EditRectangleTool', (): void => {
                 clientY: zoom * endPoint.y,
             });
 
-            expect(onComplete).toBeCalledWith({
+            expect(onComplete).toHaveBeenCalledWith({
                 ...annotation,
                 shape: { ...shape, ...expectedEndPoint },
             });
@@ -538,7 +538,7 @@ describe('EditRectangleTool', (): void => {
             clientY: endPoint.y,
         });
 
-        expect(onComplete).toBeCalledWith({ ...annotation, shape: expectedRect });
+        expect(onComplete).toHaveBeenCalledWith({ ...annotation, shape: expectedRect });
     });
 
     describe('Resizing to its minimum', () => {
@@ -579,7 +579,7 @@ describe('EditRectangleTool', (): void => {
                 clientY: endPoint.y,
             });
 
-            expect(onComplete).toBeCalledWith({ ...annotation, shape: expectedRect });
+            expect(onComplete).toHaveBeenCalledWith({ ...annotation, shape: expectedRect });
         });
     });
 });

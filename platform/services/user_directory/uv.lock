@@ -499,7 +499,7 @@ wheels = [
 [[package]]
 name = "grpc-interfaces"
 version = "1.0.0"
-source = { editable = "../../../grpc_interfaces" }
+source = { editable = "../../../libs/grpc_interfaces" }
 dependencies = [
     { name = "grpcio" },
 ]
@@ -1561,7 +1561,7 @@ requires-dist = [
     { name = "fastapi", specifier = "==0.115.2" },
     { name = "geti-spicedb-tools", editable = "../../../libs/spicedb_tools" },
     { name = "geti-telemetry-tools", extras = ["telemetry", "fastapi"], editable = "../../../libs/telemetry_tools" },
-    { name = "grpc-interfaces", extras = ["account-service"], editable = "../../../grpc_interfaces" },
+    { name = "grpc-interfaces", extras = ["account-service"], editable = "../../../libs/grpc_interfaces" },
     { name = "jinja2", specifier = "==3.1.*" },
     { name = "kubernetes", specifier = "==24.2.0" },
     { name = "pillow", specifier = ">=10.2.0" },

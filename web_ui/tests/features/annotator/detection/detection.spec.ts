@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { expect } from '@playwright/test';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { DOMAIN } from '../../../../src/core/projects/core.interface';
 import { checkCommonElements, checkDetectionTools, checkNumberOfTools } from '../../../fixtures/annotator-test';

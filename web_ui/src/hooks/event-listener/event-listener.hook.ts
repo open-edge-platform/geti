@@ -35,22 +35,27 @@ export function useEventListener<
     }, [handler]);
 
     useEffect(() => {
+        const controller = new AbortController();
         const targetElement = determineTargetElement(element);
 
         if (targetElement === null) {
             return;
         }
 
-        const eventListener: (event: EventType[EventName]) => void = (event) => {
-            if (savedHandler.current !== undefined) {
-                savedHandler.current(event);
+        targetElement.addEventListener(
+            eventName,
+            (event) => {
+                if (savedHandler.current !== undefined) {
+                    savedHandler.current(event as EventType[EventName]);
+                }
+            },
+            {
+                signal: controller.signal,
             }
-        };
-
-        targetElement.addEventListener(eventName, eventListener as EventListenerOrEventListenerObject);
+        );
 
         return () => {
-            targetElement.removeEventListener(eventName, eventListener as EventListenerOrEventListenerObject);
+            controller.abort();
         };
     }, [eventName, element]);
 }

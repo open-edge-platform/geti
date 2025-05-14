@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import uniq from 'lodash/uniq';
+import { uniq } from 'lodash-es';
 
 import { LabelTreeLabelProps } from '../label-tree-view.interface';
 import { Label, LabelsRelationType } from '../label.interface';

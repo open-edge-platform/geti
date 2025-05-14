@@ -2,9 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import type { jsPDF } from 'jspdf';
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
-import negate from 'lodash/negate';
+import { isEmpty, isNil, negate } from 'lodash-es';
 
 import base64Encodedfont from '../../../assets/fonts/intel-clear.font';
 import { downloadFile, runWhen } from '../../utils';

@@ -5,7 +5,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { DimensionValue, Flex, Grid } from '@adobe/react-spectrum';
 import { Responsive } from '@react-types/shared';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../assets/icons';
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';

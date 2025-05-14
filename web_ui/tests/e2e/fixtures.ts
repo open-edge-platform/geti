@@ -7,10 +7,11 @@ import { mergeTests } from '@playwright/test';
 import dotenv from 'dotenv';
 
 import { LicenseModalPage } from '../fixtures/page-objects/license-modal';
+import { getDirname } from '../utils/get-dirname';
 import { annotatorTest as baseTest } from './../fixtures/annotator-test';
 import { test as apiTest } from './api-fixtures';
 
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(getDirname(import.meta.url), '.env') });
 
 const test = mergeTests(apiTest, baseTest).extend<{
     account: { email: string; password: string };
@@ -43,7 +44,7 @@ const test = mergeTests(apiTest, baseTest).extend<{
         await use(page);
 
         // Update the authentication storage so that it updates the access and refresh tokens
-        const authFile = path.join(__dirname, '.auth/user.json');
+        const authFile = path.join(getDirname(import.meta.url), '.auth/user.json');
         await page.context().storageState({ path: authFile });
     },
     setupOpenAPIServer: async ({}, use) => {
@@ -52,7 +53,7 @@ const test = mergeTests(apiTest, baseTest).extend<{
     },
     // Overwrite the storage state set by testWithLocalStorageState
     storageState: async ({}, use) => {
-        const authFile = path.join(__dirname, '.auth/user.json');
+        const authFile = path.join(getDirname(import.meta.url), '.auth/user.json');
 
         await use(authFile);
     },

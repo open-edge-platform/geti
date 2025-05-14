@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useSelectedOrganization } from '../../core/organizations/hook/use-selected-organization.hook';

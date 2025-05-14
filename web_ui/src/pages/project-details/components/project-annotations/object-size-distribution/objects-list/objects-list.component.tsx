@@ -5,8 +5,7 @@ import { Dispatch, Key, SetStateAction } from 'react';
 
 import { Flex, Item, Picker, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { Heading } from '@react-spectrum/text';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { PressableElement } from '../../../../../../shared/components/pressable-element/pressable-element.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';

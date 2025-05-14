@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isPrediction } from '../../../../core/labels/utils';

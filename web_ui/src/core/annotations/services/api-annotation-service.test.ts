@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isObject from 'lodash/isObject';
+import { isObject } from 'lodash-es';
 import { rest } from 'msw';
 
 import { getMockedLabel } from '../../../test-utils/mocked-items-factory/mocked-labels';
