@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
   labels:
     {{- include "jobs-scheduling-policy.labels" . | nindent 4 }}
 rules:
