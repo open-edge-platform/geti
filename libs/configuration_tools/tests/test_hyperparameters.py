@@ -2,7 +2,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from geti_types.configuration import (
+from pydantic import ValidationError
+
+from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     CenterCrop,
     DatasetPreparationParameters,
@@ -15,7 +17,6 @@ from geti_types.configuration import (
     Tiling,
     TrainingHyperParameters,
 )
-from pydantic import ValidationError
 
 
 class TestHyperparameters:

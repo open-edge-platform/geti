@@ -5,6 +5,14 @@ import pytest
 from geti_types import ID
 from pydantic import ValidationError
 
+from geti_configuration_tools.hyperparameters import (
+    AugmentationParameters,
+    CenterCrop,
+    DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
+    TrainingHyperParameters,
+)
 from geti_configuration_tools.training_configuration import (
     Filtering,
     GlobalDatasetPreparationParameters,
@@ -12,6 +20,25 @@ from geti_configuration_tools.training_configuration import (
     SubsetSplit,
     TrainingConfiguration,
 )
+
+
+@pytest.fixture
+def ftx_hyperparameters():
+    yield Hyperparameters(
+        dataset_preparation=DatasetPreparationParameters(
+            augmentation=AugmentationParameters(
+                center_crop=CenterCrop(ratio=0.6),
+            )
+        ),
+        training=TrainingHyperParameters(
+            max_epochs=100,
+            early_stopping_epochs=10,
+            learning_rate=0.001,
+            learning_rate_warmup_epochs=5,
+            batch_size=32,
+        ),
+        evaluation=EvaluationParameters(),
+    )
 
 
 class TestTrainingConfiguration:

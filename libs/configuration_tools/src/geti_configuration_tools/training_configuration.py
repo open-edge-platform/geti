@@ -84,7 +84,9 @@ class TrainingConfiguration(BaseModel, PersistentEntity):
         PersistentEntity.__init__(self, id_=id_, ephemeral=ephemeral)
         self.task_id = task_id
 
-    model_config = ConfigDict(extra="allow")  # allows the class to have "extra" field such as task_id
+    model_config = ConfigDict(  # allows the class to have "extra" field such as task_id
+        extra="allow", protected_namespaces=()
+    )
 
     model_manifest_id: str | None = Field(
         default=None,
