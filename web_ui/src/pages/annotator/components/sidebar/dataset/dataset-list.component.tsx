@@ -16,9 +16,9 @@ import { ViewModes } from '../../../../../shared/components/media-view-modes/uti
 import { NotFound } from '../../../../../shared/components/not-found/not-found.component';
 import { useGroupedMediaItems } from '../../../../../shared/hooks/use-grouped-media-items.hook';
 import { useSelectedMediaItemIndex } from '../../../../../shared/hooks/use-selected-media-item-index.hook';
+import { getMediaId } from '../../../../media/utils';
 import { MediaItemTooltipMessage } from '../../../../project-details/components/project-media/media-item-tooltip-message/media-item-tooltip-message';
 import { getMediaItemTooltipProps } from '../../../../project-details/components/project-media/media-item-tooltip-message/utils';
-import { getMediaItemId } from '../../../../utils';
 import { DatasetItemFactory } from './dataset-item-factory.component';
 import { EmptyDataSet } from './empty-dataset.component';
 
@@ -131,9 +131,10 @@ export const DatasetList = ({
                 id='annotator-dataset-list'
                 ariaLabel={'Annotator dataset list'}
                 viewMode={viewMode}
-                idFormatter={getMediaItemId}
-                mediaItems={groupedMediaItems}
+                idFormatter={getMediaId}
                 endReached={loadNextMedia}
+                getTextValue={(item) => item.name}
+                mediaItems={groupedMediaItems}
                 viewModeSettings={viewModeSettings}
                 itemContent={(mediaItem) => {
                     return (

@@ -29,7 +29,7 @@ import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { MediaFilterChips } from '../../../media/components/media-filter-chips.component';
 import { useMedia } from '../../../media/providers/media-provider.component';
-import { getMediaItemId } from '../../../utils';
+import { getMediaId } from '../../../media/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { getMatchedMediaCounts, getTotalMediaCounts } from '../../utils';
 import { AnomalyMediaHeaderInformation } from './anomaly-media-header-information.component';
@@ -196,7 +196,8 @@ export const MediaContentBucket = ({
                             <MediaItemsList
                                 id={`media-${bucketId}-dataset-list`}
                                 endReached={() => loadNextMedia(false)}
-                                idFormatter={getMediaItemId}
+                                idFormatter={getMediaId}
+                                getTextValue={(item) => item.name}
                                 mediaItems={media}
                                 viewMode={viewMode}
                                 itemContent={(item) => (

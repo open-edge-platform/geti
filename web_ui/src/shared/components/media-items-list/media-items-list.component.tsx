@@ -30,22 +30,24 @@ interface MediaItemsListProps<T> {
     endReached?: () => void;
     itemContent: (item: T) => ReactNode;
     idFormatter: (item: T) => string;
+    getTextValue: (item: T) => string;
 }
 
-export const MediaItemsList = <T,>({
+export const MediaItemsList = <T extends object>({
     id,
     height,
     viewMode,
-    ariaLabel,
     mediaItems,
+    ariaLabel = 'media items list',
     viewModeSettings = VIEW_MODE_SETTINGS,
     itemContent,
     endReached,
     idFormatter,
+    getTextValue,
 }: MediaItemsListProps<T>): JSX.Element => {
     const config = viewModeSettings[viewMode];
     const isDetails = viewMode === ViewModes.DETAILS;
-    const formattedMediaItems = mediaItems?.map((item) => ({ id: idFormatter(item), ...item })) ?? [];
+    const layout = isDetails ? 'stack' : 'grid';
 
     const ref = useRef(null);
     useLoadMore({ onLoadMore: endReached }, ref);
@@ -67,13 +69,14 @@ export const MediaItemsList = <T,>({
             <Virtualizer layout={isDetails ? ListLayout : GridLayout} layoutOptions={layoutOptions}>
                 <AriaComponentsListBox
                     ref={ref}
-                    layout={isDetails ? 'stack' : 'grid'}
+                    key={layout}
+                    layout={layout}
                     aria-label={ariaLabel}
-                    items={formattedMediaItems}
+                    items={mediaItems}
                     className={classes.container}
                 >
                     {(item) => (
-                        <ListBoxItem textValue={item.id} style={{ height: '100%' }}>
+                        <ListBoxItem id={idFormatter(item)} textValue={getTextValue(item)} style={{ height: '100%' }}>
                             {itemContent(item)}
                         </ListBoxItem>
                     )}

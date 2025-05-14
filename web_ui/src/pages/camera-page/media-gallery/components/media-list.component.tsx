@@ -31,9 +31,10 @@ export const MediaList = ({ viewMode, screenshots }: MediaListProps): JSX.Elemen
     return (
         <>
             <MediaItemsList
-                idFormatter={(item) => item.id}
                 viewMode={viewMode}
                 mediaItems={screenshots}
+                idFormatter={(item) => item.id}
+                getTextValue={(item) => item.file.name}
                 height={`calc(100% - size-550)`}
                 itemContent={(screenshot) => {
                     const { id, ...itemData } = screenshot;

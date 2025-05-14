@@ -123,6 +123,7 @@ export const TestMediaItemsList = ({
                             mediaItems={mediaItems}
                             viewModeSettings={viewModeSettings}
                             idFormatter={getTestMediaItemId}
+                            getTextValue={(item) => item.media.name}
                             itemContent={(mediaItem) => {
                                 const mediaImageItem = mediaItem as unknown as TestImageMediaItem;
                                 const handleSelectMediaItem = () => selectMediaItem(mediaItem);
