@@ -25,7 +25,7 @@ export const RITMTool: ToolProps = {
     ],
     tooltip: {
         img: RITMImg,
-        url: 'guide/annotations/annotation-tools.html#interactive-segmentation',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#interactive-segmentation-tool',
         title: toolTypeToLabelMapping[ToolType.RITMTool],
         description: 'Left-click on an object to draw a polygon around it.',
     },
