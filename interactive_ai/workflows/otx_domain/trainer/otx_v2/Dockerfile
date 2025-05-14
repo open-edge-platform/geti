@@ -75,11 +75,8 @@ COPY --link --from=build --chown=10001 /interactive_ai/workflows/otx_domain/trai
 COPY --link --from=cuda --chown=10001 /usr/local /usr/local
 
 # Place executables in the environment at the front of the path
-ENV PATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2/.venv/bin:$PATH"
+ENV PATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2:$PATH"
 ENV PYTHONPATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2/scripts"
-
-ENV PATH="/otx_v2:$PATH"
-ENV PYTHONPATH="/otx_v2/scripts"
 ENV HF_HUB_OFFLINE=1
 
 USER non-root
