@@ -3,15 +3,15 @@
 
 from collections.abc import Callable
 
+from geti_configuration_tools.project_configuration import NullProjectConfiguration, ProjectConfiguration, TaskConfig
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
-from iai_core.entities.project_configuration import NullProjectConfiguration, ProjectConfiguration, TaskConfig
-from iai_core.repos.base import ProjectBasedSessionRepo
-from iai_core.repos.mappers.cursor_iterator import CursorIterator
-from iai_core.repos.mappers.project_configuration_mapper import ProjectConfigurationToMongo
+from storage.mappers.project_configuration_mapper import ProjectConfigurationToMongo
 
 from geti_types import ProjectIdentifier, Session
+from iai_core.repos.base import ProjectBasedSessionRepo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
 
 
 class ProjectConfigurationRepo(ProjectBasedSessionRepo[ProjectConfiguration]):

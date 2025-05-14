@@ -1,11 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from enum import Enum, auto
+from enum import Enum
 
 from pydantic import BaseModel, Field
 
-from geti_types.configuration import (
+from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,

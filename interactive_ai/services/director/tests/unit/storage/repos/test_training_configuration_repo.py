@@ -2,8 +2,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 
-from iai_core.entities.training_configuration import NullTrainingConfiguration
-from iai_core.repos.training_configuration_repo import TrainingConfigurationRepo
+from geti_configuration_tools.training_configuration import NullTrainingConfiguration
+
+from storage.repos.training_configuration_repo import TrainingConfigurationRepo
 
 from geti_types import ID
 

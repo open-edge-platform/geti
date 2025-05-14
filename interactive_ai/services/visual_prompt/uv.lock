@@ -431,21 +431,13 @@ name = "geti-types"
 version = "1.0.2"
 source = { editable = "../../../libs/types" }
 
-[package.optional-dependencies]
-configuration = [
-    { name = "pydantic" },
-]
-
 [package.metadata]
-requires-dist = [
-    { name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" },
-    { name = "pydantic", marker = "extra == 'configuration'", specifier = "==2.5.3" },
-]
-provides-extras = ["bson", "configuration"]
+requires-dist = [{ name = "bson", marker = "extra == 'bson'", specifier = "~=0.5" }]
+provides-extras = ["bson"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "geti-types", extras = ["bson", "configuration"] },
+    { name = "geti-types", extras = ["bson"] },
     { name = "mypy", specifier = "~=1.15" },
     { name = "pre-commit", specifier = "~=4.1" },
     { name = "pytest", specifier = "~=8.3" },
@@ -547,7 +539,7 @@ dependencies = [
     { name = "attrs" },
     { name = "cachetools" },
     { name = "geti-feature-tools" },
-    { name = "geti-types", extra = ["configuration"] },
+    { name = "geti-types" },
     { name = "minio" },
     { name = "networkx" },
     { name = "numpy" },
@@ -565,7 +557,7 @@ requires-dist = [
     { name = "attrs", specifier = "~=24.3" },
     { name = "cachetools", specifier = "~=5.5" },
     { name = "geti-feature-tools", editable = "../../../libs/feature_tools" },
-    { name = "geti-types", extras = ["configuration"], editable = "../../../libs/types" },
+    { name = "geti-types", editable = "../../../libs/types" },
     { name = "minio", specifier = "~=7.1.0" },
     { name = "networkx", specifier = ">=2.6,<=2.8" },
     { name = "numpy", specifier = ">=1.23.1,<=1.26.4" },

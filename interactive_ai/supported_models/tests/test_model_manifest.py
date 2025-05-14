@@ -10,7 +10,7 @@ import hiyapyco
 
 import pytest
 
-from geti_types.configuration import (
+from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,
     EvaluationParameters,
