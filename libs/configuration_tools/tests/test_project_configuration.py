@@ -2,8 +2,9 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
+from geti_types import ID
 
-from entities.project_configuration import (
+from geti_configuration_tools.project_configuration import (
     AutoTrainingParameters,
     ProjectConfiguration,
     TaskConfig,
@@ -18,6 +19,7 @@ class TestProjectConfiguration:
         [
             (
                 {
+                    "project_id": ID("test_id_1"),
                     "task_configs": [
                         {
                             "task_id": "task_1",
@@ -28,9 +30,10 @@ class TestProjectConfiguration:
                                 "min_images_per_label": 5,
                             },
                         },
-                    ]
+                    ],
                 },
                 ProjectConfiguration(
+                    project_id=ID("test_id_1"),
                     task_configs=[
                         TaskConfig(
                             task_id="task_1",
@@ -41,11 +44,12 @@ class TestProjectConfiguration:
                                 min_images_per_label=5,
                             ),
                         )
-                    ]
+                    ],
                 ),
             ),
             (
                 {
+                    "project_id": ID("test_id_2"),
                     "task_configs": [
                         {
                             "task_id": "classification_task",
@@ -65,9 +69,10 @@ class TestProjectConfiguration:
                                 "min_images_per_label": None,
                             },
                         },
-                    ]
+                    ],
                 },
                 ProjectConfiguration(
+                    project_id=ID("test_id_2"),
                     task_configs=[
                         TaskConfig(
                             task_id="classification_task",
@@ -87,7 +92,7 @@ class TestProjectConfiguration:
                                 min_images_per_label=None,
                             ),
                         ),
-                    ]
+                    ],
                 ),
             ),
         ],
@@ -97,6 +102,7 @@ class TestProjectConfiguration:
         config = ProjectConfiguration(**project_config_dict)
 
         # Basic validation
+        assert config.id_ == expected_config.id_
         assert config.task_configs
         assert len(config.task_configs) == len(expected_config.task_configs)
 
