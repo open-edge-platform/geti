@@ -4,7 +4,7 @@
 import { useRef, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, Divider, Flex, Heading, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, LoadingIndicator } from '@geti/ui';
 
 import { LabeledVideoRange } from '../../../../core/annotations/labeled-video-range.interface';
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
@@ -13,7 +13,6 @@ import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
 import { VideoControls } from '../../../../pages/annotator/components/video-player/video-controls/video-controls.interface';
 import { ZoomProvider } from '../../../../pages/annotator/zoom/zoom-provider.component';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import UndoRedoProvider from '../../tools/undo-redo/undo-redo-provider.component';
 import useUndoRedoState from '../../tools/undo-redo/use-undo-redo-state';

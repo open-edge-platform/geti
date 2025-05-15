@@ -3,7 +3,7 @@
 
 import { CSSProperties, useEffect } from 'react';
 
-import { Button } from '@geti/ui';
+import { Button, LoadingIndicator } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isFunction, isNil } from 'lodash-es';
 
@@ -11,7 +11,6 @@ import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isClassificationDomain } from '../../../../core/projects/domains';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { hasEqualSize } from '../../../../shared/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useNextMediaItem } from '../../hooks/use-next-media-item.hook';

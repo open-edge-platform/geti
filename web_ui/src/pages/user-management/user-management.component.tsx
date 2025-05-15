@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Button } from '@geti/ui';
+import { Button, Loading } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +18,6 @@ import { useMediaUpload } from '../../providers/media-upload-provider/media-uplo
 import { useFirstWorkspaceIdentifier } from '../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { useCheckPermission } from '../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../shared/components/has-permission/has-permission.interface';
-import { Loading } from '../../shared/components/loading/loading.component';
 import { PageLayoutWithTabs } from '../../shared/components/page-layout/page-layout-with-tabs.component';
 import { ShowForOnPrem } from '../../shared/components/show-for-onprem/show-for-onprem.component';
 import { TabItem } from '../../shared/components/tabs/tabs.interface';

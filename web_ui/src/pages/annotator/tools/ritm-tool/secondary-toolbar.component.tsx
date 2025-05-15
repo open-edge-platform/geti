@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Switch } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 
@@ -9,7 +10,6 @@ import { RightClick } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { Divider } from '../../../../shared/components/divider/divider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolSettings, ToolType } from '../../core/annotation-tool-context.interface';

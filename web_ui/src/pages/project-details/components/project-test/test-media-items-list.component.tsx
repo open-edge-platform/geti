@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 
 import { Flex, IllustratedMessage, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Loading } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 import { VirtuosoGridHandle } from 'react-virtuoso';
@@ -12,7 +13,6 @@ import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { TestImageMediaItem } from '../../../../core/tests/test-image.interface';
 import { TestMediaAdvancedFilter, TestMediaItem } from '../../../../core/tests/test-media.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { NotFound } from '../../../../shared/components/not-found/not-found.component';

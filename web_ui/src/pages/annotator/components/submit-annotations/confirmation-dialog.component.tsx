@@ -2,10 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, LoadingIndicator } from '@geti/ui';
 import { MutationStatus } from '@tanstack/react-query';
 
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { UseSubmitAnnotationsMutationResult } from '../../providers/submit-annotations-provider/submit-annotations.interface';
 

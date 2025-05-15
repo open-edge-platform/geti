@@ -4,13 +4,13 @@
 import { Suspense } from 'react';
 
 import { Grid, View } from '@adobe/react-spectrum';
+import { Loading } from '@geti/ui';
 import { Outlet } from 'react-router-dom';
 
 import { isAnomalyDomain } from '../../core/projects/domains';
 import { ProjectSidebar } from '../../pages/project-details/components/project-sidebar/project-sidebar.component';
 import { useProject } from '../../pages/project-details/providers/project-provider/project-provider.component';
 import { LandingPageHeader as Header } from '../../shared/components/header/header.component';
-import { Loading } from '../../shared/components/loading/loading.component';
 
 import classes from './../routes.module.scss';
 
