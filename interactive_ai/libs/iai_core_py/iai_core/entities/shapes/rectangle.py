@@ -59,7 +59,8 @@ class Rectangle(Shape):
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
-        if self.width <= 0 or self.height <= 0:
+        # Accept Rectangle with width and height of 0 for keypoints.
+        if self.width < 0 or self.height < 0:
             raise ValueError(
                 f"Invalid rectangle with coordinates: x1={self.x1}, y1={self.y1}, x2={self.x2}, y2={self.y2}"
             )
@@ -89,6 +90,16 @@ class Rectangle(Shape):
 
         :return: Rectangle: Clipped rectangle.
         """
+        if (
+            (self.x1 < 0 and self.x2 < 0)
+            or (self.x1 > 1 and self.x2 > 1)
+            or (self.y1 < 0 and self.y2 < 0)
+            or (self.y1 > 1 and self.y2 > 1)
+        ):
+            raise ValueError(
+                "It is not possible to clip a rectangle to the visible range if a set of coordinates is out of bounds."
+            )
+
         x1 = min(max(0.0, self.x1), 1.0)
         y1 = min(max(0.0, self.y1), 1.0)
         x2 = min(max(0.0, self.x2), 1.0)

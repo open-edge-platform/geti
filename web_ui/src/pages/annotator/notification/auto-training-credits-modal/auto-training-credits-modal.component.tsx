@@ -23,7 +23,7 @@ import { CreditsToConsume } from '../../../../shared/components/header/credit-ba
 import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useIsAutoTrainingOn } from '../../hooks/use-is-auto-training-on.hook';
-import { onFirstScheduledAutoTrainingJob } from './util';
+import { onFirstScheduledOrRunningAutoTrainingJob } from './util';
 
 import classes from './auto-training-credits-modal.module.scss';
 
@@ -96,7 +96,7 @@ export const AutoTrainingCreditsModal = ({ settings }: AutoTrainingCreditsModalP
     useAutoTrainingCreditsJobs({
         enabled: isQueryEnabled,
         projectIdentifier,
-        onSuccess: onFirstScheduledAutoTrainingJob(settings, (jobId: string) => {
+        onSuccess: onFirstScheduledOrRunningAutoTrainingJob(settings, (jobId: string) => {
             if (isQueryEnabled && !isOpen) {
                 setIsOpen(true);
                 handleDisplayModal(jobId);

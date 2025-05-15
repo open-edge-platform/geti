@@ -12,9 +12,8 @@ from attr.exceptions import FrozenAttributeError
 from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
 from iai_core.configuration.elements.entity_identifiers import EntityIdentifier
 from iai_core.configuration.enums import ConfigurableParameterType
-from iai_core.entities.persistent_entity import PersistentEntity
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 TConfig = TypeVar("TConfig", bound=ConfigurableParameters)
 

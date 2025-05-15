@@ -19,7 +19,7 @@ export const CircleTool: ToolProps = {
     SecondaryToolbar,
     tooltip: {
         img: CircleImg,
-        url: 'guide/annotations/annotation-tools.html#circle-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#circle-tool',
         title: toolTypeToLabelMapping[ToolType.CircleTool],
         description: `Its purpose is to simplify annotation of circular objects.`,
     },

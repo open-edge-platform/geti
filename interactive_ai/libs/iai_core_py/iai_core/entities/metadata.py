@@ -9,9 +9,8 @@ from typing import Any
 
 from iai_core.adapters.adapter import IAdapter
 from iai_core.entities.model import Model
-from iai_core.entities.persistent_entity import PersistentEntity
 
-from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier
+from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, PersistentEntity
 
 
 class IMetadata(metaclass=abc.ABCMeta):

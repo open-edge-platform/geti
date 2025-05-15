@@ -7,25 +7,26 @@ from importlib import resources
 from unittest.mock import patch
 
 import hiyapyco
-
 import pytest
-
-from geti_supported_models.hyperparameters import (
+from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     DatasetPreparationParameters,
+    EarlyStopping,
     EvaluationParameters,
     Hyperparameters,
-    TrainingHyperParameters, CenterCrop, EarlyStopping,
+    TrainingHyperParameters,
 )
+
+from geti_supported_models import manifests
 from geti_supported_models.model_manifest import (
+    Capabilities,
     GPUMaker,
     ModelManifest,
+    ModelManifestDeprecationStatus,
     ModelStats,
     NullModelManifest,
-    ModelManifestDeprecationStatus, Capabilities,
 )
 from geti_supported_models.parser import parse_manifest
-from geti_supported_models import manifests
 
 BASE_MANIFEST_PATH = str(resources.files(manifests).joinpath("base.yaml"))
 TEST_PATH = pathlib.Path(os.path.dirname(__file__))
@@ -49,20 +50,14 @@ def fxt_dummy_supported_gpu():
 @pytest.fixture
 def fxt_dummy_hyperparameters():
     yield Hyperparameters(
-        dataset_preparation=DatasetPreparationParameters(
-            augmentation=AugmentationParameters()
-        ),
-        training=TrainingHyperParameters(
-            max_epochs=101, learning_rate=0.05, early_stopping=EarlyStopping(patience=5)
-        ),
+        dataset_preparation=DatasetPreparationParameters(augmentation=AugmentationParameters()),
+        training=TrainingHyperParameters(max_epochs=101, learning_rate=0.05, early_stopping=EarlyStopping(patience=5)),
         evaluation=EvaluationParameters(metric=None),
     )
 
 
 @pytest.fixture
-def fxt_dummy_model_manifest(
-    fxt_dummy_model_stats, fxt_dummy_supported_gpu, fxt_dummy_hyperparameters
-):
+def fxt_dummy_model_manifest(fxt_dummy_model_stats, fxt_dummy_supported_gpu, fxt_dummy_hyperparameters):
     yield ModelManifest(
         id="dummy_model_manifest",
         name="Dummy ModelManifest",
@@ -84,10 +79,7 @@ class TestModelManifest:
 
     def test_dummy_model_manifest_parsing(self, fxt_dummy_model_manifest):
         model_manifest = parse_manifest(
-            BASE_MANIFEST_PATH,
-            DUMMY_BASE_MANIFEST_PATH,
-            DUMMY_MANIFEST_PATH,
-            relative=False
+            BASE_MANIFEST_PATH, DUMMY_BASE_MANIFEST_PATH, DUMMY_MANIFEST_PATH, relative=False
         )
 
         assert model_manifest == fxt_dummy_model_manifest
@@ -112,19 +104,13 @@ class TestModelManifest:
                         "tiling": {"adaptive_tiling": True, "tile_size": 100, "tile_overlap": 50},
                     }
                 },
-                "training": {
-                    "max_epochs": 100,
-                    "learning_rate": 0.01,
-                    "early_stopping": {"patience": 3}
-                },
-                "evaluation": {
-                    "metric": None
-                }
+                "training": {"max_epochs": 100, "learning_rate": 0.01, "early_stopping": {"patience": 3}},
+                "evaluation": {"metric": None},
             },
             "capabilities": {
                 "xai": True,
                 "tiling": False,
-            }
+            },
         }
 
         with patch("hiyapyco.load") as mock_load:
@@ -133,10 +119,7 @@ class TestModelManifest:
 
             # Verify hiyapyco.load was called with the correct paths
             mock_load.assert_called_once_with(
-                *expected_paths,
-                method=hiyapyco.METHOD_MERGE,
-                interpolate=True,
-                failonmissingfiles=True
+                *expected_paths, method=hiyapyco.METHOD_MERGE, interpolate=True, failonmissingfiles=True
             )
             assert model_manifest == ModelManifest(**mock_yaml_result)
 

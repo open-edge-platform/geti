@@ -1,0 +1,24 @@
+{
+  "name": "@geti/ui",
+  "version": "1.0.0",
+  "description": "Contains UI representative components",
+  "main": "index.js",
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "@geti/config": "*",
+    "jest": "^29.7.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^15.0.7",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/jest": "^29.5.14",
+    "eslint": "^9.25.1",
+    "typescript": "^5.7.2"
+  },
+  "scripts": {
+    "test:unit": "jest --config jest.config.js --watchAll=false",
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\""
+  }
+}

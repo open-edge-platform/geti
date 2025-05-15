@@ -88,6 +88,7 @@ interactive_ai/services/dataset_ie:
 interactive_ai/services/director:
   - interactive_ai/services/director/**
   - interactive_ai/libs/iai_core_py/**
+  - interactive_ai/supported_models/**
   - libs/grpc_interfaces/pyproject.toml
   - libs/grpc_interfaces/job_submission/**
   - libs/types/**
@@ -96,6 +97,7 @@ interactive_ai/services/director:
   - libs/kafka_tools/**
   - libs/fastapi_tools/**
   - libs/spicedb_tools/**
+  - libs/configuration_tools/**
   - Makefile.shared-python
   - Makefile.shared
   - .github/workflows/component.yml
