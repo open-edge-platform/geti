@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { DatePicker } from '@geti/ui';
 import { DateValue, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 
-import { DatePicker } from '../../../../shared/components/date-picker/date-picker.component';
 import { isDateBetween } from '../../../../shared/utils';
 
 interface PersonalAccessTokenExpirationDatepickerProps {
