@@ -5,8 +5,7 @@
 
 from datetime import datetime
 
-from geti_types import ID, Session, make_session
-from iai_core.entities.persistent_entity import PersistentEntity
+from geti_types import ID, PersistentEntity, Session, make_session
 from iai_core.utils.time_utils import now
 
 

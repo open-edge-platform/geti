@@ -4,7 +4,7 @@
 import { FC, useState } from 'react';
 
 import { Flex, Grid, minmax, Text, View } from '@adobe/react-spectrum';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { Refresh } from '../../../../../../../../assets/icons';
 import { ActionButton } from '../../../../../../../../shared/components/button/button.component';

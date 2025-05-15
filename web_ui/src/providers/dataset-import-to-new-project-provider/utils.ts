@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import isEmpty from 'lodash/isEmpty';
+import duration from 'dayjs/plugin/duration.js';
+import relativeTime from 'dayjs/plugin/relativeTime.js';
+import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES, DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../core/datasets/dataset.enum';
 import {

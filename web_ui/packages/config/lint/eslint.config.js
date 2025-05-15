@@ -126,6 +126,11 @@ export default [
                     paths: ['src'],
                     extensions: ['.js', '.jsx', '.ts', '.tsx'],
                 },
+
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: './tsconfig.json',
+                },
             },
 
             react: {
@@ -175,7 +180,7 @@ export default [
                 'error',
                 'ignorePackages',
                 {
-                    js: 'never',
+                    js: 'always',
                     jsx: 'never',
                     ts: 'never',
                     tsx: 'never',
@@ -236,30 +241,6 @@ export default [
         rules: {
             'max-len': 'off',
             '@typescript-eslint/no-non-null-assertion': 'error',
-        },
-    },
-
-    ...compat.extends('plugin:playwright/playwright-test').map((config) => ({
-        ...config,
-        files: ['tests/features/**/*.ts', 'tests/utils/**/*.ts', 'tests/fixtures/**/*.ts', 'tests/e2e/**/*.ts'],
-    })),
-    {
-        files: ['tests/features/**/*.ts', 'tests/utils/**/*.ts', 'tests/fixtures/**/*.ts', 'tests/e2e/**/*.ts'],
-
-        rules: {
-            'playwright/no-wait-for-selector': ['off'],
-            'playwright/no-conditional-expect': ['off'],
-            'playwright/no-standalone-expect': ['off'],
-            'playwright/missing-playwright-await': ['warn'],
-            'playwright/valid-expect': ['warn'],
-            'playwright/no-useless-not': ['warn'],
-            'playwright/no-page-pause': ['warn'],
-            'playwright/prefer-to-have-length': ['warn'],
-            'playwright/no-conditional-in-test': ['off'],
-            'playwright/expect-expect': ['off'],
-            'playwright/no-skipped-test': ['off'],
-            'playwright/no-wait-for-timeout': ['off'],
-            'playwright/no-nested-step': ['off'],
         },
     },
 ];

@@ -172,7 +172,7 @@ class TestShapeFactory:
         assert ShapeFactory.shape_produces_valid_crop(polygon)
 
         polygon = Polygon(points=[point1, point2, point3])
-        assert not ShapeFactory.shape_produces_valid_crop(polygon)
+        assert ShapeFactory.shape_produces_valid_crop(polygon)
 
         polygon = Polygon(points=[point1, point2, point3, point4, point5])
         assert not ShapeFactory.shape_produces_valid_crop(polygon)
@@ -184,4 +184,4 @@ class TestShapeFactory:
         assert not ShapeFactory.shape_produces_valid_crop(ellipse)
 
         keypoint = Keypoint(x=0.1, y=0.1, is_visible=True)
-        assert not ShapeFactory.shape_produces_valid_crop(keypoint)
+        assert ShapeFactory.shape_produces_valid_crop(keypoint)

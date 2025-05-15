@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import { AnimatePresence } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useHover } from 'react-aria';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';

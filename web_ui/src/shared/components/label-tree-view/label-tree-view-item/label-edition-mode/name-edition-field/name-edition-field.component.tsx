@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 
 import { TextFieldRef } from '@react-types/textfield';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import { LabelItemEditionState } from '../../../../../../core/labels/label-tree-view.interface';
 import { LimitedTextField } from '../../../../limited-text-field/limited-text-field.component';

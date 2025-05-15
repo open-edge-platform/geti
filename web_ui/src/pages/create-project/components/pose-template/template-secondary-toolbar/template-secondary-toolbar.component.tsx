@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Delete } from '../../../../../assets/icons';

@@ -4,7 +4,7 @@
 import { Key } from 'react';
 
 import { Flex, Item, TabList, TabPanels, Tabs, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 
@@ -40,7 +40,7 @@ export const DatasetTabPanel = ({ dataset }: { dataset: Dataset }) => {
     const { getDatasetLsByDatasetId } = useLocalStorageExportDataset();
 
     const { projectIdentifier, isSingleDomainProject } = useProject();
-    const navigateToAnnotatorRoute = useNavigateToAnnotatorRoute(projectIdentifier);
+    const navigateToAnnotatorRoute = useNavigateToAnnotatorRoute();
 
     const isAnomalyProject = isSingleDomainProject(isAnomalyDomain);
 
@@ -58,7 +58,7 @@ export const DatasetTabPanel = ({ dataset }: { dataset: Dataset }) => {
 
     const handleGoToAnnotator = () => {
         navigateToAnnotatorRoute({
-            datasetId: selectedDataset.id,
+            datasetIdentifier: { ...projectIdentifier, datasetId: selectedDataset.id },
             active: selectedDataset.useForTraining && !isAnomalyProject,
         });
     };

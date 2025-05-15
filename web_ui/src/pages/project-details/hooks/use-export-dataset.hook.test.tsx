@@ -85,7 +85,7 @@ describe('useExportDataset', () => {
             });
 
             await waitFor(() => {
-                expect(mockAddLsExportDataset).toBeCalledWith({
+                expect(mockAddLsExportDataset).toHaveBeenCalledWith({
                     datasetName,
                     datasetId: mockExportDatasetStatusIdentifier.datasetId,
                     isPrepareDone: false,
@@ -109,7 +109,10 @@ describe('useExportDataset', () => {
             });
 
             await waitFor(() => {
-                expect(mockAddNotification).toBeCalledWith({ message: errorMessage, type: NOTIFICATION_TYPE.ERROR });
+                expect(mockAddNotification).toHaveBeenCalledWith({
+                    message: errorMessage,
+                    type: NOTIFICATION_TYPE.ERROR,
+                });
             });
         });
     });
@@ -160,7 +163,7 @@ describe('useExportDataset', () => {
             });
 
             await waitFor(() => {
-                expect(mockAddNotification).toBeCalledWith({
+                expect(mockAddNotification).toHaveBeenCalledWith({
                     message: expect.any(String),
                     type: NOTIFICATION_TYPE.INFO,
                 });
@@ -182,7 +185,10 @@ describe('useExportDataset', () => {
             });
 
             await waitFor(() => {
-                expect(mockAddNotification).toBeCalledWith({ message: errorMessage, type: NOTIFICATION_TYPE.ERROR });
+                expect(mockAddNotification).toHaveBeenCalledWith({
+                    message: errorMessage,
+                    type: NOTIFICATION_TYPE.ERROR,
+                });
             });
         });
 
@@ -203,7 +209,10 @@ describe('useExportDataset', () => {
             });
 
             await waitFor(() => {
-                expect(mockAddNotification).toBeCalledWith({ message: errorMessage, type: NOTIFICATION_TYPE.ERROR });
+                expect(mockAddNotification).toHaveBeenCalledWith({
+                    message: errorMessage,
+                    type: NOTIFICATION_TYPE.ERROR,
+                });
             });
         });
     });
@@ -234,7 +243,7 @@ describe('useExportDataset', () => {
         );
 
         await waitFor(() => {
-            expect(mockedOnSuccess).toBeCalledWith(jobResponse);
+            expect(mockedOnSuccess).toHaveBeenCalledWith(jobResponse);
         });
     });
 });

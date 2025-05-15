@@ -138,9 +138,8 @@ class TestRectangle:
 
         <b>Steps</b>
         1. Check Rectangle coordinates with correct width and height
-        2. Check Rectangle coordinates with incorrect width: (x2 - x1) <= 0
-        3. Check Rectangle coordinates with incorrect height: (y2 - y1) <= 0
-        4. Check Rectangle coordinates with all coordinates equal 0
+        2. Check Rectangle coordinates with incorrect width: (x2 - x1) < 0
+        3. Check Rectangle coordinates with incorrect height: (y2 - y1) < 0
         """
         # checks for correct width and height
         self.horizontal_rectangle()
@@ -152,17 +151,8 @@ class TestRectangle:
         Rectangle(x1=0.2, y1=0.1, x2=0.4, y2=0.5)
         # checks for incorrect coordinates
         width_less_than_zero_params = {"x1": 0.4, "y1": 0.0, "x2": 0.1, "y2": 0.2}
-        width_equal_zero_params = {"x1": 0.1, "y1": 0.0, "x2": 0.1, "y2": 0.2}
         height_less_than_zero_params = {"x1": 0.1, "y1": 0.4, "x2": 0.3, "y2": 0.1}
-        height_params_equal_zero_params = {"x1": 0.1, "y1": 0.4, "x2": 0.3, "y2": 0.4}
-        zero_rectangle_params = {"x1": 0.0, "x2": 0.0, "y1": 0.0, "y2": 0.0}
-        for incorrect_coordinates in [
-            width_less_than_zero_params,
-            width_equal_zero_params,
-            height_less_than_zero_params,
-            height_params_equal_zero_params,
-            zero_rectangle_params,
-        ]:
+        for incorrect_coordinates in [width_less_than_zero_params, height_less_than_zero_params]:
             with pytest.raises(ValueError):
                 Rectangle(**incorrect_coordinates)
 

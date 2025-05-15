@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import intersectionWith from 'lodash/intersectionWith';
+import { intersectionWith } from 'lodash-es';
 
 import { MediaUploadPerDataset } from '../../../../providers/media-upload-provider/media-upload.interface';
 import { getIds, isNonEmptyArray } from '../../../../shared/utils';

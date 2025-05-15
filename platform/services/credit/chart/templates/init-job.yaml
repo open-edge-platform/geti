@@ -47,7 +47,7 @@ spec:
               --timeout=1800s
               --for=condition=complete
               --namespace {{ .Release.Namespace }}
-              impt-account-service-init-user
+              initial-user
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:

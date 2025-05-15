@@ -3,7 +3,7 @@
 
 import { HTMLProps, PointerEvent, ReactNode, useRef, useState } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { calculateDistance } from '../../../../../core/annotations/math';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';

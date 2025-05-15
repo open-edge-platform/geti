@@ -2,9 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { HttpStatusCode } from 'axios';
-import range from 'lodash/range';
-import take from 'lodash/take';
-import takeRight from 'lodash/takeRight';
+import { range, take, takeRight } from 'lodash-es';
 import OpenAPIBackend from 'openapi-backend';
 import { v4 as uuidv4 } from 'uuid';
 

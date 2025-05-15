@@ -6,7 +6,7 @@ import { useRef } from 'react';
 import { Flex, SpectrumActionButtonProps, View } from '@adobe/react-spectrum';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { clsx } from 'clsx';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../core/labels/label-resolver';

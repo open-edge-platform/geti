@@ -5,9 +5,7 @@ import { Key, useCallback, useMemo } from 'react';
 
 import { Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import capitalize from 'lodash/capitalize';
-import difference from 'lodash/difference';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, difference, isEmpty } from 'lodash-es';
 
 import { MoreMenu } from '../../../assets/icons';
 import { DATASET_IMPORT_STATUSES } from '../../../core/datasets/dataset.enum';

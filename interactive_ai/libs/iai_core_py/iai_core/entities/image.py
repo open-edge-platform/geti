@@ -7,10 +7,9 @@ import datetime
 import logging
 
 from iai_core.entities.media import ImageExtensions, Media, MediaPreprocessing, MediaPreprocessingStatus
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.time_utils import now
 
-from geti_types import ID, ImageIdentifier
+from geti_types import ID, ImageIdentifier, PersistentEntity
 
 logger = logging.getLogger(__name__)
 

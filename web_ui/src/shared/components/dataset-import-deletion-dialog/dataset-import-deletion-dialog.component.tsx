@@ -3,7 +3,7 @@
 
 import { AlertDialog, DialogContainer } from '@adobe/react-spectrum';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { DatasetImportItem } from '../../../core/datasets/dataset.interface';
 

@@ -8,9 +8,7 @@ from dataclasses import dataclass
 
 from cachetools import LRUCache, cachedmethod
 
-from iai_core.entities.persistent_entity import PersistentEntity
-
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 logger = logging.getLogger(__name__)
 

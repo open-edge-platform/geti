@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import negate from 'lodash/negate';
+import { negate } from 'lodash-es';
 
 import { ObjectsPerLabelInterface } from '../../../../../core/statistics/dtos/dataset-statistics.interface';
 import { ChartData, Colors } from '../../../../../shared/components/charts/chart.interface';

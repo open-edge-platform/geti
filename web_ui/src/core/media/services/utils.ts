@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import sortBy from 'lodash/sortBy';
+import { sortBy } from 'lodash-es';
 
 import { ImageIdDTO, VideoFrameIdDTO, VideoIdDTO } from '../../annotations/dtos/annotation.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';

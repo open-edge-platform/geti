@@ -3,8 +3,7 @@
 
 """This module implements the DatasetItemLabels"""
 
-from geti_types import ID
-from iai_core.entities.persistent_entity import PersistentEntity
+from geti_types import ID, PersistentEntity
 
 
 class DatasetItemLabels(PersistentEntity):

@@ -4,7 +4,7 @@
 import { FC, useState } from 'react';
 
 import { Grid, Item, minmax, Picker, Text, View } from '@adobe/react-spectrum';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 
 import {
     ConfigurableParametersParams,

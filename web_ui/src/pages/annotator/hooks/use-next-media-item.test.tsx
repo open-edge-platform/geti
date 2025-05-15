@@ -95,7 +95,7 @@ describe('useNextMediaItem', () => {
         const { result } = renderHook(() => useNextMediaItem(mediaItem, filter), { wrapper });
 
         await waitFor(() => {
-            expect(filter).toBeCalledWith(mediaItem, items);
+            expect(filter).toHaveBeenCalledWith(mediaItem, items);
             expect(result.current).toEqual({ type: 'media', media: items[0] });
         });
     });
@@ -154,7 +154,7 @@ describe('useNextMediaItem', () => {
             });
 
             await waitFor(() => {
-                expect(videoFilter).toBeCalledWith(mediaItem, videoFrames);
+                expect(videoFilter).toHaveBeenCalledWith(mediaItem, videoFrames);
                 expect(result.current).toEqual({ type: 'videoFrame', frameNumber: 60 });
             });
         });
@@ -192,7 +192,7 @@ describe('useNextMediaItem', () => {
             });
 
             await waitFor(() => {
-                expect(videoFilter).toBeCalledWith(mediaItem, filteredFrames);
+                expect(videoFilter).toHaveBeenCalledWith(mediaItem, filteredFrames);
             });
 
             expect(result.current).toEqual({ type: 'videoFrame', frameNumber: 60 });
@@ -236,7 +236,7 @@ describe('useNextMediaItem', () => {
             });
 
             await waitFor(() => {
-                expect(videoFilter).toBeCalledWith(mediaItem, activeVideoFrames);
+                expect(videoFilter).toHaveBeenCalledWith(mediaItem, activeVideoFrames);
             });
 
             expect(result.current).toEqual({ type: 'videoFrame', frameNumber: 30 });

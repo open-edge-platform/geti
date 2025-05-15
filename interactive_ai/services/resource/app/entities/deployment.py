@@ -5,8 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-from geti_types import ID
-from iai_core.entities.persistent_entity import PersistentEntity
+from geti_types import ID, PersistentEntity
 from iai_core.utils.time_utils import now
 
 

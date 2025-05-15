@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { screen, waitForElementToBeRemoved } from '@testing-library/react';
-import identity from 'lodash/identity';
+import { identity } from 'lodash-es';
 
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';

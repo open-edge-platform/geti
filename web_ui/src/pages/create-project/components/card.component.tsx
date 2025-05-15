@@ -5,7 +5,7 @@ import { FC, SVGProps } from 'react';
 
 import { Heading, Image, Radio, RadioGroup, Text, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isString from 'lodash/isString';
+import { isString } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import classes from './card.module.scss';

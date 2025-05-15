@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
-import union from 'lodash/union';
+import { union } from 'lodash-es';
 
 import { MissingProviderError } from '../../shared/missing-provider-error';
 

@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
-import xor from 'lodash/xor';
+import { xor } from 'lodash-es';
 
 import { useFeatureFlags } from '../../feature-flags/hooks/use-feature-flags.hook';
 import { Task } from '../../projects/task.interface';

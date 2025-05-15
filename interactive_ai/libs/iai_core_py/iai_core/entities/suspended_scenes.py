@@ -5,9 +5,7 @@
 
 from collections.abc import Sequence
 
-from iai_core.entities.persistent_entity import PersistentEntity
-
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 
 class SuspendedAnnotationScenesDescriptor(PersistentEntity):

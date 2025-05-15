@@ -16,9 +16,8 @@ from iai_core.utils.constants import DEFAULT_USER_NAME
 from iai_core.utils.time_utils import now
 
 from .keypoint_structure import KeypointStructure, NullKeypointStructure
-from .persistent_entity import PersistentEntity
 from .project_performance import ProjectPerformance, TaskPerformance
-from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
+from geti_types import CTX_SESSION_VAR, ID, PersistentEntity, ProjectIdentifier
 
 if TYPE_CHECKING:
     from iai_core.entities.interfaces.task_graph_adapter_interface import TaskGraphAdapterInterface
