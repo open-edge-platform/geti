@@ -31,7 +31,7 @@ COPY --link --from=build --chown=10001 /interactive_ai/services/mlflow_geti_stor
 
 ARG VENV="/interactive_ai/services/mlflow_geti_store/.venv"
 ENV PATH="$VENV/bin:$PATH"
-ENV PYTHONPATH="/interactive_ai/services/mlflow_geti_store"
+ENV PYTHONPATH="/interactive_ai/services"
 
 USER non-root
 WORKDIR /interactive_ai/services/mlflow_geti_store
