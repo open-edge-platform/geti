@@ -28,3 +28,6 @@ Pros:
 Cons:
 - Setting up the monorepo requires upfront effort, including choosing the right tooling and restructuring the existing codebase.
 - CI/CD pipelines might need to be reconfigured to handle the new code structure.
+
+## Diagram
+![Monorepo architecture](./monorepo-architecture.png)
