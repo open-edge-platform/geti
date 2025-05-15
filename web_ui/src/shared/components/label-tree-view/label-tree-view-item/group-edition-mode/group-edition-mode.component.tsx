@@ -23,8 +23,6 @@ import { TreeViewItemEditModeProps } from '../label-tree-view-item.interface';
 import { isNewState } from '../utils';
 import { MULTIPLE_SELECTION_SWITCH_TOOLTIP, NEW_GROUP_FIELD_TOOLTIP } from './utils';
 
-// Copyright (C) 2022-2025 Intel Corporation
-// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 type GroupEditionModeProps = Omit<TreeViewItemEditModeProps<LabelTreeGroupProps>, 'domains'>;
 
 enum ErrorPath {
