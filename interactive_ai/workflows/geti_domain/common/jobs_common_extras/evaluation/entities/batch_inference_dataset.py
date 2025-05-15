@@ -3,9 +3,9 @@
 
 from dataclasses import dataclass, field
 
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose, EvaluationResult
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose, EvaluationResult
 
 
 @dataclass

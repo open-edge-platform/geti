@@ -23,11 +23,11 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
-from sc_sdk.repos.mappers.cursor_iterator import CursorIterator
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
-from sc_sdk.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
-from sc_sdk.utils.type_helpers import SequenceOrSet
+from iai_core.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
+from iai_core.repos.mappers.cursor_iterator import CursorIterator
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.media_mapper import MediaIdentifierToMongo
+from iai_core.utils.type_helpers import SequenceOrSet
 
 
 class ActiveScoreRepo(DatasetStorageBasedSessionRepo[ActiveScore]):

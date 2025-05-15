@@ -16,10 +16,10 @@ from geti_fastapi_tools.responses import success_response_rest
 from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.project import Project
-from sc_sdk.repos.project_repo_helpers import ProjectQueryData
-from sc_sdk.utils.filesystem import check_free_space_for_operation, compute_project_size
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.project import Project
+from iai_core.repos.project_repo_helpers import ProjectQueryData
+from iai_core.utils.filesystem import check_free_space_for_operation, compute_project_size
 
 DESCRIPTION = "description"
 NAME = "name"

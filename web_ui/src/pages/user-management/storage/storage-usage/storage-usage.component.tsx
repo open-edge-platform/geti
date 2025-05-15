@@ -3,7 +3,7 @@
 
 import { Flex, Heading, ProgressCircle, View } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';

@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import { Form, Heading, Text } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { ValidationError } from 'yup';
 
 import { useResetPassword } from '../../../core/users/hook/use-users.hook';
@@ -14,7 +15,6 @@ import {
     handlePassword,
     validatePasswordsSchema,
 } from '../../../pages/user-management/users/add-member-popup/utils';
-import { Button } from '../../../shared/components/button/button.component';
 import { InvalidTokenAlert } from '../../../shared/components/invalid-token-alert/invalid-token-alert.component';
 import { PasswordField } from '../../../shared/components/password-field/password-field.component';
 import { CONFIRM_PASSWORD_ERROR_MESSAGE, encodeToBase64 } from '../../../shared/utils';

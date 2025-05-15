@@ -11,13 +11,13 @@ import {
     Text,
     useNumberFormatter,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { CONTACT_SUPPORT } from '../../core/const';
 import { useCreditsQueries } from '../../core/credits/hooks/use-credits-api.hook';
 import { GLOBAL_MODALS_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../core/user-settings/utils';
-import { Button } from '../../shared/components/button/button.component';
 import { isBalanceLow } from '../../shared/components/header/credit-balance/util';
 import { ONE_MINUTE, openNewTab } from '../../shared/utils';
 

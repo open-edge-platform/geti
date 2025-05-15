@@ -7,7 +7,7 @@ from collections.abc import Generator
 from unittest.mock import patch
 
 import pytest
-from sc_sdk.repos.base.mongo_connector import MongoConnector
+from iai_core.repos.base.mongo_connector import MongoConnector
 from testcontainers.mongodb import MongoDbContainer
 
 logging.basicConfig(level=logging.INFO)

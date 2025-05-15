@@ -3,7 +3,7 @@
 from entities.deployment import ModelIdentifier
 
 from geti_types import Singleton
-from sc_sdk.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
+from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 
 class ModelIdentifierToMongo(metaclass=Singleton):

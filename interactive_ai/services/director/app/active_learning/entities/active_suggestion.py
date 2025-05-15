@@ -5,8 +5,7 @@
 
 from collections.abc import Sequence
 
-from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from geti_types import ID, MediaIdentifierEntity, NullMediaIdentifier, PersistentEntity
 
 
 class ActiveSuggestion(PersistentEntity):

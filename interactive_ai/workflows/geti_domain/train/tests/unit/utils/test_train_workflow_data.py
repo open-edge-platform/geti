@@ -6,11 +6,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
-from sc_sdk.entities.label_schema import LabelSchemaView
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
+from iai_core.entities.label_schema import LabelSchemaView
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier
+from iai_core.entities.project import Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import LabelSchemaRepo, ModelRepo, ModelStorageRepo, ProjectRepo, TaskNodeRepo
 
 from tests.unit.tasks.utils import return_none
 

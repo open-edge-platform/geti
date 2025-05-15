@@ -6,14 +6,14 @@
 import logging
 
 from geti_types import ID
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.project import Project
+from iai_core.repos import DatasetRepo
 from jobs_common.commands.create_dataset_command import CreateDatasetCommand
 from jobs_common.exceptions import DatasetCreationFailedException
 from jobs_common.utils.annotation_filter import AnnotationFilter
 from jobs_common.utils.dataset_helpers import DatasetHelpers
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, NullDataset
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import DatasetRepo
 
 logger = logging.getLogger(__name__)
 

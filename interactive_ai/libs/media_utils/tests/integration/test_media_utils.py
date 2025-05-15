@@ -3,8 +3,8 @@
 
 
 import pytest
-from sc_sdk.entities.video import VideoFrame
-from sc_sdk.repos import ImageRepo, VideoRepo
+from iai_core.entities.video import VideoFrame
+from iai_core.repos import ImageRepo, VideoRepo
 
 from media_utils import get_image_bytes, get_image_numpy, get_video_bytes, get_video_frame_numpy
 from tests.test_helpers import generate_random_annotated_project
@@ -83,7 +83,8 @@ class TestMediaUtils:
         assert video is not None
 
         numpy_data = get_video_frame_numpy(
-            dataset_storage_identifier=dataset_storage.identifier, video_frame=VideoFrame(video=video, frame_index=0)
+            dataset_storage_identifier=dataset_storage.identifier,
+            video_frame=VideoFrame(video=video, frame_index=0),
         )
 
         assert numpy_data.shape == (360, 480, 3)

@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from sc_sdk.repos import (
+from iai_core.repos import (
     AnnotationSceneRepo,
     AnnotationSceneStateRepo,
     DatasetRepo,

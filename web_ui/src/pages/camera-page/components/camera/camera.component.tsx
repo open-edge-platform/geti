@@ -26,7 +26,7 @@ const VideoTiming = () => {
 
 export const Camera = ({ selectedLabels }: CameraFactoryProps): JSX.Element => {
     const { isLivePrediction, isPhotoCaptureMode } = useCameraParams();
-    const { webcamRef, selectedDeviceId, loadDeviceCapabilities } = useDeviceSettings();
+    const { webcamRef, selectedDeviceId, loadDeviceCapabilities, isMirrored } = useDeviceSettings();
 
     const CaptureButton = isPhotoCaptureMode ? CapturePhotoButton : CaptureVideoButton;
 
@@ -34,7 +34,7 @@ export const Camera = ({ selectedLabels }: CameraFactoryProps): JSX.Element => {
         <>
             {!isPhotoCaptureMode && <VideoTiming />}
             <Webcam
-                mirrored
+                mirrored={isMirrored}
                 ref={webcamRef}
                 aria-label='video camera'
                 className={classes.webCam}

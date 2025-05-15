@@ -17,15 +17,15 @@ from datumaro.components.annotation import NO_GROUP
 from datumaro.components.transformer import ItemTransform
 from datumaro.util import take_by
 from geti_types import ID, MediaIdentifierEntity
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.label import Domain, Label, NullLabel
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
+from iai_core.entities.video import Video
+from iai_core.repos import AnnotationSceneRepo, BinaryRepo, VideoRepo
 from media_utils import VideoDecoder
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.label import Domain, Label, NullLabel
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.media import ImageExtensions, MediaPreprocessing, MediaPreprocessingStatus, VideoExtensions
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
-from sc_sdk.entities.video import Video
-from sc_sdk.repos import AnnotationSceneRepo, BinaryRepo, VideoRepo
 
 from jobs_common_extras.datumaro_conversion.definitions import SUPPORTED_DOMAIN_TO_ANNOTATION_TYPES, GetiProjectType
 from jobs_common_extras.datumaro_conversion.import_utils import ImportUtils
@@ -52,7 +52,11 @@ class ConvertUtils:
         """
 
         def __init__(
-            self, media_w: int, media_h: int, label_source: LabelSource, get_sc_label: Callable[[int | str], Label]
+            self,
+            media_w: int,
+            media_h: int,
+            label_source: LabelSource,
+            get_sc_label: Callable[[int | str], Label],
         ):
             if media_w <= 0 or media_h <= 0:
                 raise ValueError("media_w and media_h should be positive")
@@ -80,7 +84,10 @@ class ConvertUtils:
             if isinstance(sc_label, NullLabel):
                 return None
             return ScoredLabel(
-                label_id=sc_label.id_, is_empty=sc_label.is_empty, probability=1, label_source=self._label_source
+                label_id=sc_label.id_,
+                is_empty=sc_label.is_empty,
+                probability=1,
+                label_source=self._label_source,
             )
 
         def _convert_bbox(self, dm_ann: dm.Bbox) -> list[Annotation]:
@@ -135,7 +142,12 @@ class ConvertUtils:
 
             return [
                 Annotation(
-                    Ellipse(dm_ann.x1 / self._w, dm_ann.y1 / self._h, dm_ann.x2 / self._w, dm_ann.y2 / self._h),
+                    Ellipse(
+                        dm_ann.x1 / self._w,
+                        dm_ann.y1 / self._h,
+                        dm_ann.x2 / self._w,
+                        dm_ann.y2 / self._h,
+                    ),
                     labels=[scored_label],
                 )
             ]
@@ -436,7 +448,12 @@ class ConvertUtils:
         return Annotation(
             Rectangle.generate_full_box(),
             labels=[
-                ScoredLabel(label_id=sc_label.id_, is_empty=sc_label.is_empty, probability=1, label_source=label_source)
+                ScoredLabel(
+                    label_id=sc_label.id_,
+                    is_empty=sc_label.is_empty,
+                    probability=1,
+                    label_source=label_source,
+                )
                 for sc_label in sc_labels
             ],
         )
@@ -469,7 +486,12 @@ class ConvertUtils:
             empty_annotation = Annotation(
                 Rectangle.generate_full_box(),
                 labels=[
-                    ScoredLabel(label_id=empty_labels[0].id_, is_empty=True, probability=1, label_source=label_source)
+                    ScoredLabel(
+                        label_id=empty_labels[0].id_,
+                        is_empty=True,
+                        probability=1,
+                        label_source=label_source,
+                    )
                 ],
             )
         else:
@@ -520,7 +542,10 @@ class ConvertUtils:
         try:
             h, w = dm_item.media.size
             converter = ConvertUtils.ShapeMapper(
-                media_w=w, media_h=h, label_source=label_source, get_sc_label=get_sc_label
+                media_w=w,
+                media_h=h,
+                label_source=label_source,
+                get_sc_label=get_sc_label,
             )
             for dm_ann in dm_anns:
                 sc_anns.extend(converter.convert(dm_ann))

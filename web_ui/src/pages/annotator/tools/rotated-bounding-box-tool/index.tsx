@@ -19,7 +19,7 @@ export const RotatedBoundingBoxTool: ToolProps = {
     StateProvider: ({ children }) => <>{children}</>,
     tooltip: {
         img: RotatedDetectionImg,
-        url: 'guide/annotations/annotation-tools.html#bounding-box-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#bounding-box-tool',
         title: toolTypeToLabelMapping[ToolType.RotatedBoxTool],
         description: `The tool intended for object detection task.
          A rotated bounding box acts as a normal bounding box, but it can be rotated to fit the object better.`,

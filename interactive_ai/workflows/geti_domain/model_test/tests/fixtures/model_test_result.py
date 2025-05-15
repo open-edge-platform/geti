@@ -2,8 +2,8 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from sc_sdk.entities.metrics import MultiScorePerformance, ScoreMetric
-from sc_sdk.entities.model_test_result import ModelTestResult, TestState
+from iai_core.entities.metrics import MultiScorePerformance, ScoreMetric
+from iai_core.entities.model_test_result import ModelTestResult, TestState
 
 from tests.fixtures.values import IDOffsets
 

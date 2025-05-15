@@ -14,11 +14,11 @@ import {
     Heading,
     Text,
 } from '@adobe/react-spectrum';
-import isFunction from 'lodash/isFunction';
+import { Button } from '@geti/ui';
+import { isFunction } from 'lodash-es';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { ButtonCreditsToConsume } from '../../project-model/components/button-credits-to-consume/button-credits-to-consume.component';
 import { useCanTrainModel } from '../train-model-dialog/use-can-train-model.hook';
 import { NotEnoughAnnotationsDialog } from './not-enough-annotations-dialog.component';

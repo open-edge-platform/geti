@@ -4,9 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { QueryClient, QueryKey } from '@tanstack/react-query';
-import isArray from 'lodash/isArray';
-import isEqual from 'lodash/isEqual';
-import isNumber from 'lodash/isNumber';
+import { isArray, isEqual, isNumber } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 

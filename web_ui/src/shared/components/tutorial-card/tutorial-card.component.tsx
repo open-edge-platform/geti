@@ -4,12 +4,12 @@
 import { CSSProperties } from 'react';
 
 import { ButtonGroup, Flex, Heading, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Button } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { MoreMenu } from '../../../assets/icons';
 import { TUTORIAL_CARD_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useDocsUrl } from '../../../hooks/use-docs-url/use-docs-url.hook';
-import { Button } from '../button/button.component';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 import { onPressLearnMore } from '../tutorials/utils';
 import { getCardData } from './utils';

@@ -15,16 +15,16 @@ from geti_fastapi_tools.exceptions import ModelNotFoundException, ProjectNotFoun
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentParameters, ComponentType
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.hyper_parameters import HyperParameters
-from sc_sdk.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
-from sc_sdk.entities.model import Model, NullModel
-from sc_sdk.entities.model_storage import ModelStorage, ModelStorageIdentifier, NullModelStorage
-from sc_sdk.entities.project import NullProject, Project
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import ConfigurableParametersRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.services.model_service import ModelService
+from iai_core.configuration.elements.component_parameters import ComponentParameters, ComponentType
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.hyper_parameters import HyperParameters
+from iai_core.configuration.interfaces.configurable_parameters_interface import IConfigurableParameterContainer
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.model_storage import ModelStorage, ModelStorageIdentifier, NullModelStorage
+from iai_core.entities.project import NullProject, Project
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import ConfigurableParametersRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core.services.model_service import ModelService
 
 logger = logging.getLogger(__name__)
 
@@ -167,26 +167,20 @@ class ConfigurationManager:
         task_model_storages = ConfigurationManager.__get_model_storages_by_task_id(
             project_identifier=project_identifier, task_id=task_id
         )
+
         model: Model | None = None
-        model_storage_id = ID()
+        model_storage_id: ID | None = None
         for model_storage in task_model_storages:
-            try:
-                project = ProjectRepo().get_by_id(project_id)
-                if isinstance(project, NullProject):
-                    raise ProjectNotFoundException(project_id)
-                model_storage_identifier = ModelStorageIdentifier(
-                    workspace_id=project.workspace_id,
-                    project_id=project.id_,
-                    model_storage_id=model_storage_id,
-                )
-                model = ModelRepo(model_storage_identifier).get_by_id(model_id)
-                if isinstance(model, NullModel):
-                    raise ModelNotFoundException(model_id=model_id)
+            model_storage_identifier = ModelStorageIdentifier(
+                workspace_id=project_identifier.workspace_id,
+                project_id=project_identifier.project_id,
+                model_storage_id=model_storage.id_,
+            )
+            model = ModelRepo(model_storage_identifier).get_by_id(model_id)
+            if not isinstance(model, NullModel):
                 model_storage_id = model_storage.id_
                 break
-            except ModelNotFoundException:
-                continue
-        if model is None:
+        if model is None or model_storage_id is None:
             raise ModelNotFoundException(model_id)
         return model.configuration.configurable_parameters, model_storage_id
 

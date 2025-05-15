@@ -4,7 +4,7 @@
 import { ReactNode } from 'react';
 
 import { act, waitFor } from '@testing-library/react';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { Explanation } from '../../../../../core/annotations/prediction.interface';
 import { ShapeType } from '../../../../../core/annotations/shapetype.enum';
@@ -193,7 +193,7 @@ describe('Quick Inference Provider', () => {
             result.current.handleUploadImage([file]);
 
             await waitFor(() => {
-                expect(validateMedia).toBeCalledWith(file);
+                expect(validateMedia).toHaveBeenCalledWith(file);
             });
         });
     });

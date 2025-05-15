@@ -4,10 +4,10 @@
 
 from coordination.dataset_manager.dataset_update import DatasetUpdateUseCase
 
-from sc_sdk.entities.annotation import AnnotationScene
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import AnnotationSceneRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.entities.annotation import AnnotationScene
+from iai_core.entities.subset import Subset
+from iai_core.repos import AnnotationSceneRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
 
 
 class TestDatasetUpdateUseCase:
@@ -40,7 +40,8 @@ class TestDatasetUpdateUseCase:
             image=image, labels=[annotation_label]
         )
         DatasetUpdateUseCase.update_dataset_with_new_annotation_scene(
-            project_id=fxt_db_project_service.project.id_, annotation_scene_id=annotation_scene.id_
+            project_id=fxt_db_project_service.project.id_,
+            annotation_scene_id=annotation_scene.id_,
         )
 
         # Assert that the dataset was updated correctly
@@ -60,7 +61,8 @@ class TestDatasetUpdateUseCase:
             image=image2, labels=[empty_label], full_size_rectangle=True
         )
         DatasetUpdateUseCase.update_dataset_with_new_annotation_scene(
-            project_id=fxt_db_project_service.project.id_, annotation_scene_id=annotation_scene_empty_label.id_
+            project_id=fxt_db_project_service.project.id_,
+            annotation_scene_id=annotation_scene_empty_label.id_,
         )
         dataset = task_dataset_entity.get_dataset(dataset_storage=fxt_db_project_service.dataset_storage)
         assert len(dataset) == 2
@@ -106,7 +108,8 @@ class TestDatasetUpdateUseCase:
             image=image, labels=[annotation_label]
         )
         DatasetUpdateUseCase.update_dataset_with_new_annotation_scene(
-            project_id=fxt_db_project_service.project.id_, annotation_scene_id=annotation_scene_1.id_
+            project_id=fxt_db_project_service.project.id_,
+            annotation_scene_id=annotation_scene_1.id_,
         )
 
         # Set the subset of the dataset item to TRAINED to simulate training of that item
@@ -130,7 +133,8 @@ class TestDatasetUpdateUseCase:
         )
         annotation_scene_2 = fxt_db_project_service.save_annotation_scene_and_state(annotation_scene=annotation_scene_2)
         DatasetUpdateUseCase.update_dataset_with_new_annotation_scene(
-            project_id=fxt_db_project_service.project.id_, annotation_scene_id=annotation_scene_2.id_
+            project_id=fxt_db_project_service.project.id_,
+            annotation_scene_id=annotation_scene_2.id_,
         )
 
         # Assert that the new dataset item correctly has the same subset as the previous item had before
@@ -143,7 +147,8 @@ class TestDatasetUpdateUseCase:
             image=image, labels=[annotation_label]
         )
         DatasetUpdateUseCase.update_dataset_with_new_annotation_scene(
-            project_id=fxt_db_project_service.project.id_, annotation_scene_id=annotation_scene_3.id_
+            project_id=fxt_db_project_service.project.id_,
+            annotation_scene_id=annotation_scene_3.id_,
         )
 
         # Assert that the new dataset item has the subset 'UNASSIGNED' as it should be regarded as a new item

@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { OptimizedModel } from '../../../../../../core/models/optimized-models.interface';
 import { PreselectedModel } from '../../../../project-details.interface';

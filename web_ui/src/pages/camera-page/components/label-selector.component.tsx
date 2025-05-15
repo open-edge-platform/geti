@@ -3,10 +3,11 @@
 
 import { useRef } from 'react';
 
-import { Flex, SpectrumActionButtonProps, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@adobe/react-spectrum';
+import { type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { clsx } from 'clsx';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../core/labels/label-resolver';
@@ -23,7 +24,7 @@ import { isClassificationOrAnomaly } from '../util';
 
 import classes from './camera-page.module.scss';
 
-interface LabelSelectorProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
+interface LabelSelectorProps extends Omit<ActionButtonProps, 'isQuiet'> {
     name: string;
     labelIds: string[];
     selectedLabels: Label[];

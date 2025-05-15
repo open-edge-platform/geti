@@ -5,7 +5,7 @@ import { Key, useRef, useState } from 'react';
 
 import { Flex, Grid, View } from '@adobe/react-spectrum';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';

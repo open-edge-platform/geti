@@ -26,7 +26,7 @@ describe('useCachedImages', () => {
 
         await act(async () => await result.current.load(Antelope));
 
-        expect(loadImage).toBeCalledWith(Antelope);
+        expect(loadImage).toHaveBeenCalledWith(Antelope);
     });
 
     it('does not load the same url twice', async () => {

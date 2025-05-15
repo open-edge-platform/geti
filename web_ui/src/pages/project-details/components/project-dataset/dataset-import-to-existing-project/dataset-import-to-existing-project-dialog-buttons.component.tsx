@@ -4,8 +4,9 @@
 import { useMemo } from 'react';
 
 import { ButtonGroup } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import capitalize from 'lodash/capitalize';
+import { capitalize } from 'lodash-es';
 
 import { DATASET_IMPORT_DIALOG_BUTTONS, DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportDialogButton, DatasetImportItem } from '../../../../../core/datasets/dataset.interface';
@@ -15,7 +16,6 @@ import { useDatasetImportToExistingProject } from '../../../../../providers/data
 import { matchStatus } from '../../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useTusUpload } from '../../../../../providers/tus-upload-provider/tus-upload-provider.component';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { isNonEmptyString } from '../../../../../shared/utils';
 
 interface DatasetImportToExistingProjectDialogButtonsProps {

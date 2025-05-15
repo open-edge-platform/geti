@@ -3,7 +3,7 @@
 
 import { PointerEvent, useEffect, useMemo, useRef, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { Annotation, Annotation as AnnotationInterface } from '../../../../../core/annotations/annotation.interface';

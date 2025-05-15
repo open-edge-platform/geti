@@ -6,12 +6,12 @@ import os
 import uuid
 
 from geti_types import ID
+from iai_core.repos.storage.binary_repo import BinaryRepo
+from iai_core.repos.storage.binary_repos import ModelBinaryRepo
+from iai_core.repos.storage.object_storage import ObjectStorageClient, reinit_client_and_retry_on_timeout
+from iai_core.repos.storage.storage_client import BinaryObjectType
 from minio.commonconfig import CopySource
 from minio.deleteobjects import DeleteObject
-from sc_sdk.repos.storage.binary_repo import BinaryRepo
-from sc_sdk.repos.storage.binary_repos import ModelBinaryRepo
-from sc_sdk.repos.storage.object_storage import ObjectStorageClient, reinit_client_and_retry_on_timeout
-from sc_sdk.repos.storage.storage_client import BinaryObjectType
 
 logger = logging.getLogger(__name__)
 
@@ -33,11 +33,11 @@ class MLFlowExperimentBinaryRepo(BinaryRepo):
         :param dst_filepath: Path of the file in this repo to be copied ('jobs/<job-id>/inputs/<filename>')
         :return: Same as dst_filepath
         """
-        # NOTE: There is no interface for server-side object copy in SC-SDK.
+        # NOTE: There is no interface for server-side object copy in iai-core.
         # This is a workaround for it. We need it because some models have
         # huge model artifacts (>500 MiB) and it makes the Flyte task
         # OOMKilled without the server-side object copy.
-        # TODO: Implement a clean interface for it on the SC-SDK side.
+        # TODO: Implement a clean interface for it on the iai-core side.
         # CVS-133877
 
         model_storage_client, mlflow_storage_client = self._check_storage_clients(model_binary_repo)
@@ -65,11 +65,11 @@ class MLFlowExperimentBinaryRepo(BinaryRepo):
         :param src_filepath: Path of the file in this repo to copy ('jobs/<job-id>/outputs/models/<filename>')
         :return: Filename of the copied file
         """
-        # NOTE: There is no interface for server-side object copy in SC-SDK.
+        # NOTE: There is no interface for server-side object copy in iai-core.
         # This is a workaround for it. We need it because some models have
         # huge model artifacts (>500 MiB) and it makes the Flyte task
         # OOMKilled without the server-side object copy.
-        # TODO: Implement a clean interface for it on the SC-SDK side.
+        # TODO: Implement a clean interface for it on the iai-core side.
         # CVS-133877
 
         model_storage_client, mlflow_storage_client = self._check_storage_clients(model_binary_repo)

@@ -11,7 +11,7 @@ from minio import Minio, S3Error
 from repos.mlflow_binary_repo import MLFlowBinaryRepo
 
 from geti_types import ProjectIdentifier
-from sc_sdk.adapters.binary_interpreters import RAWBinaryInterpreter
+from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
 
 
 class TestMLFlowBinaryRepo:
@@ -60,7 +60,10 @@ class TestMLFlowBinaryRepo:
         mock_delete.assert_called_once()
 
         side_effect = S3Error(code="", message="", resource="", request_id="", host_id="", response="")  # type: ignore[arg-type]
-        with patch.object(Minio, "get_object", side_effect=side_effect) as mock_get, pytest.raises(FileNotFoundError):
+        with (
+            patch.object(Minio, "get_object", side_effect=side_effect) as mock_get,
+            pytest.raises(FileNotFoundError),
+        ):
             _ = mlflow_binary_repo.get_by_filename(
                 filename="test_filename",
                 binary_interpreter=RAWBinaryInterpreter(),

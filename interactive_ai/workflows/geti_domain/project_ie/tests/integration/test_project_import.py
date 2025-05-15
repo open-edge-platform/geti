@@ -9,8 +9,8 @@ from uuid import uuid4
 
 import pytest
 from geti_types import ID
+from iai_core.versioning import DataVersion
 from migration.utils.connection import MinioStorageClient
-from sc_sdk.versioning import DataVersion
 
 from job.entities.exceptions import ImportProjectUnsupportedVersionException, SignatureVerificationFailed
 from job.repos.base.storage_repo import StorageRepo
@@ -101,7 +101,9 @@ class TestProjectImport:
             patch("job.usecases.project_import_usecase.publish_metadata_update") as mock_metadata_update,
         ):
             ProjectImportUseCase().import_zip(
-                file_id=file_id, creator_id=creator_id, progress_callback=fxt_mock_progress_callback
+                file_id=file_id,
+                creator_id=creator_id,
+                progress_callback=fxt_mock_progress_callback,
             )
 
         mock_metadata_update.assert_called_once()
@@ -109,7 +111,11 @@ class TestProjectImport:
     @pytest.mark.parametrize(
         "filename, source_data_version, target_data_version",
         [
-            ("2_0-saas-anomaly_detection-small-unknown-upgraded_from_1_8.zip", "1.0", None),
+            (
+                "2_0-saas-anomaly_detection-small-unknown-upgraded_from_1_8.zip",
+                "1.0",
+                None,
+            ),
             ("2_6-saas-classification-empty.zip", "19.0", "19.0"),
             ("2_6-saas-classification-empty.zip", "19.0", "18.0"),
         ],
@@ -152,7 +158,9 @@ class TestProjectImport:
             nullcontext() if is_data_version_supported else pytest.raises(ImportProjectUnsupportedVersionException),
         ):
             ProjectImportUseCase().import_zip(
-                file_id=file_id, creator_id=creator_id, progress_callback=fxt_mock_progress_callback
+                file_id=file_id,
+                creator_id=creator_id,
+                progress_callback=fxt_mock_progress_callback,
             )
 
         if is_data_version_supported:
@@ -189,5 +197,7 @@ class TestProjectImport:
             pytest.raises(SignatureVerificationFailed),
         ):
             ProjectImportUseCase().import_zip(
-                file_id=file_id, creator_id=creator_id, progress_callback=fxt_mock_progress_callback
+                file_id=file_id,
+                creator_id=creator_id,
+                progress_callback=fxt_mock_progress_callback,
             )

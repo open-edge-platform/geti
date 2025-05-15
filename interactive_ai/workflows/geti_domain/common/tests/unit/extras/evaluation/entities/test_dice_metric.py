@@ -3,16 +3,16 @@
 
 import pytest
 from geti_types import ID, ImageIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain, Label
-from sc_sdk.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.metrics import BarMetricsGroup, Performance, ScoreMetric
-from sc_sdk.entities.scored_label import ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain, Label
+from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.metrics import BarMetricsGroup, Performance, ScoreMetric
+from iai_core.entities.scored_label import ScoredLabel
+from iai_core.entities.shapes import Rectangle
 
 from jobs_common_extras.evaluation.entities.dice_metric import DiceMetric
 from jobs_common_extras.evaluation.entities.performance_metric import MetricAverageMethod
@@ -20,7 +20,12 @@ from jobs_common_extras.evaluation.entities.performance_metric import MetricAver
 
 @pytest.fixture
 def fxt_empty_label():
-    yield Label(name="label_empty", domain=Domain.INSTANCE_SEGMENTATION, is_empty=True, id_=ID("label_empty_id"))
+    yield Label(
+        name="label_empty",
+        domain=Domain.INSTANCE_SEGMENTATION,
+        is_empty=True,
+        id_=ID("label_empty_id"),
+    )
 
 
 @pytest.fixture
@@ -39,7 +44,9 @@ def fxt_label_schema(fxt_labels):
     label_group = LabelGroup(labels=[label_a, label_b], name="dummy segmentation label group")
     label_schema.add_group(label_group)
     empty_label_group = LabelGroup(
-        labels=[empty_label], name="dummy segmentation empty group", group_type=LabelGroupType.EMPTY_LABEL
+        labels=[empty_label],
+        name="dummy segmentation empty group",
+        group_type=LabelGroupType.EMPTY_LABEL,
     )
     label_schema.add_group(empty_label_group)
     yield label_schema
@@ -281,7 +288,12 @@ class TestDiceMetric:
         assert metric.dice_per_label[label_b].score == pytest.approx(fxt_overall_scores[label_b], 0.01)
 
     def test_get_performance(
-        self, fxt_ground_truth_dataset, fxt_prediction_dataset, fxt_label_schema, fxt_labels, fxt_overall_scores
+        self,
+        fxt_ground_truth_dataset,
+        fxt_prediction_dataset,
+        fxt_label_schema,
+        fxt_labels,
+        fxt_overall_scores,
     ) -> None:
         # Arrange
         label_a, label_b, _ = fxt_labels

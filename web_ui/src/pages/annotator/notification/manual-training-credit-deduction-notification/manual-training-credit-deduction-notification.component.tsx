@@ -4,7 +4,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 import { InfiniteData } from '@tanstack/react-query';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

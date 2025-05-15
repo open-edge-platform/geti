@@ -6,7 +6,7 @@ from testfixtures import compare
 from communication.rest_views.video_annotation_range_rest_views import VideoAnnotationRangeRESTViews
 
 from geti_types import ID
-from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
 
 
 class TestVideoAnnotationRangeRESTViews:
@@ -15,7 +15,11 @@ class TestVideoAnnotationRangeRESTViews:
 
         range_label_rest = VideoAnnotationRangeRESTViews.range_label_to_rest(range_label)
 
-        assert range_label_rest == {"start_frame": 3, "end_frame": 8, "label_ids": ["a", "b"]}
+        assert range_label_rest == {
+            "start_frame": 3,
+            "end_frame": 8,
+            "label_ids": ["a", "b"],
+        }
 
     def test_range_label_from_rest(self) -> None:
         range_label_rest_1 = {"start_frame": 3, "end_frame": 8, "label_ids": ["a", "b"]}

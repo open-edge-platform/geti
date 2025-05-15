@@ -22,12 +22,12 @@ from communication.constants import MAX_UNANNOTATED_DATASET_SIZE
 from .base_active_manager import BaseActiveManager
 from .task_active_manager import TaskActiveManager
 from geti_types import ID, MediaIdentifierEntity
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.entities.annotation_scene_state import AnnotationState
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.model import Model
-from sc_sdk.repos import ConfigurableParametersRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.model import Model
+from iai_core.repos import ConfigurableParametersRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 logger = logging.getLogger(__name__)
 

@@ -15,10 +15,10 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.video import Video
-from sc_sdk.entities.video_annotation_statistics import VideoAnnotationStatistics
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationStatePerTask
+from iai_core.entities.image import Image
+from iai_core.entities.video import Video
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.utils.annotation_scene_state_helper import AnnotationStatePerTask
 
 logger = logging.getLogger(__name__)
 

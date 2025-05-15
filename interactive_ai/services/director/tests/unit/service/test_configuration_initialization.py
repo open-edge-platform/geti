@@ -16,9 +16,9 @@ from coordination.dataset_manager.dataset_counter_config import (
 )
 from service.project_service import ProjectService
 
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.enums.utils import get_enum_names
-from sc_sdk.repos import ConfigurableParametersRepo, ProjectRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.configuration.enums.utils import get_enum_names
+from iai_core.repos import ConfigurableParametersRepo, ProjectRepo
 
 
 class TestConfigurationInitializer:
@@ -76,7 +76,10 @@ class TestConfigurationInitializer:
                         task_id=task_id,
                     )
                     repo_id = config.id
-                    register_data = cast("ComponentRegisterEntry", ConfigurableComponentRegister[component.name].value)
+                    register_data = cast(
+                        "ComponentRegisterEntry",
+                        ConfigurableComponentRegister[component.name].value,
+                    )
                     config_type = register_data.get_configuration_type(task_type)
                     expected_config = config_type(id=repo_id)
 
@@ -93,7 +96,11 @@ class TestConfigurationInitializer:
 
         # Act
         with (
-            patch.object(ProjectRepo, "get_by_id", return_value=fxt_project_with_anomaly_classification_task),
+            patch.object(
+                ProjectRepo,
+                "get_by_id",
+                return_value=fxt_project_with_anomaly_classification_task,
+            ),
         ):
             ProjectService.init_configuration(project_id=fxt_project_with_anomaly_classification_task.id_)
             for component, expected_config_type in zip(components_to_check, expected_config_types):
@@ -135,7 +142,11 @@ class TestConfigurationInitializer:
 
         # Act
         with (
-            patch.object(ProjectRepo, "get_by_id", return_value=fxt_project_with_keypoint_detection_task),
+            patch.object(
+                ProjectRepo,
+                "get_by_id",
+                return_value=fxt_project_with_keypoint_detection_task,
+            ),
         ):
             ProjectService.init_configuration(project_id=project.id_)
             config = repo.get_latest_component_parameters(

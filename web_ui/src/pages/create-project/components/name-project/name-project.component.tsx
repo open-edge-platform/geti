@@ -4,8 +4,7 @@
 import { FormEvent, useMemo, useState } from 'react';
 
 import { Form } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
+import { isEmpty, isFunction } from 'lodash-es';
 
 import { LimitedTextField } from '../../../../shared/components/limited-text-field/limited-text-field.component';
 import { ProjectMetadata } from '../../new-project-dialog-provider/new-project-dialog-provider.interface';

@@ -4,13 +4,12 @@
 import { useEffect, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Button, Checkbox } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../../../core/labels/label-resolver';
 import { Label } from '../../../../../core/labels/label.interface';
 import { Task } from '../../../../../core/projects/task.interface';
-import { Button } from '../../../../../shared/components/button/button.component';
-import { Checkbox } from '../../../../../shared/components/checkbox/checkbox.component';
 import { TaskLabelTreeSearch } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search.component';
 import { hasEqualId, isNotCropTask, runWhenTruthy } from '../../../../../shared/utils';
 

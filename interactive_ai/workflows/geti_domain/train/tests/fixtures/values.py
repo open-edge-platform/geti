@@ -3,7 +3,7 @@
 
 from datetime import datetime, timezone
 
-from sc_sdk.entities.annotation import AnnotationSceneKind
+from iai_core.entities.annotation import AnnotationSceneKind
 
 
 class DummyValues:

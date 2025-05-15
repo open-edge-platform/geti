@@ -5,7 +5,7 @@ from copy import copy
 from unittest.mock import MagicMock
 
 import pytest
-from sc_sdk.entities.model import (
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelStatus,
@@ -13,8 +13,8 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import (
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,

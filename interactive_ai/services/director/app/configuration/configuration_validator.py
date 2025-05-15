@@ -17,19 +17,19 @@ from communication.exceptions import (
     TaskNotFoundException,
 )
 
-import sc_sdk.configuration.helper as otx_config_helper
+import iai_core.configuration.helper as otx_config_helper
 from geti_fastapi_tools.exceptions import InvalidEntityIdentifierException
 from geti_types import ID, ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentEntityIdentifier
-from sc_sdk.configuration.elements.configurable_parameters import ConfigurableParameters
-from sc_sdk.configuration.elements.entity_identifiers import EntityIdentifier, ModelEntityIdentifier
-from sc_sdk.configuration.interfaces.configurable_parameters_interface import (
+from iai_core.configuration.elements.component_parameters import ComponentEntityIdentifier
+from iai_core.configuration.elements.configurable_parameters import ConfigurableParameters
+from iai_core.configuration.elements.entity_identifiers import EntityIdentifier, ModelEntityIdentifier
+from iai_core.configuration.interfaces.configurable_parameters_interface import (
     IConfigurableParameterContainer,
     NullConfigurableParameterContainer,
 )
-from sc_sdk.entities.model_storage import ModelStorage
-from sc_sdk.entities.project import Project
-from sc_sdk.repos import ConfigurableParametersRepo, ModelStorageRepo, TaskNodeRepo
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.entities.project import Project
+from iai_core.repos import ConfigurableParametersRepo, ModelStorageRepo, TaskNodeRepo
 
 logger = logging.getLogger(__name__)
 BE_VALIDATOR = logging.DEBUG

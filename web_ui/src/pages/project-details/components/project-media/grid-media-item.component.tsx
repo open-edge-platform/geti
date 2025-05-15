@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useRef, useState } from 'react';
+import { Key, useRef, useState } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Checkbox } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 
 import { MediaItem } from '../../../../core/media/media.interface';
-import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
 import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { MediaItemActions } from './media-item-actions/media-item-actions.component';
@@ -38,6 +38,7 @@ export const GridMediaItem = ({
     shouldShowAnnotationIndicator,
 }: GridMediaItemProps): JSX.Element => {
     const triggerRef = useRef(null);
+    const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
 
     const [isHovered, setIsHovered] = useState(false);
 
@@ -61,7 +62,7 @@ export const GridMediaItem = ({
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}
         >
-            {(isHovered || isSelected) && (
+            {(isHovered || isSelected || selectedMediaItemAction !== undefined) && (
                 <Flex
                     wrap
                     ref={triggerRef}
@@ -103,7 +104,11 @@ export const GridMediaItem = ({
                         height={'size-500'}
                         zIndex={10}
                     >
-                        <MediaItemActions mediaItem={mediaItem} />
+                        <MediaItemActions
+                            mediaItem={mediaItem}
+                            onSelectedMediaItemActionChange={setSelectedMediaItemAction}
+                            selectedMediaItemAction={selectedMediaItemAction}
+                        />
                     </View>
                 </Flex>
             )}

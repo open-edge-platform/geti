@@ -69,7 +69,7 @@ describe('RITM Secondary toolbar', () => {
             const annotationContext = await renderTool();
 
             fireEvent.click(screen.getByLabelText('Dynamic selection mode'));
-            expect(annotationContext.updateToolSettings).toBeCalledWith(ToolType.RITMTool, {
+            expect(annotationContext.updateToolSettings).toHaveBeenCalledWith(ToolType.RITMTool, {
                 dynamicBoxMode: false,
                 rightClickMode: false,
             });
@@ -90,7 +90,7 @@ describe('RITM Secondary toolbar', () => {
             const annotationContext = await renderTool();
 
             fireEvent.click(getAcceptButton());
-            expect(annotationContext.scene.addShapes).toBeCalledWith([expectedContour], undefined);
+            expect(annotationContext.scene.addShapes).toHaveBeenCalledWith([expectedContour], undefined);
         });
 
         it('cannot save when RITM is still in progress', async (): Promise<void> => {

@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 import { useNumberFormatter, usePress } from 'react-aria';
 
 import { AiIcon, ChevronRightSmallLight } from '../../../../assets/icons';

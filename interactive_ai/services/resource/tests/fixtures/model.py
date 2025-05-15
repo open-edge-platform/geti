@@ -11,11 +11,11 @@ import pytest
 
 from tests.fixtures.values import DummyValues
 
-from sc_sdk.adapters.model_adapter import ExportableCodeAdapter
-from sc_sdk.configuration.elements.hyper_parameters import NullHyperParameters
-from sc_sdk.entities.active_model_state import ActiveModelState
-from sc_sdk.entities.metrics import NullPerformance, Performance, ScoreMetric
-from sc_sdk.entities.model import (
+from iai_core.adapters.model_adapter import ExportableCodeAdapter
+from iai_core.configuration.elements.hyper_parameters import NullHyperParameters
+from iai_core.entities.active_model_state import ActiveModelState
+from iai_core.entities.metrics import NullPerformance, Performance, ScoreMetric
+from iai_core.entities.model import (
     Model,
     ModelConfiguration,
     ModelOptimizationType,
@@ -26,8 +26,8 @@ from sc_sdk.entities.model import (
     TrainingFramework,
     TrainingFrameworkType,
 )
-from sc_sdk.entities.model_storage import ModelStorage, NullModelStorage
-from sc_sdk.entities.model_template import (
+from iai_core.entities.model_storage import ModelStorage, NullModelStorage
+from iai_core.entities.model_template import (
     DatasetRequirements,
     HyperParameterData,
     InstantiationType,
@@ -37,7 +37,7 @@ from sc_sdk.entities.model_template import (
     TaskFamily,
     TaskType,
 )
-from sc_sdk.repos import ModelRepo
+from iai_core.repos import ModelRepo
 
 os.environ["DEFAULT_TRAINER_VERSION"] = "2.2.0"
 
@@ -831,7 +831,10 @@ def fxt_zip_file():
     """
     archive = io.BytesIO()
 
-    with ZipFile(archive, mode="w") as zf, tempfile.NamedTemporaryFile(prefix="temp_file_in_zip") as temp_file:
+    with (
+        ZipFile(archive, mode="w") as zf,
+        tempfile.NamedTemporaryFile(prefix="temp_file_in_zip") as temp_file,
+    ):
         zf.write(temp_file.name)
 
     yield archive

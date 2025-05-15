@@ -23,8 +23,8 @@ from configuration import ConfigurationValidator
 
 from geti_fastapi_tools.exceptions import InvalidEntityIdentifierException
 from geti_types import ProjectIdentifier
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.configuration.elements.entity_identifiers import ComponentEntityIdentifier, ModelEntityIdentifier
 
 
 class TestConfigurationValidator:

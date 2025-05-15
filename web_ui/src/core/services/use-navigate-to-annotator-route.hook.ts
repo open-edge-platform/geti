@@ -8,7 +8,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { isImage } from '../media/image.interface';
 import { MediaItem } from '../media/media.interface';
 import { isVideo, isVideoFrame } from '../media/video.interface';
-import { ProjectIdentifier } from '../projects/core.interface';
+import { DatasetIdentifier } from '../projects/dataset.interface';
 import { paths } from './routes';
 
 const mediaPath = ({
@@ -55,26 +55,18 @@ const mediaPath = ({
     return paths.project.annotator.index({ organizationId, workspaceId, projectId, datasetId });
 };
 
-export type NavigateToAnnotatorRoute = ({
-    datasetId,
-    mediaItem,
-    active,
-    taskId,
-}: {
-    datasetId: string;
+type AnnotatorTarget = {
+    datasetIdentifier: DatasetIdentifier;
     mediaItem?: Pick<MediaItem, 'identifier'>;
     active?: boolean;
     taskId?: string | null;
-}) => void;
+};
 
-export const useNavigateToAnnotatorRoute = (projectIdentifier: ProjectIdentifier): NavigateToAnnotatorRoute => {
+export const useAnnotatorRoutePath = () => {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
 
     return useCallback(
-        ({ datasetId, mediaItem, active, taskId }) => {
-            const { workspaceId, projectId, organizationId } = projectIdentifier;
-
+        ({ datasetIdentifier, mediaItem, active, taskId }: AnnotatorTarget): string => {
             if (active !== undefined) {
                 if (active === true) {
                     searchParams.set('active', 'true');
@@ -96,11 +88,23 @@ export const useNavigateToAnnotatorRoute = (projectIdentifier: ProjectIdentifier
             const search = searchParams.toString();
 
             if (search !== '') {
-                navigate(`${mediaPath({ organizationId, workspaceId, projectId, datasetId, mediaItem })}?${search}`);
+                return `${mediaPath({ ...datasetIdentifier, mediaItem })}?${search}`;
             } else {
-                navigate(`${mediaPath({ organizationId, workspaceId, projectId, datasetId, mediaItem })}`);
+                return `${mediaPath({ ...datasetIdentifier, mediaItem })}`;
             }
         },
-        [navigate, projectIdentifier, searchParams]
+        [searchParams]
+    );
+};
+
+export const useNavigateToAnnotatorRoute = () => {
+    const navigate = useNavigate();
+    const annotatorRoutePath = useAnnotatorRoutePath();
+
+    return useCallback(
+        ({ datasetIdentifier, mediaItem, active, taskId }: AnnotatorTarget) => {
+            navigate(annotatorRoutePath({ datasetIdentifier, mediaItem, active, taskId }));
+        },
+        [navigate, annotatorRoutePath]
     );
 };

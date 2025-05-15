@@ -38,17 +38,17 @@ from geti_types import (
     VideoFrameIdentifier,
     VideoIdentifier,
 )
-from sc_sdk.entities.annotation import Annotation, AnnotationSceneKind
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.dataset_storage import DatasetStorage
-from sc_sdk.entities.datasets import Dataset, NullDataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label import Domain
-from sc_sdk.entities.label_schema import LabelGroupType, LabelSchema
-from sc_sdk.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, LabelRepo, VideoAnnotationRangeRepo, VideoRepo
+from iai_core.entities.annotation import Annotation, AnnotationSceneKind
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.dataset_storage import DatasetStorage
+from iai_core.entities.datasets import Dataset, NullDataset
+from iai_core.entities.image import Image
+from iai_core.entities.label import Domain
+from iai_core.entities.label_schema import LabelGroupType, LabelSchema
+from iai_core.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, LabelRepo, VideoAnnotationRangeRepo, VideoRepo
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper, LabelMap
 from jobs_common_extras.datumaro_conversion.mappers.dataset_item_mapper import DatasetItemMapper
@@ -58,11 +58,11 @@ from jobs_common_extras.datumaro_conversion.mappers.label_mapper import LabelSch
 __all__ = ["ScExtractor", "ScExtractorForFlyteJob", "ScExtractorFromDatasetStorage"]
 
 from geti_types import CTX_SESSION_VAR, Session, session_context
+from iai_core.repos.storage.binary_repos import VideoBinaryRepo
 from media_utils import get_image_bytes, get_media_numpy, get_video_bytes
-from sc_sdk.repos.storage.binary_repos import VideoBinaryRepo
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
+    from iai_core.entities.video_annotation_range import RangeLabels, VideoAnnotationRange
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +93,8 @@ class ScExtractor(dm_DatasetBase):
 
         # We need all labels to be mapped
         project_identifier = ProjectIdentifier(
-            workspace_id=dataset_storage_identifier.workspace_id, project_id=dataset_storage_identifier.project_id
+            workspace_id=dataset_storage_identifier.workspace_id,
+            project_id=dataset_storage_identifier.project_id,
         )
         label_repo = LabelRepo(project_identifier=project_identifier)
         self._label_id_to_label = {label.id_: label for label in label_repo.get_all()}
@@ -206,7 +207,7 @@ class ScExtractor(dm_DatasetBase):
 
         return label_name_to_all_parents
 
-    def _convert_annotations(self, annotations: list[Annotation], width: int, height: int) -> list[dm_Annotation]:  # noqa: C901, PLR0912
+    def _convert_annotations(self, annotations: list[Annotation], width: int, height: int) -> list[dm_Annotation]:  # noqa: PLR0912, C901
         dm_anns: list[dm_Annotation] = []
         keypoints = []
         visibilities = []
@@ -302,7 +303,10 @@ class ScExtractor(dm_DatasetBase):
             if keypoints and visibilities:
                 dm_anns.append(
                     dm_Points(
-                        points=keypoints, visibility=visibilities, label=primary_label_id, attributes=keypoint_labels
+                        points=keypoints,
+                        visibility=visibilities,
+                        label=primary_label_id,
+                        attributes=keypoint_labels,
                     )
                 )
 
@@ -337,7 +341,8 @@ class ScExtractor(dm_DatasetBase):
 
         if video_root is None or not isinstance(sc_item.media, VideoFrame):
             numpy_data = get_media_numpy(
-                dataset_storage_identifier=self._dataset_storage_identifier, media=sc_item.media
+                dataset_storage_identifier=self._dataset_storage_identifier,
+                media=sc_item.media,
             )
             dm_media = dm_Image.from_numpy(
                 lambda: cv2.cvtColor(numpy_data, cv2.COLOR_RGB2BGR),
@@ -371,7 +376,8 @@ class ScExtractor(dm_DatasetBase):
             else:  # url
                 with open(video_path, "wb") as file:
                     video_data = get_video_bytes(
-                        dataset_storage_identifier=self._dataset_storage_identifier, video=video
+                        dataset_storage_identifier=self._dataset_storage_identifier,
+                        video=video,
                     )
                     file.write(video_data)
         return video_path
@@ -401,7 +407,12 @@ class ScExtractorForFlyteJob(ScExtractor):
         label_schema: LabelSchema,
         num_thread_pools: int = 10,
     ) -> None:
-        super().__init__(dataset_storage_identifier, sc_dataset_or_list_of_sc_items, label_schema, use_subset=True)
+        super().__init__(
+            dataset_storage_identifier,
+            sc_dataset_or_list_of_sc_items,
+            label_schema,
+            use_subset=True,
+        )
         self._thread_pool = ThreadPool(processes=num_thread_pools)
 
     def _set_name_mapper(self):
@@ -432,7 +443,11 @@ class ScExtractorForFlyteJob(ScExtractor):
         )
 
     @staticmethod
-    def _get_image_bytes(session: Session, dataset_storage_identifier: DatasetStorageIdentifier, image: Image) -> bytes:
+    def _get_image_bytes(
+        session: Session,
+        dataset_storage_identifier: DatasetStorageIdentifier,
+        image: Image,
+    ) -> bytes:
         with session_context(session=session):
             return get_image_bytes(dataset_storage_identifier=dataset_storage_identifier, image=image)
 

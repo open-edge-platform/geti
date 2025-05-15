@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import clsx from 'clsx';
-
-import { Button } from '../../../../../../../../shared/components/button/button.component';
 
 import styles from './toggle-buttons.module.scss';
 

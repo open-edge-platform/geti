@@ -3,8 +3,7 @@
 
 """This module implements the DatasetItemLabels"""
 
-from geti_types import ID
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from geti_types import ID, PersistentEntity
 
 
 class DatasetItemLabels(PersistentEntity):

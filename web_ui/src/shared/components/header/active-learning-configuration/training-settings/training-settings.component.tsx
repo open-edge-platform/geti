@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import { Heading, Item, Picker, View } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { hasActiveModels } from '../../../../../core/models/utils';

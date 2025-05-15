@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 
 import { Close } from '../../../../../../assets/icons';
 import { USER_ROLE, WorkspaceRole } from '../../../../../../core/users/users.interface';
 import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
 import { RolePicker } from '../../../old-project-users/role-picker.component';
 import { WorkspacesPicker } from './workspaces-picker.component';
 

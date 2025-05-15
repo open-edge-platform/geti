@@ -4,12 +4,12 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Grid, repeat, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Checkbox } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../../assets/icons';
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { Checkbox } from '../../../../../shared/components/checkbox/checkbox.component';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { hasEqualId, hasEqualSize } from '../../../../../shared/utils';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';

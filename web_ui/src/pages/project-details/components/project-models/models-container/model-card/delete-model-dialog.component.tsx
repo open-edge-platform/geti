@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Text } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { OverlayTriggerState } from 'react-stately';
 
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../../shared/components/button/button.component';
 
 interface DeleteModelDialogProps {
     version: number;

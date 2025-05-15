@@ -6,8 +6,7 @@ This module defines the FileMetadata class
 
 from enum import Enum, IntFlag, auto
 
-from geti_types import ID
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from geti_types import ID, PersistentEntity
 
 
 class ExportState(IntFlag):

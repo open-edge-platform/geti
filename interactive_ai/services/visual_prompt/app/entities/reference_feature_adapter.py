@@ -4,7 +4,7 @@ import numpy as np
 
 from repos.reference_feature_binary_repo import ReferenceFeatureBinaryRepo
 
-from sc_sdk.adapters.binary_interpreters import NumpyBinaryInterpreter
+from iai_core.adapters.binary_interpreters import NumpyBinaryInterpreter
 
 
 class ReferenceFeatureAdapter:

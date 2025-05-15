@@ -3,18 +3,18 @@
 
 import pytest
 from geti_types import ID, DatasetStorageIdentifier
-from sc_sdk.entities.compiled_dataset_shards import (
+from iai_core.entities.compiled_dataset_shards import (
     CompiledDatasetShard,
     CompiledDatasetShards,
     NullCompiledDatasetShards,
 )
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.label_schema import LabelSchema
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.video import VideoFrame
-from sc_sdk.repos import DatasetRepo
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.image import Image
+from iai_core.entities.label_schema import LabelSchema
+from iai_core.entities.subset import Subset
+from iai_core.entities.video import VideoFrame
+from iai_core.repos import DatasetRepo
 
 from tests.test_helpers import (
     generate_random_annotated_project,
@@ -23,7 +23,12 @@ from tests.test_helpers import (
 
 
 @pytest.fixture
-def fxt_dataset_item(fxt_image_entity_factory, fxt_video_factory, fxt_video_frame_entity_factory, fxt_annotation_scene):
+def fxt_dataset_item(
+    fxt_image_entity_factory,
+    fxt_video_factory,
+    fxt_video_frame_entity_factory,
+    fxt_annotation_scene,
+):
     """
     DatasetItem with a media and annotation
     The subset can be specified by parameter.

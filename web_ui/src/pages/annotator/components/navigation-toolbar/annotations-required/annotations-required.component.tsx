@@ -4,14 +4,12 @@
 import { useCallback, useRef } from 'react';
 
 import { DialogTrigger, Flex, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+import { ActionButton } from '@geti/ui';
+import { isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../../core/projects/hooks/use-project-status.hook';
 import { Task } from '../../../../../core/projects/task.interface';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { useAutoTrainingTasksConfig } from '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { getAllAutoTrainingValue } from '../../../../../shared/components/header/active-learning-configuration/util';
 import { hasEqualId } from '../../../../../shared/utils';

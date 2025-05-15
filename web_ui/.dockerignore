@@ -1,6 +1,6 @@
 *
 !.prettierrc
-!eslint.config.mjs
+!eslint.config.js
 !.env
 !.env.production
 !tsconfig.json
@@ -14,3 +14,4 @@
 !nginx.conf
 !rsbuild.config.ts
 !dev-proxy.ts
+!packages

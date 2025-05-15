@@ -4,7 +4,7 @@
 import { Key, useEffect, useMemo, useState } from 'react';
 
 import { ComboBox, Flex, Item } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 
 import { DATASET_IMPORT_DOMAIN, DATASET_IMPORT_TASK_TYPE } from '../../../../../core/datasets/dataset.enum';

@@ -20,7 +20,6 @@ RUN apt-get update && \
 WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=platform_libs . platform/libs
-COPY --link --from=grpc_interfaces . grpc_interfaces
 
 WORKDIR /builder/platform/services/user_directory
 

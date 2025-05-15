@@ -11,18 +11,18 @@ from managers.annotation_manager import AnnotationManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_types import ID, ImageIdentifier, VideoFrameIdentifier
-from sc_sdk.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
-from sc_sdk.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
-from sc_sdk.entities.scored_label import LabelSource, ScoredLabel
-from sc_sdk.entities.shapes import Rectangle
-from sc_sdk.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
-from sc_sdk.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelSchemaRepo, SuspendedAnnotationScenesRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
-from sc_sdk.utils.label_resolver import LabelResolver
+from iai_core.entities.annotation import Annotation, AnnotationScene, AnnotationSceneKind, NullAnnotationScene
+from iai_core.entities.annotation_scene_state import AnnotationSceneState, AnnotationState
+from iai_core.entities.scored_label import LabelSource, ScoredLabel
+from iai_core.entities.shapes import Rectangle
+from iai_core.entities.suspended_scenes import SuspendedAnnotationScenesDescriptor
+from iai_core.repos import AnnotationSceneRepo, AnnotationSceneStateRepo, LabelSchemaRepo, SuspendedAnnotationScenesRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.utils.annotation_scene_state_helper import AnnotationSceneStateHelper
+from iai_core.utils.label_resolver import LabelResolver
 
 if TYPE_CHECKING:
-    from sc_sdk.entities.label import Label
+    from iai_core.entities.label import Label
 
 
 @pytest.fixture

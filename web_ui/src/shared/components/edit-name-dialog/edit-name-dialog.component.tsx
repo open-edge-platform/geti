@@ -15,12 +15,11 @@ import {
     Text,
     TextField,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { Button } from '../button/button.component';
 
 import classes from './edit-name-dialog.module.scss';
 

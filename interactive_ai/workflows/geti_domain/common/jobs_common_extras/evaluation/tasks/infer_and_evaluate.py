@@ -9,15 +9,15 @@ from os import getenv
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import DatasetStorageIdentifier, ProjectIdentifier
+from iai_core.entities.evaluation_result import EvaluationResult
+from iai_core.entities.media_score import MediaScore
+from iai_core.entities.metrics import AnomalyLocalizationPerformance, MultiScorePerformance
+from iai_core.entities.model import Model
+from iai_core.entities.model_template import TaskType
+from iai_core.entities.model_test_result import ModelTestResult, TestState
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import EvaluationResultRepo, MediaScoreRepo, ModelTestResultRepo
 from kubernetes.client import V1ResourceRequirements, V1Toleration
-from sc_sdk.entities.evaluation_result import EvaluationResult
-from sc_sdk.entities.media_score import MediaScore
-from sc_sdk.entities.metrics import AnomalyLocalizationPerformance, MultiScorePerformance
-from sc_sdk.entities.model import Model
-from sc_sdk.entities.model_template import TaskType
-from sc_sdk.entities.model_test_result import ModelTestResult, TestState
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import EvaluationResultRepo, MediaScoreRepo, ModelTestResultRepo
 
 from jobs_common.tasks.primary_container_task import get_flyte_pod_spec
 from jobs_common.utils.progress_helper import create_bounded_progress_callback, noop_progress_callback
@@ -27,7 +27,11 @@ from jobs_common_extras.evaluation.utils.metrics_helper import MetricsHelper
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["INFER_AND_EVALUATE_TASK_POD_SPEC", "evaluate_and_save_results", "infer_and_evaluate"]
+__all__ = [
+    "INFER_AND_EVALUATE_TASK_POD_SPEC",
+    "evaluate_and_save_results",
+    "infer_and_evaluate",
+]
 
 BATCH_INFERENCE_NUM_ASYNC_REQUESTS = 4
 
@@ -144,7 +148,9 @@ def evaluate_and_save_results(
 
 @unified_tracing
 def _compute_and_save_evaluation(
-    project_identifier: ProjectIdentifier, evaluation_result: EvaluationResult, task_type: TaskType
+    project_identifier: ProjectIdentifier,
+    evaluation_result: EvaluationResult,
+    task_type: TaskType,
 ) -> None:
     """
     Computes the evaluation metric for the given evaluation result and saves it.

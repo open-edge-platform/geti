@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Provider } from '@adobe/react-spectrum';
-
-import { Button } from '../button/button.component';
+import { Button } from '@geti/ui';
 
 interface CustomAlertDialogProps {
     open: boolean;

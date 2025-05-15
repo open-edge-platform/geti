@@ -7,11 +7,11 @@ import pytest
 
 from coordination.dataset_manager.dataset_update import DatasetUpdateUseCase
 
-from sc_sdk.entities.dataset_entities import TaskDataset
-from sc_sdk.entities.datasets import Dataset
-from sc_sdk.entities.subset import Subset
-from sc_sdk.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
+from iai_core.entities.dataset_entities import TaskDataset
+from iai_core.entities.datasets import Dataset
+from iai_core.entities.subset import Subset
+from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ProjectRepo
+from iai_core.utils.dataset_helper import DatasetHelper
 
 
 class TestDatasetUpdateUseCase:
@@ -36,7 +36,9 @@ class TestDatasetUpdateUseCase:
                 return_value=[dataset_item],
             ) as mock_scene_to_item,
             patch.object(
-                DatasetUpdateUseCase, "_update_dataset_with_new_items", return_value=None
+                DatasetUpdateUseCase,
+                "_update_dataset_with_new_items",
+                return_value=None,
             ) as mock_update_dataset,
             patch.object(DatasetRepo, "generate_id", return_value=fxt_mongo_id()) as mock_generate_id,
         ):

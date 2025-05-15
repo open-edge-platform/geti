@@ -27,15 +27,15 @@ from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_fastapi_tools.responses import success_response_rest
 from geti_kafka_tools import publish_event
 from geti_types import ID, DatasetStorageIdentifier, MediaType
-from sc_sdk.entities.datasets import Dataset, DatasetPurpose
-from sc_sdk.entities.label import NullLabel
-from sc_sdk.entities.label_schema import LabelSchema, NullLabelSchema
-from sc_sdk.entities.media import ImageExtensions, VideoExtensions
-from sc_sdk.entities.video_annotation_statistics import VideoAnnotationStatistics
-from sc_sdk.repos import DatasetRepo, LabelRepo, LabelSchemaRepo, VideoRepo
-from sc_sdk.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
-from sc_sdk.repos.storage.storage_client import BytesStream
-from sc_sdk.services.dataset_storage_filter_service import DatasetStorageFilterService
+from iai_core.entities.datasets import Dataset, DatasetPurpose
+from iai_core.entities.label import NullLabel
+from iai_core.entities.label_schema import LabelSchema, NullLabelSchema
+from iai_core.entities.media import ImageExtensions, VideoExtensions
+from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
+from iai_core.repos import DatasetRepo, LabelRepo, LabelSchemaRepo, VideoRepo
+from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
+from iai_core.repos.storage.storage_client import BytesStream
+from iai_core.services.dataset_storage_filter_service import DatasetStorageFilterService
 
 
 class TestMediaRESTController:

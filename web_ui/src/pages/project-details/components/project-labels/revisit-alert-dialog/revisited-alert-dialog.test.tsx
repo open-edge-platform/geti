@@ -35,9 +35,9 @@ describe('revisitedAlertDialog', () => {
         const assignButton = screen.getByRole('button', { name: 'Assign' });
 
         await userEvent.click(assignButton);
-        expect(mockSave).toBeCalledWith(true);
+        expect(mockSave).toHaveBeenCalledWith(true);
         const dontAssignButton = screen.getByRole('button', { name: "Don't assign" });
         await userEvent.click(dontAssignButton);
-        expect(mockSave).toBeCalledWith(false);
+        expect(mockSave).toHaveBeenCalledWith(false);
     });
 });

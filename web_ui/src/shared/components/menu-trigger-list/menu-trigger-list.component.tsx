@@ -3,7 +3,7 @@
 
 import { Key, ReactNode } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { MenuTriggerButton } from '../menu-trigger/menu-trigger-button/menu-trigger-button.component';
 

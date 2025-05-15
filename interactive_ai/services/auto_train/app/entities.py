@@ -6,8 +6,7 @@
 from datetime import datetime
 from enum import Enum, auto
 
-from geti_types import ID, ProjectIdentifier, Session, make_session
-from sc_sdk.entities.persistent_entity import PersistentEntity
+from geti_types import ID, PersistentEntity, ProjectIdentifier, Session, make_session
 
 
 class FeatureFlag(Enum):

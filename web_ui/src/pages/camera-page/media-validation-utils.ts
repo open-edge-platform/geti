@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { getVideoDimensionErrors, isVideoFile, loadVideoFromFile, VALIDATION_RULES } from '../../shared/media-utils';
 import { getFileSize } from '../../shared/utils';

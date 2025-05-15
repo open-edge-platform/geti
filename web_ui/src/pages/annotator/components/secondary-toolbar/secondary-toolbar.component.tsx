@@ -4,9 +4,7 @@
 import { ButtonGroup, Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
 import { AnimatePresence, motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
-import negate from 'lodash/negate';
-import noop from 'lodash/noop';
+import { isEmpty, negate, noop } from 'lodash-es';
 import { useSearchParams } from 'react-router-dom';
 
 import { getAnnotationStateForTask } from '../../../../core/annotations/utils';

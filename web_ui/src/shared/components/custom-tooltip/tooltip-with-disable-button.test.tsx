@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
 import { screen } from '@testing-library/react';
 
 import { providersRender as render } from '../../../test-utils/required-providers-render';
 import { checkTooltip } from '../../../test-utils/utils';
-import { ActionButton } from '../button/button.component';
 import { TooltipWithDisableButton } from './tooltip-with-disable-button';
 
 describe('TooltipWithDisableButton', () => {

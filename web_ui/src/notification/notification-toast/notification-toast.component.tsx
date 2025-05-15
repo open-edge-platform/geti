@@ -5,7 +5,7 @@ import { ReactElement } from 'react';
 
 import { Flex, Heading, Text } from '@adobe/react-spectrum';
 import clsx from 'clsx';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { CloseSmall } from '../../assets/icons';
 import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';

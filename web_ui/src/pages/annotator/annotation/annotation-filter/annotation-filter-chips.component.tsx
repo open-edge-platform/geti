@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { ActionButton } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { BorderClose } from '../../../../assets/icons';
-import { ActionButton } from '../../../../shared/components/button/button.component';
 import { Tag } from '../../../../shared/components/tag/tag.component';
 import { hasEqualId } from '../../../../shared/utils';
 import { useAnnotationFilters } from './use-annotation-filters.hook';

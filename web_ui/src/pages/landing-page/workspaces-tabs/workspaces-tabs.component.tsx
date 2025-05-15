@@ -4,6 +4,7 @@
 import { Key } from 'react';
 
 import { Flex, Item, TabList, TabPanels, Tabs, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Add } from '../../../assets/icons';
@@ -14,7 +15,6 @@ import { useOrganizationIdentifier } from '../../../hooks/use-organization-ident
 import { usePinnedCollapsedItems } from '../../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.hook';
 import { PinnedCollapsedItemsAction } from '../../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.interface';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { CollapsedItemsPicker } from '../../../shared/components/collapsed-items-picker/collapsed-items-picker.component';
 import { CustomTabItemWithMenu } from '../../../shared/components/custom-tab-item/custom-tab-item-with-menu.component';
 import { CustomTabItem } from '../../../shared/components/custom-tab-item/custom-tab-item.component';

@@ -4,12 +4,12 @@
 import { FC, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { RangeValue } from '@react-types/shared';
 
 import { useGenerateOnboardingTokenMutation } from '../../../../core/users/hook/use-generate-onboarding-token.hook';
-import { Button } from '../../../../shared/components/button/button.component';
 import { DateRangePicker } from '../../../../shared/components/date-range-picker/date-range-picker.component';
 import { CopyOnboardingInvitationLink } from './copy-onboarding-invitation-link.component';
 

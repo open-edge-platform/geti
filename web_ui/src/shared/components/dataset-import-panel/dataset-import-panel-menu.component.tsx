@@ -4,17 +4,15 @@
 import { Key, useCallback, useMemo } from 'react';
 
 import { Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import capitalize from 'lodash/capitalize';
-import difference from 'lodash/difference';
-import isEmpty from 'lodash/isEmpty';
+import { capitalize, difference, isEmpty } from 'lodash-es';
 
 import { MoreMenu } from '../../../assets/icons';
 import { DATASET_IMPORT_STATUSES } from '../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../core/datasets/dataset.interface';
 import { matchStatus } from '../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useTusUpload } from '../../../providers/tus-upload-provider/tus-upload-provider.component';
-import { ActionButton } from '../button/button.component';
 import { isUploadingStatus } from './util';
 
 enum MENU_ITEMS {

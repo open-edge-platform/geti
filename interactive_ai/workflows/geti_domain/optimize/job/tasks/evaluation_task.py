@@ -7,6 +7,16 @@ Optimized model evaluation task
 from typing import Optional
 
 from geti_types import ID
+from iai_core.entities.annotation import AnnotationSceneKind
+from iai_core.entities.datasets import DatasetPurpose
+from iai_core.entities.evaluation_result import EvaluationPurpose
+from iai_core.entities.model import Model, ModelStatus
+from iai_core.entities.project import Project
+from iai_core.entities.subset import Subset
+from iai_core.entities.task_node import TaskNode
+from iai_core.repos import DatasetStorageRepo, ModelRepo, ModelStorageRepo, ProjectRepo
+from iai_core.utils.dataset_helper import DatasetHelper
+from iai_core.utils.time_utils import now
 from jobs_common.exceptions import CommandInternalError
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
@@ -16,16 +26,6 @@ from jobs_common.tasks.utils.telemetry import task_telemetry
 from jobs_common.utils.annotation_filter import AnnotationFilter
 from jobs_common_extras.evaluation.entities.batch_inference_dataset import BatchInferenceDataset
 from jobs_common_extras.evaluation.tasks.infer_and_evaluate import INFER_AND_EVALUATE_TASK_POD_SPEC, infer_and_evaluate
-from sc_sdk.entities.annotation import AnnotationSceneKind
-from sc_sdk.entities.datasets import DatasetPurpose
-from sc_sdk.entities.evaluation_result import EvaluationPurpose
-from sc_sdk.entities.model import Model, ModelStatus
-from sc_sdk.entities.project import Project
-from sc_sdk.entities.subset import Subset
-from sc_sdk.entities.task_node import TaskNode
-from sc_sdk.repos import DatasetStorageRepo, ModelRepo, ModelStorageRepo, ProjectRepo
-from sc_sdk.utils.dataset_helper import DatasetHelper
-from sc_sdk.utils.time_utils import now
 
 from job.models import OptimizationTrainerContext
 from job.tasks.helpers import finalize_optimize

@@ -4,10 +4,10 @@
 import numpy as np
 import pytest
 from geti_types import ID
-from sc_sdk.entities.annotation import AnnotationScene, AnnotationSceneKind
-from sc_sdk.entities.image import Image
-from sc_sdk.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from sc_sdk.entities.video import Video, VideoFrame
+from iai_core.entities.annotation import AnnotationScene, AnnotationSceneKind
+from iai_core.entities.image import Image
+from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
+from iai_core.entities.video import Video, VideoFrame
 
 from tests.fixtures.values import DummyValues
 

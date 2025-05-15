@@ -5,9 +5,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 
-from geti_types import ID
-from sc_sdk.entities.persistent_entity import PersistentEntity
-from sc_sdk.utils.time_utils import now
+from geti_types import ID, PersistentEntity
+from iai_core.utils.time_utils import now
 
 
 @dataclass

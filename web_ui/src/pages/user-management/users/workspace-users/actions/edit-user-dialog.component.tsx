@@ -4,8 +4,8 @@
 import { FC, FormEvent, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { Button } from '@geti/ui';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';
@@ -20,7 +20,6 @@ import {
 } from '../../../../../core/users/users.interface';
 import { WorkspaceEntity, WorkspaceIdentifier } from '../../../../../core/workspaces/services/workspaces.interface';
 import { useWorkspaces } from '../../../../../providers/workspaces-provider/workspaces-provider.component';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { RolePicker } from '../../old-project-users/role-picker.component';
 import { getAvailableRoles } from './roles-validation';
 import { UserSummary } from './user-summary.component';

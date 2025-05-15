@@ -13,9 +13,9 @@ from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActiva
 from usecases.auto_train import AutoTrainUseCase
 
 from geti_types import CTX_SESSION_VAR
-from sc_sdk.configuration.elements.component_parameters import ComponentType
-from sc_sdk.repos import ConfigurableParametersRepo, ImageRepo
-from sc_sdk.repos.dataset_entity_repo import PipelineDatasetRepo
+from iai_core.configuration.elements.component_parameters import ComponentType
+from iai_core.repos import ConfigurableParametersRepo, ImageRepo
+from iai_core.repos.dataset_entity_repo import PipelineDatasetRepo
 
 
 class TestIntegrationDirector:
@@ -143,5 +143,8 @@ class TestIntegrationDirector:
             )
             assert missing_annotations.total_missing_annotations_auto_training == 0
             mock_set_readiness.assert_called_once_with(
-                task_node_id=task_node.id_, readiness=True, bypass_debouncer=True, raise_exc_on_missing=False
+                task_node_id=task_node.id_,
+                readiness=True,
+                bypass_debouncer=True,
+                raise_exc_on_missing=False,
             )

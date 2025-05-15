@@ -5,9 +5,9 @@
 from collections import defaultdict
 
 from geti_types import ID
-from sc_sdk.entities.dataset_item import DatasetItem
-from sc_sdk.entities.video import Video, VideoFrame
-from sc_sdk.repos.base import SessionBasedRepo
+from iai_core.entities.dataset_item import DatasetItem
+from iai_core.entities.video import Video, VideoFrame
+from iai_core.repos.base import SessionBasedRepo
 
 
 class MediaNameIDMapper:

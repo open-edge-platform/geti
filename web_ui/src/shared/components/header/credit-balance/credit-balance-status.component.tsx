@@ -12,8 +12,8 @@ import {
     Text,
     View,
 } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import overSome from 'lodash/overSome';
+import { Button } from '@geti/ui';
+import { isEmpty, overSome } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';
@@ -23,7 +23,6 @@ import { paths } from '../../../../core/services/routes';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { formatDate, ONE_MINUTE } from '../../../utils';
-import { Button } from '../../button/button.component';
 import { CustomerSupportLink } from '../../customer-support-link/customer-support-link.component';
 import { HasPermission } from '../../has-permission/has-permission.component';
 import { OPERATION } from '../../has-permission/has-permission.interface';
