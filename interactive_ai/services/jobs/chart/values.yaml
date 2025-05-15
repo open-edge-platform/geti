@@ -1,5 +1,5 @@
 ---
-image: jobs-ms
+image: jobs
 imagePullPolicy: IfNotPresent
 
 serviceAccount:
