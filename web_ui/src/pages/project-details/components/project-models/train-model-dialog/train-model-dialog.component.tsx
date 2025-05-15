@@ -7,10 +7,10 @@
 import { FC } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { ButtonCreditsToConsume } from '../../project-model/components/button-credits-to-consume/button-credits-to-consume.component';
 import { AdvancedSettings } from './advanced-settings/advanced-settings.component';
 import { NotEnoughAnnotationsDialog } from './not-enough-annotations-dialog.component';

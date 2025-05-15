@@ -3,6 +3,7 @@
 
 import { Key } from 'react';
 
+import { Button } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +16,6 @@ import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useOrganizationIdentifier } from '../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useMediaUpload } from '../../providers/media-upload-provider/media-upload-provider.component';
 import { useFirstWorkspaceIdentifier } from '../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { Button } from '../../shared/components/button/button.component';
 import { useCheckPermission } from '../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../shared/components/has-permission/has-permission.interface';
 import { Loading } from '../../shared/components/loading/loading.component';

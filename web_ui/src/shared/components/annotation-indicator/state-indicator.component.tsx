@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 
 import { Revisit, Tag, TagHalf } from '../../../assets/icons';
 import { MEDIA_ANNOTATION_STATUS } from '../../../core/media/base.interface';
-import { ActionButton } from '../button/button.component';
 
 import classes from './annotation-indicator.module.scss';
 

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 
 import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../../assets/icons';
-import { ActionButton } from '../../button/button.component';
 
 interface LabelTreeViewItemPrefixProps {
     isOpen: boolean;

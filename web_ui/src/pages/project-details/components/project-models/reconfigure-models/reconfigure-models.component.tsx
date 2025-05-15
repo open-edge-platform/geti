@@ -14,9 +14,9 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 
-import { Button } from '../../../../../shared/components/button/button.component';
 import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
 import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';

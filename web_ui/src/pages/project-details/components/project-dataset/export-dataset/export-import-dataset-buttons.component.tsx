@@ -3,9 +3,9 @@
 
 import { CSSProperties, Key } from 'react';
 
+import { Button } from '@geti/ui';
 import { OverlayTriggerState } from 'react-stately';
 
-import { Button } from '../../../../../shared/components/button/button.component';
 import { MenuTriggerButton } from '../../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { DatasetTabActions, getDatasetButtonActions } from '../utils';

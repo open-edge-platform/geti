@@ -4,9 +4,9 @@
 import { FC } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { Checkbox } from '@geti/ui';
 
 import { TERMS_OF_USE_GETI } from '../../core/const';
-import { Checkbox } from '../../shared/components/checkbox/checkbox.component';
 
 import classes from './terms-and-conditions.module.scss';
 

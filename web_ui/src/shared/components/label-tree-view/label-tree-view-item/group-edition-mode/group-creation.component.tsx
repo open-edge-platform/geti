@@ -4,6 +4,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
 import { Flex, Switch, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
@@ -17,7 +18,6 @@ import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { filterGroups } from '../../../../../core/labels/utils';
 import { newLabelNameSchema } from '../../../../../pages/create-project/components/utils';
 import { isYupValidationError } from '../../../../../pages/user-management/profile-page/utils';
-import { Button } from '../../../button/button.component';
 import { LimitedTextField } from '../../../limited-text-field/limited-text-field.component';
 import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { ValidationErrorMsg } from '../../../validation-error-msg/validation-error-msg.component';

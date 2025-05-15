@@ -18,6 +18,7 @@ import {
     TooltipTrigger,
     View,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
@@ -25,7 +26,6 @@ import { ChevronDownSmall } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useStatus } from '../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../core/status/hooks/utils';
-import { Button } from '../../../shared/components/button/button.component';
 import { useCheckPermission } from '../../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
 import { ProjectImportPanel } from '../import-project-panel.component';

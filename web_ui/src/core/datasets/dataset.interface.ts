@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonProps } from '../../shared/components/button/button.component';
+import { type ButtonProps } from '@geti/ui';
+
 import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
 import {
     DATASET_IMPORT_DIALOG_BUTTONS,

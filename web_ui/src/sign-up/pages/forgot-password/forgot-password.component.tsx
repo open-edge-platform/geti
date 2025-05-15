@@ -4,11 +4,11 @@
 import { FormEvent, useState } from 'react';
 
 import { Form, Heading, Text, TextField, View } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { paths } from '../../../core/services/routes';
 import { useForgotPassword } from '../../../core/users/hook/use-users.hook';
 import { MAX_NUMBER_OF_CHARACTERS, validateEmail } from '../../../pages/user-management/users/utils';
-import { Button } from '../../../shared/components/button/button.component';
 import { BackgroundLayout } from '../../shared/background-layout/background-layout.component';
 
 import sharedClasses from '../../../shared/shared.module.scss';

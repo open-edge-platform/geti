@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, Divider, Text } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 
-import { Button } from '../../../../shared/components/button/button.component';
 import { usePrediction } from '../../providers/prediction-provider/prediction-provider.component';
 
 interface ReplaceOrMergeUserAnnotationsDialogProps {

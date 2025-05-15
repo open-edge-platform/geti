@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Text } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
-
-import { ActionButton } from '../button/button.component';
 
 interface LinkButtonProps extends StyleProps {
     text: string;

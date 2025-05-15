@@ -4,10 +4,10 @@
 import { useState } from 'react';
 
 import { Flex } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 
 import { Close } from '../../../../../../assets/icons';
 import { LinkButton } from '../../../../../../pages/create-project/components/project-labels-management/task-labels-management/new-label-tree-item/link-button/link-button.component';
-import { ActionButton } from '../../../../button/button.component';
 import { HotkeyEditionField } from '../../label-edition-mode/hotkey-edition-field/hotkey-edition-field.component';
 import { HotkeyLabel } from './hotkey-label.component';
 

@@ -4,13 +4,13 @@
 import { useState } from 'react';
 
 import { Flex, TextField } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 import { SpectrumTextFieldProps } from '@react-types/textfield';
 
 import { Alert, Invisible, Visible } from '../../../assets/icons';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { NEW_PASSWORD_ERROR_MESSAGE } from '../../utils';
-import { ActionButton } from '../button/button.component';
 
 import textFieldClasses from '../../../pages/user-management/profile-page/profile-page.module.scss';
 import classes from './password-field.module.scss';
