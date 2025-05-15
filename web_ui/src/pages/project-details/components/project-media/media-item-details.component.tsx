@@ -75,7 +75,7 @@ export const MediaItemDetails = ({
     const nameColumnMinWidth = isVideoItem ? (isFilteredVideo ? 'size-3000' : 'size-2000') : 'size-1000';
 
     const checkBoxColumn = 'size-200';
-    const imageColumn = 'var(--width)';
+    const imageColumn = 'size-800';
     const nameColumn = minmax(nameColumnMinWidth, '1fr');
     const dateColumn = 'size-900';
     const fileSizeColumn = minmax('size-500', 'size-1600');

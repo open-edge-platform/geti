@@ -16,6 +16,7 @@ import { ViewModes } from '../../../../../shared/components/media-view-modes/uti
 import { NotFound } from '../../../../../shared/components/not-found/not-found.component';
 import { useGroupedMediaItems } from '../../../../../shared/hooks/use-grouped-media-items.hook';
 import { useSelectedMediaItemIndex } from '../../../../../shared/hooks/use-selected-media-item-index.hook';
+import { getMediaId } from '../../../../media/utils';
 import { MediaItemTooltipMessage } from '../../../../project-details/components/project-media/media-item-tooltip-message/media-item-tooltip-message';
 import { getMediaItemTooltipProps } from '../../../../project-details/components/project-media/media-item-tooltip-message/utils';
 import { DatasetItemFactory } from './dataset-item-factory.component';
@@ -36,6 +37,13 @@ interface DatasetListProps {
     shouldShowAnnotationIndicator: boolean;
     hasTooltip?: boolean;
 }
+
+const viewModeSettings = {
+    [ViewModes.SMALL]: { minItemSize: 70, gap: 4, maxColumns: 11 },
+    [ViewModes.MEDIUM]: { minItemSize: 100, gap: 4, maxColumns: 8 },
+    [ViewModes.LARGE]: { minItemSize: 120, gap: 4, maxColumns: 4 },
+    [ViewModes.DETAILS]: { size: 85, gap: 0 },
+};
 
 export const DatasetList = ({
     viewMode,
@@ -122,13 +130,13 @@ export const DatasetList = ({
             <MediaItemsList
                 id='annotator-dataset-list'
                 ariaLabel={'Annotator dataset list'}
-                ref={ref}
                 viewMode={viewMode}
-                totalCount={groupedMediaItems.length}
+                idFormatter={getMediaId}
                 endReached={loadNextMedia}
-                itemContent={(index) => {
-                    const mediaItem = groupedMediaItems[index];
-
+                getTextValue={(item) => item.name}
+                mediaItems={groupedMediaItems}
+                viewModeSettings={viewModeSettings}
+                itemContent={(mediaItem) => {
                     return (
                         <DatasetItemFactory
                             viewMode={viewMode}

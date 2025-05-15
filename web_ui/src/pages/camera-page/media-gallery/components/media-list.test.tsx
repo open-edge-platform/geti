@@ -19,7 +19,7 @@ import { ProjectProvider } from '../../../project-details/providers/project-prov
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { getUseCameraParams } from '../../test-utils/camera-params';
 import { configUseCamera, configUseCameraStorage } from '../../test-utils/config-use-camera';
-import { MediaItemsList } from './media-items-list.component';
+import { MediaList } from './media-list.component';
 
 jest.mock('../../../camera-support/use-camera.hook');
 
@@ -59,7 +59,7 @@ const renderApp = async ({
     render(
         <ProjectProvider projectIdentifier={getMockedProjectIdentifier({})}>
             <TaskProvider>
-                <MediaItemsList screenshots={filesData} viewMode={ViewModes.MEDIUM} />
+                <MediaList screenshots={filesData} viewMode={ViewModes.MEDIUM} />
             </TaskProvider>
         </ProjectProvider>,
         { services: { projectService } }
@@ -68,7 +68,7 @@ const renderApp = async ({
     await waitForElementToBeRemoved(screen.getAllByRole('progressbar'));
 };
 
-describe('MediaItemsList', () => {
+describe('MediaList', () => {
     it('updates item label and invalidate query', async () => {
         const mockedUpdateMany = jest.fn();
         const mockedLabel = getMockedLabel({ name: 'camera-label-2' });
