@@ -8,3 +8,4 @@ export { DatePicker } from './src/date-picker/date-picker.component';
 export { DateRangePicker } from './src/date-range-picker/date-range-picker.component';
 export { Slider } from './src/slider/slider.component';
 export { Switch } from './src/switch/switch.component';
+export { SearchField } from './src/search-field/search-field.component';
