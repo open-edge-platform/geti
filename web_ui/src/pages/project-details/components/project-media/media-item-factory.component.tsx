@@ -31,7 +31,7 @@ export const MediaItemFactory = memo(
         toggleItemInMediaSelection,
     }: MediaItemFactoryProps): JSX.Element => {
         const datasetIdentifier = useDatasetIdentifier();
-        const navigate = useNavigateToAnnotatorRoute(datasetIdentifier);
+        const navigate = useNavigateToAnnotatorRoute();
 
         const id = getMediaId(mediaItem);
         const isMediaItemSelected = mediaSelection.some((selectedMedia) => isSelected(selectedMedia, mediaItem));
@@ -42,7 +42,7 @@ export const MediaItemFactory = memo(
         };
 
         const handleDblClick = (): void => {
-            navigate({ ...datasetIdentifier, mediaItem });
+            navigate({ datasetIdentifier, mediaItem });
         };
 
         return viewMode === ViewModes.DETAILS ? (
