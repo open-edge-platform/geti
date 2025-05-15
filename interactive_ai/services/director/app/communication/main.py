@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 
 import jsonschema
 import uvicorn
+from communication.endpoints.project_configuration_endpoints import project_configuration_router
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -85,6 +86,7 @@ app.include_router(prediction_router)
 app.include_router(status_router)
 app.include_router(training_router)
 app.include_router(supported_algorithms_router)
+app.include_router(project_configuration_router)
 
 base_dir = os.path.dirname(__file__) + "/../../../api/schemas/"
 mongo_id_schema = RestApiValidator().load_schema_file_as_dict(base_dir + "mongo_id.yaml")
