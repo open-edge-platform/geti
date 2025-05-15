@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-/// <reference types="@rsbuild/core/types" />
+
+import '@rsbuild/core/types';
 
 declare module '*.svg' {
     export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
