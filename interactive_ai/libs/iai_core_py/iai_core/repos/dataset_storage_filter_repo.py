@@ -161,9 +161,7 @@ class DatasetStorageFilterRepo(DatasetStorageBasedSessionRepo[DatasetStorageFilt
                 upsert=True,
             )
 
-    def update_preprocessing_status(
-        self, media_id: ID, status: MediaPreprocessingStatus
-    ) -> None:
+    def update_preprocessing_status(self, media_id: ID, status: MediaPreprocessingStatus) -> None:
         """
         Updates a DatasetStorageFilterData entity in the database with new media preprocessing status.
         :param media_id: media ID
