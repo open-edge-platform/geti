@@ -19,7 +19,7 @@ export const GrabcutTool: ToolProps = {
     supportedDomains: [DOMAIN.SEGMENTATION, DOMAIN.SEGMENTATION_INSTANCE, DOMAIN.ANOMALY_SEGMENTATION],
     tooltip: {
         img: QuickSelectionImg,
-        url: 'guide/annotations/annotation-tools.html#quick-selection-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#object-selection-tool',
         title: toolTypeToLabelMapping[ToolType.GrabcutTool],
         description: `Simply draw a rectangle around the object and Intel® Geti™ will fit a 
             polygon to the shape of the object.`,

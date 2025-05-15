@@ -242,7 +242,7 @@ describe('useDeploymentConfigQuery', () => {
         });
 
         const data = result.current.data;
-        expect(data?.docsUrl).toEqual('https://docs.geti.intel.com/cloud/');
+        expect(data?.docsUrl).toEqual('https://docs.geti.intel.com/');
     });
 
     it('ignores the data and control plane urls', async () => {

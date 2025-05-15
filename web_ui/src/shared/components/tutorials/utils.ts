@@ -90,24 +90,24 @@ export const dismissAllTutorials = async (settings: UseSettings<UserGlobalSettin
 };
 
 export enum DocsUrl {
-    LABELS_CREATION = 'user-guide/geti-fundamentals/project-management#labels-creation',
-    DETECTION = 'user-guide/geti-fundamentals/project-management#labels-creation',
-    CLASSIFICATION = 'user-guide/geti-fundamentals/project-management#labels-creation',
-    SEGMENTATION = 'user-guide/geti-fundamentals/project-management#labels-creation',
-    REVISIT_LABELS = 'user-guide/geti-fundamentals/labels/labels-management' +
+    LABELS_CREATION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    DETECTION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    CLASSIFICATION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    SEGMENTATION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    REVISIT_LABELS = 'docs/user-guide/geti-fundamentals/labels/labels-management' +
         '#dealing-with-new-labels-and-concept-drift-in-the-intel-geti-platform',
-    DATASET = 'user-guide/geti-fundamentals/datasets/dataset-management',
-    MODELS = 'user-guide/geti-fundamentals/model-training-and-optimization',
-    TESTS = 'user-guide/geti-fundamentals/tests-management/tests',
-    DEPLOYMENT = 'user-guide/geti-fundamentals/deployments/',
-    MAIN_PAGE = 'user-guide/getting-started/introduction',
-    ANNOTATIONS_VS_PREDICTIONS = 'user-guide/geti-fundamentals/annotations/annotation-editor' +
+    DATASET = 'docs/user-guide/geti-fundamentals/datasets/dataset-management',
+    MODELS = 'docs/user-guide/geti-fundamentals/model-training-and-optimization',
+    TESTS = 'docs/user-guide/geti-fundamentals/tests-management/tests',
+    DEPLOYMENT = 'docs/user-guide/geti-fundamentals/deployments/',
+    MAIN_PAGE = 'docs/user-guide/getting-started/introduction',
+    ANNOTATIONS_VS_PREDICTIONS = 'docs/user-guide/geti-fundamentals/annotations/annotation-editor' +
         '#annotations-vs-predictions',
-    ACTIVE_LEARNING = 'user-guide/learn-geti/active-learning',
-    MEDIA_GALLERY = 'user-guide/geti-fundamentals/annotations/annotation-mode#media-gallery',
-    ANNOTATION_TOOLS = 'user-guide/geti-fundamentals/annotations/annotation-tools',
-    ANNOTATION_EDITOR = 'user-guide/geti-fundamentals/annotations/annotation-editor',
-    CODE_DEPLOYMENT = 'user-guide/geti-fundamentals/deployments/code-deployment',
+    ACTIVE_LEARNING = 'docs/user-guide/learn-geti/active-learning',
+    MEDIA_GALLERY = 'docs/user-guide/geti-fundamentals/annotations/annotation-mode#media-gallery',
+    ANNOTATION_TOOLS = 'docs/user-guide/geti-fundamentals/annotations/annotation-tools',
+    ANNOTATION_EDITOR = 'docs/user-guide/geti-fundamentals/annotations/annotation-editor',
+    CODE_DEPLOYMENT = 'docs/user-guide/geti-fundamentals/deployments/code-deployment',
 }
 
 export const onPressLearnMore = (docUrl: string | undefined) => {

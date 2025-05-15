@@ -36,7 +36,7 @@ export const ProjectImportPanel = ({
 
     const fileInputRef = useRef<HTMLInputElement>({} as HTMLInputElement);
     const isExtraLarge = useMediaQuery(isExtraLargeSizeQuery);
-    const projectImportDocsUrl = `${docsUrl}/guide/project-management/project-management.html#export-import-project'`;
+    const projectImportDocsUrl = `${docsUrl}docs/user-guide/geti-fundamentals/project-management/project-export-import`;
 
     const handleDropProject = (file?: File) => {
         if (file && !isValidFileExtension(file, VALID_EXTENSIONS)) {
