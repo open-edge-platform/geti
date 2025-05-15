@@ -14,7 +14,7 @@ import { DatasetImportItem } from '../../../core/datasets/dataset.interface';
 import { useDatasetImportQueries } from '../../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { getJobInfo, isPreparingJob } from '../../../core/datasets/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { CircularProgress } from '../circular-progress/circular-progress.component';
+import { CircularProgress } from './circular-progress/circular-progress.component';
 
 import classes from './dataset-import-progress.module.scss';
 
