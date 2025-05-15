@@ -398,9 +398,7 @@ class TestDatasetStorageFilterRepo:
 
         assert {data.preprocessing for data in repo.get_all()} == {MediaPreprocessingStatus.SCHEDULED}
 
-        repo.update_preprocessing_status(
-            media_identifier=ImageIdentifier(image_id=image_id_1), status=MediaPreprocessingStatus.FINISHED
-        )
+        repo.update_preprocessing_status(media_id=image_id_1, status=MediaPreprocessingStatus.FINISHED)
         retrieved_preprocessings = {data.media_identifier.media_id: data.preprocessing for data in repo.get_all()}
         expected_preprocessings = {
             image_id_1: MediaPreprocessingStatus.FINISHED,
