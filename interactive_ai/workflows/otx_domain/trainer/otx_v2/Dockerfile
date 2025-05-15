@@ -80,4 +80,5 @@ ENV PYTHONPATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2"
 ENV HF_HUB_OFFLINE=1
 
 USER non-root
+WORKDIR /home/non-root
 WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2
