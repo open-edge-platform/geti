@@ -49,7 +49,7 @@ export const MediaItemsList = <T extends object>({
     const isDetails = viewMode === ViewModes.DETAILS;
     const layout = isDetails ? 'stack' : 'grid';
 
-    const ref = useRef(null);
+    const ref = useRef<HTMLDivElement | null>(null);
     useLoadMore({ onLoadMore: endReached }, ref);
 
     const layoutOptions = isDetails
@@ -72,14 +72,20 @@ export const MediaItemsList = <T extends object>({
                     key={layout}
                     layout={layout}
                     aria-label={ariaLabel}
-                    items={mediaItems}
                     className={classes.container}
                 >
-                    {(item) => (
-                        <ListBoxItem id={idFormatter(item)} textValue={getTextValue(item)} style={{ height: '100%' }}>
-                            {itemContent(item)}
-                        </ListBoxItem>
-                    )}
+                    {mediaItems.map((item) => {
+                        return (
+                            <ListBoxItem
+                                id={idFormatter(item)}
+                                key={idFormatter(item)}
+                                textValue={getTextValue(item)}
+                                className={classes.item}
+                            >
+                                {itemContent(item)}
+                            </ListBoxItem>
+                        );
+                    })}
                 </AriaComponentsListBox>
             </Virtualizer>
         </View>
