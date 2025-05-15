@@ -3,7 +3,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Flex, Switch, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Switch } from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
@@ -22,6 +23,8 @@ import { TreeViewItemEditModeProps } from '../label-tree-view-item.interface';
 import { isNewState } from '../utils';
 import { MULTIPLE_SELECTION_SWITCH_TOOLTIP, NEW_GROUP_FIELD_TOOLTIP } from './utils';
 
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 type GroupEditionModeProps = Omit<TreeViewItemEditModeProps<LabelTreeGroupProps>, 'domains'>;
 
 enum ErrorPath {

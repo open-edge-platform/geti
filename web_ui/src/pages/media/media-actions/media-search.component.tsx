@@ -3,7 +3,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { SearchField, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { SearchField } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 

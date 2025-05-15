@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Switch, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { LoadingIndicator, Switch } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
