@@ -3,8 +3,7 @@
 
 import { Key } from 'react';
 
-import { Item, Picker, Section } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Item, Picker, Section, Text } from '@adobe/react-spectrum';
 
 import { LabelTag } from '../../components/labels/label-tag/label-tag.component';
 import { WatershedLabel } from './watershed-tool.interface';

@@ -3,7 +3,7 @@
 
 import { DimensionValue, Flex, ProgressCircle } from '@adobe/react-spectrum';
 import { SpectrumProgressCircleProps } from '@react-types/progress';
-import { Responsive } from '@react-types/shared/src/style';
+import { Responsive } from '@react-types/shared';
 
 interface LoadingIndicatorProps extends SpectrumProgressCircleProps {
     height?: Responsive<DimensionValue>;

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@react-spectrum/view';
+import { View } from '@adobe/react-spectrum';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { TabItem } from '../tabs/tabs.interface';

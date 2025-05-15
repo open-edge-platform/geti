@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Divider } from '@adobe/react-spectrum';
-import { View } from '@react-spectrum/view';
+import { Divider, View } from '@adobe/react-spectrum';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isEmpty } from 'lodash-es';

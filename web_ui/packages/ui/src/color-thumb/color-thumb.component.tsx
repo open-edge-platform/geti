@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View, ViewProps } from '@react-spectrum/view';
+import { View, ViewProps } from '@adobe/react-spectrum';
 import { StyleProps } from '@react-types/shared';
 
 export interface ColorThumbProps extends StyleProps {

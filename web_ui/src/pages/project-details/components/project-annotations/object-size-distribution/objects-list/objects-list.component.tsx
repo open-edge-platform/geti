@@ -3,9 +3,8 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Flex, Item, Picker, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Item, Picker, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { PressableElement } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
 import { capitalize, isEmpty } from 'lodash-es';
 
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';

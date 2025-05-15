@@ -3,8 +3,7 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Item, Picker } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Item, Picker, Text } from '@adobe/react-spectrum';
 import { StyleProps } from '@react-types/shared';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';

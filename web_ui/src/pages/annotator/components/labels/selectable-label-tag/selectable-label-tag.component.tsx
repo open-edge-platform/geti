@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@react-spectrum/view';
+import { View } from '@adobe/react-spectrum';
 import { usePress } from 'react-aria';
 
 import { Label } from '../../../../../core/labels/label.interface';

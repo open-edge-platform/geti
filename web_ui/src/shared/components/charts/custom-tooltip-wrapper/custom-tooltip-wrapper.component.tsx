@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { View } from '@react-spectrum/view';
+import { View } from '@adobe/react-spectrum';
 
 import classes from './custom-tooltip-wrapper.module.scss';
 

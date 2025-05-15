@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Flex, Text } from '@adobe/react-spectrum';
 
 import { Point } from '../../../../../core/annotations/shapes.interface';
 import { CustomTooltipWrapper } from '../../custom-tooltip-wrapper/custom-tooltip-wrapper.component';

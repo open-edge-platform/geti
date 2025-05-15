@@ -3,9 +3,8 @@
 
 import { ComponentProps } from 'react';
 
-import { DialogTrigger, Flex, View } from '@adobe/react-spectrum';
+import { DialogTrigger, Flex, Text, View } from '@adobe/react-spectrum';
 import { ActionButton, Slider } from '@geti/ui';
-import { Text } from '@react-spectrum/text';
 import { noop } from 'lodash-es';
 
 import { ChevronDownLight } from '../../../assets/icons';

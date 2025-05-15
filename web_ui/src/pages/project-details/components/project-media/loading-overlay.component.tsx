@@ -3,8 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { DimensionValue, Flex, ProgressCircle } from '@adobe/react-spectrum';
-import { View } from '@react-spectrum/view';
+import { DimensionValue, Flex, ProgressCircle, View } from '@adobe/react-spectrum';
 import { BackgroundColorValue, BoxAlignmentStyleProps, Responsive, StyleProps } from '@react-types/shared';
 
 interface LoadingOverlayProps extends StyleProps, BoxAlignmentStyleProps {

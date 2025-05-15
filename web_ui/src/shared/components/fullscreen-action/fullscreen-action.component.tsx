@@ -3,8 +3,16 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import {
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Heading,
+    Tooltip,
+    TooltipTrigger,
+} from '@adobe/react-spectrum';
 import { isString } from 'lodash-es';
 
 import { Collapse, Expand } from '../../../assets/icons';

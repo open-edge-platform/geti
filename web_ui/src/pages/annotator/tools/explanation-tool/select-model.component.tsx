@@ -26,7 +26,7 @@ export const useCanSelectDifferentInferenceModel = () => {
     return true;
 };
 
-export const SelectInferenceModelPicker = (props: Omit<ComponentProps<typeof Picker>, 'children'>) => {
+const SelectInferenceModelPicker = (props: Omit<ComponentProps<typeof Picker>, 'children'>) => {
     const [selectedModel, setSelectedModel] = useSelectedInferenceModel();
 
     const { useProjectModelsQuery } = useModels();
