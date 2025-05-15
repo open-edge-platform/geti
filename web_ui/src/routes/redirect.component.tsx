@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import invoke from 'lodash/invoke';
+import { invoke } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
