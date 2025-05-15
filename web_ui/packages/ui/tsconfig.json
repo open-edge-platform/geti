@@ -1,0 +1,8 @@
+{
+  "extends": "@geti/config/typescript",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "types": ["jest", "node"],
+  },
+  "include": ["./src"]
+}

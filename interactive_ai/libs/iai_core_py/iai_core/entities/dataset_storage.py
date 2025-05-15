@@ -5,11 +5,10 @@
 
 import datetime
 
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.constants import DEFAULT_USER_NAME
 from iai_core.utils.time_utils import now
 
-from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier
+from geti_types import CTX_SESSION_VAR, ID, DatasetStorageIdentifier, PersistentEntity
 
 
 class DatasetStorage(PersistentEntity):

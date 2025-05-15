@@ -111,7 +111,7 @@ test.beforeEach(async ({ page, registerApiResponse, openApi }) => {
                 },
                 thumbnail: `${imagePathPrefix}/60d31793d5f1fb7e6e3c1a75/display/thumb`,
                 type: isVideoFrame ? 'video_frame' : 'image',
-                ...(isVideoFrame ? { frame_index: 0 } : {}),
+                ...(isVideoFrame ? { frame_index: 0, video_id: '681ec7392ee93cd56ddbef41' } : {}),
                 upload_time: '2022-08-08T07:26:00.580000+00:00',
                 uploader_id: '62f0cfb773cacf6370dbaccd',
             };

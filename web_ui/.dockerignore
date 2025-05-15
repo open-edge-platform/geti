@@ -14,3 +14,4 @@
 !nginx.conf
 !rsbuild.config.ts
 !dev-proxy.ts
+!packages

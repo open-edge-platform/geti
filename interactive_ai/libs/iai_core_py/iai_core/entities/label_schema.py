@@ -13,11 +13,10 @@ from bson import ObjectId
 
 from iai_core.entities.graph import MultiDiGraph
 from iai_core.entities.label import Label
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.utils.uid_generator import generate_uid
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 logger = logging.getLogger(__name__)
 

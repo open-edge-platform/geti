@@ -39,12 +39,12 @@ export const NotEnoughAnnotationsDialog: FC<NotEnoughAnnotationsDialogProps> = (
 }) => {
     const { projectIdentifier, isTaskChainProject, isSingleDomainProject, project } = useProject();
     const isAnomalyProject = isSingleDomainProject(isAnomalyDomain);
-    const navigateToAnnotatorRoute = useNavigateToAnnotatorRoute(projectIdentifier);
+    const navigateToAnnotatorRoute = useNavigateToAnnotatorRoute();
 
     const handleGoToAnnotator = () => {
         const selectedDataset = project.datasets[0];
         navigateToAnnotatorRoute({
-            datasetId: selectedDataset.id,
+            datasetIdentifier: { ...projectIdentifier, datasetId: selectedDataset.id },
             active: selectedDataset.useForTraining && !isAnomalyProject,
         });
     };

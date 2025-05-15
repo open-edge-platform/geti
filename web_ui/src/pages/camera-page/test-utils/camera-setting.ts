@@ -15,5 +15,7 @@ export const getUseCameraSettings = ({ stream, ...options }: Partial<SettingsCon
     applySettings: jest.fn(),
     loadDeviceCapabilities: jest.fn(),
     setSelectedDeviceId: jest.fn(),
+    isMirrored: false,
+    setIsMirrored: jest.fn(),
     ...options,
 });

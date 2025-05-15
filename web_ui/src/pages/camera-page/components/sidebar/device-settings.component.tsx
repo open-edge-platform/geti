@@ -10,7 +10,8 @@ import { applySettings } from '../../providers/util';
 import { SettingOption } from './setting-option.component';
 
 export const DeviceSettings = () => {
-    const { webcamRef, videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId } = useDeviceSettings();
+    const { webcamRef, videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId, isMirrored, setIsMirrored } =
+        useDeviceSettings();
     const sortedByOptions = orderBy(deviceConfig, ['config.options'], 'desc');
 
     return (
@@ -32,6 +33,14 @@ export const DeviceSettings = () => {
             </Picker>
 
             <Divider size={'S'} marginTop={'size-250'} marginBottom={'size-250'} />
+
+            <SettingOption
+                label='Mirror camera'
+                config={{ type: 'selection', options: ['Off', 'On'], value: isMirrored ? 'On' : 'Off' }}
+                onChange={(value) => {
+                    setIsMirrored(value === 'On');
+                }}
+            />
 
             {sortedByOptions.map(({ name, config }) => (
                 <SettingOption

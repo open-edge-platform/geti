@@ -30,7 +30,7 @@ const getSelectedKey = (isInActiveMode: boolean, selectedDataset: Dataset, train
 export const DatasetPicker = (): JSX.Element => {
     const { project, projectIdentifier, isSingleDomainProject } = useProject();
     const { isInActiveMode } = useDataset();
-    const navigateToAnnotatorRoute = useNavigateToAnnotatorRoute(projectIdentifier);
+    const navigateToAnnotatorRoute = useNavigateToAnnotatorRoute();
     const selectedDataset = useSelectedDataset();
 
     const isAnomalyProject = isSingleDomainProject(isAnomalyDomain);
@@ -60,13 +60,19 @@ export const DatasetPicker = (): JSX.Element => {
         // Selecting 'Active dataset' doesn't change the current dataset, it just
         // changes the endpoint where we get the media items from.
         if (key === ACTIVE_DATASET_ID) {
-            navigateToAnnotatorRoute({ datasetId: trainingDataset.key, active: true });
+            navigateToAnnotatorRoute({
+                datasetIdentifier: { ...projectIdentifier, datasetId: trainingDataset.key },
+                active: true,
+            });
         } else {
             // Due to the e2e tests the key for the training dataset set in the picker is set to `dataset-id`
             // in this case we want to use navigate to the training dataset's id
             const datasetId = key === 'dataset' ? trainingDataset.key : (key as string);
 
-            navigateToAnnotatorRoute({ datasetId, active: false });
+            navigateToAnnotatorRoute({
+                datasetIdentifier: { ...projectIdentifier, datasetId },
+                active: false,
+            });
         }
     };
 
