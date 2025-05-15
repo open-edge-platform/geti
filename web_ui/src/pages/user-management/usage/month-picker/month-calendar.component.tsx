@@ -4,6 +4,7 @@
 import { useRef } from 'react';
 
 import { Flex, Grid, Heading, repeat, useDateFormatter, View } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { createCalendar } from '@internationalized/date';
 import { CalendarProps, DateValue, useCalendar } from '@react-aria/calendar';
 import { useLocale } from '@react-aria/i18n';
@@ -13,7 +14,6 @@ import ChevronLeft from '@spectrum-icons/workflow/ChevronLeft';
 import ChevronRight from '@spectrum-icons/workflow/ChevronRight';
 import { range } from 'lodash-es';
 
-import { ActionButton } from '../../../../shared/components/button/button.component';
 import { CalendarCell } from './calendar-cell.component';
 
 export const MonthCalendar = (props: CalendarProps<DateValue> & StyleProps): JSX.Element => {

@@ -59,7 +59,7 @@ const deploymentConfigurationBasedOnFeatureFlags = (isAdmin: boolean): Deploymen
         },
         controlPlaneUrl: null,
         dataPlaneUrl: null,
-        docsUrl: 'https://docs.geti.intel.com/cloud/',
+        docsUrl: 'https://docs.geti.intel.com/',
         configUrl: null,
     };
 };
@@ -88,7 +88,7 @@ export const deploymentConfigQueryOptions = (isAdmin: boolean): UseSuspenseQuery
 
                 await deploymentSchema.validate(deployment.data);
 
-                let docsUrl = deployment.data.docsUrl ?? 'https://docs.geti.intel.com/cloud/';
+                let docsUrl = deployment.data.docsUrl ?? 'https://docs.geti.intel.com/';
 
                 if (!docsUrl.endsWith('/')) {
                     docsUrl += '/';

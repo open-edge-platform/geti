@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { motion } from 'framer-motion';
 
 import { AnalyticsIcon, ExternalLinkIcon } from '../../assets/icons';
 import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';
-import { Button } from '../../shared/components/button/button.component';
 import { openNewTab } from '../../shared/utils';
 
 import classes from './analytics.module.scss';

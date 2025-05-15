@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Heading, Text } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { Unauthorized } from '../../../assets/images';
 import { AccountStatus } from '../../../core/organizations/organizations.interface';
 import { useHandleSignOut } from '../../../hooks/use-handle-sign-out/use-handle-sign-out.hook';
-import { Button } from '../../../shared/components/button/button.component';
 import { ErrorLayout } from '../error-layout/error-layout.component';
 
 import classes from '../error-layout/error-layout.module.scss';

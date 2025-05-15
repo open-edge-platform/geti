@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, Heading } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
 import { useAuth } from 'react-oidc-context';
 
-import { Button } from '../../../shared/components/button/button.component';
 import { ErrorLayout } from '../error-layout/error-layout.component';
 
 import classes from '../error-layout/error-layout.module.scss';

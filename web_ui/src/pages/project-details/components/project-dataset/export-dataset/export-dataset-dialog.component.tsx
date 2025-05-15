@@ -18,6 +18,7 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@adobe/react-spectrum';
+import { ActionButton, Button } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import LinkOut from '@spectrum-icons/workflow/LinkOut';
 
@@ -25,7 +26,6 @@ import { DOCS_BASE_URL } from '../../../../../core/const';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { ExportFormats } from '../../../../../core/projects/dataset.interface';
 import { useDatasetStatistics } from '../../../../../core/statistics/hooks/use-dataset-statistics.hook';
-import { ActionButton, Button } from '../../../../../shared/components/button/button.component';
 import { isNotCropDomain, openNewTab, pluralize } from '../../../../../shared/utils';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../../media/providers/media-provider.component';

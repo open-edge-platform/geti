@@ -32,6 +32,7 @@ export const AVAILABLE_FORMATS: ExportFormatDetails[] = [
             DOMAIN.ANOMALY_DETECTION,
             DOMAIN.ANOMALY_SEGMENTATION,
             DOMAIN.SEGMENTATION_INSTANCE,
+            DOMAIN.KEYPOINT_DETECTION,
         ],
     },
     {

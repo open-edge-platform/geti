@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 
 import { Grid } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 
 import { Delete } from '../../../assets/icons';
 import {
@@ -14,7 +15,6 @@ import {
 } from '../../../core/media/media-filter.interface';
 import { isAnomalyDomain } from '../../../core/projects/domains';
 import { usePrevious } from '../../../hooks/use-previous/use-previous.hook';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { useProject } from '../../project-details/providers/project-provider/project-provider.component';
 import { FIELD_OPTIONS, isEmptyRule } from '../utils';
 import { MediaFilterValueFactory } from './field-values/media-filter-value-factory';

@@ -39,6 +39,37 @@ export const getScheduledTrainingJob = (job = getMockedJob({ state: JobState.SCH
     },
 });
 
+export const getRunningAutoTrainingJob = (
+    job = getMockedJob({ state: JobState.RUNNING, author: GETI_SYSTEM_AUTHOR_ID })
+) => ({
+    jobs: [
+        {
+            ...job,
+            type: JobType.TRAIN,
+            metadata: {
+                project: {
+                    id: '662f70313090f9f2aa13b7ed',
+                    name: 'Candy',
+                },
+                task: {
+                    task_id: '662f70313090f9f2aa13b7f0',
+                    name: 'Detection',
+                    model_template_id: 'Custom_Object_Detection_Gen3_ATSS',
+                    model_architecture: 'MobileNetV2-ATSS',
+                    dataset_storage_id: '662f70313090f9f2aa13b7f4',
+                },
+            },
+        },
+    ],
+    jobs_count: {
+        n_scheduled_jobs: 1,
+        n_running_jobs: 0,
+        n_finished_jobs: 0,
+        n_failed_jobs: 0,
+        n_cancelled_jobs: 0,
+    },
+});
+
 export const getScheduledAutoTrainingJob = (
     job = getMockedJob({ state: JobState.SCHEDULED, author: GETI_SYSTEM_AUTHOR_ID })
 ) => ({

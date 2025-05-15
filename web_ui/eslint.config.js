@@ -18,6 +18,48 @@ const compat = new FlatCompat({
 
 export default [
     ...sharedEslintConfig,
+    {
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['Button'],
+                    message: "Use 'Button' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['SpectrumButtonProps'],
+                    message: "Use 'SpectrumButtonProps' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@react-types/button',
+                    importNames: ['SpectrumButtonProps'],
+                    message: "Use 'SpectrumButtonProps' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['ActionButton'],
+                    message: "Use 'ActionButton' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['SpectrumActionButtonProps'],
+                    message: "Use 'SpectrumActionButtonProps' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@react-types/button',
+                    importNames: ['SpectrumActionButtonProps'],
+                    message: "Use 'SpectrumActionButtonProps' from @geti/ui folder instead.",
+                },
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: ['Checkbox'],
+                    message: "Use 'Checkbox' from @geti/ui folder instead.",
+                },
+            ],
+        },
+    },
     ...compat.extends('plugin:playwright/playwright-test').map((config) => ({
         ...config,
         files: ['tests/features/**/*.ts', 'tests/utils/**/*.ts', 'tests/fixtures/**/*.ts', 'tests/e2e/**/*.ts'],

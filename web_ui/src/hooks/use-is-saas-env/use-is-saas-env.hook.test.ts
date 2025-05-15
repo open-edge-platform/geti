@@ -37,7 +37,7 @@ describe('useIsSaasEnv', () => {
     it('returns true if environment is Saas', () => {
         jest.mocked(useDeploymentConfigQuery).mockReturnValue({
             // @ts-expect-error We only use data
-            data: { ...mockConfig, servingMode: 'saas', docsUrl: 'https://docs.geti.intel.com/cloud/' },
+            data: { ...mockConfig, servingMode: 'saas', docsUrl: 'https://docs.geti.intel.com/' },
         });
 
         const { result } = renderHook(() => useIsSaasEnv());

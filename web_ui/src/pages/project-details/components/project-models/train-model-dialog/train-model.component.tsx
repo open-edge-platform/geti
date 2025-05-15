@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 
+import { Button } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../../core/models/models.interface';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { CreditBalanceTrainDialog } from './credit-balance-train-dialog.component';
 
 interface TrainModelProps {

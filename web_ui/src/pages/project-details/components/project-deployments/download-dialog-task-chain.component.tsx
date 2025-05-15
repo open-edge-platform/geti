@@ -4,6 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { ButtonGroup, Content, Dialog, Divider, Flex, Heading } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useCodeDeployment } from '../../../../core/code-deployment/hooks/use-code-deployment.hook';
@@ -11,7 +12,6 @@ import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-featur
 import { ModelsGroups } from '../../../../core/models/models.interface';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { Button } from '../../../../shared/components/button/button.component';
 import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { getTaskModels } from '../../utils';
 import { DeployModel, DeployModelByTask } from './interfaces';

@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Heading, View } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../core/services/routes';
 import { RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { WorkspaceEntity } from '../../../core/workspaces/services/workspaces.interface';
 import { ActionMenu } from '../../../shared/components/action-menu/action-menu.component';
-import { Button } from '../../../shared/components/button/button.component';
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';

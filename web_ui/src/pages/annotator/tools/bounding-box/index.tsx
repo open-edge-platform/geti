@@ -18,7 +18,7 @@ export const BoundingBoxTool: ToolProps = {
     SecondaryToolbar,
     tooltip: {
         img: DetectionImg,
-        url: 'guide/annotations/annotation-tools.html#bounding-box-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#bounding-box-tool',
         title: toolTypeToLabelMapping[ToolType.BoxTool],
         description: `The tool intended for object detection task. A bounding box is a rectangle surrounding
         an object in an image.`,
