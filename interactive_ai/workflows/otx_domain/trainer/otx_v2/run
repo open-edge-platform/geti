@@ -9,7 +9,7 @@ SIDECAR_PID_FPATH=/shard_files/sidecar.pid
 
 # Step 1. Running script
 set -o pipefail;
-python -X faulthandler /interactive_ai/workflows/otx_domain/trainer/otx_v2/scripts/run.py;
+python -X faulthandler scripts/run.py;
 retVal=$?;
 echo "Finished running script. Returned exit code status: $retVal"
 
