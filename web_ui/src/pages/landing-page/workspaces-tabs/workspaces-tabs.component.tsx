@@ -4,7 +4,7 @@
 import { Key } from 'react';
 
 import { Flex, Item, TabList, TabPanels, Tabs, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, LoadingIndicator } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Add } from '../../../assets/icons';
@@ -22,7 +22,6 @@ import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-di
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
-import { LoadingIndicator } from '../../../shared/components/loading/loading-indicator.component';
 import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { getUniqueNameFromArray, hasEqualId } from '../../../shared/utils';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from '../../user-management/workspaces/utils';

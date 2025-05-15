@@ -9,3 +9,6 @@ export { DateRangePicker } from './src/date-range-picker/date-range-picker.compo
 export { Slider } from './src/slider/slider.component';
 export { Switch } from './src/switch/switch.component';
 export { SearchField } from './src/search-field/search-field.component';
+export { Loading } from './src/loading/loading.component';
+export { LoadingIndicator } from './src/loading/loading-indicator.component';
+export { IntelBrandedLoading } from './src/loading/intel-branded-loading.component';

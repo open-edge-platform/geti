@@ -4,7 +4,7 @@
 import { Flex } from '@adobe/react-spectrum';
 import { dimensionValue } from '@react-spectrum/utils';
 
-import IntelBrandedLoadingGif from '../../../assets/images/intel-loading.webp';
+import IntelBrandedLoadingGif from './intel-loading.webp';
 
 export const IntelBrandedLoading = (): JSX.Element => {
     return (

@@ -2,13 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Heading, ProgressCircle, View } from '@adobe/react-spectrum';
-import { ColorThumb } from '@geti/ui';
+import { ColorThumb, Loading } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { getFileSize } from '../../../../shared/utils';
 
 import classes from './storage-usage.module.scss';

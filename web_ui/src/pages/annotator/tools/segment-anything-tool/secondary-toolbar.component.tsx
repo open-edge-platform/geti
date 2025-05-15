@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Switch, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { LoadingIndicator } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { RightClick } from '../../../../assets/icons';
 import { Divider } from '../../../../shared/components/divider/divider.component';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
