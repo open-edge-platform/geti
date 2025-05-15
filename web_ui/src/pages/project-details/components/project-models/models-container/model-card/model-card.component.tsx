@@ -130,30 +130,43 @@ export const ModelCard = ({
                         genericId={genericId}
                         performance={performance}
                         isDisabled={isModelDeleted(model)}
+                        isModelTraining={modelInTraining}
                     />
                     <Flex direction={'column'} width={'100%'} gap='size-100'>
                         <Flex alignItems={'center'} justifyContent={'space-between'}>
                             <Text UNSAFE_className={classes.modelInfo} data-testid={'trained-model-date-id'}>
-                                Trained: {formatDate(creationDate, 'DD MMM YYYY, hh:mm A')} |
+                                Trained: {formatDate(creationDate, 'DD MMM YYYY, hh:mm A')}
                             </Text>
-                            <Flex alignItems={'center'} gap={'size-225'} height={'size-225'}>
-                                <CountWithIcon
-                                    id={genericId}
-                                    count={numberOfLabels}
-                                    text={'label'}
-                                    icon={<TagIcon />}
-                                />
-                                <CountWithIcon id={genericId} count={numberOfImages} text={'image'} icon={<Image />} />
-                                <CountWithIcon id={genericId} count={numberOfFrames} text={'frame'} icon={<Fps />} />
-                                <ModelCardMenu
-                                    model={model}
-                                    taskId={taskId}
-                                    isLatestModel={isLatestModel}
-                                    modelTemplateId={modelTemplateId}
-                                    projectIdentifier={projectIdentifier}
-                                    isMenuOptionsDisabled={isMenuOptionsDisabled}
-                                />
-                            </Flex>
+                            {!modelInTraining && (
+                                <Flex alignItems={'center'} gap={'size-225'} height={'size-225'}>
+                                    <CountWithIcon
+                                        id={genericId}
+                                        count={numberOfLabels}
+                                        text={'label'}
+                                        icon={<TagIcon />}
+                                    />
+                                    <CountWithIcon
+                                        id={genericId}
+                                        count={numberOfImages}
+                                        text={'image'}
+                                        icon={<Image />}
+                                    />
+                                    <CountWithIcon
+                                        id={genericId}
+                                        count={numberOfFrames}
+                                        text={'frame'}
+                                        icon={<Fps />}
+                                    />
+                                    <ModelCardMenu
+                                        model={model}
+                                        taskId={taskId}
+                                        isLatestModel={isLatestModel}
+                                        modelTemplateId={modelTemplateId}
+                                        projectIdentifier={projectIdentifier}
+                                        isMenuOptionsDisabled={isMenuOptionsDisabled}
+                                    />
+                                </Flex>
+                            )}
                         </Flex>
                         <Flex alignItems={'center'} gap='size-150'>
                             <Heading id={`version-${genericId}-id`} data-testid={`version-${genericId}-id`} margin={0}>
