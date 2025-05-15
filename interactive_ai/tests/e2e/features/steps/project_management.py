@@ -364,6 +364,14 @@ def step_when_user_loads_project(context: Context) -> None:
     )
 
 
+@when("the user tries to delete the project")
+def step_when_user_tries_to_delete_project(context: Context) -> None:
+    try:
+        step_when_user_deletes_project(context=context)
+    except Exception as e:
+        context.exception = e
+
+
 @when("the user tries to load the project")
 def step_when_user_tries_to_load_project(context: Context) -> None:
     try:

@@ -16,7 +16,7 @@ import logging
 import time
 from typing import TYPE_CHECKING
 
-from behave import then
+from behave import step
 from behave.runner import Context
 from static_definitions import JobState, JobType
 
@@ -29,7 +29,7 @@ JOB_POLLING_PERIOD = 3  # seconds
 logger = logging.getLogger(__name__)
 
 
-@then("a job of type '{job_type:w}' is scheduled")
+@step("a job of type '{job_type:w}' is scheduled")
 def step_then_job_scheduled(context: Context, job_type: str) -> None:
     """Asserts that the "job_type" is scheduled"""
     jobs_api: JobsApi = context.jobs_api
@@ -45,7 +45,42 @@ def step_then_job_scheduled(context: Context, job_type: str) -> None:
     assert found_job_type == expected_job_type, f"Expected job type {expected_job_type}, but found {found_job_type}"
 
 
-@then("the job completes successfully within {job_timeout:d} minutes")
+@step("a job of type '{job_type:w}' is running")
+def step_then_job_running(context: Context, job_type: str) -> None:
+    """Asserts that the "job_type" is running"""
+    jobs_api: JobsApi = context.jobs_api
+    expected_job_type = JobType(job_type)
+
+    for _ in range(20):
+        context.job_info = jobs_api.get_job(
+            organization_id=context.organization_id,
+            workspace_id=context.workspace_id,
+            job_id=context.job_id,
+        )
+        if context.job_info.actual_instance.state == JobState.RUNNING:
+            time.sleep(10)  # provide some time for the job to properly start
+            break
+        time.sleep(1)
+    else:
+        raise RuntimeError(f"A job of type '{job_type}' is not running within 20 seconds")
+
+    found_job_type = JobType(context.job_info.actual_instance.type)
+    assert found_job_type == expected_job_type, f"Expected job type {expected_job_type}, but found {found_job_type}"
+
+
+@step("the user cancels the job")
+def step_when_user_cancels_job(context: Context) -> None:
+    """Cancels the job"""
+    jobs_api: JobsApi = context.jobs_api
+    jobs_api.cancel_job(
+        organization_id=context.organization_id,
+        workspace_id=context.workspace_id,
+        job_id=context.job_id,
+    )
+    time.sleep(5)  # provide some time for the job to stop
+
+
+@step("the job completes successfully within {job_timeout:d} minutes")
 def step_then_job_finishes_before_timeout(context: Context, job_timeout: int) -> None:
     """
     Asserts that the jobs finishes within the passed "job_timeout". If not, raises a TimeoutError.
