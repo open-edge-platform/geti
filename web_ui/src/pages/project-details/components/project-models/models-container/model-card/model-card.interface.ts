@@ -12,4 +12,5 @@ export interface ModelCardProps {
     modelTemplateId: string;
     isMenuOptionsDisabled: boolean;
     complexity: number | undefined;
+    modelInTraining: boolean;
 }

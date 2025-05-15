@@ -15,6 +15,7 @@ import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { Tag } from '../../../../../../shared/components/tag/tag.component';
+import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { isModelDeleted } from '../../../../utils';
@@ -30,26 +31,46 @@ const ModelInfoFields = ({
     modelSize,
     totalDiskSize,
     complexity,
+    isModelDeleted,
 }: {
     modelSize: string | undefined;
     totalDiskSize: string | undefined;
     complexity: number | undefined;
+    isModelDeleted: boolean;
 }) => {
-    const fields = [];
-    if (modelSize !== undefined) {
-        fields.push(`Model weight size: ${modelSize}`);
-    }
-    if (totalDiskSize !== undefined) {
-        fields.push(`Total size: ${totalDiskSize}`);
-    }
-    if (complexity !== undefined) {
-        fields.push(`Complexity: ${complexity} GFlops`);
-    }
-
-    return <>{fields.join(' | ')}</>;
+    return (
+        <>
+            {!isModelDeleted && (
+                <>
+                    <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
+                        Model size: {modelSize ?? <ThreeDotsFlashing className={classes.threeDotsFlashing} />}
+                    </Text>
+                    <Text marginX={'size-50'}>|</Text>
+                    <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
+                        Total size:{' '}
+                        {totalDiskSize === '0' ? (
+                            <ThreeDotsFlashing className={classes.threeDotsFlashing} />
+                        ) : (
+                            totalDiskSize
+                        )}
+                    </Text>
+                    <Text marginX={'size-50'}>|</Text>
+                </>
+            )}
+            <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
+                Complexity:{' '}
+                {complexity ? (
+                    <span>{complexity} GFlops</span>
+                ) : (
+                    <ThreeDotsFlashing className={classes.threeDotsFlashing} />
+                )}
+            </Text>
+        </>
+    );
 };
 
 export const ModelCard = ({
+    modelInTraining,
     model,
     taskId,
     isLatestModel,
@@ -97,9 +118,12 @@ export const ModelCard = ({
                 borderWidth={'thin'}
                 borderRadius={'small'}
                 borderColor={'gray-75'}
-                padding={'size-200'}
                 data-testid={`model-card-${id}`}
-                UNSAFE_className={clsx({ [classes.modelDeleted]: isModelDeleted(model) })}
+                UNSAFE_className={clsx({
+                    [classes.modelDeleted]: isModelDeleted(model),
+                    [classes.modelCardTraining]: modelInTraining,
+                    [classes.modelCardNotTraining]: !modelInTraining,
+                })}
             >
                 <Flex alignItems={'center'} gap={'size-200'}>
                     <ModelPerformance
@@ -161,11 +185,10 @@ export const ModelCard = ({
                             UNSAFE_className={classes.modelInfo}
                         >
                             <ModelInfoFields
-                                modelSize={baseModel && !isModelDeleted(model) ? baseModel.modelSize : undefined}
-                                totalDiskSize={
-                                    !isLoadingModelDetails && !isModelDeleted(model) ? totalDiskSize : undefined
-                                }
+                                modelSize={baseModel ? baseModel.modelSize : undefined}
+                                totalDiskSize={!isLoadingModelDetails ? totalDiskSize : undefined}
                                 complexity={complexity}
+                                isModelDeleted={isModelDeleted(model)}
                             />
                         </Text>
                     </Flex>
