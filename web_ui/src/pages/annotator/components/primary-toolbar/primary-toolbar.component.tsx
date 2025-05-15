@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Provider } from '@adobe/react-spectrum';
+import { Provider, View } from '@adobe/react-spectrum';
 import { Flex } from '@react-spectrum/layout';
-import { View } from '@react-spectrum/view';
 import { partition } from 'lodash-es';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';

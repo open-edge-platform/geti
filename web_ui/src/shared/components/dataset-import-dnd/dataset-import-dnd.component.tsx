@@ -5,8 +5,7 @@ import { Dispatch, SetStateAction, useRef } from 'react';
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
 import { Button } from '@geti/ui';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { DimensionValue, Responsive } from '@react-types/shared';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 

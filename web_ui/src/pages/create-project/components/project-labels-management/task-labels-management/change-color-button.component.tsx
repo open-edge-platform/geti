@@ -3,8 +3,7 @@
 
 import { View } from '@adobe/react-spectrum';
 import { ActionButton } from '@geti/ui';
-import { BorderRadiusValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { BorderRadiusValue, Responsive } from '@react-types/shared';
 
 interface ChangeColorButtonProps {
     size: 'S' | 'L';

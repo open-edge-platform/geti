@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
 import { clsx } from 'clsx';
 import { usePress } from 'react-aria';
 import { useNavigate } from 'react-router-dom';

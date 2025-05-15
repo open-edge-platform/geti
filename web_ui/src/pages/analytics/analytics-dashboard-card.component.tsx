@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
 import { Button } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
 import { motion } from 'framer-motion';
 
 import { AnalyticsIcon, ExternalLinkIcon } from '../../assets/icons';

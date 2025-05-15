@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { SpectrumWellProps, Well } from '@adobe/react-spectrum';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { DimensionValue, Responsive } from '@react-types/shared';
 
 import classes from './custom-well.module.scss';
 

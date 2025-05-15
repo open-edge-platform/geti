@@ -10,7 +10,7 @@ import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../core/user-set
 import { UserGlobalSettings, UseSettings } from '../../../core/user-settings/services/user-settings.interface';
 import { DocsUrl, getFuxSetting } from '../../../shared/components/tutorials/utils';
 
-export enum TipPosition {
+enum TipPosition {
     BOTTOM_RIGHT = 'tipBottomRight',
     RIGHT_TOP = 'tipRightTop',
     TOP_RIGHT = 'tipTopRight',

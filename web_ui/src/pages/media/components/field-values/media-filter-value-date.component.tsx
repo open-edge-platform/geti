@@ -4,8 +4,8 @@
 import { useEffect, useState } from 'react';
 
 import { DatePicker } from '@geti/ui';
+import { View } from '@adobe/react-spectrum';
 import { DateValue, getLocalTimeZone, parseAbsolute, parseDateTime, today } from '@internationalized/date';
-import { View } from '@react-spectrum/view';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { formatLocalToUtc, isDateBetween } from '../../../../shared/utils';
