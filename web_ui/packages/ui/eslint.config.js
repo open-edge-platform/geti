@@ -17,7 +17,7 @@ export default [
                         },
                         {
                             group: ['../*/**'],
-                            message: 'Do not import anything from outside ui package.',
+                            message: 'Importing files outside of the current package is not allowed.',
                         },
                     ],
                 },
