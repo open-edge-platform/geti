@@ -1,0 +1,11 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+global:
+  registry_address: ghcr.io
+  docker_namespace: open-edge-platform/geti
+
+auth-proxy:
+  certificate:
+    issuerRef:
+      name: edge-node-cluster-issuer

@@ -1,0 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+tls:
+  ca:
+    name: edge-node-cluster-issuer

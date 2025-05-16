@@ -1,0 +1,18 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+global:
+  registry_address: ghcr.io
+  docker_namespace: open-edge-platform/geti
+
+name: istio-gateway
+
+env:
+  WASM_INSECURE_REGISTRIES: ghcr.io
+
+certificate:
+  issuerRef:
+    name: edge-node-cluster-issuer
+
+istioProxy:
+  name: istio-router

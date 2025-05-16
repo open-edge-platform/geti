@@ -1,0 +1,168 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "DeploymentPackage"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti
+displayName: Intel® Geti™ Platform
+description: Intel® Geti™ Computer Vision System
+version: 2.9.0
+
+kind: normal
+
+applications:
+  - name: geti-cm-istio-csr
+    version: 2.9.0
+  - name: geti-control-plane
+    version: 2.9.0
+  - name: geti-impt
+    version: 2.9.0
+  - name: geti-istiod
+    version: 2.9.0
+  - name: geti-istio-base
+    version: 2.9.0
+  - name: geti-istio-crds
+    version: 2.9.0
+  - name: geti-flyte-crds
+    version: 2.9.0
+  - name: geti-gateway
+    version: 2.9.0
+  - name: geti-kubelet-csr-approver
+    version: 2.9.0
+  - name: geti-migration-job
+    version: 2.9.0
+  - name: geti-modelmesh-serving-crd
+    version: 2.9.0
+  - name: geti-opa
+    version: 2.9.0
+  - name: geti-prepare
+    version: 2.9.0
+  - name: geti-pv-creation
+    version: 2.9.0
+  - name: geti-seaweed-fs
+    version: 2.9.0
+
+defaultNamespaces:
+  geti-cm-istio-csr: cert-manager
+  geti-control-plane: impt
+  geti-gateway: istio-system
+  geti-impt: impt
+  geti-istio-base: istio-system
+  geti-istiod: istio-system
+  geti-kubelet-csr-approver: kube-system
+  geti-migration-job: impt
+  geti-opa: opa-istio
+  geti-prepare: impt
+  geti-pv-creation: impt
+  geti-seaweed-fs: impt
+
+deploymentProfiles:
+  - name: default
+    description: CPU only and 50GB data
+    applicationProfiles:
+      - application: geti-cm-istio-csr
+        profile: geti
+      - application: geti-control-plane
+        profile: default
+      - application: geti-impt
+        profile: cpu
+      - application: geti-istiod
+        profile: geti
+      - application: geti-istio-base
+        profile: default
+      - application: geti-istio-crds
+        profile: default
+      - application: geti-flyte-crds
+        profile: default
+      - application: geti-gateway
+        profile: default
+      - application: geti-kubelet-csr-approver
+        profile: default
+      - application: geti-migration-job
+        profile: default
+      - application: geti-modelmesh-serving-crd
+        profile: default
+      - application: geti-opa
+        profile: default
+      - application: geti-prepare
+        profile: default
+      - application: geti-pv-creation
+        profile: small
+      - application: geti-seaweed-fs
+        profile: default
+  - name: large
+    description: CPU only and 500GB data
+    applicationProfiles:
+      - application: geti-cm-istio-csr
+        profile: geti
+      - application: geti-control-plane
+        profile: default
+      - application: geti-impt
+        profile: cpu
+      - application: geti-istiod
+        profile: geti
+      - application: geti-istio-base
+        profile: default
+      - application: geti-istio-crds
+        profile: default
+      - application: geti-flyte-crds
+        profile: default
+      - application: geti-gateway
+        profile: default
+      - application: geti-kubelet-csr-approver
+        profile: default
+      - application: geti-migration-job
+        profile: default
+      - application: geti-modelmesh-serving-crd
+        profile: default
+      - application: geti-opa
+        profile: default
+      - application: geti-prepare
+        profile: default
+      - application: geti-pv-creation
+        profile: large
+      - application: geti-seaweed-fs
+        profile: default
+
+applicationDependencies:
+  - name: geti-control-plane
+    requires: geti-impt
+  - name: geti-impt
+    requires: geti-opa
+  - name: geti-impt
+    requires: geti-seaweed-fs
+  - name: geti-istiod
+    requires: geti-istio-crds  # istiod needs the crds first
+  - name: geti-migration-job
+    requires: geti-impt
+  - name: geti-seaweed-fs
+    requires: geti-istio-crds  # seaweed needs the istio-crds
+
+namespaces:
+  - name: impt
+    labels:
+      istio-injection: enabled
+      opa-istio-injection: enabled
+      name: impt
+  - name: opa-istio
+    labels:
+      istio-injection: enabled
+      app.kubernetes.io/managed-by: Helm
+      name: opa-istio
+  - name: istio-system
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      name: istio-system
+  - name: flyte
+    labels:
+      istio-injection: enabled
+      name: flyte
+  - name: impt-jobs-production
+    labels:
+      istio-injection: enabled
+      app.kubernetes.io/managed-by: Helm
+    annotations:
+      meta.helm.sh/release-name: impt
+      meta.helm.sh/release-namespace: impt
