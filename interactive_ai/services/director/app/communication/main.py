@@ -43,6 +43,8 @@ from geti_fastapi_tools.validation import RestApiValidator
 from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry, KafkaTelemetry
 from iai_core.algorithms import ModelTemplateList
 
+from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # type: ignore # noqa: ANN201

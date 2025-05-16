@@ -6,6 +6,7 @@ from http import HTTPStatus
 from unittest.mock import patch
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
+from features.feature_flag_provider import FeatureFlag
 from testfixtures import compare
 
 from geti_types import ID, ProjectIdentifier
@@ -20,13 +21,16 @@ API_PROJECT_PATTERN = f"{API_WORKSPACE_PATTERN}/projects/{DUMMY_PROJECT_ID}"
 
 
 class TestProjectConfigurationEndpoints:
-    def test_get_project_configuration(self, fxt_director_app, fxt_project_configuration) -> None:
+    def test_get_project_configuration(self, fxt_director_app, fxt_project_configuration, fxt_enable_feature_flag_name) -> None:
+        # Arrange
+        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
         project_config_dict = fxt_project_configuration.model_dump()
         project_identifier = ProjectIdentifier(
             workspace_id=ID(DUMMY_WORKSPACE_ID),
             project_id=ID(DUMMY_PROJECT_ID),
         )
 
+        # Act
         with patch.object(
             ProjectConfigurationRESTController,
             "get_configuration",
@@ -34,7 +38,14 @@ class TestProjectConfigurationEndpoints:
         ) as mock_get_project_config:
             result = fxt_director_app.get(f"{API_PROJECT_PATTERN}/project_configuration")
 
+        # Assert
         mock_get_project_config.assert_called_once_with(project_identifier=project_identifier)
 
         assert result.status_code == HTTPStatus.OK
         compare(json.loads(result.content), project_config_dict, ignore_eq=True)
+
+    def test_get_project_configuration_feature_flag_off(self, fxt_director_app) -> None:
+        # check that endpoint is not available when feature flag is off
+        result = fxt_director_app.get(f"{API_PROJECT_PATTERN}/project_configuration")
+
+        assert result.status_code == HTTPStatus.NOT_FOUND

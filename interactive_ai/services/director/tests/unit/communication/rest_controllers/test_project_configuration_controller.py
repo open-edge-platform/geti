@@ -18,19 +18,18 @@ def project_configuration_controller():
 
 class TestProjectConfigurationRESTController:
     def test_get_configuration(
-        self, request, fxt_project_identifier, project_configuration_controller, fxt_project_configuration
+        self, request, fxt_project_identifier, project_configuration_controller, fxt_project_configuration, fxt_project_configuration_rest_view
     ) -> None:
         # Arrange
         repo = ProjectConfigurationRepo(fxt_project_identifier)
         request.addfinalizer(lambda: repo.delete_all())
         repo.save(fxt_project_configuration)
-        expected = fxt_project_configuration.model_dump()
 
         # Act
         result = project_configuration_controller.get_configuration(project_identifier=fxt_project_identifier)
 
         # Convert to dict to compare with expected output
-        compare(result, expected, ignore_eq=True)
+        compare(result, fxt_project_configuration_rest_view, ignore_eq=True)
 
     def test_get_configuration_not_found(self, project_configuration_controller) -> None:
         project_id = ID("dummy_project_id")

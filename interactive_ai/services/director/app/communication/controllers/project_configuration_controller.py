@@ -3,6 +3,7 @@
 
 from typing import Any
 
+from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
 from geti_configuration_tools.project_configuration import NullProjectConfiguration
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_telemetry_tools import unified_tracing
@@ -25,5 +26,4 @@ class ProjectConfigurationRESTController:
         project_config = ProjectConfigurationRepo(project_identifier).get_project_configuration()
         if isinstance(project_config, NullProjectConfiguration):
             raise ProjectNotFoundException(project_identifier.project_id)
-        # The project configuration is a Pydantic model, so we can simply convert it to a dict
-        return project_config.model_dump()
+        return ProjectConfigurationRESTViews.project_configuration_to_rest(project_config)
