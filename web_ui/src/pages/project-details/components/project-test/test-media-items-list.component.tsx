@@ -1,13 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 
 import { Flex, IllustratedMessage, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { Loading, PressableElement } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
-import { VirtuosoGridHandle } from 'react-virtuoso';
 
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
@@ -60,7 +59,6 @@ export const TestMediaItemsList = ({
     loadNextMedia,
     selectMediaItem,
 }: TestMediaItemsListProps): JSX.Element => {
-    const ref = useRef<VirtuosoGridHandle | null>(null);
     const { isLoading: isMediaItemsLoading, isFetchingNextPage, data } = mediaItemsQuery;
     const mediaItems = useMemo(() => data?.pages?.flatMap(({ media }) => media) ?? [], [data?.pages]);
 
@@ -69,28 +67,6 @@ export const TestMediaItemsList = ({
     const hasMediaItems = !allPagesAreEmpty && !isMediaItemsLoading;
 
     const mediaItemIndex = useSelectedMediaItemIndex(mediaItems, selectedMediaItem, false, true);
-
-    useEffect(() => {
-        let timeoutId: ReturnType<typeof setTimeout> | null = null;
-
-        if (ref.current && selectedMediaItem !== undefined) {
-            timeoutId = setTimeout(() => {
-                ref.current?.scrollToIndex({
-                    index: mediaItemIndex,
-                    behavior: 'smooth',
-                    align: 'center',
-                });
-                // we don't want to scroll immediately
-                // in case of changed view mode we have to scroll once view is rendered
-            }, 500);
-        }
-
-        return () => {
-            timeoutId && clearTimeout(timeoutId);
-        };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedMediaItem]);
 
     if (isMediaItemsLoading) {
         return (
@@ -123,6 +99,7 @@ export const TestMediaItemsList = ({
                             viewModeSettings={viewModeSettings}
                             idFormatter={getTestMediaItemId}
                             getTextValue={(item) => item.media.name}
+                            scrollToIndex={mediaItemIndex}
                             itemContent={(mediaItem) => {
                                 const mediaImageItem = mediaItem as unknown as TestImageMediaItem;
                                 const handleSelectMediaItem = () => selectMediaItem(mediaItem);
