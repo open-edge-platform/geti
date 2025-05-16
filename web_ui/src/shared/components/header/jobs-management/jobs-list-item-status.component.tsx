@@ -4,7 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { LoadingIndicator, PressableElement } from '@geti/ui';
 import { motion } from 'framer-motion';
 import { maxBy } from 'lodash-es';
 
@@ -13,7 +13,6 @@ import { JobStepState } from '../../../../core/jobs/jobs.const';
 import { Job, JobStep } from '../../../../core/jobs/jobs.interface';
 import { ANIMATION_PARAMETERS } from '../../../animation-parameters/animation-parameters';
 import { isNonEmptyArray } from '../../../utils';
-import { PressableElement } from '../../pressable-element/pressable-element.component';
 import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ThinProgressBar } from '../../thin-progress-bar/thin-progress-bar.component';
 import { JobsListItemDetailedProgress } from './jobs-list-item-progress.component';

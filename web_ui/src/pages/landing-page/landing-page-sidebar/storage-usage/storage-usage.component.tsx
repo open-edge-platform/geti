@@ -4,6 +4,7 @@
 import { CSSProperties } from 'react';
 
 import { Divider, Flex, Meter, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { PressableElement } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
@@ -13,7 +14,6 @@ import {
     TOO_LOW_FREE_DISK_SPACE_IN_BYTES,
 } from '../../../../core/status/hooks/utils';
 import { InfoTooltip } from '../../../../shared/components/info-tooltip/info-tooltip.component';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { getFileSize } from '../../../../shared/utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 

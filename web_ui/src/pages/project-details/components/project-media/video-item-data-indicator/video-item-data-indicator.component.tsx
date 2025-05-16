@@ -4,8 +4,7 @@
 import { ReactNode } from 'react';
 
 import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-
-import { PressableElement } from '../../../../../shared/components/pressable-element/pressable-element.component';
+import { PressableElement } from '@geti/ui';
 
 interface VideoItemDataIndicatorProps {
     children: ReactNode;
