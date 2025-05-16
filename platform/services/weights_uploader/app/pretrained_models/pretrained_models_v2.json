@@ -1,0 +1,372 @@
+[
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_encoder/sam_vit_b_zsl_encoder.xml",
+    "target": "/home/non-root/sam_vit_b_zsl_encoder.xml",
+    "sha_sum": "976e6926e9d8d9220f6b54bc9ae9fad1861177143feece772375e79c4b3b0e41"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_encoder/sam_vit_b_zsl_encoder.bin",
+    "target": "/home/non-root/sam_vit_b_zsl_encoder.bin",
+    "sha_sum": "2b1304d5e6721458b39c33f10cb9d67e951236bafce5df148e0c71b60234aba0"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_decoder/sam_vit_b_zsl_decoder.xml",
+    "target": "/home/non-root/sam_vit_b_zsl_decoder.xml",
+    "sha_sum": "b9acd3452d7d48fd2323b1b47cc5223657cdebe8ab264bca808b296b7682f660"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/model_api/test/otx_models/sam_vit_b_zsl_decoder/sam_vit_b_zsl_decoder.bin",
+    "target": "/home/non-root/sam_vit_b_zsl_decoder.bin",
+    "sha_sum": "78d656dddb93c9ae714b86a71a3fd3eb9cd52db1f6ef55f300c6c9cd8833a9a0"
+  },
+  {
+    "url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_ade20k_linear_head.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/dinov2_vits14_ade20k_linear_head.pth",
+    "sha_sum": "67e10225e0bf1e2c6e8bc9e07020211ab58cbb4aa14efbaa32c52914931c4ade",
+    "template_ids": ["Custom_Semantic_Segmentation_DINOV2_S"]
+  },
+  {
+    "url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_pretrain.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/dinov2_vits14_pretrain.pth",
+    "sha_sum": "b938bf1bc15cd2ec0feacfe3a1bb553fe8ea9ca46a7e1d8d00217f29aef60cd9",
+    "template_ids": ["Custom_Semantic_Segmentation_DINOV2_S"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/efficientnet_b3_rwightman-b3899882.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_b3_rwightman-b3899882.pth",
+    "sha_sum": "b3899882250c22946d0229d266049fcd133c169233530b36b9ffa7983988362f",
+    "template_ids": ["Custom_Image_Classification_EfficientNet-B3"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/efficientnet_v2_l-59c71312.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_v2_l-59c71312.pth",
+    "sha_sum": "59c713125fb834e97ba84e540464ea0b0a07de5e7d74c53ac6e5b8fdadab5f89",
+    "template_ids": ["Custom_Image_Classification_EfficientNet-V2-L"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/swin/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco_20210908_165006-90a4008c.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco_20210908_165006-90a4008c.pth",
+    "sha_sum": "90a4008ce84011fc0d75a08db1b65b01ee1f145e9a1dffe8acc15ea8894b348d",
+    "template_ids": ["Custom_Counting_Instance_Segmentation_MaskRCNN_SwinT_FP16"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/maskrcnn_resnet50_fpn_coco-bf2d0c1e.pth",
+    "sha_sum": "bf2d0c1efbc936eeee2bc95a48e80ebc86b891f61b0106485937fc29f9315fc0"
+  },
+  {
+    "url": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_b_20230227-3ab7d230.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mscan_b_20230227-3ab7d230.pth",
+    "sha_sum": "3ab7d2301876e41fdd3950e59cdce44e18ebcc36a4cf7a4f5f0817d14f381c9b",
+    "template_ids": ["Custom_Semantic_Segmentation_SegNext_B"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_s_20230227-f33ccdf2.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mscan_s_20230227-f33ccdf2.pth",
+    "sha_sum": "f33ccdf2fc0afb78a39a44645eb8436891b95b1d3d9b48c1d9ace85936740a18",
+    "template_ids": ["Custom_Semantic_Segmentation_SegNext_s"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_t_20230227-119e8c9f.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mscan_t_20230227-119e8c9f.pth",
+    "sha_sum": "119e8c9f4479cb5ed7906c26adc3c9fe722d5c5fff63651549669bff941d11c4",
+    "template_ids": ["Custom_Semantic_Segmentation_SegNext_t"]
+  },
+  {
+    "url": "https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_pretrained.tar",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet50_vd_ssld_pretrained.tar",
+    "sha_sum": "94e80c9dd1aedb98a4c627e9d3574c32712d2923a54d8a51797b1d0148164645"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/resnext101_atss_070623.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnext101_atss_070623.pth",
+    "sha_sum": "1515fb8de866c905c11172e160250044b8ecdb306334a4ba271f28f2c6ec3ccf",
+    "template_ids": ["Object_Detection_ResNeXt101_ATSS"]
+  },
+  {
+    "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/rtdetr_r101vd_2x_coco_objects365_from_paddle.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/rtdetr_r101vd_2x_coco_objects365_from_paddle.pth",
+    "sha_sum": "db3d85e3e9787daa63586284cba77bd98d0836aaf76e07b4b16aeb87d370ef00",
+    "template_ids": ["Object_Detection_RTDetr_101"]
+  },
+  {
+    "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet18_vd_pretrained_from_paddle.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet18_vd_pretrained_from_paddle.pth",
+    "sha_sum": "911a745b62e173c8f4b9af513c2ea295428cf23f1bbfe9048381500f140fd720",
+    "template_ids": ["Object_Detection_RTDetr_18"]
+  },
+  {
+    "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/rtdetr_r18vd_5x_coco_objects365_from_paddle.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/rtdetr_r18vd_5x_coco_objects365_from_paddle.pth",
+    "sha_sum": "8f2278c42012a41971f900448b3d4dcb398356e8175e2b3ee4600e37eab0a045",
+    "template_ids": ["Object_Detection_RTDetr_18"]
+  },
+  {
+    "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/rtdetr_r50vd_2x_coco_objects365_from_paddle.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/rtdetr_r50vd_2x_coco_objects365_from_paddle.pth",
+    "sha_sum": "7788173453f771d45d0b49ffa23dbeb60796ccb8425afa52befb0b8fe033608c",
+    "template_ids": ["Object_Detection_RTDetr_50"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/rtmdet_tiny.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/rtmdet_tiny.pth",
+    "sha_sum": "209f3947dc501bed1e382bc57a4dcc4e5b21c61619cf01466cfca6291b48a8d6",
+    "template_ids": ["Object_Detection_RTMDet_tiny"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
+    "sha_sum": "69c5e24fd2c8340efd3ffbce4ca37d7e04e905414887fc624736d665dfec4b58",
+    "template_ids": ["Keypoint_Detection_RTMPose_Tiny"]
+  },
+  {
+    "url": "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/sam_vit_b_01ec64.pth",
+    "sha_sum": "ec2df62732614e57411cdcf32a23ffdf28910380d03139ee0f4fcbe91eb8c912"
+  },
+  {
+    "url": "https://storage.googleapis.com/vit_models/augreg/Ti_16-i21k-300ep-lr_0.001-aug_none-wd_0.03-do_0.0-sd_0.0--imagenet2012-steps_20k-lr_0.03-res_224.npz",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/Ti_16-i21k-300ep-lr_0.001-aug_none-wd_0.03-do_0.0-sd_0.0--imagenet2012-steps_20k-lr_0.03-res_224.npz",
+    "sha_sum": "0c5c4818ecf1049ae34194223c908172a2967334bab6d86670351b59d608b5dd",
+    "template_ids": ["Custom_Image_Classification_DeiT-Tiny"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmaction/recognition/x3d/facebook/x3d_m_facebook_16x5x1_kinetics400_rgb_20201027-3f42382a.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/x3d_m_facebook_16x5x1_kinetics400_rgb_20201027-3f42382a.pth",
+    "sha_sum": "3f42382a381e1b9700853bb3edca6f5c4bc68096de8b6079cf54995415cb64f8",
+    "template_ids": ["Custom_Action_Classification_X3D"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_l_8x8_300e_coco/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
+    "sha_sum": "d3bd2b23e4cd178bfcc756df67e0d0949f3d77e0a73482f6da694c580ed54da1",
+    "template_ids": ["Object_Detection_YOLOX_L"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_s_8x8_300e_coco/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
+    "sha_sum": "4592a793b95f18f62fd73fbb6cfe61dd445f71a8e072366e114e7134d4492760",
+    "template_ids": ["Object_Detection_YOLOX_S"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/yolox/yolox_x_8x8_300e_coco/yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth",
+    "sha_sum": "1ef88d67f9c912a7c3a6df4f4d9bdf391cf70df867e6c9d7f249c7a3990e3dec",
+    "template_ids": ["Object_Detection_YOLOX_X"]
+  },
+  {
+    "url": "https://github.com/WongKinYiu/YOLO/releases/download/v1.0-alpha/v9-s.pt",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/v9-s.pt",
+    "sha_sum": "8a2c74fff91e9649cfe6ccf9d173926fc85fab1a28ec8c8e762c099304624a86"
+  },
+  {
+    "url": "https://github.com/WongKinYiu/YOLO/releases/download/v1.0-alpha/v9-m.pt",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/v9-m.pt",
+    "sha_sum": "e4e4ecbf2bb113dfb64372a1d623957d9f1b18de7c6980d202ddd71bc9a85556"
+  },
+  {
+    "url": "https://github.com/WongKinYiu/YOLO/releases/download/v1.0-alpha/v9-c.pt",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/v9-c.pt",
+    "sha_sum": "b66df73be150f1025574b4399148815d5c510cf3d8f7fc7db216228e298132c6"
+  },
+  {
+    "url": "https://github.com/WongKinYiu/YOLO/releases/download/v1.0-alpha/v7.pt",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/v7.pt",
+    "sha_sum": "acf85669634caacfa6830d1d1100a8065ecb2fdd949cf6ec81f9495b2f028c64"
+  },
+  {
+    "url": "https://download.pytorch.org/models/mobilenet_v3_small-047dcff4.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenet_v3_small-047dcff4.pth",
+    "sha_sum": "047dcff4addef86ea5bc2eff13c9614dc11f47ab1160d0a71a25e7db994f4e1f",
+    "template_ids": ["Custom_Image_Classification_MobileNet-V3-small"]
+  },
+  {
+    "url": "https://paddle-imagenet-models-name.bj.bcebos.com/ResNet18_vd_pretrained.tar",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet18_vd_pretrained.tar",
+    "sha_sum": "52f4820a7216f5b337cc0b43fef8614293987e2040b65cb28f78c4673cb67b2f"
+  },
+  {
+    "url": "https://paddle-imagenet-models-name.bj.bcebos.com/ResNet50_vd_ssld_v2_pretrained.tar",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet50_vd_ssld_v2_pretrained.tar",
+    "sha_sum": "979473e71d47081b5e8e7ae2c546ea703bdd2add8f4b5a750513647d11ccd725"
+  },
+  {
+    "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet101_vd_ssld_pretrained_from_paddle.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet101_vd_ssld_pretrained_from_paddle.pth",
+    "sha_sum": "3683aca21d46f3a78de3171ee8f0497a9b1b4cd139a254e81b3d5bf579a0ff78",
+    "template_ids": ["Object_Detection_RTDetr_101"]
+  },
+  {
+    "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet50_vd_ssld_v2_pretrained_from_paddle.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet50_vd_ssld_v2_pretrained_from_paddle.pth",
+    "sha_sum": "641dc59835d5228e6013ac45acb633592ec825144fb3d78055bc07699f404353",
+    "template_ids": ["Object_Detection_RTDetr_50"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
+    "sha_sum": "69c5e24fd2c8340efd3ffbce4ca37d7e04e905414887fc624736d665dfec4b58"
+  },
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.364/efficientnet_b0-0752-0e386130.pth.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_b0-0752-0e386130.pth",
+    "sha_sum": "bb693fa44ebec3faa35219513eb876cf0e1a1bf9c18dc60949089b9b30e03580",
+    "template_ids": ["Custom_Image_Classification_EfficinetNet-B0"]
+  },
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.403/efficientnet_b2b-0527-531f10e6.pth.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_b2b-0527-531f10e6.pth",
+    "sha_sum": "fb90f072ce0f409eab002d440bc22eb9428e329ffa2751b7f6dd9c442a669c8e",
+    "template_ids": ["Custom_Counting_Instance_Segmentation_MaskRCNN_EfficientNetB2B", "Custom_Rotated_Detection_via_Instance_Segmentation_MaskRCNN_EfficientNetB2B"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/instance_segmentation/v2/efficientnet_b2b-mask_rcnn-576x576.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/efficientnet_b2b-mask_rcnn-576x576.pth",
+    "sha_sum": "b00407a212bdba77866b6c337a24e997b4b2621afb50e62b261df1a4f8efd3c6",
+    "template_ids": ["Custom_Counting_Instance_Segmentation_MaskRCNN_EfficientNetB2B", "Custom_Rotated_Detection_via_Instance_Segmentation_MaskRCNN_EfficientNetB2B"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/custom_semantic_segmentation/litehrnet18_imagenet1k_rsc.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/litehrnet18_imagenet1k_rsc.pth",
+    "sha_sum": "f72475bc1861de763d2646bf100ab80e054a33f45b0d19ad4626915e3d6d33e5",
+    "template_ids": ["Custom_Semantic_Segmentation_Lite-HRNet-18-mod2_OCR"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/custom_semantic_segmentation/litehrnetsv2_imagenet1k_rsc.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/litehrnetsv2_imagenet1k_rsc.pth",
+    "sha_sum": "70e87e0a1485962d66ecf5dea337a886cfab252d3d6a893cf7b92bafe92c8a29",
+    "template_ids": ["Custom_Semantic_Segmentation_Lite-HRNet-s-mod2_OCR"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/custom_semantic_segmentation/litehrnetxv3_imagenet1k_rsc.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/litehrnetxv3_imagenet1k_rsc.pth",
+    "sha_sum": "5c6d5a88275fedababdbae637498aae6599e7f5987470122d027765437bfe60a",
+    "template_ids": ["Custom_Semantic_Segmentation_Lite-HRNet-x-mod3_OCR"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v2.0/mask_rcnn/mask_rcnn_r50_fpn_mstrain-poly_3x_coco/mask_rcnn_r50_fpn_mstrain-poly_3x_coco_20210524_201154-21b550bb.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mask_rcnn_r50_fpn_mstrain-poly_3x_coco_20210524_201154-21b550bb.pth",
+    "sha_sum": "21b550bb3aa94fbaf85592931466a27b90520422c8b1f2ac08ddf4cf1e4fd650",
+    "template_ids": ["Custom_Counting_Instance_Segmentation_MaskRCNN_ResNet50", "Custom_Rotated_Detection_via_Instance_Segmentation_MaskRCNN_ResNet50"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth",
+    "sha_sum": "73cbd0190fcbe3ba339921fbce2c3a0b6bb9126c9a133c85e43a2a8e060a109e"
+  },
+  {
+    "url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnet50-0676ba61.pth",
+    "sha_sum": "0676ba61b6795bbe1773cffd859882e5e297624d384b6993f7c9e683e722fb8a",
+    "template_ids": ["Custom_Counting_Instance_Segmentation_MaskRCNN_ResNet50", "Custom_Rotated_Detection_via_Instance_Segmentation_MaskRCNN_ResNet50"]
+  },
+  {
+    "url": "https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobile_sam.pt",
+    "sha_sum": "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f"
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-2s_ssd-992x736.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenet_v2-2s_ssd-992x736.pth",
+    "sha_sum": "c94e3d76fb60db7de2c6fc824a692564cf7ebb2156a58ed2e0f37ff4c0089d28",
+    "template_ids": ["Custom_Object_Detection_Gen3_SSD"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-atss.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenet_v2-atss.pth",
+    "sha_sum": "f0caa5966a77f4f74b1f051f626d942e60b30d53cbf2f7af93fe2951a2295602",
+    "template_ids": ["Custom_Object_Detection_Gen3_ATSS"]
+  },
+  {
+    "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.213/mobilenetv2_w1-0887-13a021bc.pth.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv2_w1-0887-13a021bc.pth",
+    "sha_sum": "447d0b5cf0aee0d901c270925b8448099c4f69149b4f04f80231188a6b4c8e10",
+    "template_ids": ["Custom_Object_Detection_Gen3_ATSS", "Custom_Object_Detection_Gen3_SSD"]
+  },
+  {
+    "url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained/mobilenetv3-large-1cd25616.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv3-large-1cd25616.pth",
+    "sha_sum": "1cd25616db4b6481677fcbe5f6932520894cb34860ed86f7080f03eedf937b11",
+    "template_ids": ["Custom_Image_Classification_MobileNet-V3-large-1x"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_tiny_8xb32-300e_coco/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth",
+    "sha_sum": "ec670f7ee9e20bd7931e15f15b7016f7fe531baaab81f2e6153382d046111885",
+    "template_ids": ["Custom_Instance_Segmentation_RTMDet_tiny"]
+  },
+  {
+    "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/yolox_tiny_8x8.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/yolox_tiny_8x8.pth",
+    "sha_sum": "4ff3b67e005a6356a5794f5fbc42b133e077aa30ddcb0449b2153cfd953a0030",
+    "template_ids": ["Custom_Object_Detection_YOLOX"]
+  },
+  {
+    "url": "https://github.com/rwightman/pytorch-image-models/releases/download/v0.1-effv2-weights/tf_efficientnetv2_s_21k-6337ad01.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/tf_efficientnetv2_s_21k-6337ad01.pth",
+    "sha_sum": "6337ad01eda2fde154ffd358cf1583fb3040f1bf467739f28f17fb1dce1c3eb3",
+    "template_ids": ["Custom_Image_Classification_EfficientNet-V2-S"]
+  },
+  {
+    "url": "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained/mobilenetv3-small-55df8e1f.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobilenetv3-small-55df8e1f.pth",
+    "sha_sum": "55df8e1f9178250b79eaa4333df33eed99a3252597f0244caa0e4319bf49a57c",
+    "template_ids": ["Custom_Image_Classification_MobileNet-V3-small"]
+  },
+  {
+    "url": "http://repository.toolbox.iotg.sclab.intel.com/extra-deps/models/models--timm--resnet18.a1_in1k.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/models--timm--resnet18.a1_in1k.zip",
+    "unzip": false,
+    "sha_sum": "c0ddac84c0ad89a29428527669359316f76bc746dc9f0d51b72f148e2f7b9252",
+    "template_ids": ["ote_anomaly_classification_padim", "ote_anomaly_classification_stfpm", "ote_anomaly_uflow"]
+  },
+  {
+    "url": "http://repository.toolbox.iotg.sclab.intel.com/extra-deps/models/models--timm--tf_efficientnetv2_s.in21k.zip",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/models--timm--tf_efficientnetv2_s.in21k.zip",
+    "unzip": false,
+    "sha_sum": "7ef98ff5be511c04239b066c054fb3e624c4920cbab2c77d92a638f4d6810263",
+    "template_ids": ["Custom_Image_Classification_EfficientNet-V2-S"]
+  },
+  {
+    "url": "https://github.com/Peterande/storage/releases/download/dfinev1.0/dfine_x_coco.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/dfine_x_coco.pth",
+    "sha_sum": "9a82252f2d0426b2c24e99905c36c33a4ea850f247c247bda76fb5f76daea123",
+    "template_ids": ["Object_Detection_DFine_X"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnet18-5c106cde.pth",
+    "sha_sum": "5c106cde386e87d4033832f2996f5493238eda96ccf559d1d62760c4de0613f8",
+    "template_ids": ["ote_anomaly_classification_padim", "ote_anomaly_classification_stfpm"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnet18-5c106cde.pth",
+    "sha_sum": "5c106cde386e87d4033832f2996f5493238eda96ccf559d1d62760c4de0613f8",
+    "template_ids": ["ote_anomaly_detection_padim", "ote_anomaly_detection_stfpm"]
+  },
+  {
+    "url": "https://download.pytorch.org/models/resnet18-5c106cde.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnet18-5c106cde.pth",
+    "sha_sum": "5c106cde386e87d4033832f2996f5493238eda96ccf559d1d62760c4de0613f8",
+    "template_ids": ["ote_anomaly_segmentation_padim", "ote_anomaly_segmentation_stfpm"]
+  },
+  {
+    "url": "https://download.openmmlab.com/mmclassification/v0/deit/deit-tiny_pt-4xb256_in1k_20220218-13b382a0.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/deit-tiny_pt-4xb256_in1k_20220218-13b382a0.pth",
+    "sha_sum": "13b382a0e7b4a79b8bcf7c908b9cae5eb922b8bb1d40810998d01a87b075e6b6",
+    "template_ids": ["Custom_Image_Classification_DeiT-Tiny"]
+  },
+  {
+    "url": "https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_tiny_patch4_window7_224.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/swin_tiny_patch4_window7_224.pth",
+    "sha_sum": "9f71c168d837d1b99dd1dc29e14990a7a9e8bdc5f673d46b04fe36fe15590ad3",
+    "template_ids": ["Custom_Counting_Instance_Segmentation_MaskRCNN_SwinT_FP16"]
+  },
+  {
+    "url": "https://download.openmmlab.com/pretrain/third_party/resnext101_64x4d-ee2c6f71.pth",
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/resnext101_64x4d-ee2c6f71.pth",
+    "sha_sum": "ee2c6f713dbd26a7bbc4f1bdd599dd19b1fc58b6e7d756c3eb080761cf820e1f",
+    "template_ids": ["Object_Detection_ResNeXt101_ATSS"]
+  }
+]

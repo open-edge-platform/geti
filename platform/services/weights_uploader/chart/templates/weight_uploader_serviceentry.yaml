@@ -1,0 +1,18 @@
+{{ if .Capabilities.APIVersions.Has "networking.istio.io/v1/ServiceEntry"}}
+apiVersion: networking.istio.io/v1
+{{ else }}
+apiVersion: networking.istio.io/v1beta1
+{{ end }}
+kind: ServiceEntry
+metadata:
+  name: weight-uploader-ext
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+  - {{ (urlParse .Values.global.weights_url).host }}
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL

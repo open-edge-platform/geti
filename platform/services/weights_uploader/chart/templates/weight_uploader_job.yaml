@@ -1,0 +1,87 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: weight-uploader
+  namespace: {{ .Release.Namespace }}
+  labels:
+    "app": "weight-uploader"
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      labels:
+        "app": "weight-uploader"
+{{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+{{- end }}
+    spec:
+      serviceAccountName: weight-uploader
+      restartPolicy: Never
+      initContainers:
+        - name: wait-for-pod
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait pods
+              --selector=app=seaweed-fs
+              --timeout=1200s
+              --for=condition=Ready
+              --namespace {{ .Release.Namespace }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      containers:
+      - name: weight-uploader
+        image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/weights_uploader:{{ .Values.global.tag | default .Chart.Version }}"
+        command: ["/bin/sh", "-c"]
+        args:
+          - >-
+            python weights_uploader.py;
+            retVal=$?;
+            {{- if not .Values.global.istio_ambient_mesh }}
+            until curl -XPOST 127.0.0.1:15020/quitquitquit;
+              do sleep 3;
+            done;
+            {{- end }}
+            exit $retVal
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            memory: 100Mi
+        env:
+{{- if .Values.global.proxy.enabled }}
+          - name: http_proxy
+            value: "{{ .Values.global.proxy.http_proxy }}"
+          - name: https_proxy
+            value: "{{ .Values.global.proxy.https_proxy }}"
+          - name: no_proxy
+            value: "{{ .Values.global.proxy.no_proxy }},127.0.0.1,localhost,.{{ .Release.Namespace }},.svc,.cluster.local"
+{{- end }}
+          - name: WEIGHTS_DIR
+            value: "/weights"
+          - name: WEIGHTS_URL
+            value: "{{ .Values.global.weights_url }}"
+          - name: S3_HOST
+            value: impt-seaweed-fs.{{ .Release.Namespace }}:8333
+          - name: S3_SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "impt-seaweed-fs"
+                key: admin_secret_key
+          - name: S3_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "impt-seaweed-fs"
+                key: admin_access_key
+        volumeMounts:
+          - name: weights-temp
+            mountPath: /weights
+      volumes:
+        - name: weights-temp
+          emptyDir: {}
