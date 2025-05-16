@@ -24,6 +24,7 @@ from communication.endpoints.configuration_endpoints import configuration_router
 from communication.endpoints.model_tests_endpoints import model_test_router
 from communication.endpoints.optimization_endpoints import optimization_router
 from communication.endpoints.prediction_endpoints import prediction_router
+from communication.endpoints.project_configuration_endpoints import project_configuration_router
 from communication.endpoints.status_endpoints import status_router
 from communication.endpoints.supported_algorithms_endpoints import supported_algorithms_router
 from communication.endpoints.training_endpoints import training_router
@@ -85,6 +86,7 @@ app.include_router(prediction_router)
 app.include_router(status_router)
 app.include_router(training_router)
 app.include_router(supported_algorithms_router)
+app.include_router(project_configuration_router)
 
 base_dir = os.path.dirname(__file__) + "/../../../api/schemas/"
 mongo_id_schema = RestApiValidator().load_schema_file_as_dict(base_dir + "mongo_id.yaml")

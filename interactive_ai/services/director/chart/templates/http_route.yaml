@@ -42,6 +42,9 @@ spec:
         - path:
             type: RegularExpression
             value: /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/.*/supported_algorithms
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/.*/project_configuration
       backendRefs:
         - name: {{ .Release.Namespace }}-{{ .Chart.Name }}
           port: {{ .Values.service.ports.director.port }}
