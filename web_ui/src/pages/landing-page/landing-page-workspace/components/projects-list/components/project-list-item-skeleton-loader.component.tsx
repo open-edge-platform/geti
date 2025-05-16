@@ -4,8 +4,7 @@
 import { CSSProperties } from 'react';
 
 import { Divider, Flex, View } from '@adobe/react-spectrum';
-
-import { Skeleton } from '../../../../../../shared/components/skeleton/skeleton.component';
+import { Skeleton } from '@geti/ui';
 
 import classes from './skeleton-loader.module.scss';
 
