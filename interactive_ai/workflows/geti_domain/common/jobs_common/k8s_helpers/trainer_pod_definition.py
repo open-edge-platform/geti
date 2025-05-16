@@ -229,7 +229,7 @@ def create_flyte_container_task(  # noqa: PLR0913
                     V1EnvVar(name="TASK_ID", value=container_name),
                     V1EnvVar(name="SESSION_ORGANIZATION_ID", value=str(session.organization_id)),
                     V1EnvVar(name="SESSION_WORKSPACE_ID", value=str(session.workspace_id)),
-                    V1EnvVar(name="WEIGHTS_URL", value="https://download.geti-dev.infra-host.com/weights"),
+                    V1EnvVar(name="WEIGHTS_URL", value="https://storage.geti.intel.com/weights"),
                     V1EnvVar(
                         name="KAFKA_TOPIC_PREFIX",
                         value_from=V1EnvVarSource(

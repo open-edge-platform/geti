@@ -52,11 +52,7 @@ def main() -> None:
     models_list_path_v2 = os.path.join(config_dir, model_list)
 
     client = boto3.client(
-        "s3",
-        endpoint_url=s3_host,
-        aws_access_key_id=s3_access_key,
-        aws_secret_access_key=s3_secret_key,
-        use_ssl=False,
+        "s3", endpoint_url=s3_host, aws_access_key_id=s3_access_key, aws_secret_access_key=s3_secret_key
     )
 
     upload_file(client, config_dir, model_list)
