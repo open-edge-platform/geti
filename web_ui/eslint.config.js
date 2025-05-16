@@ -38,6 +38,7 @@ export default [
                         'Slider',
                         'Switch',
                         'SpectrumSwitchProps',
+                        'Breadcrumb',
                     ],
                     message: 'Use component from the @geti/ui folder instead.',
                 },

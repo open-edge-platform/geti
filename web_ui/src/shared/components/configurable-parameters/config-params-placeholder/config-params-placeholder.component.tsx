@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
-
-import { Skeleton } from '../../skeleton/skeleton.component';
+import { Skeleton } from '@geti/ui';
 
 export const ConfigParamsPlaceholder = (): JSX.Element => {
     return (

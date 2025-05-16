@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { PressableElement, Switch } from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
@@ -15,7 +15,6 @@ import { newLabelNameSchema } from '../../../../../pages/create-project/componen
 import { isYupValidationError } from '../../../../../pages/user-management/profile-page/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { LimitedTextField } from '../../../limited-text-field/limited-text-field.component';
-import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { ValidationErrorMsg } from '../../../validation-error-msg/validation-error-msg.component';
 import { getEditedItem } from '../../utils';
 import { ItemEditionState } from '../item-edition-state/item-edition-state.component';

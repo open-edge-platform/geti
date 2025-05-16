@@ -4,13 +4,13 @@
 import { FC, useState } from 'react';
 
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, useCollator, View } from '@adobe/react-spectrum';
+import { Tag } from '@geti/ui';
 import { SortDescriptor } from '@react-types/shared';
 import { get, isEmpty } from 'lodash-es';
 
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
 import { CasualCell } from '../../../../shared/components/table/components/casual-cell/casual-cell.component';
 import { TableCellProps } from '../../../../shared/components/table/table.interface';
-import { Tag } from '../../../../shared/components/tag/tag.component';
 import { SpectrumTableLoadingState } from '../../../../shared/utils';
 import { PersonalAccessTokenMenu } from './personal-access-tokens-menu.component';
 import { sortPersonalAccessTokens } from './utils';

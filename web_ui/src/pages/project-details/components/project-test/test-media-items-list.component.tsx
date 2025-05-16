@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 
 import { Flex, IllustratedMessage, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Loading, PressableElement } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 import { VirtuosoGridHandle } from 'react-virtuoso';
@@ -16,7 +16,6 @@ import { TestMediaAdvancedFilter, TestMediaItem } from '../../../../core/tests/t
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { NotFound } from '../../../../shared/components/not-found/not-found.component';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { useSelectedMediaItemIndex } from '../../../../shared/hooks/use-selected-media-item-index.hook';
 import { isSelected } from '../../../annotator/components/sidebar/dataset/utils';
 import { MediaItemTooltipMessage } from '../project-media/media-item-tooltip-message/media-item-tooltip-message';

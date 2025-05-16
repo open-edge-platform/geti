@@ -4,10 +4,10 @@
 import { useRef, useState } from 'react';
 
 import { TextField, View } from '@adobe/react-spectrum';
+import { CustomPopover } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
 import { TaskLabelTreeContainer } from '../../../../shared/components/task-label-tree-search/task-label-tree-container.component';
 import { useFilteredTaskMetadata } from '../../../../shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
 import { getAvailableLabelsWithoutEmpty } from '../../annotation/labels/utils';
