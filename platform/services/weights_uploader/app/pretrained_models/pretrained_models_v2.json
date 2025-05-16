@@ -205,7 +205,7 @@
   {
     "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
-    "sha_sum": "69c5e24fd2c8340efd3ffbce4ca37d7e04e905414887fc624736d665dfec4b58",
+    "sha_sum": "69c5e24fd2c8340efd3ffbce4ca37d7e04e905414887fc624736d665dfec4b58"
   },
   {
     "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.364/efficientnet_b0-0752-0e386130.pth.zip",
@@ -252,7 +252,7 @@
   {
     "url": "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth",
-    "sha_sum": "73cbd0190fcbe3ba339921fbce2c3a0b6bb9126c9a133c85e43a2a8e060a109e",
+    "sha_sum": "73cbd0190fcbe3ba339921fbce2c3a0b6bb9126c9a133c85e43a2a8e060a109e"
   },
   {
     "url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
@@ -263,7 +263,7 @@
   {
     "url": "https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/mobile_sam.pt",
-    "sha_sum": "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f",
+    "sha_sum": "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f"
   },
   {
     "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-2s_ssd-992x736.pth",
