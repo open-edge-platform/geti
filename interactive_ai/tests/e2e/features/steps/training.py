@@ -12,7 +12,7 @@
 # with no express or implied warranties, other than those that are expressly stated
 # in the License.
 
-from behave import then, when
+from behave import step, then, when
 from behave.runner import Context
 from geti_client import ModelsApi, TrainJob, TrainModelRequest
 from static_definitions import TaskType
@@ -49,7 +49,7 @@ def _train(
     context.job_id = train_response.job_id
 
 
-@when("the user requests to train a model")
+@step("the user requests to train a model")
 def step_when_user_trains_model(context: Context):
     _train(context=context)
 

@@ -81,7 +81,10 @@ def _annotate_image_or_frame(  # noqa: C901, PLR0912, PLR0915
     media_name: str,
     labels: list[str],
     frame_index: int | None = None,
+    dataset_id: str | None = None,
 ) -> None:
+    if dataset_id is None:
+        dataset_id = context.dataset_id
     annotations_api: AnnotationsApi = context.annotations_api
 
     media_details = context._media_info_by_name[media_name]
@@ -277,7 +280,7 @@ def _annotate_image_or_frame(  # noqa: C901, PLR0912, PLR0915
                 organization_id=context.organization_id,
                 workspace_id=context.workspace_id,
                 project_id=context.project_id,
-                dataset_id=context.dataset_id,
+                dataset_id=dataset_id,
                 image_id=media_details.id,
                 create_image_annotation_request=CreateImageAnnotationRequest(
                     media_identifier=media_identifier,
@@ -289,7 +292,7 @@ def _annotate_image_or_frame(  # noqa: C901, PLR0912, PLR0915
                 organization_id=context.organization_id,
                 workspace_id=context.workspace_id,
                 project_id=context.project_id,
-                dataset_id=context.dataset_id,
+                dataset_id=dataset_id,
                 video_id=media_details.id,
                 frame_index=frame_index,
                 create_video_frame_annotation_request=CreateVideoFrameAnnotationRequest(
@@ -302,17 +305,19 @@ def _annotate_image_or_frame(  # noqa: C901, PLR0912, PLR0915
 
 
 def _get_image_or_frame_annotations(
-    context: Context, media_type: str, media_name: str, frame_index: int | None = None
+    context: Context, media_type: str, media_name: str, frame_index: int | None = None, dataset_id: str | None = None
 ) -> list[Annotation]:
     annotations_api: AnnotationsApi = context.annotations_api
     annotations: list[Annotation] = []
+    if dataset_id is None:
+        dataset_id = context.dataset_id
 
     if media_type == "image":
         ann_response = annotations_api.get_image_annotation(
             organization_id=context.organization_id,
             workspace_id=context.workspace_id,
             project_id=context.project_id,
-            dataset_id=context.dataset_id,
+            dataset_id=dataset_id,
             image_id=context._media_info_by_name[media_name].id,
             annotation_id="latest",
         )
@@ -321,7 +326,7 @@ def _get_image_or_frame_annotations(
             organization_id=context.organization_id,
             workspace_id=context.workspace_id,
             project_id=context.project_id,
-            dataset_id=context.dataset_id,
+            dataset_id=dataset_id,
             video_id=context._media_info_by_name[media_name].id,
             frame_index=frame_index,
             annotation_id="latest",
@@ -333,6 +338,19 @@ def _get_image_or_frame_annotations(
         label_ids = [label.id for label in ann.labels]
         annotations.append(Annotation(shape=shape, label_ids=label_ids))
     return annotations
+
+
+@when("the user annotates the image '{image_name}' in dataset '{dataset_name}' with label '{label_name}'")
+def step_when_user_annotates_image_in_dataset_with_custom_label(
+    context: Context, image_name: str, dataset_name: str, label_name: str
+) -> None:
+    _annotate_image_or_frame(
+        context=context,
+        media_type="image",
+        media_name=image_name,
+        labels=[label_name],
+        dataset_id=context._dataset_info_by_name[dataset_name].id,
+    )
 
 
 @when("the user annotates the image '{image_name}' with label '{label_name}'")
@@ -370,6 +388,43 @@ def step_when_user_tries_annotating_image_with_custom_labels(
         )
     except Exception as e:
         context.exception = e
+
+
+@then("the image '{image_name}' in dataset '{dataset_name}' has labels '{raw_expected_label_names}'")
+def step_then_image_in_dataset_has_expected_labels(
+    context: Context, image_name: str, dataset_name: str, raw_expected_label_names: str
+) -> None:
+    annotations = _get_image_or_frame_annotations(
+        context=context,
+        media_type="image",
+        media_name=image_name,
+        dataset_id=context._dataset_info_by_name[dataset_name].id,
+    )
+
+    expected_label_names = raw_expected_label_names.split(", ")
+
+    label_info_by_id = {label.id: label for label in context.label_info_by_name.values()}
+    found_label_names = [
+        label_info_by_id[label_id].name for annotation in annotations for label_id in annotation.label_ids
+    ]
+    expected_label_names_freq = Counter(expected_label_names)
+    found_label_names_freq = Counter(found_label_names)
+    assert expected_label_names_freq == found_label_names_freq, (
+        f"Expected to find labels with the respective frequency: {expected_label_names_freq}, "
+        f"found instead: {found_label_names_freq}"
+    )
+
+
+@then("the image '{image_name}' in dataset '{dataset_name}' has label '{expected_label_name}'")
+def step_then_image_in_dataset_has_expected_label(
+    context: Context, image_name: str, dataset_name: str, expected_label_name: str
+) -> None:
+    step_then_image_in_dataset_has_expected_labels(
+        context=context,
+        image_name=image_name,
+        dataset_name=dataset_name,
+        raw_expected_label_names=expected_label_name,
+    )
 
 
 @then("the image '{image_name}' has labels '{raw_expected_label_names}'")
