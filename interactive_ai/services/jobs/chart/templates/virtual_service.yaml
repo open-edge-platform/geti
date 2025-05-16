@@ -1,10 +1,10 @@
 {{- if not .Values.global.istio_ambient_mesh }}
-{{- $svc_name := printf "%s-%s" .Release.Namespace .Chart.Name -}}
-{{- $svc_port := .Values.service.ports.http -}}
+{{- $svc_name := printf "%s-%s-ms" .Release.Namespace .Chart.Name -}}
+{{- $svc_port := .Values.microservice.service.ports.http -}}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  name: {{ $svc_name }}
   labels:
     {{- if .Values.global.istio_revision_name }}
     istio.io/rev: "{{ .Values.global.istio_revision_name }}"
@@ -16,7 +16,7 @@ spec:
   - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
   http:
   - match:
-    {{- range .Values.ingress.endpoints }}
+    {{- range .Values.microservice.ingress.endpoints }}
     - uri:
         regex: {{ . | quote }}
     {{- end }}
