@@ -423,23 +423,26 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
             base_model_id=base_model_id, model_status_filter=model_status_filter
         )
 
-        # Use ascending order sorting to retrieve the oldest matching document
         models = self.get_all(extra_filter=query)
         # Determine which precision to prioritize
         use_fp16 = FeatureFlagProvider.is_enabled(FEATURE_FLAG_FP16_INFERENCE)
         primary_precision = ModelPrecision.FP16 if use_fp16 else ModelPrecision.FP32
         fallback_precision = ModelPrecision.FP32 if use_fp16 else ModelPrecision.FP16
 
+        # Try to find model with primary precision
         primary_model = next((model for model in models if primary_precision in model.precision), None)
         if primary_model:
             return primary_model
 
-        # Log warning and fall back to alternative precision
-        logger.warning(f"{primary_precision} model requested but not found. Falling back to {fallback_precision}.")
+        # Try to find model with fallback precision
         fallback_model = next((model for model in models if fallback_precision in model.precision), None)
         if fallback_model:
+            logger.warning(
+                "%s model requested but not found. Falling back to %s.", primary_precision, fallback_precision
+            )
             return fallback_model
 
+        logger.warning("Neither %s nor %s models were found.", primary_precision, fallback_precision)
         return NullModel()
 
     def get_latest_model_id_for_inference(
@@ -483,10 +486,13 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
         # Try to find model with fallback precision
         fallback_model = next((doc for doc in matched_docs if fallback_precision in doc["precision"]), None)
         if fallback_model:
-            logger.warning(f"{primary_precision} model requested but not found. Falling back to {fallback_precision}.")
+            logger.warning(
+                "%s model requested but not found. Falling back to %s.", primary_precision, fallback_precision
+            )
             return IDToMongo.backward(fallback_model["_id"])
 
         # If we get here, we have matched_docs but none with the expected precisions
+        logger.warning("Neither %s nor %s models were found.", primary_precision, fallback_precision)
         return ID()
 
     def update_model_status(self, model: Model, model_status: ModelStatus) -> None:
