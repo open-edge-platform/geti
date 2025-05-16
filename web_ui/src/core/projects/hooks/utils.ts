@@ -42,7 +42,7 @@ export const getEditLabelsPayload = (
                 return getNewLabelPayloadNew(label, shouldRevisit);
             }
 
-            return getNewLabelPayloadNew({ ...label, parentLabelId: parentElement.name }, shouldRevisit);
+            return getNewLabelPayloadNew({ ...label, parentLabelId: parentElement.id }, shouldRevisit);
         }
 
         if (state === LabelItemEditionState.REMOVED) {

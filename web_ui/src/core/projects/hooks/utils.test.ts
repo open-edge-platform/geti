@@ -151,7 +151,7 @@ describe('Projects hooks utils', () => {
                         name: 'Ly',
                         color: '#f7dab3ff',
                         group: 'Gz___Gy',
-                        parentLabelId: 'Lz',
+                        parentLabelId: '151ac58f-59cc-437a-a168-fd239f3ee5a7',
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
                     },
