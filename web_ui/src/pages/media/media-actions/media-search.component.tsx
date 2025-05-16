@@ -4,14 +4,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { SearchField } from '@geti/ui';
+import { CustomPopover, SearchField } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 
 import { Search } from '../../../assets/icons';
 import { AdvancedFilterOptions } from '../../../core/media/media-filter.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';
-import { CustomPopover } from '../../../shared/components/custom-popover/custom-popover.component';
 import { QuietToggleButton } from '../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { SEARCH_MEDIA_LABEL } from '../../project-details/components/project-media/utils';
 import { addOrUpdateFilterRule, buildSearchRule, getSearchRuleValue, removeFilterRule } from '../utils';

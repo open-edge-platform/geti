@@ -16,3 +16,4 @@ export { Breadcrumbs } from './src/breadcrumbs/breadcrumbs.component';
 export { type BreadcrumbsProps } from './src/breadcrumbs/breadcrumbs.interface';
 export { type BreadcrumbItemProps } from './src/breadcrumbs/breadcrumb/breadcrumb.interface';
 export { PasswordField } from './src/password-field/password-field.component';
+export { CustomPopover } from './src/custom-popover/custom-popover.component';

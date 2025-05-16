@@ -3,13 +3,12 @@
 
 import { useRef } from 'react';
 
-import { ActionButton } from '@geti/ui';
+import { ActionButton, CustomPopover } from '@geti/ui';
 import { CalendarProps } from '@react-aria/calendar';
 import Calendar from '@spectrum-icons/workflow/Calendar';
 import { DateValue } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
 import { MonthCalendar } from './month-calendar.component';
 
 interface MonthPickerProps extends CalendarProps<DateValue> {
