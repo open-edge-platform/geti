@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Pressable } from 'react-aria-components';
 import { Link } from 'react-router-dom';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
@@ -25,16 +26,23 @@ export const ProjectPerformance = ({ performance, projectIdentifier, isTaskChain
 
     return performance.type === PerformanceType.DEFAULT ? (
         <TooltipTrigger placement={'bottom'}>
-            <Link to={paths.project.models.index(projectIdentifier)} viewTransition>
-                <Flex direction='column' gap='size-100' height='size-400' UNSAFE_className={classes.performanceChart}>
-                    <AccuracyHalfDonutChart
-                        value={performance.score ?? 0}
-                        size={'S'}
-                        id={'navigation-toolbar-accuracy'}
-                        ariaLabel='Project score'
-                    />
-                </Flex>
-            </Link>
+            <Pressable>
+                <Link to={paths.project.models.index(projectIdentifier)} viewTransition>
+                    <Flex
+                        direction='column'
+                        gap='size-100'
+                        height='size-400'
+                        UNSAFE_className={classes.performanceChart}
+                    >
+                        <AccuracyHalfDonutChart
+                            value={performance.score ?? 0}
+                            size={'S'}
+                            id={'navigation-toolbar-accuracy'}
+                            ariaLabel='Project score'
+                        />
+                    </Flex>
+                </Link>
+            </Pressable>
             <Tooltip>
                 <ProjectPerformanceTooltip
                     key={'performance'}
