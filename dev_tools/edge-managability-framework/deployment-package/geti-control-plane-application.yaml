@@ -1,0 +1,28 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-control-plane
+version: 2.9.0
+description: Control Plane for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: control-plane
+chartVersion: 2.9.0
+
+profiles:
+  - name: default
+    valuesFileName: geti-control-plane-values.yaml
+    parameterTemplates:
+      - name: global.initial_admin_user_login
+        displayName: Email for admin user login
+        type: string
+        mandatory: true
+      - name: global.initial_admin_user_password
+        displayName: Initial password for admin user
+        type: string
+        mandatory: true
+        secret: true
