@@ -2,12 +2,12 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import pytest
-from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from testfixtures import compare
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
 from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
+from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import ID, ProjectIdentifier
 
 
@@ -18,7 +18,12 @@ def project_configuration_controller():
 
 class TestProjectConfigurationRESTController:
     def test_get_configuration(
-        self, request, fxt_project_identifier, project_configuration_controller, fxt_project_configuration, fxt_project_configuration_rest_view
+        self,
+        request,
+        fxt_project_identifier,
+        project_configuration_controller,
+        fxt_project_configuration,
+        fxt_project_configuration_rest_view,
     ) -> None:
         # Arrange
         repo = ProjectConfigurationRepo(fxt_project_identifier)

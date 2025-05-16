@@ -39,12 +39,12 @@ def fxt_project_configuration(fxt_project_identifier):
 
 
 @pytest.fixture
-def fxt_project_configuration_rest_view(fxt_project_configuration):    
+def fxt_project_configuration_rest_view(fxt_project_configuration):
     tasks_rest_view = []
     for task_config in fxt_project_configuration.task_configs:
-        min_images_per_label_schema = (
-            task_config.training.constraints.model_json_schema()["properties"]["min_images_per_label"]
-        )
+        min_images_per_label_schema = task_config.training.constraints.model_json_schema()["properties"][
+            "min_images_per_label"
+        ]
         auto_training_schema = task_config.auto_training.model_json_schema()
         tasks_rest_view.append(
             {
@@ -93,10 +93,8 @@ def fxt_project_configuration_rest_view(fxt_project_configuration):
                         "default_value": auto_training_schema["properties"]["min_images_per_label"]["default"],
                         "max_value": None,
                         "min_value": 0,
-                    }
-                ]
+                    },
+                ],
             }
         )
-    yield {
-        "task_configs": tasks_rest_view
-    }
+    yield {"task_configs": tasks_rest_view}

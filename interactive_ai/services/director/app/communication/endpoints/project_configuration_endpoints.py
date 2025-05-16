@@ -5,18 +5,20 @@ import logging
 from http import HTTPStatus
 from typing import Annotated, Any
 
-from geti_fastapi_tools.exceptions import GetiBaseException
+from fastapi import APIRouter, Depends
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
-from fastapi import APIRouter, Depends
-from features.feature_flag_provider import FeatureFlagProvider, FeatureFlag
+from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
-from geti_fastapi_tools.dependencies import setup_session_fastapi, get_project_identifier
+from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi
+from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import ProjectIdentifier
 
 logger = logging.getLogger(__name__)
 
-project_configuration_prefix_url = "/api/v1/organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}"
+project_configuration_prefix_url = (
+    "/api/v1/organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}"
+)
 project_configuration_router = APIRouter(
     prefix=project_configuration_prefix_url,
     tags=["Configuration"],
@@ -28,6 +30,7 @@ project_configuration_router = APIRouter(
 def get_project_configuration(
     project_identifier: Annotated[ProjectIdentifier, Depends(get_project_identifier)],
 ) -> dict[str, Any]:
+    """Retrieve the configuration for a specific project."""
     if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
         raise GetiBaseException(
             message="Feature not available",

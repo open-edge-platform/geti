@@ -3,12 +3,14 @@
 
 from typing import Any
 
-from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
 from geti_configuration_tools.project_configuration import NullProjectConfiguration
+
+from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
+from storage.repos.project_configuration_repo import ProjectConfigurationRepo
+
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_telemetry_tools import unified_tracing
 from geti_types import ProjectIdentifier
-from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
 
 class ProjectConfigurationRESTController:

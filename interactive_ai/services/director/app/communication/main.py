@@ -13,7 +13,6 @@ from contextlib import asynccontextmanager
 
 import jsonschema
 import uvicorn
-from communication.endpoints.project_configuration_endpoints import project_configuration_router
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
@@ -25,6 +24,7 @@ from communication.endpoints.configuration_endpoints import configuration_router
 from communication.endpoints.model_tests_endpoints import model_test_router
 from communication.endpoints.optimization_endpoints import optimization_router
 from communication.endpoints.prediction_endpoints import prediction_router
+from communication.endpoints.project_configuration_endpoints import project_configuration_router
 from communication.endpoints.status_endpoints import status_router
 from communication.endpoints.supported_algorithms_endpoints import supported_algorithms_router
 from communication.endpoints.training_endpoints import training_router
@@ -42,8 +42,6 @@ from geti_fastapi_tools.responses import error_response_rest
 from geti_fastapi_tools.validation import RestApiValidator
 from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry, KafkaTelemetry
 from iai_core.algorithms import ModelTemplateList
-
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 
 @asynccontextmanager

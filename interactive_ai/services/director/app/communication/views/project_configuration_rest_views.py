@@ -1,10 +1,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from enum import Enum
 
-from geti_configuration_tools.project_configuration import ProjectConfiguration, TaskConfig, TrainingParameters, \
-    AutoTrainingParameters
-
+from geti_configuration_tools.project_configuration import (
+    AutoTrainingParameters,
+    ProjectConfiguration,
+    TaskConfig,
+    TrainingParameters,
+)
 
 PYDANTIC_TYPES_MAPPING = {
     "integer": "int",
@@ -20,7 +22,7 @@ class ProjectConfigurationRESTViews:
     """
 
     @staticmethod
-    def _parameter_to_rest(key: str, value: int | float | str | bool, json_schema: dict) -> dict:
+    def _parameter_to_rest(key: str, value: float | str | bool, json_schema: dict) -> dict:
         rest_view = {
             "key": key,
             "name": json_schema.get("title"),
@@ -52,7 +54,7 @@ class ProjectConfigurationRESTViews:
                 value=auto_training_dict[key],
                 json_schema=auto_training_parameters_schema["properties"][key],
             )
-            for key in auto_training_dict.keys()
+            for key in auto_training_dict
         ]
 
     @classmethod
@@ -72,7 +74,7 @@ class ProjectConfigurationRESTViews:
                     value=constraints_dict[key],
                     json_schema=constraints_schema["properties"][key],
                 )
-                for key in constraints_dict.keys()
+                for key in constraints_dict
             ],
         }
 

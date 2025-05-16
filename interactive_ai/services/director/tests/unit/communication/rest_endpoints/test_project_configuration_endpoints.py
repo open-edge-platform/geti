@@ -5,9 +5,10 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
+from testfixtures import compare
+
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
 from features.feature_flag_provider import FeatureFlag
-from testfixtures import compare
 
 from geti_types import ID, ProjectIdentifier
 
@@ -21,7 +22,9 @@ API_PROJECT_PATTERN = f"{API_WORKSPACE_PATTERN}/projects/{DUMMY_PROJECT_ID}"
 
 
 class TestProjectConfigurationEndpoints:
-    def test_get_project_configuration(self, fxt_director_app, fxt_project_configuration, fxt_enable_feature_flag_name) -> None:
+    def test_get_project_configuration(
+        self, fxt_director_app, fxt_project_configuration, fxt_enable_feature_flag_name
+    ) -> None:
         # Arrange
         fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
         project_config_dict = fxt_project_configuration.model_dump()
