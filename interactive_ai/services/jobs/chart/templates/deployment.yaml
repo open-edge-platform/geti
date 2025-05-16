@@ -1,0 +1,611 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "jobs-ms.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "jobs-ms.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        sidecar.opa-istio.io/inject: enabled
+      labels:
+        {{- include "jobs-ms.selectorLabels" . | nindent 8 }}
+        opa_envoy_filter: enabled
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+      initContainers:
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              find {{ .Values.audit_logs_mount_path }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+          volumeMounts:
+            - name: data-storage
+              mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: false
+          resources:
+            {{ toYaml .Values.microservice.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.volumeSecurityContext | nindent 12 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s 
+              --for=condition=complete 
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}-ms
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.microservice.initResources | nindent 12 }}
+      containers:
+        - name: &containerName {{ .Chart.Name }}-ms
+          resources:
+            {{ toYaml .Values.microservice.resources | nindent 12 }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.microservice.service.ports.http }}
+              protocol: TCP
+            - name: grpc
+              containerPort: {{ .Values.microservice.service.ports.grpc }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.microservice.service.ports.grpc }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.microservice.service.ports.grpc }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          env:
+            - name: CREDITS_SERVICE
+              value: credit-system.impt:5556
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            {{- if .Values.global.enable_mongodb_credentials }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-ms-mongodb-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-ms-mongodb-password
+            {{- end }}
+            - name: SPICEDB_LOG_PATH
+              value: {{ .Values.spicedb_log_file_path }}
+            - name: SPICEDB_ADDRESS
+              value: {{ .Release.Namespace }}-spice-db:50051
+            - name: SPICEDB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "spice-db.secretName" . }}
+                  key: SPICEDB_GRPC_PRESHARED_KEY
+            - name: SPICEDB_CREDENTIALS
+              value: "token_and_ca"
+            - name: SPICEDB_SSL_CERTIFICATES_DIR
+              value: "/etc/tls-secrets"
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: jobs-microservice
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.instance.id=$(K8S_POD_NAME),k8s.pod.uid=$(K8S_POD_UID),k8s.container.name=$(K8S_CONTAINER_NAME)
+            - name: MONGODB_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: mongodb_credentials_provider
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: "{{ .Chart.Name | replace "-" "_" | upper }}_MS_S3_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "jobs_ms_secret_key"
+            - name: "{{ .Chart.Name | replace "-" "_" | upper }}_MS_S3_ACCESS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "jobs_ms_access_key"
+            {{- end }}
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Namespace }}-feature-flags
+          volumeMounts:
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: "/{{ .Values.audit_logs_mount_path }}"
+              name: data-storage
+              subPath: {{ .Values.audit_logs_mount_path }}
+            - name: tls-secrets
+              mountPath: "/etc/tls-secrets"
+              readOnly: true
+            - name: temp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        {{- if .Values.global.storage_volume_claim_name_jobs }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_jobs }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: tls-secrets
+          secret:
+            secretName: {{ include "spice-db.tlsSecretName" . }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        - name: temp
+          emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduler
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "jobs-scheduler.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.scheduler.replicas }}
+  selector:
+    matchLabels:
+      {{- include "jobs-scheduler.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "jobs-scheduler.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduler
+      initContainers:
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s
+              --for=condition=complete
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}-scheduler
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.scheduler.initResources | nindent 12 }}
+        - name: init-kafka
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: ['sh', '-c', 'until nc -w 5 -z {{ .Release.Namespace }}-kafka 9092; do echo wait...; sleep 2; done;']
+          resources:
+            {{ toYaml .Values.scheduler.initResources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      containers:
+        - name: &containerName {{ .Chart.Name }}-scheduler
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          ports:
+            - name: grpc
+              containerPort: {{ .Values.scheduler.service.ports.grpc }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.scheduler.service.ports.grpc }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.scheduler.service.ports.grpc }}
+            periodSeconds: 2
+            initialDelaySeconds: 2
+            timeoutSeconds: 2
+            failureThreshold: 20
+          resources:
+            {{ toYaml .Values.scheduler.resources | nindent 12 }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - python
+            - scheduler/main.py
+          env:
+            - name: SCHEDULER_SCHEDULING_LOOP_INTERVAL
+              value: "1"
+            - name: SCHEDULER_SCHEDULING_LOOP_WORKERS
+              value: "2"
+            - name: SCHEDULER_REVERT_SCHEDULING_LOOP_INTERVAL
+              value: "1"
+            - name: SCHEDULER_REVERT_SCHEDULING_LOOP_WORKERS
+              value: "1"
+            - name: SCHEDULER_CANCELLATION_LOOP_INTERVAL
+              value: "1"
+            - name: SCHEDULER_CANCELLATION_LOOP_WORKERS
+              value: "2"
+            - name: SCHEDULER_RESETTING_LOOP_INTERVAL
+              value: "10"
+            - name: SCHEDULER_RESETTING_LOOP_WORKERS
+              value: "1"
+            - name: SCHEDULER_DELETION_LOOP_INTERVAL
+              value: "1"
+            - name: SCHEDULER_DELETION_LOOP_WORKERS
+              value: "1"
+            - name: SCHEDULER_RECOVERY_LOOP_INTERVAL
+              value: "60"
+            - name: SCHEDULER_RECOVERY_LOOP_WORKERS
+              value: "1"
+            - name: SCHEDULER_RECOVERY_BATCH_SIZE
+              value: "50"
+            - name: JOB_TRAIN_FLYTE_WORKFLOW_NAME
+              value: job.workflows.train_workflow.train_workflow
+            - name: JOB_OPTIMIZE_POT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.optimize_workflow.optimize_workflow_pot
+            - name: JOB_TEST_FLYTE_WORKFLOW_NAME
+              value: job.workflows.model_test_workflow.model_test_workflow
+            - name: JOB_EXPORT_PROJECT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.export_project_workflow.export_project_workflow
+            - name: JOB_IMPORT_PROJECT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.import_project_workflow.import_project_workflow
+            - name: JOB_EXPORT_DATASET_FLYTE_WORKFLOW_NAME
+              value: job.workflows.export_workflow.export_dataset_workflow
+            - name: JOB_PREPARE_IMPORT_TO_NEW_PROJECT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.import_workflows.prepare_import_new_project_workflow
+            - name: JOB_PREPARE_IMPORT_TO_NEW_PROJECT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_PERFORM_IMPORT_TO_NEW_PROJECT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.import_workflows.create_project_from_dataset_workflow
+            - name: JOB_PERFORM_IMPORT_TO_NEW_PROJECT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_PREPARE_IMPORT_TO_EXISTING_PROJECT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.import_workflows.prepare_import_existing_project_workflow
+            - name: JOB_PREPARE_IMPORT_TO_EXISTING_PROJECT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_PERFORM_IMPORT_TO_EXISTING_PROJECT_FLYTE_WORKFLOW_NAME
+              value: job.workflows.import_workflows.import_dataset_to_project_workflow
+            - name: JOB_PERFORM_IMPORT_TO_EXISTING_PROJECT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_TRAIN_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_TEST_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_OPTIMIZE_POT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_EXPORT_DATASET_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_EXPORT_PROJECT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: JOB_IMPORT_PROJECT_FLYTE_WORKFLOW_VERSION
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: workflow_versions
+            - name: FLYTE_URL
+              value: flyteadmin.flyte.svc.cluster.local:81
+            - name: FLYTE_PROJECT
+              value: impt-jobs
+            - name: FLYTE_DOMAIN
+              value: production
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: CREDITS_SERVICE
+              value: credit-system.impt:5556
+            {{- if .Values.global.enable_mongodb_credentials }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-scheduler-mongodb-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-scheduler-mongodb-password
+            {{- end }}
+            - name: SPICEDB_LOG_PATH
+              value: {{ .Values.spicedb_log_file_path }}
+            - name: SPICEDB_ADDRESS
+              value: {{ .Release.Namespace }}-spice-db:50051
+            - name: SPICEDB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "spice-db.secretName" . }}
+                  key: SPICEDB_GRPC_PRESHARED_KEY
+            - name: SPICEDB_CREDENTIALS
+              value: "token_and_ca"
+            - name: SPICEDB_SSL_CERTIFICATES_DIR
+              value: "/etc/tls-secrets"
+            - name: KAFKA_ADDRESS
+              value: {{ .Release.Namespace }}-kafka
+            - name: KAFKA_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}-scheduler
+                  key: user
+            - name: KAFKA_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas-{{ .Chart.Name }}-scheduler
+                  key: password
+            - name: KAFKA_TOPIC_PREFIX
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: kafka_topic_prefix
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: jobs-scheduler
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            - name: K8S_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: K8S_POD_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: K8S_CONTAINER_NAME
+              value: *containerName
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.instance.id=$(K8S_POD_NAME),k8s.pod.uid=$(K8S_POD_UID),k8s.container.name=$(K8S_CONTAINER_NAME)
+            - name: MONGODB_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name:  {{ .Release.Namespace }}-configuration
+                  key: mongodb_credentials_provider
+            - name: JOBS_TEMPLATES_DIR
+              value: {{ .Values.jobs_templates_dir }}
+            - name: JOBS_TEMPLATES_FILE
+              value: {{ .Values.jobs_templates_file }}
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            - name: "S3_SECRET_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "jobs_scheduler_secret_key"
+            - name: "S3_ACCESS_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "jobs_scheduler_access_key"
+            {{- end }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: temp
+            - name: tls-secrets
+              mountPath: "/etc/tls-secrets"
+              readOnly: true
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+            - mountPath: {{ .Values.jobs_templates_dir }}
+              name: jobs-templates
+              readOnly: true
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: tls-secrets
+          secret:
+            secretName: {{ include "spice-db.tlsSecretName" . }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
+        - name: jobs-templates
+          configMap:
+            name: {{ .Release.Namespace }}-jobs-templates
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "jobs-scheduling-policy.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.scheduling_policy.replicas }}
+  selector:
+    matchLabels:
+      {{- include "jobs-scheduling-policy.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "jobs-scheduling-policy.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
+      initContainers:
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s 
+              --for=condition=complete 
+              --namespace {{ .Release.Namespace }}
+              init-job-{{ .Chart.Name }}-scheduling-policy
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.scheduling_policy.initResources | nindent 12 }}
+      containers:
+        - name: {{ .Chart.Name }}-scheduling-policy
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.scheduling_policy.resources | nindent 12 }}
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - python
+            - policies/main.py
+          env:
+            - name: SCHEDULING_POLICY_SERVICE_LOOP_INTERVAL
+              value: "1"
+            - name: RESOURCE_MANAGER_LOOP_INTERVAL
+              value: "60"
+            - name: MAX_JOBS_RUNNING_PER_ORGANIZATION
+              value: "1"
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: CREDITS_SERVICE
+              value: credit-system.impt:5556
+            {{- if .Values.global.enable_mongodb_credentials }}
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-scheduling-policy-mongodb-username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: {{ .Chart.Name }}-scheduling-policy-mongodb-password
+            {{- end }}
+            - name: MONGODB_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: mongodb_credentials_provider
+            {{- if .Values.global.enable_object_storage }}
+            - name: S3_CREDENTIALS_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: s3_credentials_provider
+            {{- end }}
+            - name: ENABLE_TRACING
+              value: "true"
+            - name: ENABLE_METRICS
+              value: "true"
+            - name: OTEL_SERVICE_NAME
+              value: jobs-scheduling-policy
+            - name: OTLP_TRACES_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_METRICS_RECEIVER
+              value: "{{ .Release.Namespace }}-opentelemetry-collector.{{ .Release.Namespace }}:4317"
+            - name: OTLP_TRACES_PROTOCOL
+              value: grpc
+            {{ toYaml .Values.policies | nindent 12 }}
+          volumeMounts:
+            - mountPath: /tmp
+              name: temp
+            - mountPath: {{ .Values.global.logging_config_dir }}
+              name: config
+              readOnly: true
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Namespace }}-feature-flags
+      volumes:
+        - name: temp
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-logging-config
