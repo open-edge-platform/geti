@@ -3,8 +3,7 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Flex, Item, Picker, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import { Flex, Heading, Item, Picker, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { capitalize, isEmpty } from 'lodash-es';
 
 import { PressableElement } from '../../../../../../shared/components/pressable-element/pressable-element.component';

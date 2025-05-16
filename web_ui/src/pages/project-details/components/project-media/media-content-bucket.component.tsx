@@ -5,8 +5,7 @@ import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
 import { Divider, Flex, IllustratedMessage, View } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { DimensionValue, Responsive } from '@react-types/shared';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { isEmpty } from 'lodash-es';
 

@@ -9,7 +9,7 @@ import { WebWorker } from '../../../../webworkers/web-worker.interface';
 import { Hotkeys } from '../../providers/annotator-provider/utils';
 import { PolygonMode } from './polygon-tool.enum';
 
-export interface IntelligentScissorsInstance {
+interface IntelligentScissorsInstance {
     new (imageData: ImageData): IntelligentScissorsMethods;
 }
 

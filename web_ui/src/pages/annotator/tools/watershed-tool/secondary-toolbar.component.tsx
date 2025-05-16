@@ -3,8 +3,7 @@
 
 import { Key, useEffect } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Flex, Text } from '@adobe/react-spectrum';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { isEmpty } from 'lodash-es';
 

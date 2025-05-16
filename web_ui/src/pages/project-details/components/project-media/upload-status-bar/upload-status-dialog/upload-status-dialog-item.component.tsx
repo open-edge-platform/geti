@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import { DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
 import { ActionButton } from '@geti/ui';
-import { IconColorValue } from '@react-types/shared/src/dna';
+import { IconColorValue } from '@react-types/shared';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 
 import { AcceptCircle, Alert, Image, Play, Refresh } from '../../../../../../assets/icons';

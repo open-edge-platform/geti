@@ -3,9 +3,8 @@
 
 import { useState } from 'react';
 
-import { Flex, TextField } from '@adobe/react-spectrum';
+import { Flex, TextField, View } from '@adobe/react-spectrum';
 import { ActionButton } from '@geti/ui';
-import { View } from '@react-spectrum/view';
 import { SpectrumTextFieldProps } from '@react-types/textfield';
 
 import { Alert, Invisible, Visible } from '../../../assets/icons';
