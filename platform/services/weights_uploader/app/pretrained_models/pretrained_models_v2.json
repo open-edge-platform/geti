@@ -92,6 +92,7 @@
   {
     "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet18_vd_pretrained_from_paddle.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet18_vd_pretrained_from_paddle.pth",
+    "sha_sum": "911a745b62e173c8f4b9af513c2ea295428cf23f1bbfe9048381500f140fd720",
     "template_ids": ["Object_Detection_RTDetr_18"]
   },
   {
@@ -192,16 +193,19 @@
   {
     "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet101_vd_ssld_pretrained_from_paddle.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet101_vd_ssld_pretrained_from_paddle.pth",
+    "sha_sum": "3683aca21d46f3a78de3171ee8f0497a9b1b4cd139a254e81b3d5bf579a0ff78",
     "template_ids": ["Object_Detection_RTDetr_101"]
   },
   {
     "url": "https://github.com/lyuwenyu/storage/releases/download/v0.1/ResNet50_vd_ssld_v2_pretrained_from_paddle.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/ResNet50_vd_ssld_v2_pretrained_from_paddle.pth",
+    "sha_sum": "641dc59835d5228e6013ac45acb633592ec825144fb3d78055bc07699f404353",
     "template_ids": ["Object_Detection_RTDetr_50"]
   },
   {
     "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
-    "target": "/home/non-root/.cache/torch/hub/checkpoints/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth"
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
+    "sha_sum": "69c5e24fd2c8340efd3ffbce4ca37d7e04e905414887fc624736d665dfec4b58",
   },
   {
     "url": "https://github.com/osmr/imgclsmob/releases/download/v0.0.364/efficientnet_b0-0752-0e386130.pth.zip",
@@ -247,7 +251,8 @@
   },
   {
     "url": "https://download.pytorch.org/models/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth",
-    "target": "/home/non-root/.cache/torch/hub/checkpoints/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth"
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/maskrcnn_resnet50_fpn_v2_coco-73cbd019.pth",
+    "sha_sum": "73cbd0190fcbe3ba339921fbce2c3a0b6bb9126c9a133c85e43a2a8e060a109e",
   },
   {
     "url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
@@ -257,7 +262,8 @@
   },
   {
     "url": "https://github.com/ChaoningZhang/MobileSAM/raw/master/weights/mobile_sam.pt",
-    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobile_sam.pt"
+    "target": "/home/non-root/.cache/torch/hub/checkpoints/mobile_sam.pt",
+    "sha_sum": "6dbb90523a35330fedd7f1d3dfc66f995213d81b29a5ca8108dbcdd4e37d6c2f",
   },
   {
     "url": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/object_detection/v2/mobilenet_v2-2s_ssd-992x736.pth",
@@ -286,6 +292,7 @@
   {
     "url": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_tiny_8xb32-300e_coco/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth",
+    "sha_sum": "ec670f7ee9e20bd7931e15f15b7016f7fe531baaab81f2e6153382d046111885",
     "template_ids": ["Custom_Instance_Segmentation_RTMDet_tiny"]
   },
   {
@@ -323,6 +330,7 @@
   {
     "url": "https://github.com/Peterande/storage/releases/download/dfinev1.0/dfine_x_coco.pth",
     "target": "/home/non-root/.cache/torch/hub/checkpoints/dfine_x_coco.pth",
+    "sha_sum": "9a82252f2d0426b2c24e99905c36c33a4ea850f247c247bda76fb5f76daea123",
     "template_ids": ["Object_Detection_DFine_X"]
   },
   {

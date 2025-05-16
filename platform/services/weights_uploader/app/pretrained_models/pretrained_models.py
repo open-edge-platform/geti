@@ -5,7 +5,6 @@ import hashlib
 import logging
 import os
 import shutil
-import ssl
 import urllib.error
 import urllib.request
 import zipfile
@@ -29,15 +28,6 @@ def sha256sum(filepath: str):  # noqa: ANN201, D103
     return sha256.hexdigest()
 
 
-def get_file(url: str, target_path: str, auto_unzip=True):  # noqa: ANN001, ANN201, D103
-    target_url = url
-    try:
-        download_file(target_url, target_path, auto_unzip)
-    except Exception:
-        logger.info("cannot find the file from local mirror. try to get it from the original url")
-        download_file(url, target_path, auto_unzip)
-
-
 def download_file(url: str, target_path: str, auto_unzip=True):  # noqa: ANN001, ANN201, D103
     logger.info(f"Downloading file: {url}")
     url_original_filename = os.path.basename(url)
@@ -47,13 +37,8 @@ def download_file(url: str, target_path: str, auto_unzip=True):  # noqa: ANN001,
     target_dir_path = os.path.dirname(target_path)
     download_temp_target_path = os.path.join(target_dir_path, url_original_filename)
 
-    # Disable SSL check
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-
     with (
-        urllib.request.urlopen(url, context=ctx) as response,  # noqa: S310
+        urllib.request.urlopen(url) as response,  # noqa: S310
         open(download_temp_target_path, "wb") as out_file,
     ):
         shutil.copyfileobj(response, out_file)
@@ -89,7 +74,7 @@ def retry_call(call: Callable, retries: int = RETRIES, **kwargs):  # noqa: ANN20
             call(**kwargs)
             break
         except Exception:
-            logging.exception(f"Failed try {i + 1}/{retries}")
+            logger.exception(f"Failed try {i + 1}/{retries}")
     else:
         raise MaxTriesExhausted
 
@@ -106,19 +91,19 @@ def download_pretrained_model(model_spec: dict, target_dir: str, weights_url: st
 
     if os.path.exists(target_download_path):
         if sha_sum is None:
-            logging.warning(f"Model already existed: {target_download_path} but sha_sum is not specified")
-            logging.warning(f"consider to add sha_sum to the model spec: {sha256sum(target_download_path)}")
+            logger.warning(f"Model already existed: {target_download_path} but sha_sum is not specified")
+            logger.warning(f"consider to add sha_sum to the model spec: {sha256sum(target_download_path)}")
         elif sha256sum(target_download_path) == sha_sum:
             logger.info(f"Model already downloaded: {target_download_path}")
             return
         else:
-            logging.warning(f"Model already downloaded but SHA mismatch: {target_download_path}")
-            logging.warning("Redownloading...")
+            logger.warning(f"Model already downloaded but SHA mismatch: {target_download_path}")
+            logger.warning("Redownloading...")
             os.remove(target_download_path)
 
     try:
         retry_call(
-            get_file,
+            download_file,
             url=model_external_url,
             target_path=target_download_path,
             auto_unzip=auto_unzip,
