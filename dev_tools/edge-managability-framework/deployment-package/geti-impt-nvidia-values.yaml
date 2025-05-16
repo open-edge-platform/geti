@@ -1,0 +1,72 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+
+enabled:
+  secrets: true
+  dcgm-exporter: true
+
+global:
+  docker_namespace: open-edge-platform/geti
+  registry_address: ghcr.io
+  workflow_versions: 2.9.0
+  manage_users_roles: true
+
+spice-db:
+  fullnameOverride: impt-spice-db
+  jobs:
+    backoffLimit: 10
+  tls:
+    ca:
+      name: edge-node-cluster-issuer
+
+mongodb:
+  fullnameOverride: impt-mongodb
+
+inference-gateway:
+  fullnameOverride: impt-inference-gateway
+
+media-ms:
+  fullnameOverride: impt-media-ms
+
+kafka:
+  fullnameOverride: impt-kafka
+
+kafka-proxy:
+  fullnameOverride: impt-kafka
+
+dex:
+  fullnameOverride: impt-dex
+
+postgresql:
+  fullnameOverride: impt-postgresql
+
+secrets:
+  postgresql:
+    flyte_db_enabled: true
+
+jobs-execution-namespace:
+  cert:
+    ca_name: edge-node-cluster-issuer
+  spicedb:
+    tls:
+      ca:
+        name: edge-node-cluster-issuer
+  feature_flags_data:
+    FEATURE_FLAG_MANAGE_USERS: "true"
+
+impt-configuration:
+  accelerator:
+    type: gpu
+    name: nvidia.com/gpu
+  feature_flags_data:
+    FEATURE_FLAG_MANAGE_USERS: "true"
+
+flyte-core:
+  jobs:
+    backoffLimit: 10
+
+modelmesh-serving:
+  certificate:
+    issuerRef:
+      name: edge-node-cluster-issuer

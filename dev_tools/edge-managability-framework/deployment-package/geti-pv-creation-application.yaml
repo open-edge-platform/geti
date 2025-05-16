@@ -1,0 +1,20 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-pv-creation
+version: 2.9.0
+description: Persistent Volumes for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: pv-creation
+chartVersion: 2.9.0
+
+profiles:
+  - name: small
+    valuesFileName: geti-pv-creation-50gb-values.yaml
+  - name: large
+    valuesFileName: geti-pv-creation-500gb-values.yaml

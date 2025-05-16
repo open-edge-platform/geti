@@ -1,0 +1,18 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-modelmesh-serving-crd
+version: 2.9.0
+description: Modelmesh Serving CRDs for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: modelmesh-serving-crds
+chartVersion: 2.9.0
+
+profiles:
+  - name: default
+    valuesFileName: empty-values.yaml

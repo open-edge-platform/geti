@@ -1,0 +1,6 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+global:
+  certSigners:
+    - clusterissuers.cert-manager.io/edge-node-cluster-issuer
