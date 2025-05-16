@@ -8,7 +8,7 @@ from unittest.mock import ANY, call, patch
 import pytest
 
 from iai_core.entities.datasets import NullDataset
-from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel, ModelPrecision
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus, NullModel
 from iai_core.repos import ModelRepo, ProjectRepo
 from iai_core.repos.model_repo import FEATURE_FLAG_FP16_INFERENCE, ModelStatusFilter
 from iai_core.repos.storage.binary_repos import ModelBinaryRepo
@@ -33,6 +33,7 @@ def create_model(project, storage, framework, model_format, opt_type, version, p
         precision=[ModelPrecision.FP32] if not precision else [precision],
         version=version,
     )
+
 
 class TestModelRepo:
     def test_indexes(self, fxt_model_storage) -> None:
@@ -417,11 +418,7 @@ class TestModelRepo:
             assert latest_model_successful_optimized == fxt_model_optimized
 
     @pytest.mark.parametrize(
-        "feature_flag_setting",
-        [
-            pytest.param(True, id="fp16-enabled"),
-            pytest.param(False, id="fp16-disabled")
-        ]
+        "feature_flag_setting", [pytest.param(True, id="fp16-enabled"), pytest.param(False, id="fp16-disabled")]
     )
     def test_get_latest_model_for_inference(
         self, request, feature_flag_setting, fxt_empty_project, fxt_model_storage, fxt_training_framework, monkeypatch
@@ -442,27 +439,76 @@ class TestModelRepo:
 
         # Create model hierarchy with both FP16 and FP32 models
         # Version 1 models
-        m1_base = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
-                               ModelOptimizationType.NONE, version=1, previous_model=None)
-        m2_fp32 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
-                               ModelOptimizationType.MO, version=1, previous_model=m1_base,
-                               precision=ModelPrecision.FP32)
-        m3_fp16 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
-                               ModelOptimizationType.MO, version=1, previous_model=m1_base,
-                               precision=ModelPrecision.FP16)
+        m1_base = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.BASE_FRAMEWORK,
+            ModelOptimizationType.NONE,
+            version=1,
+            previous_model=None,
+        )
+        m2_fp32 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.OPENVINO,
+            ModelOptimizationType.MO,
+            version=1,
+            previous_model=m1_base,
+            precision=ModelPrecision.FP32,
+        )
+        m3_fp16 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.OPENVINO,
+            ModelOptimizationType.MO,
+            version=1,
+            previous_model=m1_base,
+            precision=ModelPrecision.FP16,
+        )
 
         # Version 2 models
-        m4_base = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
-                               ModelOptimizationType.NONE, version=2, previous_model=None)
-        m5_fp32 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
-                               ModelOptimizationType.MO, version=2, previous_model=m4_base,
-                               precision=ModelPrecision.FP32)
-        m6_fp16 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
-                               ModelOptimizationType.MO, version=2, previous_model=m4_base,
-                               precision=ModelPrecision.FP16)
-        m7_onnx = create_model(project, model_storage, fxt_training_framework, ModelFormat.ONNX,
-                               ModelOptimizationType.ONNX, version=2, previous_model=m4_base,
-                               precision=ModelPrecision.FP16)
+        m4_base = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.BASE_FRAMEWORK,
+            ModelOptimizationType.NONE,
+            version=2,
+            previous_model=None,
+        )
+        m5_fp32 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.OPENVINO,
+            ModelOptimizationType.MO,
+            version=2,
+            previous_model=m4_base,
+            precision=ModelPrecision.FP32,
+        )
+        m6_fp16 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.OPENVINO,
+            ModelOptimizationType.MO,
+            version=2,
+            previous_model=m4_base,
+            precision=ModelPrecision.FP16,
+        )
+        m7_onnx = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.ONNX,
+            ModelOptimizationType.ONNX,
+            version=2,
+            previous_model=m4_base,
+            precision=ModelPrecision.FP16,
+        )
 
         model_repo.save_many([m1_base, m2_fp32, m3_fp16, m4_base, m5_fp32, m6_fp16, m7_onnx])
         with (
@@ -489,10 +535,24 @@ class TestModelRepo:
         model_storage = fxt_model_storage
         model_repo = ModelRepo(model_storage.identifier)
         request.addfinalizer(lambda: model_repo.delete_all())
-        m1 = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
-                     ModelOptimizationType.NONE, version=1, previous_model=None)
-        m2 = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
-                     ModelOptimizationType.NONE, version=2, previous_model=None)
+        m1 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.BASE_FRAMEWORK,
+            ModelOptimizationType.NONE,
+            version=1,
+            previous_model=None,
+        )
+        m2 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.BASE_FRAMEWORK,
+            ModelOptimizationType.NONE,
+            version=2,
+            previous_model=None,
+        )
         # m1.id > m2.id but m2.version > m1.version
         m1.id_ = ModelRepo.generate_id()
         model_repo.save_many([m2, m1])

@@ -16,7 +16,7 @@ from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
 from iai_core.adapters.model_adapter import DataSource
-from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel, ModelPrecision
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus, NullModel
 from iai_core.entities.model_storage import ModelStorageIdentifier
 from iai_core.repos.base.model_storage_based_repo import ModelStorageBasedSessionRepo
 from iai_core.repos.base.session_repo import QueryAccessMode
@@ -395,9 +395,7 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
             "previous_trained_revision_id": IDToMongo.forward(base_model_id),
             "optimization_type": ModelOptimizationType.MO.name,
             "has_xai_head": True,
-            "precision": {
-                "$in": [ModelPrecision.FP16.name, ModelPrecision.FP32.name]
-            },
+            "precision": {"$in": [ModelPrecision.FP16.name, ModelPrecision.FP32.name]},
             "model_status": {"$in": model_status_filter.value},
         }
 
@@ -485,9 +483,7 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
         # Try to find model with fallback precision
         fallback_model = next((doc for doc in matched_docs if fallback_precision in doc["precision"]), None)
         if fallback_model:
-            logger.warning(
-                f"{primary_precision} model requested but not found. Falling back to {fallback_precision}."
-            )
+            logger.warning(f"{primary_precision} model requested but not found. Falling back to {fallback_precision}.")
             return IDToMongo.backward(fallback_model["_id"])
 
         # If we get here, we have matched_docs but none with the expected precisions
