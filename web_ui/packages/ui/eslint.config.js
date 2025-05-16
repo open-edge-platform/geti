@@ -13,6 +13,10 @@ export default [
                 {
                     patterns: [
                         {
+                            group: ['@geti/ui'],
+                            message: 'Importing files from @geti/ui is not allowed.',
+                        },
+                        {
                             group: ['../**/*'],
                             message: 'Importing files outside of the current package is not allowed.',
                         },
@@ -28,6 +32,10 @@ export default [
                 'error',
                 {
                     patterns: [
+                        {
+                            group: ['@geti/ui'],
+                            message: 'Importing files from @geti/ui is not allowed.',
+                        },
                         {
                             group: ['../../**/*'],
                             message: 'Importing files outside of the current package is not allowed.',
