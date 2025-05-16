@@ -97,7 +97,7 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
 
@@ -185,7 +185,7 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
 
@@ -272,7 +272,7 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
 
@@ -282,7 +282,7 @@ class TestEvaluateAndInferTask:
         mocked_post_model_acceptance.assert_called_once_with(
             train_data=train_data.train_data,
             base_model_id=train_data.train_output_model_ids.base,
-            inference_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            inference_model_id=train_data.train_output_model_ids.mo_with_xai,
         )
 
         mocked_report_progress.assert_has_calls(
@@ -357,20 +357,20 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
 
         mocked_post_model_acceptance.assert_called_once_with(
             train_data=train_data.train_data,
             base_model_id=train_data.train_output_model_ids.base,
-            inference_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            inference_model_id=train_data.train_output_model_ids.mo_with_xai,
         )
 
         mocked_register_models.assert_called_once_with(
             project_id=ID(train_data.train_data.project_id),
             model_id=ID(train_data.train_output_model_ids.base),
-            optimized_model_id=ID(train_data.train_output_model_ids.mo_fp32_with_xai),
+            optimized_model_id=ID(train_data.train_output_model_ids.mo_with_xai),
             model_storage_id=ID(train_data.train_data.model_storage_id),
             task_id=ID(train_data.train_data.task_id),
         )
@@ -378,7 +378,7 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             training_dataset_id=train_data.dataset_id,
             train_inference_subset_id=TRAIN_INFERENCE_SUBSET_ID,
-            model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
         mocked_pipeline_infer_on_unannotated.assert_not_called()
@@ -453,19 +453,19 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
 
         mocked_post_model_acceptance.assert_called_once_with(
             train_data=train_data.train_data,
             base_model_id=train_data.train_output_model_ids.base,
-            inference_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            inference_model_id=train_data.train_output_model_ids.mo_with_xai,
         )
         mocked_register_models.assert_called_once_with(
             project_id=ID(train_data.train_data.project_id),
             model_id=ID(train_data.train_output_model_ids.base),
-            optimized_model_id=ID(train_data.train_output_model_ids.mo_fp32_with_xai),
+            optimized_model_id=ID(train_data.train_output_model_ids.mo_with_xai),
             model_storage_id=ID(train_data.train_data.model_storage_id),
             task_id=ID(train_data.train_data.task_id),
         )
@@ -473,7 +473,7 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             training_dataset_id=train_data.dataset_id,
             train_inference_subset_id=TRAIN_INFERENCE_SUBSET_ID,
-            model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
         mocked_pipeline_infer_on_unannotated.assert_called_once_with(
@@ -555,7 +555,7 @@ class TestEvaluateAndInferTask:
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=ANY,
         )
 
@@ -568,12 +568,12 @@ class TestEvaluateAndInferTask:
             mocked_post_model_acceptance.assert_called_once_with(
                 train_data=train_data.train_data,
                 base_model_id=train_data.train_output_model_ids.base,
-                inference_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+                inference_model_id=train_data.train_output_model_ids.mo_with_xai,
             )
             mocked_register_models.assert_called_once_with(
                 project_id=ID(train_data.train_data.project_id),
                 model_id=ID(train_data.train_output_model_ids.base),
-                optimized_model_id=ID(train_data.train_output_model_ids.mo_fp32_with_xai),
+                optimized_model_id=ID(train_data.train_output_model_ids.mo_with_xai),
                 model_storage_id=ID(train_data.train_data.model_storage_id),
                 task_id=ID(train_data.train_data.task_id),
             )
@@ -581,7 +581,7 @@ class TestEvaluateAndInferTask:
                 train_data=train_data.train_data,
                 training_dataset_id=train_data.dataset_id,
                 train_inference_subset_id=TRAIN_INFERENCE_SUBSET_ID,
-                model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+                model_id=train_data.train_output_model_ids.mo_with_xai,
                 progress_callback=ANY,
             )
             report_progress_calls.extend(

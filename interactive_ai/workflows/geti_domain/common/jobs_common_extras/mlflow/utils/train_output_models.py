@@ -28,7 +28,7 @@ class TrainOutputModelIds:
     """Class used to store different training output models' id only."""
 
     base: str
-    mo_fp32_with_xai: str
+    mo_with_xai: str
     mo_fp32_without_xai: typing.Optional[str]  # noqa: UP007
     mo_fp16_without_xai: typing.Optional[str]  # noqa: UP007
     onnx: typing.Optional[str]  # noqa: UP007
@@ -41,7 +41,7 @@ class TrainOutputModels:
     """
 
     base: Model  # The trained model in the base framework format
-    mo_fp32_with_xai: Model  # The OpenVino model with eXplainable AI (saliency maps)
+    mo_with_xai: Model  # The OpenVino model with eXplainable AI (saliency maps)
     mo_fp32_without_xai: typing.Optional[Model] = None  # noqa: UP007 # The OpenVino model without eXplainable AI
     mo_fp16_without_xai: typing.Optional[Model] = None  # noqa: UP007 # The OpenVino model with lower precision FP16
     onnx: typing.Optional[Model] = None  # noqa: UP007  # The ONNX model
@@ -119,7 +119,7 @@ class TrainOutputModels:
 
         return TrainOutputModelIds(
             base=str(self.base.id_),
-            mo_fp32_with_xai=str(self.mo_fp32_with_xai.id_),
+            mo_with_xai=str(self.mo_with_xai.id_),
             mo_fp32_without_xai=_parse(self.mo_fp32_without_xai),
             mo_fp16_without_xai=_parse(self.mo_fp16_without_xai),
             onnx=_parse(self.onnx),
@@ -146,7 +146,7 @@ class TrainOutputModels:
 
         return cls(
             base=_parse(train_output_model_ids.base),
-            mo_fp32_with_xai=_parse(train_output_model_ids.mo_fp32_with_xai),
+            mo_with_xai=_parse(train_output_model_ids.mo_with_xai),
             mo_fp32_without_xai=_parse(train_output_model_ids.mo_fp32_without_xai),
             mo_fp16_without_xai=_parse(train_output_model_ids.mo_fp16_without_xai),
             onnx=_parse(train_output_model_ids.onnx),
