@@ -8,12 +8,31 @@ from unittest.mock import ANY, call, patch
 import pytest
 
 from iai_core.entities.datasets import NullDataset
-from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel, ModelPrecision
 from iai_core.repos import ModelRepo, ProjectRepo
-from iai_core.repos.model_repo import ModelStatusFilter
+from iai_core.repos.model_repo import FEATURE_FLAG_FP16_INFERENCE, ModelStatusFilter
 from iai_core.repos.storage.binary_repos import ModelBinaryRepo
 from tests.test_helpers import empty_model_configuration
 
+
+def create_model(project, storage, framework, model_format, opt_type, version, previous_model=None, precision=None):
+    """Helper to create model instances with consistent settings"""
+    return Model(
+        project=project,
+        model_storage=storage,
+        train_dataset=NullDataset(),
+        configuration=empty_model_configuration(),
+        id_=ModelRepo.generate_id(),
+        previous_trained_revision=previous_model,
+        data_source_dict={"test_data": b"weights_data"},
+        training_framework=framework,
+        model_status=ModelStatus.SUCCESS,
+        model_format=model_format,
+        has_xai_head=True,
+        optimization_type=opt_type,
+        precision=[ModelPrecision.FP32] if not precision else [precision],
+        version=version,
+    )
 
 class TestModelRepo:
     def test_indexes(self, fxt_model_storage) -> None:
@@ -397,120 +416,70 @@ class TestModelRepo:
             )
             assert latest_model_successful_optimized == fxt_model_optimized
 
+    @pytest.mark.parametrize(
+        "feature_flag_setting",
+        [
+            pytest.param(True, id="fp16-enabled"),
+            pytest.param(False, id="fp16-disabled")
+        ]
+    )
     def test_get_latest_model_for_inference(
-        self, request, fxt_empty_project, fxt_model_storage, fxt_training_framework
+        self, request, feature_flag_setting, fxt_empty_project, fxt_model_storage, fxt_training_framework, monkeypatch
     ) -> None:
         """
         Models:
-            Models version 1: M1 (base) -> M2 (MO)
-            Models version 2: M3 (base) -> M4 (MO) -> M5 (MO) -> M6 (ONNX)
+            Models version 1: M1 (base) -> M2 (MO, FP32) -> M3 (MO, FP16)
+            Models version 2: M4 (base) -> M5 (MO, FP32) -> M6 (MO, FP16) -> M7 (ONNX)
 
         Expected:
             The latest model for inference is M4 (the first one generated after the base model).
         """
+        monkeypatch.setenv(FEATURE_FLAG_FP16_INFERENCE, str(feature_flag_setting).lower())
         project = fxt_empty_project
         model_storage = fxt_model_storage
         model_repo = ModelRepo(model_storage.identifier)
         request.addfinalizer(lambda: model_repo.delete_all())
-        m1 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.BASE_FRAMEWORK,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.NONE,
-            version=1,
-        )
-        m2 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            previous_trained_revision=m1,
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.OPENVINO,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.MO,
-            version=1,
-        )
-        m3 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.BASE_FRAMEWORK,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.NONE,
-            version=2,
-        )
-        m4 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            previous_trained_revision=m3,
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.OPENVINO,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.MO,
-            version=2,
-        )
-        m5 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            previous_trained_revision=m3,
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.OPENVINO,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.MO,
-            version=2,
-        )
-        m6 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            previous_trained_revision=m3,
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.ONNX,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.ONNX,
-            version=2,
-        )
-        model_repo.save_many([m1, m2, m3, m4, m5, m6])
+
+        # Create model hierarchy with both FP16 and FP32 models
+        # Version 1 models
+        m1_base = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
+                               ModelOptimizationType.NONE, version=1, previous_model=None)
+        m2_fp32 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
+                               ModelOptimizationType.MO, version=1, previous_model=m1_base,
+                               precision=ModelPrecision.FP32)
+        m3_fp16 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
+                               ModelOptimizationType.MO, version=1, previous_model=m1_base,
+                               precision=ModelPrecision.FP16)
+
+        # Version 2 models
+        m4_base = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
+                               ModelOptimizationType.NONE, version=2, previous_model=None)
+        m5_fp32 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
+                               ModelOptimizationType.MO, version=2, previous_model=m4_base,
+                               precision=ModelPrecision.FP32)
+        m6_fp16 = create_model(project, model_storage, fxt_training_framework, ModelFormat.OPENVINO,
+                               ModelOptimizationType.MO, version=2, previous_model=m4_base,
+                               precision=ModelPrecision.FP16)
+        m7_onnx = create_model(project, model_storage, fxt_training_framework, ModelFormat.ONNX,
+                               ModelOptimizationType.ONNX, version=2, previous_model=m4_base,
+                               precision=ModelPrecision.FP16)
+
+        model_repo.save_many([m1_base, m2_fp32, m3_fp16, m4_base, m5_fp32, m6_fp16, m7_onnx])
         with (
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
         ):
             inference_model = model_repo.get_latest_model_for_inference()
             inference_model_id = model_repo.get_latest_model_id_for_inference()
-            inference_model_for_m1 = model_repo.get_latest_model_for_inference(base_model_id=m1.id_)
+            inference_model_for_m1 = model_repo.get_latest_model_for_inference(base_model_id=m1_base.id_)
 
-        assert inference_model == m4
-        assert inference_model_id == inference_model.id_
-        assert inference_model_for_m1 == m2
+        if feature_flag_setting:
+            assert inference_model == m6_fp16
+            assert inference_model_id == inference_model.id_
+            assert inference_model_for_m1 == m3_fp16
+        else:
+            assert inference_model == m5_fp32
+            assert inference_model_id == inference_model.id_
+            assert inference_model_for_m1 == m2_fp32
 
     def test_get_latest_with_latest_version(
         self, request, fxt_empty_project, fxt_model_storage, fxt_training_framework
@@ -520,38 +489,13 @@ class TestModelRepo:
         model_storage = fxt_model_storage
         model_repo = ModelRepo(model_storage.identifier)
         request.addfinalizer(lambda: model_repo.delete_all())
-        m1 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.BASE_FRAMEWORK,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.NONE,
-            version=1,
-        )
-        m2 = Model(
-            project=project,
-            model_storage=model_storage,
-            train_dataset=NullDataset(),
-            configuration=empty_model_configuration(),
-            id_=ModelRepo.generate_id(),
-            data_source_dict={"test_data": b"weights_data"},
-            training_framework=fxt_training_framework,
-            model_status=ModelStatus.SUCCESS,
-            model_format=ModelFormat.BASE_FRAMEWORK,
-            has_xai_head=True,
-            optimization_type=ModelOptimizationType.NONE,
-            version=2,
-        )
+        m1 = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
+                     ModelOptimizationType.NONE, version=1, previous_model=None)
+        m2 = create_model(project, model_storage, fxt_training_framework, ModelFormat.BASE_FRAMEWORK,
+                     ModelOptimizationType.NONE, version=2, previous_model=None)
         # m1.id > m2.id but m2.version > m1.version
         m1.id_ = ModelRepo.generate_id()
-        model_repo.save(m2)
-        model_repo.save(m1)
+        model_repo.save_many([m2, m1])
         inference_model = model_repo.get_latest()
         assert inference_model == m2
 

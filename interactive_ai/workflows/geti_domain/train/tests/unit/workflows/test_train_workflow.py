@@ -71,7 +71,7 @@ class TestTrainWorkflow:
                 job_id="job_id",
                 train_output_model_ids=TrainOutputModelIds(
                     base=BASE_MODEL_ID,
-                    mo_fp32_with_xai=MO_MODEL_ID,
+                    mo_with_xai=MO_MODEL_ID,
                     mo_fp32_without_xai=None,
                     mo_fp16_without_xai=None,
                     onnx=None,

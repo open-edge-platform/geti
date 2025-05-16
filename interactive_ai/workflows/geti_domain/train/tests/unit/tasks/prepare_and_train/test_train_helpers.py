@@ -6,7 +6,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from geti_types import ID
-from iai_core.entities.model import ModelStatus
+from iai_core.entities.model import ModelStatus, ModelPrecision
+from jobs_common.features.feature_flag_provider import FeatureFlag
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
 
 from job.tasks.prepare_and_train.train_helpers import finalize_train, prepare_train
@@ -14,16 +15,26 @@ from job.tasks.prepare_and_train.train_helpers import finalize_train, prepare_tr
 
 @pytest.mark.JobsComponent
 class TestTrainHelpers:
+    @pytest.mark.parametrize(
+        "feature_flag_setting",
+        [
+            pytest.param(True, id="fp16-enabled"),
+            pytest.param(False, id="fp16-disabled")
+        ]
+    )
     @patch("job.tasks.prepare_and_train.train_helpers.GetiOTXInterfaceAdapter")
     @patch("job.tasks.prepare_and_train.train_helpers.ModelRepo")
     def test_prepare_train(
         self,
         mock_model_repo,
         mock_geti_otx_interface_adapter,
+        feature_flag_setting,
         mock_train_data,
         fxt_dataset_with_images,
+        monkeypatch
     ) -> None:
         # Arrange
+        monkeypatch.setenv(FeatureFlag.FEATURE_FLAG_FP16_INFERENCE.name, str(feature_flag_setting).lower())
         mock_model_repo.generate_id.side_effect = [ID(str(i)) for i in range(5)]
 
         # Act
@@ -35,7 +46,9 @@ class TestTrainHelpers:
 
         # Assert
         assert output_model_ids.base == "0"
-        assert output_model_ids.mo_fp32_with_xai == "1"
+        assert output_model_ids.mo_with_xai == "1"
+        assert ((ModelPrecision.FP16 if feature_flag_setting else ModelPrecision.FP32)
+                in train_output_models.mo_with_xai.precision)
         assert output_model_ids.mo_fp32_without_xai == "2"
         assert output_model_ids.mo_fp16_without_xai == "3"
         assert output_model_ids.onnx == "4"

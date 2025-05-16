@@ -16,7 +16,7 @@ from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
 from iai_core.adapters.model_adapter import DataSource
-from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelPrecision, ModelStatus, NullModel
+from iai_core.entities.model import Model, ModelFormat, ModelOptimizationType, ModelStatus, NullModel, ModelPrecision
 from iai_core.entities.model_storage import ModelStorageIdentifier
 from iai_core.repos.base.model_storage_based_repo import ModelStorageBasedSessionRepo
 from iai_core.repos.base.session_repo import QueryAccessMode
@@ -24,10 +24,13 @@ from iai_core.repos.mappers.cursor_iterator import CursorIterator
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 from iai_core.repos.mappers.mongodb_mappers.model_mapper import ModelPurgeInfoToMongo, ModelToMongo
 from iai_core.repos.storage.binary_repos import ModelBinaryRepo
+from iai_core.utils.feature_flags import FeatureFlagProvider
 
 from geti_types import ID, Session
 
 logger = logging.getLogger(__name__)
+
+FEATURE_FLAG_FP16_INFERENCE = "FEATURE_FLAG_FP16_INFERENCE"
 
 
 class ModelStatusFilter(Enum):
@@ -392,7 +395,9 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
             "previous_trained_revision_id": IDToMongo.forward(base_model_id),
             "optimization_type": ModelOptimizationType.MO.name,
             "has_xai_head": True,
-            "precision": [ModelPrecision.FP32.name],
+            "precision": {
+                "$in": [ModelPrecision.FP16.name, ModelPrecision.FP32.name]
+            },
             "model_status": {"$in": model_status_filter.value},
         }
 
@@ -405,8 +410,8 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
         Get the MO FP32 with XAI head version of the latest base framework model.
         This model is used for inference.
 
-        :base_model_id: Optional ID for which to get the latest inference model
-        :model_status_filter: Optional ModelStatusFilter to apply in query
+        :param base_model_id: Optional ID for which to get the latest inference model
+        :param model_status_filter: Optional ModelStatusFilter to apply in query
         :return: The MO model or :class:`~iai_core.entities.model.NullModel` if not found
         """
         # Get the ID of the latest base framework model
@@ -421,14 +426,30 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
         )
 
         # Use ascending order sorting to retrieve the oldest matching document
-        return self.get_one(extra_filter=query, earliest=True)
+        models = self.get_all(extra_filter=query)
+        # Determine which precision to prioritize
+        use_fp16 = FeatureFlagProvider.is_enabled(FEATURE_FLAG_FP16_INFERENCE)
+        primary_precision = ModelPrecision.FP16 if use_fp16 else ModelPrecision.FP32
+        fallback_precision = ModelPrecision.FP32 if use_fp16 else ModelPrecision.FP16
+
+        primary_model = next((model for model in models if primary_precision in model.precision), None)
+        if primary_model:
+            return primary_model
+
+        # Log warning and fall back to alternative precision
+        logger.warning(f"{primary_precision} model requested but not found. Falling back to {fallback_precision}.")
+        fallback_model = next((model for model in models if fallback_precision in model.precision), None)
+        if fallback_model:
+            return fallback_model
+
+        return NullModel()
 
     def get_latest_model_id_for_inference(
         self,
         model_status_filter: ModelStatusFilter = ModelStatusFilter.IMPROVED,
     ) -> ID:
         """
-        Get the ID of the MO FP32 with XAI head version of the latest base framework model.
+        Get the ID of the MO FP16 or FP32 with XAI head version of the latest base framework model.
         This model is used for inference.
 
         :return: The MO model or :class:`~iai_core.entities.model.NullModel` if not found
@@ -445,12 +466,32 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
                     base_model_id=base_model_id, model_status_filter=model_status_filter
                 ),
             },
-            {"$project": {"_id": 1}},
+            {"$project": {"_id": 1, "precision": 1}},
         ]
         matched_docs = list(self.aggregate_read(aggr_pipeline))
         if not matched_docs:
             return ID()
-        return IDToMongo.backward(matched_docs[0]["_id"])
+
+        # Determine which precision to prioritize
+        use_fp16 = FeatureFlagProvider.is_enabled(FEATURE_FLAG_FP16_INFERENCE)
+        primary_precision = ModelPrecision.FP16.name if use_fp16 else ModelPrecision.FP32.name
+        fallback_precision = ModelPrecision.FP32.name if use_fp16 else ModelPrecision.FP16.name
+
+        # Try to find model with primary precision
+        primary_model = next((doc for doc in matched_docs if primary_precision in doc["precision"]), None)
+        if primary_model:
+            return IDToMongo.backward(primary_model["_id"])
+
+        # Try to find model with fallback precision
+        fallback_model = next((doc for doc in matched_docs if fallback_precision in doc["precision"]), None)
+        if fallback_model:
+            logger.warning(
+                f"{primary_precision} model requested but not found. Falling back to {fallback_precision}."
+            )
+            return IDToMongo.backward(fallback_model["_id"])
+
+        # If we get here, we have matched_docs but none with the expected precisions
+        return ID()
 
     def update_model_status(self, model: Model, model_status: ModelStatus) -> None:
         """
