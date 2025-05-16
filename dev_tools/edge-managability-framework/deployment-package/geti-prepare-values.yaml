@@ -1,0 +1,15 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+
+metallb:
+  enabled: false
+  address: 1.2.3.4
+
+gateway:
+  # Enable an extra non-LoadBalancer service for istio gateway to expose the
+  # service to interconnect.
+  interconnectService:
+    enabled: false
+    httpsPort: 8443
+    namespace: istio-system
