@@ -55,7 +55,7 @@ class MediaRESTViews:
             ),
             "upload_time": media.creation_date.isoformat(),
             "uploader_id": media.uploader_id,
-            "thumbnail": f"{base_url}/display/thumb",
+            "thumbnail": f"{base_url}/display/thumb" if media.preprocessing.status.is_finished() else None,
             "preprocessing": {"status": media.preprocessing.status.value},
         }
 

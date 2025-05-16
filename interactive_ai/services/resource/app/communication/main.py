@@ -14,7 +14,9 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse, Response
 
 from communication.kafka_handlers.annotation_kafka_handler import AnnotationKafkaHandler
+from communication.kafka_handlers.media_uploaded_kafka_handler import MediaUploadedKafkaHandler
 from communication.kafka_handlers.miscellaneous_kafka_handler import MiscellaneousKafkaHandler
+from communication.kafka_handlers.preprocessing_kafka_handler import PreprocessingKafkaHandler
 from communication.kafka_handlers.thumb_video_kafka_handler import ThumbVideoKafkaHandler
 from communication.rest_endpoints import (
     annotation_router,
@@ -55,11 +57,15 @@ async def lifespan(app: FastAPI):  # type: ignore # noqa: ANN201
     AnnotationKafkaHandler()
     MiscellaneousKafkaHandler()
     ThumbVideoKafkaHandler()
+    MediaUploadedKafkaHandler()
+    PreprocessingKafkaHandler()
     yield
     # Shutdown
     AnnotationKafkaHandler().stop()
     MiscellaneousKafkaHandler().stop()
     ThumbVideoKafkaHandler().stop()
+    MediaUploadedKafkaHandler().stop()
+    PreprocessingKafkaHandler().stop()
     if ENABLE_TRACING:
         FastAPITelemetry.uninstrument(app)
         KafkaTelemetry.uninstrument()

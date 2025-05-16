@@ -1,6 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import io
+import os
 from unittest.mock import ANY, MagicMock, call, patch
 
 import numpy as np
@@ -9,10 +10,12 @@ import pytest
 from communication.exceptions import (
     FileNotFoundException,
     ImageNotFoundException,
+    MediaNotPreprocessedException,
     ProjectLockedException,
     VideoFrameNotFoundException,
     VideoFrameOutOfRangeException,
     VideoNotFoundException,
+    VideoThumbnailNotFoundException,
 )
 from communication.rest_views.filtered_dataset_rest_views import FilteredDatasetRESTView
 from resource_management.media_manager import IMAGE_EXT_SAVE_MAPPING, MediaManager
@@ -20,6 +23,7 @@ from usecases.dataset_filter import DatasetFilter
 from usecases.query_builder import MediaQueryResult, QueryResults
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
+from geti_kafka_tools import publish_event
 from geti_types import ID
 from iai_core.adapters.binary_interpreters import RAWBinaryInterpreter
 from iai_core.entities.image import Image, NullImage
@@ -41,41 +45,48 @@ class TestMediaManager:
         for ext in ImageExtensions:
             assert ext in IMAGE_EXT_SAVE_MAPPING, f"Extension {ext} is not mapped"
 
-    def test_get_first_media_image(self, request, fxt_image_entity, fxt_dataset_storage) -> None:
+    @pytest.mark.parametrize("only_preprocessed", [True, False])
+    def test_get_first_media_image(self, request, fxt_image_entity, fxt_dataset_storage, only_preprocessed) -> None:
         ds_identifier = fxt_dataset_storage.identifier
         image = fxt_image_entity
         with (
             patch.object(ImageRepo, "get_one", return_value=image) as mock_get_one_image,
             patch.object(VideoRepo, "get_one", return_value=NullVideo()) as mock_get_one_video,
         ):
-            found_media = MediaManager.get_first_media(ds_identifier)
+            found_media = MediaManager.get_first_media(ds_identifier, only_preprocessed)
 
-        mock_get_one_image.assert_called_once_with(earliest=True)
+        mock_get_one_image.assert_called_once_with(
+            earliest=True, extra_filter=None if not only_preprocessed else {"preprocessed": {"status": "FINISHED"}}
+        )
         mock_get_one_video.assert_not_called()
         assert found_media == image
 
-    def test_get_first_media_video(self, request, fxt_video_entity, fxt_dataset_storage) -> None:
+    @pytest.mark.parametrize("only_preprocessed", [True, False])
+    def test_get_first_media_video(self, request, fxt_video_entity, fxt_dataset_storage, only_preprocessed) -> None:
         ds_identifier = fxt_dataset_storage.identifier
+        extra_filter = None if not only_preprocessed else {"preprocessed": {"status": "FINISHED"}}
         with (
             patch.object(ImageRepo, "get_one", return_value=NullImage()) as mock_get_one_image,
             patch.object(VideoRepo, "get_one", return_value=fxt_video_entity) as mock_get_one_video,
         ):
-            found_media = MediaManager.get_first_media(ds_identifier)
+            found_media = MediaManager.get_first_media(ds_identifier, only_preprocessed)
 
-        mock_get_one_image.assert_called_once_with(earliest=True)
-        mock_get_one_video.assert_called_once_with(earliest=True)
+        mock_get_one_image.assert_called_once_with(earliest=True, extra_filter=extra_filter)
+        mock_get_one_video.assert_called_once_with(earliest=True, extra_filter=extra_filter)
         assert found_media == fxt_video_entity
 
-    def test_get_first_media_none(self, request, fxt_dataset_storage) -> None:
+    @pytest.mark.parametrize("only_preprocessed", [True, False])
+    def test_get_first_media_none(self, request, fxt_dataset_storage, only_preprocessed) -> None:
         ds_identifier = fxt_dataset_storage.identifier
+        extra_filter = None if not only_preprocessed else {"preprocessed": {"status": "FINISHED"}}
         with (
             patch.object(ImageRepo, "get_one", return_value=NullImage()) as mock_get_one_image,
             patch.object(VideoRepo, "get_one", return_value=NullVideo()) as mock_get_one_video,
         ):
-            found_media = MediaManager.get_first_media(ds_identifier)
+            found_media = MediaManager.get_first_media(ds_identifier, only_preprocessed)
 
-        mock_get_one_image.assert_called_once_with(earliest=True)
-        mock_get_one_video.assert_called_once_with(earliest=True)
+        mock_get_one_image.assert_called_once_with(earliest=True, extra_filter=extra_filter)
+        mock_get_one_video.assert_called_once_with(earliest=True, extra_filter=extra_filter)
         assert found_media is None
 
     def test_upload_image(
@@ -137,6 +148,58 @@ class TestMediaManager:
             ]
         )
         mock_create_and_save_thumbnail.assert_called_once()
+
+        assert isinstance(image, Image)
+        assert image.width == 50 and image.height == 50
+
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_upload_image_async_preprocessing(
+        self,
+        fxt_solid_color_image_bytes,
+        fxt_dataset_storage_identifier,
+    ) -> None:
+        image_bytes = fxt_solid_color_image_bytes(height=50, width=50)
+        with (
+            patch.object(MediaManager, "validate_image_dimensions") as mock_validate_dims,
+            patch.object(ImageRepo, "save") as mock_save_image,
+            patch("resource_management.media_manager.publish_event") as mock_publish_event,
+        ):
+            image = MediaManager.upload_image(
+                dataset_storage_identifier=fxt_dataset_storage_identifier,
+                basename="test_image",
+                extension=ImageExtensions.JPG,
+                data_stream=BytesStream(data=io.BytesIO(image_bytes), length=len(image_bytes)),
+                user_id=ID("dummy_user"),
+                update_metrics=True,
+            )
+
+        mock_validate_dims.assert_called_once()
+        mock_save_image.assert_called_once_with(
+            Image(
+                name="test_image",
+                uploader_id="dummy_user",
+                id=ANY,
+                extension=ImageExtensions.JPG,
+                width=50,
+                height=50,
+                size=ANY,
+                preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus.SCHEDULED, start_timestamp=ANY),
+            )
+        )
+        mock_publish_event.assert_called_once_with(
+            topic="media_preprocessing",
+            body={
+                "workspace_id": str(fxt_dataset_storage_identifier.workspace_id),
+                "project_id": str(fxt_dataset_storage_identifier.project_id),
+                "dataset_storage_id": str(fxt_dataset_storage_identifier.dataset_storage_id),
+                "media_id": str(image.id_),
+                "data_binary_filename": image.data_binary_filename,
+                "media_type": "IMAGE",
+                "event": "MEDIA_UPLOADED",
+            },
+            key=str(image.id_).encode(),
+            headers_getter=ANY,
+        )
 
         assert isinstance(image, Image)
         assert image.width == 50 and image.height == 50
@@ -261,6 +324,87 @@ class TestMediaManager:
                     )
                 ),
             ]
+        )
+        assert isinstance(video, Video)
+        assert video.height == height
+        assert video.width == width
+        assert video.total_frames == number_of_frames
+
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_upload_video_async_preprocessing(
+        self,
+        fxt_project,
+        fxt_mongo_id,
+        fxt_label,
+        request,
+        fxt_random_annotated_video_factory,
+    ) -> None:
+        project = fxt_project
+        dataset_storage = project.get_training_dataset_storage()
+        height, width, number_of_frames = 360, 480, 1
+        labels = [fxt_label]
+        video_binary_repo = VideoBinaryRepo(project.get_training_dataset_storage().identifier)
+        video, _, _, _, _, _, _ = fxt_random_annotated_video_factory(
+            project=project,
+            height=height,
+            width=width,
+            number_of_frames=number_of_frames,
+            labels=labels,
+        )
+
+        video_data = video_binary_repo.get_by_filename(
+            filename=video.data_binary_filename, binary_interpreter=RAWBinaryInterpreter()
+        )
+        with patch.object(VideoRepo, "save") as mock_video_save:
+            # Temporarily save the video bytes to the BinaryRepo and use this URL
+            # as mock url when the BinaryRepo is called
+            temp_filename = video_binary_repo.save(
+                dst_file_name="file.mp4",
+                data_source=video_data,
+            )
+            request.addfinalizer(lambda: video_binary_repo.delete_by_filename(filename=temp_filename))
+            with (
+                patch.object(VideoBinaryRepo, "save", return_value=temp_filename) as mock_save_video,
+                patch.object(VideoRepo, "generate_id", return_value="sample_id"),
+                patch("resource_management.media_manager.publish_event") as mock_publish_event,
+            ):
+                video = MediaManager.upload_video(
+                    dataset_storage_identifier=dataset_storage.identifier,
+                    basename="file",
+                    extension=VideoExtensions.MP4,
+                    data_stream=BytesStream(data=io.BytesIO(video_data), length=len(video_data)),
+                    user_id=ID("dummy_user"),
+                    update_metrics=True,
+                )
+
+        mock_save_video.assert_called_once_with(dst_file_name="sample_id.mp4", data_source=ANY)
+        mock_video_save.assert_called_once_with(
+            Video(
+                id=ANY,
+                name="file",
+                extension=VideoExtensions.MP4,
+                uploader_id="dummy_user",
+                fps=30,
+                width=width,
+                height=height,
+                total_frames=number_of_frames,
+                size=ANY,
+                preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus.IN_PROGRESS, start_timestamp=ANY),
+            )
+        )
+        mock_publish_event.assert_called_once_with(
+            topic="media_preprocessing",
+            body={
+                "workspace_id": str(dataset_storage.identifier.workspace_id),
+                "project_id": str(dataset_storage.identifier.project_id),
+                "dataset_storage_id": str(dataset_storage.identifier.dataset_storage_id),
+                "media_id": str(video.id_),
+                "data_binary_filename": video.data_binary_filename,
+                "media_type": "VIDEO",
+                "event": "MEDIA_UPLOADED",
+            },
+            key=str(video.id_).encode(),
+            headers_getter=ANY,
         )
         assert isinstance(video, Video)
         assert video.height == height
@@ -680,6 +824,207 @@ class TestMediaManager:
         # Assert
         assert np_frame == return_frame
 
+    @pytest.mark.parametrize(
+        "preprocessing_status",
+        [MediaPreprocessingStatus.SCHEDULED, MediaPreprocessingStatus.IN_PROGRESS, MediaPreprocessingStatus.FAILED],
+    )
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_video_thumbnail_frame_by_id_async_preprocessing_not_ready(
+        self, fxt_dataset_storage, fxt_mongo_id, preprocessing_status
+    ) -> None:
+        # Arrange
+        video_id = fxt_mongo_id(1)
+        video = MagicMock()
+        video.preprocessing = MediaPreprocessing(status=preprocessing_status)
+
+        # Act
+        with (
+            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
+            pytest.raises(MediaNotPreprocessedException),
+        ):
+            MediaManager.get_video_thumbnail_frame_by_id(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                video_id=video_id,
+                frame_index=1,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(video_id)
+
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_video_thumbnail_frame_by_id_async_preprocessing(self, fxt_dataset_storage, fxt_mongo_id) -> None:
+        # Arrange
+        video_id = fxt_mongo_id(1)
+        video = MagicMock()
+        video.preprocessing = MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED)
+        video_frame = MagicMock()
+
+        # Act
+        with (
+            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
+            patch.object(
+                MediaManager, "get_single_thumbnail_frame_numpy", return_value=video_frame
+            ) as mock_get_single_thumbnail_frame_numpy,
+        ):
+            np_frame = MediaManager.get_video_thumbnail_frame_by_id(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                video_id=video_id,
+                frame_index=1,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(video_id)
+        mock_get_single_thumbnail_frame_numpy.assert_called_once_with(
+            video=video, dataset_storage_identifier=fxt_dataset_storage.identifier, frame_index=1
+        )
+        assert np_frame == video_frame
+
+    @pytest.mark.parametrize(
+        "preprocessing_status",
+        [MediaPreprocessingStatus.SCHEDULED, MediaPreprocessingStatus.IN_PROGRESS, MediaPreprocessingStatus.FAILED],
+    )
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_image_thumbnail_async_preprocessing_not_ready(
+        self, fxt_dataset_storage, fxt_mongo_id, preprocessing_status
+    ) -> None:
+        # Arrange
+        image_id = fxt_mongo_id(1)
+        image = MagicMock()
+        image.preprocessing = MediaPreprocessing(status=preprocessing_status)
+
+        # Act
+        with (
+            patch.object(ImageRepo, "get_by_id", return_value=image) as mock_get_by_id,
+            pytest.raises(MediaNotPreprocessedException),
+        ):
+            MediaManager.get_image_thumbnail(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                image_id=image_id,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(image_id)
+
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_image_thumbnail_async_preprocessing(self, fxt_dataset_storage, fxt_mongo_id) -> None:
+        # Arrange
+        image_id = fxt_mongo_id(1)
+        image = MagicMock()
+        image.preprocessing = MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED)
+        thumbnail = MagicMock()
+
+        # Act
+        with (
+            patch.object(ImageRepo, "get_by_id", return_value=image) as mock_get_by_id,
+            patch.object(ThumbnailBinaryRepo, "get_by_filename", return_value=thumbnail) as mock_get_by_filename,
+        ):
+            result = MediaManager.get_image_thumbnail(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                image_id=image_id,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(image_id)
+        mock_get_by_filename.assert_called_once_with(
+            filename=f"{image_id}_thumbnail.jpg",
+            binary_interpreter=ANY,
+        )
+        assert result == thumbnail
+
+    @pytest.mark.parametrize(
+        "preprocessing_status",
+        [MediaPreprocessingStatus.SCHEDULED, MediaPreprocessingStatus.IN_PROGRESS, MediaPreprocessingStatus.FAILED],
+    )
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_video_thumbnail_async_preprocessing_not_ready(
+        self, fxt_dataset_storage, fxt_mongo_id, preprocessing_status
+    ) -> None:
+        # Arrange
+        video_id = fxt_mongo_id(1)
+        video = MagicMock()
+        video.preprocessing = MediaPreprocessing(status=preprocessing_status)
+
+        # Act
+        with (
+            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
+            pytest.raises(MediaNotPreprocessedException),
+        ):
+            MediaManager.get_video_thumbnail(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                video_id=video_id,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(video_id)
+
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_video_thumbnail_async_preprocessing(self, fxt_dataset_storage, fxt_mongo_id) -> None:
+        # Arrange
+        video_id = fxt_mongo_id(1)
+        video = MagicMock()
+        video.preprocessing = MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED)
+        thumbnail = MagicMock()
+
+        # Act
+        with (
+            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
+            patch.object(ThumbnailBinaryRepo, "get_by_filename", return_value=thumbnail) as mock_get_by_filename,
+        ):
+            result = MediaManager.get_video_thumbnail(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                video_id=video_id,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(video_id)
+        mock_get_by_filename.assert_called_once_with(
+            filename=f"{video_id}_thumbnail.jpg",
+            binary_interpreter=ANY,
+        )
+        assert result == thumbnail
+
+    @pytest.mark.parametrize(
+        "preprocessing_status",
+        [MediaPreprocessingStatus.SCHEDULED, MediaPreprocessingStatus.IN_PROGRESS, MediaPreprocessingStatus.FAILED],
+    )
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_video_thumbnail_stream_location_async_preprocessing_not_ready(
+        self, fxt_dataset_storage, fxt_mongo_id, preprocessing_status
+    ) -> None:
+        # Arrange
+        video_id = fxt_mongo_id(1)
+        video = MagicMock()
+        video.preprocessing = MediaPreprocessing(status=preprocessing_status)
+
+        # Act
+        with (
+            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
+            pytest.raises(MediaNotPreprocessedException),
+        ):
+            MediaManager.get_video_thumbnail_stream_location(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                video_id=video_id,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(video_id)
+
+    @patch.dict(os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "true"})
+    def test_get_video_thumbnail_stream_location_async_preprocessing(self, fxt_dataset_storage, fxt_mongo_id) -> None:
+        # Arrange
+        video_id = fxt_mongo_id(1)
+        video = MagicMock()
+        video.preprocessing = MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED)
+
+        # Act
+        with (
+            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
+            patch.object(
+                ThumbnailBinaryRepo, "get_path_or_presigned_url", return_value="presigned_url"
+            ) as mock_get_path_or_presigned_url,
+        ):
+            result = MediaManager.get_video_thumbnail_stream_location(
+                dataset_storage_identifier=fxt_dataset_storage.identifier,
+                video_id=video_id,
+            )
+        # Assert
+        mock_get_by_id.assert_called_once_with(video_id)
+        mock_get_path_or_presigned_url.assert_called_once_with(filename=f"{video_id}_thumbnail.mp4")
+        assert result == "presigned_url"
+
     def test_delete_image_by_id(self, fxt_empty_project_persisted, fxt_image_entity) -> None:
         dataset_storage = fxt_empty_project_persisted.get_training_dataset_storage()
         with (
@@ -819,4 +1164,46 @@ class TestMediaManager:
             mock_get_presigned_url.assert_called_once_with(
                 filename=fxt_video_entity.data_binary_filename,
                 preset_headers={"response-content-disposition": f'attachment; filename="{video_name}"'},
+            )
+
+    def test_get_thumbnail_video_stream_location(
+        self,
+        request,
+        fxt_project,
+        fxt_unannotated_video_factory,
+    ) -> None:
+        """
+        This test saves a video without a thumbnail video, requests the thumbnail and then checks that the
+        thumbnail video generation is started.
+        """
+        # Hook for event publishing
+        patch_publish_event = patch("resource_management.media_manager.publish_event", side_effect=publish_event)
+
+        dataset_storage = fxt_project.get_training_dataset_storage()
+        video = fxt_unannotated_video_factory(project=fxt_project, width=20, height=20, number_of_frames=6)
+
+        with (
+            patch.object(MediaManager, "get_video_by_id", return_value=video) as mock_get_video_by_id,
+            patch_publish_event as patched_pub_video_gen,
+            pytest.raises(VideoThumbnailNotFoundException),
+        ):
+            MediaManager.get_video_thumbnail_stream_location(
+                dataset_storage_identifier=dataset_storage.identifier,
+                video_id=video.id_,
+            )
+
+            mock_get_video_by_id.assert_called_once_with(
+                dataset_storage_identifier=dataset_storage.identifier,
+                video_id=video.id_,
+            )
+            patched_pub_video_gen.assert_called_once_with(
+                topic="thumbnail_video_missing",
+                body={
+                    "workspace_id": fxt_project.workspace_id,
+                    "project_id": dataset_storage.identifier.project_id,
+                    "dataset_storage_id": fxt_project.get_training_dataset_storage().id_,
+                    "video_id": video.id_,
+                },
+                key=str(video.id_).encode(),
+                headers_getter=ANY,
             )

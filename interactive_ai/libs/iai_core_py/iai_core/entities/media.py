@@ -53,6 +53,12 @@ class MediaPreprocessingStatus(Enum):
     FINISHED = "FINISHED"
     FAILED = "FAILED"
 
+    def is_finished(self) -> bool:
+        return self == MediaPreprocessingStatus.FINISHED
+
+    def is_failed(self) -> bool:
+        return self == MediaPreprocessingStatus.FAILED
+
 
 @dataclass
 class MediaPreprocessing:
