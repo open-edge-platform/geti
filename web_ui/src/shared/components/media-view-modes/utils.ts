@@ -12,8 +12,8 @@ export const INITIAL_VIEW_MODE = ViewModes.MEDIUM;
 export const VIEW_MODE_LABEL = 'View mode';
 
 export const VIEW_MODE_SETTINGS = {
-    [ViewModes.SMALL]: { minItemSize: 112, gap: 4, maxColumns: 11 },
+    [ViewModes.LARGE]: { minItemSize: 300, gap: 8, maxColumns: 4 },
     [ViewModes.MEDIUM]: { minItemSize: 150, gap: 8, maxColumns: 8 },
-    [ViewModes.LARGE]: { minItemSize: 300, gap: 12, maxColumns: 4 },
+    [ViewModes.SMALL]: { minItemSize: 112, gap: 4, maxColumns: 11 },
     [ViewModes.DETAILS]: { size: 81, gap: 0 },
 };
