@@ -27,7 +27,6 @@ Feature: project removal
       When the user tries to load the image 'cat.jpg'
       Then the request is rejected
 
-  @wip
   Scenario: deletion of a project in training
     Given an annotated project of type 'detection'
     And the user requests to train a model

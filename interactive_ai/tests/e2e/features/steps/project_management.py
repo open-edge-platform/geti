@@ -271,6 +271,9 @@ def _create_project_from_scratch(  # noqa: C901
     context.project_info = create_project_response  # store the whole response for convenience in other steps
     context.project_id = create_project_response.id
     context.dataset_id = create_project_response.datasets[0].id
+    context._dataset_info_by_name = {
+        dataset_info.name: dataset_info for dataset_info in create_project_response.datasets
+    }
     context.label_info_by_name = {  # dict[str, CreateProject201ResponsePipelineTasksInnerLabelsInner]
         label.name: label for task in create_project_response.pipeline.tasks if task.labels for label in task.labels
     }
