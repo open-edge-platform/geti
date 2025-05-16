@@ -39,7 +39,7 @@ class ProjectConfigurationRESTViews:
         return rest_view
 
     @classmethod
-    def _auto_training_parameters_to_rest(cls, auto_training_parameters: AutoTrainingParameters) -> dict:
+    def _auto_training_parameters_to_rest(cls, auto_training_parameters: AutoTrainingParameters) -> list[dict]:
         """
         Get the REST view of auto-training parameters
 
