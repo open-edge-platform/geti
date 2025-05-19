@@ -13,7 +13,7 @@ from minio.error import S3Error
 logger = logging.getLogger("mlflow_job")
 
 
-def download_file_from_url(client: Minio, object_name: str, file_path: str) -> None:
+def download_file_from_url(client: Minio, bucket_name: str, object_name: str, file_path: str) -> None:
     """
     Download file from weights url and save it in target S3 bucket
     """
@@ -77,7 +77,7 @@ def download_file(bucket_name, object_name, file_path, endpoint):  # noqa: ANN00
         print(f"File '{object_name}' downloaded successfully to '{file_path}'")
     except S3Error as e:
         if e.code == "NoSuchKey":
-            download_file_from_url(client, object_name, file_path)
+            download_file_from_url(client, bucket_name, object_name, file_path)
         else:
             logger.warning(f"{traceback.print_exc()}")
             logger.warning("Trying to get object using presigned URL")

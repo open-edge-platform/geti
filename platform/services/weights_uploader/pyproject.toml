@@ -60,16 +60,7 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
     "ANN"]
 
 # Covers BDD tests
-"*features*.py" = ["E741", "E402", "E501",
-    "S",
-    "RET",
-    "PL",
-    "RUF",
-    "SIM",
-    "D103",
-    "ARG",
-    "PYI024",
-    "ANN"]
+"*features*.py" = ["E741", "E402", "E501"]
 
 [tool.ruff.lint.isort]
 # First-party = self-contained packages defined within Geti
