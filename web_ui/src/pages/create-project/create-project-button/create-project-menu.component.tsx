@@ -15,11 +15,11 @@ import {
     InlineAlert,
     Item,
     Menu,
+    MenuTrigger as SpectrumMenuTrigger,
     Tooltip,
     TooltipTrigger,
     View,
 } from '@geti/ui';
-import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import { ChevronDownSmall } from '../../../assets/icons';

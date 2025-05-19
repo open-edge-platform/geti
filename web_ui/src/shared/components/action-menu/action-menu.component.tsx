@@ -3,8 +3,7 @@
 
 import { Key } from 'react';
 
-import { Icon, Item, Menu, Text, Tooltip, TooltipTrigger } from '@geti/ui';
-import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
+import { Icon, Item, Menu, MenuTrigger as SpectrumMenuTrigger, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { MoreMenu } from '../../../assets/icons';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
