@@ -396,7 +396,7 @@ class ProjectCreationValidator(ProjectValidator[ProjectParser]):
                 )
 
     @classmethod
-    def _validate_keypoint_structure(cls, parser: ParserT) -> None:
+    def _validate_keypoint_structure(cls, parser: ProjectParser) -> None:
         """
         Validates that a user defined label graph edge has exactly 2 nodes, node names match with existing labels,
         and has no duplicate edges
@@ -745,7 +745,7 @@ class ProjectUpdateValidator(ProjectValidator[ProjectUpdateParser]):
                 )
 
     @classmethod
-    def _validate_keypoint_structure(cls, parser: ParserT) -> None:
+    def _validate_keypoint_structure(cls, parser: ProjectUpdateParser) -> None:
         """
         Validates that a user defined label graph edge has exactly 2 nodes, node names match with existing labels,
         and has no duplicate edges
