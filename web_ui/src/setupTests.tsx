@@ -55,10 +55,6 @@ HTMLMediaElement.prototype.pause = async () => {
 jest.spyOn(window.HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(() => 1000);
 jest.spyOn(window.HTMLElement.prototype, 'clientHeight', 'get').mockImplementation(() => 1000);
 
-jest.mock('screenfull', () => ({
-    onchange: jest.fn(),
-}));
-
 // We need to specifically mock this util because it uses `import.meta.url` which is not supported by jest.
 // More info at https://github.com/facebook/jest/issues/12183
 jest.mock('./hooks/use-load-ai-webworker/utils', () => ({ getWorker: jest.fn() }));
