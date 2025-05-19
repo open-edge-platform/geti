@@ -22,13 +22,15 @@ import classes from './jobs.module.scss';
 interface JobsListItemStatusProps {
     job: Job;
     expanded?: boolean;
+    onExpandChange: () => void;
 }
 
-export const JobsListItemStatus = ({ expanded = false, job }: JobsListItemStatusProps): JSX.Element => {
+export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: JobsListItemStatusProps): JSX.Element => {
     const [jobStepsExpanded, setJobStepsExpanded] = useState<boolean>(expanded);
 
     const onExpandHandler = () => {
         setJobStepsExpanded((prevState: boolean) => !prevState);
+        onExpandChange();
     };
 
     const stepToDisplay: JobStep | undefined = useMemo((): JobStep | undefined => {

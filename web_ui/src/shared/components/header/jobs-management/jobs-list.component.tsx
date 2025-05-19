@@ -1,17 +1,18 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
-import { dimensionValue, Loading, Text, View } from '@geti/ui';
+import { Loading, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
-import { Virtuoso } from 'react-virtuoso';
+import { Selection } from 'react-aria-components';
 
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
 import { SortByAttribute, SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsListItem } from './jobs-list-item.component';
 import { DISCARD_TYPE, JOB_STATE_TO_DISCARD_TYPE } from './utils';
+import { VirtualizedJobList } from './virtualized-jobs-list.component';
 
 export interface JobsListProps {
     jobState: JobState;
@@ -41,11 +42,10 @@ export const JobsList = ({
     gap = 10,
 }: JobsListProps): JSX.Element => {
     const discardType: DISCARD_TYPE | undefined = JOB_STATE_TO_DISCARD_TYPE[jobState];
+    const [selected, setSelected] = useState<Selection>(new Set([]));
 
-    const handleFetchNextPage = async () => {
-        if (hasNextPage && !isFetchingNextPage) {
-            await fetchNextPage();
-        }
+    const handleFetchNextPage = () => {
+        hasNextPage && fetchNextPage();
     };
 
     if (isLoading || isEmpty(jobs)) {
@@ -58,7 +58,7 @@ export const JobsList = ({
     }
 
     return (
-        <View paddingTop={'size-50'} overflow={'hidden'} width={'100%'}>
+        <View paddingTop={'size-50'} width={'100%'}>
             <View marginBottom={'size-100'}>
                 <SortByAttribute
                     sortIconId={SORT_ICON_ID}
@@ -67,22 +67,23 @@ export const JobsList = ({
                     setSortDirection={setSortDirection}
                 />
             </View>
-            <Virtuoso
-                style={{ height: `calc(100% - ${dimensionValue('size-400')})` }}
-                data={jobs}
-                endReached={handleFetchNextPage}
-                itemContent={(index, job) => {
-                    return (
-                        <JobsListItem
-                            key={job.id}
-                            job={job}
-                            discardType={discardType}
-                            jobClickHandler={jobClickHandler}
-                            style={{ marginBottom: index === jobs.length - 1 ? 0 : gap }}
-                        />
-                    );
-                }}
-            />
+
+            <VirtualizedJobList
+                gap={gap}
+                items={jobs}
+                selected={selected}
+                isLoading={isFetchingNextPage}
+                onLoadMore={handleFetchNextPage}
+            >
+                {(job) => (
+                    <JobsListItem
+                        job={job}
+                        discardType={discardType}
+                        jobClickHandler={jobClickHandler}
+                        onItemChange={() => setSelected(new Set([job.id]))}
+                    />
+                )}
+            </VirtualizedJobList>
         </View>
     );
 };

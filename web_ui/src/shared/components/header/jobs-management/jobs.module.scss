@@ -97,3 +97,16 @@
     padding: var(--spectrum-global-dimension-size-275) var(--spectrum-global-dimension-size-175);
     background: var(--brand-daisy);
 }
+
+.mainContainer {
+    height: calc(100% - var(--spectrum-global-dimension-size-350));
+    position: relative;
+}
+
+.container {
+    width: 100%;
+    max-height: 100%;
+    overflow-x: auto;
+    position: absolute;
+    scrollbar-gutter: stable;
+}
