@@ -16,6 +16,7 @@ import {
     Text,
     View,
 } from '@adobe/react-spectrum';
+import { DateRangePicker } from '@geti/ui';
 import { getLocalTimeZone } from '@internationalized/date';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
@@ -24,7 +25,6 @@ import { DateValue } from 'react-aria';
 import { Refresh } from '../../../assets/icons';
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { DateRangePicker } from '../../../shared/components/date-range-picker/date-range-picker.component';
 import { getClassServiceName } from '../../../shared/components/header/credit-balance/util';
 import { NotFound } from '../../../shared/components/not-found/not-found.component';
 import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';

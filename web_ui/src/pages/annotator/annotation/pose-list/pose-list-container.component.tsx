@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Loading } from '@geti/ui';
+
 import { isKeypointAnnotation } from '../../../../core/annotations/services/utils';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import { useLocalAnnotations } from '../../hooks/use-local-annotations.hooks';
 import { useLocalPredictions } from '../../hooks/use-local-predictions.hooks';

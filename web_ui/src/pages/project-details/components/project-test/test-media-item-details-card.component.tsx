@@ -49,9 +49,9 @@ export const TestMediaItemDetailsCard = ({
             >
                 <Grid
                     alignItems={'center'}
-                    gap={'var(--gap)'}
+                    gap={'size-100'}
                     rows={['size-800']}
-                    columns={['var(--width)', minmax('size-1000', '1fr'), 'max-content']}
+                    columns={['size-800', minmax('size-1000', '1fr'), 'max-content']}
                 >
                     <MediaItemView
                         mediaItem={mediaItem.media}

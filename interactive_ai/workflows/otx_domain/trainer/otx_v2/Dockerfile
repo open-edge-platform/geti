@@ -41,10 +41,9 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 
-WORKDIR /builder/interactive_ai/workflows/otx_domain/trainer/otx_v2
+WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -55,7 +54,6 @@ COPY --link download_pretrained_weights.py download_pretrained_weights.py
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 # step 3: build final runtime image
@@ -72,15 +70,15 @@ RUN apt-get update && \
 	pip3 uninstall -y setuptools pip wheel && \
     rm -rf /root/.cache/pip
 
-# copy python dependencies
-COPY --link --from=build --chown=10001 /builder/interactive_ai/workflows/otx_domain/trainer/otx_v2/.venv/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
-COPY --link --from=build --chown=10001 /builder/interactive_ai/workflows/otx_domain/trainer/otx_v2 /otx_v2
+# Copy the application from the builder
+COPY --link --from=build --chown=10001 /interactive_ai/workflows/otx_domain/trainer/otx_v2 /interactive_ai/workflows/otx_domain/trainer/otx_v2
 COPY --link --from=cuda --chown=10001 /usr/local /usr/local
 
-ENV PATH="/otx_v2:$PATH"
-ENV PYTHONPATH="/otx_v2/scripts"
+# Place executables in the environment at the front of the path
+ENV PATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2/.venv/bin:/interactive_ai/workflows/otx_domain/trainer/otx_v2:$PATH"
+ENV PYTHONPATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2"
 ENV HF_HUB_OFFLINE=1
 
 USER non-root
 WORKDIR /home/non-root
-WORKDIR /otx_v2
+WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2

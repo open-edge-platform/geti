@@ -15,7 +15,7 @@ import {
     TextField,
     View,
 } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, PasswordField } from '@geti/ui';
 import { ValidationError } from 'yup';
 
 import { paths } from '../../../core/services/routes';
@@ -27,7 +27,6 @@ import {
     validatePasswordsSchema,
 } from '../../../pages/user-management/users/add-member-popup/utils';
 import { InvalidTokenAlert } from '../../../shared/components/invalid-token-alert/invalid-token-alert.component';
-import { PasswordField } from '../../../shared/components/password-field/password-field.component';
 import { encodeToBase64, redirectTo } from '../../../shared/utils';
 import { useEmailToken } from '../../hooks/use-email-token/use-email-token.hook';
 import { handleErrorMessageState } from './utils';

@@ -3,7 +3,8 @@
 
 import { Key, useState } from 'react';
 
-import { Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Heading, Item, Picker, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Slider } from '@geti/ui';
 import { capitalize, words } from 'lodash-es';
 
 import { Revisit } from '../../../../assets/icons';

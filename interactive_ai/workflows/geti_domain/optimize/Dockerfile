@@ -17,13 +17,12 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=common . interactive_ai/workflows/geti_domain/common
 COPY --link --from=libs . libs
 COPY --link --from=iai_core . interactive_ai/libs/iai_core_py
 COPY --link --from=media_utils . interactive_ai/libs/media_utils
 
-WORKDIR /builder/interactive_ai/workflows/geti_domain/workflow
+WORKDIR /interactive_ai/workflows/geti_domain/workflow
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -48,14 +47,14 @@ RUN apt-get update && \
     rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/interactive_ai/workflows/geti_domain/workflow /builder/interactive_ai/workflows/geti_domain/workflow
+COPY --link --from=build --chown=10001 /interactive_ai/workflows/geti_domain/workflow /interactive_ai/workflows/geti_domain/workflow
 COPY --link --from=build --chown=10001 /training_extensions/src/otx/tools/templates /model_templates
 
 ENV MODEL_TEMPLATES_DIR=/model_templates
 
 # Place executables in the environment at the front of the path
-ENV PATH="/builder/interactive_ai/workflows/geti_domain/workflow/.venv/bin:$PATH"
-ENV PYTHONPATH="/builder/interactive_ai/workflows/geti_domain/workflow"
+ENV PATH="/interactive_ai/workflows/geti_domain/workflow/.venv/bin:$PATH"
+ENV PYTHONPATH="/interactive_ai/workflows/geti_domain/workflow"
 
 USER non-root
-WORKDIR /builder/interactive_ai/workflows/geti_domain/workflow
+WORKDIR /interactive_ai/workflows/geti_domain/workflow
