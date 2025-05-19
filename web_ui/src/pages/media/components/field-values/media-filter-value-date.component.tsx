@@ -3,9 +3,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { DatePicker } from '@geti/ui';
+import { DatePicker, View } from '@geti/ui';
 import { DateValue, getLocalTimeZone, parseAbsolute, parseDateTime, today } from '@internationalized/date';
-import { View } from '@react-spectrum/view';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { formatLocalToUtc, isDateBetween } from '../../../../shared/utils';

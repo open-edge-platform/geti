@@ -3,9 +3,8 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { DimensionValue, View } from '@geti/ui';
+import { DimensionValue, View, type Responsive } from '@geti/ui';
 import { useLoadMore } from '@react-aria/utils';
-import { Responsive } from '@react-types/shared';
 import {
     ListBox as AriaComponentsListBox,
     GridLayout,

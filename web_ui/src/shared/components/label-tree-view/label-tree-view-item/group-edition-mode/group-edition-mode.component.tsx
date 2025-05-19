@@ -3,8 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Flex, PressableElement, Switch, Text, Tooltip, TooltipTrigger } from '@geti/ui';
-import { TextFieldRef } from '@react-types/textfield';
+import { Flex, PressableElement, Switch, Text, Tooltip, TooltipTrigger, type TextFieldRef } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 

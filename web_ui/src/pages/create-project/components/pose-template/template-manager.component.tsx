@@ -3,8 +3,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, Grid } from '@geti/ui';
-import { Responsive } from '@react-types/shared';
+import { DimensionValue, Flex, Grid, type Responsive } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../assets/icons';

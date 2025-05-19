@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Switch, Text } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Flex, Switch, Text, useMediaQuery } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { BoundingBox, BoundingCircle } from '../../../../assets/icons';

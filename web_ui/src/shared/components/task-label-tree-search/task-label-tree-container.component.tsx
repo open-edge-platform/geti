@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, Flex, Text, View } from '@geti/ui';
 
 import { LabelTreeItem } from '../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../core/labels/label.interface';

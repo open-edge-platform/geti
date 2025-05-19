@@ -17,8 +17,8 @@ import {
     TableView,
     Text,
     useCollator,
+    type SortDescriptor,
 } from '@geti/ui';
-import { SortDescriptor } from '@react-types/shared';
 import { capitalize, isEmpty } from 'lodash-es';
 import { Link } from 'react-router-dom';
 

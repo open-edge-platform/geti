@@ -3,10 +3,8 @@
 
 import { useRef } from 'react';
 
-import { DimensionValue, View } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { DimensionValue, useUnwrapDOMRef, View, type Responsive } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import { Responsive } from '@react-types/shared';
 import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 

@@ -3,8 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Grid, repeat, Text } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { Grid, Heading, repeat, Text } from '@geti/ui';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';

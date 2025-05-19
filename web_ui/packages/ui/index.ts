@@ -75,6 +75,10 @@ export {
     Meter,
     Keyboard,
     FileTrigger,
+    type SpectrumProgressBarProps,
+    type SpectrumToggleButtonProps,
+    type SpectrumTabsProps,
+    type FooterProps,
     type Selection,
     type SpectrumSliderProps,
     type Color,
@@ -86,6 +90,34 @@ export {
     type Key,
     type DimensionValue,
 } from '@adobe/react-spectrum';
+
+export { dimensionValue, useStyleProps, useUnwrapDOMRef, useMediaQuery } from '@react-spectrum/utils';
+export {
+    type RangeValue,
+    type BorderRadiusValue,
+    type FlexStyleProps,
+    type IconColorValue,
+    type SortDescriptor,
+    type DOMProps,
+    type AriaLabelingProps,
+    type ColorVersion,
+    type ColorValue,
+    type StyleProps,
+    type FocusableRefValue,
+    type BackgroundColorValue,
+    type DOMRefValue,
+    type Responsive,
+    type BoxAlignmentStyleProps,
+    type LoadingState,
+    type KeyboardEvent,
+    type FocusableRef,
+} from '@react-types/shared';
+
+export { Popover, Overlay } from '@react-spectrum/overlays';
+export { type Theme } from '@react-types/provider';
+export { type TextFieldRef } from '@react-types/textfield';
+export { type ColumnSize } from '@react-types/table';
+export { type ToggleProps } from '@react-types/checkbox';
 
 export { Button, ActionButton, type ButtonProps, type ActionButtonProps } from './src/button/button.component';
 export { Checkbox } from './src/checkbox/checkbox.component';

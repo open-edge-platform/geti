@@ -3,8 +3,7 @@
 
 import { FC, SVGProps } from 'react';
 
-import { Heading, Image, Radio, RadioGroup, Text, View } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, Heading, Image, Radio, RadioGroup, Text, View } from '@geti/ui';
 import { isString } from 'lodash-es';
 import { usePress } from 'react-aria';
 

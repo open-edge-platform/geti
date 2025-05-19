@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { useMediaQuery, View } from '@geti/ui';
 
 import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { isLargeSizeQuery } from '../../../../theme/queries';

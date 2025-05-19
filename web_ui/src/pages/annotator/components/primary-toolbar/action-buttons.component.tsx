@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
-import { Flex } from '@react-spectrum/layout';
+import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { isKeypointTask } from '../../../../core/projects/utils';

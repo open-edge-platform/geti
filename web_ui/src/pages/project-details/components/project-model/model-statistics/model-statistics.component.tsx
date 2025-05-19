@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Fragment, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 
-import { Content, Flex, Grid, Loading } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { Content, Flex, Grid, Loading, useUnwrapDOMRef } from '@geti/ui';
 import { StatusCodes } from 'http-status-codes';
 import { isEmpty } from 'lodash-es';
 

@@ -3,8 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { Divider, Flex, Meter, PressableElement, Text, Tooltip, TooltipTrigger } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Meter, PressableElement, Text, Tooltip, TooltipTrigger, useMediaQuery } from '@geti/ui';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import {

@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Provider } from '@geti/ui';
-import { Flex } from '@react-spectrum/layout';
-import { View } from '@react-spectrum/view';
+import { Flex, Provider, View } from '@geti/ui';
 import { partition } from 'lodash-es';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';

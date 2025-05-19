@@ -3,9 +3,16 @@
 
 import { ComponentProps } from 'react';
 
-import { DimensionValue, Flex, ProgressCircle } from '@geti/ui';
-import { View } from '@react-spectrum/view';
-import { BackgroundColorValue, BoxAlignmentStyleProps, Responsive, StyleProps } from '@react-types/shared';
+import {
+    Flex,
+    ProgressCircle,
+    View,
+    type BackgroundColorValue,
+    type BoxAlignmentStyleProps,
+    type DimensionValue,
+    type Responsive,
+    type StyleProps,
+} from '@geti/ui';
 
 interface LoadingOverlayProps extends StyleProps, BoxAlignmentStyleProps {
     id?: string;

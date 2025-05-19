@@ -3,8 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { ProgressBar as SpectrumProgressBar } from '@geti/ui';
-import { SpectrumProgressBarProps } from '@react-types/progress';
+import { ProgressBar as SpectrumProgressBar, SpectrumProgressBarProps } from '@geti/ui';
 
 interface ProgressBarProps extends SpectrumProgressBarProps {
     value: number;

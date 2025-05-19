@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Theme } from '@react-types/provider';
+import { Theme } from '@geti/ui';
 
 import dark from './geti-dark.module.css';
 import global from './geti-global.module.css';

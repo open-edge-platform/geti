@@ -3,8 +3,7 @@
 
 import { Key, MutableRefObject, useEffect, useRef, useState } from 'react';
 
-import { Flex, Item, Menu, Section, Text } from '@geti/ui';
-import { Overlay } from '@react-spectrum/overlays';
+import { Flex, Item, Menu, Overlay, Section, Text } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isFunction } from 'lodash-es';
 import { useOverlay } from 'react-aria';

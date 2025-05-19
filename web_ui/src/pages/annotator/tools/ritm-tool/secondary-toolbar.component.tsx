@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Switch, Text, Tooltip, TooltipTrigger } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Flex, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { RightClick } from '../../../../assets/icons';

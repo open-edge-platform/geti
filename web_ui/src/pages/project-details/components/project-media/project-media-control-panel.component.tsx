@@ -3,8 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Checkbox, Flex, Tooltip, TooltipTrigger, View } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { Checkbox, dimensionValue, Flex, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../assets/icons';

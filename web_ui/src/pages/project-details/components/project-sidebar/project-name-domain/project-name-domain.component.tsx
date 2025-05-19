@@ -3,8 +3,7 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { ActionButton, Flex, LoadingIndicator } from '@geti/ui';
-import { TextFieldRef } from '@react-types/textfield';
+import { ActionButton, Flex, LoadingIndicator, type TextFieldRef } from '@geti/ui';
 
 import { Edit } from '../../../../../assets/icons';
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';

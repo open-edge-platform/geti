@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@geti/ui';
-import { Text } from '@react-spectrum/text';
+import { Flex, Text } from '@geti/ui';
 
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';
