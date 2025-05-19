@@ -3,8 +3,16 @@
 
 import { FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ActionGroup, DimensionValue, Flex, Item, Responsive, TextField, useNumberFormatter } from '@geti/ui';
-import { SpectrumTextFieldProps } from '@react-types/textfield';
+import {
+    ActionGroup,
+    DimensionValue,
+    Flex,
+    Item,
+    Responsive,
+    SpectrumTextFieldProps,
+    TextField,
+    useNumberFormatter,
+} from '@geti/ui';
 
 import { ChevronDownLight, ChevronUpLight } from '../../../../../assets/icons';
 import { useDebouncedCallback } from '../../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
