@@ -3,12 +3,11 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, SearchField } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { USER_ROLE, UsersQueryParams } from '../../../core/users/users.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';
-import { SearchField } from '../../../shared/components/search-field/search-field.component';
 import { RolePicker } from './old-project-users/role-picker.component';
 import { UsersCount } from './workspace-users/users-count.component';
 

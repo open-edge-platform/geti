@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Button, Flex, Text } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
-import { Button } from '../../../shared/components/button/button.component';
 import { CreateProjectMenu } from './create-project-menu.component';
 
 import classes from './create-project-button.module.scss';

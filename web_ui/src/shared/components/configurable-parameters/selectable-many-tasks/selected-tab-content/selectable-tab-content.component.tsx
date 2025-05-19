@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 
 import { ConfigurableParametersMany } from '../../configurable-parameters.interface';
 import { CPDescription } from '../../cp-description/cp-description.component';

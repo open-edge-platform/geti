@@ -19,7 +19,7 @@ export const PolygonTool: ToolProps = {
     SecondaryToolbar,
     tooltip: {
         img: PolygonImg,
-        url: 'guide/annotations/annotation-tools.html#polygon-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#polygon-tool',
         title: toolTypeToLabelMapping[ToolType.PolygonTool],
         description: `The polygon tool allows for free form drawing around shapes.`,
     },

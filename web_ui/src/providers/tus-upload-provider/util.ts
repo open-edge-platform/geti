@@ -1,11 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import isNil from 'lodash/isNil';
-import throttle from 'lodash/throttle';
+import { get, isEmpty, isFunction, isNil, throttle } from 'lodash-es';
 import { DetailedError } from 'tus-js-client';
 
 import { isNonEmptyArray } from '../../shared/utils';

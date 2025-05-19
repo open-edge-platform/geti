@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import groupBy from 'lodash/groupBy';
-import isEmpty from 'lodash/isEmpty';
+import { groupBy, isEmpty } from 'lodash-es';
 
 import { MediaItem } from '../../core/media/media.interface';
 import { isVideo, isVideoFrame } from '../../core/media/video.interface';

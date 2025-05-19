@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
+import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import { DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.enum';

@@ -3,11 +3,9 @@
 
 import { useMemo, useState } from 'react';
 
-import { Flex, Heading, Link, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Link, Loading, View } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
-import take from 'lodash/take';
+import { isEmpty, isString, take } from 'lodash-es';
 import { Bar, BarChart, Legend, Rectangle, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts';
 
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';
@@ -15,7 +13,6 @@ import { TransactionsAggregatesKey } from '../../../core/credits/transactions/tr
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { convertColorToFadedColor } from '../../../shared/components/charts/utils';
 import { withDownloadableSvg } from '../../../shared/components/download-graph-menu/with-downloadable-svg.hoc';
-import { Loading } from '../../../shared/components/loading/loading.component';
 import { NotFound } from '../../../shared/components/not-found/not-found.component';
 import { isNonEmptyArray, pluralize, trimText } from '../../../shared/utils';
 import {

@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Key, useState } from 'react';
+
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
@@ -36,6 +38,18 @@ jest.mock('../../../../media/providers/media-provider.component', () => ({
 const mockVideo: MediaItem = getMockedVideoMediaItem({});
 
 describe('MediaItemActions', () => {
+    const App = ({ mediaItem }: { mediaItem: MediaItem }) => {
+        const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
+
+        return (
+            <MediaItemActions
+                mediaItem={mediaItem}
+                selectedMediaItemAction={selectedMediaItemAction}
+                onSelectedMediaItemActionChange={setSelectedMediaItemAction}
+            />
+        );
+    };
+
     const renderApp = async ({
         mediaItem,
         projectService = createInMemoryProjectService(),
@@ -47,7 +61,7 @@ describe('MediaItemActions', () => {
     }) => {
         return projectRender(
             <MediaProvider>
-                <MediaItemActions mediaItem={mediaItem} />
+                <App mediaItem={mediaItem} />
             </MediaProvider>,
             { services: { projectService }, featureFlags: { FEATURE_FLAG_CLASSIFICATION_RANGES } }
         );

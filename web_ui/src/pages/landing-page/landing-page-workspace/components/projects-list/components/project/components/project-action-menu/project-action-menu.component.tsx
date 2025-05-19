@@ -3,8 +3,8 @@
 
 import { Key, useMemo, useState } from 'react';
 
-import { DialogContainer } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { DialogContainer } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { ProjectIdentifier } from '../../../../../../../../../core/projects/core.interface';

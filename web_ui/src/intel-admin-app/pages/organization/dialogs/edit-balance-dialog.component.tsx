@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import {
     ActionGroup,
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -15,10 +16,9 @@ import {
     Item,
     NumberField,
     TextField,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
 
 import { CreditAccountBalance, NewCreditAccountBalance } from '../../../../core/credits/credits.interface';
-import { Button } from '../../../../shared/components/button/button.component';
 
 import classes from './dialogs.module.scss';
 

@@ -3,9 +3,8 @@
 
 import { Key, useState } from 'react';
 
-import { Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
-import words from 'lodash/words';
+import { Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@geti/ui';
+import { capitalize, words } from 'lodash-es';
 
 import { Revisit } from '../../../../assets/icons';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';

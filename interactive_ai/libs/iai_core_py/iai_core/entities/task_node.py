@@ -7,9 +7,8 @@ import logging
 from dataclasses import dataclass
 
 from iai_core.entities.model_template import ModelTemplate, TaskFamily, TaskType
-from iai_core.entities.persistent_entity import PersistentEntity
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 logger = logging.getLogger(__name__)
 

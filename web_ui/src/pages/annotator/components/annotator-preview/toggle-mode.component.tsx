@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, ToggleButton, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ButtonGroup, ToggleButton, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { AICPUIcon, Human } from '../../../../assets/icons';
 import { ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';

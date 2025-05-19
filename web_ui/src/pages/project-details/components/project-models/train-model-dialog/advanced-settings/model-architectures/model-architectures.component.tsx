@@ -3,8 +3,8 @@
 
 import { FC, Key, useState } from 'react';
 
-import { Item, Picker, View } from '@adobe/react-spectrum';
-import orderBy from 'lodash/orderBy';
+import { Item, Picker, View } from '@geti/ui';
+import { orderBy } from 'lodash-es';
 
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { ModelArchitecturesMainContent } from './model-architectures-main-content.component';

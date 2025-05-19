@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import noop from 'lodash/noop';
+import { Flex, LoadingIndicator, Text } from '@geti/ui';
+import { noop } from 'lodash-es';
 
 import {
     DATASET_IMPORT_DESCRIPTION,
@@ -14,7 +14,6 @@ import { useDatasetImportQueries } from '../../../core/datasets/hooks/use-datase
 import { getJobInfo, isPreparingJob } from '../../../core/datasets/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { CircularProgress } from '../circular-progress/circular-progress.component';
-import { LoadingIndicator } from '../loading/loading-indicator.component';
 
 import classes from './dataset-import-progress.module.scss';
 

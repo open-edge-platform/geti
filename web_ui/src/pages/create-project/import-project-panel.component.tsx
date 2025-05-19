@@ -3,7 +3,7 @@
 
 import { ChangeEvent, useRef } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Button, Flex, Text, View } from '@geti/ui';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 
@@ -14,7 +14,6 @@ import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notific
 import { useNotification } from '../../notification/notification.component';
 import { mediaExtensionHandler } from '../../providers/media-upload-provider/media-upload.validator';
 import { useProjectsImportProvider } from '../../providers/projects-import-provider/projects-import-provider.component';
-import { Button } from '../../shared/components/button/button.component';
 import { DropZone, onDropFiles } from '../../shared/drag-and-drop/drag-and-drop.component';
 import { isValidFileExtension } from '../../shared/media-utils';
 import { isExtraLargeSizeQuery } from '../../theme/queries';
@@ -36,7 +35,7 @@ export const ProjectImportPanel = ({
 
     const fileInputRef = useRef<HTMLInputElement>({} as HTMLInputElement);
     const isExtraLarge = useMediaQuery(isExtraLargeSizeQuery);
-    const projectImportDocsUrl = `${docsUrl}/guide/project-management/project-management.html#export-import-project'`;
+    const projectImportDocsUrl = `${docsUrl}docs/user-guide/geti-fundamentals/project-management/project-export-import`;
 
     const handleDropProject = (file?: File) => {
         if (file && !isValidFileExtension(file, VALID_EXTENSIONS)) {

@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Switch, Text } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import { findAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
@@ -13,7 +13,6 @@ import {
     BooleanGroupParams,
     ConfigurableParametersTaskChain,
 } from '../../../configurable-parameters/configurable-parameters.interface';
-import { Switch } from '../../../switch/switch.component';
 
 interface AutoTrainingConfigSwitchProps {
     task: Task;

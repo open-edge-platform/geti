@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
 
 import { Delete, Edit, Invisible, Lock, MoreMenu, Unlock, Visible } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';

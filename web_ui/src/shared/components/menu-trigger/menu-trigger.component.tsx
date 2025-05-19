@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Item, Menu, MenuTrigger as MenuTriggerSpectrum, Text, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
+import { Item, Menu, MenuTrigger as MenuTriggerSpectrum, Text, TooltipTrigger } from '@geti/ui';
+import { isEmpty, isFunction } from 'lodash-es';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { MenuTriggerProps } from '../upload-media/upload-media-button/upload-media-button.interface';

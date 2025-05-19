@@ -3,8 +3,8 @@
 
 import { ComponentProps, Dispatch, useCallback, useMemo } from 'react';
 
-import { Flex, Heading, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, Heading, View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { MediaUploadAnomalousIcon, MediaUploadNormalIcon } from '../../../../assets/images';

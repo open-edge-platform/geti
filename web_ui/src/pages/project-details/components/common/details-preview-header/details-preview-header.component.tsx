@@ -13,8 +13,8 @@ import {
     Text,
     useNumberFormatter,
     View,
-} from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+} from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { ChevronDownLight } from '../../../../../assets/icons';
 import { Explanation } from '../../../../../core/annotations/prediction.interface';

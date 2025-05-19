@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { fireEvent, screen, within } from '@testing-library/react';
-import difference from 'lodash/difference';
+import { difference } from 'lodash-es';
 import { TransformComponent } from 'react-zoom-pan-pinch';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';

@@ -3,7 +3,7 @@
 
 import { MutableRefObject, RefObject, useRef } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { Overlay } from '@react-spectrum/overlays';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';

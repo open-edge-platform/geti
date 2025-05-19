@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { GenerateOnboardingTokenDialogContainer } from './generate-onboarding-invitation-link-dialog/generate-onboarding-invitation-link-dialog.component';

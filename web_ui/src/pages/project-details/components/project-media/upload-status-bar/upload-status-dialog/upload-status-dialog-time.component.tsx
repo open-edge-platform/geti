@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Text, View } from '@geti/ui';
 
 import { getElapsedTimeText } from '../../../../../../providers/media-upload-provider/utils';
 import { useDatasetMediaUpload } from '../../../project-dataset/hooks/dataset-media-upload';

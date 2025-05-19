@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Item, Menu, MenuTrigger, Section, Text } from '@adobe/react-spectrum';
+import { ActionButton, Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
 
 import { ChevronDownSmall } from '../../../assets/icons';
 import { FilterItems, SearchRuleField } from '../../../core/media/media-filter.interface';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { getKeyConfig } from '../utils';
 
 import classes from '../media-filter.module.scss';

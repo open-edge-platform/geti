@@ -508,7 +508,7 @@ class TestDatasetItem:
             color=Color(red=80, green=70, blue=155),
             id_=ID("incorrect_shape_label"),
         )
-        incorrect_polygon = Polygon([Point(x=0.01, y=0.1), Point(x=0.35, y=0.1), Point(x=0.35, y=0.1)])
+        incorrect_polygon = Polygon([Point(x=0.01, y=0.1), Point(x=0.35, y=0.1), Point(x=0.35, y=-0.1)])
         incorrect_shape_annotation = Annotation(
             shape=incorrect_polygon,
             labels=[ScoredLabel(label_id=incorrect_shape_label.id_, is_empty=incorrect_shape_label.is_empty)],

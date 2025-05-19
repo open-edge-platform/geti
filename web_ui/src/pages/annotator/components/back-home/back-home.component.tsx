@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';

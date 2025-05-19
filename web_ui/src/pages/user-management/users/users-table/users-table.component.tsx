@@ -3,9 +3,8 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
-import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
+import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
+import { get, isEmpty } from 'lodash-es';
 
 import { isOrganizationAdmin } from '../../../../core/users/user-role-utils';
 import { User, UsersQueryParams } from '../../../../core/users/users.interface';

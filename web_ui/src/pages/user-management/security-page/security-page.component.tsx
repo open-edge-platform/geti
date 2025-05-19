@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { Divider, Flex, Heading, Text } from '@geti/ui';
 
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { ShowForOnPrem } from '../../../shared/components/show-for-onprem/show-for-onprem.component';

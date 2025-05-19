@@ -3,10 +3,10 @@
 
 import { FC, PropsWithChildren, useRef } from 'react';
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { ActionButton, Divider, Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import Alert from '@spectrum-icons/workflow/Alert';
-import noop from 'lodash/noop';
+import { noop } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
 import { InfoOutline } from '../../../assets/icons';
@@ -27,9 +27,7 @@ import { useNotification } from '../../../notification/notification.component';
 import { matchStatus } from '../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { onValidFileList } from '../../utils';
-import { ActionButton } from '../button/button.component';
 import { JobListItemProgressStatus } from '../header/jobs-management/jobs-list-item-progress.component';
-import { LoadingIndicator } from '../loading/loading-indicator.component';
 import { ThinProgressBar } from '../thin-progress-bar/thin-progress-bar.component';
 import { DatasetImportPanelMenu } from './dataset-import-panel-menu.component';
 import { isDetailsAvailable, isErrorStatus, isUploadingStatus } from './util';

@@ -3,7 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Flex, Item, Picker } from '@adobe/react-spectrum';
+import { Flex, Item, Picker } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
 
 import { ModelStatisticsBase } from '../../../../../../core/statistics/dtos/model-statistics.interface';

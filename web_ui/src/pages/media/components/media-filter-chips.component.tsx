@@ -3,9 +3,9 @@
 
 import { useMemo } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { ActionButton, Flex, Tag } from '@geti/ui';
 import { getLocalTimeZone, parseAbsolute } from '@internationalized/date';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { BorderClose } from '../../../assets/icons';
 import { Label } from '../../../core/labels/label.interface';
@@ -18,8 +18,6 @@ import {
 import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { ActionButton } from '../../../shared/components/button/button.component';
-import { Tag } from '../../../shared/components/tag/tag.component';
 import { hasEqualId } from '../../../shared/utils';
 import { useProject } from '../../project-details/providers/project-provider/project-provider.component';
 import {

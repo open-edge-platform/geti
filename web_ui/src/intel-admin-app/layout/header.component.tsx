@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Header as SpectrumHeader } from '@adobe/react-spectrum';
+import { Flex, Heading, Header as SpectrumHeader } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 
 import { IntelLogoTransparent } from '../../assets/images';

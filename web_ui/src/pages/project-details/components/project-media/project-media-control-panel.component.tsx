@@ -3,14 +3,13 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Checkbox, Flex, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Delete } from '../../../../assets/icons';
 import { isVideo } from '../../../../core/media/video.interface';
 import { useSortingParams } from '../../../../hooks/use-sorting-params/use-sorting-params.hook';
-import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { MediaViewModes } from '../../../../shared/components/media-view-modes/media-view-modes.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { MenuTriggerPopup } from '../../../../shared/components/menu-trigger-popup/menu-trigger-popup.component';

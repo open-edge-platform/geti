@@ -3,8 +3,8 @@
 
 import { useCallback, useMemo } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';

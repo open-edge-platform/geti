@@ -3,8 +3,8 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, Keyboard, Text } from '@adobe/react-spectrum';
-import isString from 'lodash/isString';
+import { Flex, Keyboard, Text } from '@geti/ui';
+import { isString } from 'lodash-es';
 
 import { getKeyName } from '../../../../../../shared/hotkeys';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';

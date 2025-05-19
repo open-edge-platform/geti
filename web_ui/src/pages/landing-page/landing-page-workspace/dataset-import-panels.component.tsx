@@ -3,11 +3,11 @@
 
 import { Fragment } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../../core/datasets/dataset.enum';
 import { DatasetImportItem, DatasetImportToNewProjectItem } from '../../../core/datasets/dataset.interface';

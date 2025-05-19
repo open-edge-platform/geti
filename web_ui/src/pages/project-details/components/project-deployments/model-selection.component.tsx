@@ -3,9 +3,8 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
-import { Flex, Item, Picker, Text } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, Item, Picker, Text } from '@geti/ui';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { PerformanceCategory } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';

@@ -3,9 +3,9 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Flex, Grid, Heading, Radio, RadioGroup, repeat, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Grid, Heading, Radio, RadioGroup, repeat, Tooltip, TooltipTrigger } from '@geti/ui';
 import clsx from 'clsx';
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';

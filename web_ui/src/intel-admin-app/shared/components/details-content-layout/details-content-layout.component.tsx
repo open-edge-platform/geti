@@ -3,10 +3,9 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Grid, View } from '@adobe/react-spectrum';
+import { BreadcrumbItemProps, Grid, View } from '@geti/ui';
 import { Outlet } from 'react-router-dom';
 
-import { BreadcrumbItemProps } from '../../../../shared/components/breadcrumbs/breadcrumb/breadcrumb.interface';
 import { Breadcrumbs } from '../breadcrumbs/breadcrumbs.component';
 
 interface DetailsContentLayoutProps {

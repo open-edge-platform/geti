@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { motion } from 'framer-motion';
 import { usePress } from 'react-aria';

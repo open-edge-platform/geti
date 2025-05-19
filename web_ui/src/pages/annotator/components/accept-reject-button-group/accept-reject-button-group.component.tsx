@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ButtonGroup, Tooltip, TooltipTrigger } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { Reject } from '../../../../assets/icons';

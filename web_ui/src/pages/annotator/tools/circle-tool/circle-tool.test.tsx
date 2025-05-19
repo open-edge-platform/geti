@@ -92,7 +92,7 @@ describe('CircleTool', (): void => {
         expect(circle).toHaveAttribute('r', `${defaultCircleSize}`);
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
     });
 
     it('draws a circle of fixed size even when moving the mouse a little bit', async (): Promise<void> => {
@@ -105,7 +105,7 @@ describe('CircleTool', (): void => {
         fireEvent.pointerMove(svg, { buttons: 1, clientX: 10, clientY: 20 });
         fireEvent.pointerUp(svg, { buttons: 1, clientX: 10, clientY: 20 });
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: defaultCircleSize }]);
     });
 
     it('draws a circle of larger size', async (): Promise<void> => {
@@ -128,7 +128,7 @@ describe('CircleTool', (): void => {
 
         fireEvent.pointerUp(svg);
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 40, y: 80, r: 30 }]);
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 40, y: 80, r: 30 }]);
     });
 
     it('allows changing the default circle radius', async (): Promise<void> => {
@@ -141,8 +141,8 @@ describe('CircleTool', (): void => {
         fireEvent.pointerMove(svg, { clientX: 50, clientY: 20 });
         fireEvent.pointerUp(svg, { button: 2, buttons: 2, clientX: 50, clientY: 20 });
 
-        expect(onComplete).toBeCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: 40 }]);
-        expect(annotationToolContext.updateToolSettings).toBeCalledWith(ToolType.CircleTool, { size: 40 });
+        expect(onComplete).toHaveBeenCalledWith([{ shapeType: ShapeType.Circle, x: 10, y: 20, r: 40 }]);
+        expect(annotationToolContext.updateToolSettings).toHaveBeenCalledWith(ToolType.CircleTool, { size: 40 });
     });
 
     it('uses the default circle radius size when stamping', async (): Promise<void> => {
@@ -159,7 +159,7 @@ describe('CircleTool', (): void => {
         expect(circle).toHaveAttribute('r', `${defaultRadius}`);
     });
 
-    it('not draws smaller circle than MIN_RADIUS', async (): Promise<void> => {
+    it('does not draw a smaller circle than MIN_RADIUS', async (): Promise<void> => {
         const { container } = await renderApp(annotationToolContext);
 
         const svg = screen.getByRole('editor');
@@ -212,7 +212,7 @@ describe('CircleTool', (): void => {
         expect(onComplete).not.toBeCalled();
     });
 
-    it('add circles partially drew inside the roi', async () => {
+    it('add circles partially drawn inside the roi', async () => {
         const onComplete = annotationToolContext.scene.addShapes;
         await renderApp(annotationToolContext);
 
@@ -223,7 +223,7 @@ describe('CircleTool', (): void => {
         expect(onComplete).toBeCalled();
     });
 
-    it('does not add circles drew outside the roi', async () => {
+    it('does not add circles drawn outside the roi', async () => {
         const onComplete = annotationToolContext.scene.addShapes;
         await renderApp(annotationToolContext);
 

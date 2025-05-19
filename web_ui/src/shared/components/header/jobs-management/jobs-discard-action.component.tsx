@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Text } from '@adobe/react-spectrum';
+import { ActionButton, LoadingIndicator, Text } from '@geti/ui';
 import { UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import clsx from 'clsx';
@@ -13,9 +13,7 @@ import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-featur
 import { Job } from '../../../../core/jobs/jobs.interface';
 import { isJobTrain } from '../../../../core/jobs/utils';
 import { CustomAlertDialog } from '../../alert-dialog/custom-alert-dialog.component';
-import { ActionButton } from '../../button/button.component';
 import { TooltipWithDisableButton } from '../../custom-tooltip/tooltip-with-disable-button';
-import { LoadingIndicator } from '../../loading/loading-indicator.component';
 import { JobCancellationWarning } from './jobs-cancellation-warning.component';
 import { DISCARD_TYPE, isCancellableJob, isJobRunning } from './utils';
 

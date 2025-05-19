@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Cell, Column, Row, TableBody, TableHeader, TableView, Text, View } from '@adobe/react-spectrum';
-import { get } from 'lodash';
+import { Cell, Column, Row, TableBody, TableHeader, TableView, Text, View } from '@geti/ui';
+import { get } from 'lodash-es';
 
 import { useSubscriptions } from '../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { Quota } from '../../../core/credits/subscriptions/quotas.interface';

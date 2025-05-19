@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import noop from 'lodash/noop';
+import { Flex, Text } from '@geti/ui';
+import { isEmpty, noop } from 'lodash-es';
 
 import { LabelTreeItem, LabelTreeLabelProps, Readonly } from '../../../../../core/labels/label-tree-view.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';

@@ -3,8 +3,8 @@
 
 import { Key, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
+import { Flex } from '@geti/ui';
+import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../core/services/routes';

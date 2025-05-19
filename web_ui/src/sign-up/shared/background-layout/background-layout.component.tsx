@@ -3,7 +3,7 @@
 
 import { ComponentProps, ReactNode } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 
 import { Header } from '../header/header.component';
 

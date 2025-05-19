@@ -3,8 +3,8 @@
 
 import { Fragment } from 'react';
 
-import { Content, Dialog, Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Content, Dialog, Divider, Flex, Text, View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { RequiredAnnotationsDetailsEntry } from '../../../../../core/projects/project-status.interface';
 import { TaskRequiredAnnotations } from '../../../hooks/use-required-annotations.hook';

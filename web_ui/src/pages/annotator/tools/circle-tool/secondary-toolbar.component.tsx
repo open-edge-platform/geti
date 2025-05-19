@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Slider } from '@adobe/react-spectrum';
+import { Flex, Slider } from '@geti/ui';
 import { Text } from '@react-spectrum/text';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';

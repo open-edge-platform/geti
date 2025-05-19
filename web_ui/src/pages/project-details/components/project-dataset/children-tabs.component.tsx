@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
+import { Flex } from '@geti/ui';
+import { capitalize } from 'lodash-es';
 
 import { GraphChart, Image } from '../../../../assets/icons';
 import { TabItem } from '../../../../shared/components/tabs/tabs.interface';

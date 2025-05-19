@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';
 import { FullscreenAction } from '../../../../shared/components/fullscreen-action/fullscreen-action.component';

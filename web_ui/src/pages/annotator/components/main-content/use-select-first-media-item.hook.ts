@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { MEDIA_ANNOTATION_STATUS } from '../../../../core/media/base.interface';
 import { MediaItem } from '../../../../core/media/media.interface';

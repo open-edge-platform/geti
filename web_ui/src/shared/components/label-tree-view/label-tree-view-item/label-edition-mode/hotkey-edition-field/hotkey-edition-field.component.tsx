@@ -3,7 +3,7 @@
 
 import { useEffect, useReducer, useRef } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
+import { TextField } from '@geti/ui';
 import { SpectrumTextFieldProps, TextFieldRef } from '@react-types/textfield';
 
 import { useEventListener } from '../../../../../../hooks/event-listener/event-listener.hook';

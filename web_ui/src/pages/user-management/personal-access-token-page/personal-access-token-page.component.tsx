@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Button, Divider, Flex, Heading, Text, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { usePersonalAccessToken } from '../../../core/personal-access-tokens/hooks/use-personal-access-token.hook';
-import { Button } from '../../../shared/components/button/button.component';
 import { CreatePersonalAccessTokenDialog } from './components/create-personal-access-token-dialog.component';
 import { PersonalAccessTokensTable } from './components/personal-access-tokens-table.component';
 

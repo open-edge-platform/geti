@@ -4,6 +4,7 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -16,9 +17,8 @@ import {
     Tabs,
     Tooltip,
     TooltipTrigger,
-} from '@adobe/react-spectrum';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
+} from '@geti/ui';
+import { isEqual, isNil } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { Gear } from '../../../../../assets/icons';
@@ -31,7 +31,6 @@ import {
 import { UserProjectSettings, UseSettings } from '../../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../../shared/components/button/button.component';
 import {
     ColorMode,
     QuietActionButton,

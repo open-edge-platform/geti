@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Text, View } from '@geti/ui';
 import { ViewProps } from '@react-types/view';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { getDistinctColorBasedOnHash } from '../../../pages/create-project/components/distinct-colors';
 import { getForegroundColor, hexaToRGBA } from '../../../pages/utils';

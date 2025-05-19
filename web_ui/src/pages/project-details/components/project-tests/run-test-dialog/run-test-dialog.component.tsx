@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DialogContainer } from '@adobe/react-spectrum';
+import { DialogContainer } from '@geti/ui';
 
 import { RunTestDialogContent } from './run-test-dialog-content.component';
 import { RunTestDialogProps } from './run-test-dialog.interface';

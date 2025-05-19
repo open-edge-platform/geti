@@ -3,10 +3,9 @@
 
 import { Key, useEffect } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Flex, Text } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { filterOutExclusiveLabel } from '../../../../core/labels/utils';
 import { Divider } from '../../../../shared/components/divider/divider.component';

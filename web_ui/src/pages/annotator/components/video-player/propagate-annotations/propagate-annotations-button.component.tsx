@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton } from '../../../../../shared/components/button/button.component';
+import { ActionButton } from '@geti/ui';
+
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { PropagateAnnotationsIcon } from './propagate-annotations-icon.component';
 

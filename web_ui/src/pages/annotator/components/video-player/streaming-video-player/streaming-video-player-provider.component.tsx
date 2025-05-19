@@ -16,7 +16,7 @@ import {
     useState,
 } from 'react';
 
-import { VisuallyHidden } from '@adobe/react-spectrum';
+import { VisuallyHidden } from '@geti/ui';
 
 import { mediaIdentifierToString, MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';

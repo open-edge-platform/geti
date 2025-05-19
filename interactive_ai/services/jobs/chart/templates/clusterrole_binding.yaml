@@ -1,0 +1,16 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "jobs-scheduling-policy.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
+    namespace: {{ .Release.Namespace }}

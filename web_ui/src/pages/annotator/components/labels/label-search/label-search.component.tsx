@@ -3,13 +3,12 @@
 
 import { ComponentProps, ReactNode, RefObject, useEffect, useRef } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
+import { CustomPopover, TextField } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 import { TextFieldRef } from '@react-types/textfield';
 
 import { Label } from '../../../../../core/labels/label.interface';
-import { CustomPopover } from '../../../../../shared/components/custom-popover/custom-popover.component';
 import { BaseLabelSearch } from './base-label-search.component';
 import { SearchLabelTreeItemSuffix } from './search-label-tree-view-item.component';
 

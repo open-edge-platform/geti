@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useNumberFormatter } from '@adobe/react-spectrum';
+import { useNumberFormatter } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { Cell, Label, Pie, PieChart as RePieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { SvgLegend } from '../../download-graph-menu/export-svg-utils';

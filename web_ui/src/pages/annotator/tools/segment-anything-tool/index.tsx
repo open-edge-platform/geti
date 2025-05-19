@@ -27,7 +27,7 @@ export const SegmentAnythingTool: ToolProps = {
     ],
     tooltip: {
         img: RITMImg,
-        url: 'guide/annotations/annotation-tools.html#automatic-segmentation',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#automatic-segmentation-tool',
         title: toolTypeToLabelMapping[ToolType.SegmentAnythingTool],
         description: 'Click on an object to draw a shape around it. Shift-click to subtract or add parts.',
     },

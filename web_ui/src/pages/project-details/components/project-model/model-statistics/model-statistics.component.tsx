@@ -3,14 +3,13 @@
 
 import { Fragment, useMemo, useRef } from 'react';
 
-import { Content, Flex, Grid } from '@adobe/react-spectrum';
+import { Content, Flex, Grid, Loading } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { StatusCodes } from 'http-status-codes';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useModelStatistics } from '../../../../../core/statistics/hooks/use-model-statistics.hook';
 import { useModelIdentifier } from '../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
 import { DownloadSvgButton } from './download-svg-button.component';
 import { ModelStatisticsError } from './model-statistics-error/model-statistics-error.component';
 import { ModelStatisticsNotFound } from './model-statistics-not-found/model-statistics-not-found.component';

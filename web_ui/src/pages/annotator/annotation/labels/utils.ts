@@ -16,7 +16,7 @@
 // otherwise. Any license under such intellectual property rights must be express
 // and approved by Intel in writing.
 
-import intersectionBy from 'lodash/intersectionBy';
+import { intersectionBy } from 'lodash-es';
 
 import { Annotation, AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { roiFromImage } from '../../../../core/annotations/math';

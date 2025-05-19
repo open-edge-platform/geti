@@ -3,24 +3,20 @@
 
 import { useMemo, useRef, useState } from 'react';
 
-import { ComboBox, Flex, Heading, Item, Key, View } from '@adobe/react-spectrum';
+import { ActionButton, ComboBox, Flex, Heading, Item, Key, Loading, View } from '@geti/ui';
 import { dimensionValue, useUnwrapDOMRef } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
 import Close from '@spectrum-icons/workflow/Close';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash/isEmpty';
-import isNumber from 'lodash/isNumber';
-import orderBy from 'lodash/orderBy';
+import { isEmpty, isNumber, orderBy } from 'lodash-es';
 import { Bar, BarChart, Rectangle, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts';
 
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';
 import { TransactionsAggregatesKey } from '../../../core/credits/transactions/transactions.interface';
 import { useProjectActions } from '../../../core/projects/hooks/use-project-actions.hook';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { convertColorToFadedColor } from '../../../shared/components/charts/utils';
 import { withDownloadableSvg } from '../../../shared/components/download-graph-menu/with-downloadable-svg.hoc';
-import { Loading } from '../../../shared/components/loading/loading.component';
 import { NotFound } from '../../../shared/components/not-found/not-found.component';
 import { isNonEmptyArray, pluralize } from '../../../shared/utils';
 import { DownloadSvgButton } from '../../project-details/components/project-model/model-statistics/download-svg-button.component';

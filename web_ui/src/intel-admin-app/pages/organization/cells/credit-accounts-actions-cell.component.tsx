@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { Edit, MoreMenu, PieChart } from '../../../../assets/icons';
 import { CreditAccount } from '../../../../core/credits/credits.interface';

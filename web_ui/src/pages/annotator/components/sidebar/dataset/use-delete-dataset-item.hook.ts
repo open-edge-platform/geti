@@ -3,8 +3,7 @@
 
 import { Key, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideo } from '../../../../../core/media/video.interface';
@@ -35,7 +34,7 @@ export const useDeleteDatasetItem = ({ mediaItem, isSelected }: UseDeleteDataset
     const { deleteMedia } = useDeleteMediaMutation();
     const { setSelectedMediaItem } = useSelectedMediaItem();
 
-    const navigate = useNavigateToAnnotatorRoute({ organizationId, projectId, workspaceId });
+    const navigate = useNavigateToAnnotatorRoute();
 
     const { refetchMedia, mediaItemsQuery } = useDataset();
 
@@ -56,7 +55,7 @@ export const useDeleteDatasetItem = ({ mediaItem, isSelected }: UseDeleteDataset
                     setSelectedMediaItem(undefined);
 
                     navigate({
-                        datasetId,
+                        datasetIdentifier: { organizationId, projectId, workspaceId, datasetId },
                         mediaItem: undefined,
                         active: isActiveMode,
                         taskId: isTaskChainProject ? selectedTask?.id : undefined,

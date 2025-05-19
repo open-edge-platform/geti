@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Header as SpectrumHeader, View } from '@adobe/react-spectrum';
+import { Flex, Header as SpectrumHeader, View } from '@geti/ui';
 import { ApiReferenceReact } from '@scalar/api-reference-react';
 import { Link } from 'react-router-dom';
 

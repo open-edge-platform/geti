@@ -1,14 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, LoadingIndicator, Text } from '@geti/ui';
 
 import {
     ProjectImportBase,
     ProjectImportingStatus,
 } from '../../../../../providers/projects-import-provider/project-import.interface';
 import { useProjectsImportProvider } from '../../../../../providers/projects-import-provider/projects-import-provider.component';
-import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
 import { MenuTriggerButton } from '../../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { ProgressBar } from '../../../../../shared/components/progress-bar/progress-bar.component';
 import { ProjectStatusHeader } from './project-status-header.component';

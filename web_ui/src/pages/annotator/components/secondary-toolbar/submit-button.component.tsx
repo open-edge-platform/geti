@@ -3,17 +3,14 @@
 
 import { CSSProperties, useEffect } from 'react';
 
+import { Button, LoadingIndicator } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
-import isNil from 'lodash/isNil';
+import { isEmpty, isFunction, isNil } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isClassificationDomain } from '../../../../core/projects/domains';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { Button } from '../../../../shared/components/button/button.component';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { hasEqualSize } from '../../../../shared/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useNextMediaItem } from '../../hooks/use-next-media-item.hook';

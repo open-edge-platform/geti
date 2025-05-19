@@ -1,11 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, LoadingIndicator } from '@geti/ui';
 import { MutationStatus } from '@tanstack/react-query';
 
-import { Button } from '../../../../shared/components/button/button.component';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { UseSubmitAnnotationsMutationResult } from '../../providers/submit-annotations-provider/submit-annotations.interface';
 

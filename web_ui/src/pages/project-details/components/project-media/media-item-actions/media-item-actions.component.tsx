@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FC, Key, useState } from 'react';
+import { FC, Key } from 'react';
 
-import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Scope } from '../../../../../assets/icons';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -55,10 +55,15 @@ const QuickAnnotationButton: FC<QuickAnnotationButtonProps> = ({ onClick }) => {
 
 interface MediaItemActionsProps {
     mediaItem: MediaItem;
+    selectedMediaItemAction: Key | undefined;
+    onSelectedMediaItemActionChange: (action: Key | undefined) => void;
 }
 
-export const MediaItemActions: FC<MediaItemActionsProps> = ({ mediaItem }) => {
-    const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
+export const MediaItemActions: FC<MediaItemActionsProps> = ({
+    mediaItem,
+    selectedMediaItemAction,
+    onSelectedMediaItemActionChange,
+}) => {
     const { FEATURE_FLAG_CLASSIFICATION_RANGES } = useFeatureFlags();
     const { isSingleDomainProject } = useProject();
 
@@ -77,9 +82,9 @@ export const MediaItemActions: FC<MediaItemActionsProps> = ({ mediaItem }) => {
 
     if (shouldShowQuickAnnotation) {
         const handleOpenQuickAnnotation = () =>
-            setSelectedMediaItemAction(MediaItemMenuActions.QUICK_ANNOTATION.toLocaleLowerCase());
+            onSelectedMediaItemActionChange(MediaItemMenuActions.QUICK_ANNOTATION.toLocaleLowerCase());
 
-        const handleCloseDialog = () => setSelectedMediaItemAction(undefined);
+        const handleCloseDialog = () => onSelectedMediaItemActionChange(undefined);
 
         return (
             <Flex alignItems={'center'}>
@@ -89,7 +94,7 @@ export const MediaItemActions: FC<MediaItemActionsProps> = ({ mediaItem }) => {
                     showQuickAnnotation
                     isAnomalyVideo={isAnomalyVideo}
                     selectedMediaItemAction={selectedMediaItemAction}
-                    onChangeSelectedMediaItemAction={setSelectedMediaItemAction}
+                    onChangeSelectedMediaItemAction={onSelectedMediaItemActionChange}
                 />
                 <DialogContainer onDismiss={handleCloseDialog}>
                     {selectedMediaItemAction === MediaItemMenuActions.QUICK_ANNOTATION.toLowerCase() &&
@@ -111,7 +116,7 @@ export const MediaItemActions: FC<MediaItemActionsProps> = ({ mediaItem }) => {
             showQuickAnnotation={false}
             isAnomalyVideo={isAnomalyVideo}
             selectedMediaItemAction={selectedMediaItemAction}
-            onChangeSelectedMediaItemAction={setSelectedMediaItemAction}
+            onChangeSelectedMediaItemAction={onSelectedMediaItemActionChange}
         />
     );
 };

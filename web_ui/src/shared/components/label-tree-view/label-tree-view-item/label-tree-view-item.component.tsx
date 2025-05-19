@@ -3,7 +3,7 @@
 
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 
 import { getFullGroupName } from '../../../../core/labels/annotator-utils/group-utils';
 import {

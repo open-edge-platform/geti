@@ -3,9 +3,9 @@
 
 import { useMemo } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger } from '@geti/ui';
 import { Flex } from '@react-spectrum/layout';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { Divider } from '../../../../shared/components/divider/divider.component';

@@ -9,11 +9,9 @@ ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
-COPY --link --from=libs . ../libs
-COPY --link --from=grpc_interfaces . ../grpc_interfaces
+COPY --link --from=libs . libs
 
-WORKDIR /builder/credit_system/app
+WORKDIR /platform/services/credit_system
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -22,7 +20,6 @@ COPY --link app .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 
@@ -35,13 +32,13 @@ RUN useradd -l -u 10001 non-root && \
 USER non-root
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/credit_system/app /app
-COPY --link entrypoint.sh /app
-COPY --link logconfig.ini /app
-COPY --link migration.sh /app
+COPY --link --from=build --chown=10001 /platform/services/credit_system /platform/services/credit_system
+COPY --link entrypoint.sh /platform/services/credit_system
+COPY --link logconfig.ini /platform/services/credit_system
+COPY --link migration.sh /platform/services/credit_system
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/platform/services/credit_system/.venv/bin:$PATH"
 
-WORKDIR /app
+WORKDIR /platform/services/credit_system
 ENTRYPOINT [ "./entrypoint.sh" ]

@@ -3,10 +3,9 @@
 
 import { CSSProperties, ReactChild, ReactElement } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 import clsx from 'clsx';
-import isEmpty from 'lodash/isEmpty';
-import isString from 'lodash/isString';
+import { isEmpty, isString } from 'lodash-es';
 import { useId } from 'react-aria';
 
 import { CloseSmall } from '../../assets/icons';

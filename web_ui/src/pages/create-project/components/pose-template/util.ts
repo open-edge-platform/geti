@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import negate from 'lodash/negate';
+import { negate } from 'lodash-es';
 
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode, Point } from '../../../../core/annotations/shapes.interface';

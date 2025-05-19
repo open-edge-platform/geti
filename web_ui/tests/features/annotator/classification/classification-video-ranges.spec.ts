@@ -116,7 +116,7 @@ const setupBeforeEach =
         registerApiResponse('GetVideoAnnotation', (_, res, ctx) => res(ctx.json(videoAnnotations)));
 
         await page.goto(datasetUrl);
-        await page.locator('[class*=gridItem]').first().hover();
+        await page.getByRole('option').first().hover();
         await page.getByLabel('open menu').first().click();
 
         const videoRangePage = new ClassificationVideoRangesPage(page);

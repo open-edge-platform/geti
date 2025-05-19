@@ -3,13 +3,11 @@
 
 import { useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isNil from 'lodash/isNil';
+import { Flex, Loading } from '@geti/ui';
+import { isEmpty, isNil } from 'lodash-es';
 
 import { Label } from '../../../core/labels/label.interface';
 import { filterOutEmptyLabel } from '../../../core/labels/utils';
-import { Loading } from '../../../shared/components/loading/loading.component';
 import { getIds, hasEqualId, isNonEmptyArray } from '../../../shared/utils';
 import { useTask } from '../../annotator/providers/task-provider/task-provider.component';
 import { useCameraParams } from '../hooks/camera-params.hook';

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { Button, DialogContainer, Flex, Heading, Text } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
-import sum from 'lodash/sum';
+import { sum } from 'lodash-es';
 
 import { FireWorks } from '../../../assets/images';
 import { useProducts } from '../../../core/credits/products/hooks/use-products.hook';
@@ -16,7 +16,6 @@ import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';
 import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { isOrganizationAdmin } from '../../../core/users/user-role-utils';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { Button } from '../../../shared/components/button/button.component';
 import { WelcomingCreditsDetails } from './welcoming-credits-details.component';
 
 import classes from './welcome-trial-modal.module.scss';

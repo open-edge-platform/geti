@@ -6,9 +6,13 @@
     font-size: var(--spectrum-global-dimension-size-130);
 }
 
-.progress {
-    display: block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.progressBar {
+    left: 0px !important;
+    width: var(--spectrum-global-dimension-size-3400) !important;
+    bottom: 0px !important;
+    position: absolute !important;
+
+    & > div {
+        background: var(--spectrum-global-color-gray-75) !important;
+    }
 }

@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Slider, Tooltip } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Slider, Tooltip } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { PointPushPull } from '../../../../../assets/icons';
 import BrushImg from '../../../../../assets/primary-tools/brush.webp';

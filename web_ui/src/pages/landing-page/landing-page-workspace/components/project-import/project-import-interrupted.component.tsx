@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { InfoOutline } from '../../../../../assets/icons';
 import { useStatus } from '../../../../../core/status/hooks/use-status.hook';

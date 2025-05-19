@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { useSelectedMediaItem } from '../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { useTaskChain } from '../providers/task-chain-provider/task-chain-provider.component';

@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, Heading, Text, View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { DatasetIdentifier } from '../../../core/projects/dataset.interface';
@@ -17,7 +17,7 @@ import { ActionButtons } from '../components/action-buttons/action-buttons.compo
 import { useCameraParams } from '../hooks/camera-params.hook';
 import { useCameraStorage } from '../hooks/use-camera-storage.hook';
 import { getSortingHandler, SortingOptions } from './../util';
-import { MediaItemsList } from './components/media-items-list.component';
+import { MediaList } from './components/media-list.component';
 import { SortByDropdown } from './components/sort-by-dropdown.component';
 
 const cameraPagePath = (datasetIdentifier: DatasetIdentifier) => paths.project.dataset.camera(datasetIdentifier);
@@ -61,7 +61,7 @@ export const MediaGallery = (): JSX.Element => {
                 backgroundColor={'gray-50'}
                 height={`calc(100vh - size-2000)`}
             >
-                <Flex justifyContent={'space-between'}>
+                <Flex justifyContent={'space-between'} marginBottom={'size-115'}>
                     <SortByDropdown onSelect={setSortingOption} />
                     <Flex gap={'size-100'} alignItems={'center'}>
                         <Text>{viewMode} </Text>
@@ -73,7 +73,7 @@ export const MediaGallery = (): JSX.Element => {
                     </Flex>
                 </Flex>
 
-                <MediaItemsList viewMode={viewMode} screenshots={screenshots} />
+                <MediaList viewMode={viewMode} screenshots={screenshots} />
             </View>
         </View>
     );

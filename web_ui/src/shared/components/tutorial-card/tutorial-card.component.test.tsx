@@ -86,7 +86,7 @@ describe('TutorialCard', () => {
 
         fireEvent.click(learnMoreBtn);
         expect(onPressLearnMoreMock).toHaveBeenCalledWith(
-            'https://docs.geti.intel.com/on-prem/2.6/guide/annotations/annotation-editor.html#active-learning'
+            'https://docs.geti.intel.com/docs/user-guide/learn-geti/active-learning'
         );
     });
 

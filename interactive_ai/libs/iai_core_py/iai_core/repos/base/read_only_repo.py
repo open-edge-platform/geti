@@ -14,12 +14,11 @@ from pymongo.collection import Collection
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 from .mongo_connector import MongoConnector
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 PersistedEntityT = TypeVar("PersistedEntityT", bound=PersistentEntity)
 logger = logging.getLogger(__name__)

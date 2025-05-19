@@ -3,10 +3,8 @@
 
 import { Key, useState } from 'react';
 
-import { Divider, Grid, Item, Picker, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import orderBy from 'lodash/orderBy';
-import partition from 'lodash/partition';
+import { Divider, Grid, Item, Picker, View } from '@geti/ui';
+import { isEmpty, orderBy, partition } from 'lodash-es';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';

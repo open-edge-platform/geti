@@ -3,12 +3,12 @@
 
 import { CSSProperties, FC, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Text } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Text } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { InfoOutline } from '../../assets/icons';
@@ -16,7 +16,6 @@ import { DOMAIN } from '../../core/projects/core.interface';
 import { useProjectActions } from '../../core/projects/hooks/use-project-actions.hook';
 import { paths } from '../../core/services/routes';
 import { useWorkspaceIdentifier } from '../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { Button } from '../../shared/components/button/button.component';
 import { TooltipWithDisableButton } from '../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { isLargeSizeQuery } from '../../theme/queries';
 import { InfoSection } from './components/info-section/info-section.component';

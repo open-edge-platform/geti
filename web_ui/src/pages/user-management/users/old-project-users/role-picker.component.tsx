@@ -3,9 +3,8 @@
 
 import { ComponentProps, Key } from 'react';
 
-import { Item, Picker } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
-import isEmpty from 'lodash/isEmpty';
+import { Item, Picker } from '@geti/ui';
+import { capitalize, isEmpty } from 'lodash-es';
 
 import { USER_ROLE } from '../../../../core/users/users.interface';
 

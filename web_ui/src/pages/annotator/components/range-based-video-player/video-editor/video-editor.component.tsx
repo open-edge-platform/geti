@@ -3,8 +3,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { Grid, View } from '@adobe/react-spectrum';
-import groupBy from 'lodash/groupBy';
+import { Grid, View } from '@geti/ui';
+import { groupBy } from 'lodash-es';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../../../core/labels/label-resolver';

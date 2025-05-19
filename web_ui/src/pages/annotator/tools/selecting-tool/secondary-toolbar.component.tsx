@@ -3,8 +3,8 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { PointSelector } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';

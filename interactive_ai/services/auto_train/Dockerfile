@@ -7,7 +7,7 @@ ARG OTX_RELEASE_TAG=2.4.2
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    git 
+    git
 
 RUN git clone --branch $OTX_RELEASE_TAG --single-branch https://github.com/open-edge-platform/training_extensions.git
 
@@ -18,12 +18,10 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=iai_core . interactive_ai/libs/iai_core_py
-COPY --link --from=grpc_interfaces . grpc_interfaces
 
-WORKDIR /builder/interactive_ai/services/auto_train
+WORKDIR /interactive_ai/services/auto_train
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
@@ -32,7 +30,6 @@ COPY --link app/ .
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -42,13 +39,13 @@ RUN useradd -l -u 10001 non-root && \
     rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/interactive_ai/services/auto_train /app
+COPY --link --from=build --chown=10001 /interactive_ai/services/auto_train /interactive_ai/services/auto_train
 COPY --link --from=build --chown=10001 /training_extensions/src/otx/tools/templates /model_templates
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app"
+ENV PATH="/interactive_ai/services/auto_train/.venv/bin:$PATH"
+ENV PYTHONPATH="/interactive_ai/services/auto_train"
 
 USER non-root
-WORKDIR /app
+WORKDIR /interactive_ai/services/auto_train
 CMD ["python", "main.py"]

@@ -12,7 +12,7 @@ import {
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
-import get from 'lodash/get';
+import { get } from 'lodash-es';
 
 import { getErrorMessage } from '../../core/services/utils';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';

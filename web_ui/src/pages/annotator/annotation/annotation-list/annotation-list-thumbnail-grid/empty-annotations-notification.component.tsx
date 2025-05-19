@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Flex, Link, Text } from '@adobe/react-spectrum';
+import { Flex, Link, Text } from '@geti/ui';
 import { createPortal } from 'react-dom';
 
 import { CloseSmall, Info } from '../../../../../assets/icons';

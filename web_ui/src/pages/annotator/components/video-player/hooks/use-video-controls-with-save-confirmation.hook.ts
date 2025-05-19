@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import isFunction from 'lodash/isFunction';
+import { isFunction } from 'lodash-es';
 
 import { usePrediction } from '../../../providers/prediction-provider/prediction-provider.component';
 import { useSubmitAnnotations } from '../../../providers/submit-annotations-provider/submit-annotations-provider.component';

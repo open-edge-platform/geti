@@ -3,10 +3,11 @@
 
 import { useRef } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { DimensionValue, View } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import isEmpty from 'lodash/isEmpty';
+import { Responsive } from '@react-types/shared';
+import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { Label } from '../../../../core/labels/label.interface';
@@ -27,6 +28,7 @@ export interface MediaItemProps {
     labelIds: string[];
     mediaFile: File;
     viewMode?: ViewModes;
+    height?: Responsive<DimensionValue>;
     onPress: (id: string) => void;
     onDeleteItem: (id: string) => void;
     onSelectLabel: (labels: Label[]) => void;
@@ -38,6 +40,7 @@ export const MediaItem = ({
     labelIds,
     mediaFile,
     viewMode,
+    height,
     onPress,
     onDeleteItem,
     onSelectLabel,
@@ -61,7 +64,7 @@ export const MediaItem = ({
           ];
 
     return (
-        <View ref={containerRef} UNSAFE_className={classes.container}>
+        <View ref={containerRef} UNSAFE_className={classes.container} height={height}>
             <ImageVideoFactory
                 src={url}
                 isVideoFile={isVideoFile(mediaFile)}

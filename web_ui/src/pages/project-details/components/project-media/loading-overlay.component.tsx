@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { DimensionValue, Flex, ProgressCircle } from '@adobe/react-spectrum';
+import { DimensionValue, Flex, ProgressCircle } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 import { BackgroundColorValue, BoxAlignmentStyleProps, Responsive, StyleProps } from '@react-types/shared';
 

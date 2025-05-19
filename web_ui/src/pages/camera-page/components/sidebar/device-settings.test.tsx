@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { defaultTheme, Provider as ThemeProvider } from '@adobe/react-spectrum';
+import { defaultTheme, Provider as ThemeProvider } from '@geti/ui';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
@@ -57,6 +57,16 @@ describe('Settings', () => {
         );
 
         expect(mockedSetSelectedDeviceId).toHaveBeenCalledWith(cameraTwo.deviceId);
+    });
+
+    it('Allows to mirror the camera feed', async () => {
+        const setIsMirrored = jest.fn();
+
+        renderApp({ setIsMirrored });
+
+        fireEvent.click(screen.getByRole('button', { name: /Mirror camera selection/ }));
+        await userEvent.selectOptions(screen.getByRole('listbox'), screen.getByRole('option', { name: 'On' }));
+        expect(setIsMirrored).toHaveBeenCalledWith(true);
     });
 
     it('apply settings', () => {

@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Content } from '@adobe/react-spectrum';
+import { Content, Loading } from '@geti/ui';
 import {
     ListBox as AriaComponentsListBox,
     DropIndicator,
@@ -14,7 +14,6 @@ import {
 } from 'react-aria-components';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { hasEqualId } from '../../../../shared/utils';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';

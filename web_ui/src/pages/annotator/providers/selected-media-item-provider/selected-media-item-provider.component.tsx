@@ -5,8 +5,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
+import { isEmpty, isEqual } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { PredictionMode, PredictionResult } from '../../../../core/annotations/services/prediction-service.interface';
@@ -152,10 +151,10 @@ export const SelectedMediaItemProvider = ({ children }: SelectedMediaItemProvide
     const datasetIdentifier = useDatasetIdentifier();
     const { annotationService, router } = useApplicationServices();
     const mediaIdentifierFromRoute = useMediaIdentifierFromRoute();
-    const { project, isSingleDomainProject, projectIdentifier } = useProject();
+    const { project, isSingleDomainProject } = useProject();
     const { selectedTask } = useTask();
 
-    const navigate = useNavigateToAnnotatorRoute(projectIdentifier);
+    const navigate = useNavigateToAnnotatorRoute();
 
     const [selectedMediaItem, setSelectedMediaItem] = useState<SelectedMediaItem>();
     const [pendingMediaItem, setPendingMediaItem] = usePendingMediaItem(datasetIdentifier, selectedMediaItem);
@@ -247,7 +246,7 @@ export const SelectedMediaItemProvider = ({ children }: SelectedMediaItemProvide
         setSelectedMediaItem(item);
 
         if (!isEqual(mediaIdentifierFromRoute, item.identifier)) {
-            navigate({ ...datasetIdentifier, mediaItem: item });
+            navigate({ datasetIdentifier, mediaItem: item });
         }
     }, [
         isSelectedMediaItemQueryEnabled,

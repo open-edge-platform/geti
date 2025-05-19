@@ -3,17 +3,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { SpectrumButtonProps } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
-import throttle from 'lodash/throttle';
+import { Button, type ButtonProps } from '@geti/ui';
+import { isNil, throttle } from 'lodash-es';
 
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { Button } from '../../../../shared/components/button/button.component';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 
 import classes from './action-buttons.module.scss';
 
-interface CaptureButtonAnimationProps extends Omit<SpectrumButtonProps, 'variant'> {
+interface CaptureButtonAnimationProps extends Omit<ButtonProps, 'variant'> {
     onPress: () => void;
     videoTag?: HTMLVideoElement | null;
 }

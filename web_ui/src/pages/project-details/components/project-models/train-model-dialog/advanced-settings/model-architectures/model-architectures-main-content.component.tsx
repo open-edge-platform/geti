@@ -3,9 +3,8 @@
 
 import { FC } from 'react';
 
-import { Divider } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import partition from 'lodash/partition';
+import { Divider } from '@geti/ui';
+import { isEmpty, partition } from 'lodash-es';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';

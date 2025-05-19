@@ -3,12 +3,11 @@
 
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Item, Menu, TextField, View } from '@adobe/react-spectrum';
+import { CustomPopover, Item, Menu, TextField, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import last from 'lodash/last';
+import { last } from 'lodash-es';
 
 import { SearchRuleShapeType, SearchRuleValue, ShapeOption } from '../../../../core/media/media-filter.interface';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
 import { KeyMap } from '../../../../shared/keyboard-events/keyboard.interface';
 import { trimAndLowerCase } from '../../../../shared/utils';
 import {

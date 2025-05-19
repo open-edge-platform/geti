@@ -3,16 +3,15 @@
 
 import { useRef } from 'react';
 
-import { Flex, SpectrumActionButtonProps, Text, View } from '@adobe/react-spectrum';
+import { CustomPopover, Flex, Text, View, type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { clsx } from 'clsx';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../core/labels/label-resolver';
 import { Label } from '../../../core/labels/label.interface';
 import { isAnomalyDomain } from '../../../core/projects/domains';
-import { CustomPopover } from '../../../shared/components/custom-popover/custom-popover.component';
 import { ViewModes } from '../../../shared/components/media-view-modes/utils';
 import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { TaskLabelTreeSearch } from '../../../shared/components/task-label-tree-search/task-label-tree-search.component';
@@ -24,7 +23,7 @@ import { isClassificationOrAnomaly } from '../util';
 
 import classes from './camera-page.module.scss';
 
-interface LabelSelectorProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
+interface LabelSelectorProps extends Omit<ActionButtonProps, 'isQuiet'> {
     name: string;
     labelIds: string[];
     selectedLabels: Label[];

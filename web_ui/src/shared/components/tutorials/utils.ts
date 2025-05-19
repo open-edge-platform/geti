@@ -90,26 +90,24 @@ export const dismissAllTutorials = async (settings: UseSettings<UserGlobalSettin
 };
 
 export enum DocsUrl {
-    LABELS_CREATION = 'guide/project-management/project-management.html#labels-creation',
-    DETECTION = 'guide/project-management/project-management.html#labels-creation',
-    CLASSIFICATION = 'guide/project-management/project-management.html#labels-creation',
-    SEGMENTATION = 'guide/project-management/project-management.html#labels-creation',
-    ANOMALY = 'guide/additional-resources/ai-fundamentals/anomaly-classification-project.html',
-    REVISIT_LABELS = `
-        guide/labels/labels-management.html#dealing-with-new-labels-and-concept-drift-in-the-intel-geti-platform
-    `,
-    DATASET = 'guide/datasets/dataset-management.html',
-    MODELS = 'guide/model-training-and-optimization/model-training-and-optimization.html',
-    TESTS = 'guide/tests-management/tests.html',
-    DEPLOYMENT = 'guide/deployments/deployments.html',
-    MAIN_PAGE = 'guide/get-started/introduction.html',
-    ANNOTATIONS_VS_PREDICTIONS = 'guide/annotations/annotation-editor.html#annotations-vs-predictions',
-    ACTIVE_LEARNING = 'guide/annotations/annotation-editor.html#active-learning',
-    MEDIA_GALLERY = 'guide/annotations/annotation-mode.html#media-gallery',
-    ANNOTATION_TOOLS = 'guide/annotations/annotation-tools.html',
-    ANNOTATION_EDITOR = 'guide/annotations/annotation-editor.html',
-    MODEL_TRAINING_AND_OPTIMIZATION = 'guide/model-training-and-optimization/model-training-and-optimization.html',
-    CODE_DEPLOYMENT = 'guide/deployments/deployments.html#code-deployment',
+    LABELS_CREATION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    DETECTION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    CLASSIFICATION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    SEGMENTATION = 'docs/user-guide/geti-fundamentals/project-management#labels-creation',
+    REVISIT_LABELS = 'docs/user-guide/geti-fundamentals/labels/labels-management' +
+        '#dealing-with-new-labels-and-concept-drift-in-the-intel-geti-platform',
+    DATASET = 'docs/user-guide/geti-fundamentals/datasets/dataset-management',
+    MODELS = 'docs/user-guide/geti-fundamentals/model-training-and-optimization',
+    TESTS = 'docs/user-guide/geti-fundamentals/tests-management/tests',
+    DEPLOYMENT = 'docs/user-guide/geti-fundamentals/deployments/',
+    MAIN_PAGE = 'docs/user-guide/getting-started/introduction',
+    ANNOTATIONS_VS_PREDICTIONS = 'docs/user-guide/geti-fundamentals/annotations/annotation-editor' +
+        '#annotations-vs-predictions',
+    ACTIVE_LEARNING = 'docs/user-guide/learn-geti/active-learning',
+    MEDIA_GALLERY = 'docs/user-guide/geti-fundamentals/annotations/annotation-mode#media-gallery',
+    ANNOTATION_TOOLS = 'docs/user-guide/geti-fundamentals/annotations/annotation-tools',
+    ANNOTATION_EDITOR = 'docs/user-guide/geti-fundamentals/annotations/annotation-editor',
+    CODE_DEPLOYMENT = 'docs/user-guide/geti-fundamentals/deployments/code-deployment',
 }
 
 export const onPressLearnMore = (docUrl: string | undefined) => {

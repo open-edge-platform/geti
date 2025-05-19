@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Flex, Item, Picker, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Picker, Text } from '@geti/ui';
 
 import { InferenceModel } from '../../../../core/annotations/services/visual-prompt-service';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

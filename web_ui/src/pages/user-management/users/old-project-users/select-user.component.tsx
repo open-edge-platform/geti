@@ -3,7 +3,7 @@
 
 import { Key, useMemo, useState } from 'react';
 
-import { ComboBox, Item, useFilter } from '@adobe/react-spectrum';
+import { ComboBox, Item, useFilter } from '@geti/ui';
 
 import { User } from '../../../../core/users/users.interface';
 import { hasEqualId } from '../../../../shared/utils';

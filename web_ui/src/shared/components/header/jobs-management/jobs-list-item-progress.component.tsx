@@ -3,8 +3,8 @@
 
 import { FC } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { Flex, LoadingIndicator, Text, View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import {
     CanceledIcon,
@@ -17,7 +17,6 @@ import { COLOR_MODE } from '../../../../assets/icons/color-mode.enum';
 import { JobStepState } from '../../../../core/jobs/jobs.const';
 import { Job, JobStep } from '../../../../core/jobs/jobs.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { LoadingIndicator } from '../../loading/loading-indicator.component';
 import { ThinProgressBar } from '../../thin-progress-bar/thin-progress-bar.component';
 import { getStepProgress, getStepProgressNumber } from './utils';
 

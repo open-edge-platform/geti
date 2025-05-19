@@ -8,6 +8,10 @@ libs/feature_tools:
   - libs/feature_tools/**
   - libs/Makefile**
   - .github/libs-path-filters.yml
+libs/grpc_interfaces:
+  - libs/grpc_interfaces/**
+  - libs/types/**
+  - .github/libs-path-filters.yml
 libs/k8s_tools:
   - libs/k8s_tools/**
   - libs/Makefile**
@@ -28,6 +32,10 @@ libs/types:
   - libs/types/**
   - libs/Makefile**
   - .github/libs-path-filters.yml
+libs/configuration_tools:
+  - libs/types/**
+  - libs/Makefile**
+  - .github/libs-path-filters.yml
 
 # # libraries for interactive_ai
 interactive_ai/libs/iai_core_go:
@@ -40,5 +48,9 @@ interactive_ai/libs/media_utils:
   - .github/libs-path-filters.yml
 interactive_ai/libs/iai_core_py:
   - interactive_ai/libs/iai_core_py/**
+  - libs/Makefile**
+  - .github/libs-path-filters.yml
+interactive_ai/supported_models/:
+  - interactive_ai/libs/supported_algorithm/**
   - libs/Makefile**
   - .github/libs-path-filters.yml

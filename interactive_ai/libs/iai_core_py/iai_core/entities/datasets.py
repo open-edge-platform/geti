@@ -16,12 +16,11 @@ import numpy as np
 
 from iai_core.entities.dataset_item import DatasetItem
 from iai_core.entities.interfaces.dataset_adapter_interface import DatasetAdapterInterface
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.entities.subset import Subset
 from iai_core.utils.time_utils import now
 from iai_core.utils.uid_generator import generate_uid
 
-from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, VideoFrameIdentifier
+from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, PersistentEntity, VideoFrameIdentifier
 
 logger = logging.getLogger(__name__)
 

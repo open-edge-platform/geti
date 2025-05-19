@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, useNumberFormatter, View } from '@adobe/react-spectrum';
+import { Flex, useNumberFormatter, View } from '@geti/ui';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { useVideoTimelineQueries } from '../hooks/use-video-timeline-queries.hook';

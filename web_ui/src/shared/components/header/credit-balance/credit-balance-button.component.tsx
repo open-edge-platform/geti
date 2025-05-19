@@ -3,9 +3,9 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger } from '@geti/ui';
 import { FocusableRef } from '@react-types/shared';
-import isNil from 'lodash/isNil';
+import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 

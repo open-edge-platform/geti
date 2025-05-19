@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
-import isNumber from 'lodash/isNumber';
+import { isEmpty, isNumber } from 'lodash-es';
 
 import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';

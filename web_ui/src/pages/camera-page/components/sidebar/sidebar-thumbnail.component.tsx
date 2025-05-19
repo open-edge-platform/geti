@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Link as SpectrumLink, Text, View } from '@adobe/react-spectrum';
+import { Flex, Link as SpectrumLink, Text, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 import useVirtual from 'react-cool-virtual';
 import { Link } from 'react-router-dom';
 

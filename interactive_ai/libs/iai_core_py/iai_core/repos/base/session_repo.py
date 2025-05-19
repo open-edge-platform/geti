@@ -21,13 +21,12 @@ from pymongo.collection import Collection
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
 from .constants import ID_FIELD_NAME, LOCATION_FIELD_NAME, ORGANIZATION_ID_FIELD_NAME, WORKSPACE_ID_FIELD_NAME
 from .mongo_connector import MongoConnector
-from geti_types import CTX_SESSION_VAR, ID, Session, make_session
+from geti_types import CTX_SESSION_VAR, ID, PersistentEntity, Session, make_session
 
 PersistedEntityT = TypeVar("PersistedEntityT", bound=PersistentEntity)
 logger = logging.getLogger(__name__)

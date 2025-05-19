@@ -26,6 +26,6 @@ describe('job scheduler fullscreen', (): void => {
 
         render(<Fullscreen enabled toggle={onToggle} />);
         fireEvent.click(screen.getByTestId('job-scheduler-action-expand'));
-        expect(onToggle).toBeCalledWith(expect.any(Function));
+        expect(onToggle).toHaveBeenCalledWith(expect.any(Function));
     });
 });

@@ -4,14 +4,10 @@
 import { CalendarDate, CalendarDateTime, DateValue } from '@internationalized/date';
 import { LoadingState, KeyboardEvent as ReactKeyboardEvent } from '@react-types/shared';
 import dayjs, { OptionType } from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
-import utc from 'dayjs/plugin/utc';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import utc from 'dayjs/plugin/utc.js';
 import { filesize, FileSizeOptionsBase } from 'filesize';
-import isEmpty from 'lodash/isEmpty';
-import isEqual from 'lodash/isEqual';
-import isNil from 'lodash/isNil';
-import isString from 'lodash/isString';
-import negate from 'lodash/negate';
+import { isEmpty, isEqual, isNil, isString, negate } from 'lodash-es';
 import * as yup from 'yup';
 
 import { DOMAIN } from '../core/projects/core.interface';
@@ -19,6 +15,7 @@ import { Task } from '../core/projects/task.interface';
 import { KeyMap } from './keyboard-events/keyboard.interface';
 import { LOCAL_STORAGE_KEYS } from './local-storage-keys';
 
+// TODO: Update dayjs imports once they support ESM https://github.com/iamkun/dayjs/issues/1765
 dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 
@@ -40,9 +37,6 @@ const NOT_ALLOWED_CHARACTERS_MESSAGE = 'Passwords must contains only latin lette
 
 const TOO_SHORT_MESSAGE = 'Password is too short. It should consist of 8 - 200 characters.';
 const TOO_LONG_MESSAGE = 'Password is too long. It should consist of 8 - 200 characters.';
-
-export const NEW_PASSWORD_ERROR_MESSAGE =
-    'Password must consist of 8 - 200 characters, at least one capital letter, lower letter, digit or symbol.';
 
 export const CONFIRM_PASSWORD_ERROR_MESSAGE = 'The password you entered did not match.';
 

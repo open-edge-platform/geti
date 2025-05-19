@@ -3,8 +3,8 @@
 
 import { useState } from 'react';
 
-import { DialogTrigger, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
+import { isNil } from 'lodash-es';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL, SLOW_INTERVAL } from '../../../../core/jobs/hooks/utils';

@@ -3,8 +3,8 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import capitalize from 'lodash/capitalize';
+import { Flex, Text } from '@geti/ui';
+import { capitalize } from 'lodash-es';
 
 import { Grid, GridMedium, GridSmall, List } from '../../../assets/icons';
 import { MenuTriggerButton } from '../menu-trigger/menu-trigger-button/menu-trigger-button.component';

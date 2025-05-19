@@ -3,7 +3,7 @@
 
 import { ComponentProps, FormEvent, ReactNode, useState } from 'react';
 
-import { Flex, TextField } from '@adobe/react-spectrum';
+import { Flex, TextField } from '@geti/ui';
 
 import { Label } from '../../../core/labels/label.interface';
 import { Task } from '../../../core/projects/task.interface';

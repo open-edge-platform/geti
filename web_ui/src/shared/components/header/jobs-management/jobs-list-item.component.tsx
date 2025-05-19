@@ -3,9 +3,8 @@
 
 import { CSSProperties } from 'react';
 
-import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
-import isFunction from 'lodash/isFunction';
+import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { isEmpty, isFunction } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { Copy, DownloadIcon } from '../../../../assets/icons';
@@ -25,7 +24,6 @@ import { paths } from '../../../../core/services/routes';
 import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { downloadFile, formatDownloadUrl, sanitize } from '../../../utils';
-import { ActionButton } from '../../button/button.component';
 import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActionLink } from './action-link.component';
 import { JobListItemSkeletonLoader } from './job-list-item-skeleton-loader.component';

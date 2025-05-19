@@ -3,8 +3,8 @@
 
 import { ComponentType, forwardRef, LegacyRef, useEffect } from 'react';
 
-import { View } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 import { Components, Virtuoso } from 'react-virtuoso';
 
 import { ProjectsQueryResult } from '../../../../../core/projects/hooks/use-project-actions.hook';

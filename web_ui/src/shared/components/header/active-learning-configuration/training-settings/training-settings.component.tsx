@@ -3,14 +3,13 @@
 
 import { useState } from 'react';
 
-import { Heading, Item, Picker, View } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { Heading, Item, Loading, Picker, View } from '@geti/ui';
+import { isNil } from 'lodash-es';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { hasActiveModels } from '../../../../../core/models/utils';
 import { Task } from '../../../../../core/projects/task.interface';
 import { useProject } from '../../../../../pages/project-details/providers/project-provider/project-provider.component';
-import { Loading } from '../../../loading/loading.component';
 import { useAutoTrainingTasksConfig } from '../use-tasks-auto-training-config.hook';
 import { AutoTrainingSwitch } from './auto-training-switch.component';
 

@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import isEmpty from 'lodash/isEmpty';
+import { isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { hasEqualId } from '../../../../shared/utils';

@@ -3,8 +3,8 @@
 
 import { useState } from 'react';
 
-import { DialogContainer } from '@adobe/react-spectrum';
-import isEmpty from 'lodash/isEmpty';
+import { DialogContainer } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
 import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';

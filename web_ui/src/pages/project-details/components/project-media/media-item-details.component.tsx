@@ -1,20 +1,18 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useRef } from 'react';
+import { Key, useRef, useState } from 'react';
 
-import { Divider, Flex, Grid, minmax, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Checkbox, Divider, Flex, Grid, minmax, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import dayjs from 'dayjs';
-import delay from 'lodash/delay';
+import { delay } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideo } from '../../../../core/media/video.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
 import { MediaItemView } from '../../../../shared/components/media-item-view/media-item-view.component';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize } from '../../../../shared/utils';
 import { getFullNameFromUser } from '../../../user-management/users/users-table/utils';
@@ -51,6 +49,7 @@ export const MediaItemDetails = ({
     const { organizationId } = useOrganizationIdentifier();
     const { useGetUserQuery } = useUsers();
     const uploaderQuery = useGetUserQuery(organizationId, uploaderId);
+    const [selectedMediaItemAction, setSelectedMediaItemAction] = useState<Key | undefined>(undefined);
 
     const preventSingleClick = useRef<boolean>(false);
     const { pressProps } = usePress({
@@ -74,7 +73,7 @@ export const MediaItemDetails = ({
     const nameColumnMinWidth = isVideoItem ? (isFilteredVideo ? 'size-3000' : 'size-2000') : 'size-1000';
 
     const checkBoxColumn = 'size-200';
-    const imageColumn = 'var(--width)';
+    const imageColumn = 'size-800';
     const nameColumn = minmax(nameColumnMinWidth, '1fr');
     const dateColumn = 'size-900';
     const fileSizeColumn = minmax('size-500', 'size-1600');
@@ -186,7 +185,11 @@ export const MediaItemDetails = ({
                         <Tooltip>{`${UPLOADER_TOOLTIP}: ${getFullNameFromUser(uploaderQuery.data)}`}</Tooltip>
                     </TooltipTrigger>
 
-                    <MediaItemActions mediaItem={mediaItem} />
+                    <MediaItemActions
+                        mediaItem={mediaItem}
+                        selectedMediaItemAction={selectedMediaItemAction}
+                        onSelectedMediaItemActionChange={setSelectedMediaItemAction}
+                    />
                 </Grid>
             </div>
             <Divider size={'S'} width={'100%'} />

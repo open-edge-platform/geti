@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import cloneDeep from 'lodash/cloneDeep';
+import { cloneDeep } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { OpenApiResponseBody } from '../../../src/core/server/types';
@@ -95,9 +95,10 @@ test.beforeEach(async ({ page, registerApiResponse, openApi }) => {
 
         const media = (isDogLabel ? dogs : isCatLabel ? cats : [...dogs, ...cats]).map((file) => {
             const isVideoFrame = ['dog.11', 'cat.11'].includes(file);
+            const id = uuidv4();
             return {
+                id,
                 annotation_state_per_task: [],
-                id: uuidv4(),
                 media_information: {
                     display_url: `${imagePathPrefix}/60d31793d5f1fb7e6e3c1a75/display/full`,
                     width: 600,
@@ -111,7 +112,7 @@ test.beforeEach(async ({ page, registerApiResponse, openApi }) => {
                 },
                 thumbnail: `${imagePathPrefix}/60d31793d5f1fb7e6e3c1a75/display/thumb`,
                 type: isVideoFrame ? 'video_frame' : 'image',
-                ...(isVideoFrame ? { frame_index: 0 } : {}),
+                ...(isVideoFrame ? { frame_index: 0, video_id: id } : {}),
                 upload_time: '2022-08-08T07:26:00.580000+00:00',
                 uploader_id: '62f0cfb773cacf6370dbaccd',
             };

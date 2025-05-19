@@ -3,8 +3,8 @@
 
 import { ComponentProps } from 'react';
 
-import { View } from '@adobe/react-spectrum';
-import isNil from 'lodash/isNil';
+import { View } from '@geti/ui';
+import { isNil } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { PhotoPlaceholder } from '../../../../../shared/components/photo-placeholder/photo-placeholder.component';

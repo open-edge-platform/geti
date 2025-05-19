@@ -3,7 +3,7 @@
 
 import { FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ActionGroup, DimensionValue, Flex, Item, TextField, useNumberFormatter } from '@adobe/react-spectrum';
+import { ActionGroup, DimensionValue, Flex, Item, TextField, useNumberFormatter } from '@geti/ui';
 import { Responsive } from '@react-types/shared';
 import { SpectrumTextFieldProps } from '@react-types/textfield';
 

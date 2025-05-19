@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButtonProps } from '@geti/ui';
+
 import { DownloadIcon } from '../../../../../../assets/icons';
 import { ButtonWithSpectrumTooltip } from '../../../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
-import { ActionButtonProps } from '../../../../../../shared/components/button/button.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 
 interface DownloadCellInterface extends ActionButtonProps {
