@@ -38,8 +38,8 @@ FROM base AS runtime
 # Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ffmpeg=7:5.1.6-0+deb12u1 \
-    libgl1=1.6.0-1 \
-    libglib2.0-0=2.74.6-2+deb12u5 \
+    libgl1=1.6.* \
+    libglib2.0-0=2.74.* \
     curl && \
     rm -rf /var/lib/apt/lists/* && \
     useradd -l -u 10001 non-root && \
