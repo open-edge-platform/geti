@@ -405,7 +405,7 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
         model_status_filter: ModelStatusFilter = ModelStatusFilter.IMPROVED,
     ) -> Model:
         """
-        Get the MO FP32 with XAI head version of the latest base framework model.
+        Get the MO FP16 or FP32 with XAI head version of the latest base framework model.
         This model is used for inference.
 
         :param base_model_id: Optional ID for which to get the latest inference model
@@ -423,7 +423,7 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
             base_model_id=base_model_id, model_status_filter=model_status_filter
         )
 
-        models = self.get_all(extra_filter=query)
+        models = list(self.get_all(extra_filter=query, sort_info=[("_id", 1)]))
         # Determine which precision to prioritize
         use_fp16 = FeatureFlagProvider.is_enabled(FEATURE_FLAG_FP16_INFERENCE)
         primary_precision = ModelPrecision.FP16 if use_fp16 else ModelPrecision.FP32
@@ -468,6 +468,7 @@ class ModelRepo(ModelStorageBasedSessionRepo[Model]):
                 ),
             },
             {"$project": {"_id": 1, "precision": 1}},
+            {"$sort": {"_id": 1}},
         ]
         matched_docs = list(self.aggregate_read(aggr_pipeline))
         if not matched_docs:

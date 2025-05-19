@@ -426,10 +426,10 @@ class TestModelRepo:
         """
         Models:
             Models version 1: M1 (base) -> M2 (MO, FP32) -> M3 (MO, FP16)
-            Models version 2: M4 (base) -> M5 (MO, FP32) -> M6 (MO, FP16) -> M7 (ONNX)
+            Models version 2: M4 (base) -> M5 (MO, FP32) -> M6 (MO, FP16) -> M7 (MO, FP16) -> M8 (ONNX)
 
         Expected:
-            The latest model for inference is M4 (the first one generated after the base model).
+            The latest model for inference is M6 (the first one generated after the base model).
         """
         monkeypatch.setenv(FEATURE_FLAG_FP16_INFERENCE, str(feature_flag_setting).lower())
         project = fxt_empty_project
@@ -499,7 +499,17 @@ class TestModelRepo:
             previous_model=m4_base,
             precision=ModelPrecision.FP16,
         )
-        m7_onnx = create_model(
+        m7_fp16 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.OPENVINO,
+            ModelOptimizationType.MO,
+            version=2,
+            previous_model=m4_base,
+            precision=ModelPrecision.FP16,
+        )
+        m8_onnx = create_model(
             project,
             model_storage,
             fxt_training_framework,
@@ -510,7 +520,7 @@ class TestModelRepo:
             precision=ModelPrecision.FP16,
         )
 
-        model_repo.save_many([m1_base, m2_fp32, m3_fp16, m4_base, m5_fp32, m6_fp16, m7_onnx])
+        model_repo.save_many([m1_base, m2_fp32, m3_fp16, m4_base, m5_fp32, m6_fp16, m7_fp16, m8_onnx])
         with (
             patch.object(ProjectRepo, "get_by_id", return_value=fxt_empty_project),
         ):
@@ -526,6 +536,37 @@ class TestModelRepo:
             assert inference_model == m5_fp32
             assert inference_model_id == inference_model.id_
             assert inference_model_for_m1 == m2_fp32
+
+    def test_get_fallback_model_for_inference(
+        self, request, fxt_empty_project, fxt_model_storage, fxt_training_framework
+    ) -> None:
+        project = fxt_empty_project
+        model_storage = fxt_model_storage
+        model_repo = ModelRepo(model_storage.identifier)
+        request.addfinalizer(lambda: model_repo.delete_all())
+        m1_base = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.BASE_FRAMEWORK,
+            ModelOptimizationType.NONE,
+            version=1,
+            previous_model=None,
+        )
+        m2_fp16 = create_model(
+            project,
+            model_storage,
+            fxt_training_framework,
+            ModelFormat.OPENVINO,
+            ModelOptimizationType.MO,
+            version=1,
+            previous_model=m1_base,
+            precision=ModelPrecision.FP16,
+        )
+
+        model_repo.save_many([m1_base, m2_fp16])
+        inference_model = model_repo.get_latest_model_for_inference()
+        assert inference_model == m2_fp16
 
     def test_get_latest_with_latest_version(
         self, request, fxt_empty_project, fxt_model_storage, fxt_training_framework
