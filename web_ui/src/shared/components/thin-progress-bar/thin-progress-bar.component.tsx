@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@geti/ui';
-import { useStyleProps } from '@react-spectrum/utils';
+import { useStyleProps, View } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
 import { ColorValue, DimensionValue } from '@react-types/shared/src/dna';
 

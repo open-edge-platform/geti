@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue } from '@geti/ui';
 import { screen } from '@testing-library/react';
 
 import { fakeAnnotationToolContext } from '../../../../../../test-utils/fake-annotator-context';

@@ -3,8 +3,7 @@
 
 import { Key, useEffect } from 'react';
 
-import { Flex, Text } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Flex, Text, useMediaQuery } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { filterOutExclusiveLabel } from '../../../../core/labels/utils';

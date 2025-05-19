@@ -3,7 +3,7 @@
 
 import { forwardRef, RefObject, useState } from 'react';
 
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { useUnwrapDOMRef } from '@geti/ui';
 import { BackgroundColorValue, DOMRefValue } from '@react-types/shared';
 
 import { DownloadIcon } from '../../../assets/icons';

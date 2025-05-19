@@ -3,8 +3,8 @@
 
 import { ReactNode, RefObject, useRef, useState } from 'react';
 
+import { useUnwrapDOMRef } from '@geti/ui';
 import { useHover, useInteractOutside } from '@react-aria/interactions';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { DOMRefValue } from '@react-types/shared';
 import clsx from 'clsx';
 

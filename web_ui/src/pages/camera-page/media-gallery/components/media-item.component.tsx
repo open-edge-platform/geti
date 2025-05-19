@@ -3,8 +3,7 @@
 
 import { useRef } from 'react';
 
-import { DimensionValue, View } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { DimensionValue, useUnwrapDOMRef, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { Responsive } from '@react-types/shared';
 import { isEmpty } from 'lodash-es';

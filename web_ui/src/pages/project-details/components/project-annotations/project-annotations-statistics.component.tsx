@@ -3,8 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Flex, Grid, Loading, View } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { Flex, Grid, Loading, useUnwrapDOMRef, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
 

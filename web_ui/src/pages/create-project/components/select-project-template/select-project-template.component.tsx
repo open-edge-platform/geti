@@ -3,7 +3,7 @@
 
 import { Key, useEffect } from 'react';
 
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import { dimensionValue, useMediaQuery } from '@geti/ui';
 import { omit } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

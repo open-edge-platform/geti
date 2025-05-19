@@ -3,8 +3,18 @@
 
 import { useMemo, useRef, useState } from 'react';
 
-import { ActionButton, ComboBox, Flex, Heading, Item, Key, Loading, View } from '@geti/ui';
-import { dimensionValue, useUnwrapDOMRef } from '@react-spectrum/utils';
+import {
+    ActionButton,
+    ComboBox,
+    dimensionValue,
+    Flex,
+    Heading,
+    Item,
+    Key,
+    Loading,
+    useUnwrapDOMRef,
+    View,
+} from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
 import Close from '@spectrum-icons/workflow/Close';
 import dayjs from 'dayjs';
