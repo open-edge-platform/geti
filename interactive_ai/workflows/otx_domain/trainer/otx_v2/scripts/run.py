@@ -12,7 +12,7 @@ from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING
 
 import mlflow
-from minio_util import download_file_from_s3
+from minio_util import download_file
 from mlflow_io import AsyncCaller, download_config_file, download_shard_files, log_error, log_full
 from optimize import optimize
 from train import train
@@ -34,7 +34,7 @@ def download_pretrained_weights(template_id: str) -> None:
     host_name = os.environ.get("S3_HOST", "impt-seaweed-fs:8333")
     bucket_name = os.environ.get("BUCKET_NAME_PRETRAINEDWEIGHTS", "pretrainedweights")
     metadata_path = os.path.join(str(work_dir), "metadata.json")
-    download_file_from_s3(bucket_name, "pretrained_models.json", metadata_path, host_name)
+    download_file(bucket_name, "pretrained_models.json", metadata_path, host_name)
 
     if not os.path.exists(metadata_path):
         raise RuntimeError(f"Metadata file {metadata_path} does not exist")
@@ -62,7 +62,7 @@ def download_pretrained_weights(template_id: str) -> None:
     host_name = os.environ.get("S3_HOST", "impt-seaweed-fs:8333")
     for obj_name in obj_names:
         file_path = os.path.join(model_cache_dir, obj_name)
-        download_file_from_s3(bucket_name, obj_name, file_path, host_name)
+        download_file(bucket_name, obj_name, file_path, host_name)
         if file_path.endswith(".zip"):
             with zipfile.ZipFile(file_path) as zip_ref:
                 zip_ref.extractall(os.path.dirname(file_path))
