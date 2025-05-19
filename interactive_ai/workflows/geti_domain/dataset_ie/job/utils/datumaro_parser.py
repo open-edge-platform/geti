@@ -24,11 +24,12 @@ logger = logging.getLogger(__name__)
 class DatumaroProjectParser(ProjectParser):
     """
     An implementation of ProjectParser for Datumaro.
-    ProjectFactory will call the fucntions in the parser to create a project.
+    ProjectFactory will call the functions in the parser to create a project.
 
-    :param dm_dataset: Datumaro dataset instance
     :param project_name: A name of project to be created
     :param project_type: Geti project type
+    :param dm_infos: Infos of datumaro dataset
+    :param dm_categories: Categories belonging to the datumaro dataset
     :param label_to_ann_types: A mapping of label names in dataset to ann_types with which they appear
     :param selected_labels: label_names that a user selected to include in the created project
     :param color_by_label: Optional, mapping between label names and their color.
@@ -99,9 +100,9 @@ class DatumaroProjectParser(ProjectParser):
         Raise an exception if parsed data is not proper to create a project
         """
 
-        # 'Minimum 2 top-label calssifcation labels' rule
+        # 'Minimum 2 top-label classification labels' rule
         # For a classification task, at least 2 labels should be provided.
-        # Otherwise the task is ill-defined (a classification model that predicts only 1 class makes no sense).
+        # Otherwise, the task is ill-defined (a classification model that predicts only 1 class makes no sense).
         # Top-level means at the root level of the hierarchy.
         for task_name in self.get_tasks_names():
             task_type = self.get_task_type_by_name(task_name=task_name)
@@ -153,7 +154,6 @@ class DatumaroProjectParser(ProjectParser):
         :param label_groups: metadata for label group information each entry has 'name' and 'labels'
         :param label_name_to_parent: mapping from label_name to parent_name
         :param label_infos: metadata for label 'color' and 'hotkey'
-
         :return: mapping from label_name to label_meta
         """
         # Store label group name with label_name as key
@@ -165,7 +165,7 @@ class DatumaroProjectParser(ProjectParser):
                 for label_name in label_names:
                     label_name_to_group[label_name] = group_name
 
-        # label_infos optionaly has 'color, 'hotkey' meta-data
+        # label_infos optionally has 'color, 'hotkey' meta-data
         label_meta: dict[str, dict[str, Any]] = {}
         for label_info in label_infos:
             label_name = label_info["name"]
@@ -195,14 +195,14 @@ class DatumaroProjectParser(ProjectParser):
         include_all_labels: bool = False,
     ) -> dict[str, dict[str, dict[str, Any]]]:
         """
-        Parse Datumaro dataset instance to extracte label meta data.
-        Label meta data includes 'parent', 'group', 'color', and 'hotkey' of labels
+        Parse Datumaro dataset instance to extract label metadata.
+        Label metadata includes 'parent', 'group', 'color', and 'hotkey' of labels
 
         :param dm_infos: Infos of datumaro dataset.
         :param dm_categories: Categories of datumaro dataset.
         :param selected_labels: label_names that a user selected to include in the created project
         :param include_all_labels: if True, ignore selected_labels then include all possible labels for each task_type
-        :return: A dictionary stores label_meta with label_name as key
+        :return: A dictionary storing label_meta with label_name as key
         """
         (
             label_groups,
@@ -298,7 +298,7 @@ class DatumaroProjectParser(ProjectParser):
         """
         Assign task_name to task_type
 
-        :param trainable_task_types: task node types that are trainable
+        :param project_type: the Geti project type
         :return: A list of task_names (used in rest api), A dictionary mapping task_name to task_type
         """
         trainable_task_types = ImportUtils.get_trainable_tasks_of_project_type(project_type=project_type)
@@ -402,7 +402,7 @@ class DatumaroProjectParser(ProjectParser):
     def _get_label_meta(self, task_name: str, label_name: str) -> dict[str, Any]:
         """
         Get the label_meta of label:label_name in the task:task_name
-        label_meta optionaly contains 'group', 'parent', 'color', and 'hotkey'
+        label_meta optionally contains 'group', 'parent', 'color', and 'hotkey'
 
         :param task_name: Name of the task node
         :param label_name: Name of the label
@@ -479,7 +479,6 @@ class DatumaroProjectParser(ProjectParser):
         Build the 'pipeline' field of the REST API 'datasets:prepare-for-import' endpoint
         retrieving the necessary information from a DatumaroProjectParser.
 
-        :param project_parser: A parser to extract project meta-data from the dataset
         :return: dictionary with the following structure.
             e.g.)
             {
@@ -584,14 +583,19 @@ def get_filtered_supported_project_types(
     """
     Return possible project types based on CVS-105432, excluding cross-mapping projects.
 
-    Project mapping is different based on the dataset format.
+    Project mapping is different based on the dataset format. (CVS-105432)
     For Geti-exported Datumaro format:
-      candaidates should be the task type itself (+ cross-mapping projects).
+      candidates should be the task type itself (+ cross-mapping projects).
     For public formats(coco, voc, yolo) + Datumaro format not exported from Geti:
       candidate tasks would be decided based on annotation types.
       - label -> classification
       - bbox -> detection
-      - polygon/ellipse/mask -> segmentation.
+      - polygon/ellipse/mask -> segmentation
+      - points -> keypoint detection
+
+    :param dm_infos: datumaro dataset info
+    :param label_to_ann_types: mapping of labels in dataset to their ann_type
+    :return: A list of supported Geti project types
     """
     exported_project_type = ImportUtils.get_exported_project_type(dm_infos)
     if exported_project_type != GetiProjectType.UNKNOWN:
@@ -632,23 +636,16 @@ def get_project_metas_with_labels(
     Get mapping of domains to label names in the dataset. The list of labels for the
     domain will be filled with the labels which are compatible with the domain.
 
-    :param dm_dataset: datumaro dataset
+    :param dm_infos: datumaro dataset info
+    :param dm_categories: datumaro dataset categories
+    :param label_to_ann_types: mapping of labels in dataset to their ann_type
     :return: A list containing a dictionary for each supported task with their
-    compatible labels, list of possible domains in dataset based on present
-    annotation types
+        compatible labels, list of possible domains in dataset based on present
+        annotation types
     """
-
-    # Project mapping is different based on the dataset format. (CVS-105432)
-    # For Geti-exported Datumaro format:
-    #   candaidates should be the task type itself + cross-mapping projects.
-    # For public formats(coco, voc, yolo) + Datumaro format not exported from Geti:
-    #   candidate tasks would be decided based on annotation types.
-    #   - label -> classification
-    #   - bbox -> detection
-    #   - polygon/ellipse/mask -> segmentation.
-
     filtered_supported_project_types = get_filtered_supported_project_types(
-        dm_infos=dm_infos, label_to_ann_types=label_to_ann_types
+        dm_infos=dm_infos,
+        label_to_ann_types=label_to_ann_types,
     )
 
     # Extract project meta-data that will be utilized when build a REST API response
@@ -675,7 +672,7 @@ def get_project_metas_with_labels(
                 f"{ImportUtils.project_type_to_rest_api_string(project_type)}: {e}"
             )
 
-    # Re-map project_type for hierarchical classifcation task.
+    # Re-map project_type for hierarchical classification task.
     # Note that single-label/multi-label/hierarchical classification project has the same project_type in Geti.
     # But we should distinguish hierarchical classification on REST API
     for project_meta in project_metas_with_labels:
