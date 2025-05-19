@@ -3,8 +3,7 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Item, Picker, Text } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
+import { Item, Picker, StyleProps, Text } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { TasksItems } from '../../project-models/project-models.interface';

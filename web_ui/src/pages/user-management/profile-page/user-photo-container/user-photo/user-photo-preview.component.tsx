@@ -3,8 +3,7 @@
 
 import { ComponentProps, useEffect, useRef } from 'react';
 
-import { useUnwrapDOMRef, View } from '@geti/ui';
-import { DOMRefValue } from '@react-types/shared';
+import { DOMRefValue, useUnwrapDOMRef, View } from '@geti/ui';
 
 import { loadImage } from '../../../../../shared/utils';
 

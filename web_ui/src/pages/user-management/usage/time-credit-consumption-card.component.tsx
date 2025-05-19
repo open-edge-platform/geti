@@ -12,10 +12,10 @@ import {
     Item,
     Key,
     Loading,
+    StyleProps,
     useUnwrapDOMRef,
     View,
 } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
 import Close from '@spectrum-icons/workflow/Close';
 import dayjs from 'dayjs';
 import { isEmpty, isNumber, orderBy } from 'lodash-es';

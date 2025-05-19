@@ -4,8 +4,8 @@
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
 import { Divider, Flex, IllustratedMessage, useMediaQuery, View } from '@geti/ui';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { DimensionValue } from '@geti/ui/src/dna';
+import { Responsive } from '@geti/ui/src/style';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { isEmpty } from 'lodash-es';
 

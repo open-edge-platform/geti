@@ -11,6 +11,7 @@ import {
     DialogTrigger,
     dimensionValue,
     Flex,
+    FocusableRefValue,
     Heading,
     Text,
     Tooltip,
@@ -19,7 +20,6 @@ import {
     useUnwrapDOMRef,
     View,
 } from '@geti/ui';
-import { FocusableRefValue } from '@react-types/shared';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 

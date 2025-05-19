@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, View } from '@geti/ui';
-import { BorderRadiusValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { BorderRadiusValue } from '@geti/ui/src/dna';
+import { Responsive } from '@geti/ui/src/style';
 
 interface ChangeColorButtonProps {
     size: 'S' | 'L';

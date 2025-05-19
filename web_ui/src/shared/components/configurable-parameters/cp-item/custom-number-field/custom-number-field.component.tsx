@@ -3,8 +3,7 @@
 
 import { FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ActionGroup, DimensionValue, Flex, Item, TextField, useNumberFormatter } from '@geti/ui';
-import { Responsive } from '@react-types/shared';
+import { ActionGroup, DimensionValue, Flex, Item, Responsive, TextField, useNumberFormatter } from '@geti/ui';
 import { SpectrumTextFieldProps } from '@react-types/textfield';
 
 import { ChevronDownLight, ChevronUpLight } from '../../../../../assets/icons';

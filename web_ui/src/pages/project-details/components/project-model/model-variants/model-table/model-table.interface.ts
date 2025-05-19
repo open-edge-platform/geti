@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { StyleProps } from '@react-types/shared';
+import { StyleProps } from '@geti/ui';
 import { ColumnSize } from '@react-types/table';
 
 export interface ModelTableColumns<T> {

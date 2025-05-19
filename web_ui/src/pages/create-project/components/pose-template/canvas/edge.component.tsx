@@ -3,9 +3,8 @@
 
 import { ReactNode, RefObject, useRef, useState } from 'react';
 
-import { useUnwrapDOMRef } from '@geti/ui';
+import { DOMRefValue, useUnwrapDOMRef } from '@geti/ui';
 import { useHover, useInteractOutside } from '@react-aria/interactions';
-import { DOMRefValue } from '@react-types/shared';
 import clsx from 'clsx';
 
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';

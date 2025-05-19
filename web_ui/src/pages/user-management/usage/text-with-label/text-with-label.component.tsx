@@ -3,8 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Text, View, ViewProps } from '@geti/ui';
-import { ColorVersion } from '@react-types/shared';
+import { ColorVersion, Text, View, ViewProps } from '@geti/ui';
 
 import classes from './text-with-label.module.scss';
 

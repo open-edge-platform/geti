@@ -3,12 +3,11 @@
 
 import { useRef } from 'react';
 
-import { ActionButton, Flex, Grid, Heading, repeat, useDateFormatter, View } from '@geti/ui';
+import { ActionButton, DOMRefValue, Flex, Grid, Heading, repeat, StyleProps, useDateFormatter, View } from '@geti/ui';
 import { createCalendar } from '@internationalized/date';
 import { CalendarProps, DateValue, useCalendar } from '@react-aria/calendar';
 import { useLocale } from '@react-aria/i18n';
 import { useCalendarState } from '@react-stately/calendar';
-import { DOMRefValue, StyleProps } from '@react-types/shared';
 import ChevronLeft from '@spectrum-icons/workflow/ChevronLeft';
 import ChevronRight from '@spectrum-icons/workflow/ChevronRight';
 import { range } from 'lodash-es';

@@ -3,7 +3,7 @@
 
 import { ForwardedRef, forwardRef, PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
-import { DOMRefValue } from '@react-types/shared';
+import { DOMRefValue } from '@geti/ui';
 import { isEmpty, minBy } from 'lodash-es';
 import { useHover } from 'react-aria';
 

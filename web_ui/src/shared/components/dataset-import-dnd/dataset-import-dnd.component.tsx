@@ -4,8 +4,8 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 
 import { Button, Flex, Text, View } from '@geti/ui';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { DimensionValue } from '@geti/ui/src/dna';
+import { Responsive } from '@geti/ui/src/style';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 

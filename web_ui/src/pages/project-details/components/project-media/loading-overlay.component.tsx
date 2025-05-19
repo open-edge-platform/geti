@@ -3,8 +3,16 @@
 
 import { ComponentProps } from 'react';
 
-import { DimensionValue, Flex, ProgressCircle, View } from '@geti/ui';
-import { BackgroundColorValue, BoxAlignmentStyleProps, Responsive, StyleProps } from '@react-types/shared';
+import {
+    BackgroundColorValue,
+    BoxAlignmentStyleProps,
+    DimensionValue,
+    Flex,
+    ProgressCircle,
+    Responsive,
+    StyleProps,
+    View,
+} from '@geti/ui';
 
 interface LoadingOverlayProps extends StyleProps, BoxAlignmentStyleProps {
     id?: string;

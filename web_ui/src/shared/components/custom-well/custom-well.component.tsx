@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { SpectrumWellProps, Well } from '@geti/ui';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { DimensionValue } from '@geti/ui/src/dna';
+import { Responsive } from '@geti/ui/src/style';
 
 import classes from './custom-well.module.scss';
 

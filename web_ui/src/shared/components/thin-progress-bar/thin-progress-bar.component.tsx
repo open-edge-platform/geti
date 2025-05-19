@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useStyleProps, View } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
-import { ColorValue, DimensionValue } from '@react-types/shared/src/dna';
+import { StyleProps, useStyleProps, View } from '@geti/ui';
+import { ColorValue, DimensionValue } from '@geti/ui/src/dna';
 
 export interface ThinProgressBarProps extends StyleProps {
     progress: number;
