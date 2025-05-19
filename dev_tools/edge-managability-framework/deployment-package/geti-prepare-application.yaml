@@ -9,9 +9,9 @@ name: geti-prepare
 version: 2.9.0
 description: Global network policies for Intel® Geti™
 
-helmRegistry: ghcr-geti-oci  # temporary location
-chartName: prepare
-chartVersion: 2.9.0  # temporary version
+helmRegistry: ghcr-geti-oci
+chartName: emf-geti
+chartVersion: 2.9.0
 
 profiles:
   - name: default
