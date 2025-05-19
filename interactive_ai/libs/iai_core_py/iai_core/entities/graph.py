@@ -129,7 +129,3 @@ class MultiDiGraph(Graph):
 
     def __init__(self) -> None:
         super().__init__(directed=True)
-
-    def topological_sort(self):
-        """Returns a generator of nodes in topologically sorted order."""
-        return nx.topological_sort(self._graph)
