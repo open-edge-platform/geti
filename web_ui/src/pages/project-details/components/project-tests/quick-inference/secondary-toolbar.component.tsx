@@ -3,8 +3,7 @@
 
 import { Key } from 'react';
 
-import { Divider, Flex, Item, Picker, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Divider, Flex, Item, Picker, Switch, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../../core/labels/label.interface';

@@ -3,7 +3,7 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Item, Picker } from '@adobe/react-spectrum';
+import { Item, Picker } from '@geti/ui';
 import { Text } from '@react-spectrum/text';
 import { StyleProps } from '@react-types/shared';
 

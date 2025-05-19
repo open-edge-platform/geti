@@ -3,8 +3,7 @@
 
 import { Fragment } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Flex } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Flex } from '@geti/ui';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import { Footer } from '../../../../pages/annotator/components/footer/annotator-footer.component';

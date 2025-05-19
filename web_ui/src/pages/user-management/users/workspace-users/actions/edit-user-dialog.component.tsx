@@ -3,8 +3,7 @@
 
 import { FC, FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';

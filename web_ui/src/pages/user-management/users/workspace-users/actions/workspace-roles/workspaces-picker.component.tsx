@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Item, Picker, Text } from '@adobe/react-spectrum';
+import { Item, Picker, Text } from '@geti/ui';
 
 import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
 

@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, Grid, minmax, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, Checkbox } from '@geti/ui';
+import { ActionButton, Checkbox, Flex, Grid, minmax, Text, View } from '@geti/ui';
 import { noop } from 'lodash-es';
 
 import { Refresh } from '../../../../../../../../assets/icons';

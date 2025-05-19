@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
+import { TextField } from '@geti/ui';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { useDebouncedCallback } from '../../../../hooks/use-debounced-callback/use-debounced-callback.hook';

@@ -3,7 +3,7 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import { Grid, minmax, Text, View } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 
 import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';

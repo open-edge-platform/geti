@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import { Flex, Grid, minmax, Text, View } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

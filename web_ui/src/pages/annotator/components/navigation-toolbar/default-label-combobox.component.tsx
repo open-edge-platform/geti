@@ -3,8 +3,7 @@
 
 import { useRef, useState } from 'react';
 
-import { TextField, View } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, TextField, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { Label } from '../../../../core/labels/label.interface';

@@ -3,8 +3,7 @@
 
 import { forwardRef } from 'react';
 
-import { Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import classes from './annotations-required.module.scss';
 

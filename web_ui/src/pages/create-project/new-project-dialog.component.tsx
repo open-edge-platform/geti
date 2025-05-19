@@ -3,8 +3,7 @@
 
 import { CSSProperties, FC, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Text } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';

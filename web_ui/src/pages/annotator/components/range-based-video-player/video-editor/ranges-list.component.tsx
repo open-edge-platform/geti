@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Grid } from '@adobe/react-spectrum';
+import { Grid } from '@geti/ui';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';

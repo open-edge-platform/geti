@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

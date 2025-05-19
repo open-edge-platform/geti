@@ -3,8 +3,7 @@
 
 import { CSSProperties, useEffect } from 'react';
 
-import { View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Loading, View } from '@geti/ui';
 
 import { Explanation } from '../../../../core/annotations/prediction.interface';
 import { useDrawImageOnCanvas } from '../../../../shared/hooks/use-draw-image-on-canvas.hook';

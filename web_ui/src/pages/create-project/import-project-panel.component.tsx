@@ -3,8 +3,7 @@
 
 import { ChangeEvent, useRef } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Flex, Text, View } from '@geti/ui';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 

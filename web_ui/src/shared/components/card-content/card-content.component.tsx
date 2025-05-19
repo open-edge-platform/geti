@@ -3,8 +3,7 @@
 
 import { CSSProperties, ReactNode, useRef } from 'react';
 
-import { Divider, Flex, Heading, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Divider, Flex, Heading, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
 import { isEmpty } from 'lodash-es';
 

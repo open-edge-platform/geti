@@ -3,8 +3,7 @@
 
 import { Key, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading } from '@geti/ui';
 import { useMatch, useNavigate } from 'react-router-dom';
 
 import { isVisualPromptModelGroup } from '../../../../core/annotations/services/visual-prompt-service';

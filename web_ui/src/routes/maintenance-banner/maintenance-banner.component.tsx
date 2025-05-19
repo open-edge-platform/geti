@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, Heading, View } from '@adobe/react-spectrum';
+import { Content, Flex, Heading, View } from '@geti/ui';
 import dayjs from 'dayjs';
 
 import { Alert, Close } from '../../assets/icons';

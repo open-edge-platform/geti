@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
-import { Button, DateRangePicker } from '@geti/ui';
+import { Button, ButtonGroup, Content, DateRangePicker, Dialog, DialogContainer, Divider, Heading } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { RangeValue } from '@react-types/shared';

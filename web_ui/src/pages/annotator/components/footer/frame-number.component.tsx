@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 
 import { VideoFrame } from '../../../../core/media/video.interface';

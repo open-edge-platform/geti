@@ -3,7 +3,7 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 
 import { Grid, GridMedium, GridSmall, List } from '../../../assets/icons';

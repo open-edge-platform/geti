@@ -3,7 +3,7 @@
 
 import { RefObject, useRef } from 'react';
 
-import { useNumberFormatter, View, VisuallyHidden } from '@adobe/react-spectrum';
+import { useNumberFormatter, View, VisuallyHidden } from '@geti/ui';
 import { isArray } from 'lodash-es';
 import { mergeProps, useFocusRing, useSlider, useSliderThumb } from 'react-aria';
 import { SliderState, useSliderState } from 'react-stately';

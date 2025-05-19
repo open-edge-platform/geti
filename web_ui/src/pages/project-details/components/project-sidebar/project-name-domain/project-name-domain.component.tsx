@@ -3,8 +3,7 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import { ActionButton, Flex, LoadingIndicator } from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 
 import { Edit } from '../../../../../assets/icons';

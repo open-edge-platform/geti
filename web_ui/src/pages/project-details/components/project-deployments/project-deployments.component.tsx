@@ -3,8 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { DialogContainer, Flex } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, DialogContainer, Flex } from '@geti/ui';
 import { isEmpty, uniqBy } from 'lodash-es';
 
 import { DeploymentImg } from '../../../../assets/images';

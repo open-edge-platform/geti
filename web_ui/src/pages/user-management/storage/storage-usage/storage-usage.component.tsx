@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, ProgressCircle, View } from '@adobe/react-spectrum';
-import { ColorThumb, Loading } from '@geti/ui';
+import { ColorThumb, Flex, Heading, Loading, ProgressCircle, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 

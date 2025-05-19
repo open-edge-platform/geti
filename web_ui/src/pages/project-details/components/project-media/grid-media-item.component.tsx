@@ -3,8 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Checkbox, PressableElement } from '@geti/ui';
+import { Checkbox, Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 
 import { MediaItem } from '../../../../core/media/media.interface';

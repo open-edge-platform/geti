@@ -3,7 +3,7 @@
 
 import { Key, useState } from 'react';
 
-import { DialogContainer } from '@adobe/react-spectrum';
+import { DialogContainer } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Delete, Edit } from '../../../../../assets/icons';

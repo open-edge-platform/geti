@@ -3,8 +3,7 @@
 
 import { ComponentProps, ReactNode } from 'react';
 
-import { Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Text } from '@geti/ui';
 import { Placement } from 'react-aria';
 
 import { MoreMenu } from '../../../../assets/icons';

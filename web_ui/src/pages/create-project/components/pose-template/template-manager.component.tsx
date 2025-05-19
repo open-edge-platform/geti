@@ -3,7 +3,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, Grid } from '@adobe/react-spectrum';
+import { DimensionValue, Flex, Grid } from '@geti/ui';
 import { Responsive } from '@react-types/shared';
 import { isEmpty } from 'lodash-es';
 

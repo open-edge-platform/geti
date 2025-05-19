@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { CloseSmall } from '../../../../../assets/icons';
 import { fetchLabelsTree, findLabelParents } from '../../../../../core/labels/annotator-utils/labels-utils';

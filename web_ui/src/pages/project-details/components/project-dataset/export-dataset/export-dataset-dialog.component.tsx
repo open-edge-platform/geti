@@ -4,6 +4,8 @@
 import { useState } from 'react';
 
 import {
+    ActionButton,
+    Button,
     ButtonGroup,
     Content,
     ContextualHelp,
@@ -17,8 +19,7 @@ import {
     Text,
     Tooltip,
     TooltipTrigger,
-} from '@adobe/react-spectrum';
-import { ActionButton, Button } from '@geti/ui';
+} from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import LinkOut from '@spectrum-icons/workflow/LinkOut';
 

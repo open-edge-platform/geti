@@ -3,8 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { LoadingIndicator, PressableElement } from '@geti/ui';
+import { Flex, LoadingIndicator, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { motion } from 'framer-motion';
 import { maxBy } from 'lodash-es';
 

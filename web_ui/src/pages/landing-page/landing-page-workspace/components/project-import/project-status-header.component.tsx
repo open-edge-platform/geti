@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Divider, Flex, Heading } from '@adobe/react-spectrum';
+import { Divider, Flex, Heading } from '@geti/ui';
 
 import { getFileSize } from '../../../../../shared/utils';
 

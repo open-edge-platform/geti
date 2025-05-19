@@ -3,8 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { formatUtcToLocal } from '../../../../utils';

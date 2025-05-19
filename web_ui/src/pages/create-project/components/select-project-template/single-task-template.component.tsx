@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Grid, minmax, repeat } from '@adobe/react-spectrum';
+import { Grid, minmax, repeat } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

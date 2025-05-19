@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Radio, RadioGroup, Text } from '@adobe/react-spectrum';
+import { Flex, Radio, RadioGroup, Text } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';

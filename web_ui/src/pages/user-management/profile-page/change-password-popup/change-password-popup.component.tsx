@@ -3,8 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Form } from '@adobe/react-spectrum';
-import { Button, PasswordField } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogTrigger, Divider, Form, PasswordField } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { ValidationError } from 'yup';
 

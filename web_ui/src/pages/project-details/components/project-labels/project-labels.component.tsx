@@ -3,8 +3,7 @@
 
 import { Fragment, useCallback, useEffect, useState } from 'react';
 
-import { DialogContainer, Divider, Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Button, Loading } from '@geti/ui';
+import { Button, DialogContainer, Divider, Flex, Loading, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import {

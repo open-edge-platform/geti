@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Heading, Text, View } from '@geti/ui';
 import Alert from '@spectrum-icons/workflow/Alert';
 import { capitalize } from 'lodash-es';
 

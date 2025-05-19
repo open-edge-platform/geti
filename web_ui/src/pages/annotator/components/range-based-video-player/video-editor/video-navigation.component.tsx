@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Divider, Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { Redo, Scope, Undo } from '../../../../../assets/icons';
 import { VideoFrame } from '../../../../../core/media/video.interface';

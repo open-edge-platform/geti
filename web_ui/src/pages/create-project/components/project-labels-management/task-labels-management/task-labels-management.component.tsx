@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 
 import {
     LabelItemEditionState,

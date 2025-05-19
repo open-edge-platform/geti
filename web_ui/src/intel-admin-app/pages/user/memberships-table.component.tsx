@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@adobe/react-spectrum';
+import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 
 import { USER_ROLE } from '../../../core/users/users.interface';
 import { DateCell } from '../../../shared/components/table/date-cell/date-cell.component';

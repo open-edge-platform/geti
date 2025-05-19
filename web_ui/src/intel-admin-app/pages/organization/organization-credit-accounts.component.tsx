@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { Button, Loading, Skeleton } from '@geti/ui';
+import { Button, Flex, Loading, Skeleton, Text, View } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 
 import { NewCreditAccount } from '../../../core/credits/credits.interface';

@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { Fps } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';

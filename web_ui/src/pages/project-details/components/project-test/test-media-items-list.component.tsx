@@ -3,8 +3,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
-import { Flex, IllustratedMessage, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { Loading, PressableElement } from '@geti/ui';
+import { Flex, IllustratedMessage, Loading, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 import { VirtuosoGridHandle } from 'react-virtuoso';

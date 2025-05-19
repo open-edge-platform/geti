@@ -3,8 +3,7 @@
 
 import { FC, useMemo, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Grid, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Grid, Heading } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

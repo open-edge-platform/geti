@@ -3,8 +3,7 @@
 
 import { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode, useState } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton, PressableElement } from '@geti/ui';
+import { ActionButton, Flex, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isFunction } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';

@@ -3,8 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Heading, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, Heading, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { Adjustments } from '../../../../assets/icons';

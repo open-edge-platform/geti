@@ -3,18 +3,7 @@
 
 import { FC, Key, useState } from 'react';
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Flex,
-    Heading,
-    Item,
-    Picker,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Item, Picker } from '@geti/ui';
 
 import { RESOURCE_TYPE, RoleResource, USER_ROLE } from '../../../../core/users/users.interface';
 import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';

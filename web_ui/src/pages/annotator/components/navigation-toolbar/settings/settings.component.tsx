@@ -4,6 +4,7 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -16,8 +17,7 @@ import {
     Tabs,
     Tooltip,
     TooltipTrigger,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 import { isEqual, isNil } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 

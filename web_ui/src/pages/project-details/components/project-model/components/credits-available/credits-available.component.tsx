@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, ContextualHelp, Flex, useNumberFormatter } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Flex, useNumberFormatter } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { CreditCard } from '../../../../../../assets/icons';

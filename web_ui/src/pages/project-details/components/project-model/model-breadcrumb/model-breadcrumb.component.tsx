@@ -3,8 +3,7 @@
 
 import { Key, useRef } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, Tag } from '@geti/ui';
+import { ActionButton, Flex, Item, Menu, MenuTrigger, Tag, Text, View } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { FocusableRefValue } from '@react-types/shared';
 import { usePress } from 'react-aria';

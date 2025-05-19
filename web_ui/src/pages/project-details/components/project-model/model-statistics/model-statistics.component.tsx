@@ -3,8 +3,7 @@
 
 import { Fragment, useMemo, useRef } from 'react';
 
-import { Content, Flex, Grid } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Content, Flex, Grid, Loading } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { StatusCodes } from 'http-status-codes';
 import { isEmpty } from 'lodash-es';

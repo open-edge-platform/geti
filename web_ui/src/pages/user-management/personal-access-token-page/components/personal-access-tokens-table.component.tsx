@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, useCollator, View } from '@adobe/react-spectrum';
-import { Tag } from '@geti/ui';
+import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, Tag, useCollator, View } from '@geti/ui';
 import { SortDescriptor } from '@react-types/shared';
 import { get, isEmpty } from 'lodash-es';
 

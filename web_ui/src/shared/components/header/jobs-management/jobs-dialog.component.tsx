@@ -3,7 +3,7 @@
 
 import { Dispatch, Key, SetStateAction, useState } from 'react';
 
-import { Content, Dialog, Flex, Text } from '@adobe/react-spectrum';
+import { Content, Dialog, Flex, Text } from '@geti/ui';
 import { keepPreviousData } from '@tanstack/react-query';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';

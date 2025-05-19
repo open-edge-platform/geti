@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Image, View } from '@adobe/react-spectrum';
+import { Image, View } from '@geti/ui';
 
 import { getAnnotationStateForTask } from '../../../../../core/annotations/utils';
 import { VideoFrame } from '../../../../../core/media/video.interface';

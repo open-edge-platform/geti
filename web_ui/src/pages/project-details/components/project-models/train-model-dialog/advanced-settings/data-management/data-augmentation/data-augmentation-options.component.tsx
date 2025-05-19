@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Grid, Text } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Grid, Switch, Text } from '@geti/ui';
 
 export interface DataAugmentationOption {
     key: string;

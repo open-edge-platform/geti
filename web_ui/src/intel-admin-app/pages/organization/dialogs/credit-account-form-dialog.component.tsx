@@ -4,8 +4,11 @@
 import { useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
+    Checkbox,
     Content,
+    DatePicker,
     Dialog,
     DialogContainer,
     Divider,
@@ -14,8 +17,7 @@ import {
     Heading,
     NumberField,
     TextField,
-} from '@adobe/react-spectrum';
-import { Button, Checkbox, DatePicker } from '@geti/ui';
+} from '@geti/ui';
 import { DateValue, getLocalTimeZone, parseAbsolute, parseDate, today } from '@internationalized/date';
 import dayjs from 'dayjs';
 

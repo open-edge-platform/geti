@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Flex, Switch, Text } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import { findAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';

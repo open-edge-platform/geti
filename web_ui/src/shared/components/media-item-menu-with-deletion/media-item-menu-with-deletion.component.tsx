@@ -3,7 +3,7 @@
 
 import { ComponentProps, Key, ReactNode } from 'react';
 
-import { AlertDialog, DialogContainer, View } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer, View } from '@geti/ui';
 
 import { DELETE_ANOMALY_VIDEO_WARNING } from '../../../pages/project-details/components/project-media/media-item-tooltip-message/utils';
 import { MenuTriggerButton } from '../menu-trigger/menu-trigger-button/menu-trigger-button.component';

@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
+import { Checkbox, Flex } from '@geti/ui';
 
 import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';

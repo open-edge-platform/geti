@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
-import { Flex, ProgressCircle, Text } from '@adobe/react-spectrum';
+import { Flex, ProgressCircle, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';

@@ -3,7 +3,7 @@
 
 import { ComponentType, forwardRef, LegacyRef, useEffect } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Components, Virtuoso } from 'react-virtuoso';
 

@@ -3,8 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, TabList, TabPanels, Tabs, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Flex, Item, TabList, TabPanels, Tabs, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';

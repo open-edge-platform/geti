@@ -3,7 +3,7 @@
 
 import { Key, ReactNode } from 'react';
 
-import { Divider, Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@geti/ui';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Image, Text } from '@adobe/react-spectrum';
+import { Flex, Heading, Image, Text } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 import { OverlayTriggerState } from '@react-stately/overlays';
 

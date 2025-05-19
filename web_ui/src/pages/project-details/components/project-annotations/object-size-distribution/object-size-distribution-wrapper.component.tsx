@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { isClassificationDomain } from '../../../../../core/projects/domains';
 import { ObjectSizeDistribution } from '../../../../../core/statistics/services/dataset-statistics.interface';

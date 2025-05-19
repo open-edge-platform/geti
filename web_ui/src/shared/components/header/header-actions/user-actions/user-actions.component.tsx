@@ -3,8 +3,7 @@
 
 import { Key, useRef } from 'react';
 
-import { Flex, Grid, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Flex, Grid, Text } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { FocusableRefValue } from '@react-types/shared';
 import Import from '@spectrum-icons/workflow/Import';

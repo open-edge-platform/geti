@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { Delete, MoreMenu, Pause, Play } from '../../../assets/icons';

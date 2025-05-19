@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 
 import { Alert } from '../../../../assets/icons';
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';

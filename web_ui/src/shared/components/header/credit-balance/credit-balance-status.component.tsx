@@ -1,18 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import {
-    Content,
-    Dialog,
-    DialogTrigger,
-    Divider,
-    Flex,
-    Heading,
-    ProgressCircle,
-    Text,
-    View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Content, Dialog, DialogTrigger, Divider, Flex, Heading, ProgressCircle, Text, View } from '@geti/ui';
 import { isEmpty, overSome } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 

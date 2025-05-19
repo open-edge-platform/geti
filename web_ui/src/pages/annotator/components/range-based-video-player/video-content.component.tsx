@@ -3,8 +3,7 @@
 
 import { RefObject, useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading, View } from '@geti/ui';
 import { useSpinDelay } from 'spin-delay';
 
 import { VideoFrame } from '../../../../core/media/video.interface';

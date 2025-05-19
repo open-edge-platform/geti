@@ -3,8 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { Grid, repeat, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
+import { Checkbox, Grid, repeat, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isEmpty } from 'lodash-es';
 

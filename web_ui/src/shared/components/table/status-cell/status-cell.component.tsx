@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { AcceptCircle, CrossCircle, HelpCircleSolidIcon, MinusCircle, Time } from '../../../../assets/icons';
 import { AccountStatus } from '../../../../core/organizations/organizations.interface';

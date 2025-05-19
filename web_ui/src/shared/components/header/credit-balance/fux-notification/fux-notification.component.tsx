@@ -3,8 +3,7 @@
 
 import { ComponentProps, MutableRefObject, ReactNode } from 'react';
 
-import { Divider, Flex, Text } from '@adobe/react-spectrum';
-import { Button, CustomPopover } from '@geti/ui';
+import { Button, CustomPopover, Divider, Flex, Text } from '@geti/ui';
 import { Popover } from '@react-spectrum/overlays';
 import { isFunction } from 'lodash-es';
 

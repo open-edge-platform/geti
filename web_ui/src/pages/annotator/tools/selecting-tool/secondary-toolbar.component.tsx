@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { PointSelector } from '../../../../assets/icons';

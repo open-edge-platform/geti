@@ -3,8 +3,7 @@
 
 import { FC, ReactNode, useState } from 'react';
 
-import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Divider, Flex, Heading, LoadingIndicator, Text, View } from '@geti/ui';
 
 import { getJobActiveStep } from '../../../../../core/jobs/utils';
 import { DatasetIdentifier, ExportDatasetLSData, ExportFormats } from '../../../../../core/projects/dataset.interface';

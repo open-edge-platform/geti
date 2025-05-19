@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { TrainingModelInfoType } from '../../../../../../core/statistics/model-statistics.interface';
 import { InfoTooltip } from '../../../../../../shared/components/info-tooltip/info-tooltip.component';

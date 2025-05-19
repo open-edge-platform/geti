@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Content, Dialog, DialogTrigger, Flex } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Content, Dialog, DialogTrigger, Flex } from '@geti/ui';
 import { HexColorInput, HexColorPicker } from 'react-colorful';
 
 import { validateColor } from '../utils';

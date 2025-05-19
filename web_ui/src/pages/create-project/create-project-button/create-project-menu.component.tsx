@@ -4,6 +4,7 @@
 import { Key, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -17,8 +18,7 @@ import {
     Tooltip,
     TooltipTrigger,
     View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
 import { OverlayTriggerState } from '@react-stately/overlays';
 

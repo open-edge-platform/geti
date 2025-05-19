@@ -3,8 +3,7 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { SearchField } from '@geti/ui';
+import { Flex, SearchField } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { USER_ROLE, UsersQueryParams } from '../../../core/users/users.interface';

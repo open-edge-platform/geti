@@ -3,8 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Heading, Text } from '@geti/ui';
 
 import { Unauthorized } from '../../../assets/images';
 import { paths } from '../../../core/services/routes';

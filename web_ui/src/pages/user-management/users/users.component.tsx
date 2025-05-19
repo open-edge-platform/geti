@@ -3,7 +3,7 @@
 
 import { ComponentProps, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { motion } from 'framer-motion';
 import { isEmpty } from 'lodash-es';
 

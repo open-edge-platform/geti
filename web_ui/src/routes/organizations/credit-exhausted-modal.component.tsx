@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -10,8 +11,7 @@ import {
     Heading,
     Text,
     useNumberFormatter,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 
 import { CONTACT_SUPPORT } from '../../core/const';
 import { useCreditsQueries } from '../../core/credits/hooks/use-credits-api.hook';

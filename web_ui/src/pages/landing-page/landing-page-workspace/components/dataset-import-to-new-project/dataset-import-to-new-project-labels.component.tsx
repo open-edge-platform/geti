@@ -3,8 +3,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { Flex, Heading, IllustratedMessage, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, Checkbox } from '@geti/ui';
+import { ActionButton, Checkbox, Flex, Heading, IllustratedMessage, Text, View } from '@geti/ui';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { differenceBy, intersectionBy, isEmpty, uniqBy } from 'lodash-es';
 

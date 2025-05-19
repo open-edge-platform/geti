@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Item, Key, Picker, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Item, Key, Picker, View } from '@geti/ui';
 import { orderBy } from 'lodash-es';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';

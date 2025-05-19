@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';

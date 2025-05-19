@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, Heading, Link as SpectrumLink, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Content, Flex, Heading, Link as SpectrumLink, Text } from '@geti/ui';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { ServiceUnavailableIcon } from '../../assets/images';

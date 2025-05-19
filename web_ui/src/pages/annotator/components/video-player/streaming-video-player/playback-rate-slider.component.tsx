@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DialogTrigger, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton, Slider } from '@geti/ui';
+import { ActionButton, DialogTrigger, Flex, Slider, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { PlaybackRate } from '../../../../../assets/icons';
 import { useStreamingVideoPlayer } from './streaming-video-player-provider.component';

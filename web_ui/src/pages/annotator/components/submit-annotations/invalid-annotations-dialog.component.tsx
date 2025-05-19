@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AlertDialog, DialogContainer } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer } from '@geti/ui';
 import { MutationStatus } from '@tanstack/react-query';
 
 import { UseSubmitAnnotationsMutationResult } from '../../providers/submit-annotations-provider/submit-annotations.interface';

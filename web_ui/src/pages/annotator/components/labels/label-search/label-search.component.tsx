@@ -3,8 +3,7 @@
 
 import { ComponentProps, ReactNode, RefObject, useEffect, useRef } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, TextField } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 import { TextFieldRef } from '@react-types/textfield';

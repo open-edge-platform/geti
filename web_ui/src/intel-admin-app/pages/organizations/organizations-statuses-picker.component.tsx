@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Item, Key, Picker } from '@adobe/react-spectrum';
+import { Item, Key, Picker } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { AccountStatus } from '../../../core/organizations/organizations.interface';

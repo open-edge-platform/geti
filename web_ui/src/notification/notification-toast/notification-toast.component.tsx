@@ -3,7 +3,7 @@
 
 import { ReactElement } from 'react';
 
-import { Flex, Heading, Text } from '@adobe/react-spectrum';
+import { Flex, Heading, Text } from '@geti/ui';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash-es';
 

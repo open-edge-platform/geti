@@ -3,8 +3,18 @@
 
 import { ReactElement } from 'react';
 
-import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator, PressableElement } from '@geti/ui';
+import {
+    ActionButton,
+    Item,
+    LoadingIndicator,
+    Menu,
+    MenuTrigger,
+    PressableElement,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+    View,
+} from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isAxiosError } from 'axios';

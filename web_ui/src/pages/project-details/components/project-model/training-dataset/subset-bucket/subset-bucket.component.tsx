@@ -3,7 +3,7 @@
 
 import { CSSProperties, useMemo, useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 
 import { BulbIcon, DocumentIcon, ShieldFilled } from '../../../../../../assets/icons';

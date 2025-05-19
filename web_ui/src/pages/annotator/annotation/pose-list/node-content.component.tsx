@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ColorSwatch } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
+import { Checkbox, ColorSwatch } from '@geti/ui';
 import { useFocusManager } from 'react-aria';
 
 import { CloseSemiBold } from '../../../../assets/icons';

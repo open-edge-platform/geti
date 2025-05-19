@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Flex, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Heading } from '@geti/ui';
 
 import { useCodeDeployment } from '../../../../core/code-deployment/hooks/use-code-deployment.hook';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

@@ -3,8 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { CustomPopover, type ActionButtonProps } from '@geti/ui';
+import { CustomPopover, Flex, Text, View, type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';

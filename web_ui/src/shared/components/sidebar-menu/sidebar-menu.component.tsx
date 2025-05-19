@@ -3,7 +3,7 @@
 
 import { Fragment } from 'react';
 
-import { Text } from '@adobe/react-spectrum';
+import { Text } from '@geti/ui';
 import clsx from 'clsx';
 import { NavLink } from 'react-router-dom';
 

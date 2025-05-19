@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { Skeleton } from '@geti/ui';
+import { Flex, Skeleton } from '@geti/ui';
 
 export const ConfigParamsPlaceholder = (): JSX.Element => {
     return (
