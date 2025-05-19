@@ -23,13 +23,22 @@ export default [
             'no-restricted-imports': [
                 'error',
                 {
-                    name: '@adobe/react-spectrum',
-                    message: 'Use component from the @geti/ui folder instead.',
-                },
-                {
-                    name: '@react-types/button',
-                    importNames: ['SpectrumButtonProps', 'SpectrumActionButtonProps'],
-                    message: "Use component's type from @geti/ui folder instead.",
+                    paths: [
+                        {
+                            name: '@adobe/react-spectrum',
+                            message: 'Use component from the @geti/ui folder instead.',
+                        },
+                    ],
+                    patterns: [
+                        {
+                            group: ['@react-spectrum/*'],
+                            message: 'Use component from the @geti/ui folder instead.',
+                        },
+                        {
+                            group: ['@react-types/*'],
+                            message: 'Use type from the @geti/ui folder instead.',
+                        },
+                    ],
                 },
             ],
         },
