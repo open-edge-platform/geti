@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { PressableElement } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 import { useNumberFormatter, usePress } from 'react-aria';
 
@@ -10,7 +11,6 @@ import { AnnotationLabel } from '../../../../core/annotations/annotation.interfa
 import { isPrediction, showLabelScore } from '../../../../core/labels/utils';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { FullnameWithLoading } from '../../../../shared/components/users/fullname.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

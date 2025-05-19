@@ -20,11 +20,6 @@ export const onHoverTooltip = (element: HTMLElement | null): void => {
     fireEvent.mouseEnter(element);
 };
 
-export const onOutsideClick = (): void => {
-    fireEvent.mouseDown(document.body);
-    fireEvent.mouseUp(document.body);
-};
-
 export const MORE_THAN_100_CHARS_NAME =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer malesuada rutrum felis nec rhoncus tincidunt.';
 

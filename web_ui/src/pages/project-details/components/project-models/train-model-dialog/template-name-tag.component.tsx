@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Tag } from '../../../../../shared/components/tag/tag.component';
+import { Tag } from '@geti/ui';
 
 import classes from '../models-container/model-card/model-card.module.scss';
 

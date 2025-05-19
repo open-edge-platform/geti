@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { PressableElement } from '@geti/ui';
 
-import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { ConfigurableParametersComponents, ConfigurableParametersMany } from '../../configurable-parameters.interface';
 
 import classes from '../../selectable-customized-tabs/selectable-customized-tabs.module.scss';

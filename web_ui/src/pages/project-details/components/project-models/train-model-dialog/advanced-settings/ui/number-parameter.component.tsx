@@ -4,8 +4,8 @@
 import { FC, useEffect, useState } from 'react';
 
 import { Flex, NumberField } from '@adobe/react-spectrum';
+import { Slider } from '@geti/ui';
 
-import { Slider } from '../../../../../../../shared/components/slider/slider.component';
 import { getFloatingPointStep } from '../utils';
 
 interface NumberGroupParamsProps {

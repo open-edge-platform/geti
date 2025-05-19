@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Button } from '@geti/ui';
+import { Button, LoadingIndicator } from '@geti/ui';
 import { head } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -15,7 +15,6 @@ import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { Task } from '../../../../../core/projects/task.interface';
 import { CreditBalanceTrainDialog } from '../../../../../pages/project-details/components/project-models/train-model-dialog/credit-balance-train-dialog.component';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
-import { LoadingIndicator } from '../../../loading/loading-indicator.component';
 import { JobCancellationWarning } from '../../jobs-management/jobs-cancellation-warning.component';
 
 interface ToggleTrainingButtonProps {

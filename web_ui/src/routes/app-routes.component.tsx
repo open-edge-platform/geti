@@ -3,6 +3,7 @@
 
 import { Suspense, useEffect } from 'react';
 
+import { IntelBrandedLoading } from '@geti/ui';
 import { negate } from 'lodash-es';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';
 
@@ -22,7 +23,6 @@ import { SignUp } from '../pages/sign-up/sign-up.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';
 import { AccessDeniedDialog } from '../shared/components/access-denied-dialog/access-denied-dialog.component';
 import { LicenseModal } from '../shared/components/license-modal/license-modal.component';
-import { IntelBrandedLoading } from '../shared/components/loading/intel-branded-loading.component';
 import { ForgotPassword } from '../sign-up/pages/forgot-password/forgot-password.component';
 import { InvalidLink } from '../sign-up/pages/invalid-link/invalid-link.component';
 import { Registration } from '../sign-up/pages/registration/registration.component';

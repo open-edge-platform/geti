@@ -1,0 +1,32 @@
+{{- if .Values.global.proxy.enabled }}
+{{- $httpHost := (split ":" ((urlParse .Values.global.proxy.http_proxy).host))._0 }}
+{{- $httpsHost := (split ":" ((urlParse .Values.global.proxy.https_proxy).host))._0 }}
+{{- $httpPort := (default "80" ((split ":" ((urlParse .Values.global.proxy.http_proxy).host))._1)) }}
+{{- $httpsPort := (default "80" ((split ":" ((urlParse .Values.global.proxy.https_proxy).host))._1)) }}
+{{ if .Capabilities.APIVersions.Has "networking.istio.io/v1/ServiceEntry"}}
+apiVersion: networking.istio.io/v1
+{{ else }}
+apiVersion: networking.istio.io/v1beta1
+{{ end }}
+kind: ServiceEntry
+metadata:
+  name: weight-uploader-proxy
+  namespace: {{ .Release.Namespace }}
+spec:
+  hosts:
+  - {{ $httpHost }}
+  {{- if ne $httpHost $httpsHost }}
+  - {{ $httpsHost }}
+  {{- end }}
+  ports:
+  - number: {{ $httpPort }}
+    name: http-proxy
+    protocol: tcp
+  {{- if ne $httpPort $httpsPort }}
+  - number: {{ $httpsPort }}
+    name: https-proxy
+    protocol: tcp
+  {{- end }}
+  resolution: DNS
+  location: MESH_EXTERNAL
+{{- end }}

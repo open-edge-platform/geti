@@ -3,13 +3,13 @@
 
 import { useEffect, useState } from 'react';
 
+import { IntelBrandedLoading } from '@geti/ui';
 import { hasAuthParams, useAuth } from 'react-oidc-context';
 import { Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { useLoginQuery } from '../../core/auth/hooks/use-login-query.hook';
 import { LoginErrorScreen } from '../../pages/errors/login-error/login-error-screen.component';
-import { IntelBrandedLoading } from '../../shared/components/loading/intel-branded-loading.component';
 import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
 
 const useOnboardingTokenSearchParam = (): string | null => {

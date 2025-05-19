@@ -3,8 +3,8 @@
 
 import { ComponentProps } from 'react';
 
-import { DialogTrigger, Flex, Slider, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { DialogTrigger, Flex, View } from '@adobe/react-spectrum';
+import { ActionButton, Slider } from '@geti/ui';
 import { Text } from '@react-spectrum/text';
 import { noop } from 'lodash-es';
 

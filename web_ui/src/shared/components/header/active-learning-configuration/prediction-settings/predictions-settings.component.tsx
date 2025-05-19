@@ -4,6 +4,7 @@
 import { FC } from 'react';
 
 import { Content, ContextualHelp, Flex, Heading, Radio, RadioGroup, Text, View } from '@adobe/react-spectrum';
+import { Switch } from '@geti/ui';
 
 import { InferenceModel } from '../../../../../core/annotations/services/visual-prompt-service';
 import { AnnotatorSettingsConfig, FEATURES_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
@@ -11,7 +12,6 @@ import { useUserProjectSettings } from '../../../../../core/user-settings/hooks/
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { useSelectedInferenceModel } from '../../../../../pages/annotator/providers/selected-media-item-provider/use-selected-inference-model';
 import { useCanSelectDifferentInferenceModel } from '../../../../../pages/annotator/tools/explanation-tool/select-model.component';
-import { Switch } from '../../../switch/switch.component';
 
 const ToggleSuggestPredictions = () => {
     const projectIdentifier = useProjectIdentifier();

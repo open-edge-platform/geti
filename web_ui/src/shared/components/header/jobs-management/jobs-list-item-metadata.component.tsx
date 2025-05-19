@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { PressableElement } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { formatJobsCreationTime, isNonEmptyString, pluralize } from '../../../utils';
 import { DomainName } from '../../domain-name/domain-name.component';
-import { PressableElement } from '../../pressable-element/pressable-element.component';
 import { TruncatedText, TruncatedTextWithTooltip } from '../../truncated-text/truncated-text.component';
 import { getNameFromJob } from './utils';
 

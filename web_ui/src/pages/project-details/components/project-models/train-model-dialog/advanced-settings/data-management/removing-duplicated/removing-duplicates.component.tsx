@@ -4,8 +4,8 @@
 import { FC, useState } from 'react';
 
 import { Flex, Text } from '@adobe/react-spectrum';
+import { Switch } from '@geti/ui';
 
-import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { Tooltip } from '../../ui/tooltip.component';
 

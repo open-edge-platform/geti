@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Text, View } from '@adobe/react-spectrum';
+import { Switch } from '@geti/ui';
 
-import { Switch } from '../../../../switch/switch.component';
 import { BooleanGroupParams } from '../../../configurable-parameters.interface';
 import { ResetButtonHandler } from '../cp-editable-item.interface';
 
