@@ -3,8 +3,7 @@
 
 import { MutableRefObject, ReactNode, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, View } from '@geti/ui';
-import { Overlay } from '@react-spectrum/overlays';
+import { DimensionValue, Flex, Overlay, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { Responsive, StyleProps } from '@react-types/shared';
 import { useOverlay } from 'react-aria';
