@@ -3,8 +3,7 @@
 
 import { KeyboardEvent, useRef, useState } from 'react';
 
-import { TextArea, View } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, TextArea, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 

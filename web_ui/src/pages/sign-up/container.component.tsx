@@ -3,7 +3,7 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Flex, Header, Heading, View } from '@adobe/react-spectrum';
+import { Flex, Header, Heading, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';

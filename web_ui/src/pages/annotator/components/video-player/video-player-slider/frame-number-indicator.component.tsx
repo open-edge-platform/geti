@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useNumberFormatter, View } from '@adobe/react-spectrum';
+import { useNumberFormatter, View } from '@geti/ui';
 
 const useFormatFrames = (frames: number) => {
     const formatter = useNumberFormatter({

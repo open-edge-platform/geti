@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { ButtonGroup, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, View } from '@geti/ui';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Alert } from '../../../../assets/icons';

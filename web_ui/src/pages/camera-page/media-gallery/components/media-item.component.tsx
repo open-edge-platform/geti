@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { DimensionValue, View } from '@adobe/react-spectrum';
+import { DimensionValue, View } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { Responsive } from '@react-types/shared';

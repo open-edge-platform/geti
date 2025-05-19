@@ -3,8 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isEmpty, isFunction } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 

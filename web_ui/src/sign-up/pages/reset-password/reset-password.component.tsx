@@ -3,8 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { Form, Heading, Text } from '@adobe/react-spectrum';
-import { Button, PasswordField } from '@geti/ui';
+import { Button, Form, Heading, PasswordField, Text } from '@geti/ui';
 import { ValidationError } from 'yup';
 
 import { useResetPassword } from '../../../core/users/hook/use-users.hook';

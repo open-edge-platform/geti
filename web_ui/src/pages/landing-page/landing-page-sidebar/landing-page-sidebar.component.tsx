@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Link as SpectrumLink, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Link as SpectrumLink, View } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { Link } from 'react-router-dom';
 

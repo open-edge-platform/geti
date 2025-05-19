@@ -3,7 +3,7 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { DimensionValue, View } from '@adobe/react-spectrum';
+import { DimensionValue, View } from '@geti/ui';
 import { useLoadMore } from '@react-aria/utils';
 import { Responsive } from '@react-types/shared';
 import {

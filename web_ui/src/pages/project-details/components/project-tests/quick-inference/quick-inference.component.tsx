@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, Heading, View } from '@adobe/react-spectrum';
+import { Flex, Heading, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';

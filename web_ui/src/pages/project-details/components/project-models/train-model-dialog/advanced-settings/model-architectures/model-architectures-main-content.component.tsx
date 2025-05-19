@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Divider } from '@adobe/react-spectrum';
+import { Divider } from '@geti/ui';
 import { isEmpty, partition } from 'lodash-es';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';

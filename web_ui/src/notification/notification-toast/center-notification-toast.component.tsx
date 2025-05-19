@@ -3,7 +3,7 @@
 
 import { CSSProperties, ReactChild, ReactElement } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 import clsx from 'clsx';
 import { isEmpty, isString } from 'lodash-es';
 import { useId } from 'react-aria';

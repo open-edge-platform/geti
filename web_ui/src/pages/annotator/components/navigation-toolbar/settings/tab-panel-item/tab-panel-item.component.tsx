@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Flex, Switch } from '@geti/ui';
 
 import {
     AnnotatorSettingsConfig,

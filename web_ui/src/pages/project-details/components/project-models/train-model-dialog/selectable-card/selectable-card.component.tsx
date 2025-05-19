@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { DimensionValue, Flex, View } from '@adobe/react-spectrum';
+import { DimensionValue, Flex, View } from '@geti/ui';
 import { Responsive } from '@react-types/shared';
 import { usePress } from 'react-aria';
 

@@ -3,17 +3,7 @@
 
 import { useState } from 'react';
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Heading,
-    TextField,
-    View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, TextField, View } from '@geti/ui';
 import { OverlayTriggerState } from 'react-stately';
 
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';

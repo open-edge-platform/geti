@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -11,11 +12,11 @@ import {
     Flex,
     Form,
     Heading,
+    PasswordField,
     Text,
     TextField,
     View,
-} from '@adobe/react-spectrum';
-import { Button, PasswordField } from '@geti/ui';
+} from '@geti/ui';
 import { ValidationError } from 'yup';
 
 import { paths } from '../../../core/services/routes';

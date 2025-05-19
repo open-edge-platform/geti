@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { defaultTheme, Provider } from '@adobe/react-spectrum';
+import { defaultTheme, Provider } from '@geti/ui';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 

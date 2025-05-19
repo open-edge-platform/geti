@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Meter, Text, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Meter, Text, View } from '@geti/ui';
 import { countBy, identity } from 'lodash-es';
 
 import { Label } from '../../../../core/labels/label.interface';

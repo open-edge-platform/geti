@@ -3,7 +3,7 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Text } from '@geti/ui';
 
 export const Tooltip: FC<{ children: ReactNode }> = ({ children }) => {
     return (

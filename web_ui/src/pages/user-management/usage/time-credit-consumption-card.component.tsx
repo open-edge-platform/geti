@@ -3,8 +3,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 
-import { ComboBox, Flex, Heading, Item, Key, View } from '@adobe/react-spectrum';
-import { ActionButton, Loading } from '@geti/ui';
+import { ActionButton, ComboBox, Flex, Heading, Item, Key, Loading, View } from '@geti/ui';
 import { dimensionValue, useUnwrapDOMRef } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
 import Close from '@spectrum-icons/workflow/Close';

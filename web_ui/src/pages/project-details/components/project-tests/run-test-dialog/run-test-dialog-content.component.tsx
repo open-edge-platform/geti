@@ -4,6 +4,7 @@
 import { useEffect } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -15,8 +16,7 @@ import {
     Text,
     TextField,
     View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { isVisualPromptModel } from '../../../../../core/annotations/services/visual-prompt-service';

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { UserCircleFilled as AdminIcon } from '../../../../../assets/icons';
 import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';

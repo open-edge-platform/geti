@@ -3,8 +3,7 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { SearchField } from '@geti/ui';
+import { Flex, SearchField } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import { ProjectSortingOptions, ProjectsQueryOptions } from '../../../core/projects/services/project-service.interface';

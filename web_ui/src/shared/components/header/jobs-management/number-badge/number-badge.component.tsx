@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text, useNumberFormatter, View, ViewProps } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { LoadingIndicator, Text, useNumberFormatter, View, ViewProps } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
 
 import classes from './number-badge.module.scss';

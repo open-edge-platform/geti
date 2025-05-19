@@ -3,7 +3,7 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@adobe/react-spectrum';
+import { Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@geti/ui';
 
 import { Task } from '../../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';

@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Icon, Item, Menu, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Icon, Item, Menu, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
 
 import { MoreMenu } from '../../../assets/icons';

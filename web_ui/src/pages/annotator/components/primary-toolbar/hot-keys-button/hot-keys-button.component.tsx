@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Dialog, DialogTrigger } from '@adobe/react-spectrum';
+import { Content, Dialog, DialogTrigger } from '@geti/ui';
 
 import { Hotkeys } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';

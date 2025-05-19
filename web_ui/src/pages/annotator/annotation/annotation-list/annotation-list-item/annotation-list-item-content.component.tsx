@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Grid } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
+import { Checkbox, Flex, Grid } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isEmpty } from 'lodash-es';
 import { useFocusManager } from 'react-aria';

@@ -3,7 +3,7 @@
 
 import { Key, useEffect } from 'react';
 
-import { Flex, Item, Picker, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Picker, Text } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';

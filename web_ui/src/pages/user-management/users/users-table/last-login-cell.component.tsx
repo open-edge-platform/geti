@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text } from '@adobe/react-spectrum';
+import { Text } from '@geti/ui';
 
 import { DateCell } from '../../../../shared/components/table/date-cell/date-cell.component';
 

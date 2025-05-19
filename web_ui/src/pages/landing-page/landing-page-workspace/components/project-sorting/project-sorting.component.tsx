@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { SortUpDown } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Divider, Flex, Switch, Text, View } from '@geti/ui';
 
 import { CANVAS_ADJUSTMENTS_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
 import { UseCanvasSettingsState } from '../../../hooks/use-canvas-settings.hook';

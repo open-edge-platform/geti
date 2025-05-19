@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { Tag } from '@geti/ui';
+import { Flex, Tag, Text, View } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { clsx } from 'clsx';
 import { usePress } from 'react-aria';

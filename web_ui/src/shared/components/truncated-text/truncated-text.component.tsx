@@ -3,8 +3,7 @@
 
 import { ComponentProps, CSSProperties } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { useStyleProps } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
 import { PositionProps } from 'react-aria';

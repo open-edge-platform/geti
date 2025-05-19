@@ -3,8 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { Content, Dialog, Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, Checkbox } from '@geti/ui';
+import { ActionButton, Checkbox, Content, Dialog, Flex, Heading, Text, View } from '@geti/ui';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
 import { isEmpty } from 'lodash-es';
 

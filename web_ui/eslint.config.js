@@ -24,22 +24,6 @@ export default [
                 'error',
                 {
                     name: '@adobe/react-spectrum',
-                    importNames: [
-                        'Button',
-                        'SpectrumButtonProps',
-                        'ActionButton',
-                        'SpectrumActionButtonProps',
-                        'Checkbox',
-                        'SearchField',
-                        'DatePicker',
-                        'SpectrumDatePickerProps',
-                        'DateRangePicker',
-                        'SpectrumDateRangePickerProps',
-                        'Slider',
-                        'Switch',
-                        'SpectrumSwitchProps',
-                        'Breadcrumb',
-                    ],
                     message: 'Use component from the @geti/ui folder instead.',
                 },
                 {

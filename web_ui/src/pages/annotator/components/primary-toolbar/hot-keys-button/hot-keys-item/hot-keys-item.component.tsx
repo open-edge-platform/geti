@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, Keyboard, Text } from '@adobe/react-spectrum';
+import { Flex, Keyboard, Text } from '@geti/ui';
 import { isString } from 'lodash-es';
 
 import { getKeyName } from '../../../../../../shared/hotkeys';

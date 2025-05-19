@@ -6,6 +6,7 @@ import { useState } from 'react';
 import {
     Cell,
     Column,
+    DateRangePicker,
     Flex,
     Form,
     Heading,
@@ -15,8 +16,7 @@ import {
     TableView,
     Text,
     View,
-} from '@adobe/react-spectrum';
-import { DateRangePicker } from '@geti/ui';
+} from '@geti/ui';
 import { getLocalTimeZone } from '@internationalized/date';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';

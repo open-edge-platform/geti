@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Heading } from '@adobe/react-spectrum';
+import { Heading } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 
 import { paths } from '../../core/services/routes';

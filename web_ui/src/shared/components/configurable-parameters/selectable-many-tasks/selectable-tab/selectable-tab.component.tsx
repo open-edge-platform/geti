@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { PressableElement, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { ConfigurableParametersComponents, ConfigurableParametersMany } from '../../configurable-parameters.interface';
 

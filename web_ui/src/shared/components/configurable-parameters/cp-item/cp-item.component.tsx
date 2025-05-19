@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Divider, Flex, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { Alert } from '../../../../assets/icons';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

@@ -3,8 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Item, ListBox, Picker, View } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, Flex, Item, ListBox, Picker, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isNil } from 'lodash-es';

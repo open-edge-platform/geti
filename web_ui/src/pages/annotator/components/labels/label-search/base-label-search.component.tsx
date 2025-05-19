@@ -3,7 +3,7 @@
 
 import { ComponentProps, FormEvent, forwardRef, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
+import { TextField } from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 import { isEmpty, isFunction } from 'lodash-es';
 import { useFilter } from 'react-aria';

@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -13,8 +14,7 @@ import {
     Heading,
     TextField,
     View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 
 import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';

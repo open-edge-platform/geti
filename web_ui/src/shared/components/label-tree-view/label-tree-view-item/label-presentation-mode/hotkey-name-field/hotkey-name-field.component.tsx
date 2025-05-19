@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Flex } from '@geti/ui';
 
 import { Close } from '../../../../../../assets/icons';
 import { LinkButton } from '../../../../../../pages/create-project/components/project-labels-management/task-labels-management/new-label-tree-item/link-button/link-button.component';

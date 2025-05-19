@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 import {

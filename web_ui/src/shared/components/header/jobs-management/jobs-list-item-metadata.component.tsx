@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Flex, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';

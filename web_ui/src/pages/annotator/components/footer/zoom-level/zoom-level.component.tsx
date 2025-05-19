@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, useNumberFormatter } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger, useNumberFormatter } from '@geti/ui';
 import clsx from 'clsx';
 import { useControls } from 'react-zoom-pan-pinch';
 

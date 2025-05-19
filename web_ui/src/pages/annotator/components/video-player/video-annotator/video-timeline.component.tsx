@@ -3,7 +3,7 @@
 
 import { memo, MutableRefObject, useEffect, useMemo, useRef } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import useVirtual from 'react-cool-virtual';
 
 import { Label } from '../../../../../core/labels/label.interface';

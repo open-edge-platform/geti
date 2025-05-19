@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { DialogTrigger, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Filter } from '../../../../assets/icons';

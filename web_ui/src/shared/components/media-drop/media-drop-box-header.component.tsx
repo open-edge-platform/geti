@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Heading, Text } from '@adobe/react-spectrum';
+import { Heading, Text } from '@geti/ui';
 
 import { MEDIA_CONTENT_BUCKET } from '../../../providers/media-upload-provider/media-upload.interface';
 import { VALID_IMAGE_TYPES, VALID_VIDEO_TYPES } from '../../media-utils';

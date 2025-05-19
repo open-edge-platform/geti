@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { LabelColorThumb } from '../../../../../shared/components/label-color-thumb/label-color-thumb.component';

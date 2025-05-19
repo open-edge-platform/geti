@@ -3,7 +3,7 @@
 
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
-import { Divider, Flex, IllustratedMessage, View } from '@adobe/react-spectrum';
+import { Divider, Flex, IllustratedMessage, View } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';

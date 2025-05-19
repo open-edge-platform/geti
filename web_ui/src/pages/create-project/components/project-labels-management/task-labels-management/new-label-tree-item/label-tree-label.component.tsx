@@ -3,8 +3,7 @@
 
 import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Flex, Form } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Flex, Form } from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 import { isEmpty } from 'lodash-es';
 

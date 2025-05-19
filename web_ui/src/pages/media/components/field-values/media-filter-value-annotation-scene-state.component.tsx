@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Item, Menu, MenuTrigger, Selection, Text } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Item, Menu, MenuTrigger, Selection, Text } from '@geti/ui';
 
 import { ChevronDownSmall } from '../../../../assets/icons';
 import { AnnotationSceneState, SearchRuleValue } from '../../../../core/media/media-filter.interface';

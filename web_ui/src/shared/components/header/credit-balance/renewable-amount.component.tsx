@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { LoadingIndicator, Text } from '@geti/ui';
 
 import { useProducts } from '../../../../core/credits/products/hooks/use-products.hook';
 import { findPolicy, hasRenewableAmount } from '../../../../core/credits/products/hooks/utils';

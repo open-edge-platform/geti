@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Item, TabList, TabPanels } from '@adobe/react-spectrum';
+import { Flex, Item, TabList, TabPanels } from '@geti/ui';
 import { Tabs } from '@react-spectrum/tabs';
 
 import { TabItem, TabsProps } from '../../tabs/tabs.interface';

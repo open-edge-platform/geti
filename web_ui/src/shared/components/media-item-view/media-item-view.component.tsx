@@ -3,8 +3,7 @@
 
 import { ReactNode, useState } from 'react';
 
-import { View } from '@adobe/react-spectrum';
-import { Skeleton } from '@geti/ui';
+import { Skeleton, View } from '@geti/ui';
 import { useSpinDelay } from 'spin-delay';
 
 import { getAnnotationStateForTask } from '../../../core/annotations/utils';

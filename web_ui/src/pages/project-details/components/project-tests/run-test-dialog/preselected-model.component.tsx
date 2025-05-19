@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex } from '@adobe/react-spectrum';
-import { Tag } from '@geti/ui';
+import { Divider, Flex, Tag } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 

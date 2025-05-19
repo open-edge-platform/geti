@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, NumberField, Text } from '@adobe/react-spectrum';
-import { ActionButton, Checkbox } from '@geti/ui';
+import { ActionButton, Checkbox, Flex, NumberField, Text } from '@geti/ui';
 
 import { Refresh } from '../../../../../../../../assets/icons';
 import { Tooltip } from '../../ui/tooltip.component';

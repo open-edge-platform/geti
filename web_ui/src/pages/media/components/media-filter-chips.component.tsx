@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { ActionButton, Tag } from '@geti/ui';
+import { ActionButton, Flex, Tag } from '@geti/ui';
 import { getLocalTimeZone, parseAbsolute } from '@internationalized/date';
 import { isEmpty } from 'lodash-es';
 

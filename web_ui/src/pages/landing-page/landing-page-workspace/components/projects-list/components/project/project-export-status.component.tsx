@@ -3,8 +3,7 @@
 
 import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 
-import { ButtonGroup, Flex, Text, View } from '@adobe/react-spectrum';
-import { Button, LoadingIndicator } from '@geti/ui';
+import { Button, ButtonGroup, Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ExportStatusStateDTO } from '../../../../../../../core/configurable-parameters/dtos/configurable-parameters.interface';

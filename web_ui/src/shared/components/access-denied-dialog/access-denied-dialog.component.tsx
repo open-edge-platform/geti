@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Flex, Heading, Text } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Forbidden } from '../../../assets/images';

@@ -3,7 +3,7 @@
 
 import { FC, ReactNode, SVGProps } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Text, View } from '@geti/ui';
 import { isFirefox } from '@react-aria/utils';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';

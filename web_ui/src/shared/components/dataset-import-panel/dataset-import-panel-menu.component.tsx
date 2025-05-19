@@ -3,8 +3,7 @@
 
 import { Key, useCallback, useMemo } from 'react';
 
-import { Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Item, Menu, MenuTrigger, Text } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { capitalize, difference, isEmpty } from 'lodash-es';
 

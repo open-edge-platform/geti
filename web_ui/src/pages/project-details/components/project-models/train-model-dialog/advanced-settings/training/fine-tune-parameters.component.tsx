@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Radio, RadioGroup } from '@adobe/react-spectrum';
+import { Radio, RadioGroup } from '@geti/ui';
 
 import { Accordion } from '../ui/accordion/accordion.component';
 

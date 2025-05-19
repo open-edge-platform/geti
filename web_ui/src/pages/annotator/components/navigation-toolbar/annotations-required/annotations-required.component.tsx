@@ -3,8 +3,7 @@
 
 import { useCallback, useRef } from 'react';
 
-import { DialogTrigger, Flex, Text, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, DialogTrigger, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';

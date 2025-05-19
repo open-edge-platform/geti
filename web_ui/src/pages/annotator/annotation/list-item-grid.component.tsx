@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, RefObject, useContext, useRef, useState } from 'react';
 
-import { Flex, FlexProps, Grid } from '@adobe/react-spectrum';
+import { Flex, FlexProps, Grid } from '@geti/ui';
 import { useInteractOutside } from '@react-aria/interactions';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import clsx from 'clsx';

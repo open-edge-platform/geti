@@ -3,8 +3,7 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Grid, View } from '@adobe/react-spectrum';
-import { BreadcrumbItemProps } from '@geti/ui';
+import { BreadcrumbItemProps, Grid, View } from '@geti/ui';
 import { Outlet } from 'react-router-dom';
 
 import { Breadcrumbs } from '../breadcrumbs/breadcrumbs.component';

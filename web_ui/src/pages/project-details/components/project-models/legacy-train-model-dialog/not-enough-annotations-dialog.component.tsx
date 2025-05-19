@@ -3,8 +3,7 @@
 
 import { CSSProperties, FC, Key } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@geti/ui';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import { Task } from '../../../../../core/projects/task.interface';

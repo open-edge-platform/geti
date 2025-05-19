@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Heading, Text } from '@adobe/react-spectrum';
+import { Flex, Heading, Text } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';

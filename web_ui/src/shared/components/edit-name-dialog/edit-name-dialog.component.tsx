@@ -4,6 +4,7 @@
 import { ComponentProps, FormEvent, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -14,8 +15,7 @@ import {
     Heading,
     Text,
     TextField,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { capitalize, isEmpty } from 'lodash-es';
 

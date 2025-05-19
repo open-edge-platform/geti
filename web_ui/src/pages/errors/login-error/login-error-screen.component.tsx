@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Content, Heading } from '@geti/ui';
 import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
 import { useAuth } from 'react-oidc-context';
 

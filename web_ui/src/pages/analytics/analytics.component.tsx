@@ -3,7 +3,7 @@
 
 import { ComponentProps, useMemo } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { DatabaseIcon, LogsIcon, MetricsIcon, TracesIcon } from '../../assets/icons';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Cell, Text } from '@adobe/react-spectrum';
+import { Cell, Text } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';

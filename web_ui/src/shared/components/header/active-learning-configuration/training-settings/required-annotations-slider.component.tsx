@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { Slider } from '@geti/ui';
+import { Flex, Slider, Text, View } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import { findRequiredImagesAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';

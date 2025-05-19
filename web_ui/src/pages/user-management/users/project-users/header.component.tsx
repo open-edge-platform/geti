@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { DialogContainer, Flex } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, DialogContainer, Flex } from '@geti/ui';
 
 import { AddUserToProjectDialog } from './add-user-to-project.component';
 

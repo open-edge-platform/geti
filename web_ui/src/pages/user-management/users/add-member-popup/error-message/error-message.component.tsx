@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { DimensionValue } from '@adobe/react-spectrum';
+import { DimensionValue } from '@geti/ui';
 import { Text } from '@react-spectrum/text';
 
 import classes from './error-message.module.scss';

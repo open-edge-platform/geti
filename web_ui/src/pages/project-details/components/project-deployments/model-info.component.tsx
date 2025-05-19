@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Text, View } from '@geti/ui';
 
 import { OptimizedModel } from '../../../../core/models/optimized-models.interface';
 import { useFormatModelAccuracy } from '../../../../shared/hooks/use-format-model-accuracy.hook';

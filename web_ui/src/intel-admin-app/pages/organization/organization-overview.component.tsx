@@ -3,8 +3,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 
-import { ActionGroup, ButtonGroup, Divider, Flex, Form, Item, Key, Text, TextField, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { ActionGroup, Button, ButtonGroup, Divider, Flex, Form, Item, Key, Text, TextField, View } from '@geti/ui';
 import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
 import DeleteOutline from '@spectrum-icons/workflow/DeleteOutline';
 import RemoveCircle from '@spectrum-icons/workflow/RemoveCircle';

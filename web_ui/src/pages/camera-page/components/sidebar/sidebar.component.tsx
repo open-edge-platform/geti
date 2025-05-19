@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
 import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
 import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
 

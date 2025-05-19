@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Text } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import { ActionButton, LoadingIndicator, Text } from '@geti/ui';
 import { UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import clsx from 'clsx';

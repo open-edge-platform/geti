@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';

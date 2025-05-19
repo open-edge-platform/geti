@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Text, View } from '@geti/ui';
 import dayjs from 'dayjs';
 import { Link, useNavigate } from 'react-router-dom';
 

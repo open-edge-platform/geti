@@ -3,8 +3,7 @@
 
 import { Key } from 'react';
 
-import { Item, Picker, Text, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Item, LoadingIndicator, Picker, Text, View } from '@geti/ui';
 
 import { hasEqualId } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

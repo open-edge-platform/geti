@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Text, View } from '@geti/ui';
 
 import { Task } from '../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../core/supported-algorithms/supported-algorithms.interface';

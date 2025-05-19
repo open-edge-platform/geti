@@ -3,8 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Picker } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Flex, Item, Picker, Switch } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';

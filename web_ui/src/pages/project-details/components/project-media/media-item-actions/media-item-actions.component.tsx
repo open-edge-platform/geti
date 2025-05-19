@@ -3,7 +3,7 @@
 
 import { FC, Key } from 'react';
 
-import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Scope } from '../../../../../assets/icons';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';

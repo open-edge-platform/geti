@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger } from '@geti/ui';
 import { Flex } from '@react-spectrum/layout';
 
 import { Redo, Undo } from '../../../../assets/icons';

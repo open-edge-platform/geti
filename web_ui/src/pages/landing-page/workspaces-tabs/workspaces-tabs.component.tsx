@@ -3,8 +3,17 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, TabList, TabPanels, Tabs, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import {
+    ActionButton,
+    Flex,
+    Item,
+    LoadingIndicator,
+    TabList,
+    TabPanels,
+    Tabs,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Add } from '../../../assets/icons';

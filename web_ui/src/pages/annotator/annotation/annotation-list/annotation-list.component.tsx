@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Content } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Content, Loading } from '@geti/ui';
 import {
     ListBox as AriaComponentsListBox,
     DropIndicator,

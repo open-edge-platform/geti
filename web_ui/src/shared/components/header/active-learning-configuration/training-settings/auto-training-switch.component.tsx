@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';

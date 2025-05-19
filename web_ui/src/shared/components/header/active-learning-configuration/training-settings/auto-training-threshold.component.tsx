@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Content, ContextualHelp, Flex, Radio, RadioGroup, Text } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Flex, Radio, RadioGroup, Text } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import { findDynamicRequiredAnnotationsConfig } from '../../../../../core/configurable-parameters/utils';

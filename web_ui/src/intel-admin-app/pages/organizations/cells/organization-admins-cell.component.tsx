@@ -3,7 +3,7 @@
 
 import { Fragment } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { OrganizationAdmin } from '../../../../core/organizations/dtos/organizations.interface';

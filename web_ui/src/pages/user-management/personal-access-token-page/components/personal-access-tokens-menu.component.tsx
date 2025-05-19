@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import dayjs from 'dayjs';
 

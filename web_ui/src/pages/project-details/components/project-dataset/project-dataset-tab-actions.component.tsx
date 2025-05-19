@@ -3,7 +3,7 @@
 
 import { Key, useCallback, useMemo } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 

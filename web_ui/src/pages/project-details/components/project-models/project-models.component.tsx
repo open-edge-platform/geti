@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading, View } from '@geti/ui';
 
 import { NoTrainedModels } from '../../../../assets/images';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Divider, Flex, Text, TextField, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Divider, Flex, Text, TextField, View } from '@geti/ui';
 
 import { Delete } from '../../../assets/icons';
 import { Header } from '../../shared/components/header/header.component';

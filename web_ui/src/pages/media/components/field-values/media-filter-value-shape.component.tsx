@@ -3,8 +3,7 @@
 
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Item, Menu, TextField, View } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, Item, Menu, TextField, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { last } from 'lodash-es';
 

@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';

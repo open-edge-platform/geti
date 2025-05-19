@@ -3,7 +3,7 @@
 
 import { ReactNode, RefObject, useState } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { DOMRefValue } from '@react-types/shared';
 import { OverlayContainer } from 'react-aria';
 

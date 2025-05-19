@@ -4,6 +4,7 @@
 import { FormEvent, useRef, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -14,8 +15,7 @@ import {
     Heading,
     Text,
     TextField,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+} from '@geti/ui';
 import { TextFieldRef } from '@react-types/textfield';
 
 import { Info } from '../../../../assets/icons';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading } from '@adobe/react-spectrum';
+import { Flex, Heading } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';

@@ -3,17 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Heading,
-    TextField,
-    View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, TextField, View } from '@geti/ui';
 import dayjs from 'dayjs';
 
 import { usePersonalAccessToken } from '../../../../core/personal-access-tokens/hooks/use-personal-access-token.hook';

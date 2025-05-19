@@ -3,8 +3,7 @@
 
 import { FC, FormEvent, ReactNode, useState } from 'react';
 
-import { ButtonGroup, Divider, Flex, Form, Heading, TextField } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Divider, Flex, Form, Heading, TextField } from '@geti/ui';
 
 import { InvalidTokenAlert } from '../../shared/components/invalid-token-alert/invalid-token-alert.component';
 import { Container } from './container.component';

@@ -3,8 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { Form, Heading, Text, TextField, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Form, Heading, Text, TextField, View } from '@geti/ui';
 
 import { paths } from '../../../core/services/routes';
 import { useForgotPassword } from '../../../core/users/hook/use-users.hook';

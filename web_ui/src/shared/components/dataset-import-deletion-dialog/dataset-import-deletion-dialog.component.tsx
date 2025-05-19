@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AlertDialog, DialogContainer } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { isFunction } from 'lodash-es';
 

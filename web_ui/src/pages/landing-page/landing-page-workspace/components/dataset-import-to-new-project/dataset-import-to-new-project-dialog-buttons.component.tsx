@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { ButtonGroup, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { capitalize, isEmpty } from 'lodash-es';
 

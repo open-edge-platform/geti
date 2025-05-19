@@ -3,8 +3,7 @@
 
 import { ReactNode, useState } from 'react';
 
-import { Flex, Grid, Text, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Flex, Grid, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';
 

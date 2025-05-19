@@ -3,8 +3,7 @@
 
 import { Dispatch, SetStateAction, useRef } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
+import { CustomPopover, Flex, Text, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { ChevronDownLight } from '../../../../../assets/icons';

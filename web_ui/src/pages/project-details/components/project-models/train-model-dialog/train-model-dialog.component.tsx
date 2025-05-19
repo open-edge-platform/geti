@@ -6,8 +6,7 @@
 
 import { FC } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';

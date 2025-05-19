@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 
 import { ConfigurableParametersTaskChain } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { DataAugmentation } from './data-augmentation/data-augmentation.component';

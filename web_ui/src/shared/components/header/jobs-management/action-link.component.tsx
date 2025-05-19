@@ -3,7 +3,7 @@
 
 import { CSSProperties, ReactNode } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 interface ActionLinkProps {

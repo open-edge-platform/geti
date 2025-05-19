@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { type ActionButtonProps } from '@geti/ui';
+import { Tooltip, TooltipTrigger, View, type ActionButtonProps } from '@geti/ui';
 import { BackgroundColorValue } from '@react-types/shared';
 
 import { DownloadIcon } from '../../../../../assets/icons';

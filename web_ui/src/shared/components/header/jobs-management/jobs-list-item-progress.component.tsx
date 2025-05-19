@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import {

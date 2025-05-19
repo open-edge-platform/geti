@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useEffect } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { useConfigParameters } from '../../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';

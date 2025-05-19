@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Item, TabList, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import { ActionButton, Flex, Item, LoadingIndicator, TabList, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Add } from '../../../../assets/icons';
 import { Dataset } from '../../../../core/projects/dataset.interface';

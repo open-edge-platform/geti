@@ -3,8 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading } from '@geti/ui';
 import { isEmpty, isFunction, isNil } from 'lodash-es';
 
 import { Play } from '../../../../../assets/icons';

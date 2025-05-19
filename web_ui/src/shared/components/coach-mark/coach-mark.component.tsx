@@ -3,8 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ChevronLeft, Close, MoreMenu } from '../../../assets/icons';

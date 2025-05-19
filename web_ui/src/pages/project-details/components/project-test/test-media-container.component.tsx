@@ -3,8 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Grid, Item, Picker, repeat, View } from '@adobe/react-spectrum';
-import { Slider } from '@geti/ui';
+import { Grid, Item, Picker, repeat, Slider, View } from '@geti/ui';
 import { uniqBy } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 

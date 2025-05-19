@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Flex, Text, View } from '@geti/ui';
 
 import { ChevronRightSmallLight, ChevronUpLight } from '../../../../assets/icons';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { AlertDialog, ButtonGroup, DialogTrigger } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { AlertDialog, Button, ButtonGroup, DialogTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useIsMounted } from 'usehooks-ts';

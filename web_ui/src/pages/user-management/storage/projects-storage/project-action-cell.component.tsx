@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { DialogContainer } from '@adobe/react-spectrum';
+import { DialogContainer } from '@geti/ui';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';

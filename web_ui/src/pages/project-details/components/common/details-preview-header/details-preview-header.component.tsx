@@ -13,7 +13,7 @@ import {
     Text,
     useNumberFormatter,
     View,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ChevronDownLight } from '../../../../../assets/icons';

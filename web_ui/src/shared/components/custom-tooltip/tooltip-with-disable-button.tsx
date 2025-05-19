@@ -3,8 +3,7 @@
 
 import { isValidElement, ReactElement } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Placement } from 'react-aria';
 

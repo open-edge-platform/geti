@@ -3,8 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Heading, Loading, Text, View } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { DOMRefValue } from '@react-types/shared';
 import { useErrorHandler } from 'react-error-boundary';

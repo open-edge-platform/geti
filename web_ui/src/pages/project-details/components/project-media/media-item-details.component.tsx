@@ -3,8 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Divider, Flex, Grid, minmax, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Checkbox, PressableElement } from '@geti/ui';
+import { Checkbox, Divider, Flex, Grid, minmax, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import dayjs from 'dayjs';
 import { delay } from 'lodash-es';
 import { usePress } from 'react-aria';

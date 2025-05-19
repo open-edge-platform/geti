@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Icon, Item, Menu, MenuTrigger as MenuTriggerSpectrum, Section, Text } from '@adobe/react-spectrum';
+import { Icon, Item, Menu, MenuTrigger as MenuTriggerSpectrum, Section, Text } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { SortDown, SortUp, SortUpDown } from '../../../assets/icons';

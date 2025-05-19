@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 import { useNumberFormatter, usePress } from 'react-aria';
 

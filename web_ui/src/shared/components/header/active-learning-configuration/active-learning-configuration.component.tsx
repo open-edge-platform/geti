@@ -8,11 +8,11 @@ import {
     Divider,
     Flex,
     Heading,
+    LoadingIndicator,
     Tooltip,
     TooltipTrigger,
     View,
-} from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+} from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { AutoTraining } from '../../../../assets/icons';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup } from '@adobe/react-spectrum';
+import { ButtonGroup } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 
 import { Pause, Play, StepBackward, StepForward } from '../../../../../assets/icons';

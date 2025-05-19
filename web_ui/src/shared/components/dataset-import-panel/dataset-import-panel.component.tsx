@@ -3,8 +3,7 @@
 
 import { FC, PropsWithChildren, useRef } from 'react';
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import { ActionButton, Divider, Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import Alert from '@spectrum-icons/workflow/Alert';
 import { noop } from 'lodash-es';

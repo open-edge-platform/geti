@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import {
     ORGANIZATIONS_QUERY_LIMIT,

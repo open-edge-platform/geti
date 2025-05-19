@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { AlertDialog, DialogContainer, Flex } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer, Flex } from '@geti/ui';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';

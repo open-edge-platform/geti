@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Heading, Text } from '@geti/ui';
 
 import { BrokenBulb } from '../../../assets/images';
 import { paths } from '../../../core/services/routes';

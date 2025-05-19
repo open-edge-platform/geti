@@ -3,7 +3,7 @@
 
 import { Fragment } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { AiIcon, CaretRightIcon } from '../../../../../assets/icons';

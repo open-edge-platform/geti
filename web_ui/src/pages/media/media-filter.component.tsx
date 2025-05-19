@@ -4,6 +4,7 @@
 import { CSSProperties, Dispatch, MutableRefObject, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import {
+    ActionButton,
     ButtonGroup,
     Content,
     Dialog,
@@ -14,8 +15,7 @@ import {
     Tooltip,
     TooltipTrigger,
     View,
-} from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+} from '@geti/ui';
 import { dimensionValue, useMediaQuery, useUnwrapDOMRef } from '@react-spectrum/utils';
 import { FocusableRefValue } from '@react-types/shared';
 import { isEmpty, isEqual } from 'lodash-es';
