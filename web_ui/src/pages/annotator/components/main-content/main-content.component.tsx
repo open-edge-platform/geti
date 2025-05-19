@@ -4,13 +4,13 @@
 import { useRef } from 'react';
 
 import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Loading } from '@geti/ui';
 import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import { DOMRefValue } from '@react-types/shared';
 import { useErrorHandler } from 'react-error-boundary';
 
 import { EmptyActiveSetIcon } from '../../../../assets/images';
 import { Label } from '../../../../core/labels/label.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { AnnotatorCanvas } from '../../annotator-canvas.component';
 import { AnnotatorCanvasSettings } from '../../annotator-settings.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';

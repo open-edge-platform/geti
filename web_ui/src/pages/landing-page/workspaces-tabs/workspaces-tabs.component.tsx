@@ -4,6 +4,7 @@
 import { Key } from 'react';
 
 import { Flex, Item, TabList, TabPanels, Tabs, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton, LoadingIndicator } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Add } from '../../../assets/icons';
@@ -14,7 +15,6 @@ import { useOrganizationIdentifier } from '../../../hooks/use-organization-ident
 import { usePinnedCollapsedItems } from '../../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.hook';
 import { PinnedCollapsedItemsAction } from '../../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.interface';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { CollapsedItemsPicker } from '../../../shared/components/collapsed-items-picker/collapsed-items-picker.component';
 import { CustomTabItemWithMenu } from '../../../shared/components/custom-tab-item/custom-tab-item-with-menu.component';
 import { CustomTabItem } from '../../../shared/components/custom-tab-item/custom-tab-item.component';
@@ -22,7 +22,6 @@ import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-di
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
-import { LoadingIndicator } from '../../../shared/components/loading/loading-indicator.component';
 import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { getUniqueNameFromArray, hasEqualId } from '../../../shared/utils';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from '../../user-management/workspaces/utils';

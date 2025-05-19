@@ -1,6 +1,0 @@
----
-name: jobs-scheduling-policy
-version: 0.0.3
-apiVersion: v2
-description: jobs-scheduling-policy
-appVersion: v0.0.1

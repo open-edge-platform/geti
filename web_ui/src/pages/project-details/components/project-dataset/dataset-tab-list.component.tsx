@@ -2,13 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Item, TabList, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton, LoadingIndicator } from '@geti/ui';
 
 import { Add } from '../../../../assets/icons';
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { useDataset } from '../../../../providers/dataset-provider/dataset-provider.component';
-import { ActionButton } from '../../../../shared/components/button/button.component';
 import { CollapsedItemsPicker } from '../../../../shared/components/collapsed-items-picker/collapsed-items-picker.component';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
 import { hasEqualId } from '../../../../shared/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';

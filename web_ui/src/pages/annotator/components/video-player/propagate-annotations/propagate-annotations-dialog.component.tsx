@@ -2,10 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, Content, Dialog, Divider, Text } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { UseMutationResult } from '@tanstack/react-query';
-
-import { Button } from '../../../../../shared/components/button/button.component';
 
 interface PropagateAnnotationsDialogProps {
     propagateAnnotationsMutation: UseMutationResult<void, unknown, boolean, unknown>;

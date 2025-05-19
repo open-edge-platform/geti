@@ -3,16 +3,14 @@
 
 import { forwardRef } from 'react';
 
-import { SpectrumActionButtonProps } from '@react-types/button';
+import { ActionButton, type ActionButtonProps } from '@geti/ui';
 import { FocusableRef } from '@react-types/shared';
-
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
 
 import classes from './label-shortcut-button.module.scss';
 
 export const LabelShortcutButton = forwardRef(
     (
-        { children, id, onPress, UNSAFE_className, ...rest }: SpectrumActionButtonProps,
+        { children, id, onPress, UNSAFE_className, ...rest }: ActionButtonProps,
         ref: FocusableRef<HTMLButtonElement>
     ): JSX.Element => {
         return (

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { PressableElement } from '@geti/ui';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { LabelColorThumb } from '../../../../../shared/components/label-color-thumb/label-color-thumb.component';
-import { PressableElement } from '../../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../../shared/components/truncated-text/truncated-text.component';
 
 interface LabelTagProps {

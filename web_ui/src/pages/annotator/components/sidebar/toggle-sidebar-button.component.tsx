@@ -4,13 +4,12 @@
 import { useRef } from 'react';
 
 import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { PressableElement } from '@geti/ui';
 import { useToggleState } from '@react-stately/toggle';
 import { ToggleProps } from '@react-types/checkbox';
 import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
 import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
 import { useToggleButton } from 'react-aria';
-
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 
 import classes from './toggle-sidebar.module.scss';
 

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 
 import { NotFound } from '../../../assets/images';
-import { Button } from '../../../shared/components/button/button.component';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';

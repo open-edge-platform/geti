@@ -18,21 +18,19 @@ ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
 # Copy the service dependencies
-WORKDIR /builder
 COPY --link --from=libs . libs
 COPY --link --from=iai_core . interactive_ai/libs/iai_core_py
 COPY --link --from=media_utils . interactive_ai/libs/media_utils
 
-WORKDIR /builder/interactive_ai/services/resource
+WORKDIR /interactive_ai/services/resource
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
-COPY --link app/ .
+COPY --link app/ app
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv venv --relocatable && \
     uv sync --frozen --no-dev --no-editable
 
 FROM base AS runtime
@@ -46,14 +44,14 @@ RUN apt-get update && \
     rm -rf /root/.cache/pip
 
 # Copy the application from the builder
-COPY --link --from=build --chown=10001 /builder/interactive_ai/services/resource /app
+COPY --link --from=build --chown=10001 /interactive_ai/services/resource /interactive_ai/services/resource
 COPY --link --from=build --chown=10001 /training_extensions/src/otx/tools/templates /model_templates
-COPY --link --from=schemas . /api
+COPY --link --from=schemas . /interactive_ai/services/api
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
-ENV PYTHONPATH="/app"
+ENV PATH="/interactive_ai/services/resource/.venv/bin:$PATH"
+ENV PYTHONPATH="/interactive_ai/services/resource:/interactive_ai/services/resource/app"
 
 USER non-root
-WORKDIR /app/communication
+WORKDIR /interactive_ai/services/resource/app/communication
 CMD ["python", "main.py"]

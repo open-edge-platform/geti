@@ -14,11 +14,11 @@ import {
     TextField,
     View,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
-import { Button } from '../../../shared/components/button/button.component';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from './utils';
 
 export const CreateWorkspaceDialog = (): JSX.Element => {

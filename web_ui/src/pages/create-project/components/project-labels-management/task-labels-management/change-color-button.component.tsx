@@ -2,10 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { View } from '@adobe/react-spectrum';
+import { ActionButton } from '@geti/ui';
 import { BorderRadiusValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
-
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 
 interface ChangeColorButtonProps {
     size: 'S' | 'L';

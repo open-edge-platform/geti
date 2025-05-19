@@ -4,6 +4,7 @@
 import { Fragment, useCallback, useEffect, useState } from 'react';
 
 import { DialogContainer, Divider, Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Button, Loading } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import {
@@ -19,9 +20,7 @@ import { TaskMetadata } from '../../../../core/projects/task.interface';
 import { useHistoryBlock } from '../../../../hooks/use-history-block/use-history-block.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { Button } from '../../../../shared/components/button/button.component';
 import { isNew } from '../../../../shared/components/label-tree-view/label-tree-view-item/utils';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
 import { UnsavedChangesDialog } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { pluralize } from '../../../../shared/utils';

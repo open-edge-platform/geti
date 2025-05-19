@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Button, Loading, Skeleton } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 
 import { NewCreditAccount } from '../../../core/credits/credits.interface';
@@ -11,9 +12,6 @@ import { useCreditsQueries } from '../../../core/credits/hooks/use-credits-api.h
 import { useSubscriptions } from '../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
-import { Button } from '../../../shared/components/button/button.component';
-import { Loading } from '../../../shared/components/loading/loading.component';
-import { Skeleton } from '../../../shared/components/skeleton/skeleton.component';
 import { Header } from '../../shared/components/header/header.component';
 import { CreditAccountFormDialog } from './dialogs/credit-account-form-dialog.component';
 import { useOrganization } from './hooks/organization.hook';

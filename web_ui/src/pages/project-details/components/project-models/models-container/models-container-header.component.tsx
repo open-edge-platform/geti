@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@adobe/react-spectrum';
+import { ActionButton, Tag } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
@@ -10,9 +11,7 @@ import { usePress } from 'react-aria';
 import { ChevronUpLight } from '../../../../../assets/icons';
 import { isVisualPromptModel } from '../../../../../core/annotations/services/visual-prompt-service';
 import { PerformanceCategory } from '../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { InfoTooltip } from '../../../../../shared/components/info-tooltip/info-tooltip.component';
-import { Tag } from '../../../../../shared/components/tag/tag.component';
 import { ModelArchitectureTooltipText } from '../model-architecture-tooltip.component';
 import { DeprecatedTag } from './model-card/deprecated-model-tag.component';
 import { ObsoleteTag } from './model-card/obsolete-model-tag.component';

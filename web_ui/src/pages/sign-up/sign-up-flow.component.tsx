@@ -4,8 +4,8 @@
 import { FormEvent, ReactNode } from 'react';
 
 import { ButtonGroup, Divider, Flex, Form, Heading } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
-import { Button } from '../../shared/components/button/button.component';
 import { InvalidTokenAlert } from '../../shared/components/invalid-token-alert/invalid-token-alert.component';
 import { Container } from './container.component';
 import { RegistrationError } from './registration-error.component';

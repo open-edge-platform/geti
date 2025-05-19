@@ -4,10 +4,9 @@
 import { FC } from 'react';
 
 import { Flex, NumberField, Text } from '@adobe/react-spectrum';
+import { ActionButton, Checkbox } from '@geti/ui';
 
 import { Refresh } from '../../../../../../../../assets/icons';
-import { ActionButton } from '../../../../../../../../shared/components/button/button.component';
-import { Checkbox } from '../../../../../../../../shared/components/checkbox/checkbox.component';
 import { Tooltip } from '../../ui/tooltip.component';
 
 export interface FilterOption {

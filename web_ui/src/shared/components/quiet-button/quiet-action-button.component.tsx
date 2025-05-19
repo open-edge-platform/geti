@@ -3,10 +3,8 @@
 
 import { forwardRef } from 'react';
 
-import { SpectrumActionButtonProps } from '@react-types/button';
+import { ActionButton, type ActionButtonProps } from '@geti/ui';
 import { FocusableRef } from '@react-types/shared';
-
-import { ActionButton } from '../button/button.component';
 
 import sharedClasses from '../../shared.module.scss';
 
@@ -16,7 +14,7 @@ export enum ColorMode {
     BLUE,
 }
 
-interface QuietActionButtonProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
+interface QuietActionButtonProps extends Omit<ActionButtonProps, 'isQuiet'> {
     colorMode?: ColorMode;
 }
 

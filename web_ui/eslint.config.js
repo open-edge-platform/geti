@@ -18,6 +18,38 @@ const compat = new FlatCompat({
 
 export default [
     ...sharedEslintConfig,
+    {
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    name: '@adobe/react-spectrum',
+                    importNames: [
+                        'Button',
+                        'SpectrumButtonProps',
+                        'ActionButton',
+                        'SpectrumActionButtonProps',
+                        'Checkbox',
+                        'SearchField',
+                        'DatePicker',
+                        'SpectrumDatePickerProps',
+                        'DateRangePicker',
+                        'SpectrumDateRangePickerProps',
+                        'Slider',
+                        'Switch',
+                        'SpectrumSwitchProps',
+                        'Breadcrumb',
+                    ],
+                    message: 'Use component from the @geti/ui folder instead.',
+                },
+                {
+                    name: '@react-types/button',
+                    importNames: ['SpectrumButtonProps', 'SpectrumActionButtonProps'],
+                    message: "Use component's type from @geti/ui folder instead.",
+                },
+            ],
+        },
+    },
     ...compat.extends('plugin:playwright/playwright-test').map((config) => ({
         ...config,
         files: ['tests/features/**/*.ts', 'tests/utils/**/*.ts', 'tests/fixtures/**/*.ts', 'tests/e2e/**/*.ts'],

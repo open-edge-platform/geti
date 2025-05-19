@@ -46,7 +46,7 @@ test.describe('Anomaly classification video ranges', () => {
         });
 
         await page.goto(datasetUrl);
-        await page.locator('[class*=gridItem]').first().hover();
+        await page.getByRole('option').first().hover();
         await page.getByLabel('open menu').first().click();
 
         const anomalyVideoRangePage = new VideoRangePage(page);

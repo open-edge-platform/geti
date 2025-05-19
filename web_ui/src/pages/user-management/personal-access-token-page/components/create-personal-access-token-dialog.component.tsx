@@ -13,11 +13,11 @@ import {
     TextField,
     View,
 } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import dayjs from 'dayjs';
 
 import { usePersonalAccessToken } from '../../../../core/personal-access-tokens/hooks/use-personal-access-token.hook';
 import { CreatePersonalAccessTokenDialogProps } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
-import { Button } from '../../../../shared/components/button/button.component';
 import { WarningMessage } from '../../../../shared/components/warning-message/warning-message.component';
 import { getDateTimeInISOAndUTCOffsetFormat } from '../../../../shared/utils';
 import { CopyPersonalAccessToken } from './copy-personal-access-token.component';

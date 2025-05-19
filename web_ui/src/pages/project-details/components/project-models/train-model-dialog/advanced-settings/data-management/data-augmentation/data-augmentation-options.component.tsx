@@ -4,8 +4,7 @@
 import { FC } from 'react';
 
 import { Grid, Text } from '@adobe/react-spectrum';
-
-import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
+import { Switch } from '@geti/ui';
 
 export interface DataAugmentationOption {
     key: string;

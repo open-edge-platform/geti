@@ -38,9 +38,6 @@ const NOT_ALLOWED_CHARACTERS_MESSAGE = 'Passwords must contains only latin lette
 const TOO_SHORT_MESSAGE = 'Password is too short. It should consist of 8 - 200 characters.';
 const TOO_LONG_MESSAGE = 'Password is too long. It should consist of 8 - 200 characters.';
 
-export const NEW_PASSWORD_ERROR_MESSAGE =
-    'Password must consist of 8 - 200 characters, at least one capital letter, lower letter, digit or symbol.';
-
 export const CONFIRM_PASSWORD_ERROR_MESSAGE = 'The password you entered did not match.';
 
 export const PASSWORD_DOES_NOT_MEET_LENGTH_RULE =

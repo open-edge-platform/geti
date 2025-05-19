@@ -4,6 +4,7 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 
 import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
 import { Link } from 'react-router-dom';
@@ -16,7 +17,6 @@ import { useNotification } from '../../../notification/notification.component';
 import { isExtraLargeSizeQuery } from '../../../theme/queries';
 import { DropZone, onDropFiles } from '../../drag-and-drop/drag-and-drop.component';
 import { onValidFileList } from '../../utils';
-import { Button } from '../button/button.component';
 
 import classes from './dataset-import-dnd.module.scss';
 

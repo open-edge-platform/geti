@@ -4,11 +4,11 @@
 import { CSSProperties, FC, Key } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
+import { Button } from '@geti/ui';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import { Task } from '../../../../../core/projects/task.interface';
 import { useNavigateToAnnotatorRoute } from '../../../../../core/services/use-navigate-to-annotator-route.hook';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { NotEnoughWarning } from '../../common/not-enough-warning/not-enough-warning.component';
 import { TaskSelection } from './model-templates-selection/task-selection.component';

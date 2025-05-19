@@ -12,13 +12,13 @@ import {
     TooltipTrigger,
     View,
 } from '@adobe/react-spectrum';
+import { LoadingIndicator } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { AutoTraining } from '../../../../assets/icons';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../core/projects/task.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
-import { LoadingIndicator } from '../../loading/loading-indicator.component';
 import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActiveLearningConfigurationContent } from './active-learning-configuration-content.component';
 import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
