@@ -5,14 +5,17 @@ import { renderHook } from '@testing-library/react';
 
 import { useScrollToTargetItem } from './use-scroll-to-target-item.hook';
 
-jest.useFakeTimers();
-
 describe('useScrollToTargetItem', () => {
     const mockCallback = jest.fn();
 
     beforeEach(() => {
+        jest.useFakeTimers();
         jest.clearAllMocks();
         jest.clearAllTimers();
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     it('should not call callback when container is not provided', () => {
