@@ -3,8 +3,7 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Tooltip, TooltipTrigger } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Heading, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isString } from 'lodash-es';
 
 import { Collapse, Expand } from '../../../assets/icons';

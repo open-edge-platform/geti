@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Switch, Tooltip, TooltipTrigger } from '@geti/ui';
-import { Text } from '@react-spectrum/text';
+import { Flex, Switch, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Divider } from '../../../../shared/components/divider/divider.component';
 import { useDrawingToolsKeyboardShortcut } from '../../../annotator/hot-keys/use-drawing-tools-keyboard-shortcut/use-drawing-tools-keyboard-shortcut';

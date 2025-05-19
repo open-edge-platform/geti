@@ -3,8 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { Button, ButtonGroup, Content, Dialog, DialogTrigger, Divider, Form, PasswordField } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { Button, ButtonGroup, Content, Dialog, DialogTrigger, Divider, Form, Heading, PasswordField } from '@geti/ui';
 import { ValidationError } from 'yup';
 
 import { useChangePassword } from '../../../../core/users/hook/use-users.hook';

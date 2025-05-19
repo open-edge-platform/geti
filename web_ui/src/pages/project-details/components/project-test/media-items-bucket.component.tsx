@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Divider, Flex, Text } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { Divider, Flex, Heading, Text } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { useParams } from 'react-router-dom';
 

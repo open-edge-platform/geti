@@ -3,8 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Radio, RadioGroup, Text } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { Flex, Heading, Radio, RadioGroup, Text } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { View } from '@react-spectrum/view';
 import { isEqual } from 'lodash-es';
