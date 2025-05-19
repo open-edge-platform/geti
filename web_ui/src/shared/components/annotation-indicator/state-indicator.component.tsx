@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton, Tooltip, TooltipTrigger } from '@geti/ui';
-import { View } from '@react-spectrum/view';
+import { ActionButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { Revisit, Tag, TagHalf } from '../../../assets/icons';
 import { MEDIA_ANNOTATION_STATUS } from '../../../core/media/base.interface';

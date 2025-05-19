@@ -3,8 +3,7 @@
 
 import { FormEvent, useRef, useState } from 'react';
 
-import { Button, Flex, Form, TextField } from '@geti/ui';
-import { View } from '@react-spectrum/view';
+import { Button, Flex, Form, TextField, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import QUERY_KEYS from '../../../core/requests/query-keys';

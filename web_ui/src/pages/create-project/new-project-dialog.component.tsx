@@ -3,9 +3,8 @@
 
 import { CSSProperties, FC, useState } from 'react';
 
-import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text, View } from '@geti/ui';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
-import { View } from '@react-spectrum/view';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
