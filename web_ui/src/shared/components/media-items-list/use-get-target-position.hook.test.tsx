@@ -3,9 +3,9 @@
 
 import { renderHook } from '@testing-library/react';
 
-import { useScrollToTargetItem } from './use-scroll-to-target-item.hook';
+import { useGetTargetPosition } from './use-get-target-position.hook';
 
-describe('useScrollToTargetItem', () => {
+describe('useGetTargetPosition', () => {
     const mockCallback = jest.fn();
 
     beforeEach(() => {
@@ -20,7 +20,7 @@ describe('useScrollToTargetItem', () => {
 
     it('should not call callback when container is not provided', () => {
         renderHook(() =>
-            useScrollToTargetItem({
+            useGetTargetPosition({
                 gap: 10,
                 container: null,
                 targetIndex: 5,
@@ -54,7 +54,7 @@ describe('useScrollToTargetItem', () => {
         const expectedScrollPos = (childHeight + gap) * targetRow; // 600
 
         renderHook(() =>
-            useScrollToTargetItem({
+            useGetTargetPosition({
                 gap,
                 container,
                 targetIndex,
@@ -72,7 +72,7 @@ describe('useScrollToTargetItem', () => {
         Object.defineProperty(container, 'clientWidth', { value: 1000 });
 
         renderHook(() =>
-            useScrollToTargetItem({
+            useGetTargetPosition({
                 gap: 10,
                 container,
                 targetIndex: 5,
@@ -88,7 +88,7 @@ describe('useScrollToTargetItem', () => {
     describe('should not call callback with invalid index', () => {
         it.each([undefined, null, -1, 1.5, NaN])('targetIndex: %p', (invalidIndex) => {
             renderHook(() =>
-                useScrollToTargetItem({
+                useGetTargetPosition({
                     gap: 10,
                     container: document.createElement('div'),
                     targetIndex: invalidIndex as number,

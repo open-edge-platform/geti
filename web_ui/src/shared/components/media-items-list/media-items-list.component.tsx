@@ -16,7 +16,7 @@ import {
 } from 'react-aria-components';
 
 import { VIEW_MODE_SETTINGS, ViewModes } from '../media-view-modes/utils';
-import { useScrollToTargetItem } from './use-scroll-to-target-item.hook';
+import { useGetTargetPosition } from './use-get-target-position.hook';
 
 import classes from './media-items-list.module.scss';
 
@@ -69,7 +69,7 @@ export const MediaItemsList = <T extends object>({
 
     const container = ref?.current?.firstElementChild;
 
-    useScrollToTargetItem({
+    useGetTargetPosition({
         gap: config.gap,
         container,
         targetIndex: scrollToIndex,
