@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { StyleProps, useStyleProps, View } from '@geti/ui';
-import { ColorValue, DimensionValue } from '@geti/ui/src/dna';
+import { ColorValue, DimensionValue, StyleProps, useStyleProps, View } from '@geti/ui';
 
 export interface ThinProgressBarProps extends StyleProps {
     progress: number;

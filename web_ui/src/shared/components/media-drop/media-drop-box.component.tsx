@@ -3,9 +3,7 @@
 
 import { FC, ReactNode, SVGProps } from 'react';
 
-import { Flex, Text, View } from '@geti/ui';
-import { DimensionValue } from '@geti/ui/src/dna';
-import { Responsive } from '@geti/ui/src/style';
+import { DimensionValue, Flex, Responsive, Text, View } from '@geti/ui';
 import { isFirefox } from '@react-aria/utils';
 import { isEmpty, isNil } from 'lodash-es';
 import { DropZone } from 'react-aria-components';

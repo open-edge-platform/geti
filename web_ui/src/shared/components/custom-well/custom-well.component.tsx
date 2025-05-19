@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SpectrumWellProps, Well } from '@geti/ui';
-import { DimensionValue } from '@geti/ui/src/dna';
-import { Responsive } from '@geti/ui/src/style';
+import { DimensionValue, Responsive, SpectrumWellProps, Well } from '@geti/ui';
 
 import classes from './custom-well.module.scss';
 

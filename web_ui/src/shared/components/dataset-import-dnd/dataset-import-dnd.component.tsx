@@ -3,9 +3,7 @@
 
 import { Dispatch, SetStateAction, useRef } from 'react';
 
-import { Button, Flex, Text, View } from '@geti/ui';
-import { DimensionValue } from '@geti/ui/src/dna';
-import { Responsive } from '@geti/ui/src/style';
+import { Button, DimensionValue, Flex, Responsive, Text, View } from '@geti/ui';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 

@@ -3,9 +3,7 @@
 
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
-import { Divider, Flex, IllustratedMessage, useMediaQuery, View } from '@geti/ui';
-import { DimensionValue } from '@geti/ui/src/dna';
-import { Responsive } from '@geti/ui/src/style';
+import { DimensionValue, Divider, Flex, IllustratedMessage, Responsive, useMediaQuery, View } from '@geti/ui';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { isEmpty } from 'lodash-es';
 
