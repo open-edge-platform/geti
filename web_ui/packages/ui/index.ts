@@ -9,7 +9,6 @@ export {
     Text,
     DialogTrigger,
     Dialog,
-    Divider,
     minmax,
     Grid,
     ButtonGroup,
@@ -138,3 +137,4 @@ export { CustomPopover } from './src/custom-popover/custom-popover.component';
 export { PressableElement } from './src/pressable-element/pressable-element.component';
 export { Tag } from './src/tag/tag.component';
 export { Skeleton } from './src/skeleton/skeleton.component';
+export { Divider } from './src/divider/divider.component';
