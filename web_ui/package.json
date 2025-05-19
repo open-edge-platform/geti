@@ -10,6 +10,7 @@
   "dependencies": {
     "@adobe/react-spectrum": "^3.41.0",
     "@doodle3d/clipper-js": "^1.0.11",
+    "@geti/ui": "*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^1.26.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.53.0",
@@ -77,8 +78,7 @@
     "web-vitals": "^4.2.4",
     "workbox-core": "^7.3.0",
     "yup": "^1.6.1",
-    "zipson": "^0.2.12",
-    "@geti/ui": "*"
+    "zipson": "^0.2.12"
   },
   "scripts": {
     "build": "rsbuild build --environment geti --environment admin",
@@ -122,6 +122,7 @@
   "devDependencies": {
     "@apidevtools/swagger-cli": "^4.0.4",
     "@eslint/compat": "^1.2.8",
+    "@geti/config": "*",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@mjackson/headers": "^0.10.0",
     "@playwright/test": "^1.51.1",
@@ -169,8 +170,7 @@
     "openapi-typescript-fetch": "^2.1.0",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2",
-    "@geti/config": "*"
+    "typescript": "^5.7.2"
   },
   "overrides": {
     "lz-string": "github:pieroxy/lz-string#573d8e6ab49cab839143953f0970930c57bc0782"
