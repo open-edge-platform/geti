@@ -111,8 +111,8 @@ jest.mock('react-aria-components', () => {
     return { Virtualizer: mockVirtualizer(), ...rest };
 });
 
-jest.mock('@geti/ui', () => ({
-    ...jest.requireActual('@geti/ui'),
+jest.mock('@react-spectrum/utils', () => ({
+    ...jest.requireActual('@react-spectrum/utils'),
     useMediaQuery: (query: string) => {
         return mockIsLargeSizeQuery === query;
     },
