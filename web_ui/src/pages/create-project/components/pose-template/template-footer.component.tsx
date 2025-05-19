@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, View } from '@geti/ui';
+import { Content, Divider, Flex, View } from '@geti/ui';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { ZoomLevel } from '../../../annotator/components/footer/zoom-level/zoom-level.component';
 import { useZoom } from '../../../annotator/zoom/zoom-provider.component';
 

@@ -3,14 +3,13 @@
 
 import { ComponentProps } from 'react';
 
-import { Flex, Item, Picker, Text } from '@geti/ui';
+import { Divider, Flex, Item, Picker, Text } from '@geti/ui';
 
 import { InferenceModel } from '../../../../core/annotations/services/visual-prompt-service';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { hasActiveModels } from '../../../../core/models/utils';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useSelectedInferenceModel } from '../../providers/selected-media-item-provider/use-selected-inference-model';
 

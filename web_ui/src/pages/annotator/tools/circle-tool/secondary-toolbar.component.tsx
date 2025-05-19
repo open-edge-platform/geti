@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Slider, Text } from '@geti/ui';
+import { Divider, Flex, Slider, Text } from '@geti/ui';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolAnnotationContextProps } from '../tools.interface';
 import { useCircleState } from './circle-state-provider.component';

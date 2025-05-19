@@ -3,13 +3,12 @@
 
 import { CSSProperties, ReactChild, ReactElement } from 'react';
 
-import { Flex, Text } from '@geti/ui';
+import { Divider, Flex, Text } from '@geti/ui';
 import clsx from 'clsx';
 import { isEmpty, isString } from 'lodash-es';
 import { useId } from 'react-aria';
 
 import { CloseSmall } from '../../assets/icons';
-import { Divider } from '../../shared/components/divider/divider.component';
 import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { NOTIFICATION_TYPE } from './notification-type.enum';
 import { getIcon, getTypeToastClass } from './utils';

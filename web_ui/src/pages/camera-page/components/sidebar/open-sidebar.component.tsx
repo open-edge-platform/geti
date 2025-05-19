@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Meter, Text, View } from '@geti/ui';
+import { Divider, Flex, Heading, Meter, Text, View } from '@geti/ui';
 import { countBy, identity } from 'lodash-es';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { isNonEmptyArray } from '../../../../shared/utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { DeviceSettings } from './device-settings.component';
