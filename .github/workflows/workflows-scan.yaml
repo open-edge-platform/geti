@@ -36,7 +36,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@22695119d769bdb6f7032ad67b9bca0ef8c4a174 # v5.4.0
+        uses: astral-sh/setup-uv@6b9c6063abd6010835644d4c2e1bef4cf5cd0fca # v6.0.1
       - name: Run zizmor
         run: uvx zizmor=="$ZIZMOR_VERSION" . --no-exit-codes > zizmor.txt
       - name: Upload report
@@ -58,6 +58,6 @@ jobs:
         with:
           persist-credentials: false
       - name: Install uv
-        uses: astral-sh/setup-uv@22695119d769bdb6f7032ad67b9bca0ef8c4a174 # v5.4.0
+        uses: astral-sh/setup-uv@6b9c6063abd6010835644d4c2e1bef4cf5cd0fca # v6.0.1
       - name: Run zizmor
         run: uvx zizmor=="$ZIZMOR_VERSION" . --min-confidence high --min-severity high
