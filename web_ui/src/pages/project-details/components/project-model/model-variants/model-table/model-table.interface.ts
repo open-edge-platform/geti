@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { StyleProps } from '@geti/ui';
-import { ColumnSize } from '@react-types/table';
+import { type ColumnSize, type StyleProps } from '@geti/ui';
 
 export interface ModelTableColumns<T> {
     label: string;

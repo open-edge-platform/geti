@@ -17,8 +17,8 @@ import {
     TableView,
     Text,
     View,
+    type ColumnSize,
 } from '@geti/ui';
-import { ColumnSize } from '@react-types/table';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
 
