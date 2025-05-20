@@ -57,7 +57,7 @@ const useTrainingProgressJobs = (isTraining: boolean) => {
         },
     });
 
-    const { data: scheduledJobsData, isSuccess: scheduledJobsIsSuccess } = useGetScheduledJobs({
+    const { data: scheduledJobsData, isSuccess: scheduledJobsIsSuccess } = useGetRunningJobs({
         projectId: projectIdentifier.projectId,
         queryOptions: {
             enabled: isTraining,
@@ -71,22 +71,20 @@ const useTrainingProgressJobs = (isTraining: boolean) => {
             return;
         }
 
-        handleSuccess({...runningJobsData, ...scheduledJobsData });
+        handleSuccess({ ...runningJobsData, ...scheduledJobsData });
     }, [runningJobsData, runningJobsIsSuccess, handleSuccess, scheduledJobsData, scheduledJobsIsSuccess]);
 
-    return {...runningJobsData, ...scheduledJobsData};
+    return { ...runningJobsData, ...scheduledJobsData };
 };
 
 export const useTrainingProgress = (taskId: string): UseTrainingProgress => {
     const isTraining = useIsTraining();
     const data = useTrainingProgressJobs(isTraining);
-    
+
     const getTrainingDetails = (): RunningTrainingJob[] | undefined => {
         const jobs = data?.pages?.flatMap((jobsResponse) => jobsResponse.jobs) ?? [];
         const jobsPerTask = jobs.filter(
-            (job) =>
-                isRunningOrScheduledTrainingJob(job) &&
-                taskId === job.metadata.task.taskId
+            (job) => isRunningOrScheduledTrainingJob(job) && taskId === job.metadata.task.taskId
         ) as RunningTrainingJob[];
         return !isEmpty(jobsPerTask) ? jobsPerTask : undefined;
     };

@@ -17,5 +17,5 @@ export interface ModelCardProps {
 }
 
 export interface TrainingModelCardProps {
-    job: RunningTrainingJob
+    job: RunningTrainingJob;
 }
