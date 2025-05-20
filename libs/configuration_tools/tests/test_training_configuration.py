@@ -18,7 +18,7 @@ from geti_configuration_tools.training_configuration import (
     GlobalDatasetPreparationParameters,
     GlobalParameters,
     SubsetSplit,
-    TrainingConfiguration,
+    TrainingConfiguration, NullTrainingConfiguration,
 )
 
 
@@ -109,3 +109,8 @@ class TestTrainingConfiguration:
                 ),
                 hyperparameters=ftx_hyperparameters,
             )
+
+    def test_null_training_configuration(self):
+        null_training_config = NullTrainingConfiguration()
+
+        assert null_training_config.model_dump() == {}

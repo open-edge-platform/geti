@@ -1,5 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+from typing import Any
 
 from geti_types import ID, PersistentEntity
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -58,8 +59,8 @@ class GlobalDatasetPreparationParameters(BaseModel):
     Controls data splitting and filtering before being passed for the training.
     """
 
-    subset_split: SubsetSplit = Field(title="Subset split", description="Configuration for splitting data into subsets")
-    filtering: Filtering = Field(title="Filtering", description="Configuration for filtering annotations")
+    subset_split: SubsetSplit | None = Field(default=None, title="Subset split", description="Configuration for splitting data into subsets")
+    filtering: Filtering | None = Field(default=None, title="Filtering", description="Configuration for filtering annotations")
 
 
 class GlobalParameters(BaseModel):
@@ -144,3 +145,6 @@ class NullTrainingConfiguration(TrainingConfiguration):
             ),
             ephemeral=True,
         )
+
+    def model_dump(self) -> dict[str, Any]:
+        return {}
