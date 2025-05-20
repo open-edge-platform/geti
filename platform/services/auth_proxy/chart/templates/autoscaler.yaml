@@ -8,7 +8,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "auth-proxy.name" . }}
-  {{- if .Values.global.running_on_vm }}
+  {{- if or .Values.global.running_on_vm (eq .Values.global.installation_profile "lite") }}
   minReplicas: 1
   maxReplicas: 1
   {{- else }}
