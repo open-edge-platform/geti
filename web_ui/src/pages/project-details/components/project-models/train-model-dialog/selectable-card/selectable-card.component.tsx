@@ -3,8 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { DimensionValue, Flex, View } from '@geti/ui';
-import { Responsive } from '@react-types/shared';
+import { DimensionValue, Flex, Responsive, View } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';

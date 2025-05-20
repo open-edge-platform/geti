@@ -3,8 +3,18 @@
 
 import { useMemo } from 'react';
 
-import { ActionButton, DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
-import { IconColorValue } from '@react-types/shared/src/dna';
+import {
+    ActionButton,
+    DialogTrigger,
+    Flex,
+    IconColorValue,
+    Link,
+    ProgressCircle,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+    View,
+} from '@geti/ui';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 
 import { AcceptCircle, Alert, Image, Play, Refresh } from '../../../../../../assets/icons';

@@ -11,10 +11,10 @@ import {
     DialogContainer,
     Divider,
     Form,
+    Heading,
     PasswordField,
     TextField,
 } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
 import { useQueryClient } from '@tanstack/react-query';
 import { ValidationError } from 'yup';
 

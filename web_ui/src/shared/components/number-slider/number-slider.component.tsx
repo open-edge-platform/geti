@@ -3,8 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { ActionButton, DialogTrigger, Flex, Slider, View } from '@geti/ui';
-import { Text } from '@react-spectrum/text';
+import { ActionButton, DialogTrigger, Flex, Slider, Text, View } from '@geti/ui';
 import { noop } from 'lodash-es';
 
 import { ChevronDownLight } from '../../../assets/icons';

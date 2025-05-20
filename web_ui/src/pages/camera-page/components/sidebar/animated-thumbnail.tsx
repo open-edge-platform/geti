@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DimensionValue } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { DimensionValue, dimensionValue } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOverlayTriggerState } from 'react-stately';
 

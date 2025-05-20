@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton, View } from '@geti/ui';
-import { BorderRadiusValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { ActionButton, BorderRadiusValue, Responsive, View } from '@geti/ui';
 
 interface ChangeColorButtonProps {
     size: 'S' | 'L';

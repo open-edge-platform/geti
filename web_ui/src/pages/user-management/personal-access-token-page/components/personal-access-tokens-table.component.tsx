@@ -3,8 +3,19 @@
 
 import { FC, useState } from 'react';
 
-import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, Tag, useCollator, View } from '@geti/ui';
-import { SortDescriptor } from '@react-types/shared';
+import {
+    Cell,
+    Column,
+    Flex,
+    Row,
+    SortDescriptor,
+    TableBody,
+    TableHeader,
+    TableView,
+    Tag,
+    useCollator,
+    View,
+} from '@geti/ui';
 import { get, isEmpty } from 'lodash-es';
 
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';

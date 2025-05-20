@@ -3,14 +3,13 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Divider, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { PointSelector } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isClassificationDomain, isSegmentationDomain } from '../../../../core/projects/domains';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { useSelectedAnnotations } from '../../hooks/use-selected-annotations.hook';
 import { getOutputFromTask } from '../../providers/task-chain-provider/utils';

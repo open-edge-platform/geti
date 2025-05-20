@@ -3,7 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import { TextFieldRef } from '@react-types/textfield';
+import { TextFieldRef } from '@geti/ui';
 import { noop } from 'lodash-es';
 
 import { LabelItemEditionState } from '../../../../../../core/labels/label-tree-view.interface';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Link } from '@react-spectrum/link';
+import { Link } from '@geti/ui';
 import { clsx } from 'clsx';
 
 import { CONTACT_SUPPORT } from '../../../core/const';

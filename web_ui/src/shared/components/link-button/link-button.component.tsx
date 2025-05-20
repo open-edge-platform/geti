@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton, Text } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
+import { ActionButton, StyleProps, Text } from '@geti/ui';
 
 interface LinkButtonProps extends StyleProps {
     text: string;

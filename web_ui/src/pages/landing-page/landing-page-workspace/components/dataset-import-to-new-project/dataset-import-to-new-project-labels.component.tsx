@@ -3,14 +3,13 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import { ActionButton, Checkbox, Flex, Heading, IllustratedMessage, Text, View } from '@geti/ui';
+import { ActionButton, Checkbox, Divider, Flex, Heading, IllustratedMessage, Text, View } from '@geti/ui';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { differenceBy, intersectionBy, isEmpty, uniqBy } from 'lodash-es';
 
 import { ChevronRightSmallLight, LabelGroup } from '../../../../../assets/icons';
 import { DATASET_IMPORT_TASK_TYPE } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportLabel, DatasetImportToNewProjectItem } from '../../../../../core/datasets/dataset.interface';
-import { Divider } from '../../../../../shared/components/divider/divider.component';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { ColorPickerDialog } from '../../../../create-project/components/project-labels-management/task-labels-management/color-picker-dialog.component';
 import { getLabelFullPath, getLabelsStructureFromPaths, isTaskChainedProject } from './utils';

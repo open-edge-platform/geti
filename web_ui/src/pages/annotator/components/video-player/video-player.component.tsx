@@ -3,10 +3,9 @@
 
 import { useState } from 'react';
 
-import { Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Divider, Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { ChevronDownLight, ChevronUpLight } from '../../../../assets/icons';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { useDataset } from '../../providers/dataset-provider/dataset-provider.component';
 import { Duration } from '../footer/duration.component';
 import { FrameStep } from './frame-step/frame-step.component';

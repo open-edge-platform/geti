@@ -3,8 +3,7 @@
 
 import { CSSProperties, ReactNode, useRef } from 'react';
 
-import { Divider, Flex, Heading, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
+import { Divider, Flex, Heading, PressableElement, StyleProps, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Info } from '../../../assets/icons';

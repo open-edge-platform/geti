@@ -11,13 +11,13 @@ import {
     DialogContainer,
     Divider,
     Flex,
+    Heading,
     Loading,
     LoadingIndicator,
     Text,
     Tooltip,
     TooltipTrigger,
 } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
 
 import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
 import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';

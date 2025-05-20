@@ -3,9 +3,7 @@
 
 import { ComponentProps, CSSProperties } from 'react';
 
-import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
-import { useStyleProps } from '@react-spectrum/utils';
-import { StyleProps } from '@react-types/shared';
+import { PressableElement, StyleProps, Tooltip, TooltipTrigger, useStyleProps } from '@geti/ui';
 import { PositionProps } from 'react-aria';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';

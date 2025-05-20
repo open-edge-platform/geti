@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Item, Picker } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Item, Picker, useMediaQuery } from '@geti/ui';
 
 import { Task } from '../../../../../core/projects/task.interface';
 import { hasEqualId } from '../../../../../shared/utils';

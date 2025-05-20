@@ -1,12 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
-import { Text } from '@react-spectrum/text';
+import { Divider, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Combine, New, Subtract } from '../../../../assets/icons';
 import { Label } from '../../../../core/labels/label.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolToggleButton } from '../../components/primary-toolbar/tool-toggle-button.component';

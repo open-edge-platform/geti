@@ -3,10 +3,20 @@
 
 import { CSSProperties, FC, useState } from 'react';
 
-import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Text } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
-import { View } from '@react-spectrum/view';
+import {
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    dimensionValue,
+    Divider,
+    Flex,
+    Heading,
+    Text,
+    useMediaQuery,
+    View,
+} from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';

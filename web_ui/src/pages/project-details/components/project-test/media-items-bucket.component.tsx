@@ -3,9 +3,7 @@
 
 import { useState } from 'react';
 
-import { Divider, Flex, Text } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Heading, Text, useMediaQuery } from '@geti/ui';
 import { useParams } from 'react-router-dom';
 
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';

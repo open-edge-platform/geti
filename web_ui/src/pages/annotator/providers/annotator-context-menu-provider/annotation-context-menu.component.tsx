@@ -3,8 +3,7 @@
 
 import { MutableRefObject, RefObject, useRef } from 'react';
 
-import { View } from '@geti/ui';
-import { Overlay } from '@react-spectrum/overlays';
+import { Overlay, View } from '@geti/ui';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { pointInRectangle } from '../../../../core/annotations/math';

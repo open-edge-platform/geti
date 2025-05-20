@@ -1,13 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-// Copyright (C) 2022-2025 Intel Corporation
-// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-
 import { Key, useRef } from 'react';
 
+import { dimensionValue } from '@geti/ui';
 import { isFirefox } from '@react-aria/utils';
-import { dimensionValue } from '@react-spectrum/utils';
 
 import { mediaExtensionHandler } from '../../../../providers/media-upload-provider/media-upload.validator';
 import { CANT_UPLOAD_FOLDER_FIREFOX } from '../../../custom-notification-messages';

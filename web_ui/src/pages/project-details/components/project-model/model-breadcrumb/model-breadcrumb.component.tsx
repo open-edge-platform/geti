@@ -3,9 +3,18 @@
 
 import { Key, useRef } from 'react';
 
-import { ActionButton, Flex, Item, Menu, MenuTrigger, Tag, Text, View } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
-import { FocusableRefValue } from '@react-types/shared';
+import {
+    ActionButton,
+    Flex,
+    FocusableRefValue,
+    Item,
+    Menu,
+    MenuTrigger,
+    Tag,
+    Text,
+    useUnwrapDOMRef,
+    View,
+} from '@geti/ui';
 import { usePress } from 'react-aria';
 
 import { ChevronDownSmallLight } from '../../../../../assets/icons';

@@ -15,8 +15,8 @@ import {
     Heading,
     Text,
     TextField,
+    TextFieldRef,
 } from '@geti/ui';
-import { TextFieldRef } from '@react-types/textfield';
 
 import { Info } from '../../../../assets/icons';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

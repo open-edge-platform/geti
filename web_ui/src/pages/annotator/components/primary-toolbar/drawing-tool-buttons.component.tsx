@@ -3,8 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
-import { Flex } from '@react-spectrum/layout';
+import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';

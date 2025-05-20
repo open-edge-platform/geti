@@ -3,9 +3,19 @@
 
 import { useMemo, useRef, useState } from 'react';
 
-import { ActionButton, ComboBox, Flex, Heading, Item, Key, Loading, View } from '@geti/ui';
-import { dimensionValue, useUnwrapDOMRef } from '@react-spectrum/utils';
-import { StyleProps } from '@react-types/shared';
+import {
+    ActionButton,
+    ComboBox,
+    dimensionValue,
+    Flex,
+    Heading,
+    Item,
+    Key,
+    Loading,
+    StyleProps,
+    useUnwrapDOMRef,
+    View,
+} from '@geti/ui';
 import Close from '@spectrum-icons/workflow/Close';
 import dayjs from 'dayjs';
 import { isEmpty, isNumber, orderBy } from 'lodash-es';
