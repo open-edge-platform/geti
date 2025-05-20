@@ -3,7 +3,7 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Flex, Grid, Heading, Radio, RadioGroup, repeat, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Grid, Heading, Radio, RadioGroup, repeat, Tooltip, TooltipTrigger } from '@geti/ui';
 import clsx from 'clsx';
 import { isFunction } from 'lodash-es';
 

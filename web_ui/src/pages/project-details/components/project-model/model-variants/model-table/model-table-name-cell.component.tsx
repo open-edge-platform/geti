@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
 import { TruncatedText } from '../../../../../../shared/components/truncated-text/truncated-text.component';

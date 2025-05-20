@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex, Grid, View } from '@adobe/react-spectrum';
+import { Flex, Grid, View } from '@geti/ui';
 
 import { filterOutEmptyLabel } from '../../../../../core/labels/utils';
 import { isKeypointTask } from '../../../../../core/projects/utils';

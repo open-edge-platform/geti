@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, LoadingIndicator, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
@@ -10,7 +10,6 @@ import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { filterOutUnsuccessfulTest } from '../../../../core/tests/services/utils';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { RunTestButton } from './run-test-dialog/run-test-button.component';
 import { TestsTable } from './tests-table.component';

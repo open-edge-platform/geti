@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, IllustratedMessage, View } from '@adobe/react-spectrum';
+import { Flex, IllustratedMessage, View } from '@geti/ui';
 
 import { Close } from '../../../assets/icons';
 

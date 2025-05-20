@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ActionButton, DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { IconColorValue } from '@react-types/shared/src/dna';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 
@@ -16,7 +16,6 @@ import {
     QueuedListItem,
     SuccessListItem,
 } from '../../../../../../providers/media-upload-provider/media-upload.interface';
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
 import { ThinProgressBar } from '../../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
 import { TruncatedTextWithTooltip } from '../../../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize } from '../../../../../../shared/utils';

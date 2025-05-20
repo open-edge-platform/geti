@@ -13,7 +13,7 @@ import {
     TableView,
     Text,
     View,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';

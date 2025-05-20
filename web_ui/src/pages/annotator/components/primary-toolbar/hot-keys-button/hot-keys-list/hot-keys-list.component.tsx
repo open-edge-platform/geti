@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Text, View } from '@adobe/react-spectrum';
+import { Divider, Text, View } from '@geti/ui';
 
 import { isVideo, isVideoFrame } from '../../../../../../core/media/video.interface';
 import { getKeyName } from '../../../../../../shared/hotkeys';

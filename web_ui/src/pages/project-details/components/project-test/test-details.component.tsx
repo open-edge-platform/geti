@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Grid, Text } from '@adobe/react-spectrum';
+import { Flex, Grid, Text } from '@geti/ui';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isAnomalyDomain, isDetectionDomain, isSegmentationDomain } from '../../../../core/projects/domains';

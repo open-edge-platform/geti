@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { ButtonGroup } from '@adobe/react-spectrum';
+import { ButtonGroup } from '@geti/ui';
 import { isNil } from 'lodash-es';
 import { useSearchParams } from 'react-router-dom';
 

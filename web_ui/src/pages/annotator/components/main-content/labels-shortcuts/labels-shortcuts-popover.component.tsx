@@ -3,12 +3,11 @@
 
 import { Dispatch, SetStateAction, useRef } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { CustomPopover, Flex, Text, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { ChevronDownLight } from '../../../../../assets/icons';
 import { Label } from '../../../../../core/labels/label.interface';
-import { CustomPopover } from '../../../../../shared/components/custom-popover/custom-popover.component';
 import { TaskLabelTreeSearch } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search.component';
 import { onEscape } from '../../../../../shared/utils';
 import { useTask } from '../../../providers/task-provider/task-provider.component';

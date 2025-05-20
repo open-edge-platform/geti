@@ -3,7 +3,7 @@
 
 import { Dispatch, Key, ReactNode, SetStateAction, useState } from 'react';
 
-import { AlertDialog, DialogContainer, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { MenuTriggerButton } from '../menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';

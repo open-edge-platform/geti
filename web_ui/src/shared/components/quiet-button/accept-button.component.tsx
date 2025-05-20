@@ -1,14 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SpectrumActionButtonProps } from '@react-types/button';
+import { ActionButton, type ActionButtonProps } from '@geti/ui';
 
 import { Accept } from '../../../assets/icons';
-import { ActionButton } from '../button/button.component';
 
 import sharedClasses from '../../shared.module.scss';
 
-export const AcceptButton = (props: SpectrumActionButtonProps) => {
+export const AcceptButton = (props: ActionButtonProps) => {
     return (
         <ActionButton
             isQuiet

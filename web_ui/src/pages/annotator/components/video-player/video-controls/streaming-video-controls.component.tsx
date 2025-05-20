@@ -3,12 +3,11 @@
 
 import { useEffect, useRef } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex, Loading } from '@geti/ui';
 import { isEmpty, isFunction, isNil } from 'lodash-es';
 
 import { Play } from '../../../../../assets/icons';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';
 import { useInferenceServerStatus } from '../../../providers/prediction-provider/use-inference-server-status';

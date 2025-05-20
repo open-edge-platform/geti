@@ -3,9 +3,8 @@
 
 import { FC, useState } from 'react';
 
-import { Grid, minmax, Text } from '@adobe/react-spectrum';
+import { Grid, minmax, Switch, Text } from '@geti/ui';
 
-import { Switch } from '../../../../../../../../shared/components/switch/switch.component';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { FilterOption, FiltersOptions } from './filters-options.component';
 

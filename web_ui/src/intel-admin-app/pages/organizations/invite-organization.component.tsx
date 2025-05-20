@@ -3,16 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Form,
-    Heading,
-    TextField,
-} from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -24,7 +15,6 @@ import { GetOrganizationsQueryOptions } from '../../../core/organizations/servic
 import QUERY_KEYS from '../../../core/requests/query-keys';
 import { ErrorMessage } from '../../../pages/user-management/users/add-member-popup/error-message/error-message.component';
 import { validateEmail } from '../../../pages/user-management/users/utils';
-import { Button } from '../../../shared/components/button/button.component';
 
 const MIN_ORG_NAME = 1;
 const MAX_ORG_NAME = 50;

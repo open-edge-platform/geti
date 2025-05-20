@@ -3,12 +3,11 @@
 
 import { ComponentProps, ReactNode } from 'react';
 
-import { Text } from '@adobe/react-spectrum';
+import { Button, Text } from '@geti/ui';
 import { Placement } from 'react-aria';
 
 import { MoreMenu } from '../../../../assets/icons';
 import { ButtonWithSpectrumTooltip } from '../../button-with-tooltip/button-with-tooltip.component';
-import { Button } from '../../button/button.component';
 import { MenuTriggerProps } from '../../upload-media/upload-media-button/upload-media-button.interface';
 import { MenuTrigger } from '../menu-trigger.component';
 

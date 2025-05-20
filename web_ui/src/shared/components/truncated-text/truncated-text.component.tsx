@@ -1,15 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { CSSProperties } from 'react';
+import { ComponentProps, CSSProperties } from 'react';
 
-import { SpectrumActionButtonProps, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { useStyleProps } from '@react-spectrum/utils';
 import { StyleProps } from '@react-types/shared';
 import { PositionProps } from 'react-aria';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { PressableElement } from '../pressable-element/pressable-element.component';
 
 const TruncatedTextStyles: CSSProperties = {
     display: 'block',
@@ -45,7 +44,7 @@ export const TruncatedText = ({ id, children, ...otherProps }: TruncatedTextProp
 type TruncatedTextWithTooltipProps = StyleProps &
     PositionProps &
     Omit<TruncatedTextProps, 'classes' | 'children'> &
-    Omit<SpectrumActionButtonProps, 'isQuiet'>;
+    ComponentProps<typeof PressableElement>;
 
 //ActionElement stops event propagation https://github.com/adobe/react-spectrum/issues/2100
 export const TruncatedTextWithTooltip = ({

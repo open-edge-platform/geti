@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Grid, repeat, Text } from '@adobe/react-spectrum';
+import { Grid, repeat, Text } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';

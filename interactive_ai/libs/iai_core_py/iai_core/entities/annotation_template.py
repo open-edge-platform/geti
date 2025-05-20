@@ -5,10 +5,9 @@
 
 import datetime
 
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.time_utils import now
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 
 class AnnotationTemplate(PersistentEntity):

@@ -3,13 +3,12 @@
 
 import { Key } from 'react';
 
-import { Divider, Flex, Item, Picker, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Divider, Flex, Item, Picker, Switch, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { NumberSliderWithLocalHandler } from '../../../../../shared/components/number-slider/number-slider-with-local-handler.component';
-import { Switch } from '../../../../../shared/components/switch/switch.component';
 import { hasEqualId } from '../../../../../shared/utils';
 import { ToggleVisibilityButton } from '../../../../annotator/annotation/toggle-visibility-button/toggle-visibility-button.component';
 import { CanvasAdjustments } from '../../../../annotator/components/primary-toolbar/canvas-adjustments/canvas-adjustments.component';

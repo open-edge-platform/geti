@@ -1,10 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex, Tag } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
-
-import { Tag } from '../../../../shared/components/tag/tag.component';
 
 export const VisualPromptModelBetaWarning = () => {
     return (

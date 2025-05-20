@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Flex, Text, ToggleButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
 import { ChevronDownLight, ChevronUpLight } from '../../../../assets/icons';
 import { Divider } from '../../../../shared/components/divider/divider.component';

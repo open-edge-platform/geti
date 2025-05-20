@@ -7,7 +7,6 @@ from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
 from iai_core.entities.model_storage import ModelStorageIdentifier
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.repos.base import (
     DatasetStorageBasedSessionRepo,
     ModelStorageBasedSessionRepo,
@@ -18,7 +17,7 @@ from iai_core.repos.mappers.cursor_iterator import CursorIterator
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
-from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier, Session
+from geti_types import ID, DatasetStorageIdentifier, PersistentEntity, ProjectIdentifier, Session
 
 
 class Foo(PersistentEntity):

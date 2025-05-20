@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { AlertDialog, DialogContainer } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer } from '@geti/ui';
 
 import { User } from '../../users/mocked-user';
 import { Membership } from '../mocked-memberships';

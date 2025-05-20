@@ -30,7 +30,7 @@ export const MediaItemMenu = ({
     const selectedDataset = useSelectedDataset();
     const { deleteMedia, loadNextMedia } = useMedia();
     const datasetIdentifier = useDatasetIdentifier();
-    const navigate = useNavigateToAnnotatorRoute(datasetIdentifier);
+    const navigate = useNavigateToAnnotatorRoute();
 
     const commonMenuItems = [MediaItemMenuActions.DELETE, MediaItemMenuActions.ANNOTATE, MediaItemMenuActions.DOWNLOAD];
     const items = showQuickAnnotation ? [...commonMenuItems, MediaItemMenuActions.QUICK_ANNOTATION] : commonMenuItems;
@@ -51,7 +51,7 @@ export const MediaItemMenu = ({
                 isQuiet: true,
                 onAction: (action) => {
                     if (action === MediaItemMenuActions.ANNOTATE.toLowerCase()) {
-                        navigate({ ...datasetIdentifier, mediaItem, active: selectedDataset.useForTraining });
+                        navigate({ datasetIdentifier, mediaItem, active: selectedDataset.useForTraining });
                         return;
                     }
 

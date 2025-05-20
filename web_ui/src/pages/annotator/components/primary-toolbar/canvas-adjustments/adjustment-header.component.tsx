@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useHover, useNumberFormatter } from 'react-aria';
 

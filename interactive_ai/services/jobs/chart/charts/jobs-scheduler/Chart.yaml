@@ -1,6 +1,0 @@
----
-name: jobs-scheduler
-version: 0.0.10
-apiVersion: v2
-description: jobs-scheduler
-appVersion: v0.0.1

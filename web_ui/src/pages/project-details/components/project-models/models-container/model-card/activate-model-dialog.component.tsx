@@ -3,10 +3,9 @@
 
 import { useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Text } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Text } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { Button } from '../../../../../../shared/components/button/button.component';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
 import { useTrainStateValue } from '../../legacy-train-model-dialog/use-training-state-value/use-training-state-value.hook';
 

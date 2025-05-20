@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Heading, Text } from '@adobe/react-spectrum';
+import { Button, Heading, Text } from '@geti/ui';
 
 import { BrokenBulb } from '../../../assets/images';
 import { paths } from '../../../core/services/routes';
 import { ErrorLayout } from '../../../pages/errors/error-layout/error-layout.component';
-import { Button } from '../../../shared/components/button/button.component';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../../../pages/errors/error-layout/error-layout.module.scss';

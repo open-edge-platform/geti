@@ -4,6 +4,7 @@
 import { CSSProperties, Dispatch, MutableRefObject, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import {
+    ActionButton,
     ButtonGroup,
     Content,
     Dialog,
@@ -14,7 +15,7 @@ import {
     Tooltip,
     TooltipTrigger,
     View,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
 import { dimensionValue, useMediaQuery, useUnwrapDOMRef } from '@react-spectrum/utils';
 import { FocusableRefValue } from '@react-types/shared';
 import { isEmpty, isEqual } from 'lodash-es';
@@ -28,7 +29,6 @@ import {
     SearchOptionsRule,
     SearchRuleField,
 } from '../../core/media/media-filter.interface';
-import { ActionButton } from '../../shared/components/button/button.component';
 import { ColorMode } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { QuietToggleButton } from '../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';

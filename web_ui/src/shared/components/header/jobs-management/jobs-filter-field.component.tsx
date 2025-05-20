@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { ComboBox, Item } from '@adobe/react-spectrum';
+import { ComboBox, Item } from '@geti/ui';
 
 export interface JobsFilterFieldProps {
     value: string;

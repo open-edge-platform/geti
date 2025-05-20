@@ -3,18 +3,7 @@
 
 import { FC, PropsWithChildren } from 'react';
 
-import {
-    Cell,
-    Column,
-    Content,
-    Heading,
-    Row,
-    TableBody,
-    TableHeader,
-    TableView,
-    Text,
-    View,
-} from '@adobe/react-spectrum';
+import { Cell, Column, Content, Heading, Row, TableBody, TableHeader, TableView, Text, View } from '@geti/ui';
 import { AriaLabelingProps, DOMProps, StyleProps } from '@react-types/shared';
 import { ColumnSize } from '@react-types/table';
 import dayjs from 'dayjs';

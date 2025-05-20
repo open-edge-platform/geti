@@ -3,7 +3,7 @@
 
 import { Dispatch, Key, SetStateAction, useState } from 'react';
 
-import { Content, Dialog, Flex, Text } from '@adobe/react-spectrum';
+import { Content, Dialog, Flex, Text } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { RangeValue } from '@react-types/shared';
 import { keepPreviousData } from '@tanstack/react-query';

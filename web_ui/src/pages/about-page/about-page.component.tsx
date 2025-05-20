@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Heading, Link as SpectrumLink, Text, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Link as SpectrumLink, Text, View } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { COOKIES_NOTICE, PRIVACY_NOTICE, TERMS_OF_USE_GETI, TERMS_OF_USE_INTEL } from '../../core/const';

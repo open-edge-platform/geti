@@ -3,12 +3,11 @@
 
 import { ComponentProps } from 'react';
 
-import { DialogTrigger, Flex, Slider, View } from '@adobe/react-spectrum';
+import { ActionButton, DialogTrigger, Flex, Slider, View } from '@geti/ui';
 import { Text } from '@react-spectrum/text';
 import { noop } from 'lodash-es';
 
 import { ChevronDownLight } from '../../../assets/icons';
-import { ActionButton } from '../button/button.component';
 import { CustomNumberField } from '../configurable-parameters/cp-item/custom-number-field/custom-number-field.component';
 
 import classes from './number-slider.module.scss';

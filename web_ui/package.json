@@ -54,7 +54,6 @@
     "react-aria": "^3.39.0",
     "react-aria-components": "^1.8.0",
     "react-colorful": "^5.6.1",
-    "react-content-loader": "^7.0.2",
     "react-cool-virtual": "^0.7.0",
     "react-countup": "^6.5.3",
     "react-dom": "^18.3.1",
@@ -68,7 +67,6 @@
     "react-webcam": "^7.2.0",
     "react-zoom-pan-pinch": "^3.7.0",
     "recharts": "^2.15.1",
-    "screenfull": "^6.0.2",
     "spin-delay": "^2.0.1",
     "static-path": "^0.0.4",
     "svg2pdf.js": "^2.5.0",
@@ -79,7 +77,8 @@
     "web-vitals": "^4.2.4",
     "workbox-core": "^7.3.0",
     "yup": "^1.6.1",
-    "zipson": "^0.2.12"
+    "zipson": "^0.2.12",
+    "@geti/ui": "*"
   },
   "scripts": {
     "build": "rsbuild build --environment geti --environment admin",
@@ -94,19 +93,19 @@
     "build:server-types": "openapi-typescript src/core/server/generated/api-spec.json --output src/core/server/generated/schemas.ts",
     "cyclic-deps-check": "npx madge --circular src/**/*.ts* tests/**/*.ts*",
     "find-deadcode": "npx knip",
-    "format": "prettier --write --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\"",
-    "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\"",
-    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0",
-    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\"",
+    "format": "prettier --write --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\" \"packages/**/*.ts*\"",
+    "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\" \"packages/**/*.ts*\"",
+    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0 && npm run lint --workspace=@geti/ui",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\" && npm run lint:fix --workspace=@geti/ui",
     "preview": "rsbuild preview",
     "start": "rsbuild dev --environment dev",
     "test:component": "npx playwright test --config=playwright.config.ts",
     "test:component:ui": "npm run test:component -- --ui",
     "test:coverage": "npm test -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
-    "test:unit": "jest --config jest.config.ts --watchAll=false",
-    "test:unit:watch": "jest --config jest.config.ts --watch",
-    "type-check": "tsc --noEmit"
+    "test:unit": "jest --config jest.config.js --watchAll=false && npm run test:unit --workspace=@geti/ui",
+    "test:unit:watch": "jest --config jest.config.js --watch",
+    "type-check": "tsc --noEmit && npm run type-check --workspace=@geti/ui"
   },
   "browserslist": {
     "production": [
@@ -170,9 +169,13 @@
     "openapi-typescript-fetch": "^2.1.0",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "@geti/config": "*"
   },
   "overrides": {
     "lz-string": "github:pieroxy/lz-string#573d8e6ab49cab839143953f0970930c57bc0782"
-  }
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

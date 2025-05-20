@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Divider } from '@adobe/react-spectrum';
+import { Divider } from '@geti/ui';
 import { View } from '@react-spectrum/view';
 import { clsx } from 'clsx';
 import { AnimatePresence, motion } from 'framer-motion';

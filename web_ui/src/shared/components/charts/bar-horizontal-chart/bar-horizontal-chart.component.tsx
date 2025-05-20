@@ -3,7 +3,7 @@
 
 import { ComponentProps, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { trimText } from '../../../utils';

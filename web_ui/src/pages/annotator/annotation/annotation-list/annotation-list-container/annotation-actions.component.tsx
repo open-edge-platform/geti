@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { useIsSceneBusy } from '../../../hooks/use-annotator-scene-interaction-state.hook';
 import { AnnotationsFilterChips } from '../../annotation-filter/annotation-filter-chips.component';

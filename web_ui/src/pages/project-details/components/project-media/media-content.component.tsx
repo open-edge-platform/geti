@@ -3,7 +3,7 @@
 
 import { Dispatch, useCallback, useMemo } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../../core/services/routes';

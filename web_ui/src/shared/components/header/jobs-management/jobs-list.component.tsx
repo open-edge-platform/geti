@@ -3,14 +3,13 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Text, View } from '@adobe/react-spectrum';
+import { Loading, Text, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isEmpty } from 'lodash-es';
 import { Virtuoso } from 'react-virtuoso';
 
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
-import { Loading } from '../../loading/loading.component';
 import { SortByAttribute, SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsListItem } from './jobs-list-item.component';
 import { DISCARD_TYPE, JOB_STATE_TO_DISCARD_TYPE } from './utils';

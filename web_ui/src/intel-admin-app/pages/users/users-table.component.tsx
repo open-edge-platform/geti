@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@adobe/react-spectrum';
+import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 
 import { paths } from '../../../core/services/routes';
 import { TruncatedText } from '../../../shared/components/truncated-text/truncated-text.component';

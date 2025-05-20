@@ -3,7 +3,7 @@
 
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
-import { Divider, Flex, IllustratedMessage, View } from '@adobe/react-spectrum';
+import { Divider, Flex, IllustratedMessage, View } from '@geti/ui';
 import { useMediaQuery } from '@react-spectrum/utils';
 import { DimensionValue } from '@react-types/shared/src/dna';
 import { Responsive } from '@react-types/shared/src/style';
@@ -29,6 +29,7 @@ import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { MediaFilterChips } from '../../../media/components/media-filter-chips.component';
 import { useMedia } from '../../../media/providers/media-provider.component';
+import { getMediaId } from '../../../media/utils';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { getMatchedMediaCounts, getTotalMediaCounts } from '../../utils';
 import { AnomalyMediaHeaderInformation } from './anomaly-media-header-information.component';
@@ -195,11 +196,13 @@ export const MediaContentBucket = ({
                             <MediaItemsList
                                 id={`media-${bucketId}-dataset-list`}
                                 endReached={() => loadNextMedia(false)}
-                                totalCount={media.length}
+                                idFormatter={getMediaId}
+                                getTextValue={(item) => item.name}
+                                mediaItems={media}
                                 viewMode={viewMode}
-                                itemContent={(index) => (
+                                itemContent={(item) => (
                                     <MediaItemFactory
-                                        mediaItem={media[index]}
+                                        mediaItem={item}
                                         viewMode={viewMode}
                                         isLargeSize={isLargeSize}
                                         mediaSelection={mediaSelection}

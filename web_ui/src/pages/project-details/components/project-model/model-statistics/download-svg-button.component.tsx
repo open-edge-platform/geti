@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { SpectrumActionButtonProps } from '@react-types/button';
+import { Tooltip, TooltipTrigger, View, type ActionButtonProps } from '@geti/ui';
 import { BackgroundColorValue } from '@react-types/shared';
 
 import { DownloadIcon } from '../../../../../assets/icons';
@@ -22,7 +21,7 @@ import { QuietActionButton } from '../../../../../shared/components/quiet-button
 
 import classes from './download-svg-button.module.scss';
 
-interface DownloadSvgButtonProps extends SpectrumActionButtonProps {
+interface DownloadSvgButtonProps extends ActionButtonProps {
     text?: string;
     tooltip?: string;
     fileName: string;

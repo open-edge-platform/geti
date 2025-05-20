@@ -26,6 +26,15 @@ const mockedAnnotation = getMockedAnnotation({ labels: [mockedLabel] }, ShapeTyp
 const mockedInvalidAnnotation = getMockedAnnotation({ id: 'invalid-annotation', labels: [] }, ShapeType.Rect);
 const mockedPrediction = getMockedAnnotation({ id: 'prediction', labels: [mockedLabel] }, ShapeType.Rect);
 
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useParams: () => ({
+        organizationId: 'organization-id',
+        workspaceId: 'workspace-id',
+        projectId: 'project-id',
+    }),
+}));
+
 describe('Annotator provider', (): void => {
     const annotationService = createInMemoryAnnotationService();
     const inferenceService = createInMemoryInferenceService();

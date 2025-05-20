@@ -3,7 +3,7 @@
 
 import { CSSProperties, ReactNode, useRef } from 'react';
 
-import { Divider, Flex, Heading, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Heading, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { StyleProps } from '@react-types/shared';
 import { isEmpty } from 'lodash-es';
 
@@ -11,7 +11,6 @@ import { Info } from '../../../assets/icons';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { DownloadGraphMenu } from '../download-graph-menu/download-graph-menu.component';
 import { DownloadableData } from '../download-graph-menu/export-csv-utils';
-import { PressableElement } from '../pressable-element/pressable-element.component';
 
 interface CardContentProps extends StyleProps {
     children: ReactNode;

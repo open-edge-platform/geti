@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { DialogContainer } from '@adobe/react-spectrum';
+import { DialogContainer } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';

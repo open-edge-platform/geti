@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ListBox, ListBoxItem, ListLayout, Virtualizer } from 'react-aria-components';
+import { ListBox as AriaComponentsListBox, ListBoxItem, ListLayout, Virtualizer } from 'react-aria-components';
 
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
@@ -36,7 +36,7 @@ export const NodeList = ({ keypointAnnotation }: NodeListProps) => {
 
     return (
         <Virtualizer layout={ListLayout}>
-            <ListBox aria-label='Virtualized ListBox' items={points} className={styles.container}>
+            <AriaComponentsListBox aria-label='Virtualized ListBox' items={points} className={styles.container}>
                 {(point) => (
                     <ListBoxItem textValue={point.label.name}>
                         <NodeContent
@@ -46,7 +46,7 @@ export const NodeList = ({ keypointAnnotation }: NodeListProps) => {
                         />
                     </ListBoxItem>
                 )}
-            </ListBox>
+            </AriaComponentsListBox>
         </Virtualizer>
     );
 };

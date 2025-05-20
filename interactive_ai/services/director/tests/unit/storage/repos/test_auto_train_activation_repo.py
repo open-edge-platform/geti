@@ -24,7 +24,6 @@ def fxt_auto_train_activation(fxt_ote_id, fxt_session_ctx):
     )
 
 
-@pytest.mark.ScSdkComponent
 class TestAutoTrainActivationRepo:
     @freeze_time("2011-11-11 11:11:11")
     def test_auto_train_activation_repo(self, request, fxt_ote_id) -> None:

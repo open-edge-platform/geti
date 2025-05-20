@@ -167,26 +167,20 @@ class ConfigurationManager:
         task_model_storages = ConfigurationManager.__get_model_storages_by_task_id(
             project_identifier=project_identifier, task_id=task_id
         )
+
         model: Model | None = None
-        model_storage_id = ID()
+        model_storage_id: ID | None = None
         for model_storage in task_model_storages:
-            try:
-                project = ProjectRepo().get_by_id(project_id)
-                if isinstance(project, NullProject):
-                    raise ProjectNotFoundException(project_id)
-                model_storage_identifier = ModelStorageIdentifier(
-                    workspace_id=project.workspace_id,
-                    project_id=project.id_,
-                    model_storage_id=model_storage_id,
-                )
-                model = ModelRepo(model_storage_identifier).get_by_id(model_id)
-                if isinstance(model, NullModel):
-                    raise ModelNotFoundException(model_id=model_id)
+            model_storage_identifier = ModelStorageIdentifier(
+                workspace_id=project_identifier.workspace_id,
+                project_id=project_identifier.project_id,
+                model_storage_id=model_storage.id_,
+            )
+            model = ModelRepo(model_storage_identifier).get_by_id(model_id)
+            if not isinstance(model, NullModel):
                 model_storage_id = model_storage.id_
                 break
-            except ModelNotFoundException:
-                continue
-        if model is None:
+        if model is None or model_storage_id is None:
             raise ModelNotFoundException(model_id)
         return model.configuration.configurable_parameters, model_storage_id
 

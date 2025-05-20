@@ -3,7 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ChevronLeft, Close, MoreMenu } from '../../../assets/icons';
@@ -11,7 +11,6 @@ import { FUX_NOTIFICATION_KEYS } from '../../../core/user-settings/dtos/user-set
 import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
 import { useDocsUrl } from '../../../hooks/use-docs-url/use-docs-url.hook';
 import { useTutorialEnablement } from '../../hooks/use-tutorial-enablement.hook';
-import { Button } from '../button/button.component';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 import { onPressLearnMore } from '../tutorials/utils';
 import { getFuxNotificationData, getStepInfo } from './utils';

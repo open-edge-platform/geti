@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Grid, minmax, repeat } from '@adobe/react-spectrum';
+import { Grid, minmax, repeat } from '@geti/ui';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';

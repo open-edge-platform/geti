@@ -3,7 +3,7 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { isString } from 'lodash-es';
 

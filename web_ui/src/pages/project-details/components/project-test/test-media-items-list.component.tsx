@@ -3,19 +3,18 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
-import { Flex, IllustratedMessage, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Flex, IllustratedMessage, Loading, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 import { VirtuosoGridHandle } from 'react-virtuoso';
 
+import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { TestImageMediaItem } from '../../../../core/tests/test-image.interface';
 import { TestMediaAdvancedFilter, TestMediaItem } from '../../../../core/tests/test-media.interface';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { NotFound } from '../../../../shared/components/not-found/not-found.component';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { useSelectedMediaItemIndex } from '../../../../shared/hooks/use-selected-media-item-index.hook';
 import { isSelected } from '../../../annotator/components/sidebar/dataset/utils';
 import { MediaItemTooltipMessage } from '../project-media/media-item-tooltip-message/media-item-tooltip-message';
@@ -33,6 +32,23 @@ interface TestMediaItemsListProps {
     selectedMediaItem?: MediaItem;
     selectedLabelId?: string;
 }
+
+const viewModeSettings = {
+    [ViewModes.SMALL]: { minItemSize: 70, gap: 4, maxColumns: 6 },
+    [ViewModes.MEDIUM]: { minItemSize: 90, gap: 4, maxColumns: 4 },
+    [ViewModes.LARGE]: { minItemSize: 100, gap: 4, maxColumns: 2 },
+    [ViewModes.DETAILS]: { size: 85, gap: 0 },
+};
+
+const getTestMediaItemId = (item: TestMediaItem) => {
+    const annotationId = 'testResult' in item ? item.testResult.annotationId : '';
+
+    if (item.type === MEDIA_TYPE.IMAGE) {
+        return `${item.media.identifier.imageId}-${annotationId}`;
+    }
+
+    return `${item.media.identifier.videoId}-${annotationId}`;
+};
 
 export const TestMediaItemsList = ({
     viewMode,
@@ -100,16 +116,17 @@ export const TestMediaItemsList = ({
                 <Flex direction={'column'} position={'relative'} height={'100%'} width={'100%'}>
                     <View flex={1}>
                         <MediaItemsList
-                            ref={ref}
                             viewMode={viewMode}
-                            totalCount={mediaItems.length}
                             endReached={loadNextMedia}
-                            itemContent={(index) => {
-                                const mediaItem = mediaItems[index];
+                            mediaItems={mediaItems}
+                            viewModeSettings={viewModeSettings}
+                            idFormatter={getTestMediaItemId}
+                            getTextValue={(item) => item.media.name}
+                            itemContent={(mediaItem) => {
                                 const mediaImageItem = mediaItem as unknown as TestImageMediaItem;
                                 const handleSelectMediaItem = () => selectMediaItem(mediaItem);
 
-                                const tooltipProps = getMediaItemTooltipProps(mediaItems[index].media);
+                                const tooltipProps = getMediaItemTooltipProps(mediaItem.media);
                                 const isMediaSelected =
                                     selectedMediaItem && isSelected(mediaItem.media, selectedMediaItem, true);
 
@@ -120,7 +137,7 @@ export const TestMediaItemsList = ({
 
                                 return (
                                     <TooltipTrigger placement={'bottom'}>
-                                        <PressableElement>
+                                        <PressableElement height={'100%'}>
                                             {viewMode === ViewModes.DETAILS ? (
                                                 <TestMediaItemDetailsCard
                                                     mediaItem={mediaItem}
@@ -132,7 +149,7 @@ export const TestMediaItemsList = ({
                                             ) : (
                                                 <TestMediaItemCard
                                                     labelScore={labelScore}
-                                                    mediaItem={mediaItems[index]}
+                                                    mediaItem={mediaItem}
                                                     selectMediaItem={handleSelectMediaItem}
                                                     isSelected={isMediaSelected}
                                                     shouldShowAnnotationIndicator={shouldShowAnnotationIndicator}

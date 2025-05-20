@@ -3,7 +3,7 @@
 
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 
-import { Item, TabList, TabPanels, Tabs } from '@adobe/react-spectrum';
+import { Item, TabList, TabPanels, Tabs } from '@geti/ui';
 import { isEmpty, isNil } from 'lodash-es';
 
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../../../../core/datasets/dataset.enum';

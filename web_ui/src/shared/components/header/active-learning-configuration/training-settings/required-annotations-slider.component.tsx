@@ -3,7 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Slider, Text, View } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import { findRequiredImagesAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
@@ -12,7 +12,6 @@ import {
     ConfigurableParametersTaskChain,
     NumberGroupParams,
 } from '../../../configurable-parameters/configurable-parameters.interface';
-import { Slider } from '../../../slider/slider.component';
 
 interface RequiredAnnotationsSliderProps {
     task: Task;

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Text, View } from '@adobe/react-spectrum';
+import { Divider, Text, View } from '@geti/ui';
 
 import { DeprecatedTag } from './models-container/model-card/deprecated-model-tag.component';
 import { ObsoleteTag } from './models-container/model-card/obsolete-model-tag.component';

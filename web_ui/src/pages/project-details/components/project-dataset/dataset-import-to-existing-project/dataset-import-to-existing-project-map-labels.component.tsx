@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@adobe/react-spectrum';
+import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@geti/ui';
 import { isEmpty, omitBy, sortBy } from 'lodash-es';
 
 import { Close } from '../../../../../assets/icons';

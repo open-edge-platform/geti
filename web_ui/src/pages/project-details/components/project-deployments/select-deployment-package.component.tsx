@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Item, Picker, Link as SpectrumLink, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Picker, Link as SpectrumLink, Text } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { useDocsUrl } from '../../../../hooks/use-docs-url/use-docs-url.hook';

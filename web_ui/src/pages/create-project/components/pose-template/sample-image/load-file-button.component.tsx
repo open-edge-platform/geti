@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FileTrigger, Flex } from '@adobe/react-spectrum';
+import { Button, FileTrigger, Flex } from '@geti/ui';
 
 import { Image } from '../../../../../assets/icons';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { onValidFileList } from '../../../../../shared/utils';
 
 interface LoadFileButtonProps {

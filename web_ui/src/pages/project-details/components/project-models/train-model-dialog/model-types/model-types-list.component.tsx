@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Grid, minmax, repeat } from '@adobe/react-spectrum';
+import { Grid, minmax, repeat } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 
 import { PerformanceCategory } from '../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';

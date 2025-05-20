@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 
 import { usePlatformUtils } from '../../../core/platform-utils/hooks/use-platform-utils.hook';
 import { useUsers } from '../../../core/users/hook/use-users.hook';

@@ -28,6 +28,7 @@ WORKDIR ${LOCATION}
 
 COPY --link package.json ./
 COPY --link package-lock.json ./
+COPY --link packages/ packages/
 RUN npm ci --audit=false
 
 COPY --link ./eslint.config.js ./

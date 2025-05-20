@@ -4,15 +4,17 @@
 import { useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
+    DateRangePicker,
     Dialog,
     DialogTrigger,
     Divider,
     Heading,
     Radio,
     RadioGroup,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { RangeValue } from '@react-types/shared';
 import dayjs from 'dayjs';
@@ -20,8 +22,6 @@ import dayjs from 'dayjs';
 import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
-import { Button } from '../../shared/components/button/button.component';
-import { DateRangePicker } from '../../shared/components/date-range-picker/date-range-picker.component';
 import { downloadFile, getDateTimeInISOAndUTCOffsetFormat, getDownloadNotificationMessage } from '../../shared/utils';
 import { idMatchingFormat } from '../../test-utils/id-utils';
 import { DownloadButton } from './download-button.component';

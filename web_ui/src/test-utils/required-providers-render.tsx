@@ -3,7 +3,7 @@
 
 import { ReactElement, ReactNode, Suspense } from 'react';
 
-import { defaultTheme, Provider as ThemeProvider } from '@adobe/react-spectrum';
+import { defaultTheme, IntelBrandedLoading, Provider as ThemeProvider } from '@geti/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import { AuthProvider } from 'react-oidc-context';
@@ -19,7 +19,6 @@ import {
 import { OnboardingProfile } from '../core/users/services/onboarding-service.interface';
 import { NotificationProvider, Notifications } from '../notification/notification.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';
-import { IntelBrandedLoading } from '../shared/components/loading/intel-branded-loading.component';
 import { getMockedWorkspace } from './mocked-items-factory/mocked-workspace';
 
 interface RequiredProvidersProps extends Partial<ApplicationServicesContextProps> {

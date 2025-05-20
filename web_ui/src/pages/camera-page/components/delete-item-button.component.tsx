@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AlertDialog, DialogContainer, SpectrumActionButtonProps } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer, type ActionButtonProps } from '@geti/ui';
 import { OverlayTriggerState } from 'react-stately';
 
 import { Delete } from '../../../assets/icons';
 import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 
-interface DeleteItemButtonProps extends Omit<SpectrumActionButtonProps, 'isQuiet'> {
+interface DeleteItemButtonProps extends Omit<ActionButtonProps, 'isQuiet'> {
     id: string;
     alertDialogState: OverlayTriggerState;
     onDeleteItem: (id: string) => void;

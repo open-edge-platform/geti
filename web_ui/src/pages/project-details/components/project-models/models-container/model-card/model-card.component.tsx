@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Tag, Text, View } from '@geti/ui';
 import { Heading } from '@react-spectrum/text';
 import { clsx } from 'clsx';
 import { usePress } from 'react-aria';
@@ -14,7 +14,6 @@ import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { Tag } from '../../../../../../shared/components/tag/tag.component';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { isModelDeleted } from '../../../../utils';

@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, useNumberFormatter, View } from '@adobe/react-spectrum';
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import { Flex, Text, useNumberFormatter, View } from '@geti/ui';
+import { useMediaQuery } from '@react-spectrum/utils';
 
+import { ProgressBar } from '../../../../../shared/components/progress-bar/progress-bar.component';
 import { trimText } from '../../../../../shared/utils';
 import { isLargeSizeQuery, isMediumLargeSizeQuery } from '../../../../../theme/queries';
-import { ProgressBar } from './progress-bar.component';
 
 import classes from './training-progress.module.scss';
 
@@ -22,20 +22,17 @@ interface TrainingProgressProps {
 export const TrainingProgress = ({ training }: TrainingProgressProps): JSX.Element => {
     const formatter = useNumberFormatter({ style: 'percent', maximumFractionDigits: 0 });
 
-    const { message, progress } = training;
+    const { message, progress = 0 } = training;
 
     const isLargeSize = useMediaQuery(isLargeSizeQuery);
     const isMediumLargeSize = useMediaQuery(isMediumLargeSizeQuery);
-    const progressWidth = dimensionValue(isMediumLargeSize || !isLargeSize ? 'size-1700' : 'size-3400');
 
     return (
-        <View height='100%' id='training-progress'>
+        <View height='100%' id='training-progress' position={'relative'}>
             <Flex
                 height='size-400'
-                position='absolute'
                 alignItems='center'
                 aria-label='training progress'
-                justifyContent='space-around'
                 UNSAFE_className={classes.container}
             >
                 <Text
@@ -59,10 +56,10 @@ export const TrainingProgress = ({ training }: TrainingProgressProps): JSX.Eleme
             </Flex>
 
             <ProgressBar
-                completed={progress ?? 0}
-                width={progressWidth}
-                progressBarColor='var(--energy-blue-shade-darker)'
-                backgroundColor='var(--spectrum-global-color-gray-200)'
+                size={'S'}
+                value={progress}
+                aria-label='job-item-progress-bar'
+                UNSAFE_className={classes.progressBar}
             />
         </View>
     );

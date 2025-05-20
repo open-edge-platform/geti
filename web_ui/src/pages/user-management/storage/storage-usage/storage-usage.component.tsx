@@ -1,14 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, ProgressCircle, View } from '@adobe/react-spectrum';
+import { ColorThumb, Flex, Heading, Loading, ProgressCircle, View } from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { ColorThumb } from '../../../../shared/components/color-thumb/color-thumb.component';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { getFileSize } from '../../../../shared/utils';
 
 import classes from './storage-usage.module.scss';

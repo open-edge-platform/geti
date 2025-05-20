@@ -24,8 +24,9 @@ import { AutoTrainingCreditsModal } from './auto-training-credits-modal.componen
 
 jest.mock('./util', () => ({
     ...jest.requireActual('./util'),
-    onFirstScheduledAutoTrainingJob: (_settings: UseSettings<UserGlobalSettings>, callback: () => void) => () =>
-        callback(),
+    onFirstScheduledOrRunningAutoTrainingJob:
+        (_settings: UseSettings<UserGlobalSettings>, callback: () => void) => () =>
+            callback(),
 }));
 
 jest.mock(

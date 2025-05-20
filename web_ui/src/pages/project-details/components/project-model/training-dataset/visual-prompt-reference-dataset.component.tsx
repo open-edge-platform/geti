@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { SubsetBucket } from './subset-bucket/subset-bucket.component';

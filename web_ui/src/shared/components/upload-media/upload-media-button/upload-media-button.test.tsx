@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { defaultTheme, Provider } from '@adobe/react-spectrum';
+import { defaultTheme, Provider } from '@geti/ui';
 import { UseQueryResult } from '@tanstack/react-query';
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { AxiosError } from 'axios';

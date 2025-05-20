@@ -8,10 +8,9 @@ import datetime
 from enum import Enum, auto
 
 from iai_core.entities.color import Color
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.utils.time_utils import now
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 
 def distinct_colors(number_of_colors: int) -> list[Color]:

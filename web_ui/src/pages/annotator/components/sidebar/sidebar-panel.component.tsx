@@ -3,7 +3,7 @@
 
 import { MutableRefObject, ReactNode, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, View } from '@adobe/react-spectrum';
+import { DimensionValue, Flex, View } from '@geti/ui';
 import { Overlay } from '@react-spectrum/overlays';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { Responsive, StyleProps } from '@react-types/shared';

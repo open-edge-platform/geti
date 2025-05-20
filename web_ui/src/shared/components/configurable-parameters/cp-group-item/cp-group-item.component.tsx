@@ -3,11 +3,10 @@
 
 import { useState } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { ActionButton, Flex, Text, View } from '@geti/ui';
 
 import { ChevronRightSmallLight, ChevronUpLight } from '../../../../assets/icons';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { ActionButton } from '../../button/button.component';
 import { ConfigParameterItemProp, ConfigurableParametersGroups } from '../configurable-parameters.interface';
 import { CPParamsList } from '../cp-list/cp-list.component';
 

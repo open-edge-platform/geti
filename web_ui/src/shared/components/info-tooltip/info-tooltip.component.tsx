@@ -3,7 +3,7 @@
 
 import { CSSProperties, ReactNode } from 'react';
 
-import { Content, ContextualHelp, Text } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Text } from '@geti/ui';
 
 interface InfoTooltipProps {
     id: string;

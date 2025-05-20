@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, Heading, Link as SpectrumLink, Text } from '@adobe/react-spectrum';
+import { Button, Content, Flex, Heading, Link as SpectrumLink, Text } from '@geti/ui';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { ServiceUnavailableIcon } from '../../assets/images';
 import { ErrorLayout } from '../../pages/errors/error-layout/error-layout.component';
-import { Button } from '../../shared/components/button/button.component';
 
 export const LogoutRoute = ({ home }: { home: string }): JSX.Element => {
     const navigate = useNavigate();

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Heading, Text } from '@adobe/react-spectrum';
+import { Flex, Heading, Text } from '@geti/ui';
 import { DateValue, getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import dayjs from 'dayjs';
 

@@ -4,9 +4,8 @@
 """This file defines the ActiveModelState class"""
 
 from iai_core.entities.model_storage import ModelStorage, NullModelStorage
-from iai_core.entities.persistent_entity import PersistentEntity
 
-from geti_types import ID
+from geti_types import ID, PersistentEntity
 
 
 class ActiveModelState(PersistentEntity):

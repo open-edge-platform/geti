@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { Edit } from '../../../../../assets/icons';
 import { Annotation } from '../../../../../core/annotations/annotation.interface';

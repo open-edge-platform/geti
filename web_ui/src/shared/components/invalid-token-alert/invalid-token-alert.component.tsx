@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Content, Heading, InlineAlert } from '@adobe/react-spectrum';
+import { Content, Heading, InlineAlert } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../animation-parameters/animation-parameters';

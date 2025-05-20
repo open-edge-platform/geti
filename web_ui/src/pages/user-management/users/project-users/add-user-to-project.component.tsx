@@ -3,14 +3,13 @@
 
 import { FC, useMemo, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Grid, Heading } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, Divider, Grid, Heading } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { getRoleCreationPayload } from '../../../../core/users/services/utils';
 import { RESOURCE_TYPE, User, USER_ROLE } from '../../../../core/users/users.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../shared/components/button/button.component';
 import { hasEqualId } from '../../../../shared/utils';
 import { RolePicker } from '../old-project-users/role-picker.component';
 import { SelectUser } from '../old-project-users/select-user.component';

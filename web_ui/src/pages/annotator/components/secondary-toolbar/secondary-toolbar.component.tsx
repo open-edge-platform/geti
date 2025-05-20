@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ButtonGroup, Flex, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isEmpty, negate, noop } from 'lodash-es';

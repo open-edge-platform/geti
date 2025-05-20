@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Key } from '@adobe/react-spectrum';
+import { Key } from '@geti/ui';
 import { isEqual, isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 

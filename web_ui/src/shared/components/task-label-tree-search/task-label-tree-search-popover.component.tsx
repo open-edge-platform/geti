@@ -3,14 +3,13 @@
 
 import { ComponentProps, useRef, useState } from 'react';
 
-import { TextField, View } from '@adobe/react-spectrum';
+import { CustomPopover, TextField, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isFunction } from 'lodash-es';
 
 import { Label } from '../../../core/labels/label.interface';
 import { Task } from '../../../core/projects/task.interface';
 import { blurActiveInput } from '../../../pages/annotator/tools/utils';
-import { CustomPopover } from '../../../shared/components/custom-popover/custom-popover.component';
 import { runWhen } from '../../utils';
 import { TaskLabelTreeContainer } from './task-label-tree-container.component';
 import { SearchLabelTreeItemSuffix } from './task-label-tree-item.component';

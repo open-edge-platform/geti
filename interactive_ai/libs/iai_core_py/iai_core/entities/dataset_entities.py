@@ -6,10 +6,9 @@
 from iai_core.entities.dataset_item import DatasetItem
 from iai_core.entities.dataset_storage import DatasetStorage
 from iai_core.entities.datasets import Dataset
-from iai_core.entities.persistent_entity import PersistentEntity
 from iai_core.repos.dataset_repo import DatasetRepo
 
-from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity
+from geti_types import ID, DatasetStorageIdentifier, MediaIdentifierEntity, PersistentEntity
 
 
 class TaskDataset:

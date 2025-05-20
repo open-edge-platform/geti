@@ -3,7 +3,18 @@
 
 import { ReactElement } from 'react';
 
-import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import {
+    ActionButton,
+    Item,
+    LoadingIndicator,
+    Menu,
+    MenuTrigger,
+    PressableElement,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+    View,
+} from '@geti/ui';
 import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isAxiosError } from 'axios';
@@ -17,9 +28,6 @@ import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { ModelIdentifier } from '../../../../../../core/models/models.interface';
 import { NOTIFICATION_TYPE } from '../../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../../notification/notification.component';
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
-import { LoadingIndicator } from '../../../../../../shared/components/loading/loading-indicator.component';
-import { PressableElement } from '../../../../../../shared/components/pressable-element/pressable-element.component';
 import { formatDate } from '../../../../../../shared/utils';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';
 import { isModelDeleted } from '../../../../utils';

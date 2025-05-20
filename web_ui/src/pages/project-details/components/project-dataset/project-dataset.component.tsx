@@ -3,7 +3,7 @@
 
 import { Key, useMemo } from 'react';
 
-import { Flex, Item, TabPanels, Tabs } from '@adobe/react-spectrum';
+import { Flex, Item, TabPanels, Tabs } from '@geti/ui';
 
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';

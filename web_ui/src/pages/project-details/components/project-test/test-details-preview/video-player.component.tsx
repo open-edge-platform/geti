@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { ButtonGroup, Flex, View } from '@adobe/react-spectrum';
+import { ButtonGroup, Flex, View } from '@geti/ui';
 
 import { StepBackward, StepForward } from '../../../../../assets/icons';
 import { MediaItem } from '../../../../../core/media/media.interface';

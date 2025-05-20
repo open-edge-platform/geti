@@ -3,7 +3,7 @@
 
 import { MutableRefObject, ReactNode } from 'react';
 
-import { Grid } from '@adobe/react-spectrum';
+import { Grid } from '@geti/ui';
 
 interface LabelEditionFieldsWrapperProps {
     children: ReactNode;
