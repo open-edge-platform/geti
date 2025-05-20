@@ -29,6 +29,11 @@ JOB_POLLING_PERIOD = 3  # seconds
 logger = logging.getLogger(__name__)
 
 
+@step("the user waits for {seconds:d} seconds")
+def step_wait_seconds(seconds: int) -> None:
+    time.sleep(seconds)
+
+
 @step("a job of type '{job_type:w}' is scheduled")
 def step_then_job_scheduled(context: Context, job_type: str) -> None:
     """Asserts that the "job_type" is scheduled"""
@@ -58,7 +63,6 @@ def step_then_job_running(context: Context, job_type: str) -> None:
             job_id=context.job_id,
         )
         if context.job_info.actual_instance.state == JobState.RUNNING:
-            time.sleep(10)  # provide some time for the job to properly start
             break
         time.sleep(1)
     else:
@@ -77,7 +81,6 @@ def step_when_user_cancels_job(context: Context) -> None:
         workspace_id=context.workspace_id,
         job_id=context.job_id,
     )
-    time.sleep(5)  # provide some time for the job to stop
 
 
 @step("the job completes successfully within {job_timeout:d} minutes")

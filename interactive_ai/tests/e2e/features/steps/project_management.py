@@ -357,6 +357,14 @@ def step_when_user_deletes_project(context: Context) -> None:
     )
 
 
+@when("the user tries to delete the project")
+def step_when_user_tries_to_delete_project(context: Context) -> None:
+    try:
+        step_when_user_deletes_project(context=context)
+    except Exception as e:
+        context.exception = e
+
+
 @when("the user loads the project")
 def step_when_user_loads_project(context: Context) -> None:
     projects_api: ProjectsApi = context.projects_api
@@ -365,14 +373,6 @@ def step_when_user_loads_project(context: Context) -> None:
         workspace_id=context.workspace_id,
         project_id=context.project_id,
     )
-
-
-@when("the user tries to delete the project")
-def step_when_user_tries_to_delete_project(context: Context) -> None:
-    try:
-        step_when_user_deletes_project(context=context)
-    except Exception as e:
-        context.exception = e
 
 
 @when("the user tries to load the project")
