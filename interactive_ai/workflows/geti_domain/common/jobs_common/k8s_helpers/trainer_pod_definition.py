@@ -233,13 +233,17 @@ def create_flyte_container_task(  # noqa: PLR0913
                     V1EnvVar(
                         name="http_proxy",
                         value_from=V1EnvVarSource(
-                            config_map_key_ref=V1ConfigMapKeySelector(name=f"{namespace}-configuration", key="http_proxy")
+                            config_map_key_ref=V1ConfigMapKeySelector(
+                                name=f"{namespace}-configuration", key="http_proxy"
+                            )
                         ),
                     ),
                     V1EnvVar(
                         name="https_proxy",
                         value_from=V1EnvVarSource(
-                            config_map_key_ref=V1ConfigMapKeySelector(name=f"{namespace}-configuration", key="https_proxy")
+                            config_map_key_ref=V1ConfigMapKeySelector(
+                                name=f"{namespace}-configuration", key="https_proxy"
+                            )
                         ),
                     ),
                     V1EnvVar(
