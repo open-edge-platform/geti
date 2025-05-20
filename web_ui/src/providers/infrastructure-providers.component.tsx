@@ -4,7 +4,6 @@
 import { FC, ReactNode, StrictMode, Suspense, useState } from 'react';
 
 import { IntelBrandedLoading } from '@geti/ui';
-import { ThemeProvider } from '@geti/ui/theme';
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, RouterProviderProps } from 'react-router-dom';
 
 import { useFeatureFlags } from '../core/feature-flags/hooks/use-feature-flags.hook';
@@ -14,6 +13,7 @@ import { ErrorBoundary } from '../pages/errors/error-boundary.component';
 import { AuthProvider } from './auth-provider/auth-provider.component';
 import { ProgressiveWebAppProvider } from './progressive-web-app-provider/progressive-web-app-provider.component';
 import { QueryClientProvider } from './query-client-provider/query-client-provider.component';
+import { ThemeProvider } from './theme-provider/theme-provider.component';
 
 const useInMemoryEnvironment = process.env.REACT_APP_VALIDATION_COMPONENT_TESTS === 'true';
 

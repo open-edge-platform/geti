@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ThemeProvider } from '@geti/ui/theme';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import {
@@ -9,6 +8,7 @@ import {
     PerformanceCategory,
 } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { getMockedSupportedAlgorithm } from '../../../../../../../core/supported-algorithms/services/test-utils';
+import { ThemeProvider } from '../../../../../../../providers/theme-provider/theme-provider.component';
 import { idMatchingFormat } from '../../../../../../../test-utils/id-utils';
 import { checkTooltip } from '../../../../../../../test-utils/utils';
 import { ModelTemplate } from './model-template.component';

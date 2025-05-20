@@ -5,8 +5,6 @@ import { ComponentProps } from 'react';
 
 import { Provider } from '@adobe/react-spectrum';
 
-import '../../../src/assets/index.scss';
-
 import theme from './geti/theme';
 
 export const ThemeProvider = ({ children, router }: ComponentProps<typeof Provider>) => {
