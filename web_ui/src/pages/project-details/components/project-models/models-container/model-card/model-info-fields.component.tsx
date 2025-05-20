@@ -8,40 +8,54 @@ export const ModelInfoFields = ({
     modelSize,
     totalDiskSize,
     complexity,
-    isModelDeleted,
+    isModelTraining,
 }: {
-    modelSize: string | undefined;
-    totalDiskSize: string | undefined;
-    complexity: number | undefined;
-    isModelDeleted: boolean;
+    modelSize?: string | undefined;
+    totalDiskSize?: string | undefined;
+    complexity?: number | undefined;
+    isModelTraining: boolean;
 }) => {
     return (
         <>
-            {!isModelDeleted && (
+            {isModelTraining ? (
                 <>
                     <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
-                        Model size: {modelSize ?? <ThreeDotsFlashing className={classes.threeDotsFlashing} />}
+                        Model weight size: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
                     </Text>
                     <Text marginX={'size-50'}>|</Text>
                     <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
-                        Total size:{' '}
-                        {totalDiskSize === '0' ? (
-                            <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                        ) : (
-                            totalDiskSize
-                        )}
+                        Total size: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
                     </Text>
                     <Text marginX={'size-50'}>|</Text>
+                    <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
+                        Complexity: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
+                    </Text>
+                </>
+            ) : (
+                <>
+                    {modelSize !== undefined && (
+                        <>
+                            <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
+                                Model weight size: {modelSize}
+                            </Text>
+                            <Text marginX={'size-50'}>|</Text>
+                        </>
+                    )}
+                    {totalDiskSize !== undefined && (
+                        <>
+                            <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
+                                Total size: {totalDiskSize}
+                            </Text>
+                            <Text marginX={'size-50'}>|</Text>
+                        </>
+                    )}
+                    {complexity !== undefined && (
+                        <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
+                            Complexity: {complexity} GFlops
+                        </Text>
+                    )}
                 </>
             )}
-            <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
-                Complexity:{' '}
-                {complexity ? (
-                    <span>{complexity} GFlops</span>
-                ) : (
-                    <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                )}
-            </Text>
         </>
     );
 };

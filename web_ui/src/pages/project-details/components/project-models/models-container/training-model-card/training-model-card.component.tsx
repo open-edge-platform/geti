@@ -55,12 +55,7 @@ export const TrainingModelCard = ({ job }: TrainingModelCardProps) => {
                             data-testid={`model-info-${genericId}-id`}
                             UNSAFE_className={classes.modelInfo}
                         >
-                            <ModelInfoFields
-                                modelSize={undefined}
-                                totalDiskSize={undefined}
-                                complexity={undefined}
-                                isModelDeleted={false}
-                            />
+                            <ModelInfoFields isModelTraining={true} />
                         </Text>
                     </Flex>
                 </Flex>

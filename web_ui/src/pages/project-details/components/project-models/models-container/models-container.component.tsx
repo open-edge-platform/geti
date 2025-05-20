@@ -81,7 +81,6 @@ export const ModelsContainer = ({
                                     modelTemplateId={modelTemplateId}
                                     isMenuOptionsDisabled={isObsolete || isDeprecated}
                                     complexity={complexity}
-                                    modelInTraining={false}
                                 />
                                 {index !== renderModelVersions.length - 1 && <Divider size='S' />}
                             </motion.div>
