@@ -11,7 +11,6 @@ import {
     DialogTrigger,
     dimensionValue,
     Flex,
-    FocusableRefValue,
     Heading,
     Text,
     Tooltip,
@@ -19,6 +18,7 @@ import {
     useMediaQuery,
     useUnwrapDOMRef,
     View,
+    type FocusableRefValue,
 } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';

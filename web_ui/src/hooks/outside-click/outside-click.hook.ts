@@ -3,7 +3,7 @@
 
 import { MutableRefObject, RefObject, useCallback } from 'react';
 
-import { DOMRefValue } from '@geti/ui';
+import { type DOMRefValue } from '@geti/ui';
 
 import { useEventListener } from '../event-listener/event-listener.hook';
 

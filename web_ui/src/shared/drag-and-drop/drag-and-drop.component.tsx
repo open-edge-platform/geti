@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SpectrumDropZoneProps as DropZoneProps, DropZone as SpectrumDropZone } from '@geti/ui';
+import { DropZone as SpectrumDropZone, type SpectrumDropZoneProps as DropZoneProps } from '@geti/ui';
 import clsx from 'clsx';
 
 import { GetElementType } from '../utils';
