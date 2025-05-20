@@ -3,7 +3,7 @@
 
 import { ReactNode, RefObject, useRef, useState } from 'react';
 
-import { DOMRefValue, useUnwrapDOMRef } from '@geti/ui';
+import { useUnwrapDOMRef, type DOMRefValue } from '@geti/ui';
 import { useHover, useInteractOutside } from '@react-aria/interactions';
 import clsx from 'clsx';
 

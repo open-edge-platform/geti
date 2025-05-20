@@ -7,13 +7,13 @@ import {
     ActionButton,
     DialogTrigger,
     Flex,
-    IconColorValue,
     Link,
     ProgressCircle,
     Text,
     Tooltip,
     TooltipTrigger,
     View,
+    type IconColorValue,
 } from '@geti/ui';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 

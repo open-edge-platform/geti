@@ -12,9 +12,9 @@ import {
     Item,
     Key,
     Loading,
-    StyleProps,
     useUnwrapDOMRef,
     View,
+    type StyleProps,
 } from '@geti/ui';
 import Close from '@spectrum-icons/workflow/Close';
 import dayjs from 'dayjs';

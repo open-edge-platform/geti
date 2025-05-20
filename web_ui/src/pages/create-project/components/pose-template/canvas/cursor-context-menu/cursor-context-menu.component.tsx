@@ -3,7 +3,7 @@
 
 import { ReactNode, RefObject, useState } from 'react';
 
-import { DOMRefValue, View } from '@geti/ui';
+import { View, type DOMRefValue } from '@geti/ui';
 import { OverlayContainer } from 'react-aria';
 
 import { useEventListener } from '../../../../../../hooks/event-listener/event-listener.hook';

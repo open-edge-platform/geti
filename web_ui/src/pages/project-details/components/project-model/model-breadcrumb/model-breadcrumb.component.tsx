@@ -6,7 +6,6 @@ import { Key, useRef } from 'react';
 import {
     ActionButton,
     Flex,
-    FocusableRefValue,
     Item,
     Menu,
     MenuTrigger,
@@ -14,6 +13,7 @@ import {
     Text,
     useUnwrapDOMRef,
     View,
+    type FocusableRefValue,
 } from '@geti/ui';
 import { usePress } from 'react-aria';
 

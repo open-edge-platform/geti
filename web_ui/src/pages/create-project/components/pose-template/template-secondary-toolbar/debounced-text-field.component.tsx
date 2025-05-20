@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SpectrumTextFieldProps, TextField } from '@geti/ui';
+import { TextField, type SpectrumTextFieldProps } from '@geti/ui';
 
 import { useDebouncedCallback } from '../../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 

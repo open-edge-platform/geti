@@ -3,7 +3,7 @@
 
 import { ForwardedRef, forwardRef } from 'react';
 
-import { FocusableRefValue, ToggleButton, type SpectrumToggleButtonProps } from '@geti/ui';
+import { ToggleButton, type FocusableRefValue, type SpectrumToggleButtonProps } from '@geti/ui';
 
 import sharedClasses from '../../shared.module.scss';
 

@@ -3,7 +3,7 @@
 
 import { forwardRef, RefObject, useState } from 'react';
 
-import { BackgroundColorValue, DOMRefValue, useUnwrapDOMRef } from '@geti/ui';
+import { useUnwrapDOMRef, type BackgroundColorValue, type DOMRefValue } from '@geti/ui';
 
 import { DownloadIcon } from '../../../assets/icons';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';

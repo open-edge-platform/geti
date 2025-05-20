@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, FlexProps, Text } from '@geti/ui';
+import { Flex, Text, type FlexProps } from '@geti/ui';
 
 import classes from './info-section.module.scss';
 

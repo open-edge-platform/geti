@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { DimensionValue, Text } from '@geti/ui';
+import { Text, type DimensionValue } from '@geti/ui';
 
 import classes from './error-message.module.scss';
 
