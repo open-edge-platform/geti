@@ -65,7 +65,7 @@ def main() -> None:
     with open(models_list_path_v2) as file:
         models_spec = json.load(file)
 
-    for model in models_spec:
+    for model in models_spec[:4]:
         initial_models = set(os.listdir(weights_dir))
         download_pretrained_model(model, weights_dir, weights_url)
         updated_models = set(os.listdir(weights_dir))
