@@ -104,8 +104,9 @@ jest.mock('react-aria-components', () => {
 
     const mockVirtualizer = () =>
         forwardRef((props: Record<string, unknown>, ref: unknown) => {
+            const layoutOptions = props.layoutOptions ?? {};
             // "rowHeight" is necessary for testing purposes, or the container will render empty
-            return <Virtualizer layoutOptions={{ rowHeight: 50 }} {...props} ref={ref} />;
+            return <Virtualizer {...props} layoutOptions={{ ...layoutOptions, rowHeight: 50 }} ref={ref} />;
         });
 
     return { Virtualizer: mockVirtualizer(), ...rest };
