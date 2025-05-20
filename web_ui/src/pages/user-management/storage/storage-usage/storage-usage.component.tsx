@@ -51,7 +51,7 @@ export const StorageUsage = (): JSX.Element => {
             </View>
 
             <Flex marginTop={'size-200'} gap={'size-100'} alignItems={'center'}>
-                <ColorThumb id={'progress-color'} color={COLOR} />
+                <ColorThumb color={COLOR} />
                 {getFileSize(DISK_USAGE)} used of {getFileSize(data.totalSpace)}
             </Flex>
         </CardContent>
