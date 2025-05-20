@@ -5,13 +5,13 @@ import { FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } 
 
 import {
     ActionGroup,
-    DimensionValue,
     Flex,
     Item,
-    Responsive,
-    SpectrumTextFieldProps,
     TextField,
     useNumberFormatter,
+    type DimensionValue,
+    type Responsive,
+    type SpectrumTextFieldProps,
 } from '@geti/ui';
 
 import { ChevronDownLight, ChevronUpLight } from '../../../../../assets/icons';

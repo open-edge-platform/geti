@@ -4,14 +4,14 @@
 import { ComponentProps } from 'react';
 
 import {
-    BackgroundColorValue,
-    BoxAlignmentStyleProps,
-    DimensionValue,
     Flex,
     ProgressCircle,
-    Responsive,
-    StyleProps,
     View,
+    type BackgroundColorValue,
+    type BoxAlignmentStyleProps,
+    type DimensionValue,
+    type Responsive,
+    type StyleProps,
 } from '@geti/ui';
 
 interface LoadingOverlayProps extends StyleProps, BoxAlignmentStyleProps {

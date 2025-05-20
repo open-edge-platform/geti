@@ -12,7 +12,7 @@ import {
     DialogContainer,
     Divider,
     Heading,
-    RangeValue,
+    type RangeValue,
 } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { useOverlayTriggerState } from '@react-stately/overlays';

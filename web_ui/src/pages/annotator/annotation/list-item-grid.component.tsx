@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, RefObject, useContext, useRef, useState } from 'react';
 
-import { Flex, FlexProps, Grid, useUnwrapDOMRef } from '@geti/ui';
+import { Flex, Grid, useUnwrapDOMRef, type FlexProps } from '@geti/ui';
 import { useInteractOutside } from '@react-aria/interactions';
 import clsx from 'clsx';
 

@@ -3,7 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Flex, Item, Picker, StyleProps } from '@geti/ui';
+import { Flex, Item, Picker, type StyleProps } from '@geti/ui';
 
 import { ModelStatisticsBase } from '../../../../../../core/statistics/dtos/model-statistics.interface';
 import { TrainModelStatisticsConfusionMatrix } from '../../../../../../core/statistics/model-statistics.interface';

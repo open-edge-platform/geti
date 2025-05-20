@@ -3,7 +3,7 @@
 
 import { forwardRef } from 'react';
 
-import { ActionButton, FocusableRef, type ActionButtonProps } from '@geti/ui';
+import { ActionButton, type ActionButtonProps, type FocusableRef } from '@geti/ui';
 
 import sharedClasses from '../../shared.module.scss';
 

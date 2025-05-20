@@ -3,7 +3,7 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { DimensionValue, Responsive, View } from '@geti/ui';
+import { View, type DimensionValue, type Responsive } from '@geti/ui';
 import { useLoadMore } from '@react-aria/utils';
 import {
     ListBox as AriaComponentsListBox,

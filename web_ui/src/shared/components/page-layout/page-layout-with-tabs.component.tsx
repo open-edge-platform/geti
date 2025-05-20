@@ -3,7 +3,18 @@
 
 import { Key, ReactNode } from 'react';
 
-import { DimensionValue, Divider, Flex, Item, Responsive, TabList, TabPanels, Tabs, Text, View } from '@geti/ui';
+import {
+    Divider,
+    Flex,
+    Item,
+    TabList,
+    TabPanels,
+    Tabs,
+    Text,
+    View,
+    type DimensionValue,
+    type Responsive,
+} from '@geti/ui';
 
 import { TabItem } from '../tabs/tabs.interface';
 

@@ -14,7 +14,7 @@ import {
     Heading,
     Radio,
     RadioGroup,
-    RangeValue,
+    type RangeValue,
 } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import dayjs from 'dayjs';

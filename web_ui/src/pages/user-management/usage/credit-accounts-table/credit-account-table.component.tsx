@@ -4,20 +4,20 @@
 import { FC, PropsWithChildren } from 'react';
 
 import {
-    AriaLabelingProps,
     Cell,
     Column,
     Content,
-    DOMProps,
     Heading,
     Row,
-    StyleProps,
     TableBody,
     TableHeader,
     TableView,
     Text,
     View,
+    type AriaLabelingProps,
     type ColumnSize,
+    type DOMProps,
+    type StyleProps,
 } from '@geti/ui';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, FooterProps, Footer as FooterView, View } from '@geti/ui';
+import { Flex, Footer as FooterView, View, type FooterProps } from '@geti/ui';
 import clsx from 'clsx';
 
 import { MediaItem } from '../../../../core/media/media.interface';

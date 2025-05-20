@@ -8,13 +8,13 @@ import {
     Column,
     Flex,
     Row,
-    SortDescriptor,
     TableBody,
     TableHeader,
     TableView,
     Tag,
     useCollator,
     View,
+    type SortDescriptor,
 } from '@geti/ui';
 import { get, isEmpty } from 'lodash-es';
 
