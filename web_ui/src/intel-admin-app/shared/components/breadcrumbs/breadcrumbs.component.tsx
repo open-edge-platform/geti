@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Breadcrumbs as BreadcrumbsComponent, BreadcrumbsProps, Flex } from '@geti/ui';
+import { Breadcrumbs as BreadcrumbsComponent, Flex, type BreadcrumbsProps } from '@geti/ui';
 
 import IntelAdminBackground from '../../../../assets/images/intel-admin-app-background.webp';
 
