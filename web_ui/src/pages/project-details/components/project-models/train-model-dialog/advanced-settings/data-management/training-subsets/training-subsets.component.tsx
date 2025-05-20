@@ -3,11 +3,10 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, Grid, minmax, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, Checkbox } from '@geti/ui';
+import { ActionButton, Checkbox, Flex, Grid, minmax, Text, View } from '@geti/ui';
+import { Refresh } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
 
-import { Refresh } from '../../../../../../../../assets/icons';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { SubsetsDistributionSlider } from './subsets-distribution-slider/subsets-distribution-slider.component';
 

@@ -3,10 +3,9 @@
 
 import { useEffect, useState } from 'react';
 
-import { Grid } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Grid } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 
-import { Delete } from '../../../assets/icons';
 import {
     SearchOptionsRule,
     SearchRuleField,

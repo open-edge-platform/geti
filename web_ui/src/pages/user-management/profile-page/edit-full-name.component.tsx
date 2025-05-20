@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Flex, TextField } from '@adobe/react-spectrum';
+import { Flex, TextField } from '@geti/ui';
 
 import { MAX_NUMBER_OF_CHARACTERS } from '../users/utils';
 

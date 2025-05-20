@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
+import { Checkbox, Flex } from '@geti/ui';
 
 import { TERMS_OF_USE_GETI } from '../../core/const';
 

@@ -6,6 +6,8 @@ import { useState } from 'react';
 import {
     Cell,
     Column,
+    DateRangePicker,
+    dimensionValue,
     Flex,
     Form,
     Heading,
@@ -15,14 +17,12 @@ import {
     TableView,
     Text,
     View,
-} from '@adobe/react-spectrum';
-import { DateRangePicker } from '@geti/ui';
+} from '@geti/ui';
+import { Refresh } from '@geti/ui/icons';
 import { getLocalTimeZone } from '@internationalized/date';
-import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 import { DateValue } from 'react-aria';
 
-import { Refresh } from '../../../assets/icons';
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { getClassServiceName } from '../../../shared/components/header/credit-balance/util';

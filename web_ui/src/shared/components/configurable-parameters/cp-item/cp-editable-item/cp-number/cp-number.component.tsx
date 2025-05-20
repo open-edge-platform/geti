@@ -3,9 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex, NumberField, Text, useNumberFormatter } from '@adobe/react-spectrum';
-import { Slider } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Flex, NumberField, Slider, Text, useMediaQuery, useNumberFormatter } from '@geti/ui';
 
 import { isLargeSizeQuery } from '../../../../../../theme/queries';
 import { NumberGroupParams } from '../../../configurable-parameters.interface';

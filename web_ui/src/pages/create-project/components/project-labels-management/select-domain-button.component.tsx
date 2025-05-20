@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import { ActionButton, type ActionButtonProps } from '@geti/ui';
+import { ActionButton, Flex, Text, type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 
 import classes from './select-domain-button.module.scss';

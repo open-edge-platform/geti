@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Grid, minmax, Text, View } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Grid, minmax, Text, useMediaQuery, View } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
@@ -10,7 +9,6 @@ import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { CoachMark } from '../../../../shared/components/coach-mark/coach-mark.component';
 import { AutoTrainingCoachMark } from '../../../../shared/components/coach-mark/fux-notifications/auto-training-coach-mark.component';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';
 import { ActiveLearningConfiguration } from '../../../../shared/components/header/active-learning-configuration/active-learning-configuration.component';
 import { CreditBalanceStatus } from '../../../../shared/components/header/credit-balance/credit-balance-status.component';

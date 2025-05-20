@@ -3,11 +3,20 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, TabList, TabPanels, Tabs, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import {
+    ActionButton,
+    Flex,
+    Item,
+    LoadingIndicator,
+    TabList,
+    TabPanels,
+    Tabs,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti/ui';
+import { Add } from '@geti/ui/icons';
 import { useNavigate } from 'react-router-dom';
 
-import { Add } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';

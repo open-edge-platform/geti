@@ -3,13 +3,21 @@
 
 import { Key, useRef } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, Tag } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
-import { FocusableRefValue } from '@react-types/shared';
+import {
+    ActionButton,
+    Flex,
+    Item,
+    Menu,
+    MenuTrigger,
+    Tag,
+    Text,
+    useUnwrapDOMRef,
+    View,
+    type FocusableRefValue,
+} from '@geti/ui';
+import { ChevronDownSmallLight } from '@geti/ui/icons';
 import { usePress } from 'react-aria';
 
-import { ChevronDownSmallLight } from '../../../../../assets/icons';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { formatDate } from '../../../../../shared/utils';
 import { isModelDeleted } from '../../../utils';

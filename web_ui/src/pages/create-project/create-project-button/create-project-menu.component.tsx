@@ -4,6 +4,7 @@
 import { Key, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -14,15 +15,14 @@ import {
     InlineAlert,
     Item,
     Menu,
+    MenuTrigger as SpectrumMenuTrigger,
     Tooltip,
     TooltipTrigger,
     View,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
-import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
+} from '@geti/ui';
+import { ChevronDownSmall } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
-import { ChevronDownSmall } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useStatus } from '../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../core/status/hooks/utils';

@@ -11,14 +11,14 @@ import {
     Heading,
     IllustratedMessage,
     Row,
+    SortDescriptor,
     Link as SpectrumLink,
     TableBody,
     TableHeader,
     TableView,
     Text,
     useCollator,
-} from '@adobe/react-spectrum';
-import { SortDescriptor } from '@react-types/shared';
+} from '@geti/ui';
 import { capitalize, isEmpty } from 'lodash-es';
 import { Link } from 'react-router-dom';
 

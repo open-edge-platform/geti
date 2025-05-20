@@ -3,12 +3,11 @@
 
 import { CSSProperties } from 'react';
 
-import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Copy, DownloadIcon } from '@geti/ui/icons';
 import { isEmpty, isFunction } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
-import { Copy, DownloadIcon } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobType } from '../../../../core/jobs/jobs.const';

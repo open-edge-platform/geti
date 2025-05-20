@@ -3,8 +3,7 @@
 
 import { forwardRef } from 'react';
 
-import { ActionButton, type ActionButtonProps } from '@geti/ui';
-import { FocusableRef } from '@react-types/shared';
+import { ActionButton, type ActionButtonProps, type FocusableRef } from '@geti/ui';
 
 import classes from './label-shortcut-button.module.scss';
 

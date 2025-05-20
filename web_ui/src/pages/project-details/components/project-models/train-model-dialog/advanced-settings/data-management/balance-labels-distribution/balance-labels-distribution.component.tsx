@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, Grid, Heading, Text, View } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Flex, Grid, Heading, Switch, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 

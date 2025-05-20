@@ -3,9 +3,9 @@
 
 import { ComponentProps, ReactNode, useState } from 'react';
 
-import { Flex, Header, View } from '@adobe/react-spectrum';
+import { Flex, Header, View } from '@geti/ui';
+import { ChevronDownLight, ChevronUpLight } from '@geti/ui/icons';
 
-import { ChevronDownLight, ChevronUpLight } from '../../../assets/icons';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 import classes from './accordion.module.scss';

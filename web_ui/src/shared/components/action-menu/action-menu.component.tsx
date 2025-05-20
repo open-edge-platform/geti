@@ -3,10 +3,9 @@
 
 import { Key } from 'react';
 
-import { Icon, Item, Menu, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { MenuTrigger as SpectrumMenuTrigger } from '@react-spectrum/menu';
+import { Icon, Item, Menu, MenuTrigger as SpectrumMenuTrigger, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { MoreMenu } from '@geti/ui/icons';
 
-import { MoreMenu } from '../../../assets/icons';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 import { MenuAction } from './menu-action.interface';
 

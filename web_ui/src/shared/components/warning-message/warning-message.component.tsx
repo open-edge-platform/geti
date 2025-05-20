@@ -3,10 +3,10 @@
 
 import { ComponentProps, ReactNode } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { Alert } from '../../../assets/icons';
 import { ANIMATION_PARAMETERS } from '../../animation-parameters/animation-parameters';
 
 import classes from './warning-message.module.scss';

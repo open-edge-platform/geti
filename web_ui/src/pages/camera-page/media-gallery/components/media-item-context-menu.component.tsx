@@ -3,8 +3,7 @@
 
 import { Key, RefObject, useRef, useState } from 'react';
 
-import { Item, Menu } from '@adobe/react-spectrum';
-import { Button, CustomPopover } from '@geti/ui';
+import { Button, CustomPopover, Item, Menu } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isFunction } from 'lodash-es';
 

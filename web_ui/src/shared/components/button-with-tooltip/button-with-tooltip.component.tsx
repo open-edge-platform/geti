@@ -3,8 +3,7 @@
 
 import { forwardRef, ReactNode } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Button, type ButtonProps } from '@geti/ui';
+import { Button, Tooltip, TooltipTrigger, type ButtonProps } from '@geti/ui';
 import { clsx } from 'clsx';
 import { isNil } from 'lodash-es';
 import { Placement } from 'react-aria';

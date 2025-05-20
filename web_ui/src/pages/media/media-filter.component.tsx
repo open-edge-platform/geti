@@ -4,24 +4,26 @@
 import { CSSProperties, Dispatch, MutableRefObject, useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import {
+    ActionButton,
     ButtonGroup,
     Content,
     Dialog,
     DialogTrigger,
+    dimensionValue,
     Flex,
     Heading,
     Text,
     Tooltip,
     TooltipTrigger,
+    useMediaQuery,
+    useUnwrapDOMRef,
     View,
-} from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
-import { dimensionValue, useMediaQuery, useUnwrapDOMRef } from '@react-spectrum/utils';
-import { FocusableRefValue } from '@react-types/shared';
+    type FocusableRefValue,
+} from '@geti/ui';
+import { Add, Filter } from '@geti/ui/icons';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Add, Filter } from '../../assets/icons';
 import {
     AdvancedFilterOptions,
     SearchOptionsActions,

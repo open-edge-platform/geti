@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Content, Flex, Heading } from '@geti/ui';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
 
 import { AccessDenied } from '../../../assets/images';

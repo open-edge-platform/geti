@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
+import { Copy } from '@geti/ui/icons';
 import { usePress } from 'react-aria';
 
-import { Copy } from '../../../../assets/icons';
 import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 
 interface CopyTextProps {

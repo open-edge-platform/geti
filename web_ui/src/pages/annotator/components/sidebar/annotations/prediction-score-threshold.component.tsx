@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DialogTrigger, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton, Slider } from '@geti/ui';
+import { ActionButton, DialogTrigger, Flex, Slider, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ChevronDownLight } from '@geti/ui/icons';
 
-import { ChevronDownLight } from '../../../../../assets/icons';
 import { useAnnotationThreshold } from '../../../providers/annotation-threshold-provider/annotation-threshold-provider.component';
 
 import classes from './annotations.module.scss';

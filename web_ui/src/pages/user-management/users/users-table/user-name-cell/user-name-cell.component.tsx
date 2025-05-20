@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
+import { UserCircleFilled as AdminIcon } from '@geti/ui/icons';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 
-import { UserCircleFilled as AdminIcon } from '../../../../../assets/icons';
-import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';
 import { USER_ROLE } from '../../../../../core/users/users.interface';
 import { UserPhotoPresentation } from '../../../profile-page/user-photo-container/user-photo-presentation.component';
 

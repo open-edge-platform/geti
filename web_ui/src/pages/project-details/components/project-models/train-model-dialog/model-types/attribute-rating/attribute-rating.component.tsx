@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, Heading, View } from '@adobe/react-spectrum';
+import { Flex, Heading, View } from '@geti/ui';
 
 import classes from './attribute-rating.module.scss';
 

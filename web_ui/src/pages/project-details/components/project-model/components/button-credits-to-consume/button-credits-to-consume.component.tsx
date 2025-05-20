@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Button, type ButtonProps } from '@geti/ui';
+import { Button, Text, Tooltip, TooltipTrigger, type ButtonProps } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useTotalCreditPrice } from '../../../../hooks/use-credits-to-consume.hook';

@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
+import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { get } from 'lodash-es';
 

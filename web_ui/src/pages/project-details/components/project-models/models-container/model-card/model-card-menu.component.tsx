@@ -3,14 +3,24 @@
 
 import { ReactElement } from 'react';
 
-import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator, PressableElement } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import {
+    ActionButton,
+    dimensionValue,
+    Item,
+    LoadingIndicator,
+    Menu,
+    MenuTrigger,
+    PressableElement,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+    View,
+} from '@geti/ui';
+import { ExclamationCircleOutlined, MoreMenu } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isAxiosError } from 'axios';
 import { isEqual, isFunction, isNil } from 'lodash-es';
 
-import { ExclamationCircleOutlined, MoreMenu } from '../../../../../../assets/icons';
 import { isVisualPromptModel } from '../../../../../../core/annotations/services/visual-prompt-service';
 import { useCreditsQueries } from '../../../../../../core/credits/hooks/use-credits-api.hook';
 import { useFeatureFlags } from '../../../../../../core/feature-flags/hooks/use-feature-flags.hook';

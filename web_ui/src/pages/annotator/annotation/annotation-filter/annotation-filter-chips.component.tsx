@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { ActionButton, Tag } from '@geti/ui';
+import { ActionButton, Flex, Tag } from '@geti/ui';
+import { BorderClose } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { BorderClose } from '../../../../assets/icons';
 import { hasEqualId } from '../../../../shared/utils';
 import { useAnnotationFilters } from './use-annotation-filters.hook';
 import { useTaskLabels } from './use-task-labels.hook';

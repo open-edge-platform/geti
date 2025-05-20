@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Item, Key, Menu, MenuTrigger, Section } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Flex, Item, Key, Menu, MenuTrigger, Section } from '@geti/ui';
+import { JointConnection } from '@geti/ui/icons';
 
-import { JointConnection } from '../../../../../assets/icons';
 import { RegionOfInterest } from '../../../../../core/annotations/annotation.interface';
 import { isNonEmptyArray } from '../../../../../shared/utils';
 import { useGetProjectsTemplates } from '../hooks/use-get-projects-templates.hook';

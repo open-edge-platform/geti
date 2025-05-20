@@ -3,12 +3,11 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { CustomPopover, SearchField } from '@geti/ui';
+import { CustomPopover, SearchField, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Search } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 
-import { Search } from '../../../assets/icons';
 import { AdvancedFilterOptions } from '../../../core/media/media-filter.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { QuietToggleButton } from '../../../shared/components/quiet-button/quiet-toggle-button.component';

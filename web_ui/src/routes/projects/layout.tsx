@@ -3,8 +3,7 @@
 
 import { Suspense } from 'react';
 
-import { Grid, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Grid, Loading, View } from '@geti/ui';
 import { Outlet } from 'react-router-dom';
 
 import { isAnomalyDomain } from '../../core/projects/domains';

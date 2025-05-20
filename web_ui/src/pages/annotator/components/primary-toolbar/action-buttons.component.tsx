@@ -3,12 +3,10 @@
 
 import { useMemo } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Flex } from '@react-spectrum/layout';
+import { Divider, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { hasEqualId } from '../../../../shared/utils';
 import {
     TOGGLE_VISIBILITY_COLOR_MODE,

@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Link as SpectrumLink, View } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Link as SpectrumLink, useMediaQuery, View } from '@geti/ui';
+import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '@geti/ui/icons';
 import { Link } from 'react-router-dom';
 
-import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';

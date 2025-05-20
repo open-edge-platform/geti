@@ -3,10 +3,10 @@
 
 import { CSSProperties, useMemo, useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
+import { BulbIcon, DocumentIcon, ShieldFilled } from '@geti/ui/icons';
 import { capitalize } from 'lodash-es';
 
-import { BulbIcon, DocumentIcon, ShieldFilled } from '../../../../../../assets/icons';
 import { useTrainingDatasetMediaQuery } from '../../../../../../core/datasets/hooks/use-training-dataset.hook';
 import {
     AdvancedFilterOptions,

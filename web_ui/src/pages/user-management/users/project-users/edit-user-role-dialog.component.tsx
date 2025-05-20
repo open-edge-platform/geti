@@ -3,8 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Form, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

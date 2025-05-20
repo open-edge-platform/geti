@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Heading, IllustratedMessage } from '@adobe/react-spectrum';
+import { Content, Heading, IllustratedMessage } from '@geti/ui';
 import NotFoundSpectrum from '@spectrum-icons/illustrations/NotFound';
 
 interface NotFoundProps {

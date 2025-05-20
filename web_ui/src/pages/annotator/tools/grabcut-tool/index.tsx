@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { QuickSelection } from '../../../../assets/icons';
+import { QuickSelection } from '@geti/ui/icons';
+
 import QuickSelectionImg from '../../../../assets/primary-tools/quick_selection.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';

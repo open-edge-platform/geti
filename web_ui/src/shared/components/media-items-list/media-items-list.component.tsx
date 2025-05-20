@@ -3,9 +3,8 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { DimensionValue, View } from '@adobe/react-spectrum';
+import { View, type DimensionValue, type Responsive } from '@geti/ui';
 import { useLoadMore } from '@react-aria/utils';
-import { Responsive } from '@react-types/shared';
 import {
     ListBox as AriaComponentsListBox,
     GridLayout,
@@ -16,6 +15,7 @@ import {
 } from 'react-aria-components';
 
 import { VIEW_MODE_SETTINGS, ViewModes } from '../media-view-modes/utils';
+import { useGetTargetPosition } from './use-get-target-position.hook';
 
 import classes from './media-items-list.module.scss';
 
@@ -26,6 +26,7 @@ interface MediaItemsListProps<T> {
     viewMode: ViewModes;
     mediaItems: T[];
     height?: Responsive<DimensionValue>;
+    scrollToIndex?: number;
     viewModeSettings?: ViewModeSettings;
     endReached?: () => void;
     itemContent: (item: T) => ReactNode;
@@ -38,6 +39,7 @@ export const MediaItemsList = <T extends object>({
     height,
     viewMode,
     mediaItems,
+    scrollToIndex,
     ariaLabel = 'media items list',
     viewModeSettings = VIEW_MODE_SETTINGS,
     itemContent,
@@ -48,9 +50,6 @@ export const MediaItemsList = <T extends object>({
     const config = viewModeSettings[viewMode];
     const isDetails = viewMode === ViewModes.DETAILS;
     const layout = isDetails ? 'stack' : 'grid';
-
-    const ref = useRef<HTMLDivElement | null>(null);
-    useLoadMore({ onLoadMore: endReached }, ref);
 
     const layoutOptions = isDetails
         ? {
@@ -63,6 +62,19 @@ export const MediaItemsList = <T extends object>({
               maxColumns: config.maxColumns,
               preserveAspectRatio: true,
           };
+
+    const ref = useRef<HTMLDivElement | null>(null);
+    useLoadMore({ onLoadMore: endReached }, ref);
+
+    const container = ref?.current?.firstElementChild;
+
+    useGetTargetPosition({
+        gap: config.gap,
+        container,
+        targetIndex: scrollToIndex,
+        dependencies: [scrollToIndex, viewMode, container],
+        callback: (top) => ref.current?.scrollTo({ top, behavior: 'smooth' }),
+    });
 
     return (
         <View id={id} UNSAFE_className={classes.mainContainer} height={height}>

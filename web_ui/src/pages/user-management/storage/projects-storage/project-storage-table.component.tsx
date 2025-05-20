@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Cell, Column, Row, TableBody, TableHeader, TableView, Text } from '@adobe/react-spectrum';
+import { Cell, Column, Row, TableBody, TableHeader, TableView, Text } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Image, Text } from '@adobe/react-spectrum';
-import { View } from '@react-spectrum/view';
+import { Flex, Heading, Image, Text, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import NoProjectsPlaceholder from '../../../../../assets/images/no-projects-placeholder.webp';

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { DatasetItemMenu } from './dataset-item-menu.component';

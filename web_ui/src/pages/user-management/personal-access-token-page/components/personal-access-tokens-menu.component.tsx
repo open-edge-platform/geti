@@ -3,11 +3,11 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
+import { Delete, Edit, MoreMenu } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import dayjs from 'dayjs';
 
-import { Delete, Edit, MoreMenu } from '../../../../assets/icons';
 import { usePersonalAccessToken } from '../../../../core/personal-access-tokens/hooks/use-personal-access-token.hook';
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

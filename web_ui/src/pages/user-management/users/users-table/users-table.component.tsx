@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
+import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
 import { get, isEmpty } from 'lodash-es';
 
 import { isOrganizationAdmin } from '../../../../core/users/user-role-utils';

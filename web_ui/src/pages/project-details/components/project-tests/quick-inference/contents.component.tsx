@@ -3,8 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { NoTrainedModels } from '../../../../../assets/images';

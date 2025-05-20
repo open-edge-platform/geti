@@ -3,19 +3,9 @@
 
 import { useState } from 'react';
 
-import {
-    Content,
-    Dialog,
-    DialogTrigger,
-    Divider,
-    Flex,
-    Heading,
-    Text,
-    Tooltip,
-    TooltipTrigger,
-} from '@adobe/react-spectrum';
+import { Content, Dialog, DialogTrigger, Divider, Flex, Heading, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Adjustments, Close } from '@geti/ui/icons';
 
-import { Adjustments, Close } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useAnnotatorCanvasSettings } from '../../../providers/annotator-canvas-settings-provider/annotator-canvas-settings-provider.component';
 import { AdjustmentsList } from './adjustments-list.component';

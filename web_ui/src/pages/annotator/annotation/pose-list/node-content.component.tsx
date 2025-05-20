@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ColorSwatch } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
+import { Checkbox, ColorSwatch } from '@geti/ui';
+import { CloseSemiBold } from '@geti/ui/icons';
 import { useFocusManager } from 'react-aria';
 
-import { CloseSemiBold } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { useSetHoveredId } from '../../../../providers/hovered-provider/hovered-provider.component';
 import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';

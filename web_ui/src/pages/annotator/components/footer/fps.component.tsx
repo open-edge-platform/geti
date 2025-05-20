@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useNumberFormatter, View } from '@adobe/react-spectrum';
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import { dimensionValue, useMediaQuery, useNumberFormatter, View } from '@geti/ui';
+import { Fps } from '@geti/ui/icons';
 
-import { Fps } from '../../../../assets/icons';
 import { Video, VideoFrame } from '../../../../core/media/video.interface';
 import { biggerThanQuery } from '../../../../theme/queries';
 

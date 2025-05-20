@@ -3,13 +3,22 @@
 
 import { useMemo } from 'react';
 
-import { DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
-import { IconColorValue } from '@react-types/shared/src/dna';
+import {
+    ActionButton,
+    DialogTrigger,
+    Flex,
+    Link,
+    ProgressCircle,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+    View,
+    type IconColorValue,
+} from '@geti/ui';
+import { AcceptCircle, Alert, Image, Play, Refresh } from '@geti/ui/icons';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 
-import { AcceptCircle, Alert, Image, Play, Refresh } from '../../../../../../assets/icons';
-import { COLOR_MODE } from '../../../../../../assets/icons/color-mode.enum';
 import { MEDIA_TYPE } from '../../../../../../core/media/base-media.interface';
 import {
     ErrorListItem,

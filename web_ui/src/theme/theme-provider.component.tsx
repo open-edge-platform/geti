@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Provider } from '@adobe/react-spectrum';
+import { Provider } from '@geti/ui';
 
 import './../assets/index.scss';
 

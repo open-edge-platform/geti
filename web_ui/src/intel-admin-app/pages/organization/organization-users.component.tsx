@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { Header } from '../../shared/components/header/header.component';
 import { MOCKED_USERS } from '../users/mocked-user';

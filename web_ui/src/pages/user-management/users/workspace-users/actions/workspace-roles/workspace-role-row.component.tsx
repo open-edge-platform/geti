@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { ActionButton } from '@geti/ui';
+import { ActionButton, Flex } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 
-import { Close } from '../../../../../../assets/icons';
 import { USER_ROLE, WorkspaceRole } from '../../../../../../core/users/users.interface';
 import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
 import { RolePicker } from '../../../old-project-users/role-picker.component';

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, Heading, View } from '@adobe/react-spectrum';
+import { Content, Flex, Heading, View } from '@geti/ui';
+import { Alert, Close } from '@geti/ui/icons';
 import dayjs from 'dayjs';
 
-import { Alert, Close } from '../../assets/icons';
 import { useMaintenanceQuery } from '../../core/maintenance/hooks/use-maintenance-query.hook';
 import { GENERAL_SETTINGS_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../core/user-settings/hooks/use-global-settings.hook';

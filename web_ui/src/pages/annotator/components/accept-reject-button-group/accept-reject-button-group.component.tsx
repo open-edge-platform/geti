@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ButtonGroup, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Reject } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { Reject } from '../../../../assets/icons';
 import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
 import { AcceptButton } from '../../../../shared/components/quiet-button/accept-button.component';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';

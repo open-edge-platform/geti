@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading } from '@geti/ui';
 import { isEmpty, isNil } from 'lodash-es';
 
 import { Label } from '../../../core/labels/label.interface';

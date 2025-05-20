@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Flex, LoadingIndicator, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useModels } from '../../../../core/models/hooks/use-models.hook';

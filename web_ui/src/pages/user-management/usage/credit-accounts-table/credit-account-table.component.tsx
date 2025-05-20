@@ -14,9 +14,11 @@ import {
     TableView,
     Text,
     View,
-} from '@adobe/react-spectrum';
-import { AriaLabelingProps, DOMProps, StyleProps } from '@react-types/shared';
-import { ColumnSize } from '@react-types/table';
+    type AriaLabelingProps,
+    type ColumnSize,
+    type DOMProps,
+    type StyleProps,
+} from '@geti/ui';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
 

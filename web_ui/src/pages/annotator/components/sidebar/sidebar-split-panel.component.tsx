@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { Allotment } from 'allotment';
 
 import { SelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item.interface';

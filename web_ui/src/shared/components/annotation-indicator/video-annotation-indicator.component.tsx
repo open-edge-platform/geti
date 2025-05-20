@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { View } from '@react-spectrum/view';
+import { Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Tag, TagHalf } from '@geti/ui/icons';
 
-import { Tag, TagHalf } from '../../../assets/icons';
 import { Video } from '../../../core/media/video.interface';
 import { pluralize } from '../../utils';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';

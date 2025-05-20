@@ -3,11 +3,19 @@
 
 import { FC, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading } from '@adobe/react-spectrum';
-import { Button, DateRangePicker } from '@geti/ui';
+import {
+    Button,
+    ButtonGroup,
+    Content,
+    DateRangePicker,
+    Dialog,
+    DialogContainer,
+    Divider,
+    Heading,
+    type RangeValue,
+} from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import { RangeValue } from '@react-types/shared';
 
 import { useGenerateOnboardingTokenMutation } from '../../../../core/users/hook/use-generate-onboarding-token.hook';
 import { CopyOnboardingInvitationLink } from './copy-onboarding-invitation-link.component';

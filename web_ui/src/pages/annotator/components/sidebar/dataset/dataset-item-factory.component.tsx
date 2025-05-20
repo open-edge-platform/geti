@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';

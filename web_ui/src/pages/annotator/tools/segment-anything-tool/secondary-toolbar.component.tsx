@@ -1,14 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { LoadingIndicator, Switch } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, LoadingIndicator, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
+import { RightClick } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { RightClick } from '../../../../assets/icons';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
 import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';

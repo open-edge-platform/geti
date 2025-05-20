@@ -3,8 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useProjectActions } from '../../../../../../../../../core/projects/hooks/use-project-actions.hook';

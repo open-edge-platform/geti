@@ -3,18 +3,11 @@
 
 import { FC } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Flex, LoadingIndicator, Text, View } from '@geti/ui';
+import { CanceledIcon, CheckCircleOutlined, ExclamationCircleOutlined, SkippedIcon, WaitingIcon } from '@geti/ui/icons';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 import { isEmpty } from 'lodash-es';
 
-import {
-    CanceledIcon,
-    CheckCircleOutlined,
-    ExclamationCircleOutlined,
-    SkippedIcon,
-    WaitingIcon,
-} from '../../../../assets/icons';
-import { COLOR_MODE } from '../../../../assets/icons/color-mode.enum';
 import { JobStepState } from '../../../../core/jobs/jobs.const';
 import { Job, JobStep } from '../../../../core/jobs/jobs.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

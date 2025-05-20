@@ -3,12 +3,10 @@
 
 import { ComponentProps, MutableRefObject, ReactNode } from 'react';
 
-import { Divider, Flex, Text } from '@adobe/react-spectrum';
-import { Button, CustomPopover } from '@geti/ui';
-import { Popover } from '@react-spectrum/overlays';
+import { Button, CustomPopover, Divider, Flex, Popover, Text } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 
-import { Close } from '../../../../../assets/icons';
 import { openNewTab } from '../../../../utils';
 import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 

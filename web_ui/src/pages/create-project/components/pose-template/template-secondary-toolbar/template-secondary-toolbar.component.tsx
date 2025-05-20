@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Text, View } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { Delete } from '../../../../../assets/icons';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { useIsPressed } from '../../../../../hooks/use-is-pressed/use-is-pressed.hook';

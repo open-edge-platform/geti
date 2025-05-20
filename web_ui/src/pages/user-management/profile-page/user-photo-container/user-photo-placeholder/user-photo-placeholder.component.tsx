@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { isNil } from 'lodash-es';
 import { usePress } from 'react-aria';
 

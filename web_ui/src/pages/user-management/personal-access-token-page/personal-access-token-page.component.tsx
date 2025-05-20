@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Divider, Flex, Heading, Text, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 

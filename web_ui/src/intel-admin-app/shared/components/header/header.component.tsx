@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Divider, Heading } from '@adobe/react-spectrum';
+import { Divider, Heading } from '@geti/ui';
 
 interface HeaderProps {
     title: string;

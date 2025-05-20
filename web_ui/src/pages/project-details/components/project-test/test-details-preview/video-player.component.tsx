@@ -3,9 +3,9 @@
 
 import { useEffect } from 'react';
 
-import { ButtonGroup, Flex, View } from '@adobe/react-spectrum';
+import { ButtonGroup, Flex, View } from '@geti/ui';
+import { StepBackward, StepForward } from '@geti/ui/icons';
 
-import { StepBackward, StepForward } from '../../../../../assets/icons';
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
 import { TestMediaItem } from '../../../../../core/tests/test-media.interface';

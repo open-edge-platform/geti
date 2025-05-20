@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, View } from '@adobe/react-spectrum';
+import { Divider, Flex, View } from '@geti/ui';
 
 import { SelectableManyTasksProps } from './selectable-many-tasks.interface';
 import { SelectableTabsList } from './selectable-tabs-list/selectable-tabs-list.component';

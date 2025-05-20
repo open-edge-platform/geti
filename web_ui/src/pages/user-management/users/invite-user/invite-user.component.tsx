@@ -4,6 +4,7 @@
 import { FormEvent, useRef, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
@@ -14,11 +15,10 @@ import {
     Heading,
     Text,
     TextField,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
-import { TextFieldRef } from '@react-types/textfield';
+    TextFieldRef,
+} from '@geti/ui';
+import { Info } from '@geti/ui/icons';
 
-import { Info } from '../../../../assets/icons';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
 import { WorkspaceIdentifier } from '../../../../core/workspaces/services/workspaces.interface';

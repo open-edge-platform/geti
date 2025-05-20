@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { BoundingCircle } from '../../../../assets/icons';
+import { BoundingCircle } from '@geti/ui/icons';
+
 import CircleImg from '../../../../assets/primary-tools/circle.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';

@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 
 import { DatasetIdentifier, ExportDatasetLSData } from '../../../../../core/projects/dataset.interface';

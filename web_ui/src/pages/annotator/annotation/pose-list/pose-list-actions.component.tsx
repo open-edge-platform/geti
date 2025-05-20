@@ -1,12 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Checkbox } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { Checkbox, dimensionValue, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
+import { CloseSemiBold, EyeSolid } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { CloseSemiBold, EyeSolid } from '../../../../assets/icons';
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';

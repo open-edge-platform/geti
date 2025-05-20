@@ -3,11 +3,8 @@
 
 import { ComponentProps, ReactNode, RefObject, useEffect, useRef } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
-import { CustomPopover } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { CustomPopover, TextField, useUnwrapDOMRef, type TextFieldRef } from '@geti/ui';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
-import { TextFieldRef } from '@react-types/textfield';
 
 import { Label } from '../../../../../core/labels/label.interface';
 import { BaseLabelSearch } from './base-label-search.component';

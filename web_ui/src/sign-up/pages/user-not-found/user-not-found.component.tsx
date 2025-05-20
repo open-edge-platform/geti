@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Button } from '@geti/ui';
-import { Heading, Text } from '@react-spectrum/text';
+import { Button, Heading, Text } from '@geti/ui';
 
 import { paths } from '../../../core/services/routes';
 import { ErrorLayout } from '../../../pages/errors/error-layout/error-layout.component';

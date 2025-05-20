@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, useNumberFormatter } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Flex, LoadingIndicator, useNumberFormatter } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';

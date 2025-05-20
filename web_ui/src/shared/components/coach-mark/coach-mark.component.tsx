@@ -3,11 +3,10 @@
 
 import { CSSProperties } from 'react';
 
-import { ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
+import { ChevronLeft, Close, MoreMenu } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { ChevronLeft, Close, MoreMenu } from '../../../assets/icons';
 import { FUX_NOTIFICATION_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
 import { useDocsUrl } from '../../../hooks/use-docs-url/use-docs-url.hook';

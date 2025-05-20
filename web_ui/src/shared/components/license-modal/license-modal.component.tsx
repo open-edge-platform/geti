@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 
 import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';

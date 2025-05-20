@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, IllustratedMessage, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Heading, IllustratedMessage, Text, View } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { useDocsUrl } from '../../../../hooks/use-docs-url/use-docs-url.hook';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { ToolTooltipProps } from '../../tools/tools.interface';
 import { Hotkey } from './hotkey/hotkey.component';
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Grid, minmax, Text, useNumberFormatter } from '@adobe/react-spectrum';
+import { Divider, Grid, minmax, Text, useNumberFormatter } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../core/media/video.interface';

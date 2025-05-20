@@ -3,10 +3,10 @@
 
 import { useMemo } from 'react';
 
-import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@adobe/react-spectrum';
+import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 import { isEmpty, omitBy, sortBy } from 'lodash-es';
 
-import { Close } from '../../../../../assets/icons';
 import { DatasetImportToExistingProjectItem } from '../../../../../core/datasets/dataset.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';

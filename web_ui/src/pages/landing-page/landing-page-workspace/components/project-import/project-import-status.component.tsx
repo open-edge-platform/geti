@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import { LoadingIndicator } from '@geti/ui';
+import { Flex, LoadingIndicator, Text } from '@geti/ui';
 
 import {
     ProjectImportBase,

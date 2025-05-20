@@ -3,13 +3,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Content, DialogContainer, Flex, Header, Heading, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, Content, DialogContainer, Divider, Flex, Header, Heading, Text, View } from '@geti/ui';
+import { Info } from '@geti/ui/icons';
 import { InfiniteData } from '@tanstack/react-query';
 import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
-import { Info } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useGetScheduledJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobsResponse } from '../../../../core/jobs/services/jobs-service.interface';
@@ -18,7 +17,6 @@ import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { UserGlobalSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { CreditsToConsume } from '../../../../shared/components/header/credit-balance/credits-to-consume.component';
 import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';

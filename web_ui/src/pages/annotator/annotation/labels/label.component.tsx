@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
+import { AiIcon, ChevronRightSmallLight } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 import { useNumberFormatter, usePress } from 'react-aria';
 
-import { AiIcon, ChevronRightSmallLight } from '../../../../assets/icons';
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { isPrediction, showLabelScore } from '../../../../core/labels/utils';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

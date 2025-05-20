@@ -1,4 +1,4 @@
 {
   "extends": "@geti/config/typescript",
-  "include": ["./src", "geti-type.d.ts"]
+  "include": ["./src", "./icons", "geti-type.d.ts"],
 }

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 
-import { Delete } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 import { MenuButtonProps } from './menu-button.interface';
 

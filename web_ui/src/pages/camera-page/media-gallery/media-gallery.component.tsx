@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 

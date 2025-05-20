@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Heading, Item, Picker, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Heading, Item, Loading, Picker, View } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';

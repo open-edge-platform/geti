@@ -3,8 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
-import { SearchField } from '@geti/ui';
+import { Flex, SearchField, View } from '@geti/ui';
 
 import { EntitiesCounter } from '../../shared/components/entities-counter/entities-counter.component';
 import { User } from './mocked-user';

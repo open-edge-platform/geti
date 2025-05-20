@@ -3,11 +3,10 @@
 
 import { CSSProperties } from 'react';
 
-import { ButtonGroup, Flex, Heading, Item, Menu, MenuTrigger, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Flex, Heading, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
+import { MoreMenu } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { MoreMenu } from '../../../assets/icons';
 import { TUTORIAL_CARD_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useDocsUrl } from '../../../hooks/use-docs-url/use-docs-url.hook';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';

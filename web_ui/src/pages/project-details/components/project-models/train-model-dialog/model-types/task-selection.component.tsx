@@ -3,7 +3,7 @@
 
 import { FC, Key } from 'react';
 
-import { Item, Picker, Text } from '@adobe/react-spectrum';
+import { Item, Picker, Text } from '@geti/ui';
 
 import { Task } from '../../../../../../core/projects/task.interface';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';

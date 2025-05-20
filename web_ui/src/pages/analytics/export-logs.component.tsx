@@ -4,18 +4,19 @@
 import { useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
+    DateRangePicker,
     Dialog,
     DialogTrigger,
     Divider,
     Heading,
     Radio,
     RadioGroup,
-} from '@adobe/react-spectrum';
-import { Button, DateRangePicker } from '@geti/ui';
+    type RangeValue,
+} from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
-import { RangeValue } from '@react-types/shared';
 import dayjs from 'dayjs';
 
 import { useApplicationServices } from '../../core/services/application-services-provider.component';

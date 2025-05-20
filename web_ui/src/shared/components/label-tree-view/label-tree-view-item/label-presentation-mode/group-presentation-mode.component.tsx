@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import { Tag } from '@geti/ui';
+import { Flex, Tag, Text } from '@geti/ui';
 
 import {
     LabelTreeGroupProps,

@@ -3,9 +3,18 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, TextField } from '@adobe/react-spectrum';
-import { Button, PasswordField } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import {
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    Divider,
+    Form,
+    Heading,
+    PasswordField,
+    TextField,
+} from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { ValidationError } from 'yup';
 

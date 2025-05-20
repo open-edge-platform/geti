@@ -3,8 +3,7 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Flex, Loading, View } from '@geti/ui';
 import { sortBy } from 'lodash-es';
 
 import { useTrainingDatasetVideo } from '../../../../../../core/datasets/hooks/use-training-dataset.hook';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Heading, Text } from '@adobe/react-spectrum';
+import { Heading, Text } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../../../test-utils/id-utils';
 

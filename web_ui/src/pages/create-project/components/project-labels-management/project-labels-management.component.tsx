@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Divider } from '@adobe/react-spectrum';
+import { Divider } from '@geti/ui';
 
 import { LabelTreeItem, SetValidationProps } from '../../../../core/labels/label-tree-view.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';

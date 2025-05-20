@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Refresh } from '../../../../../assets/icons';
+import { Refresh } from '@geti/ui/icons';
+
 import { TooltipWithDisableButton } from '../../../custom-tooltip/tooltip-with-disable-button';
 import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 

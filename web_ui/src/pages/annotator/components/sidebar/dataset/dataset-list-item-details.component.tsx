@@ -3,8 +3,7 @@
 
 import { ComponentProps, useMemo } from 'react';
 
-import { Divider, Flex, Grid, minmax, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+import { Divider, Flex, Grid, minmax, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 
@@ -78,7 +77,9 @@ export const DatasetListItemDetails = ({
                     </View>
                     <Flex direction={'column'} width={'100%'}>
                         <TooltipTrigger placement={'bottom'}>
-                            <PressableElement UNSAFE_className={classes.itemMediaName}>{name}</PressableElement>
+                            <PressableElement isTruncated UNSAFE_className={classes.itemMediaName}>
+                                {name}
+                            </PressableElement>
                             <Tooltip>{name}</Tooltip>
                         </TooltipTrigger>
 

@@ -4,18 +4,20 @@
 import { useEffect, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
     DialogContainer,
     Divider,
     Flex,
+    Heading,
+    Loading,
+    LoadingIndicator,
     Text,
     Tooltip,
     TooltipTrigger,
-} from '@adobe/react-spectrum';
-import { Button, Loading, LoadingIndicator } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+} from '@geti/ui';
 
 import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
 import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';

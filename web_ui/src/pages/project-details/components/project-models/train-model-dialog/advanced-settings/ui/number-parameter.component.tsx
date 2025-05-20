@@ -3,8 +3,7 @@
 
 import { FC, useEffect, useState } from 'react';
 
-import { Flex, NumberField } from '@adobe/react-spectrum';
-import { Slider } from '@geti/ui';
+import { Flex, NumberField, Slider } from '@geti/ui';
 
 import { getFloatingPointStep } from '../utils';
 

@@ -3,8 +3,7 @@
 
 import { useRef, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Flex, Heading, View } from '@adobe/react-spectrum';
-import { Button, LoadingIndicator } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Heading, LoadingIndicator, View } from '@geti/ui';
 
 import { LabeledVideoRange } from '../../../../core/annotations/labeled-video-range.interface';
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';

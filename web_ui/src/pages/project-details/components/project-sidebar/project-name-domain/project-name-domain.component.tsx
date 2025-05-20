@@ -3,11 +3,9 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
-import { TextFieldRef } from '@react-types/textfield';
+import { ActionButton, Flex, LoadingIndicator, TextFieldRef } from '@geti/ui';
+import { Edit } from '@geti/ui/icons';
 
-import { Edit } from '../../../../../assets/icons';
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';

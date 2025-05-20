@@ -3,9 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Text, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, Loading, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Virtuoso } from 'react-virtuoso';
 

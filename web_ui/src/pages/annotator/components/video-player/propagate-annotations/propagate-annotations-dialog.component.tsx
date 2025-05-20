@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, Divider, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { Button, ButtonGroup, Content, Dialog, Divider, Heading, Text } from '@geti/ui';
 import { UseMutationResult } from '@tanstack/react-query';
 
 interface PropagateAnnotationsDialogProps {

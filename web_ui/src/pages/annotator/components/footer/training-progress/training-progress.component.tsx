@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, useNumberFormatter, View } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Flex, Text, useMediaQuery, useNumberFormatter, View } from '@geti/ui';
 
 import { ProgressBar } from '../../../../../shared/components/progress-bar/progress-bar.component';
 import { trimText } from '../../../../../shared/utils';

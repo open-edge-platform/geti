@@ -3,13 +3,11 @@
 
 import { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode, useState } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { ActionButton, PressableElement } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { ActionButton, dimensionValue, Flex, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ChevronDownSmallLight, ChevronRightSmallLight } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';
 
-import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../assets/icons';
 import { LabelItemType, LabelTreeItem, LabelTreeLabelProps } from '../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../core/labels/label.interface';
 import { getLabelId } from '../../../core/labels/utils';

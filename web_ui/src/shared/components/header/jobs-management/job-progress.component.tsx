@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 
 import { JobStep } from '../../../../core/jobs/jobs.interface';
 import { JobListItemProgressStatus } from './jobs-list-item-progress.component';

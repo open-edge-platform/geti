@@ -3,7 +3,7 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
-import { ComboBox, Flex, Item } from '@adobe/react-spectrum';
+import { ComboBox, Flex, Item } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 

@@ -10,13 +10,13 @@ import {
     Flex,
     Heading,
     Link,
+    PressableElement,
     Text,
     Tooltip,
     TooltipTrigger,
     View,
     ViewProps,
-} from '@adobe/react-spectrum';
-import { PressableElement } from '@geti/ui';
+} from '@geti/ui';
 import { Tooltip as ChartTooltip, Pie, PieChart, ResponsiveContainer, TooltipProps } from 'recharts';
 
 import { CONTACT_SUPPORT } from '../../../core/const';

@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { useParams } from 'react-router-dom';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';

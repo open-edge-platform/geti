@@ -3,9 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Flex, Heading, Link, View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
+import { Flex, Heading, Link, Loading, View, type StyleProps } from '@geti/ui';
 import { isEmpty, isString, take } from 'lodash-es';
 import { Bar, BarChart, Legend, Rectangle, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts';
 

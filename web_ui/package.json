@@ -91,7 +91,7 @@
     "build:server-combine": "ts-node ./src/core/server/combine.js",
     "build:server-schema": "swagger-cli bundle -o src/core/server/generated/api-spec.json ../docs/rest_api/openapi_internal.yaml -r",
     "build:server-types": "openapi-typescript src/core/server/generated/api-spec.json --output src/core/server/generated/schemas.ts",
-    "cyclic-deps-check": "npx madge --circular src/**/*.ts* tests/**/*.ts*",
+    "cyclic-deps-check": "npx madge --circular src/**/*.ts* tests/**/*.ts* packages/**/*.ts*",
     "find-deadcode": "npx knip",
     "format": "prettier --write --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\" \"packages/**/*.ts*\"",
     "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\" \"packages/**/*.ts*\"",

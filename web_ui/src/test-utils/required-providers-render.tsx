@@ -3,8 +3,7 @@
 
 import { ReactElement, ReactNode, Suspense } from 'react';
 
-import { defaultTheme, Provider as ThemeProvider } from '@adobe/react-spectrum';
-import { IntelBrandedLoading } from '@geti/ui';
+import { defaultTheme, IntelBrandedLoading, Provider as ThemeProvider } from '@geti/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import { AuthProvider } from 'react-oidc-context';

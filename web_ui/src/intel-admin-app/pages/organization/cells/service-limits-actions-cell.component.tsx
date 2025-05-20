@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
+import { Edit, MoreMenu } from '@geti/ui/icons';
 
-import { Edit, MoreMenu } from '../../../../assets/icons';
 import { useSubscriptions } from '../../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { Quota } from '../../../../core/credits/subscriptions/quotas.interface';
 import { MenuTrigger } from '../../../../shared/components/menu-trigger/menu-trigger.component';

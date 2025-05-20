@@ -3,7 +3,7 @@
 
 import { ComponentProps, Key, ReactNode } from 'react';
 
-import { Item, Menu, MenuTrigger, Section, Text } from '@adobe/react-spectrum';
+import { Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { ColorMode, QuietActionButton } from '../../../quiet-button/quiet-action-button.component';

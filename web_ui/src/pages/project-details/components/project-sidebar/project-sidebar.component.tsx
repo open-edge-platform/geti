@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
+import { Datasets, Deployments, Model, Shield, Tag, Users } from '@geti/ui/icons';
 
-import { Datasets, Deployments, Model, Shield, Tag, Users } from '../../../../assets/icons';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';

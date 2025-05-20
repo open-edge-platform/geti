@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Grid, repeat, View } from '@adobe/react-spectrum';
+import { Grid, repeat, View } from '@geti/ui';
 import { isEmpty, sortBy } from 'lodash-es';
 
 import { TaskChainInput } from '../../../../../core/annotations/annotation.interface';

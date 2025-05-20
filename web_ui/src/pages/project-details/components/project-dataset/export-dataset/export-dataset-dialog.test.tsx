@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { defaultTheme, Provider } from '@adobe/react-spectrum';
+import { defaultTheme, Provider } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { fireEvent, render, RenderResult, screen } from '@testing-library/react';
 

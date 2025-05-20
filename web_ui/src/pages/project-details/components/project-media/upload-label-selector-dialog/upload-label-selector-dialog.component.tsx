@@ -3,8 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
-import { Button, Checkbox } from '@geti/ui';
+import { Button, ButtonGroup, Checkbox, Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../../../core/labels/label-resolver';

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
-import { Loading } from '@geti/ui';
+import { Loading, View } from '@geti/ui';
 
 import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
 import { useModelIdentifier } from '../../../../../hooks/use-model-identifier/use-model-identifier.hook';

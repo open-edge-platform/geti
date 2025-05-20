@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Edit } from '@geti/ui/icons';
 import Cross from '@spectrum-icons/ui/CrossMedium';
 import { motion } from 'framer-motion';
 
-import { Edit } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
 import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';

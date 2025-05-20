@@ -1,12 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
-import { Heading } from '@react-spectrum/text';
+import { Button, Divider, Flex, Heading, Text, View } from '@geti/ui';
+import { AnalyticsIcon, ExternalLinkIcon } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 
-import { AnalyticsIcon, ExternalLinkIcon } from '../../assets/icons';
 import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';
 import { openNewTab } from '../../shared/utils';

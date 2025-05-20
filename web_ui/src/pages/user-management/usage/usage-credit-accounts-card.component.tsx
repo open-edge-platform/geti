@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Dialog, DialogTrigger, Divider, Flex, Heading, Link, Text, View } from '@adobe/react-spectrum';
-import { StyleProps } from '@react-types/shared';
+import { Content, Dialog, DialogTrigger, Divider, Flex, Heading, Link, Text, View, type StyleProps } from '@geti/ui';
 import { take } from 'lodash-es';
 
 import { useCreditsQueries } from '../../../core/credits/hooks/use-credits-api.hook';

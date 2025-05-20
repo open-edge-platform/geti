@@ -3,8 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Flex, Heading } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Heading } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useCodeDeployment } from '../../../../core/code-deployment/hooks/use-code-deployment.hook';

@@ -1,12 +1,20 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import {
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    dimensionValue,
+    Divider,
+    Flex,
+    Heading,
+    Text,
+} from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
-
-import { Alert } from '../../../../assets/icons';
 
 import classes from './jobs.module.scss';
 

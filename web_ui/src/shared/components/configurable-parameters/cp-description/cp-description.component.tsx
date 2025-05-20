@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex } from '@adobe/react-spectrum';
+import { Divider, Flex } from '@geti/ui';
 
 interface CPDescriptionProps {
     description: string;

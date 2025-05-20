@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 
-import { DialogTrigger, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Filter } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { Filter } from '../../../../assets/icons';
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { AnnotationFilterDialog } from './annotation-filter-dialog.component';
 import { CornerIndicator } from './corner-indicator.component';

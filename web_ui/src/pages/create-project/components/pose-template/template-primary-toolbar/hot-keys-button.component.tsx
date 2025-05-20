@@ -3,9 +3,9 @@
 
 import { ReactNode } from 'react';
 
-import { Content, Dialog, DialogTrigger, Divider, Flex, Keyboard, Text, View } from '@adobe/react-spectrum';
+import { Content, Dialog, DialogTrigger, Divider, Flex, Keyboard, Text, View } from '@geti/ui';
+import { Hotkeys, LeftClick, RightClick } from '@geti/ui/icons';
 
-import { Hotkeys, LeftClick, RightClick } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './hot-keys-button.module.scss';

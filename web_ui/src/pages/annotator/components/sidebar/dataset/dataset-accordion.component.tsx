@@ -3,7 +3,7 @@
 
 import { CSSProperties, Dispatch, SetStateAction } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';

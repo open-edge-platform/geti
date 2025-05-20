@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DetectionTool } from '../../../../assets/icons';
+import { DetectionTool } from '@geti/ui/icons';
+
 import SSIMImg from '../../../../assets/primary-tools/ssim.webp';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolProps } from '../tools.interface';

@@ -3,17 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Form,
-    Heading,
-    TextField,
-} from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 

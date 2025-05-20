@@ -3,8 +3,7 @@
 
 import { FC } from 'react';
 
-import { Content, ContextualHelp, Flex, Heading, Radio, RadioGroup, Text, View } from '@adobe/react-spectrum';
-import { Switch } from '@geti/ui';
+import { Content, ContextualHelp, Flex, Heading, Radio, RadioGroup, Switch, Text, View } from '@geti/ui';
 
 import { InferenceModel } from '../../../../../core/annotations/services/visual-prompt-service';
 import { AnnotatorSettingsConfig, FEATURES_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';

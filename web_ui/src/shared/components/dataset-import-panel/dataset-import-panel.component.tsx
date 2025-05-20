@@ -3,14 +3,13 @@
 
 import { FC, PropsWithChildren, useRef } from 'react';
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
-import { ActionButton, LoadingIndicator } from '@geti/ui';
+import { ActionButton, Divider, Flex, LoadingIndicator, Text, View } from '@geti/ui';
+import { InfoOutline } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import Alert from '@spectrum-icons/workflow/Alert';
 import { noop } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
-import { InfoOutline } from '../../../assets/icons';
 import { DATASET_IMPORT_MESSAGE } from '../../../core/datasets/dataset.const';
 import { DATASET_IMPORT_STATUSES } from '../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../core/datasets/dataset.interface';

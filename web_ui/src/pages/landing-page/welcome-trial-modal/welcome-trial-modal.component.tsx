@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { Button } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
+import { Button, DialogContainer, dimensionValue, Flex, Heading, Text } from '@geti/ui';
 import { sum } from 'lodash-es';
 
 import { FireWorks } from '../../../assets/images';
