@@ -35,6 +35,7 @@ export const TrainingProgress = ({ taskId }: TrainingProgressProps): JSX.Element
                                 borderTopEndRadius={'small'}
                                 backgroundColor={'gray-75'}
                                 marginTop={'size-100'}
+                                key={`training-${job.metadata.task.modelArchitecture}-job-${job.id}`}
                             >
                                 <Heading
                                     id={`model-group-name-${job.id}-id`}
