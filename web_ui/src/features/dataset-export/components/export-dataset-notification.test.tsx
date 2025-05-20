@@ -30,7 +30,7 @@ const mockExportDatasetLSData = {
 const mockUpdateLsExportDataset = jest.fn();
 const mockRemoveDatasetLsByDatasetId = jest.fn();
 const mockGetDatasetLsByDatasetId = jest.fn();
-jest.mock('../../../hooks/use-local-storage-export-dataset.hook', () => ({
+jest.mock('../hooks/use-local-storage-export-dataset.hook', () => ({
     useLocalStorageExportDataset: () => ({
         getDatasetLsByDatasetId: mockGetDatasetLsByDatasetId,
         updateLsExportDataset: mockUpdateLsExportDataset,

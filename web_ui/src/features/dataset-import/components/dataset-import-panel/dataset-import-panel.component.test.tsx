@@ -61,8 +61,8 @@ const mockDatasetImportItem: DatasetImportItem = {
 };
 
 const mockedAddNotification = jest.fn();
-jest.mock('../../../notification/notification.component', () => ({
-    ...jest.requireActual('../../../notification/notification.component'),
+jest.mock('../../../../notification/notification.component', () => ({
+    ...jest.requireActual('../../../../notification/notification.component'),
     useNotification: () => ({ addNotification: mockedAddNotification }),
 }));
 
@@ -72,8 +72,8 @@ jest.mock('react-router-dom', () => ({
 }));
 
 const mockAbortActiveUpload = jest.fn();
-jest.mock('../../../providers/tus-upload-provider/tus-upload-provider.component', () => ({
-    ...jest.requireActual('../../../providers/tus-upload-provider/tus-upload-provider.component'),
+jest.mock('../../../../providers/tus-upload-provider/tus-upload-provider.component', () => ({
+    ...jest.requireActual('../../../../providers/tus-upload-provider/tus-upload-provider.component'),
     useTusUpload: () => ({ abortActiveUpload: mockAbortActiveUpload }),
 }));
 

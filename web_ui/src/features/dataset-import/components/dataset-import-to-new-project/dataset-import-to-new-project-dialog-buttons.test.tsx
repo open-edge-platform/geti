@@ -34,8 +34,8 @@ const mockDeleteTemporallyDatasetImport = jest.fn();
 let mockIsReadyValue = false;
 
 const mockAbortActiveUpload = jest.fn();
-jest.mock('../../../../../providers/tus-upload-provider/tus-upload-provider.component', () => ({
-    ...jest.requireActual('../../../../../providers/tus-upload-provider/tus-upload-provider.component'),
+jest.mock('../../../../providers/tus-upload-provider/tus-upload-provider.component', () => ({
+    ...jest.requireActual('../../../../providers/tus-upload-provider/tus-upload-provider.component'),
     useTusUpload: () => ({ abortActiveUpload: mockAbortActiveUpload }),
 }));
 

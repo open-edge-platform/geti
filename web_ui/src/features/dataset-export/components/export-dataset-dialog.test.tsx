@@ -15,27 +15,27 @@ import { getMockedProject } from '../../../test-utils/mocked-items-factory/mocke
 import { RequiredProviders } from '../../../test-utils/required-providers-render';
 import { ExportDatasetDialog } from './export-dataset-dialog.component';
 
-jest.mock('../../../providers/project-provider/project-provider.component', () => ({
-    ...jest.requireActual('../../../providers/project-provider/project-provider.component'),
+jest.mock('../../../pages/project-details/providers/project-provider/project-provider.component', () => ({
+    ...jest.requireActual('../../../pages/project-details/providers/project-provider/project-provider.component'),
     useProject: jest.fn(),
 }));
 
 const mockDatasetId = '321';
 const mockWorkspaceId = '123';
-jest.mock('../../../../annotator/hooks/use-dataset-identifier.hook', () => ({
-    ...jest.requireActual('../../../../annotator/hooks/use-dataset-identifier.hook'),
+jest.mock('../../../pages/annotator/hooks/use-dataset-identifier.hook', () => ({
+    ...jest.requireActual('../../../pages/annotator/hooks/use-dataset-identifier.hook'),
     useDatasetIdentifier: () => ({ workspaceId: mockWorkspaceId, datasetId: mockDatasetId }),
 }));
 
 const mockAddNotification = jest.fn();
-jest.mock('../../../../../notification/notification.component', () => ({
-    ...jest.requireActual('../../../../../notification/notification.component'),
+jest.mock('../../../notification/notification.component', () => ({
+    ...jest.requireActual('../../../notification/notification.component'),
     useNotification: () => ({ addNotification: mockAddNotification }),
 }));
 
 const mockPrepareExportDataset = jest.fn();
-jest.mock('../../../hooks/use-export-dataset.hook', () => ({
-    ...jest.requireActual('../../../hooks/use-export-dataset.hook'),
+jest.mock('../hooks/use-export-dataset.hook', () => ({
+    ...jest.requireActual('../hooks/use-export-dataset.hook'),
     useExportDataset: () => ({
         prepareExportDatasetJob: {
             mutate: mockPrepareExportDataset,
@@ -61,7 +61,9 @@ describe('ExportDatasetDialog', () => {
         mediaService?: MediaService;
     }): Promise<RenderResult> => {
         jest.mocked(useProject).mockReturnValue({
-            ...jest.requireActual('../../../providers/project-provider/project-provider.component'),
+            ...jest.requireActual(
+                '../../../pages/project-details/providers/project-provider/project-provider.component'
+            ),
             project: getMockedProject({ domains }),
             isTaskChainProject,
         });

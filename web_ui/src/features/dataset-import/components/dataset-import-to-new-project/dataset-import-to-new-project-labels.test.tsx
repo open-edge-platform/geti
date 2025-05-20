@@ -42,8 +42,8 @@ const MOCKED_LABELS_DEEP_HIERARCHY: DatasetImportLabel[] = [
 ];
 
 const mockedAddNotifications = jest.fn();
-jest.mock('../../../../../notification/notification.component', () => ({
-    ...jest.requireActual('../../../../../notification/notification.component'),
+jest.mock('../../../../notification/notification.component', () => ({
+    ...jest.requireActual('../../../../notification/notification.component'),
     useNotification: jest.fn(() => ({
         addNotification: mockedAddNotifications,
     })),

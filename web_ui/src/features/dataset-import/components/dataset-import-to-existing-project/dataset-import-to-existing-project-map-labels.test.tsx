@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { defaultTheme, Provider } from '@geti/ui';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
@@ -37,10 +38,10 @@ const mockProjectLabels: Label[] = [
 
 const mockPatchActiveDatasetImport = jest.fn();
 jest.mock(
-    '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
+    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
     () => ({
         ...jest.requireActual(
-            '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+            '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
         ),
         useDatasetImportToExistingProject: jest.fn(() => ({ patchActiveDatasetImport: mockPatchActiveDatasetImport })),
     })
@@ -73,10 +74,12 @@ describe(DatasetImportToExistingProjectMapLabels, () => {
 
     it('should properly interact on labels mapping change', async () => {
         render(
-            <DatasetImportToExistingProjectMapLabels
-                projectLabels={mockProjectLabels}
-                activeDatasetImport={{ ...mockDatasetImportItem, labels: ['cat'] }}
-            />
+            <Provider theme={defaultTheme}>
+                <DatasetImportToExistingProjectMapLabels
+                    projectLabels={mockProjectLabels}
+                    activeDatasetImport={{ ...mockDatasetImportItem, labels: ['cat'] }}
+                />
+            </Provider>
         );
 
         expect(screen.getByRole('textbox', { name: 'Select label' })).toBeVisible();

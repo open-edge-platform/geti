@@ -28,8 +28,10 @@ import { ProjectProvider } from '../../providers/project-provider/project-provid
 import { ProjectDatasetTabActions, ProjectDatasetTabActionsProps } from './project-dataset-tab-actions.component';
 import { DatasetTabActions } from './utils';
 
-jest.mock('./export-dataset/export-import-dataset-dialog-provider.component', () => ({
-    ...jest.requireActual('./export-dataset/export-import-dataset-dialog-provider.component'),
+jest.mock('../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component', () => ({
+    ...jest.requireActual(
+        '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component'
+    ),
     useExportImportDatasetDialogStates: jest.fn(),
 }));
 
