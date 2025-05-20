@@ -5,6 +5,7 @@ import { CSSProperties } from 'react';
 
 import { Divider, Flex, Meter, PressableElement, Text, Tooltip, TooltipTrigger, useMediaQuery } from '@geti/ui';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import {
     isBelowLowFreeDiskSpace,
@@ -13,7 +14,6 @@ import {
 } from '../../../../core/status/hooks/utils';
 import { InfoTooltip } from '../../../../shared/components/info-tooltip/info-tooltip.component';
 import { getFileSize } from '../../../../shared/utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 
 import classes from './storage-usage.module.scss';
 

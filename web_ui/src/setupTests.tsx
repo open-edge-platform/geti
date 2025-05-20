@@ -7,10 +7,10 @@ import 'jest-canvas-mock';
 
 import { ComponentType, PropsWithChildren, ReactNode } from 'react';
 
+import { isLargeSizeQuery as mockIsLargeSizeQuery } from '../packages/ui/theme/queries';
 import { initializeMetrics } from './analytics/metrics';
 import { API_URLS } from './core/services/urls';
 import * as CanvasUtils from './shared/canvas-utils';
-import { isLargeSizeQuery as mockIsLargeSizeQuery } from './theme/queries';
 
 window.ResizeObserver = class ResizeObserver {
     observe() {

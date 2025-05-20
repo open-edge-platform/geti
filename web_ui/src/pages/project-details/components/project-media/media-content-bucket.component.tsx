@@ -7,6 +7,7 @@ import { Divider, Flex, IllustratedMessage, useMediaQuery, View, type DimensionV
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { isEmpty } from 'lodash-es';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
@@ -23,7 +24,6 @@ import { INITIAL_VIEW_MODE, VIEW_MODE_SETTINGS, ViewModes } from '../../../../sh
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { VALID_MEDIA_TYPES_DISPLAY } from '../../../../shared/media-utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { MediaFilterChips } from '../../../media/components/media-filter-chips.component';
 import { useMedia } from '../../../media/providers/media-provider.component';
 import { getMediaId } from '../../../media/utils';

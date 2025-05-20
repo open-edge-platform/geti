@@ -3,9 +3,9 @@
 
 import { ComponentProps } from 'react';
 
-import { Provider } from '@geti/ui';
+import { Provider } from '@adobe/react-spectrum';
 
-import './../assets/index.scss';
+import '../../../src/assets/index.scss';
 
 import theme from './geti/theme';
 

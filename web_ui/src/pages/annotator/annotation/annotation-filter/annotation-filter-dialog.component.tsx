@@ -17,8 +17,8 @@ import {
 } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { Label } from '../../../../core/labels/label.interface';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { BaseLabelSearch } from '../../components/labels/label-search/base-label-search.component';
 import { useTaskChainOutput } from '../../providers/task-chain-provider/use-task-chain-output.hook';
 import { useTask } from '../../providers/task-provider/task-provider.component';

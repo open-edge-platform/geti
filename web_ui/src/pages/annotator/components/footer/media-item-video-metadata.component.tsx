@@ -3,8 +3,8 @@
 
 import { useMediaQuery } from '@geti/ui';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { isVideoFrame, Video, VideoFrame } from '../../../../core/media/video.interface';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { FPS } from './fps.component';
 import { FrameNumber } from './frame-number.component';
 import { LastAnnotator } from './last-annotator.component';

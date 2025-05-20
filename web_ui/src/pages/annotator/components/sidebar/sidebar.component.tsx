@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { Flex, useMediaQuery, View } from '@geti/ui';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
@@ -12,7 +13,6 @@ import { useViewMode } from '../../../../hooks/use-view-mode/use-view-mode.hook'
 import { MEDIA_CONTENT_BUCKET } from '../../../../providers/media-upload-provider/media-upload.interface';
 import { ActiveDatasetCoachMark } from '../../../../shared/components/coach-mark/fux-notifications/active-dataset-coach-mark.component';
 import { INITIAL_VIEW_MODE } from '../../../../shared/components/media-view-modes/utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
 import { ToolAnnotationContextProps } from '../../tools/tools.interface';
 import { SidebarPanel } from './sidebar-panel.component';

@@ -3,8 +3,8 @@
 
 import { useMediaQuery } from '@geti/ui';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { MediaItem } from '../../../../core/media/media.interface';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { LastAnnotator } from './last-annotator.component';
 import { MediaNameAndResolution } from './media-name-and-resolution.component';
 

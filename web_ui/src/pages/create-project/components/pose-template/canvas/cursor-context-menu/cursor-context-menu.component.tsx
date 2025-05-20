@@ -7,8 +7,8 @@ import { View, type DOMRefValue } from '@geti/ui';
 import { OverlayContainer } from 'react-aria';
 
 import { useEventListener } from '../../../../../../hooks/event-listener/event-listener.hook';
+import { ThemeProvider } from '../../../../../../providers/theme-provider/theme-provider.component';
 import { MouseEvents } from '../../../../../../shared/mouse-events';
-import { ThemeProvider } from '../../../../../../theme/theme-provider.component';
 
 export interface CursorContextMenuProps {
     isOpen: boolean;

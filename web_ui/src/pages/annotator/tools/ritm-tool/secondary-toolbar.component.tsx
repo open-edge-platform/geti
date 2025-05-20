@@ -5,9 +5,9 @@ import { Divider, Flex, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery } f
 import { RightClick } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 
+import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolSettings, ToolType } from '../../core/annotation-tool-context.interface';
 import { useAddUnfinishedShape } from '../../hooks/use-add-unfinished-shape.hook';

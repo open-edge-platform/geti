@@ -4,13 +4,13 @@
 import { FC, ReactNode, StrictMode, Suspense, useState } from 'react';
 
 import { IntelBrandedLoading } from '@geti/ui';
+import { ThemeProvider } from '@geti/ui/theme';
 import { createBrowserRouter, createRoutesFromElements, RouterProvider, RouterProviderProps } from 'react-router-dom';
 
 import { useFeatureFlags } from '../core/feature-flags/hooks/use-feature-flags.hook';
 import { ApplicationServicesProvider } from '../core/services/application-services-provider.component';
 import { NotificationProvider } from '../notification/notification.component';
 import { ErrorBoundary } from '../pages/errors/error-boundary.component';
-import { ThemeProvider } from '../theme/theme-provider.component';
 import { AuthProvider } from './auth-provider/auth-provider.component';
 import { ProgressiveWebAppProvider } from './progressive-web-app-provider/progressive-web-app-provider.component';
 import { QueryClientProvider } from './query-client-provider/query-client-provider.component';

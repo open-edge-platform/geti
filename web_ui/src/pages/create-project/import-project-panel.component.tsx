@@ -8,6 +8,7 @@ import { DatasetImport as DatasetImportIcon } from '@geti/ui/icons';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 
+import { isExtraLargeSizeQuery } from '../../../packages/ui/theme/queries';
 import { ImportOptions } from '../../core/projects/services/project-service.interface';
 import { useDocsUrl } from '../../hooks/use-docs-url/use-docs-url.hook';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
@@ -16,7 +17,6 @@ import { mediaExtensionHandler } from '../../providers/media-upload-provider/med
 import { useProjectsImportProvider } from '../../providers/projects-import-provider/projects-import-provider.component';
 import { DropZone, onDropFiles } from '../../shared/drag-and-drop/drag-and-drop.component';
 import { isValidFileExtension } from '../../shared/media-utils';
-import { isExtraLargeSizeQuery } from '../../theme/queries';
 
 import classes from './import-project-panel.module.scss';
 
