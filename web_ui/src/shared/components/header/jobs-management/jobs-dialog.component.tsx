@@ -85,8 +85,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
 
     const isInitialRange = isEqual(range, INITIAL_DATES);
 
-    const areFiltersChanged = () =>
-        !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length;
+    const areFiltersChanged = !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length;
 
     const allJobs = getAllJobs(data);
     const {
