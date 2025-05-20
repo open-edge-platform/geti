@@ -14,7 +14,7 @@ import {
 } from './utils';
 
 interface ModelPerformanceProps {
-    performance: ModelPerformanceInterface;
+    performance: ModelPerformanceInterface | undefined;
     genericId: string;
     isDisabled?: boolean;
     isModelTraining?: boolean;
@@ -36,6 +36,10 @@ export const ModelPerformance = ({
                 heading='Score'
             />
         );
+    }
+
+    if (performance === undefined) {
+        return;
     }
 
     if (performance.type === PerformanceType.DEFAULT) {

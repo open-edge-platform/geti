@@ -15,7 +15,6 @@ import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { Tag } from '../../../../../../shared/components/tag/tag.component';
-import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { isModelDeleted } from '../../../../utils';
@@ -23,51 +22,10 @@ import { ActiveModelTag } from './active-model-tag.component';
 import { CountWithIcon } from './count-with-icon.component';
 import { ModelCardMenu } from './model-card-menu.component';
 import { ModelCardProps } from './model-card.interface';
+import { ModelInfoFields } from './model-info-fields.component';
 import { ModelPerformance } from './model-performance.component';
 
 import classes from './model-card.module.scss';
-
-const ModelInfoFields = ({
-    modelSize,
-    totalDiskSize,
-    complexity,
-    isModelDeleted,
-}: {
-    modelSize: string | undefined;
-    totalDiskSize: string | undefined;
-    complexity: number | undefined;
-    isModelDeleted: boolean;
-}) => {
-    return (
-        <>
-            {!isModelDeleted && (
-                <>
-                    <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
-                        Model size: {modelSize ?? <ThreeDotsFlashing className={classes.threeDotsFlashing} />}
-                    </Text>
-                    <Text marginX={'size-50'}>|</Text>
-                    <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
-                        Total size:{' '}
-                        {totalDiskSize === '0' ? (
-                            <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                        ) : (
-                            totalDiskSize
-                        )}
-                    </Text>
-                    <Text marginX={'size-50'}>|</Text>
-                </>
-            )}
-            <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
-                Complexity:{' '}
-                {complexity ? (
-                    <span>{complexity} GFlops</span>
-                ) : (
-                    <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                )}
-            </Text>
-        </>
-    );
-};
 
 export const ModelCard = ({
     modelInTraining,
