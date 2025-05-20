@@ -1,6 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { RangeValue } from '@react-types/shared';
+
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
 export {
     View,
     Flex,
@@ -138,3 +143,4 @@ export { PressableElement } from './src/pressable-element/pressable-element.comp
 export { Tag } from './src/tag/tag.component';
 export { Skeleton } from './src/skeleton/skeleton.component';
 export { Divider } from './src/divider/divider.component';
+export { CornerIndicator } from './src/corner-indicator/corner-indicator.component';

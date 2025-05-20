@@ -3,9 +3,8 @@
 
 import { Dispatch, Key, SetStateAction, useState } from 'react';
 
-import { Content, CornerIndicator, Dialog, Flex, Text } from '@geti/ui';
+import { Content, CornerIndicator, Dialog, Flex, RangeValue, Text } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
-import { RangeValue } from '@react-types/shared';
 import { keepPreviousData } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 
@@ -13,9 +12,9 @@ import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { JobCount } from '../../../../core/jobs/jobs.interface';
-import { RefreshButton } from '../../../../pages/annotator/components/sidebar/dataset/refresh-button/refresh-button.component';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
+import { RefreshButton } from '../../refresh-button/refresh-button.component';
 import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { Tabs } from '../../tabs/tabs.component';
 import { TabItem } from '../../tabs/tabs.interface';

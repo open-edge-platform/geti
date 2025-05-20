@@ -3,8 +3,8 @@
 
 import { Tooltip, TooltipTrigger } from '@geti/ui';
 
-import { Refresh } from '../../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../../shared/components/quiet-button/quiet-action-button.component';
+import { Refresh } from '../../../assets/icons';
+import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 import classes from './refresh-button.module.scss';
 
@@ -17,6 +17,7 @@ interface RefreshButtonProps {
     isDisabled?: boolean;
 }
 
+// TODO: look through all the buttons with Refresh icon and make it consistent; then think about moving to @geti/ui
 export const RefreshButton = ({
     id,
     tooltip,

@@ -15,11 +15,6 @@ import { JobsFiltering } from './jobs-filtering.component';
 
 const mockedProject = getMockedProject({});
 
-const clickOutside = (): void => {
-    fireEvent.mouseDown(document.body);
-    fireEvent.mouseUp(document.body);
-};
-
 jest.mock('../../../../../core/users/hook/use-users.hook', () => ({
     ...jest.requireActual('../../../../../core/users/hook/use-users.hook'),
     useUsers: jest.fn(() => ({
@@ -194,50 +189,48 @@ describe('jobs filtering', (): void => {
         expect(screen.getByRole('option', { name: 'Optimize' })).toHaveAttribute('data-key', 'optimize');
     });
 
-    it('should trigger onChange event with selected filters', async (): Promise<void> => {
-        const users = [
-            mockedUser,
-            { ...mockedUser, id: '2', email: 'admin2@example.com', firstName: 'Administrator 2' },
-            { ...mockedUser, id: '3', email: 'admin3@example.com', firstName: 'Administrator 3' },
-        ];
-
-        await renderComponent(undefined, undefined, undefined, users);
-
-        fireEvent.click(screen.getByRole('button', { name: /filter project/ }));
-        fireEvent.click(await screen.findByRole('option', { name: 'Test project 2' }));
-        expect(mockOnChange).toHaveBeenNthCalledWith(
-            1,
-            expect.objectContaining({
+    it.each([
+        {
+            filterName: /filter project/,
+            filterValue: 'Test project 2',
+            changedValues: {
                 projectId: '222222',
+            },
+        },
+        {
+            filterName: /filter user/,
+            filterValue: 'admin3@example.com',
+            changedValues: {
+                userId: '3',
+            },
+        },
+        {
+            filterName: /filter job type/,
+            filterValue: 'Optimize',
+            changedValues: {
+                jobTypes: ['optimize_pot'],
+            },
+        },
+    ])(
+        `should trigger onChange event with selected filter `,
+        async ({ filterName, filterValue, changedValues }): Promise<void> => {
+            const users = [
+                mockedUser,
+                { ...mockedUser, id: '2', email: 'admin2@example.com', firstName: 'Administrator 2' },
+                { ...mockedUser, id: '3', email: 'admin3@example.com', firstName: 'Administrator 3' },
+            ];
+
+            await renderComponent(undefined, undefined, undefined, users);
+
+            fireEvent.click(screen.getByRole('button', { name: filterName }));
+            fireEvent.click(await screen.findByRole('option', { name: filterValue }));
+            const defaultValues = {
                 userId: undefined,
                 jobTypes: [],
-            })
-        );
-
-        clickOutside();
-
-        fireEvent.click(screen.getByRole('button', { name: /filter user/ }));
-        fireEvent.click(screen.getByRole('option', { name: 'admin3@example.com' }));
-        expect(mockOnChange).toHaveBeenNthCalledWith(
-            2,
-            expect.objectContaining({
-                projectId: '222222',
-                userId: '3',
-                jobTypes: [],
-            })
-        );
-
-        clickOutside();
-
-        fireEvent.click(screen.getByRole('button', { name: /filter job type/ }));
-        fireEvent.click(screen.getByRole('option', { name: 'Optimize' }));
-        expect(mockOnChange).toHaveBeenNthCalledWith(
-            3,
-            expect.objectContaining({
-                projectId: '222222',
-                userId: '3',
-                jobTypes: ['optimize_pot'],
-            })
-        );
-    });
+                projectId: undefined,
+            };
+            const expected = { ...defaultValues, ...changedValues };
+            expect(mockOnChange).toHaveBeenNthCalledWith(1, expect.objectContaining(expected));
+        }
+    );
 });

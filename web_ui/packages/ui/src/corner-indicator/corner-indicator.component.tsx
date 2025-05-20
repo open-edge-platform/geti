@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@geti/ui';
+import { View } from '@adobe/react-spectrum';
 
 interface CornerIndicatorProps {
     isActive: boolean;
