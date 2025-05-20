@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@geti/ui';
+import { ColorThumb, Flex, Text, View } from '@geti/ui';
 
-import { ColorThumb } from '../../../../../../packages/ui/src/color-thumb/color-thumb.component';
 import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';
 import { LabelItemEditionState } from '../../../../../core/labels/label-tree-view.interface';
 import { isNewState } from '../utils';
