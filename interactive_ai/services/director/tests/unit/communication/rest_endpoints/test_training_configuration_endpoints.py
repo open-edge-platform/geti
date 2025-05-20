@@ -64,4 +64,4 @@ class TestTrainingConfigurationEndpoints:
         # check that endpoint is not available when feature flag is off
         result = fxt_director_app.get(f"{API_PROJECT_PATTERN}/training_configuration")
 
-        assert result.status_code == HTTPStatus.NOT_FOUND
+        assert result.status_code == HTTPStatus.FORBIDDEN
