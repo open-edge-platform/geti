@@ -1,6 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-"""This module implements conversion from SC Dataset to Datumaro dataset."""
+"""This module implements conversion from Geti Dataset to Datumaro dataset."""
 
 import logging
 import os
@@ -25,6 +25,7 @@ from datumaro import Label as dm_Label
 from datumaro import LabelCategories as dm_LabelCategories
 from datumaro import MaskCategories as dm_MaskCategories
 from datumaro import Points as dm_Points
+from datumaro import PointsCategories as dm_PointCategories
 from datumaro import Polygon as dm_Polygon
 from datumaro import Video as dm_Video
 from datumaro import VideoFrame as dm_VideoFrame
@@ -43,12 +44,21 @@ from iai_core.entities.dataset_item import DatasetItem
 from iai_core.entities.dataset_storage import DatasetStorage
 from iai_core.entities.datasets import Dataset, NullDataset
 from iai_core.entities.image import Image
+from iai_core.entities.keypoint_structure import KeypointStructure
 from iai_core.entities.label import Domain
 from iai_core.entities.label_schema import LabelGroupType, LabelSchema
 from iai_core.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
 from iai_core.entities.subset import Subset
 from iai_core.entities.video import Video, VideoFrame
-from iai_core.repos import AnnotationSceneRepo, DatasetRepo, ImageRepo, LabelRepo, VideoAnnotationRangeRepo, VideoRepo
+from iai_core.repos import (
+    AnnotationSceneRepo,
+    DatasetRepo,
+    ImageRepo,
+    LabelRepo,
+    ProjectRepo,
+    VideoAnnotationRangeRepo,
+    VideoRepo,
+)
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper, LabelMap
 from jobs_common_extras.datumaro_conversion.mappers.dataset_item_mapper import DatasetItemMapper
@@ -69,7 +79,7 @@ logger = logging.getLogger(__name__)
 
 class ScExtractor(dm_DatasetBase):
     """
-    Represents the SC dataset as a lazy dataset for Datumaro.
+    Represents the Geti dataset as a lazy dataset for Datumaro.
     """
 
     VERSION = "1.0"
@@ -96,6 +106,7 @@ class ScExtractor(dm_DatasetBase):
             workspace_id=dataset_storage_identifier.workspace_id,
             project_id=dataset_storage_identifier.project_id,
         )
+        project = ProjectRepo().get_by_id(dataset_storage_identifier.project_id)
         label_repo = LabelRepo(project_identifier=project_identifier)
         self._label_id_to_label = {label.id_: label for label in label_repo.get_all()}
 
@@ -109,7 +120,9 @@ class ScExtractor(dm_DatasetBase):
         self._init_infos()
 
         self._categories: dm_CategoriesInfo = {}
-        self._init_categories(sc_dataset=self._dataset, label_schema=label_schema)
+        self._init_categories(
+            sc_dataset=self._dataset, label_schema=label_schema, keypoint_structure=project.keypoint_structure
+        )
         self._use_subset = use_subset
         self._set_name_mapper()
 
@@ -125,16 +138,22 @@ class ScExtractor(dm_DatasetBase):
         """
         self._infos = {"ScExtractorVersion": ScExtractor.VERSION}
 
-    def _init_categories(self, sc_dataset: Dataset, label_schema: LabelSchema) -> None:  # noqa: ARG002
+    def _init_categories(
+        self,
+        sc_dataset: Dataset,  # noqa: ARG002
+        label_schema: LabelSchema,
+        keypoint_structure: KeypointStructure | None,
+    ) -> None:
         label_cat = dm_LabelCategories()
         mask_cat = dm_MaskCategories()
-        sc_labels = label_schema.get_labels(include_empty=False)
+        point_cat = dm_PointCategories()
+        geti_labels = label_schema.get_labels(include_empty=False)
 
         # Collect label names that are necessary to be exported
         valid_labelnames: set[str] = set()
-        valid_labelnames.update([sc_label.name for sc_label in sc_labels])
+        valid_labelnames.update([sc_label.name for sc_label in geti_labels])
 
-        for i, sc_label in enumerate(sc_labels):
+        for i, sc_label in enumerate(geti_labels):
             if label_schema is not None:
                 sc_parent = label_schema.label_tree.get_parent(sc_label)
                 if sc_parent is not None:
@@ -147,8 +166,19 @@ class ScExtractor(dm_DatasetBase):
                 label_cat.add(sc_label.name)
             mask_cat.colormap[i] = sc_label.color.rgb_tuple
 
+        if keypoint_structure:
+            joints = []
+            for edge in keypoint_structure._edges:
+                node_1 = self._label_id_to_idx[edge.node_1]
+                node_2 = self._label_id_to_idx[edge.node_2]
+                joints.append([node_1, node_2])
+            positions = []
+            for position in keypoint_structure._positions:
+                positions.extend([position.x, position.y])
+            point_cat.add(label_id=0, labels=[label.name for label in geti_labels], joints=joints, positions=positions)
+
         # Old version of datumaro doesn't have 'add_label_group' function
-        # We thus check the existance of function before the function call
+        # We thus check the existence of function before the function call
         if label_schema is not None:
             label_groups = label_schema.get_groups()
             for label_group in label_groups:
@@ -171,6 +201,7 @@ class ScExtractor(dm_DatasetBase):
         self._categories = {
             dm_AnnotationType.label: label_cat,
             dm_AnnotationType.mask: mask_cat,
+            dm_AnnotationType.points: point_cat,
         }
 
         self._label_name_to_all_parent = self.get_label_to_all_parents()
@@ -251,7 +282,7 @@ class ScExtractor(dm_DatasetBase):
                     )
                 )
             elif isinstance(shape, Rectangle):
-                # Classification is represented as full boxes in SC
+                # Classification is represented as full boxes in Geti
                 if Rectangle.is_full_box(shape):
                     # hierarchical classification task may store multiple-labels
                     # e.g.) in "rectangle" -> "square" structure,
@@ -300,15 +331,15 @@ class ScExtractor(dm_DatasetBase):
             else:
                 raise NotImplementedError(f"Unsupported conversion to DM of {sc_ann.__class__.__name__} items")
 
-            if keypoints and visibilities:
-                dm_anns.append(
-                    dm_Points(
-                        points=keypoints,
-                        visibility=visibilities,
-                        label=primary_label_id,
-                        attributes=keypoint_labels,
-                    )
+        if keypoints and visibilities:
+            dm_anns.append(
+                dm_Points(
+                    points=keypoints,
+                    visibility=visibilities,
+                    label=0,
+                    attributes=keypoint_labels,
                 )
+            )
 
         return dm_anns
 
@@ -318,9 +349,9 @@ class ScExtractor(dm_DatasetBase):
         video_root: str | None = None,
     ) -> dm_DatasetItem:
         """
-        Convert SC dataset item to DM dataset item.
+        Convert Geti dataset item to DM dataset item.
 
-        :param sc_item: SC dataset item
+        :param sc_item: Geti dataset item
         :param video_root: If this value is None, save the video as individual frame images.
                            Otherwise, save the video in its original format.
         :return: Datumaro dataset item
@@ -396,7 +427,7 @@ class DatasetItemWithFuture:
 
 class ScExtractorForFlyteJob(ScExtractor):
     """
-    Represents the SC dataset as a lazy dataset for Datumaro.
+    Represents the Geti dataset as a lazy dataset for Datumaro.
     It is used for Flyte job.
     """
 
@@ -418,16 +449,20 @@ class ScExtractorForFlyteJob(ScExtractor):
     def _set_name_mapper(self):
         self._name_mapper = IDMapper
 
-    def _init_categories(self, sc_dataset: Dataset, label_schema: LabelSchema | None) -> None:
+    def _init_categories(
+        self, sc_dataset: Dataset, label_schema: LabelSchema | None, keypoint_structure: KeypointStructure | None = None
+    ) -> None:
         if label_schema is None:
             raise RuntimeError("label_schema=None is not allowed.")
 
-        dm_label_schema_info = LabelSchemaMapper.forward(label_schema=label_schema, include_empty=True)
+        dm_label_schema_info = LabelSchemaMapper.forward(
+            label_schema=label_schema, include_empty=True, keypoint_structure=keypoint_structure
+        )
 
         self._categories = {
-            dm_AnnotationType.label: dm_label_schema_info.label_cat,
-            dm_AnnotationType.mask: dm_label_schema_info.mask_cat,
-            dm_AnnotationType.points: dm_label_schema_info.point_cat,
+            dm_AnnotationType.label: dm_label_schema_info.label_cat,  # label names: name, parent, attributes
+            dm_AnnotationType.mask: dm_label_schema_info.mask_cat,  # label colour: rgb
+            dm_AnnotationType.points: dm_label_schema_info.point_cat,  # keypoint label: position, visibility
         }
 
         self.dataset_item_mapper = DatasetItemMapper(
@@ -521,7 +556,7 @@ class ProgressConfig(NamedTuple):
 
 class ScExtractorFromDatasetStorage(ScExtractor):
     """
-    Represents the SC dataset storage as a lazy dataset for Datumaro.
+    Represents the Geti dataset storage as a lazy dataset for Datumaro.
     """
 
     def __init__(
@@ -534,10 +569,10 @@ class ScExtractorFromDatasetStorage(ScExtractor):
         progress_config: ProgressConfig | None = None,
     ) -> None:
         """
-        Represents the SC dataset storage as a lazy dataset for Datumaro.
+        Represents the Geti dataset storage as a lazy dataset for Datumaro.
 
-        :param dataset_storage: SC dataset storage
-        :param label_schema: SC label schema
+        :param dataset_storage: Geti dataset storage
+        :param label_schema: Geti label schema
         :param use_subset: Whether to set subset name from sc item or not
         :param include_unannotated: Whether to include unannotated media or not
         :param video_export_config: If this is given, save video as its original format.
