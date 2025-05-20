@@ -1,8 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RangeValue } from '@react-types/shared';
-
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
@@ -79,6 +77,8 @@ export {
     Meter,
     Keyboard,
     FileTrigger,
+    DateField,
+    RangeCalendar,
     type SpectrumProgressBarProps,
     type SpectrumToggleButtonProps,
     type SpectrumTabsProps,

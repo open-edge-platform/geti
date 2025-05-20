@@ -14,7 +14,7 @@ import {
     Tooltip,
     TooltipTrigger,
     useDateFormatter,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
 import { DateValue, getLocalTimeZone } from '@internationalized/date';
 import Calendar from '@spectrum-icons/workflow/Calendar';
 import { isFunction } from 'lodash-es';

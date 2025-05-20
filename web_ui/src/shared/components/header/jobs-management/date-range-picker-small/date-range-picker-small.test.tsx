@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { RangeValue } from '@geti/ui';
 import { CalendarDate } from '@internationalized/date';
-import { RangeValue } from '@react-types/shared';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
