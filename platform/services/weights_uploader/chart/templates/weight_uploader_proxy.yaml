@@ -1,8 +1,19 @@
-{{- if .Values.global.proxy.enabled }}
-{{- $httpHost := (split ":" ((urlParse .Values.global.proxy.http_proxy).host))._0 }}
-{{- $httpsHost := (split ":" ((urlParse .Values.global.proxy.https_proxy).host))._0 }}
-{{- $httpPort := (default "80" ((split ":" ((urlParse .Values.global.proxy.http_proxy).host))._1)) }}
-{{- $httpsPort := (default "80" ((split ":" ((urlParse .Values.global.proxy.https_proxy).host))._1)) }}
+{{- $configMap := (lookup "v1" "ConfigMap" .Release.Namespace "impt-configuration") }}
+{{- $proxy_enabled := index $configMap.data "proxy_enabled" }}
+{{- if eq $proxy_enabled "true" }}
+{{- $httpProxy := index $configMap.data "http_proxy" }}
+{{- $httpsProxy := index $configMap.data "https_proxy" }}
+{{- $httpHost := (split ":" ((urlParse $httpProxy).host))._0 }}
+{{- $httpsHost := (split ":" ((urlParse $httpsProxy).host))._0 }}
+{{- $httpPort := (default "80" ((split ":" ((urlParse $httpProxy).host))._1)) }}
+{{- $httpsPort := (default "80" ((split ":" ((urlParse $httpsProxy).host))._1)) }}
+{{- $httpProxy := index $configMap.data "http_proxy" }}
+{{- $httpsProxy := index $configMap.data "https_proxy" }}
+{{- $httpHost := (split ":" ((urlParse $httpProxy).host))._0 }}
+{{- $httpsHost := (split ":" ((urlParse $httpsProxy).host))._0 }}
+{{- $httpPort := (default "80" ((split ":" ((urlParse $httpProxy).host))._1)) }}
+{{- $httpsPort := (default "80" ((split ":" ((urlParse $httpsProxy).host))._1)) }}
+
 {{ if .Capabilities.APIVersions.Has "networking.istio.io/v1/ServiceEntry"}}
 apiVersion: networking.istio.io/v1
 {{ else }}
@@ -10,7 +21,7 @@ apiVersion: networking.istio.io/v1beta1
 {{ end }}
 kind: ServiceEntry
 metadata:
-  name: weight-uploader-proxy
+  name: proxy-service
   namespace: {{ .Release.Namespace }}
 spec:
   hosts:
