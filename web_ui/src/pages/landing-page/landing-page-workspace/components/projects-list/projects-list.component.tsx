@@ -55,7 +55,7 @@ export const ProjectsList = ({ projects, projectsQuery }: ProjectsListProps): JS
             ariaLabel={'Projects in workspace'}
             layoutOptions={{ gap: 10 }}
             renderLoading={() => <ProjectListItemSkeletonLoader itemCount={1} />}
-            renderItem={(item) => <Project project={item} onItemChange={() => setSelected(new Set(item.id))} />}
+            renderItem={(item) => <Project project={item} onSelectItem={() => setSelected(new Set(item.id))} />}
         />
     );
 };

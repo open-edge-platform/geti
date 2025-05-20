@@ -50,7 +50,7 @@ interface ProjectExportStatusProps {
     setIsExporting: Dispatch<SetStateAction<boolean>>;
     workspaceIdentifier: WorkspaceIdentifier;
     exportProjectMutationIdentifier: ExportProjectMutationIdentifier;
-    onItemChange: () => void;
+    onSelectItem?: () => void;
     onResetProjectExport: () => void;
 }
 
@@ -59,7 +59,7 @@ export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
     isExporting,
     workspaceIdentifier,
     exportProjectMutationIdentifier,
-    onItemChange,
+    onSelectItem,
     setIsExporting,
     onResetProjectExport,
 }) => {
@@ -130,7 +130,7 @@ export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
                     initial={'hidden'}
                     animate={'visible'}
                     variants={ANIMATION_PARAMETERS.FADE_ITEM}
-                    onAnimationComplete={onItemChange}
+                    onAnimationComplete={onSelectItem}
                 >
                     <Flex
                         gap={'size-200'}

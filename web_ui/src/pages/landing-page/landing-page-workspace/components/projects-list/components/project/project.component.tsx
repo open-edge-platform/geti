@@ -32,10 +32,10 @@ import classes from './project.module.scss';
 
 export const Project = ({
     project,
-    onItemChange,
+    onSelectItem,
 }: {
     project: ProjectProps;
-    onItemChange: () => void;
+    onSelectItem?: () => void;
 }): JSX.Element => {
     const navigate = useNavigate();
 
@@ -162,7 +162,7 @@ export const Project = ({
                 <ProjectExportStatus
                     projectId={id}
                     isExporting={isExporting}
-                    onItemChange={onItemChange}
+                    onSelectItem={onSelectItem}
                     setIsExporting={setIsExporting}
                     workspaceIdentifier={{ organizationId, workspaceId }}
                     exportProjectMutationIdentifier={{
