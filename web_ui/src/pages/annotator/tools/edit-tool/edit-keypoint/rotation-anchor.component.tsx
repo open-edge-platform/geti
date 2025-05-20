@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Rotation } from '@geti/ui/icons';
 import clsx from 'clsx';
 
-import { Rotation } from '../../../../../assets/icons';
 import { radiansToDegrees } from '../../../../../core/annotations/math';
 import { Point } from '../../../../../core/annotations/shapes.interface';
 import * as Vec2 from '../../../../../core/annotations/vec2';

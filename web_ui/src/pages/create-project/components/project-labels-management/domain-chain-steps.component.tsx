@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@geti/ui';
+import { ChevronRightSmallLight } from '@geti/ui/icons';
 
-import { ChevronRightSmallLight } from '../../../../assets/icons';
 import { DomainStepProps } from './domain-step.interface';
 import { useDomainButtons } from './use-domain-buttons.hook';
 

@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 
-import { Alert } from '../../../../assets/icons';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
 import { ConfigParameterItemProp, ConfigurableParametersParams } from '../configurable-parameters.interface';

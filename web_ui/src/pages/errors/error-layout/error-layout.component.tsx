@@ -4,8 +4,7 @@
 import { ReactNode } from 'react';
 
 import { Flex, IllustratedMessage, View } from '@geti/ui';
-
-import { Close } from '../../../assets/icons';
+import { Close } from '@geti/ui/icons';
 
 import classes from './error-layout.module.scss';
 

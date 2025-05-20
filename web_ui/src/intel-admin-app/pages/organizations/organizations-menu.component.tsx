@@ -4,9 +4,9 @@
 import { Key } from 'react';
 
 import { Flex, Text } from '@geti/ui';
+import { Delete, MoreMenu, Pause, Play } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import { Delete, MoreMenu, Pause, Play } from '../../../assets/icons';
 import { useOrganizationsApi } from '../../../core/organizations/hook/use-organizations-api.hook';
 import { AccountStatus, Organization } from '../../../core/organizations/organizations.interface';
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';

@@ -4,10 +4,10 @@
 import { useMemo, useState } from 'react';
 
 import { Flex, LoadingIndicator, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Alert, ChevronDownSmallLight } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { maxBy } from 'lodash-es';
 
-import { Alert, ChevronDownSmallLight } from '../../../../assets/icons';
 import { JobStepState } from '../../../../core/jobs/jobs.const';
 import { Job, JobStep } from '../../../../core/jobs/jobs.interface';
 import { ANIMATION_PARAMETERS } from '../../../animation-parameters/animation-parameters';

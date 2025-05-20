@@ -4,10 +4,9 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import { Flex, Heading } from '@geti/ui';
+import { SortUp } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { usePress } from 'react-aria';
-
-import { SortUp } from '../../../assets/icons';
 
 import classes from './sort-by-attribute.module.scss';
 

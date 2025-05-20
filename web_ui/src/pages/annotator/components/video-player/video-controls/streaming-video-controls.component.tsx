@@ -4,9 +4,9 @@
 import { useEffect, useRef } from 'react';
 
 import { Flex, Loading } from '@geti/ui';
+import { Play } from '@geti/ui/icons';
 import { isEmpty, isFunction, isNil } from 'lodash-es';
 
-import { Play } from '../../../../../assets/icons';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';

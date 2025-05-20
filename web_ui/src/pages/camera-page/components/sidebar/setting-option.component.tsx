@@ -4,9 +4,9 @@
 import { Key, useState } from 'react';
 
 import { Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Revisit } from '@geti/ui/icons';
 import { capitalize, words } from 'lodash-es';
 
-import { Revisit } from '../../../../assets/icons';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { DeviceConfiguration } from '../../providers/util';
 

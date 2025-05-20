@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButtonProps } from '@geti/ui';
+import { DownloadIcon } from '@geti/ui/icons';
 
-import { DownloadIcon } from '../../../../../../assets/icons';
 import { ButtonWithSpectrumTooltip } from '../../../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 

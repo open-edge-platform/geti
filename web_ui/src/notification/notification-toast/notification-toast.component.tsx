@@ -4,10 +4,10 @@
 import { ReactElement } from 'react';
 
 import { Flex, Heading, Text } from '@geti/ui';
+import { CloseSmall } from '@geti/ui/icons';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash-es';
 
-import { CloseSmall } from '../../assets/icons';
 import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { NOTIFICATION_TYPE } from './notification-type.enum';
 import { getIcon, getTypeToastClass } from './utils';

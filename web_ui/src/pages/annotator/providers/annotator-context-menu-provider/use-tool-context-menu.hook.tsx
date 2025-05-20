@@ -3,10 +3,10 @@
 
 import { Key, useMemo } from 'react';
 
+import { FitScreen, Invisible, NoStamp, Redo, Undo, Visible } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 import { useControls } from 'react-zoom-pan-pinch';
 
-import { FitScreen, Invisible, NoStamp, Redo, Undo, Visible } from '../../../../assets/icons';
 import { Point } from '../../../../core/annotations/shapes.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { hasEqualId } from '../../../../shared/utils';

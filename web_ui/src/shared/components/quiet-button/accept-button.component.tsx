@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, type ActionButtonProps } from '@geti/ui';
-
-import { Accept } from '../../../assets/icons';
+import { Accept } from '@geti/ui/icons';
 
 import sharedClasses from '../../shared.module.scss';
 

@@ -4,11 +4,11 @@
 import { RefObject, useRef } from 'react';
 
 import { useNumberFormatter, View, VisuallyHidden } from '@geti/ui';
+import { VideoThumb } from '@geti/ui/icons';
 import { isArray } from 'lodash-es';
 import { mergeProps, useFocusRing, useSlider, useSliderThumb } from 'react-aria';
 import { SliderState, useSliderState } from 'react-stately';
 
-import { VideoThumb } from '../../../../../assets/icons';
 import { VideoFrame } from '../../../../../core/media/video.interface';
 
 import classes from './video-player.module.scss';

@@ -3,7 +3,8 @@
 
 import { SVGProps } from 'react';
 
-import { CloseBold } from '../../../../assets/icons';
+import { CloseBold } from '@geti/ui/icons';
+
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { useIsHovered } from '../../../../providers/hovered-provider/hovered-provider.component';
 import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';

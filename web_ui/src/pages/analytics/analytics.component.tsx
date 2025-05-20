@@ -4,9 +4,9 @@
 import { ComponentProps, useMemo } from 'react';
 
 import { View } from '@geti/ui';
+import { DatabaseIcon, LogsIcon, MetricsIcon, TracesIcon } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { DatabaseIcon, LogsIcon, MetricsIcon, TracesIcon } from '../../assets/icons';
 import { usePlatformUtils } from '../../core/platform-utils/hooks/use-platform-utils.hook';
 import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';

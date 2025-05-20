@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Revisit, Tag, TagHalf } from '@geti/ui/icons';
 
-import { Revisit, Tag, TagHalf } from '../../../assets/icons';
 import { MEDIA_ANNOTATION_STATUS } from '../../../core/media/base.interface';
 
 import classes from './annotation-indicator.module.scss';

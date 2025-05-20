@@ -4,8 +4,8 @@
 import { useState } from 'react';
 
 import { Flex, Text } from '@geti/ui';
+import { Edit, MoreMenu, PieChart } from '@geti/ui/icons';
 
-import { Edit, MoreMenu, PieChart } from '../../../../assets/icons';
 import { CreditAccount } from '../../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
 import { MenuTrigger } from '../../../../shared/components/menu-trigger/menu-trigger.component';

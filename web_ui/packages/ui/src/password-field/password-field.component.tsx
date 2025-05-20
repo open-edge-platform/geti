@@ -4,9 +4,8 @@
 import { ComponentProps, useState } from 'react';
 
 import { Flex, TextField, View } from '@adobe/react-spectrum';
+import { Alert, Invisible, Visible } from '@geti/ui/icons';
 
-// eslint-disable-next-line no-restricted-imports
-import { Alert, Invisible, Visible } from '../../../../src/assets/icons';
 import { ActionButton } from '../button/button.component';
 
 import classes from './password-field.module.scss';
