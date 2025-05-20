@@ -34,7 +34,7 @@ def download_pretrained_weights(template_id: str) -> None:
     host_name = os.environ.get("S3_HOST", "impt-seaweed-fs:8333")
     bucket_name = os.environ.get("BUCKET_NAME_PRETRAINEDWEIGHTS", "pretrainedweights")
     metadata_path = os.path.join(str(work_dir), "metadata.json")
-    download_file(bucket_name, "pretrained_models.json", metadata_path, host_name)
+    download_file(bucket_name, "pretrained_models_v2.json", metadata_path, host_name)
 
     if not os.path.exists(metadata_path):
         raise RuntimeError(f"Metadata file {metadata_path} does not exist")
