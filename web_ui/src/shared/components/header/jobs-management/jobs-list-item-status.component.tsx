@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 
 import { Flex, LoadingIndicator, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { motion } from 'framer-motion';
-import { maxBy } from 'lodash-es';
+import { isFunction, maxBy } from 'lodash-es';
 
 import { Alert, ChevronDownSmallLight } from '../../../../assets/icons';
 import { JobStepState } from '../../../../core/jobs/jobs.const';
@@ -22,7 +22,7 @@ import classes from './jobs.module.scss';
 interface JobsListItemStatusProps {
     job: Job;
     expanded?: boolean;
-    onExpandChange: () => void;
+    onExpandChange?: () => void;
 }
 
 export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: JobsListItemStatusProps): JSX.Element => {
@@ -30,7 +30,7 @@ export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: Jo
 
     const onExpandHandler = () => {
         setJobStepsExpanded((prevState: boolean) => !prevState);
-        onExpandChange();
+        isFunction(onExpandChange) && onExpandChange();
     };
 
     const stepToDisplay: JobStep | undefined = useMemo((): JobStep | undefined => {

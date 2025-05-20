@@ -92,7 +92,7 @@ interface JobsListItemProps {
     discardType?: DISCARD_TYPE;
     style?: CSSProperties;
     jobClickHandler?: () => void;
-    onItemChange: () => void;
+    onSelectItem: () => void;
 }
 export const JobsListItem = ({
     job,
@@ -100,7 +100,7 @@ export const JobsListItem = ({
     expanded = false,
     style = {},
     jobClickHandler,
-    onItemChange,
+    onSelectItem,
 }: JobsListItemProps) => {
     const { FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
     const navigate = useNavigate();
@@ -231,7 +231,7 @@ export const JobsListItem = ({
 
             <Divider size='S' marginX='size-250' />
 
-            <JobsListItemStatus expanded={expanded} job={job} onExpandChange={onItemChange} />
+            <JobsListItemStatus expanded={expanded} job={job} onExpandChange={onSelectItem} />
         </View>
     );
 };

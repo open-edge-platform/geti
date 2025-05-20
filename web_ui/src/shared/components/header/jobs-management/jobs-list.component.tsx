@@ -80,7 +80,7 @@ export const JobsList = ({
                         job={job}
                         discardType={discardType}
                         jobClickHandler={jobClickHandler}
-                        onItemChange={() => setSelected(new Set([job.id]))}
+                        onSelectItem={() => setSelected(new Set([job.id]))}
                     />
                 )}
             </VirtualizedJobList>
