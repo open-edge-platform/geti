@@ -249,6 +249,14 @@ def create_flyte_container_task(  # noqa: PLR0913
                         ),
                     ),
                     V1EnvVar(
+                        name="KAFKA_TOPIC_PREFIX",
+                        value_from=V1EnvVarSource(
+                            config_map_key_ref=V1ConfigMapKeySelector(
+                                name="impt-configuration", key="kafka_topic_prefix"
+                            )
+                        ),
+                    ),
+                    V1EnvVar(
                         name="KAFKA_USERNAME",
                         value_from=V1EnvVarSource(
                             secret_key_ref=V1SecretKeySelector(name=f"{namespace}-kafka-jaas-flyte", key="user")
