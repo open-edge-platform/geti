@@ -10,6 +10,7 @@ import { Dataset } from '../../../../core/projects/dataset.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { ApplicationServicesContextProps } from '../../../../core/services/application-services-provider.component';
 import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
+import { ExportImportDatasetDialogProvider } from '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component';
 import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { MediaUploadProvider } from '../../../../providers/media-upload-provider/media-upload-provider.component';
@@ -21,7 +22,6 @@ import { projectRender as render } from '../../../../test-utils/project-provider
 import { checkTooltip } from '../../../../test-utils/utils';
 import { MediaProvider } from '../../../media/providers/media-provider.component';
 import { DatasetTabPanel } from './dataset-tab-panel.component';
-import { ExportImportDatasetDialogProvider } from './export-dataset/export-import-dataset-dialog-provider.component';
 import { NO_MEDIA_MESSAGE } from './utils';
 
 jest.mock('../../../../core/services/use-navigate-to-annotator-route.hook', () => ({
