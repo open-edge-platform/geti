@@ -52,11 +52,7 @@ spec:
               subPath: {{ .Values.audit_logs_mount_path }}
               readOnly: false
           resources:
-            {{- if (eq .Values.global.installation_profile "lite") }}
-              {{ toYaml .Values.liteResources | nindent 12 }}
-            {{- else }}
-              {{ toYaml .Values.standardResources | nindent 12 }}
-            {{- end }}
+            {{ toYaml .Values.initResources | nindent 12 }}
         - name: init-kafka
           image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
@@ -230,7 +226,11 @@ spec:
           securityContext:
             {{ toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{ toYaml .Values.resources | nindent 12 }}
+            {{- if (eq .Values.global.installation_profile "lite") }}
+              {{ toYaml .Values.liteResources | nindent 12 }}
+            {{- else }}
+              {{ toYaml .Values.standardResources | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - mountPath: {{ .Values.mountPath }}
               readOnly: false
