@@ -12,7 +12,7 @@ from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException
-from geti_types import ProjectIdentifier
+from geti_types import ID, ProjectIdentifier
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +34,7 @@ def get_training_configuration(
     model_id: Annotated[str | None, Query()] = None,
     exclude_none: Annotated[bool, Query()] = False,
 ) -> dict[str, Any]:
-    """"""
+    """Retrieve the training configuration"""
     if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
         raise GetiBaseException(
             message="Feature not available",
@@ -43,8 +43,8 @@ def get_training_configuration(
         )
     return TrainingConfigurationRESTController.get_configuration(
         project_identifier=project_identifier,
-        task_id=task_id,
+        task_id=ID(task_id) if task_id else None,
         model_manifest_id=model_manifest_id,
-        model_id=model_id,
+        model_id=ID(model_id) if model_id else None,
         exclude_none=exclude_none,
     )

@@ -86,14 +86,17 @@ class ConfigurableParametersRESTViews:
         json_model = configurable_parameters.model_json_schema()
         for field_name in configurable_parameters.model_fields:
             field = getattr(configurable_parameters, field_name)
-            if exclude_none and field is None:
-                # Skip None values
-                continue
 
             schema = json_model["properties"][field_name]
             # optional parameter may contain `'anyOf': [{'exclusiveMinimum': 0, 'type': 'integer'}, {'type': 'null'}]`
             type_any_of = schema.get(PYDANTIC_ANY_OF, [{}])[0]
             pydantic_type = schema.get("type", type_any_of.get("type"))
+
+            if field is None and (exclude_none or pydantic_type not in PYDANTIC_BASE_TYPES_MAPPING):
+                # Skip values that are None if either:
+                # 1) exclude_none is True (for basic types),
+                # 2) they're non-basic types (nested pydantic models)
+                continue
 
             # skip all None fields if exclude_none is True
             if exclude_none and field is None:
@@ -110,9 +113,6 @@ class ConfigurableParametersRESTViews:
                     )
                 )
             else:
-                if field is None:
-                    # Skip None values for non-basic types
-                    continue
                 # If the field is a nested Pydantic model, process it recursively
                 nested_params[field_name] = cls.configurable_parameters_to_rest(
                     configurable_parameters=field,

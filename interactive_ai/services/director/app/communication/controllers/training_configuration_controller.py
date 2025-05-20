@@ -69,12 +69,25 @@ class TrainingConfigurationRESTController:
         project_identifier: ProjectIdentifier,
         task_id: ID,
         model_manifest_id: str | None = None,
+        model_id: ID | None = None,  # noqa: ARG003
         exclude_none: bool = False,
     ) -> dict[str, Any]:
-        """ """
+        """
+        Retrieves training configuration.
+
+        If model_id is provided, the configuration is loaded from the model entity.
+
+        :param project_identifier: Identifier for the project (containing organization_id, workspace_id, and project_id)
+        :param task_id: ID of the task to retrieve configuration for
+        :param model_manifest_id: Optional ID of the model manifest to retrieve specific configurations
+        :param exclude_none: Whether to exclude None values from the response
+        :return: Dictionary representation of the training configuration
+        :raises TaskNotFoundException: If the task does not exist
+        """
         if not TaskNodeRepo(project_identifier).exists(task_id):
             raise TaskNodeNotFoundException(task_node_id=task_id)
 
+        # TODO: if model_id is provided, load configuration from the model entity
         # TODO: load hyperparameters from model manifest and merge with the stored configuration
         training_configuration_repo = TrainingConfigurationRepo(project_identifier)
         training_config = training_configuration_repo.get_by_task_id(task_id)
