@@ -3,17 +3,6 @@
 /// <reference types="@rsbuild/core/types" />
 /// <reference types="./opencv-types/index" />
 
-declare interface Window {
-    // This add showDirectoryPicker to window object to silent the compiler
-    // showDirectoryPicker is need for upload whole directory with media files inside using File System Access API
-    showDirectoryPicker: (options: FileSystemGetDirectoryOptions) => FileSystemDirectoryHandle;
-    FeatureFlags: {
-        features: FeaturesFlags;
-        enableFeature: (featureFlag: string) => void;
-        disableFeature: (featureFlag: string) => void;
-    };
-}
-
 /**
  * The BeforeInstallPromptEvent is fired at the Window.onbeforeinstallprompt handler
  * before a user is prompted to "install" a web site to a home screen on mobile.

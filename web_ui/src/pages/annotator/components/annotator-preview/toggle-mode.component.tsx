@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, ToggleButton, Tooltip, TooltipTrigger } from '@geti/ui';
+import { AICPUIcon, Human } from '@geti/ui/icons';
 
-import { AICPUIcon, Human } from '../../../../assets/icons';
 import { ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';
 import { usePrediction } from '../../providers/prediction-provider/prediction-provider.component';
 

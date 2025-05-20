@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ChevronLeft } from '@geti/ui/icons';
 import { minBy } from 'lodash-es';
 
-import { ChevronLeft } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideo } from '../../../../core/media/video.interface';

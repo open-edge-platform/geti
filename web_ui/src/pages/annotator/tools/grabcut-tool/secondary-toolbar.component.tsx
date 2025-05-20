@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Combine, New, Subtract } from '@geti/ui/icons';
 
-import { Combine, New, Subtract } from '../../../../assets/icons';
 import { Label } from '../../../../core/labels/label.interface';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';

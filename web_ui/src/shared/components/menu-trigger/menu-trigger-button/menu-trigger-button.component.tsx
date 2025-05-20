@@ -4,9 +4,9 @@
 import { ComponentProps, ReactNode } from 'react';
 
 import { Button, Text } from '@geti/ui';
+import { MoreMenu } from '@geti/ui/icons';
 import { Placement } from 'react-aria';
 
-import { MoreMenu } from '../../../../assets/icons';
 import { ButtonWithSpectrumTooltip } from '../../button-with-tooltip/button-with-tooltip.component';
 import { MenuTriggerProps } from '../../upload-media/upload-media-button/upload-media-button.interface';
 import { MenuTrigger } from '../menu-trigger.component';

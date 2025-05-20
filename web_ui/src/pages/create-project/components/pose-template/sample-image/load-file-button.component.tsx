@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Button, FileTrigger, Flex } from '@geti/ui';
+import { Image } from '@geti/ui/icons';
 
-import { Image } from '../../../../../assets/icons';
 import { onValidFileList } from '../../../../../shared/utils';
 
 interface LoadFileButtonProps {

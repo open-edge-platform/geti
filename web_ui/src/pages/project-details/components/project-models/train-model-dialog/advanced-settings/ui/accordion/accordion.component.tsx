@@ -4,9 +4,8 @@
 import { ComponentProps, FC, ReactNode } from 'react';
 
 import { Disclosure, DisclosurePanel, DisclosureTitle, Divider, Flex, Text, View } from '@geti/ui';
+import { AlertOutlined } from '@geti/ui/icons';
 import clsx from 'clsx';
-
-import { AlertOutlined } from '../../../../../../../../assets/icons';
 
 import styles from './accordion.module.scss';
 

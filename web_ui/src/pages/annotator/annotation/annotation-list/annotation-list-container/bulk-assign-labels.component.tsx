@@ -4,8 +4,8 @@
 import { useState } from 'react';
 
 import { Flex, View } from '@geti/ui';
+import { Edit } from '@geti/ui/icons';
 
-import { Edit } from '../../../../../assets/icons';
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { QuietToggleButton } from '../../../../../shared/components/quiet-button/quiet-toggle-button.component';

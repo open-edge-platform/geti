@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery } from '@geti/ui';
+import { RightClick } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 
-import { RightClick } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { isLargeSizeQuery } from '../../../../theme/queries';

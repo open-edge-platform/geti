@@ -3,12 +3,12 @@
 
 import { FC, Key, ReactNode } from 'react';
 
+import { HelpIcon } from '@geti/ui/icons';
 import { ValueType } from '@opentelemetry/api';
 import { Link } from 'react-router-dom';
 
 import { useAnalytics } from '../../../../../analytics/analytics-provider.component';
 import { getMetricName } from '../../../../../analytics/metrics';
-import { HelpIcon } from '../../../../../assets/icons';
 import { CONTACT_SUPPORT as CONTACT_SUPPORT_URL } from '../../../../../core/const';
 import { paths } from '../../../../../core/services/routes';
 import { useDocsUrl } from '../../../../../hooks/use-docs-url/use-docs-url.hook';

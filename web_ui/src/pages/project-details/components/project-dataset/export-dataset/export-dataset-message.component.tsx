@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Text } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 
-import { Alert } from '../../../../../assets/icons';
 import { ExportFormats } from '../../../../../core/projects/dataset.interface';
 import { isClassificationDomain, isRotatedDetectionDomain } from '../../../../../core/projects/domains';
 import { ProjectProps } from '../../../../../core/projects/project.interface';

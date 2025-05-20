@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Delete, LineMappingLight, Reject } from '@geti/ui/icons';
 
-import { Delete, LineMappingLight, Reject } from '../../../../assets/icons';
 import { isKeypointAnnotation } from '../../../../core/annotations/services/utils';
 import { labelFromUser } from '../../../../core/annotations/utils';
 import { AcceptButton } from '../../../../shared/components/quiet-button/accept-button.component';

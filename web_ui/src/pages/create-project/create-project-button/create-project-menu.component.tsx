@@ -20,9 +20,9 @@ import {
     TooltipTrigger,
     View,
 } from '@geti/ui';
+import { ChevronDownSmall } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
-import { ChevronDownSmall } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useStatus } from '../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../core/status/hooks/utils';

@@ -4,9 +4,9 @@
 import { ComponentProps, MutableRefObject, ReactNode } from 'react';
 
 import { Button, CustomPopover, Divider, Flex, Popover, Text } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 
-import { Close } from '../../../../../assets/icons';
 import { openNewTab } from '../../../../utils';
 import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 

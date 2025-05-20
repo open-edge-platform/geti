@@ -3,7 +3,8 @@
 
 import { FC, Key, useState } from 'react';
 
-import { Delete } from '../../../../assets/icons';
+import { Delete } from '@geti/ui/icons';
+
 import { ActionMenu } from '../../../../shared/components/action-menu/action-menu.component';
 import { User } from '../mocked-user';
 import { DeleteUserDialog } from './delete-user-dialog.component';

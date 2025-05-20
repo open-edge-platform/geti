@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Provider, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { InstallPWA } from '@geti/ui/icons';
 
-import { InstallPWA } from '../../../../assets/icons';
 import { AutoTrainingCreditsModalFactory } from '../../../../pages/annotator/notification/auto-training-credits-modal/auto-training-credits-modal.component';
 import { ManualTrainingCreditDeductionNotificationFactory } from '../../../../pages/annotator/notification/manual-training-credit-deduction-notification/manual-training-credit-deduction-notification.component';
 import { useProgressiveWebApp } from '../../../../providers/progressive-web-app-provider/progressive-web-app-provider.component';

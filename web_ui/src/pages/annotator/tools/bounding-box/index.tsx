@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { BoundingBox } from '../../../../assets/icons';
+import { BoundingBox } from '@geti/ui/icons';
+
 import DetectionImg from '../../../../assets/primary-tools/detection.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';

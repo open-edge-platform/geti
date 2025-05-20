@@ -4,8 +4,8 @@
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import { ActionButton, Flex, LoadingIndicator, TextFieldRef } from '@geti/ui';
+import { Edit } from '@geti/ui/icons';
 
-import { Edit } from '../../../../../assets/icons';
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';

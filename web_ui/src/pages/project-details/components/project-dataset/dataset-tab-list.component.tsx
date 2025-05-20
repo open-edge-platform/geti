@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, Flex, Item, LoadingIndicator, TabList, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Add } from '@geti/ui/icons';
 
-import { Add } from '../../../../assets/icons';
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { useDataset } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { CollapsedItemsPicker } from '../../../../shared/components/collapsed-items-picker/collapsed-items-picker.component';

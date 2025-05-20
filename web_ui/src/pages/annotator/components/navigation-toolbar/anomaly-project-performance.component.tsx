@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, Dialog, DialogTrigger, Divider, Flex, Heading, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ScoreMetric } from '@geti/ui/icons';
 
-import { ScoreMetric } from '../../../../assets/icons';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { AnomalyTaskPerformance } from '../../../../core/projects/task.interface';
 import { ColorMode, QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';

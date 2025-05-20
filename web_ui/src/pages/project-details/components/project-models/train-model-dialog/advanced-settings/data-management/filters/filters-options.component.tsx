@@ -4,8 +4,8 @@
 import { FC } from 'react';
 
 import { ActionButton, Checkbox, Flex, NumberField, Text } from '@geti/ui';
+import { Refresh } from '@geti/ui/icons';
 
-import { Refresh } from '../../../../../../../../assets/icons';
 import { Tooltip } from '../../ui/tooltip.component';
 
 export interface FilterOption {

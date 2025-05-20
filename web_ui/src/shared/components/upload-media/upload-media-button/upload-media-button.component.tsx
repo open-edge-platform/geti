@@ -4,10 +4,10 @@
 import { ComponentProps, Key, useRef } from 'react';
 
 import { Button } from '@geti/ui';
+import { Share } from '@geti/ui/icons';
 import { isFirefox } from '@react-aria/utils';
 import { isFunction } from 'lodash-es';
 
-import { Share } from '../../../../assets/icons';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../../core/status/hooks/utils';
 import { UPLOAD_MEDIA_LABEL } from '../../../../pages/project-details/components/project-media/utils';

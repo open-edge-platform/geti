@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Watershed } from '../../../../assets/icons';
+import { Watershed } from '@geti/ui/icons';
+
 import ObjectColoringImg from '../../../../assets/primary-tools/object_coloring.webp';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolProps } from '../tools.interface';

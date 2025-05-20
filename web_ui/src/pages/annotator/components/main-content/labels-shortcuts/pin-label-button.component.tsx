@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton } from '@geti/ui';
-
-import { Pin } from '../../../../../assets/icons';
+import { Pin } from '@geti/ui/icons';
 
 interface PinLabelButtonProps {
     pinLabel: (labelId: string) => void;

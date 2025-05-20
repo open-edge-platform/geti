@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, ContextualHelp, Flex, useNumberFormatter } from '@geti/ui';
+import { CreditCard } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 
-import { CreditCard } from '../../../../../../assets/icons';
 import { useCreditsQueries } from '../../../../../../core/credits/hooks/use-credits-api.hook';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
 
