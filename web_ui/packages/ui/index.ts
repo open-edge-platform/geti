@@ -138,3 +138,4 @@ export { PressableElement } from './src/pressable-element/pressable-element.comp
 export { Tag } from './src/tag/tag.component';
 export { Skeleton } from './src/skeleton/skeleton.component';
 export { Divider } from './src/divider/divider.component';
+export { VirtualizedListLayout } from './src/virtualize-list-layout/virtualize-list-layout';

@@ -50,15 +50,17 @@ interface ProjectExportStatusProps {
     setIsExporting: Dispatch<SetStateAction<boolean>>;
     workspaceIdentifier: WorkspaceIdentifier;
     exportProjectMutationIdentifier: ExportProjectMutationIdentifier;
+    onItemChange: () => void;
     onResetProjectExport: () => void;
 }
 
 export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
     projectId,
     isExporting,
-    setIsExporting,
     workspaceIdentifier,
     exportProjectMutationIdentifier,
+    onItemChange,
+    setIsExporting,
     onResetProjectExport,
 }) => {
     const { router } = useApplicationServices();
@@ -124,10 +126,11 @@ export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
         <AnimatePresence mode={'wait'}>
             {isExporting && (
                 <motion.div
-                    variants={ANIMATION_PARAMETERS.FADE_ITEM}
+                    exit={'exit'}
                     initial={'hidden'}
                     animate={'visible'}
-                    exit={'exit'}
+                    variants={ANIMATION_PARAMETERS.FADE_ITEM}
+                    onAnimationComplete={onItemChange}
                 >
                     <Flex
                         gap={'size-200'}
