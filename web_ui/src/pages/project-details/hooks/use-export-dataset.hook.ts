@@ -9,11 +9,11 @@ import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanst
 import { AxiosError } from 'axios';
 
 import { ExportDatasetStatusDTO } from '../../../core/configurable-parameters/dtos/configurable-parameters.interface';
-import { IntervalJobHandlers } from '../../../core/datasets/hooks/dataset-import.interface';
 import { getIntervalJobHandlers } from '../../../core/datasets/hooks/utils';
 import { JobExportStatus, JobStatusIdentifier } from '../../../core/jobs/jobs.interface';
 import { ExportDatasetIdentifier, ExportDatasetStatusIdentifier } from '../../../core/projects/dataset.interface';
 import { isStateDone, isStateError } from '../../../core/projects/hooks/utils';
+import { IntervalJobHandlers } from '../../../features/dataset-import/types/dataset-import.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { useLocalStorageExportDataset } from './use-local-storage-export-dataset.hook';

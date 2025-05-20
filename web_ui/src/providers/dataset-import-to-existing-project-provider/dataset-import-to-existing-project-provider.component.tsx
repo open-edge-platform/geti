@@ -11,9 +11,9 @@ import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
 import { DatasetImportToExistingProjectItem } from '../../core/datasets/dataset.interface';
-import { useDatasetImportQueries } from '../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { ProjectIdentifier } from '../../core/projects/core.interface';
 import { CreateDatasetResponse } from '../../core/projects/dataset.interface';
+import { useDatasetImportQueries } from '../../features/dataset-import/hooks/use-dataset-import-queries.hook';
 import { useLocalStorageDatasetImport } from '../../features/dataset-import/hooks/use-local-storage-dataset-import.hook';
 import { PinnedCollapsedItemsAction } from '../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.interface';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
