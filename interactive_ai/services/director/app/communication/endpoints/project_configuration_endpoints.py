@@ -35,6 +35,6 @@ def get_project_configuration(
         raise GetiBaseException(
             message="Feature not available",
             error_code="feature_not_available",
-            http_status=HTTPStatus.NOT_FOUND,
+            http_status=HTTPStatus.FORBIDDEN,
         )
     return ProjectConfigurationRESTController().get_configuration(project_identifier=project_identifier)
