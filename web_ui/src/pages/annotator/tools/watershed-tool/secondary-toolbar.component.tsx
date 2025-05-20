@@ -4,9 +4,9 @@
 import { Key, useEffect } from 'react';
 
 import { Divider, Flex, Text, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { filterOutExclusiveLabel } from '../../../../core/labels/utils';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';

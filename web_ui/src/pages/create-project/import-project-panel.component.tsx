@@ -5,10 +5,10 @@ import { ChangeEvent, useRef } from 'react';
 
 import { Button, Flex, Text, View } from '@geti/ui';
 import { DatasetImport as DatasetImportIcon } from '@geti/ui/icons';
+import { isExtraLargeSizeQuery } from '@geti/ui/theme';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 
-import { isExtraLargeSizeQuery } from '../../../packages/ui/theme/queries';
 import { ImportOptions } from '../../core/projects/services/project-service.interface';
 import { useDocsUrl } from '../../hooks/use-docs-url/use-docs-url.hook';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';

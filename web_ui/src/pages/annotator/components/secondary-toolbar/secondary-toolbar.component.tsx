@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup, dimensionValue, Flex, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isEmpty, negate, noop } from 'lodash-es';
 import { useSearchParams } from 'react-router-dom';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { getAnnotationStateForTask } from '../../../../core/annotations/utils';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../core/media/base.interface';
 import { MediaItem } from '../../../../core/media/media.interface';

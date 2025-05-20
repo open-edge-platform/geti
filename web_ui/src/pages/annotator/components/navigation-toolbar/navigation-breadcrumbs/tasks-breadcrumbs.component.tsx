@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Item, Picker, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
-import { isLargeSizeQuery } from '../../../../../../packages/ui/theme/queries';
 import { Task } from '../../../../../core/projects/task.interface';
 import { hasEqualId } from '../../../../../shared/utils';
 import { useIsSceneBusy } from '../../../hooks/use-annotator-scene-interaction-state.hook';

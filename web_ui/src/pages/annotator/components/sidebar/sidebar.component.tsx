@@ -4,8 +4,8 @@
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react';
 
 import { Flex, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';

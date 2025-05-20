@@ -5,10 +5,10 @@ import { Dispatch, SetStateAction, useRef } from 'react';
 
 import { Button, Flex, Text, View, type DimensionValue, type Responsive } from '@geti/ui';
 import { DatasetImport as DatasetImportIcon } from '@geti/ui/icons';
+import { isExtraLargeSizeQuery } from '@geti/ui/theme';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 
-import { isExtraLargeSizeQuery } from '../../../../packages/ui/theme/queries';
 import { IMPORT_DATASET_LEARN_MORE } from '../../../core/const';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';

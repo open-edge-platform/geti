@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Grid, minmax, Text, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
 import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';

@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { isVideoFrame, Video, VideoFrame } from '../../../../core/media/video.interface';
 import { FPS } from './fps.component';
 import { FrameNumber } from './frame-number.component';

@@ -18,11 +18,11 @@ import {
     View,
 } from '@geti/ui';
 import { InfoOutline } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
-import { isLargeSizeQuery } from '../../../packages/ui/theme/queries';
 import { DOMAIN } from '../../core/projects/core.interface';
 import { useProjectActions } from '../../core/projects/hooks/use-project-actions.hook';
 import { paths } from '../../core/services/routes';

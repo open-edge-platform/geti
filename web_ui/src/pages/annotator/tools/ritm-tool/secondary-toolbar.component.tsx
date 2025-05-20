@@ -3,9 +3,9 @@
 
 import { Divider, Flex, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery } from '@geti/ui';
 import { RightClick } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isNil } from 'lodash-es';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';

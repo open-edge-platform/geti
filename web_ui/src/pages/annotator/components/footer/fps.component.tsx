@@ -3,8 +3,8 @@
 
 import { dimensionValue, useMediaQuery, useNumberFormatter, View } from '@geti/ui';
 import { Fps } from '@geti/ui/icons';
+import { biggerThanQuery } from '@geti/ui/theme';
 
-import { biggerThanQuery } from '../../../../../packages/ui/theme/queries';
 import { Video, VideoFrame } from '../../../../core/media/video.interface';
 
 export const FPS = ({ mediaItem, className }: { mediaItem: Video | VideoFrame; className?: string }): JSX.Element => {

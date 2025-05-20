@@ -4,9 +4,9 @@
 import { useState } from 'react';
 
 import { Divider, Flex, Heading, Text, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { useParams } from 'react-router-dom';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';
 import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';

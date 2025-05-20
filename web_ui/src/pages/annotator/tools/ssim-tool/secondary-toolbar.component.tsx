@@ -3,9 +3,9 @@
 
 import { Divider, Flex, Switch, Text, useMediaQuery } from '@geti/ui';
 import { BoundingBox, BoundingCircle } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { Label } from '../../../../core/labels/label.interface';

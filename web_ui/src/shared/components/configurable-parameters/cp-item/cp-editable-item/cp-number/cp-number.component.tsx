@@ -4,8 +4,8 @@
 import { useMemo } from 'react';
 
 import { Flex, NumberField, Slider, Text, useMediaQuery, useNumberFormatter } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
-import { isLargeSizeQuery } from '../../../../../../../packages/ui/theme/queries';
 import { NumberGroupParams } from '../../../configurable-parameters.interface';
 import { ResetButtonHandler } from '../cp-editable-item.interface';
 

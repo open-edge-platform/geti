@@ -21,3 +21,11 @@ export const ThemeProvider = ({ children, router }: ComponentProps<typeof Provid
         </Provider>
     );
 };
+
+export {
+    isLargeSizeQuery,
+    biggerThanQuery,
+    isMediumLargeSizeQuery,
+    isExtraLargeSizeQuery,
+    smallerThanQuery,
+} from './queries';

@@ -21,10 +21,10 @@ import {
     type FocusableRefValue,
 } from '@geti/ui';
 import { Add, Filter } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
-import { isLargeSizeQuery } from '../../../packages/ui/theme/queries';
 import {
     AdvancedFilterOptions,
     SearchOptionsActions,

@@ -4,9 +4,9 @@
 import { useEffect } from 'react';
 
 import { Flex, Heading, Radio, RadioGroup, Text, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEqual } from 'lodash-es';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Arrow } from '../../../../shared/components/arrow/arrow.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

@@ -3,10 +3,10 @@
 
 import { Divider, Flex, LoadingIndicator, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
 import { RightClick } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { isLargeSizeQuery } from '../../../../../packages/ui/theme/queries';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolSettings, ToolType } from '../../core/annotation-tool-context.interface';
