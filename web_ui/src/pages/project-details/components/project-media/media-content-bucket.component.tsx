@@ -3,10 +3,7 @@
 
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
-import { Divider, Flex, IllustratedMessage, View } from '@geti/ui';
-import { useMediaQuery } from '@react-spectrum/utils';
-import { DimensionValue } from '@react-types/shared/src/dna';
-import { Responsive } from '@react-types/shared/src/style';
+import { Divider, Flex, IllustratedMessage, useMediaQuery, View, type DimensionValue, type Responsive } from '@geti/ui';
 import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { isEmpty } from 'lodash-es';
 
@@ -22,7 +19,7 @@ import {
 import { MediaDropBoxHeader } from '../../../../shared/components/media-drop/media-drop-box-header.component';
 import { MediaDropBox } from '../../../../shared/components/media-drop/media-drop-box.component';
 import { MediaItemsList } from '../../../../shared/components/media-items-list/media-items-list.component';
-import { INITIAL_VIEW_MODE } from '../../../../shared/components/media-view-modes/utils';
+import { INITIAL_VIEW_MODE, VIEW_MODE_SETTINGS, ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { VALID_MEDIA_TYPES_DISPLAY } from '../../../../shared/media-utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
@@ -60,6 +57,11 @@ export interface MediaContentBucketProps {
     showExportImportButton?: boolean;
     footerInfo?: ReactNode;
 }
+
+const VIEW_MODE_SETTINGS_ANOMALY = {
+    ...VIEW_MODE_SETTINGS,
+    [ViewModes.LARGE]: { minItemSize: 180, gap: 8, maxColumns: 2 },
+};
 
 export const MediaContentBucket = ({
     header,
@@ -200,6 +202,7 @@ export const MediaContentBucket = ({
                                 getTextValue={(item) => item.name}
                                 mediaItems={media}
                                 viewMode={viewMode}
+                                viewModeSettings={isAnomalyProject ? VIEW_MODE_SETTINGS_ANOMALY : VIEW_MODE_SETTINGS}
                                 itemContent={(item) => (
                                     <MediaItemFactory
                                         mediaItem={item}

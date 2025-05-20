@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useMediaQuery } from '@react-spectrum/utils';
+import { useMediaQuery } from '@geti/ui';
 
 import { isVideoFrame, Video, VideoFrame } from '../../../../core/media/video.interface';
 import { isLargeSizeQuery } from '../../../../theme/queries';

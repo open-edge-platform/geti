@@ -3,8 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex } from '@geti/ui';
-import { StyleProps } from '@react-types/shared';
+import { Flex, type StyleProps } from '@geti/ui';
 
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';
 import {

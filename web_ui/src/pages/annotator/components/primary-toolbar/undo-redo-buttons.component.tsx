@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
-import { Flex } from '@react-spectrum/layout';
+import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Redo, Undo } from '../../../../assets/icons';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';

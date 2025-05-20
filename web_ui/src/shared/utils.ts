@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { type LoadingState, type KeyboardEvent as ReactKeyboardEvent } from '@geti/ui';
 import { CalendarDate, CalendarDateTime, DateValue } from '@internationalized/date';
-import { LoadingState, KeyboardEvent as ReactKeyboardEvent } from '@react-types/shared';
 import dayjs, { OptionType } from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import utc from 'dayjs/plugin/utc.js';

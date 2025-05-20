@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Link } from '@geti/ui';
-import { FlexStyleProps } from '@react-types/shared';
+import { Flex, Link, type FlexStyleProps } from '@geti/ui';
 
 import { InfoTooltip } from '../../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { idMatchingFormat } from '../../../../../../../test-utils/id-utils';

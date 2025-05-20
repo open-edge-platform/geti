@@ -9,15 +9,17 @@ import {
     Content,
     Dialog,
     DialogTrigger,
+    dimensionValue,
     Flex,
     Heading,
     Text,
     Tooltip,
     TooltipTrigger,
+    useMediaQuery,
+    useUnwrapDOMRef,
     View,
+    type FocusableRefValue,
 } from '@geti/ui';
-import { dimensionValue, useMediaQuery, useUnwrapDOMRef } from '@react-spectrum/utils';
-import { FocusableRefValue } from '@react-types/shared';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 

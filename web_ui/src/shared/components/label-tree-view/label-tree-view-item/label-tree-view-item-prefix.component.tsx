@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton } from '@geti/ui';
-import { View } from '@react-spectrum/view';
+import { ActionButton, View } from '@geti/ui';
 
 import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../../assets/icons';
 

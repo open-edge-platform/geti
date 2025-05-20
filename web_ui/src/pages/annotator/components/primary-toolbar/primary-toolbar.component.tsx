@@ -1,12 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Provider } from '@geti/ui';
-import { Flex } from '@react-spectrum/layout';
-import { View } from '@react-spectrum/view';
+import { Divider, Flex, Provider, View } from '@geti/ui';
 import { partition } from 'lodash-es';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { HelpActions } from '../../../../shared/components/header/header-actions/help-actions/help-actions.component';
 import { isNonEmptyArray } from '../../../../shared/utils';
 import { ToolType } from '../../core/annotation-tool-context.interface';

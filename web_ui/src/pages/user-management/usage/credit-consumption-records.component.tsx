@@ -7,6 +7,7 @@ import {
     Cell,
     Column,
     DateRangePicker,
+    dimensionValue,
     Flex,
     Form,
     Heading,
@@ -18,7 +19,6 @@ import {
     View,
 } from '@geti/ui';
 import { getLocalTimeZone } from '@internationalized/date';
-import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 import { DateValue } from 'react-aria';
 

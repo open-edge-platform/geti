@@ -3,9 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Heading, Loading, Text, View } from '@geti/ui';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
-import { DOMRefValue } from '@react-types/shared';
+import { Flex, Heading, Loading, Text, useUnwrapDOMRef, View, type DOMRefValue } from '@geti/ui';
 import { useErrorHandler } from 'react-error-boundary';
 
 import { EmptyActiveSetIcon } from '../../../../assets/images';

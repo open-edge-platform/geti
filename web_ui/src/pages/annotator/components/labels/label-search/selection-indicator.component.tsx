@@ -3,7 +3,7 @@
 
 import { FC, PropsWithChildren } from 'react';
 
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue } from '@geti/ui';
 
 import { AcceptSmall, Add, CloseSmall } from '../../../../../assets/icons';
 import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';

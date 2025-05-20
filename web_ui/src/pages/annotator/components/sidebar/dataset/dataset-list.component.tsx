@@ -1,15 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 
 import { Flex, Loading } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
-import { VirtuosoGridHandle } from 'react-virtuoso';
 
 import { MediaAdvancedFilterResponse, MediaItem, MediaItemResponse } from '../../../../../core/media/media.interface';
-import { usePrevious } from '../../../../../hooks/use-previous/use-previous.hook';
 import { MediaItemsList } from '../../../../../shared/components/media-items-list/media-items-list.component';
 import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
 import { NotFound } from '../../../../../shared/components/not-found/not-found.component';
@@ -53,15 +51,11 @@ export const DatasetList = ({
     selectedMediaItem,
     isInActiveMode = false,
     isMediaFilterEmpty = false,
-    previouslySelectedMediaItem,
     shouldShowAnnotationIndicator,
 }: DatasetListProps): JSX.Element => {
-    const ref = useRef<VirtuosoGridHandle | null>(null);
-
     const { hasNextPage, isPending: isMediaItemsLoading, isFetchingNextPage, fetchNextPage, data } = mediaItemsQuery;
 
     const mediaItems = useMemo(() => data?.pages?.flatMap(({ media }) => media) ?? [], [data?.pages]);
-    const prevViewMode = usePrevious(viewMode);
 
     const loadNextMedia = async () => {
         if (isInActiveMode) {
@@ -75,32 +69,6 @@ export const DatasetList = ({
 
     const groupedMediaItems = useGroupedMediaItems(mediaItems);
     const mediaItemIndex = useSelectedMediaItemIndex(mediaItems, selectedMediaItem, isInActiveMode);
-
-    useEffect(() => {
-        let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        const mediaItemChanged = previouslySelectedMediaItem?.identifier !== selectedMediaItem?.identifier;
-        const viewModeChanged = prevViewMode !== viewMode;
-
-        // We want to automatically scroll to the previously selected media.
-        // But only if the media item or view mode is different.
-        if ((mediaItemChanged || viewModeChanged) && ref.current) {
-            timeoutId = setTimeout(() => {
-                ref.current?.scrollToIndex({
-                    index: mediaItemIndex,
-                    behavior: 'smooth',
-                    align: 'center',
-                });
-                // we don't want to scroll immediately
-                // in case of changed view mode we have to scroll once view is rendered
-            }, 500);
-        }
-
-        return () => {
-            timeoutId && clearTimeout(timeoutId);
-        };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [viewMode, selectedMediaItem?.identifier, previouslySelectedMediaItem?.identifier, prevViewMode]);
 
     const allPagesAreEmpty = data?.pages.every((page) => isEmpty(page.media));
 
@@ -135,6 +103,7 @@ export const DatasetList = ({
                 getTextValue={(item) => item.name}
                 mediaItems={groupedMediaItems}
                 viewModeSettings={viewModeSettings}
+                scrollToIndex={mediaItemIndex}
                 itemContent={(mediaItem) => {
                     return (
                         <DatasetItemFactory

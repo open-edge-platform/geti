@@ -11,6 +11,7 @@ import {
     Heading,
     IllustratedMessage,
     Row,
+    SortDescriptor,
     Link as SpectrumLink,
     TableBody,
     TableHeader,
@@ -18,7 +19,6 @@ import {
     Text,
     useCollator,
 } from '@geti/ui';
-import { SortDescriptor } from '@react-types/shared';
 import { capitalize, isEmpty } from 'lodash-es';
 import { Link } from 'react-router-dom';
 

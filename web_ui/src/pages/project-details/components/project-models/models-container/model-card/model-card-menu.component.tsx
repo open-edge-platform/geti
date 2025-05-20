@@ -5,6 +5,7 @@ import { ReactElement } from 'react';
 
 import {
     ActionButton,
+    dimensionValue,
     Item,
     LoadingIndicator,
     Menu,
@@ -15,7 +16,6 @@ import {
     TooltipTrigger,
     View,
 } from '@geti/ui';
-import { dimensionValue } from '@react-spectrum/utils';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isAxiosError } from 'axios';
 import { isEqual, isFunction, isNil } from 'lodash-es';

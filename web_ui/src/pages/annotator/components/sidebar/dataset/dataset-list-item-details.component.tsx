@@ -77,7 +77,9 @@ export const DatasetListItemDetails = ({
                     </View>
                     <Flex direction={'column'} width={'100%'}>
                         <TooltipTrigger placement={'bottom'}>
-                            <PressableElement UNSAFE_className={classes.itemMediaName}>{name}</PressableElement>
+                            <PressableElement isTruncated UNSAFE_className={classes.itemMediaName}>
+                                {name}
+                            </PressableElement>
                             <Tooltip>{name}</Tooltip>
                         </TooltipTrigger>
 

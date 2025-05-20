@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, View, type ActionButtonProps } from '@geti/ui';
-import { BackgroundColorValue } from '@react-types/shared';
+import { Tooltip, TooltipTrigger, View, type ActionButtonProps, type BackgroundColorValue } from '@geti/ui';
 
 import { DownloadIcon } from '../../../../../assets/icons';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';

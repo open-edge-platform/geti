@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { ColorValue } from '@react-types/shared/src/dna';
+import { type ColorValue } from '@geti/ui';
 
 interface CircularProgressProps {
     percentage: number;

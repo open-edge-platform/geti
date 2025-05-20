@@ -3,8 +3,7 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
-import { FocusableRef } from '@react-types/shared';
+import { Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
 import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';

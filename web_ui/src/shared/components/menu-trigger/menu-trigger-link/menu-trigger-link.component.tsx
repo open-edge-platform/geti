@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue } from '@geti/ui';
 
 import { LinkButton } from '../../link-button/link-button.component';
 import { MenuTriggerProps } from '../../upload-media/upload-media-button/upload-media-button.interface';

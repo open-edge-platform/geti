@@ -14,9 +14,9 @@ import {
     Heading,
     Radio,
     RadioGroup,
+    type RangeValue,
 } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
-import { RangeValue } from '@react-types/shared';
 import dayjs from 'dayjs';
 
 import { useApplicationServices } from '../../core/services/application-services-provider.component';

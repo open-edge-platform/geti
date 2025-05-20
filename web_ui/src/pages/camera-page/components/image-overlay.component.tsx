@@ -3,8 +3,7 @@
 
 import { MutableRefObject, useRef, useState } from 'react';
 
-import { View } from '@geti/ui';
-import { Overlay } from '@react-spectrum/overlays';
+import { Overlay, View } from '@geti/ui';
 import { isNumber } from 'lodash-es';
 import { useOverlay } from 'react-aria';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';

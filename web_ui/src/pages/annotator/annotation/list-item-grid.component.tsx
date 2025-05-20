@@ -3,9 +3,8 @@
 
 import { createContext, ReactNode, RefObject, useContext, useRef, useState } from 'react';
 
-import { Flex, FlexProps, Grid } from '@geti/ui';
+import { Flex, Grid, useUnwrapDOMRef, type FlexProps } from '@geti/ui';
 import { useInteractOutside } from '@react-aria/interactions';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
 import clsx from 'clsx';
 
 import classes from './list-item-grid.module.scss';

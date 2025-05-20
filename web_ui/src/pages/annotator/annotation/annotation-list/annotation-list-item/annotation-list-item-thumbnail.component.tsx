@@ -3,7 +3,7 @@
 
 import { memo, useEffect, useRef } from 'react';
 
-import { Flex } from '@react-spectrum/layout';
+import { Flex } from '@geti/ui';
 
 import { Shape } from '../../../../../core/annotations/shapes.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../../core/media/base.interface';

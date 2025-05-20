@@ -3,10 +3,8 @@
 
 import { MutableRefObject, ReactNode, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, View } from '@geti/ui';
-import { Overlay } from '@react-spectrum/overlays';
+import { Flex, Overlay, View, type DimensionValue, type Responsive, type StyleProps } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import { Responsive, StyleProps } from '@react-types/shared';
 import { useOverlay } from 'react-aria';
 
 import { Datasets, Edit, Manifest } from '../../../../assets/icons';
