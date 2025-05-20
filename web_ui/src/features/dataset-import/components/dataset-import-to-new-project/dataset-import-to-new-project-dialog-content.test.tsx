@@ -9,7 +9,6 @@ import {
     DATASET_IMPORT_TO_NEW_PROJECT_STEP,
 } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportToNewProjectItem, DatasetImportWarning } from '../../../../core/datasets/dataset.interface';
-import { useNotification } from '../../../../notification/notification.component';
 import { ProjectProvider } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { getMockedProjectIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
