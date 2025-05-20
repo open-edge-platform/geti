@@ -6,7 +6,6 @@ import { FC, Key, useState } from 'react';
 import { Flex, Heading } from '@adobe/react-spectrum';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';
-import { useIsTraining } from './hooks/use-is-training.hook';
 import { ModelsContainer } from './models-container/models-container.component';
 import { MODEL_SORTING_FUNCTIONS, ModelsSorting, ModelsSortingOptions } from './models-sorting.component';
 import { TrainingProgress } from './training-progress/training-progress.component';
@@ -40,8 +39,6 @@ const ModelsHeader: FC<{
 };
 
 export const ModelsGroupsSingleTask = ({ modelsGroups, taskName }: ModelsGroupsSingleTaskProps): JSX.Element => {
-    const isTraining = useIsTraining();
-
     const [selectedSortingOption, setSelectedSortingOption] = useState<ModelsSortingOptions>(
         ModelsSortingOptions.ACTIVE_MODEL_ASC
     );
@@ -54,7 +51,7 @@ export const ModelsGroupsSingleTask = ({ modelsGroups, taskName }: ModelsGroupsS
 
     return (
         <Flex height={'100%'} direction={'column'} gap={'size-200'}>
-            {isTraining && <TrainingProgress taskId={modelsGroups[0].taskId} />}
+            <TrainingProgress taskId={modelsGroups[0].taskId} />
 
             <ModelsHeader selectedSortingOption={selectedSortingOption} onSort={handleModelsSort} taskName={taskName} />
 
