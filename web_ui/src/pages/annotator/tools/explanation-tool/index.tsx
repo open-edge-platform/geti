@@ -3,7 +3,8 @@
 
 import { FunctionComponent, PropsWithChildren } from 'react';
 
-import { Explanation } from '../../../../assets/icons';
+import { Explanation } from '@geti/ui/icons';
+
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolAnnotationContextProps, ToolProps } from '../tools.interface';

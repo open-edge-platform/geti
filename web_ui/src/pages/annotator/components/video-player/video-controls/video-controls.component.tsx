@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ButtonGroup } from '@geti/ui';
+import { Pause, Play, StepBackward, StepForward } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 
-import { Pause, Play, StepBackward, StepForward } from '../../../../../assets/icons';
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useVideoKeyboardShortcuts } from '../../../hot-keys/use-video-keyboard-shortcuts/use-video-keyboard-shortcuts';

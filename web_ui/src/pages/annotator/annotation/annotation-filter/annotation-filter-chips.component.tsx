@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, Flex, Tag } from '@geti/ui';
+import { BorderClose } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { BorderClose } from '../../../../assets/icons';
 import { hasEqualId } from '../../../../shared/utils';
 import { useAnnotationFilters } from './use-annotation-filters.hook';
 import { useTaskLabels } from './use-task-labels.hook';

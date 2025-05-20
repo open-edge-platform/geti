@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, DialogTrigger, Flex, Slider, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { PlaybackRate } from '@geti/ui/icons';
 
-import { PlaybackRate } from '../../../../../assets/icons';
 import { useStreamingVideoPlayer } from './streaming-video-player-provider.component';
 
 interface PlaybackRate {

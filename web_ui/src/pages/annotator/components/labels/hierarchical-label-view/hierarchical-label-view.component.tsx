@@ -4,8 +4,8 @@
 import { useMemo } from 'react';
 
 import { Flex, View } from '@geti/ui';
+import { CloseSmall } from '@geti/ui/icons';
 
-import { CloseSmall } from '../../../../../assets/icons';
 import { fetchLabelsTree, findLabelParents } from '../../../../../core/labels/annotator-utils/labels-utils';
 import { LabelTreeItem } from '../../../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../../../core/labels/label.interface';

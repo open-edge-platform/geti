@@ -4,9 +4,9 @@
 import { ReactNode, useRef } from 'react';
 
 import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Heading, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Collapse, Expand } from '@geti/ui/icons';
 import { isString } from 'lodash-es';
 
-import { Collapse, Expand } from '../../../assets/icons';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { DownloadGraphMenu } from '../download-graph-menu/download-graph-menu.component';
 import { DownloadableData } from '../download-graph-menu/export-csv-utils';

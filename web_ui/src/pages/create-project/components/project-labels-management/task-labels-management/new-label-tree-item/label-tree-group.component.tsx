@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@geti/ui';
+import { LabelGroup } from '@geti/ui/icons';
 
-import { LabelGroup } from '../../../../../../assets/icons';
 import { LabelTreeGroupProps, LabelTreeItem } from '../../../../../../core/labels/label-tree-view.interface';
 import { getFlattenedItems } from '../../../../../../core/labels/utils';
 import { GroupCreation } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/group-edition-mode/group-creation.component';

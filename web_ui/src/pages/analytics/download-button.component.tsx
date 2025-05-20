@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, View } from '@geti/ui';
+import { DownloadIcon } from '@geti/ui/icons';
 
-import { DownloadIcon } from '../../assets/icons';
 import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { idMatchingFormat } from '../../test-utils/id-utils';
 

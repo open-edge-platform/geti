@@ -13,9 +13,8 @@ import {
     Heading,
     Text,
 } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
-
-import { Alert } from '../../../../assets/icons';
 
 import classes from './jobs.module.scss';
 

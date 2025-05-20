@@ -4,10 +4,10 @@
 import { CSSProperties } from 'react';
 
 import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Copy, DownloadIcon } from '@geti/ui/icons';
 import { isEmpty, isFunction } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
-import { Copy, DownloadIcon } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobType } from '../../../../core/jobs/jobs.const';
@@ -92,6 +92,7 @@ interface JobsListItemProps {
     discardType?: DISCARD_TYPE;
     style?: CSSProperties;
     jobClickHandler?: () => void;
+    onSelectItem: () => void;
 }
 export const JobsListItem = ({
     job,
@@ -99,6 +100,7 @@ export const JobsListItem = ({
     expanded = false,
     style = {},
     jobClickHandler,
+    onSelectItem,
 }: JobsListItemProps) => {
     const { FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
     const navigate = useNavigate();
@@ -229,7 +231,7 @@ export const JobsListItem = ({
 
             <Divider size='S' marginX='size-250' />
 
-            <JobsListItemStatus expanded={expanded} job={job} />
+            <JobsListItemStatus expanded={expanded} job={job} onExpandChange={onSelectItem} />
         </View>
     );
 };

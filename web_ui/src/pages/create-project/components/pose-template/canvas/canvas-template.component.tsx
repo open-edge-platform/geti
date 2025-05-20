@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 
+import { Delete, SortUpDown } from '@geti/ui/icons';
 import { isEqual, isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Delete, SortUpDown } from '../../../../../assets/icons';
 import { RegionOfInterest } from '../../../../../core/annotations/annotation.interface';
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';
 import { useIsPressed } from '../../../../../hooks/use-is-pressed/use-is-pressed.hook';

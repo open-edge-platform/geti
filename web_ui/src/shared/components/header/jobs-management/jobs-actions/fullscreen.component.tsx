@@ -3,7 +3,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Collapse, Expand } from '../../../../../assets/icons';
+import { Collapse, Expand } from '@geti/ui/icons';
+
 import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
 interface FullscreenProps {

@@ -4,10 +4,10 @@
 import { ReactNode, useState } from 'react';
 
 import { ActionButton, Flex, Grid, Text, View } from '@geti/ui';
+import { Expanded } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 import { useHover, usePress } from 'react-aria';
 
-import { Expanded } from '../../../../../assets/icons';
 import { LabelTreeLabelProps } from '../../../../../core/labels/label-tree-view.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { getLabelId } from '../../../../../core/labels/utils';

@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text } from '@geti/ui';
+import { AcceptCircle, CrossCircle, HelpCircleSolidIcon, MinusCircle, Time } from '@geti/ui/icons';
 
-import { AcceptCircle, CrossCircle, HelpCircleSolidIcon, MinusCircle, Time } from '../../../../assets/icons';
 import { AccountStatus } from '../../../../core/organizations/organizations.interface';
 
 import classes from './status-cell.module.scss';

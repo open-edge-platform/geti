@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton } from '@geti/ui';
-
-import { Back } from '../../../assets/icons';
+import { Back } from '@geti/ui/icons';
 
 interface BackButtonProps {
     onPress: () => void;

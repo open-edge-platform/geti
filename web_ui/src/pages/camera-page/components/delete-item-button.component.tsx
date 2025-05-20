@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { AlertDialog, DialogContainer, type ActionButtonProps } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 import { OverlayTriggerState } from 'react-stately';
 
-import { Delete } from '../../../assets/icons';
 import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface DeleteItemButtonProps extends Omit<ActionButtonProps, 'isQuiet'> {

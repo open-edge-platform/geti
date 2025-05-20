@@ -14,9 +14,9 @@ import {
     useNumberFormatter,
     View,
 } from '@geti/ui';
+import { ChevronDownLight } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { ChevronDownLight } from '../../../../../assets/icons';
 import { Explanation } from '../../../../../core/annotations/prediction.interface';
 import { Task } from '../../../../../core/projects/task.interface';
 import { getAverageScore } from '../../../../../core/tests/services/utils';

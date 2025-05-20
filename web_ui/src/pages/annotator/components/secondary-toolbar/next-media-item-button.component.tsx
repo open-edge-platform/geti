@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ChevronRight } from '../../../../assets/icons';
+import { ChevronRight } from '@geti/ui/icons';
+
 import { MediaItem } from '../../../../core/media/media.interface';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';

@@ -4,8 +4,8 @@
 import { useRef } from 'react';
 
 import { Flex, Text } from '@geti/ui';
+import { InfoOutline } from '@geti/ui/icons';
 
-import { InfoOutline } from '../../../../../assets/icons';
 import { useStatus } from '../../../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../../../core/status/hooks/utils';
 import { ProjectImportBase } from '../../../../../providers/projects-import-provider/project-import.interface';

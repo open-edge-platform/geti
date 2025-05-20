@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Link, Text, View } from '@geti/ui';
+import { Info } from '@geti/ui/icons';
 
-import { Info } from '../../../../../assets/icons';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { NOTIFICATION_MESSAGE } from '../utils';
 

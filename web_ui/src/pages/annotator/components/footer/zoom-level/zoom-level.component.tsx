@@ -4,10 +4,10 @@
 import { useState } from 'react';
 
 import { ActionButton, Tooltip, TooltipTrigger, useNumberFormatter } from '@geti/ui';
+import { Add, Remove } from '@geti/ui/icons';
 import clsx from 'clsx';
 import { useControls } from 'react-zoom-pan-pinch';
 
-import { Add, Remove } from '../../../../../assets/icons';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 

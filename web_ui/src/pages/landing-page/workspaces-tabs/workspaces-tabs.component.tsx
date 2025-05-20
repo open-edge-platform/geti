@@ -14,9 +14,9 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@geti/ui';
+import { Add } from '@geti/ui/icons';
 import { useNavigate } from 'react-router-dom';
 
-import { Add } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';

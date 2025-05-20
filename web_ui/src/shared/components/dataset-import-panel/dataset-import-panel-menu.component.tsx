@@ -4,10 +4,10 @@
 import { Key, useCallback, useMemo } from 'react';
 
 import { ActionButton, Item, Menu, MenuTrigger, Text } from '@geti/ui';
+import { MoreMenu } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { capitalize, difference, isEmpty } from 'lodash-es';
 
-import { MoreMenu } from '../../../assets/icons';
 import { DATASET_IMPORT_STATUSES } from '../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../core/datasets/dataset.interface';
 import { matchStatus } from '../../../providers/dataset-import-to-existing-project-provider/utils';

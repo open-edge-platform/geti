@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { Add } from '@geti/ui/icons';
 
-import { Add } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 import { MenuButtonProps } from './menu-button.interface';
 

@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, Flex } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 
-import { Close } from '../../../../../../assets/icons';
 import { USER_ROLE, WorkspaceRole } from '../../../../../../core/users/users.interface';
 import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
 import { RolePicker } from '../../../old-project-users/role-picker.component';

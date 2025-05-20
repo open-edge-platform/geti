@@ -4,8 +4,7 @@
 import { ComponentProps, FC } from 'react';
 
 import { ActionButton } from '@geti/ui';
-
-import { Refresh } from '../../../../../../../assets/icons';
+import { Refresh } from '@geti/ui/icons';
 
 type ResetButtonProps = Omit<ComponentProps<typeof ActionButton>, 'children' | 'isQuiet'>;
 

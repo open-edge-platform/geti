@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { dimensionValue, useMediaQuery, useNumberFormatter, View } from '@geti/ui';
+import { Fps } from '@geti/ui/icons';
 
-import { Fps } from '../../../../assets/icons';
 import { Video, VideoFrame } from '../../../../core/media/video.interface';
 import { biggerThanQuery } from '../../../../theme/queries';
 
