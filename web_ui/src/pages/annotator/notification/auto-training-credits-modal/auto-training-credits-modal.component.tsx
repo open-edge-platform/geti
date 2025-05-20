@@ -4,11 +4,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Button, Content, DialogContainer, Divider, Flex, Header, Heading, Text, View } from '@geti/ui';
+import { Info } from '@geti/ui/icons';
 import { InfiniteData } from '@tanstack/react-query';
 import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
-import { Info } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useGetScheduledJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobsResponse } from '../../../../core/jobs/services/jobs-service.interface';

@@ -13,9 +13,9 @@ import {
     TooltipTrigger,
     View,
 } from '@geti/ui';
+import { AutoTraining } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 
-import { AutoTraining } from '../../../../assets/icons';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../core/projects/task.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';

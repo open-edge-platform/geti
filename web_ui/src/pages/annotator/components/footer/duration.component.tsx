@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { dimensionValue, View } from '@geti/ui';
+import { TimeSmall } from '@geti/ui/icons';
 
-import { TimeSmall } from '../../../../assets/icons';
 import { isVideoFrame, Video, VideoFrame } from '../../../../core/media/video.interface';
 import { useDurationText } from '../../../../shared/hooks/data-format/use-duration-text.hook';
 

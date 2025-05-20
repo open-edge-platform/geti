@@ -18,10 +18,10 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@geti/ui';
+import { Gear } from '@geti/ui/icons';
 import { isEqual, isNil } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { Gear } from '../../../../../assets/icons';
 import { isClassificationDomain } from '../../../../../core/projects/domains';
 import {
     AnnotatorSettingsConfig,

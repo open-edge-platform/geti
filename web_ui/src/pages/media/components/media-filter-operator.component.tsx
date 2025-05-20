@@ -4,8 +4,8 @@
 import { useEffect, useMemo } from 'react';
 
 import { ActionButton, Item, Menu, MenuTrigger, Text } from '@geti/ui';
+import { ChevronDownSmall } from '@geti/ui/icons';
 
-import { ChevronDownSmall } from '../../../assets/icons';
 import { SearchRuleField, SearchRuleOperator } from '../../../core/media/media-filter.interface';
 import { getKeyConfig, OPERATOR_OPTIONS } from '../utils';
 

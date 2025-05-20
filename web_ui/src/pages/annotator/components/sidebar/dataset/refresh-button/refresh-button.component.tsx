@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { Refresh } from '@geti/ui/icons';
 
-import { Refresh } from '../../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './refresh-button.module.scss';

@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton } from '@geti/ui';
+import { Unpin } from '@geti/ui/icons';
 
-import { Unpin } from '../../../../../assets/icons';
 import { useRenderDelay } from '../../../../../shared/hooks/use-render-delay.hook';
 
 interface UnpinLabelButtonProps {

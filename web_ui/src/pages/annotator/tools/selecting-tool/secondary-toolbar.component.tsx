@@ -4,9 +4,9 @@
 import { useEffect } from 'react';
 
 import { Divider, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { PointSelector } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { PointSelector } from '../../../../assets/icons';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isClassificationDomain, isSegmentationDomain } from '../../../../core/projects/domains';
 import { isKeypointTask } from '../../../../core/projects/utils';

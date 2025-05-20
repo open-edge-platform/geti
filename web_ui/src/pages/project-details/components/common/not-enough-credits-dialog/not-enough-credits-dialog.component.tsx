@@ -13,9 +13,9 @@ import {
     Heading,
     Text,
 } from '@geti/ui';
+import { CreditCard } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
 
-import { CreditCard } from '../../../../../assets/icons';
 import { CONTACT_SUPPORT } from '../../../../../core/const';
 import { openNewTab } from '../../../../../shared/utils';
 import { NotEnoughWarning } from '../not-enough-warning/not-enough-warning.component';

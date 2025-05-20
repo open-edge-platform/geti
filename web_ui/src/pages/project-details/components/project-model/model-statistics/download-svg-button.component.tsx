@@ -4,8 +4,8 @@
 import { useState } from 'react';
 
 import { Tooltip, TooltipTrigger, View, type ActionButtonProps, type BackgroundColorValue } from '@geti/ui';
+import { DownloadIcon } from '@geti/ui/icons';
 
-import { DownloadIcon } from '../../../../../assets/icons';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import {

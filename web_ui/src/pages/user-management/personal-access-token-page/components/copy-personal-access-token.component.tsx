@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Button, Flex, Text } from '@geti/ui';
+import { Copy } from '@geti/ui/icons';
 
-import { Copy } from '../../../../assets/icons';
 import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 
 import classes from '../personal-access-token-page.module.scss';

@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, View } from '@geti/ui';
-
-import { ChevronDownSmallLight, ChevronRightSmallLight } from '../../../../assets/icons';
+import { ChevronDownSmallLight, ChevronRightSmallLight } from '@geti/ui/icons';
 
 interface LabelTreeViewItemPrefixProps {
     isOpen: boolean;

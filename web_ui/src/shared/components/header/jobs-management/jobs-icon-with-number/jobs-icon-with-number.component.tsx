@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Bell } from '../../../../../assets/icons';
+import { Bell } from '@geti/ui/icons';
+
 import { NumberBadge } from '../number-badge/number-badge.component';
 
 import sharedClasses from '../../../../shared.module.scss';

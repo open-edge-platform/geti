@@ -3,7 +3,8 @@
 
 import { CSSProperties } from 'react';
 
-import { Rotation } from '../../../../../../assets/icons';
+import { Rotation } from '@geti/ui/icons';
+
 import { Anchor } from '../../anchor.component';
 
 interface RotationAnchorProps {

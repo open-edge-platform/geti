@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex } from '@geti/ui';
+import { Invisible } from '@geti/ui/icons';
 
-import { Invisible } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ToggleLockButton } from '../../toggle-lock-button/toggle-lock-button.component';
 import { TOGGLE_VISIBILITY_COLOR_MODE } from '../../toggle-visibility-button/toggle-visibility-button.component';

@@ -3,9 +3,9 @@
 
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
+import { Delete } from '@geti/ui/icons';
 import { isEmpty, noop } from 'lodash-es';
 
-import { Delete } from '../../../../../assets/icons';
 import { Point, Polygon } from '../../../../../core/annotations/shapes.interface';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';
 import { KeyboardEvents } from '../../../../../shared/keyboard-events/keyboard.interface';

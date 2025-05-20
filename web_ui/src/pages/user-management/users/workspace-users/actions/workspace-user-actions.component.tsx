@@ -4,9 +4,9 @@
 import { Key, useState } from 'react';
 
 import { DialogContainer } from '@geti/ui';
+import { Delete, Edit } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { Delete, Edit } from '../../../../../assets/icons';
 import { AccountStatus } from '../../../../../core/organizations/organizations.interface';
 import { isOrganizationAdmin, isWorkspaceContributor } from '../../../../../core/users/user-role-utils';
 import { User } from '../../../../../core/users/users.interface';

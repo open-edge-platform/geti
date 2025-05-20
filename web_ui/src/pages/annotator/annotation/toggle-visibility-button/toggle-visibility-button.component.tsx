@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Invisible, Visible } from '@geti/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { Invisible, Visible } from '../../../../assets/icons';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorHotkeys } from '../../hooks/use-hotkeys-configuration.hook';

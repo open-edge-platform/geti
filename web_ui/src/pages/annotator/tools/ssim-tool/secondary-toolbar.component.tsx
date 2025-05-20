@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Switch, Text, useMediaQuery } from '@geti/ui';
+import { BoundingBox, BoundingCircle } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { BoundingBox, BoundingCircle } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { Label } from '../../../../core/labels/label.interface';

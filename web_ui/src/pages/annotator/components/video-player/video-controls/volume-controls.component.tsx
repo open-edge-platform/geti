@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { SoundOff, SoundOn } from '@geti/ui/icons';
 
-import { SoundOff, SoundOn } from '../../../../../assets/icons';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface VolumeControlsProps {

@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RotatedBox } from '../../../../assets/icons';
+import { RotatedBox } from '@geti/ui/icons';
+
 import RotatedDetectionImg from '../../../../assets/primary-tools/rotated_detection.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';

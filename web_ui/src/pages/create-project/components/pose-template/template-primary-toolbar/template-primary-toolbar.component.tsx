@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, View } from '@geti/ui';
+import { Redo, Undo } from '@geti/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { Redo, Undo } from '../../../../../assets/icons';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { CTRL_OR_COMMAND_KEY } from '../../../../../shared/hotkeys';

@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, DialogTrigger, Flex, Slider, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ChevronDownLight } from '@geti/ui/icons';
 
-import { ChevronDownLight } from '../../../../../assets/icons';
 import { useAnnotationThreshold } from '../../../providers/annotation-threshold-provider/annotation-threshold-provider.component';
 
 import classes from './annotations.module.scss';

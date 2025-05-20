@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, Divider, Text, Tooltip, TooltipTrigger } from '@geti/ui';
-
-import { InfoOutline } from '../../../../../assets/icons';
+import { InfoOutline } from '@geti/ui/icons';
 
 import classes from './dataset-accordion.module.scss';
 
