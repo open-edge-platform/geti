@@ -22,7 +22,7 @@ class ConfigurableParametersRESTViews:
     """
 
     @staticmethod
-    def _parameter_to_rest(key: str, value: int | float | str | bool, json_schema: dict) -> dict[str, Any]:
+    def _parameter_to_rest(key: str, value: float | str | bool, json_schema: dict) -> dict[str, Any]:
         """
         Convert a single parameter to its REST representation.
 
@@ -47,7 +47,9 @@ class ConfigurableParametersRESTViews:
         return rest_view
 
     @classmethod
-    def configurable_parameters_to_rest(cls, configurable_parameters: BaseModel) -> dict[str, Any] | list[dict[str, Any]]:
+    def configurable_parameters_to_rest(
+        cls, configurable_parameters: BaseModel
+    ) -> dict[str, Any] | list[dict[str, Any]]:
         """
         Convert a Pydantic model of configurable parameters to its REST representation.
 
@@ -88,5 +90,5 @@ class ConfigurableParametersRESTViews:
 
         # Return combined or individual results based on content
         if nested_params and list_params:
-            return list_params + [nested_params]
+            return [*list_params, nested_params]
         return list_params or nested_params
