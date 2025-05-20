@@ -17,7 +17,7 @@ from iai_core.repos import ImageRepo, VideoRepo
 from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 DATASET_STORAGE_ID: DatasetStorageIdentifier = DatasetStorageIdentifier(
-    workspace_id=ID("workspace_id"),
+    workspace_id=ID("63b183d00000000000000001"),
     project_id=ID("project_id"),
     dataset_storage_id=ID("dataset_storage_id"),
 )
@@ -37,7 +37,6 @@ def kafka_message(event: str, media_type: str | None = None, preprocessing: dict
         b"media_id",
         {
             "event": event,
-            "workspace_id": str(DATASET_STORAGE_ID.workspace_id),
             "project_id": str(DATASET_STORAGE_ID.project_id),
             "dataset_storage_id": str(DATASET_STORAGE_ID.dataset_storage_id),
             "media_type": media_type,

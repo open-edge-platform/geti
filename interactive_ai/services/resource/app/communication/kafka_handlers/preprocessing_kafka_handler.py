@@ -4,7 +4,7 @@ import logging
 from typing import Any
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
-from geti_types import ID, Singleton
+from geti_types import CTX_SESSION_VAR, ID, Singleton
 from iai_core.entities.dataset_storage import DatasetStorageIdentifier
 from iai_core.entities.image import Image
 from iai_core.entities.video import Video
@@ -36,7 +36,7 @@ class PreprocessingKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         value: dict = raw_message.value
         event = value["event"]
         dataset_storage_identifier = DatasetStorageIdentifier(
-            workspace_id=ID(value["workspace_id"]),
+            workspace_id=CTX_SESSION_VAR.get().workspace_id,
             project_id=ID(value["project_id"]),
             dataset_storage_id=ID(value["dataset_storage_id"]),
         )

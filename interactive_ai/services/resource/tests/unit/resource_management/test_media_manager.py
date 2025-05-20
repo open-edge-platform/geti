@@ -189,7 +189,6 @@ class TestMediaManager:
         mock_publish_event.assert_called_once_with(
             topic="media_preprocessing",
             body={
-                "workspace_id": str(fxt_dataset_storage_identifier.workspace_id),
                 "project_id": str(fxt_dataset_storage_identifier.project_id),
                 "dataset_storage_id": str(fxt_dataset_storage_identifier.dataset_storage_id),
                 "media_id": str(image.id_),
@@ -395,7 +394,6 @@ class TestMediaManager:
         mock_publish_event.assert_called_once_with(
             topic="media_preprocessing",
             body={
-                "workspace_id": str(dataset_storage.identifier.workspace_id),
                 "project_id": str(dataset_storage.identifier.project_id),
                 "dataset_storage_id": str(dataset_storage.identifier.dataset_storage_id),
                 "media_id": str(video.id_),

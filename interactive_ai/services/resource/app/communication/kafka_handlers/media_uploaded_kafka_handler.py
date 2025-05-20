@@ -42,7 +42,7 @@ class MediaUploadedKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
             return
 
         dataset_storage_identifier = DatasetStorageIdentifier(
-            workspace_id=ID(value["workspace_id"]),
+            workspace_id=CTX_SESSION_VAR.get().workspace_id,
             project_id=ID(value["project_id"]),
             dataset_storage_id=ID(value["dataset_storage_id"]),
         )
@@ -157,7 +157,6 @@ class MediaUploadedKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         preprocessing: dict | None = None,
     ) -> None:
         body: dict[str, Any] = {
-            "workspace_id": str(dataset_storage_identifier.workspace_id),
             "project_id": str(dataset_storage_identifier.project_id),
             "dataset_storage_id": str(dataset_storage_identifier.dataset_storage_id),
             "media_id": str(media_id),

@@ -595,7 +595,6 @@ class MediaManager:
             publish_event(
                 topic="media_preprocessing",
                 body={
-                    "workspace_id": str(dataset_storage_identifier.workspace_id),
                     "project_id": str(dataset_storage_identifier.project_id),
                     "dataset_storage_id": str(dataset_storage_identifier.dataset_storage_id),
                     "media_id": str(image_id),
@@ -827,7 +826,6 @@ class MediaManager:
             publish_event(
                 topic="media_preprocessing",
                 body={
-                    "workspace_id": str(dataset_storage_identifier.workspace_id),
                     "project_id": str(dataset_storage_identifier.project_id),
                     "dataset_storage_id": str(dataset_storage_identifier.dataset_storage_id),
                     "media_id": str(video_id),
