@@ -61,7 +61,7 @@ class LabelTreeMapper:
 
     @classmethod
     def forward(  # noqa: C901
-        cls, label_schema: LabelSchema, include_empty: bool = False, keypoint_structure: KeypointStructure = None
+        cls, label_schema: LabelSchema, include_empty: bool = False, keypoint_structure: KeypointStructure | None = None
     ) -> tuple[dm.LabelCategories, dm.PointsCategories]:
         """Convert SC label list and their tree info to Datumaro LabelCategories"""
         # labels = label_schema.get_labels(include_empty=include_empty)
@@ -80,7 +80,7 @@ class LabelTreeMapper:
         label_cat = dm.LabelCategories()
         point_cat = dm.PointsCategories()
         if keypoint_structure:
-            label_id_to_idx = {label.id_ for idx, label in enumerate(labels)}
+            label_id_to_idx = {label.id_: idx for idx, label in enumerate(labels)}
             joints = []
             for edge in keypoint_structure._edges:
                 node_1 = label_id_to_idx[edge.node_1]
@@ -137,7 +137,7 @@ class LabelSchemaMapper:
 
     @staticmethod
     def forward(
-        label_schema: LabelSchema, include_empty: bool = False, keypoint_structure: KeypointStructure = None
+        label_schema: LabelSchema, include_empty: bool = False, keypoint_structure: KeypointStructure | None = None
     ) -> DmLabelSchemaInfo:
         """Convert SC LabelSchema to DmLabelSchemaInfo"""
 
