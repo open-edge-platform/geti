@@ -231,11 +231,21 @@ def create_flyte_container_task(  # noqa: PLR0913
                     V1EnvVar(name="SESSION_WORKSPACE_ID", value=str(session.workspace_id)),
                     V1EnvVar(name="WEIGHTS_URL", value="https://storage.geti.intel.com/weights"),
                     V1EnvVar(
-                        name="KAFKA_TOPIC_PREFIX",
+                        name="http_proxy",
                         value_from=V1EnvVarSource(
-                            config_map_key_ref=V1ConfigMapKeySelector(
-                                name="impt-configuration", key="kafka_topic_prefix"
-                            )
+                            config_map_key_ref=V1ConfigMapKeySelector(name=f"{namespace}-configuration", key="http_proxy")
+                        ),
+                    ),
+                    V1EnvVar(
+                        name="https_proxy",
+                        value_from=V1EnvVarSource(
+                            config_map_key_ref=V1ConfigMapKeySelector(name=f"{namespace}-configuration", key="https_proxy")
+                        ),
+                    ),
+                    V1EnvVar(
+                        name="no_proxy",
+                        value_from=V1EnvVarSource(
+                            config_map_key_ref=V1ConfigMapKeySelector(name=f"{namespace}-configuration", key="no_proxy")
                         ),
                     ),
                     V1EnvVar(

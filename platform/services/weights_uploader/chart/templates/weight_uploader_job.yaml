@@ -55,14 +55,21 @@ spec:
           limits:
             memory: 100Mi
         env:
-{{- if .Values.global.proxy.enabled }}
           - name: http_proxy
-            value: "{{ .Values.global.proxy.http_proxy }}"
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Namespace }}-configuration
+                key: http_proxy
           - name: https_proxy
-            value: "{{ .Values.global.proxy.https_proxy }}"
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Namespace }}-configuration
+                key: https_proxy
           - name: no_proxy
-            value: "{{ .Values.global.proxy.no_proxy }},127.0.0.1,localhost,.{{ .Release.Namespace }},.svc,.cluster.local"
-{{- end }}
+            valueFrom:
+              configMapKeyRef:
+                name: {{ .Release.Namespace }}-configuration
+                key: no_proxy
           - name: WEIGHTS_DIR
             value: "/weights"
           - name: WEIGHTS_URL
