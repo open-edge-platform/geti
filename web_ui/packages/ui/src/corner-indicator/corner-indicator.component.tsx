@@ -16,7 +16,6 @@ export const CornerIndicator = ({ isActive, children }: CornerIndicatorProps): J
                 top='size-50'
                 right='size-50'
                 width='size-50'
-                height='size-50'
                 borderRadius='large'
                 backgroundColor='blue-700'
                 isHidden={!isActive}

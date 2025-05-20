@@ -3,7 +3,7 @@
 
 import { Dispatch, Key, SetStateAction, useState } from 'react';
 
-import { Content, Dialog, Flex, Text } from '@geti/ui';
+import { Content, CornerIndicator, Dialog, Flex, Text } from '@geti/ui';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { RangeValue } from '@react-types/shared';
 import { keepPreviousData } from '@tanstack/react-query';
@@ -13,7 +13,6 @@ import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { JobCount } from '../../../../core/jobs/jobs.interface';
-import { CornerIndicator } from '../../../../pages/annotator/annotation/annotation-filter/corner-indicator.component';
 import { RefreshButton } from '../../../../pages/annotator/components/sidebar/dataset/refresh-button/refresh-button.component';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
