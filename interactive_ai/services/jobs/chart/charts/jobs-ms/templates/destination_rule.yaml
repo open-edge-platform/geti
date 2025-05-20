@@ -1,4 +1,4 @@
-{{- $svc_name := printf "%s-%s-ms" .Release.Namespace .Chart.Name -}}
+{{- $svc_name := printf "%s-%s" .Release.Namespace .Chart.Name -}}
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
