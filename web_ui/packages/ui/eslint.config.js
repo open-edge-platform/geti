@@ -33,12 +33,12 @@ export default [
                 {
                     patterns: [
                         {
-                            group: ['../../**/*'],
-                            message: 'Importing files outside of the current package is not allowed.',
+                            group: ['../../**/*', '!../**/icons'],
+                            message: 'Importing files outside of the current package is not allowed except /icons.',
                         },
                         {
-                            regex: '@geti/ui(?!/icons)',
-                            message: 'Importing files from @geti/ui is not allowed except @geti/ui/icons.',
+                            group: ['@geti/ui'],
+                            message: 'Importing files from @geti/ui is not allowed.',
                         },
                     ],
                 },

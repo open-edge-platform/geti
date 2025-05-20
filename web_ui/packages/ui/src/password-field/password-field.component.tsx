@@ -4,8 +4,8 @@
 import { ComponentProps, useState } from 'react';
 
 import { Flex, TextField, View } from '@adobe/react-spectrum';
-import { Alert, Invisible, Visible } from '@geti/ui/icons';
 
+import { Alert, Invisible, Visible } from '../../icons';
 import { ActionButton } from '../button/button.component';
 
 import classes from './password-field.module.scss';
