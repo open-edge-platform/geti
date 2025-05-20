@@ -9,7 +9,7 @@ import { mockedProjectContextProps } from '../../../test-utils/mocked-items-fact
 import { ExportImportDatasetButtons } from './export-import-dataset-buttons.component';
 import { ExportImportDatasetDialogProvider } from './export-import-dataset-dialog-provider.component';
 
-jest.mock('../../../providers/project-provider/project-provider.component', () => ({
+jest.mock('../../../pages/project-details/providers/project-provider/project-provider.component', () => ({
     useProject: jest.fn(),
 }));
 

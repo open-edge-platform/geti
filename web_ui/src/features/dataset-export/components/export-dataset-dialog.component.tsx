@@ -29,9 +29,9 @@ import { ExportFormats } from '../../../core/projects/dataset.interface';
 import { useDatasetStatistics } from '../../../core/statistics/hooks/use-dataset-statistics.hook';
 import { useDatasetIdentifier } from '../../../pages/annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../pages/media/providers/media-provider.component';
-import { useExportDataset } from '../../../pages/project-details/hooks/use-export-dataset.hook';
 import { useProject } from '../../../pages/project-details/providers/project-provider/project-provider.component';
 import { isNotCropDomain, openNewTab, pluralize } from '../../../shared/utils';
+import { useExportDataset } from '../hooks/use-export-dataset.hook';
 import { AVAILABLE_FORMATS, ExportFormatDetails, isDatumaroFormat } from '../utils/utils';
 import { ExportDatasetMessage } from './export-dataset-message.component';
 

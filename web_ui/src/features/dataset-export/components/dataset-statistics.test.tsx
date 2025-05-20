@@ -8,15 +8,15 @@ import { useDatasetIdentifier } from '../../../pages/annotator/hooks/use-dataset
 import { useMedia } from '../../../pages/media/providers/media-provider.component';
 import { ExportDatasetStatistics } from './export-dataset-dialog.component';
 
-jest.mock('../../../../media/providers/media-provider.component', () => ({
+jest.mock('../../../pages/media/providers/media-provider.component', () => ({
     useMedia: jest.fn(),
 }));
 
-jest.mock('../../../../annotator/hooks/use-dataset-identifier.hook', () => ({
+jest.mock('../../../pages/annotator/hooks/use-dataset-identifier.hook', () => ({
     useDatasetIdentifier: jest.fn(),
 }));
 
-jest.mock('../../../../../core/statistics/hooks/use-dataset-statistics.hook', () => ({
+jest.mock('../../../core/statistics/hooks/use-dataset-statistics.hook', () => ({
     useDatasetStatistics: jest.fn(),
 }));
 

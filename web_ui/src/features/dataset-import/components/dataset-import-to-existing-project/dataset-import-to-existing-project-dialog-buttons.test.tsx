@@ -53,16 +53,16 @@ const mockPatchActiveDatasetImport = jest.fn();
 let mockIsReadyValue = false;
 
 const mockAbortActiveUpload = jest.fn();
-jest.mock('../../../../../providers/tus-upload-provider/tus-upload-provider.component', () => ({
-    ...jest.requireActual('../../../../../providers/tus-upload-provider/tus-upload-provider.component'),
+jest.mock('../../../../providers/tus-upload-provider/tus-upload-provider.component', () => ({
+    ...jest.requireActual('../../../../providers/tus-upload-provider/tus-upload-provider.component'),
     useTusUpload: () => ({ abortActiveUpload: mockAbortActiveUpload }),
 }));
 
 jest.mock(
-    '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
+    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
     () => ({
         ...jest.requireActual(
-            '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+            '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
         ),
         useDatasetImportToExistingProject: jest.fn(() => ({
             abortDatasetImportAction: mockAbortDatasetImportAction,

@@ -9,10 +9,10 @@ import { getJobActiveStep } from '../../../core/jobs/utils';
 import { DatasetIdentifier, ExportDatasetLSData, ExportFormats } from '../../../core/projects/dataset.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { useExportDataset } from '../../../pages/project-details/hooks/use-export-dataset.hook';
 import { JobProgress } from '../../../shared/components/header/jobs-management/job-progress.component';
 import { ThinProgressBar } from '../../../shared/components/thin-progress-bar/thin-progress-bar.component';
 import { formatDownloadUrl } from '../../../shared/utils';
+import { useExportDataset } from '../hooks/use-export-dataset.hook';
 
 import classes from './dataset-export.module.scss';
 

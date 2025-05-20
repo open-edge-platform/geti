@@ -7,7 +7,7 @@ import { View } from '@geti/ui';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 
 import { DatasetIdentifier, ExportDatasetLSData } from '../../../core/projects/dataset.interface';
-import { useLocalStorageExportDataset } from '../../../pages/project-details/hooks/use-local-storage-export-dataset.hook';
+import { useLocalStorageExportDataset } from '../hooks/use-local-storage-export-dataset.hook';
 import { ExportDatasetDownload } from './export-dataset-download.component';
 import { ExportDatasetStatusJob } from './export-dataset-status-job.component';
 

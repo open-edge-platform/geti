@@ -9,12 +9,12 @@ import { downloadFile, getDownloadNotificationMessage } from '../../../shared/ut
 import { providersRender as render } from '../../../test-utils/required-providers-render';
 import { ExportDatasetDownload } from './export-dataset-download.component';
 
-jest.mock('../../../hooks/use-export-dataset.hook', () => ({
-    ...jest.requireActual('../../../hooks/use-export-dataset.hook'),
+jest.mock('../hooks/use-export-dataset.hook', () => ({
+    ...jest.requireActual('../hooks/use-export-dataset.hook'),
     useExportDataset: jest.fn(() => ({ exportDatasetStatus: {} })),
 }));
-jest.mock('../../../../../shared/utils', () => ({
-    ...jest.requireActual('../../../../../shared/utils'),
+jest.mock('../../../shared/utils', () => ({
+    ...jest.requireActual('../../../shared/utils'),
     downloadFile: jest.fn(),
 }));
 
