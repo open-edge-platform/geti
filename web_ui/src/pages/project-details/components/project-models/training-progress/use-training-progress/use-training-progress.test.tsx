@@ -56,7 +56,7 @@ describe('useTrainingProgress', () => {
         expect(result.current.showTrainingProgress).toBe(false);
     });
 
-    it('should return running job item when there is running job assigned to the task', async () => {
+    it('should return a list of running and/or scheduled job items when there is running job assigned to the task', async () => {
         const jobs = [
             getMockedJob({
                 state: JobState.RUNNING,
@@ -107,7 +107,7 @@ describe('useTrainingProgress', () => {
         const { result } = renderHook(() => useTrainingProgress(taskId), { wrapper });
 
         expect(result.current.showTrainingProgress).toBe(true);
-        expect('trainingDetails' in result.current && result.current.trainingDetails).toEqual(jobs[0]);
+        expect('trainingDetails' in result.current && result.current.trainingDetails).toEqual(jobs);
     });
 
     it('should not return running job item when there is running job but assigned to another task', async () => {

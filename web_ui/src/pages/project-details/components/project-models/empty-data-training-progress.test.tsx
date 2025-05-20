@@ -16,7 +16,7 @@ jest.mock('./training-progress/use-training-progress/use-training-progress.hook'
 
 describe('EmptyDataTrainingProgress', () => {
     it('Single task project', async () => {
-        const trainingDetails = mockedRunningTrainingJobs[0];
+        const trainingDetails = mockedRunningTrainingJobs;
 
         jest.mocked(useTrainingProgress).mockImplementation(() => ({
             showTrainingProgress: true,
@@ -30,7 +30,7 @@ describe('EmptyDataTrainingProgress', () => {
     });
 
     it('Task chain project', async () => {
-        const trainingDetails = mockedRunningTrainingJobs[0];
+        const trainingDetails = mockedRunningTrainingJobs;
         let taskIndex = 0;
 
         jest.mocked(useTrainingProgress).mockImplementation(() => {
@@ -39,7 +39,7 @@ describe('EmptyDataTrainingProgress', () => {
                 : {
                       ...trainingDetails,
                       metadata: {
-                          ...trainingDetails.metadata,
+                          ...trainingDetails[0].metadata,
                           task: getMockedTask({ domain: DOMAIN.SEGMENTATION }),
                       },
                   };
