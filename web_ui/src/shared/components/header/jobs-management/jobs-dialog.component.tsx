@@ -1,12 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Dispatch, Key, SetStateAction, useMemo, useState } from 'react';
+import { Dispatch, Key, SetStateAction, useState } from 'react';
 
 import { Content, Dialog, Flex, Text } from '@adobe/react-spectrum';
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { RangeValue } from '@react-types/shared';
 import { keepPreviousData } from '@tanstack/react-query';
+import { isEqual } from 'lodash-es';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
@@ -15,11 +16,11 @@ import { JobCount } from '../../../../core/jobs/jobs.interface';
 import { CornerIndicator } from '../../../../pages/annotator/annotation/annotation-filter/corner-indicator.component';
 import { RefreshButton } from '../../../../pages/annotator/components/sidebar/dataset/refresh-button/refresh-button.component';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { DateRangePickerSmall } from '../../date-range-picker-small/date-range-picker-small.component';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
 import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { Tabs } from '../../tabs/tabs.component';
 import { TabItem } from '../../tabs/tabs.interface';
+import { DateRangePickerSmall } from './date-range-picker-small/date-range-picker-small.component';
 import { Fullscreen } from './jobs-actions/fullscreen.component';
 import { FiltersType } from './jobs-actions/jobs-dialog.interface';
 import { JobsFiltering } from './jobs-actions/jobs-filtering.component';
@@ -50,13 +51,10 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
     const { useGetJobs } = useJobs({ organizationId, workspaceId });
 
     const TODAY = today(getLocalTimeZone());
-    const INITIAL_DATES: RangeValue<DateValue> = useMemo(
-        () => ({
-            start: TODAY.subtract({ months: 3 }),
-            end: TODAY,
-        }),
-        [TODAY]
-    );
+    const INITIAL_DATES: RangeValue<DateValue> = {
+        start: TODAY.subtract({ months: 3 }),
+        end: TODAY,
+    };
 
     const [filters, setFilters] = useState<FiltersType>({
         projectId: undefined,
@@ -87,15 +85,10 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         }
     );
 
-    const isInitialRange = useMemo(
-        () => JSON.stringify(range) === JSON.stringify(INITIAL_DATES),
-        [range, INITIAL_DATES]
-    );
+    const isInitialRange = isEqual(range, INITIAL_DATES);
 
-    const areFiltersChanged = useMemo(
-        () => !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length,
-        [isInitialRange, filters]
-    );
+    const areFiltersChanged = () =>
+        !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length;
 
     const allJobs = getAllJobs(data);
     const {

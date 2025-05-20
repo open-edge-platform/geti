@@ -17,12 +17,13 @@ import {
 } from '@adobe/react-spectrum';
 import { DateValue, getLocalTimeZone } from '@internationalized/date';
 import Calendar from '@spectrum-icons/workflow/Calendar';
+import { isFunction } from 'lodash-es';
 import isEmpty from 'lodash/isEmpty';
 import { RangeCalendarProps } from 'react-aria-components';
 
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
+import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
-interface DateRangePickerSmall extends RangeCalendarProps<DateValue> {
+interface DateRangePickerSmall extends Omit<RangeCalendarProps<DateValue>, 'focusedValue' | 'onFocusChange'> {
     hasManualEdition?: boolean;
     headerContent?: ReactNode;
 }
@@ -46,7 +47,7 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({
             return;
         }
 
-        onChange && onChange({ ...range, [attribute]: value });
+        isFunction(onChange) && onChange({ ...range, [attribute]: value });
         setFocusedDate(value);
     };
 

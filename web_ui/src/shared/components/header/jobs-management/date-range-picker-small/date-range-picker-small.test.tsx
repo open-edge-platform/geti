@@ -6,7 +6,7 @@ import { RangeValue } from '@react-types/shared';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { providersRender as render } from '../../../test-utils/required-providers-render';
+import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { DateRangePickerSmall } from './date-range-picker-small.component';
 
 describe('DateRangePickerSmall Component', () => {
@@ -19,14 +19,13 @@ describe('DateRangePickerSmall Component', () => {
 
     const mockOnChange = jest.fn();
 
-    const renderComponent = (props = {}) =>
+    const renderComponent = () =>
         render(
             <DateRangePickerSmall
                 value={INITIAL_DATES}
                 onChange={mockOnChange}
                 hasManualEdition={true}
                 headerContent='Select Date Range'
-                {...props}
             />
         );
 
@@ -37,7 +36,6 @@ describe('DateRangePickerSmall Component', () => {
     it('should open the date range dialog when the button is clicked', async () => {
         renderComponent();
 
-        expect(screen.getByRole('button', { name: 'Select date range' })).toBeInTheDocument();
         await userEvent.click(screen.getByRole('button', { name: 'Select date range' }));
         expect(await screen.findByRole('dialog')).toBeVisible();
 

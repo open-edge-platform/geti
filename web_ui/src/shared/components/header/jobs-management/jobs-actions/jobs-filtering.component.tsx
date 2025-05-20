@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Key, useCallback, useMemo, useState } from 'react';
+import { Key, useCallback, useMemo } from 'react';
 
 import { InfiniteQueryObserverResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
@@ -26,12 +26,10 @@ interface JobsFilteringProps {
 export const JobsFiltering = ({ values, onChange }: JobsFilteringProps): JSX.Element => {
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
 
-    const [jobFilters, setJobFilters] = useState<FiltersType>(values);
-    const { projectId, userId, jobTypes } = jobFilters;
+    const { projectId, userId, jobTypes } = values;
 
     const updateJobsFilters = (newFilters: FiltersType): void => {
         onChange(newFilters);
-        setJobFilters(newFilters);
     };
 
     const { useGetProjects } = useProjectActions();
@@ -92,17 +90,17 @@ export const JobsFiltering = ({ values, onChange }: JobsFilteringProps): JSX.Ele
     const setSelectedProjectHandler = (key: Key | null): void => {
         const newFilterValue: undefined | string = isEmpty(key) ? undefined : (key as string);
 
-        updateJobsFilters({ ...jobFilters, projectId: newFilterValue });
+        updateJobsFilters({ ...values, projectId: newFilterValue });
     };
 
     const setSelectedUserHandler = (key: Key | null): void => {
         const newFilterValue: undefined | string = isEmpty(key) ? undefined : (key as string);
 
-        updateJobsFilters({ ...jobFilters, userId: newFilterValue });
+        updateJobsFilters({ ...values, userId: newFilterValue });
     };
 
     const setSelectedJobTypesHandler = (newJobTypes: JobType[]): void => {
-        updateJobsFilters({ ...jobFilters, jobTypes: newJobTypes });
+        updateJobsFilters({ ...values, jobTypes: newJobTypes });
     };
 
     return (
