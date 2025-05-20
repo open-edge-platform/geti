@@ -91,13 +91,13 @@ class LabelGroupToMongo(IMapperForward[LabelGroup, dict], IMapperProjectIdentifi
         from iai_core.repos import LabelRepo
 
         label_repo = LabelRepo(project_identifier)
+        label_ids = [IDToMongo.backward(label_id) for label_id in instance["label_ids"]]
+        label_map = label_repo.get_by_ids(label_ids)
         return LabelGroup(
             id=IDToMongo.backward(instance["_id"]),
             name=instance["name"],
             group_type=LabelGroupType[instance["relation_type"]],
-            labels=list(
-                label_repo.get_by_ids([IDToMongo.backward(label_id) for label_id in instance["label_ids"]]).values()
-            ),
+            labels=[label_map[label_id] for label_id in label_ids],
         )
 
 
