@@ -3,7 +3,7 @@
 
 import { Key, useRef } from 'react';
 
-import { Button, Flex, FocusableRefValue, Grid, Text, useUnwrapDOMRef } from '@geti/ui';
+import { Button, Flex, Grid, Text, useUnwrapDOMRef, type FocusableRefValue } from '@geti/ui';
 import Import from '@spectrum-icons/workflow/Import';
 import { useNavigate } from 'react-router-dom';
 

@@ -3,8 +3,8 @@
 
 import { ComponentProps, CSSProperties } from 'react';
 
-import { PressableElement, StyleProps, Tooltip, TooltipTrigger, useStyleProps } from '@geti/ui';
-import { PositionProps } from 'react-aria';
+import { PressableElement, Tooltip, TooltipTrigger, useStyleProps, type StyleProps } from '@geti/ui';
+import { type PositionProps } from 'react-aria';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 

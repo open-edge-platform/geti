@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Link, Text, View } from '@geti/ui';
+import { InfoOutline } from '@geti/ui/icons';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { InfoOutline } from '../../../../../assets/icons';
 import { paths } from '../../../../../core/services/routes';
 import { useDataset } from '../../../providers/dataset-provider/dataset-provider.component';
 

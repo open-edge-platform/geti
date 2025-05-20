@@ -4,10 +4,10 @@
 import { RefObject, useRef } from 'react';
 
 import { useNumberFormatter, VisuallyHidden } from '@geti/ui';
+import { EndRangeVideoThumb, StartRageVideoThumb } from '@geti/ui/icons';
 import { mergeProps, useFocusRing, useSlider, useSliderThumb } from 'react-aria';
 import { SliderState, useSliderState } from 'react-stately';
 
-import { EndRangeVideoThumb, StartRageVideoThumb } from '../../../../../assets/icons';
 import { Label } from '../../../../../core/labels/label.interface';
 import { RangeSection } from './range-section.component';
 

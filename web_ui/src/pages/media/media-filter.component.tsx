@@ -11,7 +11,6 @@ import {
     DialogTrigger,
     dimensionValue,
     Flex,
-    FocusableRefValue,
     Heading,
     Text,
     Tooltip,
@@ -19,11 +18,12 @@ import {
     useMediaQuery,
     useUnwrapDOMRef,
     View,
+    type FocusableRefValue,
 } from '@geti/ui';
+import { Add, Filter } from '@geti/ui/icons';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Add, Filter } from '../../assets/icons';
 import {
     AdvancedFilterOptions,
     SearchOptionsActions,

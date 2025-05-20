@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Redo, Undo } from '@geti/ui/icons';
 
-import { Redo, Undo } from '../../../../assets/icons';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useUndoRedoKeyboardShortcuts } from '../../hot-keys/use-undo-redo-keyboard-shortcuts/use-undo-redo-keyboard-shortcuts';
 import { useUndoRedo } from '../../tools/undo-redo/undo-redo-provider.component';

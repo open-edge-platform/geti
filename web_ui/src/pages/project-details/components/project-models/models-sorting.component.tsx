@@ -4,8 +4,8 @@
 import { FC, Key } from 'react';
 
 import { Icon, Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
+import { SortDown, SortUp, SortUpDown } from '@geti/ui/icons';
 
-import { SortDown, SortUp, SortUpDown } from '../../../../assets/icons';
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';
 import {
     sortModelsGroupsByActiveModel,

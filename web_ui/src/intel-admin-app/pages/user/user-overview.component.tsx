@@ -4,8 +4,8 @@
 import { FC, useState } from 'react';
 
 import { ActionButton, Divider, Flex, Text, TextField, View } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 
-import { Delete } from '../../../assets/icons';
 import { Header } from '../../shared/components/header/header.component';
 import { MOCKED_USERS, User } from '../users/mocked-user';
 import { DeleteUserDialog } from '../users/user-actions/delete-user-dialog.component';

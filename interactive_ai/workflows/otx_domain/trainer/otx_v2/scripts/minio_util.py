@@ -98,7 +98,7 @@ def download_file(bucket_name, object_name, file_path, endpoint):  # noqa: ANN00
 # Example usage
 if __name__ == "__main__":
     bucket_name = "pretrainedweights"
-    object_name = "pretrained_models.json"
+    object_name = "pretrained_models_v2.json"
     file_path = "./temp_downloaded.obj"
     endpoint = os.environ.get("S3_HOST", "impt-seaweed-fs:8333")
 

@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Checkbox, ColorSwatch } from '@geti/ui';
+import { CloseSemiBold } from '@geti/ui/icons';
 import { useFocusManager } from 'react-aria';
 
-import { CloseSemiBold } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { useSetHoveredId } from '../../../../providers/hovered-provider/hovered-provider.component';
 import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';

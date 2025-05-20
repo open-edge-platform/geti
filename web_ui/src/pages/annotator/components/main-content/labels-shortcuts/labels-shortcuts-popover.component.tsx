@@ -4,9 +4,9 @@
 import { Dispatch, SetStateAction, useRef } from 'react';
 
 import { CustomPopover, Flex, Text, View } from '@geti/ui';
+import { ChevronDownLight } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import { ChevronDownLight } from '../../../../../assets/icons';
 import { Label } from '../../../../../core/labels/label.interface';
 import { TaskLabelTreeSearch } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search.component';
 import { onEscape } from '../../../../../shared/utils';

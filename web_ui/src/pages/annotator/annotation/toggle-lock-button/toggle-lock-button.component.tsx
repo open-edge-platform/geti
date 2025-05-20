@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Lock, Unlock } from '../../../../assets/icons';
+import { Lock, Unlock } from '@geti/ui/icons';
+
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { TOGGLE_VISIBILITY_COLOR_MODE } from '../toggle-visibility-button/toggle-visibility-button.component';
 

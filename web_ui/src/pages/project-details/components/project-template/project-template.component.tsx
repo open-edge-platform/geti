@@ -4,9 +4,9 @@
 import { useState } from 'react';
 
 import { Button, ButtonGroup, View } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Alert } from '../../../../assets/icons';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';

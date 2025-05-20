@@ -3,9 +3,9 @@
 
 import { forwardRef, RefObject, useState } from 'react';
 
-import { BackgroundColorValue, DOMRefValue, useUnwrapDOMRef } from '@geti/ui';
+import { useUnwrapDOMRef, type BackgroundColorValue, type DOMRefValue } from '@geti/ui';
+import { DownloadIcon } from '@geti/ui/icons';
 
-import { DownloadIcon } from '../../../assets/icons';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { idMatchingFormat } from '../../../test-utils/id-utils';

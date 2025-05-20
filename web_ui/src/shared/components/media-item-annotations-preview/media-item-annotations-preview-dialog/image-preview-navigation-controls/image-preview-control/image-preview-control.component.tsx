@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton } from '@geti/ui';
-
-import { ChevronLeft, ChevronRight } from '../../../../../../assets/icons';
+import { ChevronLeft, ChevronRight } from '@geti/ui/icons';
 
 import classes from './image-preview-control.module.scss';
 

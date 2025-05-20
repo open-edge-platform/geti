@@ -4,8 +4,8 @@
 import { useEffect, useState } from 'react';
 
 import { ActionButton, Grid } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 
-import { Delete } from '../../../assets/icons';
 import {
     SearchOptionsRule,
     SearchRuleField,

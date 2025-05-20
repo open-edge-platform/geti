@@ -4,11 +4,11 @@
 import { MutableRefObject, useRef, useState } from 'react';
 
 import { Overlay, View } from '@geti/ui';
+import { ChevronLeft, ChevronRight, Close } from '@geti/ui/icons';
 import { isNumber } from 'lodash-es';
 import { useOverlay } from 'react-aria';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
-import { ChevronLeft, ChevronRight, Close } from '../../../assets/icons';
 import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { isVideoFile } from '../../../shared/media-utils';
 import { Screenshot } from '../../camera-support/camera.interface';

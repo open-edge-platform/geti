@@ -4,9 +4,9 @@
 import { useRef } from 'react';
 
 import { CustomPopover, Divider, Heading, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Adjustments } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import { Adjustments } from '../../../../assets/icons';
 import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { DeviceSettings } from './device-settings.component';

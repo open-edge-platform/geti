@@ -2,8 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Tag, TagHalf } from '@geti/ui/icons';
 
-import { Tag, TagHalf } from '../../../assets/icons';
 import { Video } from '../../../core/media/video.interface';
 import { pluralize } from '../../utils';
 import { QuietActionButton } from '../quiet-button/quiet-action-button.component';

@@ -4,10 +4,10 @@
 import { useMemo } from 'react';
 
 import { ActionButton, Flex, Tag } from '@geti/ui';
+import { BorderClose } from '@geti/ui/icons';
 import { getLocalTimeZone, parseAbsolute } from '@internationalized/date';
 import { isEmpty } from 'lodash-es';
 
-import { BorderClose } from '../../../assets/icons';
 import { Label } from '../../../core/labels/label.interface';
 import {
     AdvancedFilterOptions,

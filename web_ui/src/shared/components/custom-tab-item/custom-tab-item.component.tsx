@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, View } from '@geti/ui';
+import { MoreMenu } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { MoreMenu } from '../../../assets/icons';
 import { DATASET_NAME_MAX_WIDTH } from '../../../pages/project-details/components/project-dataset/utils';
 import { ANIMATION_PARAMETERS } from '../../animation-parameters/animation-parameters';
 import { TruncatedText } from '../truncated-text/truncated-text.component';
