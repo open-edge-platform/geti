@@ -102,12 +102,13 @@ describe('useTrainingProgress', () => {
 
         jest.mocked(useIsTraining).mockReturnValue(true);
         // @ts-expect-error We don't care about mocking other rq vars
-        jest.mocked(useGetRunningJobs).mockReturnValue({ data: { pages: [{ jobs }] } });
+        jest.mocked(useGetRunningJobs).mockReturnValue({ data: { pages: [{ jobs }] }, isSuccess: true });
 
         const { result } = renderHook(() => useTrainingProgress(taskId), { wrapper });
 
         expect(result.current.showTrainingProgress).toBe(true);
-        expect('trainingDetails' in result.current && result.current.trainingDetails).toEqual(jobs);
+        // returns only the job assigned to the task
+        expect('trainingDetails' in result.current && result.current.trainingDetails).toEqual([jobs[0]]);
     });
 
     it('should not return running job item when there is running job but assigned to another task', async () => {
