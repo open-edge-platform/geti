@@ -125,7 +125,7 @@ def post_image(
     status_code = (
         status.HTTP_202_ACCEPTED
         if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING)
-        else status.HTTP_201_CREATED
+        else status.HTTP_200_OK
     )
     return JSONResponse(content=content, status_code=status_code)
 
@@ -161,7 +161,7 @@ def post_video(
     status_code = (
         status.HTTP_202_ACCEPTED
         if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING)
-        else status.HTTP_201_CREATED
+        else status.HTTP_200_OK
     )
     return JSONResponse(content=content, status_code=status_code)
 
