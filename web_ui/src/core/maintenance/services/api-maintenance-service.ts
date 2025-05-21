@@ -8,7 +8,7 @@ import { MaintenanceResponse, MaintenanceService } from './maintenance.interface
 
 export const createApiMaintenanceService: CreateApiService<MaintenanceService> = () => {
     const getMaintenanceInfo = async (configUrl: string): Promise<MaintenanceResponse> => {
-        const { data } = await client.get<MaintenanceResponse>(configUrl);
+        const { data } = await apiClient.get<MaintenanceResponse>(configUrl);
 
         return data;
     };
