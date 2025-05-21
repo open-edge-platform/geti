@@ -205,7 +205,10 @@ jobs:
     permissions:
       contents: read # to checkout code
       id-token: write # is required by nested component-check
-    secrets: inherit
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REGISTRY: ${{ secrets.REGISTRY }}
     uses: ./.github/workflows/component.yml
     with:
       image-tag: ${{ inputs.image-tag }}
