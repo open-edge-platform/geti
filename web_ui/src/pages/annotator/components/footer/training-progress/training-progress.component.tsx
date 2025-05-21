@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, useMediaQuery, useNumberFormatter, View } from '@geti/ui';
+import { isLargeSizeQuery, isMediumLargeSizeQuery } from '@geti/ui/theme';
 
 import { ProgressBar } from '../../../../../shared/components/progress-bar/progress-bar.component';
 import { trimText } from '../../../../../shared/utils';
-import { isLargeSizeQuery, isMediumLargeSizeQuery } from '../../../../../theme/queries';
 
 import classes from './training-progress.module.scss';
 

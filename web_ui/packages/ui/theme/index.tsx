@@ -3,9 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Provider } from '@geti/ui';
-
-import './../assets/index.scss';
+import { Provider } from '@adobe/react-spectrum';
 
 import theme from './geti/theme';
 
@@ -23,3 +21,11 @@ export const ThemeProvider = ({ children, router }: ComponentProps<typeof Provid
         </Provider>
     );
 };
+
+export {
+    isLargeSizeQuery,
+    biggerThanQuery,
+    isMediumLargeSizeQuery,
+    isExtraLargeSizeQuery,
+    smallerThanQuery,
+} from './queries';

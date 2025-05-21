@@ -18,6 +18,7 @@ import {
     View,
 } from '@geti/ui';
 import { InfoOutline } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +28,6 @@ import { useProjectActions } from '../../core/projects/hooks/use-project-actions
 import { paths } from '../../core/services/routes';
 import { useWorkspaceIdentifier } from '../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { TooltipWithDisableButton } from '../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { isLargeSizeQuery } from '../../theme/queries';
 import { InfoSection } from './components/info-section/info-section.component';
 import { getStepInfo, getTotalSteps } from './components/utils';
 import { CreateProjectButton } from './create-project-button/create-project-button.component';

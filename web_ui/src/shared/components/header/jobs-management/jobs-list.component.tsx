@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Loading, Text, View } from '@geti/ui';
+import { Loading, Text, View, VirtualizedListLayout } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Selection } from 'react-aria-components';
 
@@ -12,7 +12,6 @@ import { Job } from '../../../../core/jobs/jobs.interface';
 import { SortByAttribute, SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsListItem } from './jobs-list-item.component';
 import { DISCARD_TYPE, JOB_STATE_TO_DISCARD_TYPE } from './utils';
-import { VirtualizedJobList } from './virtualized-jobs-list.component';
 
 export interface JobsListProps {
     jobState: JobState;
@@ -68,14 +67,16 @@ export const JobsList = ({
                 />
             </View>
 
-            <VirtualizedJobList
-                gap={gap}
+            <VirtualizedListLayout
                 items={jobs}
                 selected={selected}
                 isLoading={isFetchingNextPage}
+                layoutOptions={{ gap }}
+                idFormatter={({ id }) => id}
+                textValueFormatter={({ name }) => name}
                 onLoadMore={handleFetchNextPage}
-            >
-                {(job) => (
+                containerHeight={'calc(100% - size-350)'}
+                renderItem={(job) => (
                     <JobsListItem
                         job={job}
                         discardType={discardType}
@@ -83,7 +84,7 @@ export const JobsList = ({
                         onSelectItem={() => setSelected(new Set([job.id]))}
                     />
                 )}
-            </VirtualizedJobList>
+            />
         </View>
     );
 };

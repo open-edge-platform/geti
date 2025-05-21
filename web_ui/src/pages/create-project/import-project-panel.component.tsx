@@ -5,6 +5,7 @@ import { ChangeEvent, useRef } from 'react';
 
 import { Button, Flex, Text, View } from '@geti/ui';
 import { DatasetImport as DatasetImportIcon } from '@geti/ui/icons';
+import { isExtraLargeSizeQuery } from '@geti/ui/theme';
 import { Link } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 
@@ -16,7 +17,6 @@ import { mediaExtensionHandler } from '../../providers/media-upload-provider/med
 import { useProjectsImportProvider } from '../../providers/projects-import-provider/projects-import-provider.component';
 import { DropZone, onDropFiles } from '../../shared/drag-and-drop/drag-and-drop.component';
 import { isValidFileExtension } from '../../shared/media-utils';
-import { isExtraLargeSizeQuery } from '../../theme/queries';
 
 import classes from './import-project-panel.module.scss';
 

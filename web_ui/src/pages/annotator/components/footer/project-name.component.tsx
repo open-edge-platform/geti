@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
 import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 
 import classes from './annotator-footer.module.scss';
 

@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import { Divider, Flex, Heading, Text, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { useParams } from 'react-router-dom';
 
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';
@@ -18,7 +19,6 @@ import {
     SortDirection,
 } from '../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { getMatchedMediaCounts } from '../../utils';
 import { MediaItemsBucketTitle, MediaItemsBucketType } from './media-items-bucket.interface';
 import { TestMediaItemsList } from './test-media-items-list.component';

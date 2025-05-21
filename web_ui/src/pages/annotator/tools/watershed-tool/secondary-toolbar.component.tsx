@@ -4,10 +4,10 @@
 import { Key, useEffect } from 'react';
 
 import { Divider, Flex, Text, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
 import { filterOutExclusiveLabel } from '../../../../core/labels/utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';

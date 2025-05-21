@@ -4,6 +4,7 @@
 import { Key, useEffect } from 'react';
 
 import { dimensionValue, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { omit } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -15,7 +16,6 @@ import { SliderAnimation } from '../../../../shared/components/slider-animation/
 import { Tabs } from '../../../../shared/components/tabs/tabs.component';
 import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import {
     CreateNewProjectSelectedTabType,
     ProjectMetadata,

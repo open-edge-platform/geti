@@ -13,9 +13,6 @@ from dataclasses_json import dataclass_json
 from iai_core.entities.model import TrainingFramework, TrainingFrameworkType
 from kubernetes_asyncio import client, config
 from kubernetes_asyncio.config import ConfigException
-from packaging.version import parse as parse_version
-
-from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 logger = logging.getLogger(__name__)
 
@@ -72,19 +69,11 @@ class TrainerImageInfo:
         # This information is from `impt-configuration` config map in the namespace `impt`
         if (mlflow_sidecar_image := configmap.data.get("mlflow_sidecar_image")) is None:
             raise ValueError(msg.format("mlflow_sidecar_image", namespace, name))
-        if (ote_image := configmap.data.get("ote_image")) is None:
-            raise ValueError(msg.format("ote_image", namespace, name))
         if (otx2_image := configmap.data.get("otx2_image")) is None:
             raise ValueError(msg.format("otx2_image", namespace, name))
         if render_gid_value := configmap.data.get("render_gid"):
             render_gid = int(render_gid_value)
-        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_OTX_VERSION_SELECTION):
-            if parse_version(training_framework.version) < parse_version("2.0.0"):
-                image_name = ote_image
-            else:
-                image_name = otx2_image
-        else:
-            image_name = otx2_image
+        image_name = otx2_image
 
         logger.info(
             f"Trainer image has been selected {image_name}, where a model has trainer "

@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Grid, minmax, Text, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
@@ -15,7 +16,6 @@ import { CreditBalanceStatus } from '../../../../shared/components/header/credit
 import { JobsActionIcon } from '../../../../shared/components/header/jobs-management/jobs-action-icon.component';
 import { useIsCreditAccountEnabled } from '../../../../shared/hooks/use-is-credit-account-enabled';
 import { hasEqualSize } from '../../../../shared/utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { useSelectedDataset } from '../../../project-details/components/project-dataset/use-selected-dataset/use-selected-dataset.hook';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useRequiredAnnotations } from '../../hooks/use-required-annotations.hook';

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Item, Picker, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
 import { Task } from '../../../../../core/projects/task.interface';
 import { hasEqualId } from '../../../../../shared/utils';
-import { isLargeSizeQuery } from '../../../../../theme/queries';
 import { useIsSceneBusy } from '../../../hooks/use-annotator-scene-interaction-state.hook';
 import { usePrediction } from '../../../providers/prediction-provider/prediction-provider.component';
 import { BreadcrumbSegment } from './breadcrumb-segment.component';

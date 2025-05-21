@@ -113,7 +113,6 @@ export {
 } from '@react-types/shared';
 
 export { Popover, Overlay } from '@react-spectrum/overlays';
-export { type Theme } from '@react-types/provider';
 export { type TextFieldRef } from '@react-types/textfield';
 export { type ColumnSize } from '@react-types/table';
 export { type ToggleProps } from '@react-types/checkbox';
