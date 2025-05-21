@@ -91,8 +91,8 @@ class ConfigurableParametersRESTViews:
             type_any_of = schema.get(PYDANTIC_ANY_OF, [{}])[0]
             pydantic_type = schema.get("type", type_any_of.get("type"))
 
-            if field is None and pydantic_type not in PYDANTIC_BASE_TYPES_MAPPING:
-                # Skip values that are None if they're non-basic types (nested pydantic models)
+            if field is None:
+                # Do not show None values in the REST view. None parameters means they are not supported
                 continue
 
             if pydantic_type in PYDANTIC_BASE_TYPES_MAPPING:

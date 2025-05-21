@@ -31,18 +31,18 @@ class RandomAffine(BaseModel):
         description="Whether to apply random affine transformations to the image",
     )
     degrees: float = Field(gte=0.0, default=0.0, title="Rotation degrees", description="Maximum rotation angle in degrees")
-    translate_x: float | None = Field(
-        default=None,
+    translate_x: float = Field(
+        default=0.0,
         title="Horizontal translation",
         description="Maximum horizontal translation as a fraction of image width",
     )
-    translate_y: float | None = Field(
-        default=None,
+    translate_y: float = Field(
+        default=0.0,
         title="Vertical translation",
         description="Maximum vertical translation as a fraction of image height",
     )
-    scale: float | None = Field(
-        default=None, title="Scale factor", description="Scaling factor for the image during affine transformation"
+    scale: float = Field(
+        default=1.0, title="Scale factor", description="Scaling factor for the image during affine transformation"
     )
 
 

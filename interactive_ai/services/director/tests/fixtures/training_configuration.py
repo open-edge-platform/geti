@@ -13,12 +13,13 @@ from geti_configuration_tools.hyperparameters import (
     Tiling,
     TrainingHyperParameters,
 )
+from geti_configuration_tools.hyperparameters.hyperparameters import LearningRate, MaxDetectionPerImage, MaxEpochs
 from geti_configuration_tools.training_configuration import (
     Filtering,
     GlobalDatasetPreparationParameters,
     GlobalParameters,
     SubsetSplit,
-    TrainingConfiguration,
+    TrainingConfiguration, MaxAnnotationPixels, MaxAnnotationObjects,
 )
 
 
@@ -31,7 +32,10 @@ def ftx_hyperparameters():
             )
         ),
         training=TrainingHyperParameters(
-            early_stopping=EarlyStopping(enable=True, patience=5),
+            early_stopping=EarlyStopping(),
+            learning_rate=LearningRate(),
+            max_epochs=MaxEpochs(),
+            max_detection_per_image=MaxDetectionPerImage(),
         ),
         evaluation=EvaluationParameters(),
     )
@@ -52,8 +56,7 @@ def ftx_hyperparameters_2():
             )
         ),
         training=TrainingHyperParameters(
-            max_epochs=10,
-            max_detection_per_image=5,
+            learning_rate=LearningRate(learning_rate=0.05),
         ),
         evaluation=EvaluationParameters(),
     )
@@ -90,8 +93,14 @@ def fxt_global_parameters_2():
             ),
             filtering=Filtering(
                 min_annotation_pixels=10,
-                max_annotation_pixels=100,
-                max_annotation_objects=1000,
+                max_annotation_pixels=MaxAnnotationPixels(
+                    enable=True,
+                    max_annotation_pixels=100,
+                ),
+                max_annotation_objects=MaxAnnotationObjects(
+                    enable=True,
+                    max_annotation_objects=1000,
+                ),
             ),
         )
     )
@@ -172,24 +181,46 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "max_value": None,
                 },
                 {
-                    "key": "max_annotation_pixels",
-                    "name": "Maximum annotation pixels",
-                    "description": "Maximum number of pixels in an annotation",
-                    "value": None,
-                    "default_value": None,
-                    "type": "int",
-                    "min_value": 1,
-                    "max_value": None,
-                },
-                {
-                    "key": "max_annotation_objects",
-                    "name": "Maximum annotation objects",
-                    "description": "Maximum number of objects in an annotation",
-                    "value": None,
-                    "default_value": None,
-                    "type": "int",
-                    "min_value": 1,
-                    "max_value": None,
+                    "max_annotation_objects": [
+                        {
+                            "default_value": False,
+                            "description": "Whether to apply maximum annotation objects filtering",
+                            "key": "enable",
+                            "name": "Enable maximum annotation objects filtering",
+                            "type": "bool",
+                            "value": False,
+                        },
+                        {
+                            "key": "max_annotation_objects",
+                            "name": "Maximum annotation objects",
+                            "description": "Maximum number of objects in an annotation",
+                            "value": 10000,
+                            "default_value": 10000,
+                            "type": "int",
+                            "min_value": 1,
+                            "max_value": None,
+                        },
+                    ],
+                    "max_annotation_pixels": [
+                        {
+                            "default_value": False,
+                            "description": "Whether to apply maximum annotation pixels filtering",
+                            "key": "enable",
+                            "name": "Enable maximum annotation pixels filtering",
+                            "type": "bool",
+                            "value": False,
+                        },
+                        {
+                            "key": "max_annotation_pixels",
+                            "name": "Maximum annotation pixels",
+                            "description": "Maximum number of pixels in an annotation",
+                            "value": 10000,
+                            "default_value": 10000,
+                            "type": "int",
+                            "min_value": 1,
+                            "max_value": None,
+                        },
+                    ]
                 },
             ],
             "augmentation": {
@@ -215,63 +246,75 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                 ]
             },
         },
-        "training": [
-            {
-                "key": "max_epochs",
-                "name": "Maximum epochs",
-                "description": "Maximum number of training epochs to run",
-                "value": None,
-                "default_value": None,
-                "type": "int",
-                "min_value": 0,
-                "max_value": None,
-            },
-            {
-                "default_value": None,
-                "description": "Base learning rate for the optimizer",
-                "key": "learning_rate",
-                "max_value": 1.0,
-                "min_value": 0.0,
-                "name": "Learning rate",
-                "type": "float",
-                "value": None,
-            },
-            {
-                "key": "max_detection_per_image",
-                "name": "Maximum number of detections per image",
-                "description": (
-                    "Maximum number of objects that can be detected in a single image, "
-                    "only applicable for instance segmentation models"
-                ),
-                "value": None,
-                "default_value": None,
-                "type": "int",
-                "min_value": 0,
-                "max_value": None,
-            },
-            {
-                "early_stopping": [
-                    {
-                        "default_value": False,
-                        "description": "Whether to stop training early when performance stops improving",
-                        "key": "enable",
-                        "name": "Enable early stopping",
-                        "type": "bool",
-                        "value": True,
-                    },
-                    {
-                        "default_value": 1,
-                        "description": "Number of epochs with no improvement after which training will be stopped",
-                        "key": "patience",
-                        "max_value": None,
-                        "min_value": 0,
-                        "name": "Patience",
-                        "type": "int",
-                        "value": 5,
-                    },
-                ]
-            },
-        ],
+        "training": {
+            "max_epochs": [
+                {
+                    "key": "max_epochs",
+                    "name": "Maximum epochs",
+                    "description": "Maximum number of training epochs to run",
+                    "value": 1000,
+                    "default_value": 1000,
+                    "type": "int",
+                    "min_value": 0,
+                    "max_value": None,
+                },
+            ],
+            "learning_rate": [
+                {
+                    "default_value": 0.001,
+                    "description": "Base learning rate for the optimizer",
+                    "key": "learning_rate",
+                    "max_value": 1.0,
+                    "min_value": 0.0,
+                    "name": "Learning rate",
+                    "type": "float",
+                    "value": 0.001,
+                },
+            ],
+            "early_stopping": [
+                {
+                    "default_value": False,
+                    "description": "Whether to stop training early when performance stops improving",
+                    "key": "enable",
+                    "name": "Enable early stopping",
+                    "type": "bool",
+                    "value": False,
+                },
+                {
+                    "default_value": 1,
+                    "description": "Number of epochs with no improvement after which training will be stopped",
+                    "key": "patience",
+                    "max_value": None,
+                    "min_value": 0,
+                    "name": "Patience",
+                    "type": "int",
+                    "value": 1,
+                },
+            ],
+            "max_detection_per_image": [
+                {
+                    "default_value": False,
+                    "description": "Whether to limit the number of detections per image",
+                    "key": "enable",
+                    "name": "Enable maximum detection per image",
+                    "type": "bool",
+                    "value": False,
+                },
+                {
+                    "default_value": 10000,
+                    "description": (
+                        "Maximum number of objects that can be detected in a single image, "
+                        "only applicable for instance segmentation models"
+                    ),
+                    "key": "max_detection_per_image",
+                    "name": "Maximum number of detections per image",
+                    "type": "int",
+                    "min_value": 0,
+                    "max_value": None,
+                    "value": 10000,
+                },
+            ]
+        },
         "evaluation": [],
     }
 
@@ -356,24 +399,46 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                     "max_value": None,
                 },
                 {
-                    "key": "max_annotation_pixels",
-                    "name": "Maximum annotation pixels",
-                    "description": "Maximum number of pixels in an annotation",
-                    "value": 100,
-                    "default_value": None,
-                    "type": "int",
-                    "min_value": 1,
-                    "max_value": None,
-                },
-                {
-                    "key": "max_annotation_objects",
-                    "name": "Maximum annotation objects",
-                    "description": "Maximum number of objects in an annotation",
-                    "value": 1000,
-                    "default_value": None,
-                    "type": "int",
-                    "min_value": 1,
-                    "max_value": None,
+                    "max_annotation_objects": [
+                        {
+                            "default_value": False,
+                            "description": "Whether to apply maximum annotation objects filtering",
+                            "key": "enable",
+                            "name": "Enable maximum annotation objects filtering",
+                            "type": "bool",
+                            "value": True,
+                        },
+                        {
+                            "key": "max_annotation_objects",
+                            "name": "Maximum annotation objects",
+                            "description": "Maximum number of objects in an annotation",
+                            "value": 1000,
+                            "default_value": 10000,
+                            "type": "int",
+                            "min_value": 1,
+                            "max_value": None,
+                        },
+                    ],
+                    "max_annotation_pixels": [
+                        {
+                            "default_value": False,
+                            "description": "Whether to apply maximum annotation pixels filtering",
+                            "key": "enable",
+                            "name": "Enable maximum annotation pixels filtering",
+                            "type": "bool",
+                            "value": True,
+                        },
+                        {
+                            "key": "max_annotation_pixels",
+                            "name": "Maximum annotation pixels",
+                            "description": "Maximum number of pixels in an annotation",
+                            "value": 100,
+                            "default_value": 10000,
+                            "type": "int",
+                            "min_value": 1,
+                            "max_value": None,
+                        },
+                    ]
                 },
             ],
             "augmentation": {
@@ -420,8 +485,8 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                         "key": "translate_x",
                         "name": "Horizontal translation",
                         "description": "Maximum horizontal translation as a fraction of image width",
-                        "value": None,
-                        "default_value": None,
+                        "value": 0.0,
+                        "default_value": 0.0,
                         "type": "float",
                         "min_value": None,
                         "max_value": None,
@@ -430,8 +495,8 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                         "key": "translate_y",
                         "name": "Vertical translation",
                         "description": "Maximum vertical translation as a fraction of image height",
-                        "value": None,
-                        "default_value": None,
+                        "value": 0.0,
+                        "default_value": 0.0,
                         "type": "float",
                         "min_value": None,
                         "max_value": None,
@@ -440,8 +505,8 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                         "key": "scale",
                         "name": "Scale factor",
                         "description": "Scaling factor for the image during affine transformation",
-                        "value": None,
-                        "default_value": None,
+                        "value": 1.0,
+                        "default_value": 1.0,
                         "type": "float",
                         "min_value": None,
                         "max_value": None,
@@ -487,62 +552,74 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                 ],
             },
         },
-        "training": [
-            {
-                "key": "max_epochs",
-                "name": "Maximum epochs",
-                "description": "Maximum number of training epochs to run",
-                "value": 10,
-                "default_value": None,
-                "type": "int",
-                "min_value": 0,
-                "max_value": None,
-            },
-            {
-                "default_value": None,
-                "description": "Base learning rate for the optimizer",
-                "key": "learning_rate",
-                "max_value": 1.0,
-                "min_value": 0.0,
-                "name": "Learning rate",
-                "type": "float",
-                "value": None,
-            },
-            {
-                "key": "max_detection_per_image",
-                "name": "Maximum number of detections per image",
-                "description": (
-                    "Maximum number of objects that can be detected in a single image, "
-                    "only applicable for instance segmentation models"
-                ),
-                "value": 5,
-                "default_value": None,
-                "type": "int",
-                "min_value": 0,
-                "max_value": None,
-            },
-            {
-                "early_stopping": [
-                    {
-                        "default_value": False,
-                        "description": "Whether to stop training early when performance stops improving",
-                        "key": "enable",
-                        "name": "Enable early stopping",
-                        "type": "bool",
-                        "value": True,
-                    },
-                    {
-                        "default_value": 1,
-                        "description": "Number of epochs with no improvement after which training will be stopped",
-                        "key": "patience",
-                        "max_value": None,
-                        "min_value": 0,
-                        "name": "Patience",
-                        "type": "int",
-                        "value": 5,
-                    },
-                ]
-            },
-        ],
+        "training": {
+            "max_epochs": [
+                {
+                    "key": "max_epochs",
+                    "name": "Maximum epochs",
+                    "description": "Maximum number of training epochs to run",
+                    "value": 1000,
+                    "default_value": 1000,
+                    "type": "int",
+                    "min_value": 0,
+                    "max_value": None,
+                },
+            ],
+            "learning_rate": [
+                {
+                    "default_value": 0.001,
+                    "description": "Base learning rate for the optimizer",
+                    "key": "learning_rate",
+                    "max_value": 1.0,
+                    "min_value": 0.0,
+                    "name": "Learning rate",
+                    "type": "float",
+                    "value": 0.05,
+                },
+            ],
+            "early_stopping": [
+                {
+                    "default_value": False,
+                    "description": "Whether to stop training early when performance stops improving",
+                    "key": "enable",
+                    "name": "Enable early stopping",
+                    "type": "bool",
+                    "value": False,
+                },
+                {
+                    "default_value": 1,
+                    "description": "Number of epochs with no improvement after which training will be stopped",
+                    "key": "patience",
+                    "max_value": None,
+                    "min_value": 0,
+                    "name": "Patience",
+                    "type": "int",
+                    "value": 1,
+                },
+            ],
+            "max_detection_per_image": [
+                {
+                    "default_value": False,
+                    "description": "Whether to limit the number of detections per image",
+                    "key": "enable",
+                    "name": "Enable maximum detection per image",
+                    "type": "bool",
+                    "value": False,
+                },
+                {
+                    "default_value": 10000,
+                    "description": (
+                        "Maximum number of objects that can be detected in a single image, "
+                        "only applicable for instance segmentation models"
+                    ),
+                    "key": "max_detection_per_image",
+                    "name": "Maximum number of detections per image",
+                    "type": "int",
+                    "min_value": 0,
+                    "max_value": None,
+                    "value": 10000,
+                },
+            ]
+        },
         "evaluation": [],
     }

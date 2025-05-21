@@ -39,17 +39,43 @@ class SubsetSplit(BaseModel):
         return self
 
 
+class MaxAnnotationPixels(BaseModel):
+    """Parameters for maximum annotation pixels."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable maximum annotation pixels filtering",
+        description="Whether to apply maximum annotation pixels filtering",
+    )
+    max_annotation_pixels: int = Field(
+        ge=1, default=10000, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    )
+
+
+class MaxAnnotationObjects(BaseModel):
+    """Parameters for maximum annotation objects."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable maximum annotation objects filtering",
+        description="Whether to apply maximum annotation objects filtering",
+    )
+    max_annotation_objects: int = Field(
+        ge=1, default=10000, title="Maximum annotation objects", description="Maximum number of objects in an annotation"
+    )
+
+
 class Filtering(BaseModel):
     """Parameters for filtering annotations in the dataset."""
 
     min_annotation_pixels: int = Field(
         gt=0, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
     )
-    max_annotation_pixels: int | None = Field(
-        ge=1, default=None, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    max_annotation_pixels: MaxAnnotationPixels = Field(
+        default=MaxAnnotationPixels(), title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
     )
-    max_annotation_objects: int | None = Field(
-        gt=1, default=None, title="Maximum annotation objects", description="Maximum number of objects in an annotation"
+    max_annotation_objects: MaxAnnotationObjects = Field(
+        default=MaxAnnotationObjects(), title="Maximum annotation objects", description="Maximum number of objects in an annotation"
     )
 
 
