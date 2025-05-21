@@ -8,16 +8,14 @@ import { isLargeSizeQuery } from '@geti/ui/theme';
 import { useParams } from 'react-router-dom';
 
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { useViewMode } from '../../../../hooks/use-view-mode/use-view-mode.hook';
 import { MediaViewModes } from '../../../../shared/components/media-view-modes/media-view-modes.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
-import {
-    SortByAttribute,
-    SortDirection,
-} from '../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
+import { SortByAttribute } from '../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { getMatchedMediaCounts } from '../../utils';
 import { MediaItemsBucketTitle, MediaItemsBucketType } from './media-items-bucket.interface';

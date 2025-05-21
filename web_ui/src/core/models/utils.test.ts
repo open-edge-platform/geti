@@ -7,6 +7,7 @@ import {
     getMockedModelVersion,
 } from '../../test-utils/mocked-items-factory/mocked-model';
 import { PerformanceType } from '../projects/task.interface';
+import { SortDirection } from '../shared/query-parameters';
 import {
     hasActiveModels,
     sortModelsByCreationTime,
@@ -39,14 +40,12 @@ describe('sortModelGroupsByActiveModel', () => {
     });
 
     it('model group that contains active model should be at the top', () => {
-        expect(sortModelsGroupsByActiveModel([groupWithInactiveModel, groupWithActiveModel], 'ASC')).toEqual([
-            groupWithActiveModel,
-            groupWithInactiveModel,
-        ]);
-        expect(sortModelsGroupsByActiveModel([groupWithActiveModel, groupWithInactiveModel], 'ASC')).toEqual([
-            groupWithActiveModel,
-            groupWithInactiveModel,
-        ]);
+        expect(
+            sortModelsGroupsByActiveModel([groupWithInactiveModel, groupWithActiveModel], SortDirection.ASC)
+        ).toEqual([groupWithActiveModel, groupWithInactiveModel]);
+        expect(
+            sortModelsGroupsByActiveModel([groupWithActiveModel, groupWithInactiveModel], SortDirection.ASC)
+        ).toEqual([groupWithActiveModel, groupWithInactiveModel]);
     });
 
     it('does not change the order of model groups across different tasks', () => {
@@ -70,7 +69,10 @@ describe('sortModelGroupsByActiveModel', () => {
         });
 
         expect(
-            sortModelsGroupsByActiveModel([taskOneInactiveModel, taskOneActiveModel, taskTwoActiveModel], 'ASC')
+            sortModelsGroupsByActiveModel(
+                [taskOneInactiveModel, taskOneActiveModel, taskTwoActiveModel],
+                SortDirection.ASC
+            )
         ).toEqual([taskOneActiveModel, taskOneInactiveModel, taskTwoActiveModel]);
     });
 });
@@ -82,7 +84,7 @@ describe('sortModelsByCreationTime', () => {
     const modelD = getMockedModelVersion({ creationDate: '2025-04-05' });
 
     it('sorts by creation date in ascending order', () => {
-        expect(sortModelsByCreationTime([modelD, modelA, modelC, modelB], 'ASC')).toEqual([
+        expect(sortModelsByCreationTime([modelD, modelA, modelC, modelB], SortDirection.ASC)).toEqual([
             modelA,
             modelB,
             modelD,
@@ -91,7 +93,7 @@ describe('sortModelsByCreationTime', () => {
     });
 
     it('sorts by creation date in descending order', () => {
-        expect(sortModelsByCreationTime([modelD, modelA, modelC, modelB], 'DESC')).toEqual([
+        expect(sortModelsByCreationTime([modelD, modelA, modelC, modelB], SortDirection.DESC)).toEqual([
             modelD,
             modelC,
             modelB,
@@ -114,11 +116,11 @@ describe('sortModelsGroupsByCreationTime', () => {
     });
 
     it('sorts by creation date in ascending order', () => {
-        expect(sortModelsGroupsByCreationTime([groupB, groupA], 'ASC')).toEqual([groupA, groupB]);
+        expect(sortModelsGroupsByCreationTime([groupB, groupA], SortDirection.ASC)).toEqual([groupA, groupB]);
     });
 
     it('sorts by creation date in descending order', () => {
-        expect(sortModelsGroupsByCreationTime([groupB, groupA], 'DESC')).toEqual([
+        expect(sortModelsGroupsByCreationTime([groupB, groupA], SortDirection.DESC)).toEqual([
             { ...groupB, modelVersions: [modelBB, modelBA] },
             { ...groupA, modelVersions: [modelAB, modelAA] },
         ]);
@@ -137,8 +139,8 @@ describe('sortModelsGroupsByActiveModel', () => {
     });
 
     it('model group that contains active model should be at the top', () => {
-        expect(sortModelsGroupsByActiveModel([groupB, groupA], 'ASC')).toEqual([groupA, groupB]);
-        expect(sortModelsGroupsByActiveModel([groupB, groupA], 'DESC')).toEqual([groupB, groupA]);
+        expect(sortModelsGroupsByActiveModel([groupB, groupA], SortDirection.ASC)).toEqual([groupA, groupB]);
+        expect(sortModelsGroupsByActiveModel([groupB, groupA], SortDirection.DESC)).toEqual([groupB, groupA]);
     });
 
     it('does not change the order of model groups across different tasks', () => {
@@ -168,7 +170,7 @@ describe('sortModelsGroupsByActiveModel', () => {
         expect(
             sortModelsGroupsByActiveModel(
                 [taskOneInactiveModel, taskOneActiveModel, taskTwoInactiveModel, taskTwoActiveModel],
-                'ASC'
+                SortDirection.ASC
             )
         ).toEqual([taskOneActiveModel, taskOneInactiveModel, taskTwoActiveModel, taskTwoInactiveModel]);
     });
@@ -186,14 +188,14 @@ describe('sortModelsGroupsByScore', () => {
     const groupB = getMockedModelsGroupAlgorithmDetails({ modelVersions: [modelBA, modelBB, modelBC] });
 
     it('sorts by score in ascending order', () => {
-        expect(sortModelsGroupsByScore([groupA, groupB], 'ASC')).toEqual([
+        expect(sortModelsGroupsByScore([groupA, groupB], SortDirection.ASC)).toEqual([
             { ...groupB, modelVersions: [modelBC, modelBA, modelBB] },
             groupA,
         ]);
     });
 
     it('sorts by score in descending order', () => {
-        expect(sortModelsGroupsByScore([groupA, groupB], 'DESC')).toEqual([
+        expect(sortModelsGroupsByScore([groupA, groupB], SortDirection.DESC)).toEqual([
             { ...groupA, modelVersions: [modelAB, modelAA] },
             { ...groupB, modelVersions: [modelBB, modelBA, modelBC] },
         ]);
@@ -216,11 +218,11 @@ describe('sortModelsGroupsByComplexity', () => {
     });
 
     it('sorts by complexity in ascending order', () => {
-        expect(sortModelsGroupsByComplexity([groupA, groupB], 'ASC')).toEqual([groupA, groupB]);
+        expect(sortModelsGroupsByComplexity([groupA, groupB], SortDirection.ASC)).toEqual([groupA, groupB]);
     });
 
     it('sorts by complexity in descending order', () => {
-        expect(sortModelsGroupsByComplexity([groupA, groupB], 'DESC')).toEqual([groupB, groupA]);
+        expect(sortModelsGroupsByComplexity([groupA, groupB], SortDirection.DESC)).toEqual([groupB, groupA]);
     });
 });
 
@@ -236,11 +238,11 @@ describe('sortModelsGroupsByModelSize', () => {
     const groupB = getMockedModelsGroupAlgorithmDetails({ modelVersions: [modelBA, modelBB, modelBC] });
 
     it('sorts by model size in ascending order', () => {
-        expect(sortModelsGroupsByModelSize([groupA, groupB], 'ASC')).toEqual([groupA, groupB]);
+        expect(sortModelsGroupsByModelSize([groupA, groupB], SortDirection.ASC)).toEqual([groupA, groupB]);
     });
 
     it('sorts by model size in descending order', () => {
-        expect(sortModelsGroupsByModelSize([groupA, groupB], 'DESC')).toEqual([
+        expect(sortModelsGroupsByModelSize([groupA, groupB], SortDirection.DESC)).toEqual([
             { ...groupB, modelVersions: [modelBC, modelBB, modelBA] },
             { ...groupA, modelVersions: [modelAB, modelAA] },
         ]);
