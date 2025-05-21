@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SortDirection } from '../../shared/components/sort-by-attribute/sort-by-attribute.component';
 import { getMockedProjectIdentifier } from '../../test-utils/mocked-items-factory/mocked-identifiers';
 import { PredictionCache, PredictionMode } from '../annotations/services/prediction-service.interface';
 import { MEDIA_TYPE } from '../media/base-media.interface';
 import { MediaIdentifier } from '../media/media.interface';
+import { SortDirection } from '../shared/query-parameters';
 import { API_URLS, MEDIA_ITEM } from './urls';
 
 describe('urls', () => {

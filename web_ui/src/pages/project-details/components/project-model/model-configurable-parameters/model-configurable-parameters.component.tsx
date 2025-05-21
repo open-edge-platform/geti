@@ -4,9 +4,9 @@
 import { Loading, View } from '@geti/ui';
 
 import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
+import { ConfigurableParametersType } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { useModelIdentifier } from '../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
-import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 
 interface ModelConfigurableParametersProps {
     taskId: string;

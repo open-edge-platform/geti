@@ -4,8 +4,11 @@
 import { View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import {
+    ConfigParameterItemProp,
+    ConfigurableParametersParams,
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ANIMATION_PARAMETERS } from '../../../animation-parameters/animation-parameters';
-import { ConfigParameterItemProp, ConfigurableParametersParams } from '../configurable-parameters.interface';
 import { CPParamItem } from '../cp-item/cp-item.component';
 import { useCPRule } from '../use-rule.hook';
 

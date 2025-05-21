@@ -3,8 +3,8 @@
 
 import { screen } from '@testing-library/react';
 
+import { ConfigurableParametersComponents } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
-import { ConfigurableParametersComponents } from '../../configurable-parameters.interface';
 import { SelectableTabContent } from './selectable-tab-content.component';
 
 describe('Selectable tab content', () => {

@@ -9,7 +9,8 @@ import { Selection } from 'react-aria-components';
 
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
-import { SortByAttribute, SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
+import { SortDirection } from '../../../../core/shared/query-parameters';
+import { SortByAttribute } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsListItem } from './jobs-list-item.component';
 import { DISCARD_TYPE, JOB_STATE_TO_DISCARD_TYPE } from './utils';
 

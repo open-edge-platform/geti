@@ -2,14 +2,14 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ConfigurableParametersComponentsBodyDTO } from '../../../../core/configurable-parameters/dtos/configurable-parameters.interface';
-import { ModelGroupsAlgorithmDetails, ModelsGroups } from '../../../../core/models/models.interface';
-import { PerformanceCategory } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
-import { TaskWithSupportedAlgorithms } from '../../../../core/supported-algorithms/supported-algorithms.interface';
 import {
     ConfigurableParametersComponents,
     ConfigurableParametersTaskChain,
-} from '../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { getComponentsDTO } from '../../../../shared/components/configurable-parameters/utils';
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { getComponentsDTO } from '../../../../core/configurable-parameters/utils';
+import { ModelGroupsAlgorithmDetails, ModelsGroups } from '../../../../core/models/models.interface';
+import { PerformanceCategory } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
+import { TaskWithSupportedAlgorithms } from '../../../../core/supported-algorithms/supported-algorithms.interface';
 import { hasEqualId } from '../../../../shared/utils';
 
 export const getSelectedComponent = (

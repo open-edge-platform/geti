@@ -6,15 +6,15 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } f
 import { isEqual } from 'lodash-es';
 
 import { useConfigParameters } from '../../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
-import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
 import {
     ConfigurableParametersComponents,
     ConfigurableParametersTaskChain,
-} from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+} from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import {
     getReconfigureParametersDTO,
     updateSelectedParameter,
-} from '../../../../../../shared/components/configurable-parameters/utils';
+} from '../../../../../../core/configurable-parameters/utils';
+import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
 import { getSelectedComponent } from '../../utils';
 
 interface UseReconfigureParametersValue {

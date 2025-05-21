@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { isEmpty } from 'lodash-es';
+import { isEmpty, orderBy } from 'lodash-es';
 
-import { getFileSize, isNonEmptyString, sortDescending } from '../../../shared/utils';
+import { getFileSize, isNonEmptyString } from '../../../shared/utils';
 import { TrainingDatasetInfoDTO } from '../../datasets/dtos/training-dataset.interface';
 import { TrainingDatasetInfo } from '../../datasets/services/training-dataset.interface';
 import { getRawNewLabel } from '../../projects/services/utils';
@@ -49,7 +49,7 @@ export const getModelsEntity = (
     tasksWithSupportedAlgorithms: TaskWithSupportedAlgorithms
 ): ModelsGroups[] => {
     return modelsDTO.map(({ name, models, id, task_id, model_template_id, lifecycle_stage }) => {
-        const sortedModelsByVersion: ModelDTO[] = sortDescending(models, 'version');
+        const sortedModelsByVersion: ModelDTO[] = orderBy(models, 'version', 'desc');
 
         const algorithms = tasksWithSupportedAlgorithms[task_id] ?? [];
         const usedAlgorithm = algorithms.find((algorithm) => algorithm.modelTemplateId === model_template_id);

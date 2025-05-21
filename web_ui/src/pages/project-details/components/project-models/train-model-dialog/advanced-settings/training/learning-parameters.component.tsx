@@ -5,7 +5,7 @@ import { FC } from 'react';
 
 import { noop } from 'lodash-es';
 
-import { ConfigurableParametersParams } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { ConfigurableParametersParams } from '../../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { Accordion } from '../ui/accordion/accordion.component';
 import { Parameters } from '../ui/parameters.component';
 

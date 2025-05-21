@@ -8,12 +8,9 @@ import { SortUp } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { usePress } from 'react-aria';
 
-import classes from './sort-by-attribute.module.scss';
+import { SortDirection } from '../../../core/shared/query-parameters';
 
-export enum SortDirection {
-    ASC = 'asc',
-    DESC = 'dsc',
-}
+import classes from './sort-by-attribute.module.scss';
 
 interface SortByAttributeProps {
     label?: string;

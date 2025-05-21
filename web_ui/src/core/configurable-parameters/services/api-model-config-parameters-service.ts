@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ConfigurableParametersTaskChain } from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
@@ -12,6 +11,7 @@ import {
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
 import { ProjectConfigurationDTO, ProjectConfigurationUploadPayloadDTO } from '../dtos/configuration.interface';
+import { ConfigurableParametersTaskChain } from './configurable-parameters.interface';
 import {
     ProjectConfiguration,
     TrainingConfiguration,
