@@ -19,7 +19,10 @@ class EarlyStopping(BaseModel):
         description="Whether to stop training early when performance stops improving"
     )
     patience: int = Field(
-        gt=0, default=1, title="Patience", description="Number of epochs with no improvement after which training will be stopped"
+        gt=0,
+        default=1,
+        title="Patience",
+        description="Number of epochs with no improvement after which training will be stopped",
     )
 
 
@@ -32,7 +35,9 @@ class TrainingHyperParameters(BaseModel):
     early_stopping: EarlyStopping | None = Field(
         default=None, title="Early stopping", description="Configuration for early stopping mechanism"
     )
-    learning_rate: float = Field(gt=0.0, lt=1.0, default=0.001, title="Learning rate", description="Base learning rate for the optimizer")
+    learning_rate: float | None = Field(
+        gt=0.0, lt=1.0, default=None, title="Learning rate", description="Base learning rate for the optimizer"
+    )
     max_detection_per_image: int | None = Field(
         default=None,
         gt=0,

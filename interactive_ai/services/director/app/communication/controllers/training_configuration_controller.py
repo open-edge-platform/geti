@@ -70,7 +70,6 @@ class TrainingConfigurationRESTController:
         task_id: ID,
         model_manifest_id: str | None = None,
         model_id: ID | None = None,  # noqa: ARG003
-        exclude_none: bool = False,
     ) -> dict[str, Any]:
         """
         Retrieves training configuration.
@@ -80,7 +79,6 @@ class TrainingConfigurationRESTController:
         :param project_identifier: Identifier for the project (containing organization_id, workspace_id, and project_id)
         :param task_id: ID of the task to retrieve configuration for
         :param model_manifest_id: Optional ID of the model manifest to retrieve specific configurations
-        :param exclude_none: Whether to exclude None values from the response
         :return: Dictionary representation of the training configuration
         :raises TaskNotFoundException: If the task does not exist
         """
@@ -99,6 +97,4 @@ class TrainingConfigurationRESTController:
             complete_config_dict = cls._merge_deep_dict(training_config_dict, algo_config_dict)
             complete_config_dict["id_"] = ""  # ID is required but is not relevant for the REST view
             training_config = TrainingConfiguration.model_validate(complete_config_dict)
-        return TrainingConfigurationRESTViews.training_configuration_to_rest(
-            training_configuration=training_config, exclude_none=exclude_none
-        )
+        return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=training_config)

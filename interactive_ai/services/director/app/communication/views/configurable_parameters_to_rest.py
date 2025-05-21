@@ -58,7 +58,7 @@ class ConfigurableParametersRESTViews:
 
     @classmethod
     def configurable_parameters_to_rest(
-        cls, configurable_parameters: BaseModel, exclude_none: bool = False
+        cls, configurable_parameters: BaseModel
     ) -> dict[str, Any] | list[dict[str, Any]]:
         """
         Convert a Pydantic model of configurable parameters to its REST representation.
@@ -76,7 +76,6 @@ class ConfigurableParametersRESTViews:
         - If both exist: returns a list containing parameter dictionaries and nested model dictionary
 
         :param configurable_parameters: Pydantic model containing configurable parameters
-        :param exclude_none: Flag to exclude optional parameters in the rest view
         :return: REST representation as either a dictionary of nested models,
             a list of parameter dictionaries, or a combined list of both
         """
@@ -92,14 +91,8 @@ class ConfigurableParametersRESTViews:
             type_any_of = schema.get(PYDANTIC_ANY_OF, [{}])[0]
             pydantic_type = schema.get("type", type_any_of.get("type"))
 
-            if field is None and (exclude_none or pydantic_type not in PYDANTIC_BASE_TYPES_MAPPING):
-                # Skip values that are None if either:
-                # 1) exclude_none is True (for basic types),
-                # 2) they're non-basic types (nested pydantic models)
-                continue
-
-            # skip all None fields if exclude_none is True
-            if exclude_none and field is None:
+            if field is None and pydantic_type not in PYDANTIC_BASE_TYPES_MAPPING:
+                # Skip values that are None if they're non-basic types (nested pydantic models)
                 continue
 
             if pydantic_type in PYDANTIC_BASE_TYPES_MAPPING:
@@ -114,10 +107,7 @@ class ConfigurableParametersRESTViews:
                 )
             else:
                 # If the field is a nested Pydantic model, process it recursively
-                nested_params[field_name] = cls.configurable_parameters_to_rest(
-                    configurable_parameters=field,
-                    exclude_none=exclude_none,
-                )
+                nested_params[field_name] = cls.configurable_parameters_to_rest(configurable_parameters=field)
 
         # Return combined or individual results based on content
         if nested_params and list_params:

@@ -54,7 +54,6 @@ class TestTrainingConfigurationEndpoints:
             task_id=task_id,
             model_manifest_id=model_manifest_id,
             model_id=None,
-            exclude_none=True,
         )
 
         assert result.status_code == HTTPStatus.OK

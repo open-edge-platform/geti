@@ -31,7 +31,6 @@ def ftx_hyperparameters():
             )
         ),
         training=TrainingHyperParameters(
-            min_annotation_pixels=10,
             early_stopping=EarlyStopping(enable=True, patience=5),
         ),
         evaluation=EvaluationParameters(),
@@ -172,6 +171,26 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "min_value": 0,
                     "max_value": None,
                 },
+                {
+                    "key": "max_annotation_pixels",
+                    "name": "Maximum annotation pixels",
+                    "description": "Maximum number of pixels in an annotation",
+                    "value": None,
+                    "default_value": None,
+                    "type": "int",
+                    "min_value": 1,
+                    "max_value": None,
+                },
+                {
+                    "key": "max_annotation_objects",
+                    "name": "Maximum annotation objects",
+                    "description": "Maximum number of objects in an annotation",
+                    "value": None,
+                    "default_value": None,
+                    "type": "int",
+                    "min_value": 1,
+                    "max_value": None,
+                },
             ],
             "augmentation": {
                 "center_crop": [
@@ -198,14 +217,37 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
         },
         "training": [
             {
-                "default_value": 0.001,
+                "key": "max_epochs",
+                "name": "Maximum epochs",
+                "description": "Maximum number of training epochs to run",
+                "value": None,
+                "default_value": None,
+                "type": "int",
+                "min_value": 0,
+                "max_value": None,
+            },
+            {
+                "default_value": None,
                 "description": "Base learning rate for the optimizer",
                 "key": "learning_rate",
                 "max_value": 1.0,
                 "min_value": 0.0,
                 "name": "Learning rate",
                 "type": "float",
-                "value": 0.001,
+                "value": None,
+            },
+            {
+                "key": "max_detection_per_image",
+                "name": "Maximum number of detections per image",
+                "description": (
+                    "Maximum number of objects that can be detected in a single image, "
+                    "only applicable for instance segmentation models"
+                ),
+                "value": None,
+                "default_value": None,
+                "type": "int",
+                "min_value": 0,
+                "max_value": None,
             },
             {
                 "early_stopping": [
@@ -374,6 +416,36 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                         "min_value": None,
                         "max_value": None,
                     },
+                    {
+                        "key": "translate_x",
+                        "name": "Horizontal translation",
+                        "description": "Maximum horizontal translation as a fraction of image width",
+                        "value": None,
+                        "default_value": None,
+                        "type": "float",
+                        "min_value": None,
+                        "max_value": None,
+                    },
+                    {
+                        "key": "translate_y",
+                        "name": "Vertical translation",
+                        "description": "Maximum vertical translation as a fraction of image height",
+                        "value": None,
+                        "default_value": None,
+                        "type": "float",
+                        "min_value": None,
+                        "max_value": None,
+                    },
+                    {
+                        "key": "scale",
+                        "name": "Scale factor",
+                        "description": "Scaling factor for the image during affine transformation",
+                        "value": None,
+                        "default_value": None,
+                        "type": "float",
+                        "min_value": None,
+                        "max_value": None,
+                    },
                 ],
                 "tiling": [
                     {
@@ -427,14 +499,14 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                 "max_value": None,
             },
             {
-                "default_value": 0.001,
+                "default_value": None,
                 "description": "Base learning rate for the optimizer",
                 "key": "learning_rate",
                 "max_value": 1.0,
                 "min_value": 0.0,
                 "name": "Learning rate",
                 "type": "float",
-                "value": 0.001,
+                "value": None,
             },
             {
                 "key": "max_detection_per_image",

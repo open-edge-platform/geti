@@ -32,7 +32,6 @@ def get_training_configuration(
     task_id: Annotated[str | None, Query()] = None,
     model_manifest_id: Annotated[str | None, Query()] = None,
     model_id: Annotated[str | None, Query()] = None,
-    exclude_none: Annotated[bool, Query()] = False,
 ) -> dict[str, Any]:
     """Retrieve the training configuration"""
     if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
@@ -46,5 +45,4 @@ def get_training_configuration(
         task_id=ID(task_id) if task_id else None,
         model_manifest_id=model_manifest_id,
         model_id=ID(model_id) if model_id else None,
-        exclude_none=exclude_none,
     )

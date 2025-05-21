@@ -30,7 +30,6 @@ class TestTrainingConfigurationController:
         config_rest = TrainingConfigurationRESTController.get_configuration(
             project_identifier=fxt_project_identifier,
             task_id=fxt_training_configuration_task_level.task_id,
-            exclude_none=True,
         )
         assert config_rest == fxt_training_configuration_task_level_rest_view
 
@@ -40,7 +39,6 @@ class TestTrainingConfigurationController:
             project_identifier=fxt_project_identifier,
             task_id=fxt_training_configuration_manifest_level.task_id,
             model_manifest_id=fxt_training_configuration_manifest_level.model_manifest_id,
-            exclude_none=True,
         )
 
         # check that both task level and manifest level configuration are present
