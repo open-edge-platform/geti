@@ -40,7 +40,7 @@ class TestTrainerImageInfo:
             (
                 TrainingFramework(type=TrainingFrameworkType.OTX, version="1.6.0"),
                 "true",
-                "ote_image",
+                "otx2_image",
                 "mlflow_sidecar_image",
                 992,
             ),
