@@ -3,6 +3,7 @@
 
 import { Divider, Flex, Switch, Text, useMediaQuery } from '@geti/ui';
 import { BoundingBox, BoundingCircle } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
 import { Shape } from '../../../../core/annotations/shapes.interface';
@@ -10,7 +11,6 @@ import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { Label } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAddUnfinishedShape } from '../../hooks/use-add-unfinished-shape.hook';

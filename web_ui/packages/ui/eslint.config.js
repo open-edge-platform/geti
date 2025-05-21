@@ -26,7 +26,7 @@ export default [
         },
     },
     {
-        files: ['./src/**/*.{js,jsx,ts,tsx,css,scss}'],
+        files: ['./src/**/*.{js,jsx,ts,tsx,css,scss}', './theme/**/*.{js,jsx,ts,tsx,css,scss}'],
         rules: {
             'no-restricted-imports': [
                 'error',

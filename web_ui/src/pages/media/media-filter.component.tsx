@@ -21,6 +21,7 @@ import {
     type FocusableRefValue,
 } from '@geti/ui';
 import { Add, Filter } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty, isEqual } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -34,7 +35,6 @@ import {
 import { ColorMode } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { QuietToggleButton } from '../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';
-import { isLargeSizeQuery } from '../../theme/queries';
 import { FILTER_MEDIA_LABEL } from '../project-details/components/project-media/utils';
 import { MediaFilterRow } from './components/media-filter-row.component';
 import { SearchOptionReducer } from './reducers/search-options-reducer';
