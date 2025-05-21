@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { client } from '@geti/core';
 import { isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,7 +13,6 @@ import { mediaIdentifierToDTO } from '../../../media/services/utils';
 import { isVideo, Video } from '../../../media/video.interface';
 import { ProjectIdentifier } from '../../../projects/core.interface';
 import { DatasetIdentifier } from '../../../projects/dataset.interface';
-import { instance as defaultAxiosInstance } from '../../../services/axios-instance';
 import { API_URLS } from '../../../services/urls';
 import { Annotation, TaskChainInput } from '../../annotation.interface';
 import {
@@ -102,7 +102,7 @@ const getInputConfig = (predictions: AnnotationDTO[], selectedInput: TaskChainIn
 };
 
 export const createApiInferenceService: CreateApiService<InferenceService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: client, router: API_URLS }
 ) => {
     const getTestPredictions = async (
         projectIdentifier: ProjectIdentifier,

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { client } from '@geti/core';
 import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { GlobalStatusDTO } from '../dtos/status.interface';
@@ -13,7 +13,7 @@ import { getGlobalStatus } from '../utils';
 import { StatusService } from './status-service.interface';
 
 export const createApiStatusService: CreateApiService<StatusService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: client, router: API_URLS }
 ) => {
     const getStatus = async (organizationId?: string): Promise<StatusProps> => {
         const url = router.STATUS(organizationId);

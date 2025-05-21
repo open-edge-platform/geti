@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { client } from '@geti/core';
+
 import {
     JobImportDatasetToExistingProjectStatusDTO,
     JobImportDatasetToNewProjectStatusDTO,
@@ -16,7 +18,6 @@ import {
 } from '../../jobs/jobs.interface';
 import { getJobEntity } from '../../jobs/utils';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
@@ -45,7 +46,7 @@ import { getSupportedProjectTypesFromDTO, getTaskTypeDTOFromTaskType, getWarning
     or to add a dataset to an existing project
 */
 export const createApiDatasetImportService: CreateApiService<DatasetImportService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: client, router: API_URLS }
 ) => {
     const prepareDatasetForNewProject = async ({
         uploadId,

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { client } from '@geti/core';
 import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
@@ -10,7 +11,6 @@ import { MediaItem } from '../../media/media.interface';
 import { mediaIdentifierToDTO } from '../../media/services/utils';
 import { Video } from '../../media/video.interface';
 import { DatasetIdentifier } from '../../projects/dataset.interface';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { Annotation } from '../annotation.interface';
@@ -26,7 +26,7 @@ import { getAnnotationsFromDTO, getKeypointToAnnotationDTO, isKeypointAnnotation
 import { VideoPaginationOptions } from './video-pagination-options.interface';
 
 export const createApiAnnotationService: CreateApiService<AnnotationService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: client, router: API_URLS }
 ) => {
     const getAnnotations = async (
         datasetIdentifier: DatasetIdentifier,

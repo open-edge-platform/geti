@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { instance as defaultAxiosInstance } from '../../../services/axios-instance';
+import { client } from '@geti/core';
+
 import { CreateApiService } from '../../../services/create-api-service.interface';
 import { API_URLS } from '../../../services/urls';
 import { ProductDTO, ProductsResponseDTO } from '../dtos/products.interface';
@@ -10,7 +11,7 @@ import { GetProductsQueryOptions, ProductsService } from './products-service.int
 import { getProductEntity, getProductsQueryOptionsDTO, getProductsResponseEntity } from './utils';
 
 export const createApiProductsService: CreateApiService<ProductsService> = (
-    { instance: platformInstance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance: platformInstance, router } = { instance: client, router: API_URLS }
 ) => {
     const getProducts = async (queryOptions: GetProductsQueryOptions): Promise<ProductsResponse> => {
         const { data } = await platformInstance.get<ProductsResponseDTO>(router.PRODUCTS(), {
