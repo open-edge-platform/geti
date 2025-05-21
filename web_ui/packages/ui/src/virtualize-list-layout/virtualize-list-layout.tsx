@@ -20,16 +20,18 @@ import classes from './virtualize-list-layout.module.scss';
 
 interface VirtualizedListLayoutProps<T> {
     items: T[];
-    selected: Selection;
-    isLoading: boolean;
+    selected?: Selection;
+    isLoading?: boolean;
     ariaLabel?: string;
     layoutOptions: ListLayoutOptions;
+    idFormatter: (item: T) => string;
+    textValueFormatter: (item: T) => string;
     renderLoading?: () => ReactNode;
     renderItem: (item: T) => ReactNode;
-    onLoadMore: () => void;
+    onLoadMore?: () => void;
 }
 
-export const VirtualizedListLayout = <T extends { id: string; name: string }>({
+export const VirtualizedListLayout = <T,>({
     items,
     isLoading,
     selected,
@@ -38,6 +40,8 @@ export const VirtualizedListLayout = <T extends { id: string; name: string }>({
     renderLoading = () => <LoadingIndicator size={'M'} />,
     renderItem,
     onLoadMore,
+    idFormatter,
+    textValueFormatter,
 }: VirtualizedListLayoutProps<T>) => {
     const ref = useRef<HTMLDivElement | null>(null);
     useLoadMore({ onLoadMore, isLoading, items }, ref);
@@ -53,8 +57,10 @@ export const VirtualizedListLayout = <T extends { id: string; name: string }>({
                     aria-label={ariaLabel}
                 >
                     {items.map((item) => {
+                        const id = idFormatter(item);
+
                         return (
-                            <ListBoxItem id={item.id} key={item.id} textValue={item.name}>
+                            <ListBoxItem id={id} key={id} textValue={textValueFormatter(item)}>
                                 {renderItem(item)}
                             </ListBoxItem>
                         );
