@@ -436,8 +436,7 @@ class ImportUtils:
         :return: dictionary mapping label names to a set of dm annotation type
         """
         label_cat: dm.LabelCategories = dm_dataset.categories()[dm.AnnotationType.label]
-
-        # label_names = [label_item.name for label_item in label_cat]
+        label_points: dm.PointsCategories | None = dm_dataset.categories().get(dm.AnnotationType.points, None)
 
         label_idx_to_ann_types = defaultdict(set)
         total = len(dm_dataset)
@@ -448,8 +447,11 @@ class ImportUtils:
                 continue
             for dm_ann in dm_item.annotations:
                 label_id = getattr(dm_ann, "label", None)
-                if label_id is not None:
+                if label_id:
                     label_idx_to_ann_types[label_id].add(dm_ann.type)
+                elif label_points:
+                    # for keypoint annotations, we force the label_id to be 0 which is the first label in the dm dataset
+                    label_idx_to_ann_types[0].add(dm_ann.type)
                 # TODO: need to check if this is needed.
                 # for dm_attr_key in dm_ann.attributes:
                 #     if dm_attr_key in label_names:
