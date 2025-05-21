@@ -3,7 +3,7 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
-import { ActionButton, ColorMode, Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
 import { CreditCard } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
@@ -61,7 +61,7 @@ const CreditBalanceButtonDefault = forwardRef(
                     aria-label={'credit balance status'}
                     onPress={onPress}
                     UNSAFE_className={UNSAFE_className}
-                    colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                    colorVariant={isDarkMode ? 'dark' : 'light'}
                 >
                     {organizationBalance && isBalanceLow(organizationBalance) && (
                         <div className={classes.cornerIndicator} aria-label={`low credit indicator`}></div>

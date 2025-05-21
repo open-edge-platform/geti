@@ -7,7 +7,6 @@ import {
     ActionButton,
     Button,
     ButtonGroup,
-    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -155,7 +154,7 @@ export const ChangePasswordPopup = ({ userId }: ChangePasswordPopupProps): JSX.E
 
     return (
         <DialogTrigger>
-            <ActionButton isQuiet colorMode={ColorMode.BLUE} alignSelf='self-start' id={'change-password-button'}>
+            <ActionButton isQuiet colorVariant={'blue'} alignSelf='self-start' id={'change-password-button'}>
                 Change password
             </ActionButton>
             {(close) => (

@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { ActionButton, ColorMode, Flex, Link, Text } from '@geti/ui';
+import { ActionButton, Flex, Link, Text } from '@geti/ui';
 import { CloseSmall, Info } from '@geti/ui/icons';
 import { createPortal } from 'react-dom';
 
@@ -49,7 +49,7 @@ export const EmptyAnnotationsNotification = (): JSX.Element => {
                             Go to detection
                         </Link>
                     </Flex>
-                    <ActionButton isQuiet colorMode={ColorMode.LIGHT} onPress={() => setIsVisible(false)}>
+                    <ActionButton isQuiet colorVariant={'light'} onPress={() => setIsVisible(false)}>
                         <CloseSmall />
                     </ActionButton>
                 </Flex>

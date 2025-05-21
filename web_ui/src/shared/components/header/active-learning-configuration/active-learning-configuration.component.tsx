@@ -3,7 +3,6 @@
 
 import {
     ActionButton,
-    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -91,7 +90,7 @@ export const ActiveLearningConfiguration = ({
                     isDisabled={isLoading}
                     id={'active-learning-configuration-button'}
                     aria-label={'Active learning configuration'}
-                    colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                    colorVariant={isDarkMode ? 'dark' : 'light'}
                     zIndex={1}
                 >
                     <AutoTraining width={15} aria-label={'tasks in progress'} />

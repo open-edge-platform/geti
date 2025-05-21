@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { ActionButton, ColorMode, Flex, View } from '@geti/ui';
+import { ActionButton, Flex, View } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 import { UserPhotoPreview } from './user-photo-preview.component';
@@ -49,7 +49,7 @@ export const UserPhoto = ({
                     isQuiet
                     onPress={handleUploadClick}
                     UNSAFE_className={classes.userPhotoBtn}
-                    colorMode={ColorMode.BLUE}
+                    colorVariant={'blue'}
                     isDisabled={isLoading}
                 >
                     Change
@@ -58,7 +58,7 @@ export const UserPhoto = ({
                     isQuiet
                     onPress={handleDeleteUserPhoto}
                     UNSAFE_className={classes.userPhotoBtn}
-                    colorMode={ColorMode.BLUE}
+                    colorVariant={'blue'}
                     isDisabled={isLoading}
                 >
                     Remove

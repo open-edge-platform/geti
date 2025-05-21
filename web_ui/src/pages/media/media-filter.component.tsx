@@ -6,7 +6,6 @@ import { CSSProperties, Dispatch, MutableRefObject, useCallback, useEffect, useR
 import {
     ActionButton,
     ButtonGroup,
-    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -193,7 +192,7 @@ export const MediaFilter = ({
                                 >
                                     {isMediaFetching && (
                                         <View paddingTop={'size-65'}>
-                                            <ThreeDotsFlashing mode={ColorMode.LIGHT} size={'S'} />
+                                            <ThreeDotsFlashing variant={'light'} size={'S'} />
                                         </View>
                                     )}
 

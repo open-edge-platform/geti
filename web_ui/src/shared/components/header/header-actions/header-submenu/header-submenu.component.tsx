@@ -3,7 +3,7 @@
 
 import { ComponentProps, Key, ReactNode } from 'react';
 
-import { ActionButton, ColorMode, Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
+import { ActionButton, Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 
@@ -43,7 +43,7 @@ export const HeaderSubmenu = ({
                 isQuiet
                 id={idMatchingFormat(ariaLabel)}
                 aria-label={ariaLabel}
-                colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                colorVariant={isDarkMode ? 'dark' : 'light'}
                 UNSAFE_className={buttonClasses}
             >
                 {icon}

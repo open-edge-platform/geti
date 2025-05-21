@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton, ColorMode, Flex, Provider, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ActionButton, Flex, Provider, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { InstallPWA } from '@geti/ui/icons';
 
 import { AutoTrainingCreditsModalFactory } from '../../../../pages/annotator/notification/auto-training-credits-modal/auto-training-credits-modal.component';
@@ -43,7 +43,7 @@ export const HeaderActions = ({ isDarkMode, isProject, isAnomalyProject }: Heade
                                 isQuiet
                                 key='install-app'
                                 id='install-app'
-                                colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                                colorVariant={isDarkMode ? 'dark' : 'light'}
                                 aria-label='Install Geti (PWA)'
                                 onPress={handlePromptInstallApp}
                             >

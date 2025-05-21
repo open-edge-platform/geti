@@ -7,7 +7,6 @@ import {
     ActionButton,
     Button,
     ButtonGroup,
-    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -113,7 +112,7 @@ export const Settings = ({ settings, isDarkMode = false }: SettingsProps): JSX.E
             <TooltipTrigger placement={'bottom'}>
                 <ActionButton
                     isQuiet
-                    colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                    colorVariant={isDarkMode ? 'dark' : 'light'}
                     aria-label='Settings'
                     data-testid='settings-icon'
                 >

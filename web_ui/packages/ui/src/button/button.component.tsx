@@ -35,19 +35,15 @@ function LinkBuilder({ href, target, rel }: { href: string; target?: LinkProps['
 
 export interface ActionButtonProps extends SpectrumActionButtonProps {
     ref?: Ref<FocusableRefValue<HTMLElement, HTMLButtonElement>>;
-    colorMode?: ColorMode;
+    colorVariant?: ButtonColorVariant;
 }
 
-export enum ColorMode {
-    DARK,
-    LIGHT,
-    BLUE,
-}
+type ButtonColorVariant = 'dark' | 'light' | 'blue';
 
-const getActionButtonClass = (colorMode: ColorMode = ColorMode.DARK) => {
-    return colorMode === ColorMode.DARK
+const getActionButtonClass = (colorVariant: ButtonColorVariant = 'dark') => {
+    return colorVariant === 'dark'
         ? buttonClasses.actionButtonDark
-        : colorMode === ColorMode.LIGHT
+        : colorVariant === 'light'
           ? buttonClasses.actionButtonLight
           : buttonClasses.actionButtonBlue;
 };
@@ -62,8 +58,8 @@ export const Button = forwardRef((props: ButtonProps, ref: ButtonProps['ref']) =
 });
 
 export const ActionButton = forwardRef((props: ActionButtonProps, ref: ActionButtonProps['ref']) => {
-    const { colorMode = ColorMode.DARK, UNSAFE_className, ...rest } = props;
-    const buttonClass = getActionButtonClass(colorMode);
+    const { colorVariant, UNSAFE_className, ...rest } = props;
+    const buttonClass = getActionButtonClass(colorVariant);
 
     return <SpectrumActionButton {...rest} ref={ref} UNSAFE_className={clsx(buttonClass, UNSAFE_className)} />;
 });

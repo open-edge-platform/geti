@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { ActionButton, ColorMode, DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
@@ -46,7 +46,7 @@ export const JobsActionIcon = ({ isDarkMode = false }: JobsActionIconProps): JSX
                     id='jobs-in-progress'
                     aria-label='Jobs in progress'
                     data-testid='jobs-in-progress'
-                    colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                    colorVariant={isDarkMode ? 'dark' : 'light'}
                     onPress={() => {
                         settings.saveConfig({
                             ...settings.config,
