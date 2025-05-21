@@ -118,9 +118,7 @@ class TestMediaRESTEndpoint:
 
         # Assert
         assert (
-            result.status_code == status.HTTP_202_ACCEPTED
-            if asynchronous_media_preprocessing
-            else status.HTTP_200_OK
+            result.status_code == status.HTTP_202_ACCEPTED if asynchronous_media_preprocessing else status.HTTP_200_OK
         )
         mock_upload_media.assert_called_once_with(
             user_id=DUMMY_USER,
@@ -163,9 +161,7 @@ class TestMediaRESTEndpoint:
 
         # Assert
         assert (
-            result.status_code == status.HTTP_202_ACCEPTED
-            if asynchronous_media_preprocessing
-            else status.HTTP_200_OK
+            result.status_code == status.HTTP_202_ACCEPTED if asynchronous_media_preprocessing else status.HTTP_200_OK
         )
         mock_upload_media.assert_called_once_with(
             user_id=DUMMY_USER,
@@ -228,9 +224,7 @@ class TestMediaRESTEndpoint:
 
         # Assert
         assert (
-            result.status_code == status.HTTP_202_ACCEPTED
-            if asynchronous_media_preprocessing
-            else status.HTTP_200_OK
+            result.status_code == status.HTTP_202_ACCEPTED if asynchronous_media_preprocessing else status.HTTP_200_OK
         )
         mock_upload_media.assert_called_once_with(
             user_id=DUMMY_USER,
