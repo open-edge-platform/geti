@@ -4,10 +4,10 @@
 import { ReactNode, RefObject, useState } from 'react';
 
 import { View, type DOMRefValue } from '@geti/ui';
+import { ThemeProvider } from '@geti/ui/theme';
 import { OverlayContainer } from 'react-aria';
 
 import { useEventListener } from '../../../../../../hooks/event-listener/event-listener.hook';
-import { ThemeProvider } from '../../../../../../providers/theme-provider/theme-provider.component';
 import { MouseEvents } from '../../../../../../shared/mouse-events';
 
 export interface CursorContextMenuProps {

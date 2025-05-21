@@ -5,7 +5,7 @@ import { ComponentProps, FC } from 'react';
 
 import { ThemeProvider as Provider } from '@geti/ui/theme';
 
-import '../../assets/index.scss';
+import '../assets/index.scss';
 
 export const ThemeProvider: FC<Pick<ComponentProps<typeof Provider>, 'router' | 'children'>> = ({
     children,

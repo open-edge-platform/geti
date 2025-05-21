@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ThemeProvider } from '@geti/ui/theme';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { ThemeProvider } from '../../../../../../providers/theme-provider/theme-provider.component';
 import { TrainingModelInfo } from './training-model-info.component';
 
 describe('TrainingModelInfo', () => {

@@ -13,7 +13,7 @@ import { ErrorBoundary } from '../pages/errors/error-boundary.component';
 import { AuthProvider } from './auth-provider/auth-provider.component';
 import { ProgressiveWebAppProvider } from './progressive-web-app-provider/progressive-web-app-provider.component';
 import { QueryClientProvider } from './query-client-provider/query-client-provider.component';
-import { ThemeProvider } from './theme-provider/theme-provider.component';
+import { ThemeProvider } from './theme-provider.component';
 
 const useInMemoryEnvironment = process.env.REACT_APP_VALIDATION_COMPONENT_TESTS === 'true';
 

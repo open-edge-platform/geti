@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useMediaQuery } from '@geti/ui';
+import { ThemeProvider } from '@geti/ui/theme';
 import { render, screen } from '@testing-library/react';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
-import { ThemeProvider } from '../../../../providers/theme-provider/theme-provider.component';
 import { checkTooltip } from '../../../../test-utils/utils';
 import { StorageUsage } from './storage-usage.component';
 
