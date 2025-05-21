@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import 'core-js';
 import 'jest-canvas-mock';
 
-import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import { isLargeSizeQuery as mockIsLargeSizeQuery } from '@geti/ui/theme';
 
@@ -83,21 +83,6 @@ jest.mock('recharts', () => {
 });
 
 jest.mock('@opentelemetry/core/build/src/platform/node/timer-util.js', () => ({ unrefTimer: jest.fn() }));
-
-jest.mock('react-virtuoso', () => {
-    const { VirtuosoGrid, Virtuoso, ...rest } = jest.requireActual('react-virtuoso');
-    const { forwardRef } = jest.requireActual('react');
-
-    const mockVirtuoso = <T extends { totalCount?: number; data?: never[] }>(
-        WrappedVirtuoso: ComponentType<PropsWithChildren<T>>
-    ) =>
-        forwardRef((props: T, ref: null) => {
-            return (
-                <WrappedVirtuoso initialItemCount={props?.totalCount ?? props.data?.length ?? 1} ref={ref} {...props} />
-            );
-        });
-    return { VirtuosoGrid: mockVirtuoso(VirtuosoGrid), Virtuoso: mockVirtuoso(Virtuoso), ...rest };
-});
 
 jest.mock('react-aria-components', () => {
     const { Virtualizer, ...rest } = jest.requireActual('react-aria-components');
