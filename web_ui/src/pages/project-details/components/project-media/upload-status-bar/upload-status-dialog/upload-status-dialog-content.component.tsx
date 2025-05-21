@@ -26,7 +26,7 @@ export const UploadStatusDialogContent = (): JSX.Element => {
             <Flex direction='column' height={'size-3600'} UNSAFE_style={{ overflowY: 'scroll' }} gap={'size-100'}>
                 <VirtualizedListLayout
                     items={list}
-                    idFormatter={(item) => `${item.uploadId}-${item.uploadId}`}
+                    idFormatter={(item) => `${item.fileName}-${item.uploadId}`}
                     textValueFormatter={(item) => item.fileName}
                     layoutOptions={{ gap: 10 }}
                     renderItem={(item: MediaUploadItem) => (

@@ -20,7 +20,7 @@ interface ProjectsListProps {
 }
 
 export const ProjectsList = ({ projects, projectsQuery }: ProjectsListProps): JSX.Element => {
-    const [selected, setSelected] = useState<Selection>(new Set());
+    const [selected, setSelected] = useState<Selection>(new Set([]));
 
     useEffect(() => {
         // The user might have searched for a project (using our client side search) and
@@ -57,7 +57,7 @@ export const ProjectsList = ({ projects, projectsQuery }: ProjectsListProps): JS
             idFormatter={({ id }) => id}
             textValueFormatter={({ name }) => name}
             renderLoading={() => <ProjectListItemSkeletonLoader itemCount={1} />}
-            renderItem={(item) => <Project project={item} onSelectItem={() => setSelected(new Set(item.id))} />}
+            renderItem={(item) => <Project project={item} onSelectItem={() => setSelected(new Set([item.id]))} />}
         />
     );
 };

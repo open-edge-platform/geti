@@ -3,8 +3,9 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { DimensionValue, View } from '@adobe/react-spectrum';
 import { useLoadMore } from '@react-aria/utils';
+import { type Responsive } from '@react-types/shared';
 import {
     ListBox as AriaComponentsListBox,
     ListBoxItem,
@@ -24,11 +25,12 @@ interface VirtualizedListLayoutProps<T> {
     isLoading?: boolean;
     ariaLabel?: string;
     layoutOptions: ListLayoutOptions;
-    idFormatter: (item: T) => string;
-    textValueFormatter: (item: T) => string;
+    containerHeight?: Responsive<DimensionValue>;
+    onLoadMore?: () => void;
     renderLoading?: () => ReactNode;
     renderItem: (item: T) => ReactNode;
-    onLoadMore?: () => void;
+    idFormatter: (item: T) => string;
+    textValueFormatter: (item: T) => string;
 }
 
 export const VirtualizedListLayout = <T,>({
@@ -37,6 +39,7 @@ export const VirtualizedListLayout = <T,>({
     selected,
     ariaLabel,
     layoutOptions,
+    containerHeight,
     renderLoading = () => <LoadingIndicator size={'M'} />,
     renderItem,
     onLoadMore,
@@ -47,7 +50,7 @@ export const VirtualizedListLayout = <T,>({
     useLoadMore({ onLoadMore, isLoading, items }, ref);
 
     return (
-        <View UNSAFE_className={classes.mainContainer}>
+        <View UNSAFE_className={classes.mainContainer} height={containerHeight}>
             <Virtualizer layout={ListLayout} layoutOptions={layoutOptions}>
                 <AriaComponentsListBox
                     ref={ref}

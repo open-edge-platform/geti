@@ -5,7 +5,7 @@ import '@testing-library/jest-dom';
 import 'core-js';
 import 'jest-canvas-mock';
 
-import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import { initializeMetrics } from './analytics/metrics';
 import { API_URLS } from './core/services/urls';
