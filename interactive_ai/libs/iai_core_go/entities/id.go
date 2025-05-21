@@ -28,7 +28,7 @@ func (s ID) IsValid() error {
 	return validator.Validate(s)
 }
 
-// IsEmptyID checks if the ID is empty.
-func (s ID) IsEmptyID() bool {
-	return s == ID{""}
+// IsEmpty checks if the ID is empty.
+func (s ID) IsEmpty() bool {
+	return s.ID == ""
 }

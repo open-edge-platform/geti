@@ -199,12 +199,12 @@ func getMediaBuffer(
 	frameIndex int,
 ) (*bytes.Buffer, error) {
 	switch {
-	case !imageID.IsEmptyID():
+	case !imageID.IsEmpty():
 		fullImageID := sdkentities.NewFullImageID(r.OrganizationID, r.WorkspaceID, r.ProjectID,
 			datasetID.String(), imageID.String())
 		return ic.mediaSrv.GetImage(ctx, fullImageID)
 
-	case !videoID.IsEmptyID():
+	case !videoID.IsEmpty():
 		fullVideoID := sdkentities.NewFullVideoID(r.OrganizationID, r.WorkspaceID, r.ProjectID,
 			datasetID.String(), videoID.String())
 		return ic.mediaSrv.GetFrame(ctx, fullVideoID, frameIndex)

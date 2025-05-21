@@ -113,7 +113,7 @@ func (pd PredictionRequestData) GetURL() string {
 		pd.ProjectID.String() + "/datasets/" + pd.MediaInfo.DatasetID.String()
 
 	// Determine if a request needs to be made to the image or video frame endpoint
-	if !pd.MediaInfo.ImageID.IsEmptyID() {
+	if !pd.MediaInfo.ImageID.IsEmpty() {
 		predictionURL += "/media/images/" + pd.MediaInfo.ImageID.String() +
 			"/predictions/latest?inf_gateway=true"
 	} else {
@@ -141,7 +141,7 @@ func (pd PredictionRequestData) ToPredictBytes(predictionJSONString string) ([]b
 	var jsonOutput []byte
 
 	switch {
-	case !pd.MediaInfo.ImageID.IsEmptyID():
+	case !pd.MediaInfo.ImageID.IsEmpty():
 		imageIdentifier := ImageIdentifier{
 			ImageID: pd.MediaInfo.ImageID.String(),
 			Type:    "image",
@@ -151,7 +151,7 @@ func (pd PredictionRequestData) ToPredictBytes(predictionJSONString string) ([]b
 			MediaIdentifier:  imageIdentifier,
 		})
 
-	case !pd.MediaInfo.VideoID.IsEmptyID():
+	case !pd.MediaInfo.VideoID.IsEmpty():
 		videoFrameIdentifier := VideoFrameIdentifier{
 			VideoID:    pd.MediaInfo.VideoID.String(),
 			FrameIndex: pd.MediaInfo.FrameIndex,
@@ -187,7 +187,7 @@ func (pd PredictionRequestData) ToExplainBytes(explainJSONString string) ([]byte
 	var jsonOutput []byte
 
 	switch {
-	case !pd.MediaInfo.ImageID.IsEmptyID():
+	case !pd.MediaInfo.ImageID.IsEmpty():
 		imageIdentifier := ImageIdentifier{
 			ImageID: pd.MediaInfo.ImageID.String(),
 			Type:    "image",
@@ -196,7 +196,7 @@ func (pd PredictionRequestData) ToExplainBytes(explainJSONString string) ([]byte
 			ExplainOutput:   explainOutput,
 			MediaIdentifier: imageIdentifier,
 		})
-	case !pd.MediaInfo.VideoID.IsEmptyID():
+	case !pd.MediaInfo.VideoID.IsEmpty():
 		videoFrameIdentifier := VideoFrameIdentifier{
 			VideoID:    pd.MediaInfo.VideoID.String(),
 			FrameIndex: pd.MediaInfo.FrameIndex,

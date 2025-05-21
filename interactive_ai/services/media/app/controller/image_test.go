@@ -15,7 +15,7 @@ import (
 
 	sdkendities "geti.com/iai_core/entities"
 	"geti.com/iai_core/middleware"
-	mockstorage "geti.com/iai_core/mock/storage"
+	"geti.com/iai_core/storage"
 	"geti.com/iai_core/testhelper"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -33,7 +33,7 @@ func TestImageController(t *testing.T) {
 	fullImageID := testhelper.GetFullImageID(t)
 
 	ctx := context.Background()
-	mockImageRepo := mockstorage.NewMockImageRepository(t)
+	mockImageRepo := storage.NewMockImageRepository(t)
 	mockGetThumbUC := usecase.NewMockIGetOrCreateThumbnail(t)
 
 	tests := []struct {

@@ -12,16 +12,16 @@ import (
 	"testing"
 
 	sdkentities "geti.com/iai_core/entities"
-	mockframes "geti.com/iai_core/mock/frames"
-	mockstorage "geti.com/iai_core/mock/storage"
+	"geti.com/iai_core/frames"
+	"geti.com/iai_core/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestMediaService(t *testing.T) {
-	videoRepoMock := mockstorage.NewMockVideoRepository(t)
-	imageRepoMock := mockstorage.NewMockImageRepository(t)
-	frameReaderMock := mockframes.NewMockFrameReader(t)
+	videoRepoMock := storage.NewMockVideoRepository(t)
+	imageRepoMock := storage.NewMockImageRepository(t)
+	frameReaderMock := frames.NewMockFrameReader(t)
 
 	ctx := context.Background()
 	fullImageID := sdkentities.GetFullImageID(t)

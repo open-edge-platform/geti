@@ -10,8 +10,7 @@ import (
 
 	sdkentities "geti.com/iai_core/entities"
 	"geti.com/iai_core/frames"
-	mockframes "geti.com/iai_core/mock/frames"
-	mockstorage "geti.com/iai_core/mock/storage"
+	"geti.com/iai_core/storage"
 	pb "geti.com/predict"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -68,8 +67,8 @@ func TestPredictBatch(t *testing.T) {
 	}
 
 	mockModelAccess := service.NewMockModelAccessService(t)
-	mockVideoRepo := mockstorage.NewMockVideoRepository(t)
-	mockFrameExtractor := mockframes.NewMockCLIFrameExtractor(t)
+	mockVideoRepo := storage.NewMockVideoRepository(t)
+	mockFrameExtractor := frames.NewMockCLIFrameExtractor(t)
 
 	mockVideoRepo.EXPECT().
 		LoadVideoByID(ctx, fullVideoID).

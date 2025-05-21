@@ -21,6 +21,6 @@ func TestValidateID(t *testing.T) {
 func TestEmptyID(t *testing.T) {
 	emptyID := ID{""}
 
-	assert.True(t, emptyID.IsEmptyID())
+	assert.True(t, emptyID.IsEmpty())
 	require.Error(t, emptyID.IsValid())
 }

@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	sdkendities "geti.com/iai_core/entities"
-	mockstorage "geti.com/iai_core/mock/storage"
+	"geti.com/iai_core/storage"
 	"geti.com/iai_core/testhelper"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -29,7 +29,7 @@ func readImage(t *testing.T) (*os.File, int64) {
 }
 
 func TestGetOrCreateThumbnail(t *testing.T) {
-	mockRepo := mockstorage.NewMockImageRepository(t)
+	mockRepo := storage.NewMockImageRepository(t)
 	mockCropper := service.NewMockCropper(t)
 
 	ctx := context.Background()
