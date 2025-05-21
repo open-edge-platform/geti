@@ -119,7 +119,7 @@ spec:
             - name: JOB_SERVICE_ADDRESS
               value: {{ .Release.Namespace }}-jobs-ms:50051
             - name: WORKDIR
-              value: {{ .Values.mountPath }}
+              value: {{ .Values.diskSizeMountPath }}
             - name: SERVICE_MANAGEMENT_ENABLED
               value: "1"
             - name: ORCHESTRATOR
@@ -242,6 +242,10 @@ spec:
             - name: tls-secrets
               mountPath: "/etc/tls-secrets"
               readOnly: true
+            - name: disk-size
+              mountPath: {{ .Values.diskSizeMountPath }}
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: true
           ports:
             - name: director
               containerPort: {{ .Values.service.ports.director.port }}
@@ -259,6 +263,9 @@ spec:
         - name: data-storage
           emptyDir: {}
         {{- end }}
+        - name: disk-size
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim
         - name: config
           configMap:
             name: {{ .Release.Namespace }}-logging-config
