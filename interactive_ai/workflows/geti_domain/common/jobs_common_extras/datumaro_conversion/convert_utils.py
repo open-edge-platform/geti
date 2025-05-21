@@ -424,7 +424,7 @@ class ConvertUtils:
             # e.g.) 1 <- a0, 1 <- a1, 2 <- b0, 2 <- b1, [1, 2], [a0, a1], [b0, b1]
             # if an item is annotated to 'a0' and 'b0',
             # it disobeys the multi-label rule after including ancestors of 'a0' and 'b0'
-            # becaus '1' and '2' are grouped together.
+            # because '1' and '2' are grouped together.
             # In this case, we remove 'b0' and all ancestors of 'b0'
             multi_label_error = False
             for sc_label in sc_labels_for_dm_label:
@@ -649,7 +649,7 @@ class ConvertUtils:
         :param dm_categories: Categories of datumaro dataset to map.
         :param dm_infos: Infos of datumaro dataset to map.
         :param sc_labels: SC labels.
-        :param domain: Lable domain. We should provide special mapping for anomaly labels.
+        :param domain: Label domain. We should provide special mapping for anomaly labels.
         :return: Method that return sc label corresponding to datumaro label id.
         """
         dm_label_mapper = ConvertUtils.get_dm_label_mapper(dm_categories, domain)
@@ -699,10 +699,14 @@ class ConvertUtils:
         :return: method mapping dm label id to sc label
         """
         dm_labels: dm.LabelCategories = dm_categories[dm.AnnotationType.label]
+        dm_points: dm.PointsCategories | None = dm_categories.get(dm.AnnotationType.points, None)
 
         def _get_sc_label(dm_label_id: int | str) -> Label | None:
             try:
-                dm_label_name = dm_labels[dm_label_id].name if isinstance(dm_label_id, int) else dm_label_id
+                if dm_points:
+                    dm_label_name = dm_points.items[0].labels[dm_label_id]
+                else:
+                    dm_label_name = dm_labels[dm_label_id].name if isinstance(dm_label_id, int) else dm_label_id
                 return labels_map[dm_label_name]
             except KeyError:
                 return NullLabel()
@@ -715,7 +719,7 @@ class ConvertUtils:
         Mapping of sc_label to group id
 
         :param label_schema: label_schema of target sc project
-        :return: mapping of sc_label to all ancester labels
+        :return: mapping of sc_label to all ancestor labels
         """
         sc_label_to_group_id = {}
         for label_group in label_schema.get_groups(include_empty=False):
@@ -726,11 +730,11 @@ class ConvertUtils:
     @staticmethod
     def get_sc_label_to_all_parents(sc_labels: list[Label], label_schema: LabelSchema) -> dict[Label, list[Label]]:
         """
-        Mapping of sc_label to all ancester labels
+        Mapping of sc_label to all ancestor labels
 
         :param sc_labels: list of sc_label
         :param label_schema: label_schema of target sc project
-        :return: mapping of sc_label to all ancester labels
+        :return: mapping of sc_label to all ancestor labels
         """
         sc_label_to_all_parents = defaultdict(list)
         for sc_label in sc_labels:
@@ -782,10 +786,10 @@ class ConvertUtils:
         :param selected_labels: labels selected by a user for being imported
         :param project_type: Geti project type
         :param include_all_labels: if True, ignore selected_labels then include all possible labels for each task_type
-        :return: label_groups metadata, hierachical labeling tree, list of label names
+        :return: label_groups metadata, hierarchical labeling tree, list of label names
         """
         # Collect the label names from the categories()
-        # that are utilized to construct a hierachical labeling structure or LabelGroup
+        # that are utilized to construct a hierarchical labeling structure or LabelGroup
         label_groups: list[dict[str, Any]] = []
         labelname_to_parent: dict[str, str] = {}
 

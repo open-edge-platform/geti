@@ -634,7 +634,7 @@ class ScExtractorFromDatasetStorage(ScExtractor):
         for i, identifier in enumerate(self._identifiers):
             if self._progress_config:
                 # Datumaro's export iterates the dataset several times while exporting.
-                # This is trickey, but we need to consider the implementation detail of datumaro here.
+                # This is tricky, but we need to consider the implementation detail of datumaro here.
                 if i == 0:
                     self._iter_count += 1
                     logger.info(
