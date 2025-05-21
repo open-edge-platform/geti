@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
@@ -26,7 +26,7 @@ import { getAnnotationsFromDTO, getKeypointToAnnotationDTO, isKeypointAnnotation
 import { VideoPaginationOptions } from './video-pagination-options.interface';
 
 export const createApiAnnotationService: CreateApiService<AnnotationService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getAnnotations = async (
         datasetIdentifier: DatasetIdentifier,

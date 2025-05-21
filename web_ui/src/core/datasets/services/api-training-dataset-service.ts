@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { MediaAdvancedFilterDTO, MediaItemDTO } from '../../media/dtos/media.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';
@@ -45,7 +45,7 @@ export interface TrainingDatasetService {
 }
 
 export const createApiTrainingDatasetService: CreateApiService<TrainingDatasetService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getTrainingDatasetRevision = async (
         projectIdentifier: ProjectIdentifier,

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
@@ -11,7 +11,7 @@ import { WorkspacesService } from './workspaces-service.interface';
 import { WorkspaceEntity, WorkspaceIdentifier } from './workspaces.interface';
 
 export const createApiWorkspacesService: CreateApiService<WorkspacesService> = (
-    { instance: platformInstance, router } = { instance: client, router: API_URLS }
+    { instance: platformInstance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getWorkspaces = async (organizationId: string): Promise<WorkspaceEntity[]> => {
         const { data } = await platformInstance.get<WorkspacesResponseDTO>(router.WORKSPACES(organizationId));

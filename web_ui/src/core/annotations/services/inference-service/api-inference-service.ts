@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 import { isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -102,7 +102,7 @@ const getInputConfig = (predictions: AnnotationDTO[], selectedInput: TaskChainIn
 };
 
 export const createApiInferenceService: CreateApiService<InferenceService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getTestPredictions = async (
         projectIdentifier: ProjectIdentifier,

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../../services/create-api-service.interface';
 import { API_URLS } from '../../../services/urls';
@@ -10,7 +10,7 @@ import { TransactionsService } from './transactions-service.interface';
 import { getTransactionResponseEntity, getTransactionsAggregatesResponseEntity } from './utils';
 
 export const createApiTransactionsService: CreateApiService<TransactionsService> = (
-    { instance: platformInstance, router } = { instance: client, router: API_URLS }
+    { instance: platformInstance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getTransactions: TransactionsService['getTransactions'] = async (orgId, options) => {
         const { data } = await platformInstance.get<TransactionsResponseDTO>(

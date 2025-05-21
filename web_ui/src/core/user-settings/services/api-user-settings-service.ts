@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
@@ -10,7 +10,7 @@ import { INITIAL_GLOBAL_SETTINGS, INITIAL_PROJECT_SETTINGS } from '../utils';
 import { UserGlobalSettings, UserSettingsService } from './user-settings.interface';
 
 export const createApiUserSettingsService: CreateApiService<UserSettingsService> = (
-    { instance, router } = { router: API_URLS, instance: client }
+    { instance, router } = { router: API_URLS, instance: apiClient }
 ) => {
     const getGlobalSettings: UserSettingsService['getGlobalSettings'] = async (): Promise<UserGlobalSettings> => {
         const { data } = await instance.get<SettingsResponseDTO>(router.GLOBAL_SETTINGS());

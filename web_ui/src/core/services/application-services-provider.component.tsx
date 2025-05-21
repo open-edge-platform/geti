@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { MissingProviderError } from '../../shared/missing-provider-error';
 import { ApplicationServices } from './application-services.interface';
@@ -38,7 +38,7 @@ export const ApplicationServicesProvider = ({
     const router = useApiRouter();
 
     const services = useMemo((): ApplicationServicesContextProps => {
-        const serviceConfiguration = { instance: client, router };
+        const serviceConfiguration = { instance: apiClient, router };
 
         if (useInMemoryEnvironment) {
             return getInMemoryServices(serviceConfiguration);

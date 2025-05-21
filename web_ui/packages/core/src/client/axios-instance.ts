@@ -12,12 +12,12 @@ import { removeLocalStorageKey } from '../../../../src/shared/utils';
     Axios instance used for Intel® Geti™ requests
 */
 
-export const client = axios.create({
+export const apiClient = axios.create({
     withCredentials: true,
     headers: { ...CSRF_HEADERS },
 });
 
-client.interceptors.response.use(
+apiClient.interceptors.response.use(
     (response) => {
         if (isAuthenticationResponseUrl(response)) {
             localStorage.setItem(LOCAL_STORAGE_KEYS.UNAUTHORIZED, 'true');

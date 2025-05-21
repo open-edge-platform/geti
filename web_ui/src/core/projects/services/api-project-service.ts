@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { isNotCropDomain } from '../../../shared/utils';
 import {
@@ -67,7 +67,7 @@ export const JobStateToExportStatus: Record<JobState, ExportStatusStateDTO> = {
 };
 
 export const createApiProjectService: CreateApiService<ProjectService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getProjects: ProjectService['getProjects'] = async (
         workspaceIdentifier: WorkspaceIdentifier,

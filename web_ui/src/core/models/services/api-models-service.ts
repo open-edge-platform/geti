@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { ProjectIdentifier } from '../../projects/core.interface';
 import { CreateApiService } from '../../services/create-api-service.interface';
@@ -16,7 +16,7 @@ import { ModelsService } from './models.interface';
 import { checkModelIntegrity, getModelEntity, getModelsEntity } from './utils';
 
 export const createApiModelsService: CreateApiService<ModelsService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getModels: ModelsService['getModels'] = async (
         projectIdentifier: ProjectIdentifier,

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { ModelIdentifier } from '../../models/models.interface';
 import { CreateApiService } from '../../services/create-api-service.interface';
@@ -17,7 +17,7 @@ export interface ApiModelStatisticsServiceInterface {
 }
 
 export const createApiModelStatisticsService: CreateApiService<ApiModelStatisticsServiceInterface> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     return {
         getModelStatistics: async (

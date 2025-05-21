@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { MaintenanceResponse, MaintenanceService } from './maintenance.interface';

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
-
+import { apiClient } from '@geti/core';
 import { orderBy } from 'lodash-es';
+
 import { mapSearchRulesToDto } from '../../datasets/services/utils';
 import { JobTestDTO } from '../../jobs/dtos/jobs-dto.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';
@@ -19,7 +19,7 @@ import { RunTestBody, TestsService } from './tests-service.interface';
 import { getRunTestBodyDTO, getTestEntity, getTestMediaItemEntity } from './utils';
 
 export const createApiTestsService: CreateApiService<TestsService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getTests = async (projectIdentifier: ProjectIdentifier, modelsGroups: ModelsGroups[]): Promise<Test[]> => {
         const { data } = await instance.get<TestsDTO>(router.TESTS(projectIdentifier));

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { Label } from '../../../labels/label.interface';
 import { MediaItem } from '../../../media/media.interface';
@@ -22,7 +22,7 @@ import { VisualPromptService } from '../visual-prompt-service';
 import { CreateApiService } from './utils';
 
 export const createApiVisualPromptService: CreateApiService<VisualPromptService> = (
-    { instance, router } = { instance: client, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const infer = async (
         datasetIdentifier: DatasetIdentifier,

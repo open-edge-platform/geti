@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { client } from '@geti/core';
+import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../../services/create-api-service.interface';
 import { API_URLS } from '../../../services/urls';
@@ -11,7 +11,7 @@ import { GetProductsQueryOptions, ProductsService } from './products-service.int
 import { getProductEntity, getProductsQueryOptionsDTO, getProductsResponseEntity } from './utils';
 
 export const createApiProductsService: CreateApiService<ProductsService> = (
-    { instance: platformInstance, router } = { instance: client, router: API_URLS }
+    { instance: platformInstance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getProducts = async (queryOptions: GetProductsQueryOptions): Promise<ProductsResponse> => {
         const { data } = await platformInstance.get<ProductsResponseDTO>(router.PRODUCTS(), {
