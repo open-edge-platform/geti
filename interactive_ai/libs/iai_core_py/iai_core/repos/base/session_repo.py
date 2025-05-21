@@ -398,8 +398,6 @@ class SessionBasedRepo(Generic[PersistedEntityT], metaclass=abc.ABCMeta):
         :param collation: Optional, collation to use for string comparison
         :return: pymongo CommandCursor over the result set
         """
-        print("@@@@@@@@")
-        print(pipeline)
         pre_match_stage = self.preliminary_aggregation_match_stage(access_mode=access_mode)
         full_pipeline = [pre_match_stage, *pipeline] if pre_match_stage else pipeline
         return self._collection.aggregate(full_pipeline, allowDiskUse=True, collation=collation)
