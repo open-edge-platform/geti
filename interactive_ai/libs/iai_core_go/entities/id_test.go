@@ -7,19 +7,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidateID(t *testing.T) {
 	validID := ID{"012345678910abcdefABCDEF"}
 	invalidID := ID{"001"}
 
-	assert.Nil(t, validID.IsValid())
-	assert.NotNil(t, invalidID.IsValid())
+	require.NoError(t, validID.IsValid())
+	require.Error(t, invalidID.IsValid())
 }
 
 func TestEmptyID(t *testing.T) {
 	emptyID := ID{""}
 
 	assert.True(t, emptyID.IsEmptyID())
-	assert.NotNil(t, emptyID.IsValid())
+	require.Error(t, emptyID.IsValid())
 }

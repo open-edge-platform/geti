@@ -12,6 +12,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/uptrace/opentelemetry-go-extra/otelzap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"
@@ -55,13 +56,13 @@ func TestLoggerWithZapMiddleware(t *testing.T) {
 	assert.Equal(t, "/test", fields["path"].String)
 
 	assert.Contains(t, fields, "query")
-	assert.Equal(t, "", fields["query"].String)
+	assert.Empty(t, fields["query"].String)
 
 	assert.Contains(t, fields, "latency")
 	latencyStr := fields["latency"].String
 	numStr := strings.TrimSuffix(latencyStr, "ms")
 	latencyVal, err := strconv.ParseFloat(numStr, 64)
-	assert.NoError(t, err, "should be able to parse latency value")
+	require.NoError(t, err, "should be able to parse latency value")
 	assert.Greater(t, latencyVal, 0.0, "latency should be > 0 ms")
 
 	assert.Contains(t, fields, "bytes_in")
