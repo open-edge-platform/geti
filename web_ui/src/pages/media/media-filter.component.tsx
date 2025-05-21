@@ -6,6 +6,7 @@ import { CSSProperties, Dispatch, MutableRefObject, useCallback, useEffect, useR
 import {
     ActionButton,
     ButtonGroup,
+    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -31,7 +32,6 @@ import {
     SearchOptionsRule,
     SearchRuleField,
 } from '../../core/media/media-filter.interface';
-import { ColorMode } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { QuietToggleButton } from '../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { isLargeSizeQuery } from '../../theme/queries';

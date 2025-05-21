@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ColorMode } from '@geti/ui';
 import { motion, Variants } from 'framer-motion';
-
-import { ColorMode } from '../quiet-button/quiet-action-button.component';
 
 type Sizes = 'S' | 'M';
 

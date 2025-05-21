@@ -3,7 +3,6 @@
 
 import {
     ActionButton,
-    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -35,7 +34,7 @@ export const AnomalyProjectPerformance = ({
     return (
         <DialogTrigger type='popover' hideArrow>
             <TooltipTrigger placement={'bottom'}>
-                <ActionButton isQuiet colorMode={ColorMode.DARK} aria-label={'project performance'}>
+                <ActionButton isQuiet aria-label={'project performance'}>
                     <ScoreMetric className={classes.anomalyPerformanceIcon} />
                 </ActionButton>
                 <Tooltip>

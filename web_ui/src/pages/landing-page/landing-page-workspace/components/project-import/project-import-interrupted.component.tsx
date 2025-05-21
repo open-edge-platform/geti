@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { ActionButton, ColorMode, Flex, Text } from '@geti/ui';
+import { ActionButton, Flex, Text } from '@geti/ui';
 import { InfoOutline } from '@geti/ui/icons';
 
 import { useStatus } from '../../../../../core/status/hooks/use-status.hook';
@@ -56,12 +56,7 @@ export const ProjectImportInterrupted = ({ importItem }: ProjectImportInterrupte
                     <InfoOutline />
                     <Text>Importing has been interrupted</Text>
                 </Flex>
-                <ActionButton
-                    isQuiet
-                    colorMode={ColorMode.DARK}
-                    onPress={onTryAgain}
-                    isDisabled={isTryAgainButtonDisabled}
-                >
+                <ActionButton isQuiet onPress={onTryAgain} isDisabled={isTryAgainButtonDisabled}>
                     Try again
                 </ActionButton>
             </Flex>

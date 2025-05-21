@@ -3,10 +3,9 @@
 
 import { Key } from 'react';
 
-import { ActionButton, Flex, View } from '@geti/ui';
+import { ActionButton, ColorMode, Flex, View } from '@geti/ui';
 import { usePress } from 'react-aria';
 
-import { ColorMode } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { UserPhotoPreview } from './user-photo-preview.component';
 
 import sharedClasses from '../../../../../shared/shared.module.scss';
