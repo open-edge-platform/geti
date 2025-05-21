@@ -214,6 +214,11 @@ spec:
                   name: "{{ .Release.Namespace}}-seaweed-fs"
                   key: "director_s3_presigned_url_secret_key"
             {{- end }}
+            - name: GPU_PROVIDER
+              valueFrom:
+                configMapKeyRef:
+                  key: accelerator_name
+                  name: accelerator-configuration
           envFrom:
             - configMapRef:
                 name: {{ .Release.Namespace }}-feature-flags
