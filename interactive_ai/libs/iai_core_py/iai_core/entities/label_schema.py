@@ -639,7 +639,7 @@ class LabelSchemaView(LabelSchema):
         label_groups = []
 
         for parent_group in parent_schema.get_groups(include_empty=True):
-            group_labels = list(set(parent_group.labels).intersection(set_of_labels))
+            group_labels = [label for label in parent_group.labels if label in set_of_labels]
             if len(group_labels) > 0:
                 label_groups.append(
                     LabelGroup(

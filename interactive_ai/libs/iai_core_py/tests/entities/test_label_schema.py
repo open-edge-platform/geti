@@ -151,14 +151,14 @@ class TestLabelGroup:
             id=ID("1"),
         )
         assert no_group_type_label_group.id_ == "1"
-        # Expected ascending sorting of labels
+        # Expected labels to respect the original order
         assert no_group_type_label_group.labels == [
-            labels.label_0,
             labels.label_0_1,
+            labels.label_0,
         ]
         assert no_group_type_label_group.name == "Type non-specified specified label group"
         assert no_group_type_label_group.group_type == LabelGroupType.EXCLUSIVE
-        assert no_group_type_label_group.labels[0].id_ == ID(0)
+        assert no_group_type_label_group.labels[0].id_ == ID("0_1")
         # Checking attributes of LabelGroup object with specified group_type and not specified id parameters
         no_id_label_group = LabelGroup(
             name="ID non-specified Label Group",
@@ -168,11 +168,10 @@ class TestLabelGroup:
         # Expected randomly generated ID object with 24 characters as "id" attribute
         assert isinstance(no_id_label_group.id_, ID)
         assert len(no_id_label_group.id_) == 24
-        # Expected ascending sorting of labels
-        assert no_id_label_group.labels == [labels.label_0, labels.label_0_1]
+        assert no_id_label_group.labels == [labels.label_0_1, labels.label_0]
         assert no_id_label_group.name == "ID non-specified Label Group"
         assert no_id_label_group.group_type == LabelGroupType.EMPTY_LABEL
-        assert no_id_label_group.labels[0].id_ == "0"
+        assert no_id_label_group.labels[0].id_ == "0_1"
 
     def test_label_group_remove_label(self):
         """
