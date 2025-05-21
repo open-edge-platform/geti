@@ -27,9 +27,9 @@ class AutoTrainingParameters(BaseModel):
         title="Enable dynamic required annotations",
         description="Whether to dynamically adjust the number of required annotations",
     )
-    min_images_per_label: int | None = Field(
-        gt=0,
-        default=None,
+    min_images_per_label: int = Field(
+        ge=0,
+        default=0,
         title="Minimum images per label",
         description="Minimum number of images needed for each label to trigger auto-training",
     )
@@ -47,11 +47,11 @@ class TaskConfig(BaseModel):
     """Configuration for a specific task within a project."""
 
     task_id: str = Field(title="Task ID", description="Unique identifier for the task")
-    training: TrainingParameters = Field(
-        title="Training parameters", description="Parameters controlling the training process"
+    training: TrainingParameters | None = Field(
+        default=None, title="Training parameters", description="Parameters controlling the training process"
     )
-    auto_training: AutoTrainingParameters = Field(
-        title="Auto-training parameters", description="Parameters controlling auto-training"
+    auto_training: AutoTrainingParameters | None = Field(
+        default=None, title="Auto-training parameters", description="Parameters controlling auto-training"
     )
 
 

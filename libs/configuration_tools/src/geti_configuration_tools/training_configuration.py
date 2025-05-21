@@ -39,6 +39,19 @@ class SubsetSplit(BaseModel):
         return self
 
 
+class MinAnnotationPixels(BaseModel):
+    """Parameters for minimum annotation pixels."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable minimum annotation pixels filtering",
+        description="Whether to apply minimum annotation pixels filtering",
+    )
+    min_annotation_pixels: int = Field(
+        ge=1, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+    )
+
+
 class MaxAnnotationPixels(BaseModel):
     """Parameters for maximum annotation pixels."""
 
@@ -68,14 +81,14 @@ class MaxAnnotationObjects(BaseModel):
 class Filtering(BaseModel):
     """Parameters for filtering annotations in the dataset."""
 
-    min_annotation_pixels: int = Field(
-        gt=0, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+    min_annotation_pixels: MinAnnotationPixels | None = Field(
+        default=None, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
     )
-    max_annotation_pixels: MaxAnnotationPixels = Field(
-        default=MaxAnnotationPixels(), title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    max_annotation_pixels: MaxAnnotationPixels | None = Field(
+        default=None, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
     )
-    max_annotation_objects: MaxAnnotationObjects = Field(
-        default=MaxAnnotationObjects(), title="Maximum annotation objects", description="Maximum number of objects in an annotation"
+    max_annotation_objects: MaxAnnotationObjects | None = Field(
+        default=None, title="Maximum annotation objects", description="Maximum number of objects in an annotation"
     )
 
 
@@ -155,18 +168,13 @@ class NullTrainingConfiguration(TrainingConfiguration):
             id_=ID(),
             task_id=ID(),
             global_parameters=GlobalParameters(
-                dataset_preparation=GlobalDatasetPreparationParameters(
-                    subset_split=SubsetSplit(), filtering=Filtering()
-                )
+                dataset_preparation=GlobalDatasetPreparationParameters()
             ),
             hyperparameters=Hyperparameters(
                 dataset_preparation=DatasetPreparationParameters(
                     augmentation=AugmentationParameters(),
                 ),
-                training=TrainingHyperParameters(
-                    max_epochs=1,
-                    learning_rate=0.001,
-                ),
+                training=TrainingHyperParameters(),
                 evaluation=EvaluationParameters(metric=None),
             ),
             ephemeral=True,

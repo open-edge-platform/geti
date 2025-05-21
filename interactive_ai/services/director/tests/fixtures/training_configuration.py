@@ -18,8 +18,11 @@ from geti_configuration_tools.training_configuration import (
     Filtering,
     GlobalDatasetPreparationParameters,
     GlobalParameters,
+    MaxAnnotationObjects,
+    MaxAnnotationPixels,
+    MinAnnotationPixels,
     SubsetSplit,
-    TrainingConfiguration, MaxAnnotationPixels, MaxAnnotationObjects,
+    TrainingConfiguration,
 )
 
 
@@ -74,7 +77,7 @@ def fxt_global_parameters():
                 remixing=False,
             ),
             filtering=Filtering(
-                min_annotation_pixels=10,
+                min_annotation_pixels=MinAnnotationPixels(),
             ),
         )
     )
@@ -92,7 +95,10 @@ def fxt_global_parameters_2():
                 remixing=False,
             ),
             filtering=Filtering(
-                min_annotation_pixels=10,
+                min_annotation_pixels=MinAnnotationPixels(
+                    enable=True,
+                    min_annotation_pixels=10,
+                ),
                 max_annotation_pixels=MaxAnnotationPixels(
                     enable=True,
                     max_annotation_pixels=100,
@@ -169,60 +175,28 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "type": "bool",
                 },
             ],
-            "filtering": [
-                {
-                    "key": "min_annotation_pixels",
-                    "name": "Minimum annotation pixels",
-                    "description": "Minimum number of pixels in an annotation",
-                    "value": 10,
-                    "default_value": 1,
-                    "type": "int",
-                    "min_value": 0,
-                    "max_value": None,
-                },
-                {
-                    "max_annotation_objects": [
-                        {
-                            "default_value": False,
-                            "description": "Whether to apply maximum annotation objects filtering",
-                            "key": "enable",
-                            "name": "Enable maximum annotation objects filtering",
-                            "type": "bool",
-                            "value": False,
-                        },
-                        {
-                            "key": "max_annotation_objects",
-                            "name": "Maximum annotation objects",
-                            "description": "Maximum number of objects in an annotation",
-                            "value": 10000,
-                            "default_value": 10000,
-                            "type": "int",
-                            "min_value": 1,
-                            "max_value": None,
-                        },
-                    ],
-                    "max_annotation_pixels": [
-                        {
-                            "default_value": False,
-                            "description": "Whether to apply maximum annotation pixels filtering",
-                            "key": "enable",
-                            "name": "Enable maximum annotation pixels filtering",
-                            "type": "bool",
-                            "value": False,
-                        },
-                        {
-                            "key": "max_annotation_pixels",
-                            "name": "Maximum annotation pixels",
-                            "description": "Maximum number of pixels in an annotation",
-                            "value": 10000,
-                            "default_value": 10000,
-                            "type": "int",
-                            "min_value": 1,
-                            "max_value": None,
-                        },
-                    ]
-                },
-            ],
+            "filtering": {
+                "min_annotation_pixels": [
+                    {
+                        "default_value": False,
+                        "description": "Whether to apply minimum annotation pixels filtering",
+                        "key": "enable",
+                        "name": "Enable minimum annotation pixels filtering",
+                        "type": "bool",
+                        "value": False,
+                    },
+                    {
+                        "key": "min_annotation_pixels",
+                        "name": "Minimum annotation pixels",
+                        "description": "Minimum number of pixels in an annotation",
+                        "value": 1,
+                        "default_value": 1,
+                        "type": "int",
+                        "min_value": 1,
+                        "max_value": None,
+                    },
+                ],
+            },
             "augmentation": {
                 "center_crop": [
                     {
@@ -313,7 +287,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "max_value": None,
                     "value": 10000,
                 },
-            ]
+            ],
         },
         "evaluation": [],
     }
@@ -387,60 +361,68 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                     "type": "bool",
                 },
             ],
-            "filtering": [
-                {
-                    "key": "min_annotation_pixels",
-                    "name": "Minimum annotation pixels",
-                    "description": "Minimum number of pixels in an annotation",
-                    "value": 10,
-                    "default_value": 1,
-                    "type": "int",
-                    "min_value": 0,
-                    "max_value": None,
-                },
-                {
-                    "max_annotation_objects": [
-                        {
-                            "default_value": False,
-                            "description": "Whether to apply maximum annotation objects filtering",
-                            "key": "enable",
-                            "name": "Enable maximum annotation objects filtering",
-                            "type": "bool",
-                            "value": True,
-                        },
-                        {
-                            "key": "max_annotation_objects",
-                            "name": "Maximum annotation objects",
-                            "description": "Maximum number of objects in an annotation",
-                            "value": 1000,
-                            "default_value": 10000,
-                            "type": "int",
-                            "min_value": 1,
-                            "max_value": None,
-                        },
-                    ],
-                    "max_annotation_pixels": [
-                        {
-                            "default_value": False,
-                            "description": "Whether to apply maximum annotation pixels filtering",
-                            "key": "enable",
-                            "name": "Enable maximum annotation pixels filtering",
-                            "type": "bool",
-                            "value": True,
-                        },
-                        {
-                            "key": "max_annotation_pixels",
-                            "name": "Maximum annotation pixels",
-                            "description": "Maximum number of pixels in an annotation",
-                            "value": 100,
-                            "default_value": 10000,
-                            "type": "int",
-                            "min_value": 1,
-                            "max_value": None,
-                        },
-                    ]
-                },
-            ],
+            "filtering": {
+                "min_annotation_pixels": [
+                    {
+                        "default_value": False,
+                        "description": "Whether to apply minimum annotation pixels filtering",
+                        "key": "enable",
+                        "name": "Enable minimum annotation pixels filtering",
+                        "type": "bool",
+                        "value": True,
+                    },
+                    {
+                        "key": "min_annotation_pixels",
+                        "name": "Minimum annotation pixels",
+                        "description": "Minimum number of pixels in an annotation",
+                        "value": 10,
+                        "default_value": 1,
+                        "type": "int",
+                        "min_value": 1,
+                        "max_value": None,
+                    },
+                ],
+                "max_annotation_objects": [
+                    {
+                        "default_value": False,
+                        "description": "Whether to apply maximum annotation objects filtering",
+                        "key": "enable",
+                        "name": "Enable maximum annotation objects filtering",
+                        "type": "bool",
+                        "value": True,
+                    },
+                    {
+                        "key": "max_annotation_objects",
+                        "name": "Maximum annotation objects",
+                        "description": "Maximum number of objects in an annotation",
+                        "value": 1000,
+                        "default_value": 10000,
+                        "type": "int",
+                        "min_value": 1,
+                        "max_value": None,
+                    },
+                ],
+                "max_annotation_pixels": [
+                    {
+                        "default_value": False,
+                        "description": "Whether to apply maximum annotation pixels filtering",
+                        "key": "enable",
+                        "name": "Enable maximum annotation pixels filtering",
+                        "type": "bool",
+                        "value": True,
+                    },
+                    {
+                        "key": "max_annotation_pixels",
+                        "name": "Maximum annotation pixels",
+                        "description": "Maximum number of pixels in an annotation",
+                        "value": 100,
+                        "default_value": 10000,
+                        "type": "int",
+                        "min_value": 1,
+                        "max_value": None,
+                    },
+                ],
+            },
             "augmentation": {
                 "center_crop": [
                     {
@@ -619,7 +601,7 @@ def fxt_training_configuration_full_rest_view(fxt_training_configuration_manifes
                     "max_value": None,
                     "value": 10000,
                 },
-            ]
+            ],
         },
         "evaluation": [],
     }
