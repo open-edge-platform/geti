@@ -1,6 +1,6 @@
 {
   "name": "geti-ui",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "engines": {
     "node": "22.12.0",
     "npm": "10.9.0"
