@@ -4,7 +4,7 @@
 # build_rest_api_specs
 #############
 
-FROM node_image AS build_rest_api_specs
+FROM node:22.12-bookworm-slim AS build_rest_api_specs
 
 ARG LOCATION=/home/app/rest-api-specs/
 
@@ -20,7 +20,7 @@ RUN npm run build:rest-openapi-spec
 #############
 # web_ui_deps
 #############
-FROM node_image AS web_ui_deps
+FROM node:22.12-bookworm-slim AS web_ui_deps
 
 ARG LOCATION=/home/app/web_ui/
 
@@ -49,7 +49,7 @@ RUN npm run build
 # web_ui
 #######
 
-FROM nginx_image AS web_ui
+FROM nginx:1.27-bookworm AS web_ui
 
 COPY --link --from=web_ui_deps /home/app/web_ui/build/app/ /usr/share/nginx/webui/
 COPY --link --from=web_ui_deps /home/app/web_ui/build/admin/ /usr/share/nginx/admin-app/
