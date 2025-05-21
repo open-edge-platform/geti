@@ -10,6 +10,7 @@ import {
     SpectrumButtonProps,
 } from '@adobe/react-spectrum';
 import { FocusableRef, FocusableRefValue } from '@react-types/shared';
+import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 
 import buttonClasses from './button.module.scss';
@@ -43,15 +44,12 @@ export enum ColorMode {
     BLUE,
 }
 
-const getActionButtonClass = (colorMode: ColorMode = ColorMode.DARK, customClass?: string) => {
-    const buttonClass =
-        colorMode === ColorMode.DARK
-            ? buttonClasses.actionButtonDark
-            : colorMode === ColorMode.LIGHT
-              ? buttonClasses.actionButtonLight
-              : buttonClasses.actionButtonBlue;
-
-    return `${buttonClass} ${customClass ?? ''}`;
+const getActionButtonClass = (colorMode: ColorMode = ColorMode.DARK) => {
+    return colorMode === ColorMode.DARK
+        ? buttonClasses.actionButtonDark
+        : colorMode === ColorMode.LIGHT
+          ? buttonClasses.actionButtonLight
+          : buttonClasses.actionButtonBlue;
 };
 
 export const Button = forwardRef((props: ButtonProps, ref: ButtonProps['ref']) => {
@@ -65,7 +63,7 @@ export const Button = forwardRef((props: ButtonProps, ref: ButtonProps['ref']) =
 
 export const ActionButton = forwardRef((props: ActionButtonProps, ref: ActionButtonProps['ref']) => {
     const { colorMode = ColorMode.DARK, UNSAFE_className, ...rest } = props;
-    const className = getActionButtonClass(colorMode, UNSAFE_className);
+    const buttonClass = getActionButtonClass(colorMode);
 
-    return <SpectrumActionButton {...rest} ref={ref} UNSAFE_className={className} />;
+    return <SpectrumActionButton {...rest} ref={ref} UNSAFE_className={clsx(buttonClass, UNSAFE_className)} />;
 });
