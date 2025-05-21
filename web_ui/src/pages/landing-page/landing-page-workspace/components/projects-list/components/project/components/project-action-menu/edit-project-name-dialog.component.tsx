@@ -3,13 +3,12 @@
 
 import { FormEvent, useState } from 'react';
 
-import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useProjectActions } from '../../../../../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { LimitedTextField } from '../../../../../../../../../shared/components/limited-text-field/limited-text-field.component';
 
 interface EditProjectNameDialogProps {
     onClose: () => void;
@@ -66,7 +65,8 @@ export const EditProjectNameDialog = ({ onClose, isOpen, project }: EditProjectN
                     <Divider />
                     <Content>
                         <Form onSubmit={handleEditProjectName}>
-                            <LimitedTextField
+                            <TextField
+                                maxLength={100}
                                 //eslint-disable-next-line jsx-a11y/no-autofocus
                                 autoFocus
                                 value={newProjectName}

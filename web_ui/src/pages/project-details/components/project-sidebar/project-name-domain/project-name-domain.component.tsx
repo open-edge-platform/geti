@@ -3,13 +3,12 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { ActionButton, Flex, LoadingIndicator, TextFieldRef } from '@geti/ui';
+import { ActionButton, Flex, LoadingIndicator, TextField, TextFieldRef } from '@geti/ui';
 import { Edit } from '@geti/ui/icons';
 
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { LimitedTextField } from '../../../../../shared/components/limited-text-field/limited-text-field.component';
 import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 import { ValidationErrorMsg } from '../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
@@ -111,7 +110,8 @@ export const ProjectNameDomain = ({
                 >
                     {editMode ? (
                         <>
-                            <LimitedTextField
+                            <TextField
+                                maxLength={100}
                                 value={newName}
                                 onChange={changeName}
                                 onKeyDown={handleKeyDown}
