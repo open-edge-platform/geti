@@ -21,7 +21,6 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"inference_gateway/app/entities"
-	mockcontrollers "inference_gateway/app/mock/controllers"
 	"inference_gateway/app/service"
 	"inference_gateway/app/usecase"
 )
@@ -40,7 +39,7 @@ func (suite *PipelineControllerSuite) SetupTest() {
 
 func (suite *PipelineControllerSuite) TestPipelineController_Status() {
 	t := suite.T()
-	inferenceCtrlMock := mockcontrollers.NewMockInferenceController(t)
+	inferenceCtrlMock := NewMockInferenceController(t)
 	fullID := sdkentities.GetFullTestID(t)
 
 	tests := []struct {
@@ -164,7 +163,7 @@ func (suite *PipelineControllerSuite) TestPipelineController_Status() {
 
 func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 	t := suite.T()
-	inferenceMock := mockcontrollers.NewMockInferenceController(t)
+	inferenceMock := NewMockInferenceController(t)
 
 	fullTestID := sdkentities.GetFullTestID(t)
 	inferenceRequest := &entities.InferenceRequest{

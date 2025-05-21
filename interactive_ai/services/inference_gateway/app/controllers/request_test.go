@@ -22,7 +22,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"inference_gateway/app/entities"
-	mockservice "inference_gateway/app/mock/service"
+	"inference_gateway/app/service"
 	testhelpers "inference_gateway/app/test_helpers"
 )
 
@@ -60,7 +60,7 @@ func TestRequestHandler_NewPredictionRequest_File(t *testing.T) {
 	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, buffer)
 	c.Request.Header.Set("Content-Type", writer.FormDataContentType())
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	rh := NewRequestHandlerImpl(mediaMock)
 	predictionRequestData, err := rh.NewPredictionRequest(c, req, testID.TestID)
 	require.NoError(t, err)
@@ -114,7 +114,7 @@ func TestRequestHandler_NewPredictionRequest_Image(t *testing.T) {
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
 	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, bytes.NewBuffer(body))
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	mediaMock.EXPECT().GetImage(c.Request.Context(), fullImageID).Return(buf, nil).Once()
 	rh := NewRequestHandlerImpl(mediaMock)
 	modelID := fullImageID.ImageID
@@ -174,7 +174,7 @@ func TestRequestHandler_NewPredictionRequest_Video(t *testing.T) {
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
 	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, bytes.NewBuffer(body))
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	mediaMock.EXPECT().GetFrame(c.Request.Context(), fullVideoID, 1).Return(buf, nil).Once()
 	rh := NewRequestHandlerImpl(mediaMock)
 	modelID := fullVideoID.VideoID
@@ -240,7 +240,7 @@ func TestRequestHandler_NewBatchPredictionRequest_Video(t *testing.T) {
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
 	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, bytes.NewBuffer(body))
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	rh := NewRequestHandlerImpl(mediaMock)
 	modelID := fullVideoID.VideoID
 	batchRequest, err := rh.NewBatchPredictionRequest(c, req, modelID)

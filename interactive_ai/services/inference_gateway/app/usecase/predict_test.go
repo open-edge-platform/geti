@@ -18,7 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"inference_gateway/app/entities"
-	mockservice "inference_gateway/app/mock/service"
+	"inference_gateway/app/service"
 )
 
 func MockDoneCh() <-chan error {
@@ -67,7 +67,7 @@ func TestPredictBatch(t *testing.T) {
 		HyperParameters: &hyperParamaters,
 	}
 
-	mockModelAccess := mockservice.NewMockModelAccessService(t)
+	mockModelAccess := service.NewMockModelAccessService(t)
 	mockVideoRepo := mockstorage.NewMockVideoRepository(t)
 	mockFrameExtractor := mockframes.NewMockCLIFrameExtractor(t)
 
