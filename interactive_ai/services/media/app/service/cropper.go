@@ -13,8 +13,11 @@ import (
 	"github.com/nfnt/resize"
 )
 
+// centeringFactor divides dimensions by 2 to position the crop rectangle at the center.
+const centeringFactor = 2
+
 type Cropper interface {
-	CropImage(reader io.Reader, tWidth uint, tHeight uint) (image.Image, error)
+	CropImage(reader io.Reader, tWidth int, tHeight int) (image.Image, error)
 }
 
 type ResizeCropper struct {
@@ -28,10 +31,10 @@ func NewResizeCropper() *ResizeCropper {
 // It will first resize the initial image (media) to target the dimensions (tHeight, tWidth) by a scaling factor
 // which causes the least amount of rescaling, then in it will crop out a tWidth x tHeight rectangle from the
 // center of the resized media to make the thumbnail.
-func (c ResizeCropper) CropImage(reader io.Reader, tWidth uint, tHeight uint) (image.Image, error) {
+func (c ResizeCropper) CropImage(reader io.Reader, tWidth int, tHeight int) (image.Image, error) {
 	media, _, err := image.Decode(reader)
 	if err != nil {
-		return nil, fmt.Errorf("cannot decode image: %s", err)
+		return nil, fmt.Errorf("cannot decode image: %w", err)
 	}
 
 	// Obtain the initial dimensions of the original media
@@ -48,12 +51,12 @@ func (c ResizeCropper) CropImage(reader io.Reader, tWidth uint, tHeight uint) (i
 
 	// Here we determine the min and max points of the crop rectangle. The rectangle which has its center at the center
 	// of resizedMedia. The min and the max values must be clamped to be in the interval [0, new_size]
-	xMin := (nWidth - int(tWidth)) / 2
-	xMax := xMin + int(tWidth)
+	xMin := (nWidth - tWidth) / centeringFactor
+	xMax := xMin + tWidth
 	xMin = int(math.Max(float64(xMin), 0))
 	xMax = int(math.Min(float64(xMax), float64(nWidth)))
-	yMin := (nHeight - int(tHeight)) / 2
-	yMax := yMin + int(tHeight)
+	yMin := (nHeight - tHeight) / centeringFactor
+	yMax := yMin + tHeight
 	yMin = int(math.Max(float64(yMin), 0))
 	yMax = int(math.Min(float64(yMax), float64(nHeight)))
 	minPoint := image.Point{X: xMin, Y: yMin}
