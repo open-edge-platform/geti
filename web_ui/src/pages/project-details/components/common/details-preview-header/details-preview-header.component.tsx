@@ -4,6 +4,7 @@
 import { useEffect } from 'react';
 
 import {
+    ActionButton,
     Content,
     ContextualHelp,
     Dialog,
@@ -23,7 +24,6 @@ import { getAverageScore } from '../../../../../core/tests/services/utils';
 import { TestImageMediaResult } from '../../../../../core/tests/test-image.interface';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { TaskLabelTreeContainer } from '../../../../../shared/components/task-label-tree-search/task-label-tree-container.component';
 import { useFilteredTaskMetadata } from '../../../../../shared/components/task-label-tree-search/use-filtered-task-metadata.hook';
 import { hasEqualDomain } from '../../../../../shared/utils';
@@ -103,9 +103,9 @@ export const DetailsPreviewHeader = ({
                                     <Text>Model score: {formatter.format(averagedScore.value)}</Text>
 
                                     <DialogTrigger type='popover' hideArrow>
-                                        <QuietActionButton aria-label='labels scores'>
+                                        <ActionButton isQuiet aria-label='labels scores'>
                                             <ChevronDownLight />
-                                        </QuietActionButton>
+                                        </ActionButton>
                                         <Dialog UNSAFE_className={classes.dialog}>
                                             <Content width={'size-4600'} maxHeight={'31.2rem'} marginY={'size-125'}>
                                                 <TaskLabelTreeContainer

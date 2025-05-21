@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
+import { ActionButton, Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
 import { Delete, Edit, MoreMenu } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import dayjs from 'dayjs';
@@ -13,7 +13,6 @@ import { PartialPersonalAccessToken } from '../../../../core/personal-access-tok
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { getDateTimeInISOAndUTCOffsetFormat } from '../../../../shared/utils';
 import { UpdatePersonalAccessTokenDialog } from './update-personal-access-token-dialog.component';
 import { checkIfTokenOwner } from './utils';
@@ -75,9 +74,9 @@ export const PersonalAccessTokenMenu = ({ token }: PersonalAccessTokenMenuProps)
     return (
         <>
             <MenuTrigger>
-                <QuietActionButton id={`personal-access-token-menu-${token.id}-button`}>
+                <ActionButton isQuiet id={`personal-access-token-menu-${token.id}-button`}>
                     <MoreMenu />
-                </QuietActionButton>
+                </ActionButton>
                 <Menu id={`${token.id}-menu-id`} onAction={handleOnAction}>
                     <Item key={PersonalAccessTokenMenuItems.EDIT} textValue='Update'>
                         <Text>

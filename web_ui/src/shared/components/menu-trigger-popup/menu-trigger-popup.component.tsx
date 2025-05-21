@@ -3,10 +3,9 @@
 
 import { Dispatch, Key, ReactNode, SetStateAction, useState } from 'react';
 
-import { AlertDialog, DialogContainer, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, AlertDialog, DialogContainer, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { MenuTriggerButton } from '../menu-trigger/menu-trigger-button/menu-trigger-button.component';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 const CANCEL = 'Cancel';
 
@@ -51,13 +50,14 @@ export const MenuTriggerPopup = ({
             )}
             {!items?.length && children && (
                 <TooltipTrigger placement={'bottom'} isDisabled={!ariaLabel}>
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         isDisabled={isButtonDisabled}
                         aria-label={ariaLabel}
                         onPress={() => setDialog('delete')}
                     >
                         {children}
-                    </QuietActionButton>
+                    </ActionButton>
                     <Tooltip>{ariaLabel}</Tooltip>
                 </TooltipTrigger>
             )}

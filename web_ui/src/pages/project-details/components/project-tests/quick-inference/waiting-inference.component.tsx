@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, LoadingIndicator, Text } from '@geti/ui';
+import { ActionButton, Flex, LoadingIndicator, Text } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './quick-inference.module.scss';
 
@@ -33,9 +32,9 @@ export const WaitingInference = ({ isVisible, dismiss }: WaitingInferenceProps) 
                     >
                         <LoadingIndicator size={'S'} marginEnd={'size-200'} />
                         <Text>Retrieving inference results may take some time</Text>
-                        <QuietActionButton UNSAFE_className={classes.cancelInference} onPress={dismiss}>
+                        <ActionButton isQuiet UNSAFE_className={classes.cancelInference} onPress={dismiss}>
                             Dismiss
-                        </QuietActionButton>
+                        </ActionButton>
                     </Flex>
                 </motion.div>
             )}

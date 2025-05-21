@@ -1,16 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Add } from '@geti/ui/icons';
 
-import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 import { MenuButtonProps } from './menu-button.interface';
 
 export const AddLabelMenuButton = ({ action, id }: MenuButtonProps): JSX.Element => {
     return (
         <TooltipTrigger placement={'bottom'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 key={'add-child-label-button'}
                 onPress={action}
                 id={`${id}-add-child-label-button`}
@@ -18,7 +18,7 @@ export const AddLabelMenuButton = ({ action, id }: MenuButtonProps): JSX.Element
                 aria-label={'add child label button'}
             >
                 <Add aria-label={'add child'} width={'16px'} height={'16px'} />
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>Add new label</Tooltip>
         </TooltipTrigger>
     );

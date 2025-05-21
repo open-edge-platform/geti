@@ -3,9 +3,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import { ActionButton } from '@geti/ui';
 import { Collapse, Expand } from '@geti/ui/icons';
-
-import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
 interface FullscreenProps {
     enabled: boolean;
@@ -14,7 +13,8 @@ interface FullscreenProps {
 
 export const Fullscreen = ({ enabled, toggle }: FullscreenProps): JSX.Element => {
     return (
-        <QuietActionButton
+        <ActionButton
+            isQuiet
             justifySelf='end'
             id='job-scheduler-action-expand'
             data-testid='job-scheduler-action-expand'
@@ -22,6 +22,6 @@ export const Fullscreen = ({ enabled, toggle }: FullscreenProps): JSX.Element =>
             onPress={() => toggle((prevState: boolean) => !prevState)}
         >
             {!enabled ? <Expand /> : <Collapse />}
-        </QuietActionButton>
+        </ActionButton>
     );
 };

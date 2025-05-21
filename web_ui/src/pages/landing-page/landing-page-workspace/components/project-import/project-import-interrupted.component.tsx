@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Text } from '@geti/ui';
+import { ActionButton, ColorMode, Flex, Text } from '@geti/ui';
 import { InfoOutline } from '@geti/ui/icons';
 
 import { useStatus } from '../../../../../core/status/hooks/use-status.hook';
@@ -11,10 +11,6 @@ import { isBelowTooLowFreeDiskSpace } from '../../../../../core/status/hooks/uti
 import { ProjectImportBase } from '../../../../../providers/projects-import-provider/project-import.interface';
 import { useProjectsImportProvider } from '../../../../../providers/projects-import-provider/projects-import-provider.component';
 import { MenuTriggerButton } from '../../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ProjectImportFilePicker } from './project-import-file-picker.component';
 import { ProjectStatusHeader } from './project-status-header.component';
 
@@ -60,13 +56,14 @@ export const ProjectImportInterrupted = ({ importItem }: ProjectImportInterrupte
                     <InfoOutline />
                     <Text>Importing has been interrupted</Text>
                 </Flex>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     colorMode={ColorMode.DARK}
                     onPress={onTryAgain}
                     isDisabled={isTryAgainButtonDisabled}
                 >
                     Try again
-                </QuietActionButton>
+                </ActionButton>
             </Flex>
             <ProjectImportFilePicker ref={fileRef} options={importItem.options} />
         </>

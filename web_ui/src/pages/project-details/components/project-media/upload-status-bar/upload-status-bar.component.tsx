@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
-import { Flex, ProgressCircle, Text } from '@geti/ui';
+import { ActionButton, Flex, ProgressCircle, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
@@ -13,7 +13,6 @@ import {
     UploadMedia,
 } from '../../../../../providers/media-upload-provider/media-upload.interface';
 import { getElapsedTimeText, getTotalProgress } from '../../../../../providers/media-upload-provider/utils';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ThinProgressBar } from '../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
 import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 import { getPlural } from '../../../../../shared/utils';
@@ -122,13 +121,14 @@ export const UploadStatusBar = ({
                 type: NOTIFICATION_TYPE.DEFAULT,
                 dismiss: { duration: 0, click: false, touch: false },
                 actionButtons: [
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         key={'status-dialog'}
                         onPress={uploadStatusDialogState.open}
                         UNSAFE_style={{ textDecoration: 'underline' }}
                     >
                         Details
-                    </QuietActionButton>,
+                    </ActionButton>,
                 ],
             });
         }
@@ -149,13 +149,14 @@ export const UploadStatusBar = ({
                     />
                 ),
                 actionButtons: [
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         key={'status-dialog'}
                         onPress={uploadStatusDialogState.open}
                         UNSAFE_style={{ textDecoration: 'underline' }}
                     >
                         Details
-                    </QuietActionButton>,
+                    </ActionButton>,
                 ],
                 type: NOTIFICATION_TYPE.DEFAULT,
                 dismiss: { duration: 0, click: false, touch: false },

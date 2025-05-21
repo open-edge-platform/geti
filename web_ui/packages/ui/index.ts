@@ -118,7 +118,13 @@ export { type TextFieldRef } from '@react-types/textfield';
 export { type ColumnSize } from '@react-types/table';
 export { type ToggleProps } from '@react-types/checkbox';
 
-export { Button, ActionButton, type ButtonProps, type ActionButtonProps } from './src/button/button.component';
+export {
+    Button,
+    ActionButton,
+    type ButtonProps,
+    ColorMode,
+    type ActionButtonProps,
+} from './src/button/button.component';
 export { Checkbox } from './src/checkbox/checkbox.component';
 export { ColorThumb, type ColorThumbProps } from './src/color-thumb/color-thumb.component';
 export { DatePicker } from './src/date-picker/date-picker.component';

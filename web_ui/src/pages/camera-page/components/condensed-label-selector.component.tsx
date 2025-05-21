@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { CustomPopover, Flex, Text, View, type ActionButtonProps } from '@geti/ui';
+import { ActionButton, CustomPopover, Flex, Text, View, type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
@@ -13,7 +13,6 @@ import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../core/labe
 import { Label } from '../../../core/labels/label.interface';
 import { isAnomalyDomain } from '../../../core/projects/domains';
 import { ViewModes } from '../../../shared/components/media-view-modes/utils';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { TaskLabelTreeSearch } from '../../../shared/components/task-label-tree-search/task-label-tree-search.component';
 import { hasEqualId } from '../../../shared/utils';
 import { useTask } from '../../annotator/providers/task-provider/task-provider.component';
@@ -94,7 +93,8 @@ export const ConsensedLabelSelector = ({
         <>
             <Flex>
                 {isEmpty(selectedLabels) || !selectedLabel ? (
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         ref={triggerRef}
                         {...buttonStyles}
                         id={'select-label-button-id'}
@@ -108,9 +108,10 @@ export const ConsensedLabelSelector = ({
                         }}
                     >
                         {name}
-                    </QuietActionButton>
+                    </ActionButton>
                 ) : (
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         key={selectedLabel.id}
                         id={`label-button-${selectedLabel.id}-id`}
                         ref={triggerRef}
@@ -137,7 +138,7 @@ export const ConsensedLabelSelector = ({
                         <Text UNSAFE_className={clsx(classes.suffix, viewModeClassName ? viewModeClassName : '')}>
                             {selectedLabels.length > 1 && `${condensedModeSuffix}`}
                         </Text>
-                    </QuietActionButton>
+                    </ActionButton>
                 )}
             </Flex>
 

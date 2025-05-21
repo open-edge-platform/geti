@@ -1,14 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Checkbox, dimensionValue, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Checkbox, dimensionValue, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
 import { CloseSemiBold, EyeSolid } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { useSelected } from '../../../../providers/selected-provider/selected-provider.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';
 import { useIsSceneBusy } from '../../hooks/use-annotator-scene-interaction-state.hook';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';
@@ -83,13 +82,14 @@ export const PoseListActions = ({ keypointAnnotation }: PoseListActionsProps) =>
             </TooltipTrigger>
 
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     isDisabled={!hasSelectedPoints}
                     onPress={handleSelectedVisibilityToggle}
                     aria-label='visibility toggle'
                 >
                     <ToggleAllIcon />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{visibilityTooltipText}</Tooltip>
             </TooltipTrigger>
         </Flex>

@@ -3,7 +3,7 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
-import { Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
+import { ActionButton, ColorMode, Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
 import { CreditCard } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
@@ -19,7 +19,6 @@ import { useOrganizationIdentifier } from '../../../../hooks/use-organization-id
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { ONE_MINUTE } from '../../../utils';
-import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { CreditsToConsume } from './credits-to-consume.component';
 import { FuxNotification } from './fux-notification/fux-notification.component';
 import { isBalanceLow } from './util';
@@ -53,7 +52,8 @@ const CreditBalanceButtonDefault = forwardRef(
 
         return (
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     ref={ref}
                     width={15}
                     zIndex={1}
@@ -68,7 +68,7 @@ const CreditBalanceButtonDefault = forwardRef(
                     )}
 
                     <CreditCard />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Credit balance</Tooltip>
             </TooltipTrigger>
         );

@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, Heading, Link as SpectrumLink, Text, View } from '@geti/ui';
+import { ActionButton, Flex, Heading, Link as SpectrumLink, Text, View } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { COOKIES_NOTICE, PRIVACY_NOTICE, TERMS_OF_USE_GETI, TERMS_OF_USE_INTEL } from '../../core/const';
@@ -11,7 +11,6 @@ import { usePlatformUtils } from '../../core/platform-utils/hooks/use-platform-u
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { LicenseModal } from '../../shared/components/license-modal/license-modal.component';
 import { PageLayout } from '../../shared/components/page-layout/page-layout.component';
-import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './about-page.module.scss';
 
@@ -66,12 +65,13 @@ const AboutPage = (): JSX.Element => {
                                 </a>
                             </SpectrumLink>
                         ) : (
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 UNSAFE_className={classes.licenceButton}
                                 onPress={() => setForceOpenLicenseModal(true)}
                             >
                                 License
-                            </QuietActionButton>
+                            </ActionButton>
                         )}
                     </>
 

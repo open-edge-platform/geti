@@ -1,13 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Revisit } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useHover, useNumberFormatter } from 'react-aria';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 export interface AdjustmentHeaderProps {
     headerText: string;
@@ -41,12 +40,13 @@ export const AdjustmentHeader = ({
                                     animate={'visible'}
                                     exit={'hidden'}
                                 >
-                                    <QuietActionButton
+                                    <ActionButton
+                                        isQuiet
                                         onPress={() => handleValueChange(defaultValue)}
                                         aria-label={`Reset ${headerText.toLocaleLowerCase()}`}
                                     >
                                         <Revisit />
-                                    </QuietActionButton>
+                                    </ActionButton>
                                 </motion.div>
                                 <Tooltip>{`Reset to default value ${headerText.toLocaleLowerCase()}`}</Tooltip>
                             </TooltipTrigger>

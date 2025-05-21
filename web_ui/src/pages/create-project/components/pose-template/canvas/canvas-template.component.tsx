@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { ActionButton } from '@geti/ui';
 import { Delete, SortUpDown } from '@geti/ui/icons';
 import { isEqual, isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +12,6 @@ import { RegionOfInterest } from '../../../../../core/annotations/annotation.int
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';
 import { useIsPressed } from '../../../../../hooks/use-is-pressed/use-is-pressed.hook';
 import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
 import { getIds, hasDifferentId } from '../../../../../shared/utils';
 import { ClosestKeypoint } from '../../../../annotator/tools/edit-tool/edit-keypoint/closest-keypoint.component';
@@ -213,7 +213,8 @@ export const CanvasTemplate = ({
                             isVisible={visibleLabelId === point.label.id}
                             isFaded={isDrawingGhostLine && selectedPoint?.label.id !== point.label.id}
                         >
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 aria-label={`link keypoint ${point.label.name}`}
                                 onPress={() => {
                                     setSelected([point.label.id]);
@@ -222,14 +223,15 @@ export const CanvasTemplate = ({
                                 }}
                             >
                                 <SortUpDown />
-                            </QuietActionButton>
-                            <QuietActionButton
+                            </ActionButton>
+                            <ActionButton
+                                isQuiet
                                 onPress={() => handleDeletePoint(point)}
                                 isDisabled={ghostLine?.from && isEqualLabel(ghostLine.from)(point)}
                                 aria-label={`delete keypoint ${point.label.name}`}
                             >
                                 <Delete />
-                            </QuietActionButton>
+                            </ActionButton>
                         </ExpandablePointLabel>
                     );
                 })}

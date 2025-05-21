@@ -2,6 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import {
+    ActionButton,
+    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -19,7 +21,6 @@ import { isNil } from 'lodash-es';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../core/projects/task.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
-import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActiveLearningConfigurationContent } from './active-learning-configuration-content.component';
 import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
 import { AutoTrainingTask, getAllAutoTrainingValue, getNotificationConfig } from './util';
@@ -84,7 +85,8 @@ export const ActiveLearningConfiguration = ({
     return (
         <DialogTrigger type='popover' hideArrow>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     width={15}
                     isDisabled={isLoading}
                     id={'active-learning-configuration-button'}
@@ -94,7 +96,7 @@ export const ActiveLearningConfiguration = ({
                 >
                     <AutoTraining width={15} aria-label={'tasks in progress'} />
                     {configParameters && <CornerIndicator autoTrainingTasks={filteredAutoTrainingTask} />}
-                </QuietActionButton>
+                </ActionButton>
 
                 <Tooltip>Active learning configuration</Tooltip>
             </TooltipTrigger>

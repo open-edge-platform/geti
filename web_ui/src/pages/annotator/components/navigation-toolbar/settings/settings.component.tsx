@@ -4,8 +4,10 @@
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 
 import {
+    ActionButton,
     Button,
     ButtonGroup,
+    ColorMode,
     Content,
     Dialog,
     DialogTrigger,
@@ -31,10 +33,6 @@ import {
 import { UserProjectSettings, UseSettings } from '../../../../../core/user-settings/services/user-settings.interface';
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { getPanelSettingsKey } from '../../../../../shared/local-storage-keys';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { ActiveLearningSettings } from './active-learning-settings.component';
@@ -113,13 +111,14 @@ export const Settings = ({ settings, isDarkMode = false }: SettingsProps): JSX.E
     return (
         <DialogTrigger>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
                     aria-label='Settings'
                     data-testid='settings-icon'
                 >
                     <Gear width={15} />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Settings</Tooltip>
             </TooltipTrigger>
 

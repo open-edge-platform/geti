@@ -3,13 +3,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import { Checkbox, Grid, repeat, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ActionButton, Checkbox, Grid, repeat, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Delete } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isEmpty } from 'lodash-es';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { hasEqualId, hasEqualSize } from '../../../../../shared/utils';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';
 import { useIsSceneBusy } from '../../../hooks/use-annotator-scene-interaction-state.hook';
@@ -148,7 +147,8 @@ export const AnnotationListActions = (): JSX.Element => {
                                 </TooltipTrigger>
 
                                 <TooltipTrigger placement={'bottom'}>
-                                    <QuietActionButton
+                                    <ActionButton
+                                        isQuiet
                                         key='delete-annotations'
                                         onPress={removeSelectedAnnotations}
                                         isDisabled={isSceneBusy}
@@ -157,7 +157,7 @@ export const AnnotationListActions = (): JSX.Element => {
                                         aria-label='Delete selected annotations'
                                     >
                                         <Delete />
-                                    </QuietActionButton>
+                                    </ActionButton>
                                     <Tooltip>Delete annotations</Tooltip>
                                 </TooltipTrigger>
 

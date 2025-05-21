@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
 import { Edit } from '@geti/ui/icons';
 import Cross from '@spectrum-icons/ui/CrossMedium';
 import { motion } from 'framer-motion';
@@ -8,7 +9,6 @@ import { motion } from 'framer-motion';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../core/projects/domains';
 import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { hasEqualId } from '../../../../shared/utils';
 import { AnnotationToolContext } from '../../core/annotation-tool-context.interface';
 import { useROI } from '../../providers/region-of-interest-provider/region-of-interest-provider.component';
@@ -71,18 +71,24 @@ export const AnnotationActions = ({
             id={`edit`}
             className={[classes.annotationAction, classes.actionButtons].join(' ')}
         >
-            <QuietActionButton onPress={onEditLabels} aria-label='Edit labels' UNSAFE_className={classes.iconWrapper}>
+            <ActionButton
+                isQuiet
+                onPress={onEditLabels}
+                aria-label='Edit labels'
+                UNSAFE_className={classes.iconWrapper}
+            >
                 <Edit />
-            </QuietActionButton>
+            </ActionButton>
 
             {onRemoveLabels !== undefined && (
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     onPress={onRemoveLabels}
                     aria-label='Remove annotation'
                     UNSAFE_className={classes.iconWrapper}
                 >
                     <Cross />
-                </QuietActionButton>
+                </ActionButton>
             )}
         </motion.li>
     );
