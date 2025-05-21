@@ -1,0 +1,80 @@
+image: jobs-ms
+imagePullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+resources:
+  requests:
+    cpu: 400m
+    memory: 500Mi
+  limits:
+    memory: 500Mi
+
+service:
+  type: ClusterIP
+  ports:
+    grpc: 50051
+    http: 8000
+
+ingress:
+  endpoints:
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/jobs(/|$)(.*)
+
+audit_logs_mount_path: "audit_logs"
+
+global:
+  logging_config_dir: ''
+  storage_volume_claim_name_jobs: ''
+  docker_namespace: geti
+  security_headers: ''
+  stripped_headers: ''
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+
+spicedb_log_file_path: "/audit_logs/spicedb.log"
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 70
