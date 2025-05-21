@@ -125,8 +125,8 @@ class ImportUtils:
         """
         Check if given dm_dataset is exported from multi-label classification
 
-        :param dm_categories: Categories of Datumaro dataset obejct
-        :param dm_infos: Infos of Datumaro dataset obejct
+        :param dm_categories: Categories of Datumaro dataset object
+        :param dm_infos: Infos of Datumaro dataset object
         :return: True if dm_dataset is exported from multi-label classification project
         """
         project_type = ImportUtils.get_exported_project_type(dm_infos)
@@ -150,7 +150,7 @@ class ImportUtils:
         """
         Find the Geti project type where dm_dataset is exported from
 
-        :param dm_infos: Infos of Datumaro dataset obejct
+        :param dm_infos: Infos of Datumaro dataset object
         :return: Geti project type
         """
         project_task_type: str = dm_infos.get("GetiProjectTask", "NONE")
@@ -171,8 +171,8 @@ class ImportUtils:
         """
         Check if given dm_dataset is exported from hierarchical classification
 
-        :param dm_categories: Categories of Datumaro dataset obejct
-        :param dm_infos: Infos of Datumaro dataset obejct
+        :param dm_categories: Categories of Datumaro dataset object
+        :param dm_infos: Infos of Datumaro dataset object
         :return: True if dm_dataset is exported from hierarchical classification project
         """
         project_type = ImportUtils.get_exported_project_type(dm_infos)
@@ -252,7 +252,7 @@ class ImportUtils:
         :param item: dataset item
         :param label_categories: label categories within a dataset
         :param label_name_to_group: mapping between label names and label group names
-        :return: number of label, bbox, mask annotations within a item and multi-label flag
+        :return: number of label, bbox, mask annotations within an item and multi-label flag
         """
         number_of_labels: dict[str, int] = defaultdict(lambda: 0)
         multi_label_flag: bool = False
@@ -273,6 +273,8 @@ class ImportUtils:
                 dm.AnnotationType.ellipse,
             ]:
                 number_of_labels["mask"] += 1
+            elif ann.type == dm.AnnotationType.points:
+                number_of_labels["points"] += 1
 
         return number_of_labels, multi_label_flag
 
@@ -319,6 +321,8 @@ class ImportUtils:
                 reports["items_missing_annotation_det"].add((item.id, item.subset))
             if number_of_labels["mask"] == 0:
                 reports["items_missing_annotation_seg"].add((item.id, item.subset))
+            if number_of_labels["points"] == 0:
+                reports["items_missing_annotation_key"].add((item.id, item.subset))
 
         return reports
 
@@ -332,7 +336,7 @@ class ImportUtils:
     ) -> ImportErrorDetail:
         """
         Collect number of non-actionable errors (warnings) in dataset using different validators
-        for supported task types in dataset, skip classification since classificaiton errors
+        for supported task types in dataset, skip classification since classification errors
         were collected earlier
 
         :param dm_dataset: datumaro dataset to validate for warnings
@@ -447,11 +451,11 @@ class ImportUtils:
                 continue
             for dm_ann in dm_item.annotations:
                 label_id = getattr(dm_ann, "label", None)
-                if label_id:
-                    label_idx_to_ann_types[label_id].add(dm_ann.type)
-                elif label_points:
+                if label_points:
                     # for keypoint annotations, we force the label_id to be 0 which is the first label in the dm dataset
                     label_idx_to_ann_types[0].add(dm_ann.type)
+                elif label_id:
+                    label_idx_to_ann_types[label_id].add(dm_ann.type)
                 # TODO: need to check if this is needed.
                 # for dm_attr_key in dm_ann.attributes:
                 #     if dm_attr_key in label_names:
@@ -475,7 +479,7 @@ class ImportUtils:
 
         :param project_type: Geti project type
         :param dm_infos: infos of datumaro dataset
-        :param dm_categories: Categories of Datumaro dataset obejct
+        :param dm_categories: Categories of Datumaro dataset object
         :param label_to_ann_types: A mapping of label names in dataset to ann_types with which they appear
         :param selected_labels: label_names that a user selected to include in the created project
         :param include_all_labels: If True, ignore selected_labels then include all possible labels for each task_type
@@ -779,7 +783,7 @@ class ImportUtils:
     @staticmethod
     def project_type_to_label_domain(project_type: GetiProjectType) -> Domain:
         """
-        Get an label domain of interest by project_type
+        Get a label domain of interest by project_type
 
         :param project_type: project_type
         :return: label domain related to the project_type
@@ -795,7 +799,7 @@ class ImportUtils:
             GetiProjectType.ANOMALY_SEGMENTATION: Domain.ANOMALY_SEGMENTATION,
             GetiProjectType.INSTANCE_SEGMENTATION: Domain.INSTANCE_SEGMENTATION,
             GetiProjectType.ROTATED_DETECTION: Domain.ROTATED_DETECTION,
-            # For CHAINED_DETECTION_CLSSIFICATION project, we interest in bbox annotations in dm_dataset
+            # For CHAINED_DETECTION_CLASSIFICATION project, we interest in bbox annotations in dm_dataset
             GetiProjectType.CHAINED_DETECTION_CLASSIFICATION: Domain.DETECTION,
             # For CHAINED_DETECTION_SEGMENTATION project, we interest in bbox, polygon, and ellipse annotations
             # Note that Domain.SEGMENTATION includes all of them.
