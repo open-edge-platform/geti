@@ -3,6 +3,7 @@
 
 import { InfiniteData, QueryKey, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { chunk } from 'lodash-es';
 
 import { MediaAdvancedFilterResponse, MediaItem } from '../../../../core/media/media.interface';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
@@ -16,6 +17,8 @@ import { filterPageMedias } from '../../utils';
 interface UseDeleteMediaMutation {
     deleteMedia: UseMutationResult<unknown, AxiosError, MediaItem[]>;
 }
+
+const BATCH_SIZE = 1000;
 
 const getQueriesAndPreviousItems = (
     previousItems: [QueryKey, InfiniteData<MediaAdvancedFilterResponse> | undefined][]
@@ -47,10 +50,15 @@ export const useDeleteMediaMutation = (): UseDeleteMediaMutation => {
         MediaItem[],
         [QueryKey, InfiniteData<MediaAdvancedFilterResponse> | undefined][]
     >({
-        mutationFn: (mediaItems) => {
-            return Promise.all(mediaItems.map((mediaItem) => mediaService.deleteMedia(datasetIdentifier, mediaItem)));
+        mutationFn: async (mediaItems) => {
+            // Batching the delete requests to avoid browser simultaneous requests limit
+            const batches = chunk(mediaItems, BATCH_SIZE);
+            for (const batch of batches) {
+                await Promise.all(
+                    batch.map((mediaItem) => mediaService.deleteMedia(datasetIdentifier, mediaItem))
+                );
+            }
         },
-
         onError: (error, _variables, previousItems) => {
             if (previousItems !== undefined) {
                 const { queryKeys, data } = getQueriesAndPreviousItems(previousItems);
@@ -62,7 +70,6 @@ export const useDeleteMediaMutation = (): UseDeleteMediaMutation => {
                 type: NOTIFICATION_TYPE.ERROR,
             });
         },
-
         onMutate: (itemsDeleted) => {
             const previousItems = queryClient.getQueriesData<InfiniteData<MediaAdvancedFilterResponse>>({
                 queryKey: mediaQueryKeyPrefix,
