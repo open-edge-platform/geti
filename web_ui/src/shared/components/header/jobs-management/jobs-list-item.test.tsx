@@ -112,6 +112,7 @@ describe('jobs list item', (): void => {
                 job={{ ...job, creationTime: '2023-08-10T06:17:43.849000+00:00' }}
                 expanded={expanded}
                 discardType={discardType}
+                onSelectItem={jest.fn()}
             />,
             {
                 featureFlags: { FEATURE_FLAG_CREDIT_SYSTEM: enableCreditSystem },
