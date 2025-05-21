@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ConfigurableParametersParams } from '../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { usePrevious } from '../../../hooks/use-previous/use-previous.hook';
-import { ConfigurableParametersParams } from './configurable-parameters.interface';
 import { ACTION_TYPES, CP_RULES } from './rules';
 
 export const useCPRule = (

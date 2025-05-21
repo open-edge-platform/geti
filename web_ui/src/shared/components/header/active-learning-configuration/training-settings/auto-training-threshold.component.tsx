@@ -6,13 +6,13 @@ import { FC } from 'react';
 import { Content, ContextualHelp, Flex, Radio, RadioGroup, Text } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
-import { findDynamicRequiredAnnotationsConfig } from '../../../../../core/configurable-parameters/utils';
-import { Task } from '../../../../../core/projects/task.interface';
 import {
     BooleanGroupParams,
     ConfigurableParametersTaskChain,
     NumberGroupParams,
-} from '../../../configurable-parameters/configurable-parameters.interface';
+} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { findDynamicRequiredAnnotationsConfig } from '../../../../../core/configurable-parameters/utils';
+import { Task } from '../../../../../core/projects/task.interface';
 import { RequiredAnnotationsSlider } from './required-annotations-slider.component';
 
 enum AutoTrainingThresholdOption {

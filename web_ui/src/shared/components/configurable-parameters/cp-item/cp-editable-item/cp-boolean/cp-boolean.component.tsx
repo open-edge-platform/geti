@@ -3,7 +3,7 @@
 
 import { Switch, Text, View } from '@geti/ui';
 
-import { BooleanGroupParams } from '../../../configurable-parameters.interface';
+import { BooleanGroupParams } from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ResetButtonHandler } from '../cp-editable-item.interface';
 
 interface CPBooleanProps extends ResetButtonHandler {

@@ -5,7 +5,7 @@ import { FC } from 'react';
 
 import { View } from '@geti/ui';
 
-import { ConfigurableParametersTaskChain } from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { ConfigurableParametersTaskChain } from '../../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { FineTuneParameters } from './fine-tune-parameters.component';
 import { LearningParameters } from './learning-parameters.component';
 

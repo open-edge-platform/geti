@@ -4,8 +4,8 @@
 import { Flex } from '@geti/ui';
 
 import { ConfigGroupParametersDataTypesDTO } from '../../../../../../core/configurable-parameters/dtos/configurable-parameters.interface';
+import { SelectableGroupParams } from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
-import { SelectableGroupParams } from '../../../configurable-parameters.interface';
 import { ResetButtonHandler } from '../cp-editable-item.interface';
 import { CPSelectableItem } from './cp-selectable-item.component';
 
