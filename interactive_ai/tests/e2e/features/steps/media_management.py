@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 import cv2
 import numpy as np
-from behave import given, when
+from behave import given, then, when
 from behave.runner import Context
 
 if TYPE_CHECKING:
@@ -28,7 +28,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
-def _create_and_upload_random_image(context: Context, image_name: str) -> None:
+def _create_and_upload_random_image(context: Context, image_name: str, dataset_id: str) -> None:
     random_image = np.random.randint(0, 256, (100, 100, 3), dtype=np.uint8)
     img = Image.fromarray(random_image)
 
@@ -42,7 +42,7 @@ def _create_and_upload_random_image(context: Context, image_name: str) -> None:
             organization_id=context.organization_id,
             workspace_id=context.workspace_id,
             project_id=context.project_id,
-            dataset_id=context.dataset_id,
+            dataset_id=dataset_id,
             file=image_path,  # file.read(),
             _headers={"Content-Disposition": f'form-data; name="file"; filename="{image_name}"'},
         )
@@ -50,7 +50,7 @@ def _create_and_upload_random_image(context: Context, image_name: str) -> None:
         context._media_info_by_name[image_name] = upload_image_response
 
 
-def _create_and_upload_random_video(context: Context, video_name: str) -> None:
+def _create_and_upload_random_video(context: Context, video_name: str, dataset_id: str) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         video_path = f"{temp_dir}/{video_name}"
 
@@ -71,7 +71,7 @@ def _create_and_upload_random_video(context: Context, video_name: str) -> None:
             organization_id=context.organization_id,
             workspace_id=context.workspace_id,
             project_id=context.project_id,
-            dataset_id=context.dataset_id,
+            dataset_id=dataset_id,
             file=video_path,
             _headers={"Content-Disposition": f'form-data; name="file"; filename="{video_name}"'},
         )
@@ -81,12 +81,12 @@ def _create_and_upload_random_video(context: Context, video_name: str) -> None:
 
 @given("an image called '{image_name}'")
 def step_given_image_with_custom_name(context: Context, image_name: str) -> None:
-    _create_and_upload_random_image(context=context, image_name=image_name)
+    _create_and_upload_random_image(context=context, image_name=image_name, dataset_id=context.dataset_id)
 
 
 @given("a video called '{video_name}'")
 def step_given_video_with_custom_name(context: Context, video_name: str) -> None:
-    _create_and_upload_random_video(context=context, video_name=video_name)
+    _create_and_upload_random_video(context=context, video_name=video_name, dataset_id=context.dataset_id)
 
 
 @when("the user loads the image '{image_name}'")
@@ -101,9 +101,27 @@ def step_when_user_loads_image(context: Context, image_name: str) -> None:
     )
 
 
+@when("the user uploads an image called '{image_name}' to dataset '{dataset_name}'")
+def step_when_user_uploads_image_to_dataset(context: Context, image_name: str, dataset_name: str) -> None:
+    dataset_id = context._dataset_info_by_name[dataset_name].id
+    _create_and_upload_random_image(context=context, image_name=image_name, dataset_id=dataset_id)
+
+
 @when("the user tries to load the image '{image_name}'")
 def step_when_user_tries_loading_image(context: Context, image_name: str) -> None:
     try:
         step_when_user_loads_image(context=context, image_name=image_name)
     except Exception as e:
         context.exception = e
+
+
+@then("the dataset '{dataset_name}' contains an image called '{image_name}'")
+def step_then_dataset_contains_image(context: Context, dataset_name: str, image_name: str) -> None:
+    media_api: MediaApi = context.media_api
+    context._media_info_by_name[image_name] = media_api.get_image_detail(
+        organization_id=context.organization_id,
+        workspace_id=context.workspace_id,
+        project_id=context.project_id,
+        dataset_id=context._dataset_info_by_name[dataset_name].id,
+        image_id=context._media_info_by_name[image_name].id,
+    )

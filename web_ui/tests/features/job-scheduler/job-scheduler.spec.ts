@@ -42,7 +42,8 @@ test.describe('JobScheduler', (): void => {
             .getByLabel(/Show suggestions/)
             .first()
             .click();
-        await page.getByText(/Card detection/).click();
+
+        await page.getByRole('option', { name: /Card detection/ }).click();
 
         const request = await requestPromise;
 
