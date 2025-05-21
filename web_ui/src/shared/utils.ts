@@ -43,40 +43,7 @@ export const CONFIRM_PASSWORD_ERROR_MESSAGE = 'The password you entered did not 
 export const PASSWORD_DOES_NOT_MEET_LENGTH_RULE =
     'The password you pasted consists of more than a maximum 200 characters.';
 
-export const LONG_FORMAT_DATE = 'DD/MM/YYYY HH:mm';
-
-export const SHORT_FORMAT_DATE = 'DD/MM/YYYY';
-
 export const DATE_TIME_IN_ISO_AND_UTC_OFFSETFORMAT = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
-
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-const sort = <T, K extends keyof T>(list: T[], attribute: K, toLowercase = false, ascending = true): T[] => {
-    return [
-        ...list.sort((previous: T, current: T): number => {
-            let previousValue: any = previous[attribute],
-                currentValue: any = current[attribute];
-            let comparison: any;
-            if (typeof previous[attribute] === 'string' && toLowercase) {
-                previousValue = (previous[attribute] as unknown as string).toLowerCase();
-                currentValue = (current[attribute] as unknown as string).toLowerCase();
-                comparison = previousValue.localeCompare(currentValue);
-            } else {
-                comparison = previousValue < currentValue ? -1 : 1;
-            }
-            return ascending ? comparison : comparison <= 0 ? 1 : -1;
-        }),
-    ];
-};
-
-export const sortAscending = <T, K extends keyof T>(list: T[], attribute: K, toLowercase = false): T[] => {
-    return sort(list, attribute, toLowercase);
-};
-
-export const sortDescending = <T, K extends keyof T>(list: T[], attribute: K, toLowercase = false): T[] => {
-    return sort(list, attribute, toLowercase, false);
-};
-
-export const camelCaseSplitter = (value: string): string => value.replace(/([^A-Z])([A-Z])/g, '$1 $2');
 
 export const encodeToBase64 = (password: string): string => {
     return btoa(password);
@@ -95,8 +62,6 @@ export const passwordValidationRules = (requiredPasswordMessage: string) =>
         .max(MAX_NUMBER_OF_PASSWORD_CHARACTERS, TOO_LONG_MESSAGE);
 
 export const formatDate = (date: string | number, format: string): string => dayjs(date).format(format);
-
-export const isValidDate = (date: string, formats: OptionType): boolean => dayjs(date, formats, true).isValid();
 
 // When using `compare`, a negative result indicates that this date is before the given one,
 // and a positive date indicates that it is after

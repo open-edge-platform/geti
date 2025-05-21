@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { sortDescending } from '../../../shared/utils';
+import { orderBy } from 'lodash-es';
+
 import { mapSearchRulesToDto } from '../../datasets/services/utils';
 import { JobTestDTO } from '../../jobs/dtos/jobs-dto.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';
@@ -27,7 +28,7 @@ export const createApiTestsService: CreateApiService<TestsService> = (
             return getTestEntity(test, modelsGroups);
         });
 
-        return sortDescending(tests, 'creationTime');
+        return orderBy(tests, 'creationTime', 'desc');
     };
 
     const runTest = async (projectIdentifier: ProjectIdentifier, body: RunTestBody): Promise<string> => {
