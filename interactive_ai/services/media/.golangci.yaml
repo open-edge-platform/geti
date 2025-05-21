@@ -285,6 +285,11 @@ linters:
           # Default: true
           skipRecvDeref: false
 
+    gomoddirectives:
+      # Allow local `replace` directives.
+      # Default: false
+      replace-local: true
+
     govet:
       # Enable all analyzers.
       # Default: false

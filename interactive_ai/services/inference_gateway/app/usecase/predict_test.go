@@ -15,6 +15,7 @@ import (
 	pb "geti.com/predict"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"inference_gateway/app/entities"
 	mockservice "inference_gateway/app/mock/service"
@@ -32,7 +33,7 @@ func MockDoneCh() <-chan error {
 func MockFrameCh(total int) <-chan *frames.FrameData {
 	frameCh := make(chan *frames.FrameData)
 	go func() {
-		for i := 0; i < total; i++ {
+		for i := range total {
 			frameCh <- &frames.FrameData{
 				Index: i,
 				Data:  []byte("test"),
@@ -44,7 +45,6 @@ func MockFrameCh(total int) <-chan *frames.FrameData {
 }
 
 func TestPredictBatch(t *testing.T) {
-
 	ctx := context.Background()
 	fullVideoID := sdkentities.GetFullVideoID(t)
 	start, end, skip := 200, 399, 10
@@ -93,7 +93,7 @@ func TestPredictBatch(t *testing.T) {
 	infer := NewPredict(mockModelAccess, mockVideoRepo, mockFrameExtractor)
 
 	result, err := infer.Batch(ctx, &batchRequest)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Len(t, result.BatchPredictions, total)
 	for i, item := range result.BatchPredictions {

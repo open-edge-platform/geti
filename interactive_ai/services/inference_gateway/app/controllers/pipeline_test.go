@@ -148,7 +148,7 @@ func (suite *PipelineControllerSuite) TestPipelineController_Status() {
 				tt.setupMocks()
 			}
 
-			req, _ := http.NewRequest("GET", tt.giveRequest, nil)
+			req, _ := http.NewRequest(http.MethodGet, tt.giveRequest, nil)
 			resp := httptest.NewRecorder()
 			req.Context()
 			router.ServeHTTP(resp, req)
@@ -265,8 +265,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchPredictActive_OK",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				var batchResp usecase.BatchPredictionJSON
 				batchResp.BatchPredictions = append(batchResp.BatchPredictions, []byte(`{"score": 0.5}`))
@@ -293,8 +297,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchPredict_Err",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				inferenceMock.EXPECT().
 					BatchPredict(mock.AnythingOfType("*gin.Context"), inferenceRequest, sdkentities.ID{ID: "active"}).
@@ -304,8 +312,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchExplainActive_OK",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				var batchResp usecase.BatchExplainJSON
 				batchResp.BatchExplain = append(batchResp.BatchExplain, []byte(`{"score": 0.5}`))
@@ -332,8 +344,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchExplain_Err",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				var batchResp usecase.BatchExplainJSON
 				batchResp.BatchExplain = append(batchResp.BatchExplain, []byte(`{"score": 0.5}`))
@@ -347,11 +363,16 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 			name: "Unknown",
 			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:unknown",
 				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
-			wantErrMsg: fmt.Sprintf("Action `unknown` is not a valid action. Choose one of %s", entities.SupportedActions),
+			wantErrMsg: fmt.Sprintf(
+				"Action `unknown` is not a valid action. Choose one of %s",
+				entities.GetSupportedActions(),
+			),
 		},
 	}
 
-	pipelines := router.Group("/api/v1/organizations/:organization_id/workspaces/:workspace_id/projects/:project_id/pipelines/:pipeline_id")
+	pipelines := router.Group(
+		"/api/v1/organizations/:organization_id/workspaces/:workspace_id/projects/:project_id/pipelines/:pipeline_id",
+	)
 	{
 		pipelines.POST("", pipelineCtrl.Infer)
 	}
@@ -362,7 +383,7 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 				tt.setupMocks()
 			}
 
-			req, _ := http.NewRequest("POST", tt.giveRequest, nil)
+			req, _ := http.NewRequest(http.MethodPost, tt.giveRequest, nil)
 			resp := httptest.NewRecorder()
 			router.ServeHTTP(resp, req)
 

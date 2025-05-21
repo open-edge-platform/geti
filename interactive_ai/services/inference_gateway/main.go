@@ -24,12 +24,13 @@ import (
 )
 
 type config struct {
-	InferenceGatewayPort string `env:"INFERENCE_GATEWAY_PORT" envDefault:"7000"`
+	InferenceGatewayPort string `env:"INFERENCE_GATEWAY_PORT"  envDefault:"7000"`
 	MaxMultipartMemoryMB int64  `env:"MAX_MULTIPART_MEMORY_MB" envDefault:"64"`
 }
 
 const (
-	baseProjectPath = "/api/v1/organizations/:organization_id/workspaces/:workspace_id/projects/:project_id"
+	baseProjectPath     = "/api/v1/organizations/:organization_id/workspaces/:workspace_id/projects/:project_id"
+	megabyteToByteShift = 20 // represents the bit shift value to convert megabytes to bytes (1 MB = 2^20 bytes)
 )
 
 func main() {
@@ -60,7 +61,7 @@ func main() {
 
 	modelAccessSrv := service.NewModelAccessService(meshClient, registrationClient)
 	router := createRouter(cfg.MaxMultipartMemoryMB, modelAccessSrv)
-	if err := router.Run(":" + cfg.InferenceGatewayPort); err != nil {
+	if err = router.Run(":" + cfg.InferenceGatewayPort); err != nil {
 		logger.Log().Fatalf("Cannot run server: %s", err)
 	}
 }
@@ -69,7 +70,7 @@ func main() {
 // This function abstracts the setup of routes/route groups.
 func createRouter(maxMultipartLimit int64, modelAccessSrv service.ModelAccessService) *gin.Engine {
 	r := gin.New()
-	r.MaxMultipartMemory = maxMultipartLimit << 20
+	r.MaxMultipartMemory = maxMultipartLimit << megabyteToByteShift
 
 	r.Use(gin.Recovery())
 	r.Use(middleware.ZapRequestLogger(logger.Log().Desugar()))
@@ -101,19 +102,12 @@ func createRouter(maxMultipartLimit int64, modelAccessSrv service.ModelAccessSer
 
 	inferenceCtrl := controllers.NewInferenceControllerImpl(modelAccessSrv, cacheSrv, requestHandler, predict, explain)
 	pipelineCtrl := controllers.NewPipelineController(inferenceCtrl)
-	// Pipeline endpoints
+
 	pipelines := r.Group(baseProjectPath + "/pipelines/:pipeline_id")
 	{
 		pipelines.GET("/status", pipelineCtrl.Status)
 		pipelines.POST("", pipelineCtrl.Infer)
 	}
-
-	// Model endpoints --- Temporarily disabled for SaaS MVP
-	//models := r.Group(baseProjectPath + "/models/:model_id")
-	//{
-	//	models.GET("/status", statusController.Model)
-	//	models.POST("", endpoints.ModelEndpoint)
-	//}
 
 	return r
 }

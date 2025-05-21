@@ -15,6 +15,7 @@ import (
 	mockframes "geti.com/iai_core/mock/frames"
 	mockstorage "geti.com/iai_core/mock/storage"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMediaService(t *testing.T) {
@@ -40,11 +41,10 @@ func TestMediaService(t *testing.T) {
 					LoadImageByID(ctx, fullImageID).
 					Return(reader, nil, nil).
 					Once()
-
 			},
 			actionAndAssert: func() {
 				buf, err := mediaSrv.GetImage(ctx, fullImageID)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.Equal(t, "test", buf.String())
 			},
 		},
@@ -55,7 +55,6 @@ func TestMediaService(t *testing.T) {
 					LoadImageByID(ctx, fullImageID).
 					Return(nil, nil, errors.New("error")).
 					Once()
-
 			},
 			actionAndAssert: func() {
 				buf, err := mediaSrv.GetImage(ctx, fullImageID)
@@ -76,12 +75,12 @@ func TestMediaService(t *testing.T) {
 					Once()
 				frameReaderMock.EXPECT().
 					ReadFrameToBufferFps("somepath", 1, float64(25)).
-					Return(bytes.NewBuffer([]byte("test")), nil).
+					Return(bytes.NewBufferString("test"), nil).
 					Once()
 			},
 			actionAndAssert: func() {
 				buf, err := mediaSrv.GetFrame(ctx, fullVideoID, 1)
-				assert.NoError(t, err)
+				require.NoError(t, err)
 				assert.NotNil(t, buf)
 			},
 		},
@@ -92,7 +91,6 @@ func TestMediaService(t *testing.T) {
 					LoadVideoByID(ctx, fullVideoID).
 					Return(nil, errors.New("error")).
 					Once()
-
 			},
 			actionAndAssert: func() {
 				buf, err := mediaSrv.GetFrame(ctx, fullVideoID, 1)

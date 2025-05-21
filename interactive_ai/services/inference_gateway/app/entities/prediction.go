@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"image"
 	"strconv"
-	"strings"
 	"time"
 
 	sdkentities "geti.com/iai_core/entities"
@@ -56,7 +55,7 @@ type ExplainOutput struct {
 	Created string `json:"created"`
 }
 
-// PredictionOutput can be used in ephemeral cases where there is no media identifier
+// PredictionOutput can be used in ephemeral cases where there is no media identifier.
 type PredictionOutput struct {
 	PredictionJSON
 	Created string `json:"created"`
@@ -81,10 +80,9 @@ type ImageExplainOutput struct {
 	MediaIdentifier ImageIdentifier `json:"media_identifier"`
 }
 
-// GetCurrentTimeString returns current UTC time
-var GetCurrentTimeString = func() string {
-	currTime := time.Now().UTC().String()
-	return strings.Trim(currTime, " UTC")
+// GetCurrentTimeString returns current UTC time.
+func GetCurrentTimeString() string {
+	return time.Now().UTC().Format("2006-01-02 15:04:05.999999999 -0700")
 }
 
 type PredictionRequestData struct {
@@ -100,11 +98,11 @@ type PredictionRequestData struct {
 	HyperParameters *string
 }
 
-// DecodeMedia reads the image from the buffer and returns it
+// DecodeMedia reads the image from the buffer and returns it.
 func (pd PredictionRequestData) DecodeMedia() (image.Image, error) {
 	decodedImage, _, err := image.Decode(pd.Media)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode image: %s", err)
+		return nil, fmt.Errorf("failed to decode image: %w", err)
 	}
 	return decodedImage, nil
 }
@@ -141,7 +139,9 @@ func (pd PredictionRequestData) ToPredictBytes(predictionJSONString string) ([]b
 	predictionOutput := PredictionOutput{predictionJSON, GetCurrentTimeString()}
 
 	var jsonOutput []byte
-	if !pd.MediaInfo.ImageID.IsEmptyID() {
+
+	switch {
+	case !pd.MediaInfo.ImageID.IsEmptyID():
 		imageIdentifier := ImageIdentifier{
 			ImageID: pd.MediaInfo.ImageID.String(),
 			Type:    "image",
@@ -150,7 +150,8 @@ func (pd PredictionRequestData) ToPredictBytes(predictionJSONString string) ([]b
 			PredictionOutput: predictionOutput,
 			MediaIdentifier:  imageIdentifier,
 		})
-	} else if !pd.MediaInfo.VideoID.IsEmptyID() {
+
+	case !pd.MediaInfo.VideoID.IsEmptyID():
 		videoFrameIdentifier := VideoFrameIdentifier{
 			VideoID:    pd.MediaInfo.VideoID.String(),
 			FrameIndex: pd.MediaInfo.FrameIndex,
@@ -161,14 +162,14 @@ func (pd PredictionRequestData) ToPredictBytes(predictionJSONString string) ([]b
 			PredictionOutput: predictionOutput,
 			MediaIdentifier:  videoFrameIdentifier,
 		})
-	} else { // Ephemeral prediction
+
+	default: // Ephemeral prediction
 		jsonOutput, err = json.Marshal(predictionOutput)
 	}
 
 	if err != nil {
 		return nil, err
 	}
-
 	return jsonOutput, nil
 }
 
@@ -178,12 +179,15 @@ func (pd PredictionRequestData) ToExplainBytes(explainJSONString string) ([]byte
 		explainBytes = []byte(explainJSONString)
 		err          error
 	)
-	if err := json.Unmarshal(explainBytes, &explainJSON); err != nil {
+	if err = json.Unmarshal(explainBytes, &explainJSON); err != nil {
 		return nil, err
 	}
 	explainOutput := ExplainOutput{explainJSON, GetCurrentTimeString()}
+
 	var jsonOutput []byte
-	if !pd.MediaInfo.ImageID.IsEmptyID() {
+
+	switch {
+	case !pd.MediaInfo.ImageID.IsEmptyID():
 		imageIdentifier := ImageIdentifier{
 			ImageID: pd.MediaInfo.ImageID.String(),
 			Type:    "image",
@@ -192,7 +196,7 @@ func (pd PredictionRequestData) ToExplainBytes(explainJSONString string) ([]byte
 			ExplainOutput:   explainOutput,
 			MediaIdentifier: imageIdentifier,
 		})
-	} else if !pd.MediaInfo.VideoID.IsEmptyID() {
+	case !pd.MediaInfo.VideoID.IsEmptyID():
 		videoFrameIdentifier := VideoFrameIdentifier{
 			VideoID:    pd.MediaInfo.VideoID.String(),
 			FrameIndex: pd.MediaInfo.FrameIndex,
@@ -202,7 +206,7 @@ func (pd PredictionRequestData) ToExplainBytes(explainJSONString string) ([]byte
 			ExplainOutput:   explainOutput,
 			MediaIdentifier: videoFrameIdentifier,
 		})
-	} else { // Ephemeral prediction
+	default: // Ephemeral prediction
 		jsonOutput, err = json.Marshal(explainOutput)
 	}
 
@@ -240,10 +244,9 @@ func (b BatchPredictionRequestData) ToSingleRequest() *PredictionRequestData {
 }
 
 // ExceedsMaxPredictions checks if the start frame, end frame and frame skip combination does not exceed the maximum
-// amount allowed predictions
+// amount allowed predictions.
 func (b BatchPredictionRequestData) ExceedsMaxPredictions(maxPredictions int) bool {
 	// + 1 because start and end frame are inclusive
-	numPredictions := b.EndFrame - b.StartFrame + 1
-	numPredictions = numPredictions / b.FrameSkip
+	numPredictions := (b.EndFrame - b.StartFrame + 1) / b.FrameSkip
 	return numPredictions > maxPredictions
 }

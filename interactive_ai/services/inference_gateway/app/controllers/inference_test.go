@@ -49,7 +49,13 @@ func TestInferenceController_InferOne(t *testing.T) {
 		UseCache:       entities.Always,
 	}
 
-	inferenceCtrl := NewInferenceControllerImpl(modelAccessMock, cacheMock, requestHandlerMock, predictMock, explainMock)
+	inferenceCtrl := NewInferenceControllerImpl(
+		modelAccessMock,
+		cacheMock,
+		requestHandlerMock,
+		predictMock,
+		explainMock,
+	)
 
 	tests := []struct {
 		name            string
@@ -82,7 +88,6 @@ func TestInferenceController_InferOne(t *testing.T) {
 				assert.Equal(t, []byte("cached"), result)
 
 				predictMock.AssertNotCalled(t, "One", c.Request.Context(), requestData)
-
 			},
 		},
 		{
@@ -111,7 +116,6 @@ func TestInferenceController_InferOne(t *testing.T) {
 				assert.Equal(t, []byte("no prediction found"), result)
 
 				predictMock.AssertNotCalled(t, "One", c.Request.Context(), requestData)
-
 			},
 		},
 		{
@@ -250,7 +254,11 @@ func TestInferenceController_InferOne(t *testing.T) {
 
 				assert.Nil(t, result)
 				assert.Equal(t, http.StatusBadRequest, err.StatusCode)
-				assert.Equal(t, "Invalid parameter: `use_cache=always` is not supported for the `explain` endpoint.", err.Error())
+				assert.Equal(
+					t,
+					"Invalid parameter: `use_cache=always` is not supported for the `explain` endpoint.",
+					err.Error(),
+				)
 			},
 		},
 		{
@@ -345,10 +353,20 @@ func TestInferenceController_InferBatch(t *testing.T) {
 		StartFrame:     1,
 		EndFrame:       5,
 		LabelOnly:      true,
-		MediaInfo:      &entities.MediaInfo{FrameIndex: 1, DatasetID: fullVideoID.DatasetID, VideoID: fullVideoID.VideoID},
+		MediaInfo: &entities.MediaInfo{
+			FrameIndex: 1,
+			DatasetID:  fullVideoID.DatasetID,
+			VideoID:    fullVideoID.VideoID,
+		},
 	}
 
-	inferenceCtrl := NewInferenceControllerImpl(modelAccessMock, cacheMock, requestHandlerMock, predictMock, explainMock)
+	inferenceCtrl := NewInferenceControllerImpl(
+		modelAccessMock,
+		cacheMock,
+		requestHandlerMock,
+		predictMock,
+		explainMock,
+	)
 
 	tests := []struct {
 		name            string
@@ -556,7 +574,13 @@ func TestInferenceController_IsModelReady(t *testing.T) {
 	explainMock := mockusecase.NewMockInfer[usecase.BatchExplainJSON](t)
 	requestHandlerMock := mockcontrollers.NewMockRequestHandler(t)
 
-	inferenceCtrl := NewInferenceControllerImpl(modelAccessMock, cacheMock, requestHandlerMock, predictMock, explainMock)
+	inferenceCtrl := NewInferenceControllerImpl(
+		modelAccessMock,
+		cacheMock,
+		requestHandlerMock,
+		predictMock,
+		explainMock,
+	)
 
 	modelAccessMock.EXPECT().
 		IsModelReady(c.Request.Context(), "dummy_id").

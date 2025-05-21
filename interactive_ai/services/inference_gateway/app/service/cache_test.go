@@ -8,6 +8,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"inference_gateway/app/entities"
 
 	"github.com/go-resty/resty/v2"
@@ -45,8 +47,8 @@ func TestPredictionCacheService(t *testing.T) {
 					httpmock.NewStringResponder(200, `{"predictions": [{"score": 0.6}]}`))
 			},
 			wantAsserts: func(statusCode int, body []byte, cached bool) {
-				assert.Equal(t, statusCode, 200)
-				assert.Equal(t, body, []byte(`{"predictions": [{"score": 0.6}]}`))
+				assert.Equal(t, 200, statusCode)
+				assert.JSONEq(t, `{"predictions": [{"score": 0.6}]}`, string(body))
 				assert.True(t, cached)
 				httpmock.Reset()
 			},
@@ -58,7 +60,7 @@ func TestPredictionCacheService(t *testing.T) {
 					httpmock.NewStringResponder(404, `not_found`))
 			},
 			wantAsserts: func(statusCode int, body []byte, cached bool) {
-				assert.Equal(t, statusCode, 0)
+				assert.Equal(t, 0, statusCode)
 				assert.Nil(t, body)
 				assert.False(t, cached)
 			},
@@ -70,7 +72,7 @@ func TestPredictionCacheService(t *testing.T) {
 					httpmock.NewErrorResponder(errors.New("error")))
 			},
 			wantAsserts: func(statusCode int, body []byte, cached bool) {
-				assert.Equal(t, statusCode, 0)
+				assert.Equal(t, 0, statusCode)
 				assert.Nil(t, body)
 				assert.False(t, cached)
 			},
@@ -81,7 +83,7 @@ func TestPredictionCacheService(t *testing.T) {
 				req.UseCache = entities.Never
 			},
 			wantAsserts: func(statusCode int, body []byte, cached bool) {
-				assert.Equal(t, statusCode, 0)
+				assert.Equal(t, 0, statusCode)
 				assert.Nil(t, body)
 				assert.False(t, cached)
 			},
@@ -95,7 +97,7 @@ func TestPredictionCacheService(t *testing.T) {
 				}
 			},
 			wantAsserts: func(statusCode int, body []byte, cached bool) {
-				assert.Equal(t, statusCode, 0)
+				assert.Equal(t, 0, statusCode)
 				assert.Nil(t, body)
 				assert.False(t, cached)
 			},
@@ -106,7 +108,7 @@ func TestPredictionCacheService(t *testing.T) {
 		t.Run(tt.name, func(_ *testing.T) {
 			tt.setupClient()
 			service, err := NewPredictionCacheService(client)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			statusCode, body, cached := service.Get(ctx, req)
 			tt.wantAsserts(statusCode, body, cached)
