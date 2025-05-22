@@ -3,6 +3,10 @@
 
 /// <reference types="@rsbuild/core/types" />
 
+/*
+    TODO: We can remove it once @geti/core does not have any dependencies in the main geti
+ */
+
 declare module '*.svg' {
     export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 }

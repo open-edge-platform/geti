@@ -2,6 +2,9 @@
   "extends": "@geti/config/typescript",
   "include": ["./src", "./geti-type.d.ts"],
   "compilerOptions": {
+    /*
+      TODO remove @types/node once @geti/core does not have any dependencies in the main geti.
+    */
     "types": ["node", "jest"]
   }
 }
