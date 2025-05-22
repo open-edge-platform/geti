@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FormEvent, ForwardedRef, forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button, Flex, Form, TextField, TextFieldRef } from '@geti/ui';
-import { debounce, isEmpty } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 
 import {
     LabelItemEditionState,

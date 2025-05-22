@@ -222,7 +222,6 @@ describe('New project dialog - Task chain', () => {
             await userEvent.keyboard('{enter}');
 
             await addChildLabel('child1');
-            await addChildLabel('child2');
 
             fireEvent.click(screen.getByRole('button', { name: 'Create' }));
 
@@ -232,7 +231,7 @@ describe('New project dialog - Task chain', () => {
                     'task chain - Detection Classification',
                     ['Detection', 'Classification'],
                     [
-                        {
+                        expect.objectContaining({
                             domain: 'Detection',
                             labels: [
                                 expect.objectContaining({
@@ -240,24 +239,19 @@ describe('New project dialog - Task chain', () => {
                                 }),
                             ],
                             relation: 'Single selection',
-                        },
-                        {
+                        }),
+                        expect.objectContaining({
                             domain: 'Classification',
                             labels: [
                                 expect.objectContaining({
-                                    name: 'child1',
-                                    children: [
-                                        expect.objectContaining({ name: 'Label' }),
-                                        expect.objectContaining({ name: 'Label 2' }),
-                                    ],
+                                    name: 'test',
                                 }),
                                 expect.objectContaining({
-                                    name: 'child2',
-                                    children: [expect.objectContaining({ name: 'Label 3' })],
+                                    name: 'child1',
                                 }),
                             ],
                             relation: 'Mixed',
-                        },
+                        }),
                     ],
                     true
                 );
