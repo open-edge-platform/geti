@@ -18,6 +18,7 @@ jest.mock('../../hooks/use-is-training.hook', () => ({
 
 jest.mock('../../../../../../core/jobs/hooks/use-jobs.hook', () => ({
     useGetRunningJobs: jest.fn(() => ({ data: { pages: [] } })),
+    useGetScheduledJobs: jest.fn(() => ({ data: { pages: [] } })),
 }));
 
 jest.mock('react-router-dom', () => ({
