@@ -910,9 +910,12 @@ class ConvertUtils:
                         continue
                     joint_names = tuple(idx_to_label_name[idx] for idx in joint)
                     logger.warning(f"{joint_names}")
+                    logger.warning(f"{include_all_labels}, {any(label in selected_labels for label in joint_names)}")
                     if not include_all_labels and not any(label in selected_labels for label in joint_names):
                         continue
                     structure["edges"].append({"nodes": list(joint_names)})
+                    logger.warning(structure)
+                logger.warning(f"{cat.positions}, {len(cat.positions)}")
                 for i in range(0, len(cat.positions), 2):
                     logger.warning(f"{cat.positions[i]}, {cat.positions[i + 1]}")
                     structure["positions"].append(
