@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.7
 
-FROM python:3.10-slim-bookworm
+FROM python:3.10-slim-bookworm@sha256:727bcea1bca58820e83b67b048f0eafe936fa215a69847e1466bc6312251fe2c
 
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=0
 
-COPY --from=ghcr.io/astral-sh/uv:0.6.12 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8ea41eb4553a794195ef5803aa7ca6258653100d /uv /uvx /bin/
 
 ARG DOCKER_VERSION="5:28.0.4-1~debian.12~bookworm"
 
