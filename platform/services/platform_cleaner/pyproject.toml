@@ -4,7 +4,7 @@
 name = "platform_cleaner"
 version = "1.0.0"
 description = "Platform cleaner service for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "python-ldap==3.4.4",
