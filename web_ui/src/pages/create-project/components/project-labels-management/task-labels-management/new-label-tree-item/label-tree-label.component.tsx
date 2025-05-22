@@ -15,6 +15,7 @@ import {
 import { getFlattenedLabels } from '../../../../../../core/labels/utils';
 import { DOMAIN } from '../../../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../../../core/projects/task.interface';
+import { useDebouncedCallback } from '../../../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { LabelEditionFieldsWrapper } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/label-edition-mode/label-edition-fields-wrapper.component';
 import { HotkeyNameField } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/label-presentation-mode/hotkey-name-field/hotkey-name-field.component';
 import {
@@ -193,13 +194,7 @@ export const LabelTreeLabel = forwardRef(
             }
         };
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        const debouncedConfirm = useCallback(
-            debounce((value: string) => {
-                confirmNewLabel(false, { name: value });
-            }, 200),
-            []
-        );
+        const debouncedConfirm = useDebouncedCallback((value: string) => confirmNewLabel(false, { name: value }), 200);
 
         const handleNameChange = (value: string) => {
             setDirtyOnChange('name');
