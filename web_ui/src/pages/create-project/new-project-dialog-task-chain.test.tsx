@@ -6,11 +6,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { LabelItemType } from '../../core/labels/label-tree-view.interface';
-import { DOMAIN } from '../../core/projects/core.interface';
-import { CreateProjectProps } from '../../core/projects/project.interface';
 import { createInMemoryProjectService } from '../../core/projects/services/in-memory-project-service';
-import { TaskMetadata } from '../../core/projects/task.interface';
-import { WorkspaceIdentifier } from '../../core/workspaces/services/workspaces.interface';
 import { providersRender as render } from '../../test-utils/required-providers-render';
 import { UNIQUE_VALIDATION_MESSAGE } from './components/utils';
 import { NewProjectDialogProvider } from './new-project-dialog-provider/new-project-dialog-provider.component';
@@ -33,19 +29,9 @@ jest.mock('react-router-dom', () => ({
     }),
 }));
 
-let createProjectData: { tasksLabels: TaskMetadata[] };
-
 const projectService = createInMemoryProjectService();
-projectService.createProject = async (
-    _workspaceIdentifier: WorkspaceIdentifier,
-    _name: string,
-    _domains: DOMAIN[],
-    _tasksLabels: TaskMetadata[]
-): Promise<CreateProjectProps> => {
-    createProjectData = { tasksLabels: _tasksLabels };
-
-    return Promise.resolve({ id: 'new-project-id' } as CreateProjectProps);
-};
+const createProjectMock = jest.fn();
+projectService.createProject = createProjectMock;
 
 const openImportDatasetDialog = {} as OverlayTriggerState;
 
@@ -56,17 +42,14 @@ const clearInput = (input: HTMLElement) => {
 const renderApp = async () => {
     render(
         <NewProjectDialogProvider>
-            <NewProjectDialog buttonText={'test button'} openImportDatasetDialog={openImportDatasetDialog} />
+            <NewProjectDialog buttonText={'create project'} openImportDatasetDialog={openImportDatasetDialog} />
         </NewProjectDialogProvider>,
         { services: { projectService } }
     );
 
-    const button = screen.getByText('test button');
-
-    expect(button).toBeInTheDocument();
+    const button = screen.getByText('create project');
 
     fireEvent.click(button);
-    createProjectData = { tasksLabels: [] };
 };
 
 describe('New project dialog - Task chain', () => {
@@ -160,13 +143,9 @@ describe('New project dialog - Task chain', () => {
 
         fireEvent.change(screen.getByRole('textbox', { name: 'edited name' }), { target: { value: '123' } });
 
-        await userEvent.keyboard('[Enter]');
-
         fireEvent.click(screen.getByRole('button', { name: 'add child label button' }));
 
         fireEvent.change(screen.getByTestId('label-tree-Label-name-input'), { target: { value: '234' } });
-
-        await userEvent.keyboard('[Enter]');
 
         const createButton = screen.getByRole('button', { name: 'Create' });
         expect(createButton).toBeEnabled();
@@ -201,7 +180,9 @@ describe('New project dialog - Task chain', () => {
 
         fireEvent.change(labelTextField, { target: { value: 'test-label' } });
 
-        expect(screen.getByText(UNIQUE_VALIDATION_MESSAGE('test-label', LabelItemType.LABEL))).toBeInTheDocument();
+        await waitFor(() =>
+            expect(screen.getByText(UNIQUE_VALIDATION_MESSAGE('test-label', LabelItemType.LABEL))).toBeInTheDocument()
+        );
     });
 
     it('Cannot add label in task chain', async () => {
@@ -220,7 +201,7 @@ describe('New project dialog - Task chain', () => {
             fireEvent.click(screen.getByRole('button', { name: 'add child label button' }));
 
             await userEvent.keyboard(labelName);
-            await userEvent.keyboard('[Enter]');
+            await userEvent.keyboard('{enter}');
         };
 
         it('Task chain - check if enter properly saves first task label', async () => {
@@ -233,20 +214,53 @@ describe('New project dialog - Task chain', () => {
 
             fireEvent.change(input, { target: { value: 'animal' } });
 
-            await userEvent.keyboard('[Enter]');
+            await userEvent.keyboard('{enter}');
 
             const groupNameInput = screen.getByRole('textbox', { name: 'Label group name' });
             clearInput(groupNameInput);
             fireEvent.change(groupNameInput, { target: { value: 'test' } });
-            await userEvent.keyboard('[Enter]');
+            await userEvent.keyboard('{enter}');
 
+            await addChildLabel('child1');
             await addChildLabel('child2');
 
-            expect(screen.getByRole('button', { name: 'Create' })).toBeEnabled();
             fireEvent.click(screen.getByRole('button', { name: 'Create' }));
 
             await waitFor(() => {
-                expect(createProjectData.tasksLabels[0].labels[0].name).toBe('animal');
+                expect(createProjectMock).toHaveBeenCalledWith(
+                    expect.anything(),
+                    'task chain - Detection Classification',
+                    ['Detection', 'Classification'],
+                    [
+                        {
+                            domain: 'Detection',
+                            labels: [
+                                expect.objectContaining({
+                                    name: 'animal',
+                                }),
+                            ],
+                            relation: 'Single selection',
+                        },
+                        {
+                            domain: 'Classification',
+                            labels: [
+                                expect.objectContaining({
+                                    name: 'child1',
+                                    children: [
+                                        expect.objectContaining({ name: 'Label' }),
+                                        expect.objectContaining({ name: 'Label 2' }),
+                                    ],
+                                }),
+                                expect.objectContaining({
+                                    name: 'child2',
+                                    children: [expect.objectContaining({ name: 'Label 3' })],
+                                }),
+                            ],
+                            relation: 'Mixed',
+                        },
+                    ],
+                    true
+                );
             });
         });
 

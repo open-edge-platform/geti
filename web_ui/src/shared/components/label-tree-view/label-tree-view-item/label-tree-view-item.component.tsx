@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { ReactNode, useMemo, useRef, useState } from 'react';
 
 import { Flex } from '@geti/ui';
 
@@ -64,22 +64,8 @@ export const LabelTreeViewItem = ({
 
     const savedItem = useRef<LabelTreeItem>({ ...item });
 
-    useEffect(() => {
-        savedItem.current = { ...item };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const isTaskChainProject = domains.length > 1;
     const isAnomalyProject = !isTaskChainProject && isAnomalyDomain(domains[0]);
-
-    useEffect(() => {
-        // If the node is closed and user want to add child item is opened
-        // this is needed to show proper icon
-        item.open !== isOpen && setIsOpen(item.open);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [item.open]);
-
-    useEffect(() => setInEditMode(item.inEditMode), [item.inEditMode]);
 
     const flatProjectItems = useMemo(() => {
         return getFlattenedItems(projectLabels);
