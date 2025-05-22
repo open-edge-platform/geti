@@ -62,9 +62,7 @@ async def lifespan(app: FastAPI):  # type: ignore # noqa: ANN201
     """
     Defines startup and shutdown of the fastAPI app
     """
-    # Initialize the model template list to speed up project creation and obtaining model storages from DB.
-    # When called the first time, ModelTemplateList loads all model templates from disk taking several seconds.
-    ModelTemplateList()
+    init_model_template_list()
 
     if ENABLE_TRACING:
         KafkaTelemetry.instrument()
