@@ -55,8 +55,8 @@ export const Card = ({
             data-testid={id}
             className={clsx({
                 [classes.card]: true,
-                [classes.cardSelected]: isSelected,
-                [classes.cardDisabled]: isDisabled,
+                [classes.selected]: isSelected,
+                [classes.disabled]: isDisabled,
             })}
             aria-label={title}
         >
