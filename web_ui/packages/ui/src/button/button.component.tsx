@@ -35,17 +35,19 @@ function LinkBuilder({ href, target, rel }: { href: string; target?: LinkProps['
 
 export interface ActionButtonProps extends SpectrumActionButtonProps {
     ref?: Ref<FocusableRefValue<HTMLElement, HTMLButtonElement>>;
-    colorVariant?: ButtonColorVariant;
+    colorVariant?: ActionButtonColorVariant;
 }
 
-type ButtonColorVariant = 'dark' | 'light' | 'blue';
+type ActionButtonColorVariant = 'dark' | 'light' | 'blue';
 
-const getActionButtonClass = (colorVariant: ButtonColorVariant = 'dark') => {
-    return colorVariant === 'dark'
-        ? buttonClasses.actionButtonDark
-        : colorVariant === 'light'
-          ? buttonClasses.actionButtonLight
-          : buttonClasses.actionButtonBlue;
+const getActionButtonClass = (colorVariant: ActionButtonColorVariant = 'dark') => {
+    const COLOR_VARIANTS: Record<ActionButtonColorVariant, string> = {
+        dark: buttonClasses.actionButtonDark,
+        light: buttonClasses.actionButtonLight,
+        blue: buttonClasses.actionButtonBlue,
+    };
+
+    return COLOR_VARIANTS[colorVariant];
 };
 
 export const Button = forwardRef((props: ButtonProps, ref: ButtonProps['ref']) => {
