@@ -9,9 +9,10 @@ import { isNewState } from '../utils';
 
 interface ItemEditionStateProps {
     state: LabelItemEditionState;
+    idSuffix: string;
 }
 
-export const ItemEditionState = ({ state }: ItemEditionStateProps): JSX.Element => {
+export const ItemEditionState = ({ state, idSuffix }: ItemEditionStateProps): JSX.Element => {
     let color;
     const editionState = isNewState(state) ? LabelItemEditionState.NEW : state;
 
@@ -39,7 +40,12 @@ export const ItemEditionState = ({ state }: ItemEditionStateProps): JSX.Element 
             paddingEnd={'size-125'}
         >
             <Flex width={'100%'} gap={'size-75'} justifyContent={'space-between'} alignItems={'center'}>
-                <ColorThumb size={8} color={color} borderRadius={'large'} />
+                <ColorThumb
+                    size={8}
+                    color={color}
+                    id={`label-state-${editionState}-${idSuffix}`}
+                    borderRadius={'large'}
+                />
                 <Text UNSAFE_style={{ fontSize: '11px', whiteSpace: 'nowrap' }}>{editionState}</Text>
             </Flex>
         </View>
