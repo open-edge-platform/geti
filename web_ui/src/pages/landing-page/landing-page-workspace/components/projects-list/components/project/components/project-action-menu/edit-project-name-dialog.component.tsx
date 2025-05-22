@@ -9,6 +9,7 @@ import { isEmpty } from 'lodash-es';
 import { useProjectActions } from '../../../../../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
+import { MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME } from '../../../../../../../../create-project/components/utils';
 
 interface EditProjectNameDialogProps {
     onClose: () => void;
@@ -66,7 +67,7 @@ export const EditProjectNameDialog = ({ onClose, isOpen, project }: EditProjectN
                     <Content>
                         <Form onSubmit={handleEditProjectName}>
                             <TextField
-                                maxLength={100}
+                                maxLength={MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME}
                                 //eslint-disable-next-line jsx-a11y/no-autofocus
                                 autoFocus
                                 value={newProjectName}

@@ -14,7 +14,10 @@ import { ValidationErrorMsg } from '../../../../../shared/components/validation-
 import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
 import { isNotCropDomain } from '../../../../../shared/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
-import { projectNameSchema } from '../../../../create-project/components/utils';
+import {
+    MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME,
+    projectNameSchema,
+} from '../../../../create-project/components/utils';
 import { isYupValidationError } from '../../../../user-management/profile-page/utils';
 
 import classes from './project-name-domain.module.scss';
@@ -111,7 +114,7 @@ export const ProjectNameDomain = ({
                     {editMode ? (
                         <>
                             <TextField
-                                maxLength={100}
+                                maxLength={MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME}
                                 value={newName}
                                 onChange={changeName}
                                 onKeyDown={handleKeyDown}
