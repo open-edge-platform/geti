@@ -3,8 +3,8 @@
 
 import { useLocalStorage } from 'usehooks-ts';
 
+import { DatasetImport } from '../../../core/datasets/dataset.interface';
 import { getParsedLocalStorage, hasDifferentId, hasEqualId } from '../../../shared/utils';
-import { DatasetImport } from '../dataset.interface';
 
 interface useLocalStorageDatasetImportProps<T> {
     lsDatasetImports: T[] | null;

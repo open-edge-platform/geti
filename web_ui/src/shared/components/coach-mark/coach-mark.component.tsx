@@ -3,7 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { Button, ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
+import { ActionButton, Button, ButtonGroup, Divider, Flex, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
 import { ChevronLeft, Close, MoreMenu } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
@@ -11,7 +11,6 @@ import { FUX_NOTIFICATION_KEYS } from '../../../core/user-settings/dtos/user-set
 import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
 import { useDocsUrl } from '../../../hooks/use-docs-url/use-docs-url.hook';
 import { useTutorialEnablement } from '../../hooks/use-tutorial-enablement.hook';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 import { onPressLearnMore } from '../tutorials/utils';
 import { getFuxNotificationData, getStepInfo } from './utils';
 
@@ -57,9 +56,14 @@ export const CoachMark = ({ settingsKey, styles, customDescription = '' }: Coach
                     </Button>
                 )}
                 <Divider orientation='vertical' size='S' UNSAFE_className={classes.coachMarkDivider} />
-                <QuietActionButton onPress={close} aria-label={'Dismiss help dialog'} UNSAFE_className={classes.close}>
+                <ActionButton
+                    isQuiet
+                    onPress={close}
+                    aria-label={'Dismiss help dialog'}
+                    UNSAFE_className={classes.close}
+                >
                     <Close />
-                </QuietActionButton>
+                </ActionButton>
             </View>
         );
     }
@@ -132,14 +136,15 @@ export const CoachMark = ({ settingsKey, styles, customDescription = '' }: Coach
                 </Flex>
 
                 <MenuTrigger>
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         id={`${settingsKey}-more-btn-id`}
                         aria-label='Open to dismiss all help dialogs'
                         data-testid={`${settingsKey}-more-btn-id`}
                         UNSAFE_className={classes.moreMenu}
                     >
                         <MoreMenu />
-                    </QuietActionButton>
+                    </ActionButton>
                     <Menu id={`${settingsKey}-tutorial-card-menu-id`} onAction={dismissAll}>
                         <Item key={settingsKey} test-id={`${settingsKey}-dismiss-all-id`} textValue='Dismiss all'>
                             Dismiss all

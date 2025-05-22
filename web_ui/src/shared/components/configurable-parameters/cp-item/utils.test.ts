@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ConfigurableParametersParams } from '../configurable-parameters.interface';
+import { ConfigurableParametersParams } from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { getStaticContent } from './utils';
 
 describe('getStaticContent', () => {

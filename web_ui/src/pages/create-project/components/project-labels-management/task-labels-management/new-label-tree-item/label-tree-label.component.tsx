@@ -3,7 +3,7 @@
 
 import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Button, Flex, Form, TextFieldRef } from '@geti/ui';
+import { Button, Flex, Form, TextField, TextFieldRef } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import {
@@ -29,7 +29,6 @@ import {
     getGroupBasedOnRelationType,
     getNextColor,
 } from '../../../../../../shared/components/label-tree-view/utils';
-import { LimitedTextField } from '../../../../../../shared/components/limited-text-field/limited-text-field.component';
 import { ValidationErrorMsg } from '../../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { isYupValidationError } from '../../../../../user-management/profile-page/utils';
 import { useUsedAnnotatorHotkeys } from '../../../use-used-annotator-hotkeys.hook';
@@ -256,7 +255,8 @@ export const LabelTreeLabel = forwardRef(
                             inheritHeight
                         />
 
-                        <LimitedTextField
+                        <TextField
+                            maxLength={100}
                             ref={inputRef}
                             width={'100%'}
                             value={newName}

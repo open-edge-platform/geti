@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useMemo } from 'react';
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
 import { get, isEmpty } from 'lodash-es';
 
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { isOrganizationAdmin } from '../../../../core/users/user-role-utils';
 import { User, UsersQueryParams } from '../../../../core/users/users.interface';
 import { Workspace } from '../../../../core/workspaces/services/workspaces.interface';
@@ -175,7 +176,8 @@ export const UsersTable = ({
                         onSortChange={(change) => {
                             sort({
                                 sortBy: String(change.column),
-                                sortDirection: change.direction === 'ascending' ? 'ASC' : 'DESC',
+                                sortDirection:
+                                    change.direction === 'ascending' ? SortDirection.ASC : SortDirection.DESC,
                             });
                         }}
                         sortDescriptor={

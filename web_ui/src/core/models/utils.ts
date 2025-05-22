@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SortDirection } from '../../shared/components/table/table.interface';
+import { SortDirection } from '../shared/query-parameters';
 import { ModelGroupsAlgorithmDetails, ModelsGroups, ModelVersion } from './models.interface';
 
 export const isActiveModel = (model: ModelVersion) => model.isActiveModel;

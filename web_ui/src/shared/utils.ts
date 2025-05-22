@@ -3,7 +3,7 @@
 
 import { type LoadingState, type KeyboardEvent as ReactKeyboardEvent } from '@geti/ui';
 import { CalendarDate, CalendarDateTime, DateValue } from '@internationalized/date';
-import dayjs, { OptionType } from 'dayjs';
+import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import utc from 'dayjs/plugin/utc.js';
 import { filesize, FileSizeOptionsBase } from 'filesize';
@@ -12,6 +12,7 @@ import * as yup from 'yup';
 
 import { DOMAIN } from '../core/projects/core.interface';
 import { Task } from '../core/projects/task.interface';
+import { GetElementType } from '../types-utils/types';
 import { KeyMap } from './keyboard-events/keyboard.interface';
 import { LOCAL_STORAGE_KEYS } from './local-storage-keys';
 
@@ -20,9 +21,6 @@ dayjs.extend(customParseFormat);
 dayjs.extend(utc);
 
 export const ONE_MINUTE = 60_000;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type GetElementType<T extends any[]> = T extends (infer U)[] ? U : never;
 
 const requiredCharactersPart = '^(?=.*[A-Z])(?=.*[a-z])((?=.*[0-9])|(?=.*[#%!$&()*+,-.:;<=>?@\\[\\]^_{|}~]))';
 const allowedCharactersAndLengthPart = '^[A-Za-z0-9#%!$&()*+,-.:;<=>?@\\[\\]^_{|}~]*$';
@@ -43,40 +41,7 @@ export const CONFIRM_PASSWORD_ERROR_MESSAGE = 'The password you entered did not 
 export const PASSWORD_DOES_NOT_MEET_LENGTH_RULE =
     'The password you pasted consists of more than a maximum 200 characters.';
 
-export const LONG_FORMAT_DATE = 'DD/MM/YYYY HH:mm';
-
-export const SHORT_FORMAT_DATE = 'DD/MM/YYYY';
-
 export const DATE_TIME_IN_ISO_AND_UTC_OFFSETFORMAT = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
-
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-const sort = <T, K extends keyof T>(list: T[], attribute: K, toLowercase = false, ascending = true): T[] => {
-    return [
-        ...list.sort((previous: T, current: T): number => {
-            let previousValue: any = previous[attribute],
-                currentValue: any = current[attribute];
-            let comparison: any;
-            if (typeof previous[attribute] === 'string' && toLowercase) {
-                previousValue = (previous[attribute] as unknown as string).toLowerCase();
-                currentValue = (current[attribute] as unknown as string).toLowerCase();
-                comparison = previousValue.localeCompare(currentValue);
-            } else {
-                comparison = previousValue < currentValue ? -1 : 1;
-            }
-            return ascending ? comparison : comparison <= 0 ? 1 : -1;
-        }),
-    ];
-};
-
-export const sortAscending = <T, K extends keyof T>(list: T[], attribute: K, toLowercase = false): T[] => {
-    return sort(list, attribute, toLowercase);
-};
-
-export const sortDescending = <T, K extends keyof T>(list: T[], attribute: K, toLowercase = false): T[] => {
-    return sort(list, attribute, toLowercase, false);
-};
-
-export const camelCaseSplitter = (value: string): string => value.replace(/([^A-Z])([A-Z])/g, '$1 $2');
 
 export const encodeToBase64 = (password: string): string => {
     return btoa(password);
@@ -96,8 +61,6 @@ export const passwordValidationRules = (requiredPasswordMessage: string) =>
 
 export const formatDate = (date: string | number, format: string): string => dayjs(date).format(format);
 
-export const isValidDate = (date: string, formats: OptionType): boolean => dayjs(date, formats, true).isValid();
-
 // When using `compare`, a negative result indicates that this date is before the given one,
 // and a positive date indicates that it is after
 export const isDateBetween = (
@@ -115,6 +78,7 @@ export const formatLocalToUtc = (date: string, localFormat?: string): string =>
 
 export const runWhen =
     <T>(predicate: (...args: T[]) => boolean) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (whenTrueFn: (...args: any[]) => void) =>
     (...args: T[]): void => {
         if (predicate(...args)) {
@@ -170,6 +134,7 @@ export const isNotCropDomain = (domain: DOMAIN) => domain !== DOMAIN.CROP;
 export const hasEqualSize = <T extends { length: number }, U extends { length: number }>(a: T, b: U) =>
     isEqual(a.length, b.length);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IsValidArrayType<T> = T extends any[] ? GetElementType<T> : never;
 export const isNonEmptyArray = <T>(value: T): value is IsValidArrayType<T> => Array.isArray(value) && !isEmpty(value);
 
@@ -304,20 +269,6 @@ export const sanitize = (str: string) => {
 
     return str.replace(pattern, '_');
 };
-
-export enum SortDirection {
-    /**
-     * Sort items in ascending order.
-     * This means arranging from the lowest value to the highest (e.g. a-z, 0-9).
-     */
-    ASC = 'ASC',
-
-    /**
-     * Sort items in descending order.
-     * This means arranging from the highest value to the lowest (e.g. z-a, 9-0).
-     */
-    DESC = 'DESC',
-}
 
 /**
  *

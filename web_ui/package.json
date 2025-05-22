@@ -1,6 +1,6 @@
 {
   "name": "geti-ui",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "engines": {
     "node": "22.12.0",
     "npm": "10.9.0"
@@ -102,7 +102,7 @@
     "test:component:ui": "npm run test:component -- --ui",
     "test:coverage": "npm test -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
-    "test:unit": "jest --config jest.config.js --watchAll=false && npm run test:unit --workspace=@geti/ui",
+    "test:unit": "jest --config jest.config.js --watchAll=false",
     "test:unit:watch": "jest --config jest.config.js --watch",
     "type-check": "tsc --noEmit && npm run type-check --workspace=@geti/ui"
   },

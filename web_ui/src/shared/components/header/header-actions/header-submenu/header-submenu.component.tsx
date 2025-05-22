@@ -3,10 +3,9 @@
 
 import { ComponentProps, Key, ReactNode } from 'react';
 
-import { Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
+import { ActionButton, Item, Menu, MenuTrigger, Section, Text } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
-import { ColorMode, QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
 import classes from './header-submenu.module.scss';
 
@@ -40,14 +39,15 @@ export const HeaderSubmenu = ({
 }: HeaderSubmenuProps): JSX.Element => {
     return (
         <MenuTrigger>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 id={idMatchingFormat(ariaLabel)}
                 aria-label={ariaLabel}
-                colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                colorVariant={isDarkMode ? 'dark' : 'light'}
                 UNSAFE_className={buttonClasses}
             >
                 {icon}
-            </QuietActionButton>
+            </ActionButton>
             <Menu onAction={onMenuAction} width={menuWidth} UNSAFE_className={classes.headerSubmenu}>
                 {items.map((item) => (
                     <Section items={item.children} key={item.id}>

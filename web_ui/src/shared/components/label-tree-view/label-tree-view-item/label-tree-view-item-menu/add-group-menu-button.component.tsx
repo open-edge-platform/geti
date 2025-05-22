@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger } from '@geti/ui';
 import { AddGroup } from '@geti/ui/icons';
 
-import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 import { MenuButtonProps } from './menu-button.interface';
 
 export const AddGroupMenuButton = ({ action, id }: MenuButtonProps): JSX.Element => {
@@ -12,7 +11,8 @@ export const AddGroupMenuButton = ({ action, id }: MenuButtonProps): JSX.Element
 
     return (
         <TooltipTrigger placement={'bottom'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 key={elementId}
                 onPress={action}
                 id={elementId}
@@ -20,7 +20,7 @@ export const AddGroupMenuButton = ({ action, id }: MenuButtonProps): JSX.Element
                 aria-label={'add child group button'}
             >
                 <AddGroup aria-label={'add child'} width={'16px'} height={'16px'} />
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>Add new group</Tooltip>
         </TooltipTrigger>
     );

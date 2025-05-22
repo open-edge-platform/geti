@@ -3,11 +3,11 @@
 
 import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 
+import { BooleanGroupParams } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { ProjectStatusTaskDTO } from '../../../../../core/projects/dtos/status.interface';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
 import { PerformanceType, Task } from '../../../../../core/projects/task.interface';
-import { BooleanGroupParams } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { useAutoTrainingTasksConfig } from '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';

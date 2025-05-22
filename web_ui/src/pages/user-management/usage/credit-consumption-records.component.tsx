@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import {
+    ActionButton,
     Cell,
     Column,
     DateRangePicker,
@@ -27,7 +28,6 @@ import { useTransactionsQueries } from '../../../core/credits/transactions/hooks
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { getClassServiceName } from '../../../shared/components/header/credit-balance/util';
 import { NotFound } from '../../../shared/components/not-found/not-found.component';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { formatDate, SpectrumTableLoadingState } from '../../../shared/utils';
 
 import classes from './usage.module.scss';
@@ -69,9 +69,9 @@ export const CreditConsumptionRecords = (): JSX.Element => {
                                 setFilterByDate(filterDate);
                             }}
                         />
-                        <QuietActionButton type={'reset'} aria-label={'reset calendar'}>
+                        <ActionButton isQuiet type={'reset'} aria-label={'reset calendar'}>
                             <Refresh />
-                        </QuietActionButton>
+                        </ActionButton>
                     </Flex>
                 </Form>
             </Flex>

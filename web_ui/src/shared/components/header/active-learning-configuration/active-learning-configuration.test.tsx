@@ -5,6 +5,10 @@ import { UseQueryResult } from '@tanstack/react-query';
 import { fireEvent, screen } from '@testing-library/react';
 import { AxiosError } from 'axios';
 
+import {
+    BooleanGroupParams,
+    ConfigurableParametersTaskChain,
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { ProjectService } from '../../../../core/projects/services/project-service.interface';
@@ -12,10 +16,6 @@ import { Task } from '../../../../core/projects/task.interface';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
-import {
-    BooleanGroupParams,
-    ConfigurableParametersTaskChain,
-} from '../../configurable-parameters/configurable-parameters.interface';
 import { ActiveLearningConfiguration, CornerIndicator } from './active-learning-configuration.component';
 
 const mockedUseGetConfigParameters = jest.fn();

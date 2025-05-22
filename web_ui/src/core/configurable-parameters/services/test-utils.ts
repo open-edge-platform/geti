@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ConfigurableParametersTaskChain } from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import {
     ConfigurableParametersDTO,
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
+import { ConfigurableParametersTaskChain } from './configurable-parameters.interface';
 import { getConfigParametersEntity, getModelConfigEntity } from './utils';
 
 export const mockedConfigTaskChainDTO: ConfigurableParametersTaskChainDTO = {

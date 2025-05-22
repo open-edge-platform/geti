@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Text } from '@geti/ui';
+import { ActionButton, Flex, Text } from '@geti/ui';
 import { Delete, MoreMenu, Pause, Play } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
@@ -11,7 +11,6 @@ import { useOrganizationsApi } from '../../../core/organizations/hook/use-organi
 import { AccountStatus, Organization } from '../../../core/organizations/organizations.interface';
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { MenuTrigger } from '../../../shared/components/menu-trigger/menu-trigger.component';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { getItemActions, OrganizationsMenuItems } from './utils';
 
 interface OrganizationsMenuProps {
@@ -71,12 +70,13 @@ export const OrganizationsMenu = ({ organization }: OrganizationsMenuProps): JSX
                 onAction={handleOnAction}
                 renderContent={renderItem}
             >
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     aria-label={`${organization.name} menu button`}
                     id={`organizations-menu-${organization.name}-button`}
                 >
                     <MoreMenu />
-                </QuietActionButton>
+                </ActionButton>
             </MenuTrigger>
             <DeleteDialog
                 title={'organization'}

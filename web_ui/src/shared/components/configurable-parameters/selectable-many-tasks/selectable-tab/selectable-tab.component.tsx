@@ -3,7 +3,10 @@
 
 import { PressableElement, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
-import { ConfigurableParametersComponents, ConfigurableParametersMany } from '../../configurable-parameters.interface';
+import {
+    ConfigurableParametersComponents,
+    ConfigurableParametersMany,
+} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 
 import classes from '../../selectable-customized-tabs/selectable-customized-tabs.module.scss';
 

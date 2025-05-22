@@ -32,7 +32,6 @@ import {
     SearchOptionsRule,
     SearchRuleField,
 } from '../../core/media/media-filter.interface';
-import { ColorMode } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { QuietToggleButton } from '../../shared/components/quiet-button/quiet-toggle-button.component';
 import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { FILTER_MEDIA_LABEL } from '../project-details/components/project-media/utils';
@@ -193,7 +192,7 @@ export const MediaFilter = ({
                                 >
                                     {isMediaFetching && (
                                         <View paddingTop={'size-65'}>
-                                            <ThreeDotsFlashing mode={ColorMode.LIGHT} size={'S'} />
+                                            <ThreeDotsFlashing variant={'light'} size={'S'} />
                                         </View>
                                     )}
 

@@ -3,13 +3,12 @@
 
 import { MutableRefObject, useRef, useState } from 'react';
 
-import { Overlay, View } from '@geti/ui';
+import { ActionButton, Overlay, View } from '@geti/ui';
 import { ChevronLeft, ChevronRight, Close } from '@geti/ui/icons';
 import { isNumber } from 'lodash-es';
 import { useOverlay } from 'react-aria';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { isVideoFile } from '../../../shared/media-utils';
 import { Screenshot } from '../../camera-support/camera.interface';
 import { DeleteItemButton } from './delete-item-button.component';
@@ -69,7 +68,8 @@ export const ImageOverlay = ({
         >
             <View UNSAFE_className={classes.thumbnailPreviewContainer}>
                 <div ref={container}>
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         top={'size-400'}
                         left={'size-400'}
                         position={'absolute'}
@@ -81,7 +81,7 @@ export const ImageOverlay = ({
                         UNSAFE_className={classes.previewButton}
                     >
                         <Close width={20} height={20} />
-                    </QuietActionButton>
+                    </ActionButton>
 
                     <DeleteItemButton
                         top={'size-400'}
@@ -94,7 +94,8 @@ export const ImageOverlay = ({
                     />
 
                     {showNavigationArrows && (
-                        <QuietActionButton
+                        <ActionButton
+                            isQuiet
                             top={'50%'}
                             left={'size-400'}
                             position={'absolute'}
@@ -106,7 +107,7 @@ export const ImageOverlay = ({
                             aria-label={'previous item'}
                         >
                             <ChevronLeft width={20} height={20} />
-                        </QuietActionButton>
+                        </ActionButton>
                     )}
 
                     <ImageVideoFactory
@@ -119,7 +120,8 @@ export const ImageOverlay = ({
                     />
 
                     {showNavigationArrows && (
-                        <QuietActionButton
+                        <ActionButton
+                            isQuiet
                             top={'50%'}
                             right={'size-400'}
                             position={'absolute'}
@@ -131,7 +133,7 @@ export const ImageOverlay = ({
                             aria-label={'next item'}
                         >
                             <ChevronRight width={20} height={20} />
-                        </QuietActionButton>
+                        </ActionButton>
                     )}
                 </div>
             </View>

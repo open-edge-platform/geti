@@ -3,21 +3,21 @@
 
 import axios, { AxiosError, isCancel } from 'axios';
 
-import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
-import { removeLocalStorageKey } from '../../shared/utils';
-import { CSRF_HEADERS } from './security';
-import { getErrorMessageByStatusCode, isAuthenticationResponseUrl } from './utils';
+import { CSRF_HEADERS } from '../../../../src/core/services/security';
+import { getErrorMessageByStatusCode, isAuthenticationResponseUrl } from '../../../../src/core/services/utils';
+import { LOCAL_STORAGE_KEYS } from '../../../../src/shared/local-storage-keys';
+import { removeLocalStorageKey } from '../../../../src/shared/utils';
 
 /*
     Axios instance used for Intel® Geti™ requests
 */
 
-export const instance = axios.create({
+export const apiClient = axios.create({
     withCredentials: true,
     headers: { ...CSRF_HEADERS },
 });
 
-instance.interceptors.response.use(
+apiClient.interceptors.response.use(
     (response) => {
         if (isAuthenticationResponseUrl(response)) {
             localStorage.setItem(LOCAL_STORAGE_KEYS.UNAUTHORIZED, 'true');

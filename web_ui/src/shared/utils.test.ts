@@ -31,8 +31,6 @@ import {
     onValidFileList,
     pluralize,
     sanitize,
-    sortAscending,
-    sortDescending,
     trimText,
 } from './utils';
 
@@ -280,24 +278,6 @@ it('getProgressScoreColor', () => {
 
 it('loadImage', () => {
     return expect(loadImage('url-test')).resolves.not.toThrow();
-});
-
-it('sortAscending', () => {
-    expect(sortAscending([{ id: '1' }, { id: '3' }, { id: '4' }, { id: '2' }], 'id')).toEqual([
-        { id: '1' },
-        { id: '2' },
-        { id: '3' },
-        { id: '4' },
-    ]);
-});
-
-it('sortDescending', () => {
-    expect(sortDescending([{ id: '1' }, { id: '3' }, { id: '4' }, { id: '2' }], 'id')).toEqual([
-        { id: '4' },
-        { id: '3' },
-        { id: '2' },
-        { id: '1' },
-    ]);
 });
 
 it('isDateBetween', () => {

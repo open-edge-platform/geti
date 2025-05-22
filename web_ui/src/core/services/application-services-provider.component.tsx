@@ -3,9 +3,10 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
+import { apiClient } from '@geti/core';
+
 import { MissingProviderError } from '../../shared/missing-provider-error';
 import { ApplicationServices } from './application-services.interface';
-import { instance as defaultAxiosInstance } from './axios-instance';
 import { getApiServices } from './get-api-services';
 import { getInMemoryServices } from './get-in-memory-services';
 import { useApiRouter } from './use-api-router.hook';
@@ -37,7 +38,7 @@ export const ApplicationServicesProvider = ({
     const router = useApiRouter();
 
     const services = useMemo((): ApplicationServicesContextProps => {
-        const serviceConfiguration = { instance: defaultAxiosInstance, router };
+        const serviceConfiguration = { instance: apiClient, router };
 
         if (useInMemoryEnvironment) {
             return getInMemoryServices(serviceConfiguration);

@@ -4,9 +4,12 @@
 import { Divider, Flex, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Alert } from '@geti/ui/icons';
 
+import {
+    ConfigParameterItemProp,
+    ConfigurableParametersParams,
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
-import { ConfigParameterItemProp, ConfigurableParametersParams } from '../configurable-parameters.interface';
 import { CPEditableItem } from './cp-editable-item/cp-editable-item.component';
 import { CPStaticItem } from './cp-static-item/cp-static-item.component';
 import { ResetButton } from './reset-button/reset-button.component';
