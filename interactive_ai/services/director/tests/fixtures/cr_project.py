@@ -226,7 +226,6 @@ def fxt_test_dataset_manager_data(
     label_repo = LabelRepo(project.identifier)
     for label in itertools.chain(fxt_detection_labels, fxt_classification_labels_good_bad):
         label_repo.save(label)
-        request.addfinalizer(lambda: label_repo.delete_by_id(label.id_))
 
     # Save schemas
     fxt_detection_label_schema._project_id = project.id_
@@ -236,8 +235,6 @@ def fxt_test_dataset_manager_data(
     label_schema_repo = LabelSchemaRepo(project.identifier)
     label_schema_repo.save(fxt_detection_label_schema)
     label_schema_repo.save(fxt_classification_label_schema_good_bad)
-    request.addfinalizer(lambda: label_schema_repo.delete_by_id(fxt_detection_label_schema.id_))
-    request.addfinalizer(lambda: label_schema_repo.delete_by_id(fxt_classification_label_schema_good_bad.id_))
 
     project = ProjectRepo().get_by_id(project.id_)
     return ProjectNodesLabels(
