@@ -16,7 +16,7 @@ spec:
       serviceAccountName: {{ include "notifier.name" . }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          image: "broken-image"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
