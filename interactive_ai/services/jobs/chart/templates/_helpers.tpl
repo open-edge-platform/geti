@@ -81,8 +81,8 @@ Jobs scheduler selector labels
 */}}
 {{- define "jobs-scheduler.selectorLabels" -}}
 app: {{ include "jobs-scheduler.name" . }}
-app.kubernetes.io/name: {{ include "jobs-scheduler.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
 {{- end }}
 
 {{/*
@@ -102,8 +102,8 @@ Jobs scheduling policy service selector labels
 */}}
 {{- define "jobs-scheduling-policy.selectorLabels" -}}
 app: {{ include "jobs-scheduling-policy.name" . }}
-app.kubernetes.io/name: {{ include "jobs-scheduling-policy.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+release: {{ .Release.Name }}
+heritage: {{ .Release.Service }}
 {{- end }}
 
 {{/*
