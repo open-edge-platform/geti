@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "Configuration for common loggers and telemetry in the Geti platform"
 requires-python = ">=3.10, <3.13"
 dependencies = [
-    "cryptography==43.0.1",
+    "cryptography==44.0.1",
     "Pillow==11.1.0",
     "pyjwt==2.4.0",
     "python-ldap==3.4.4",
