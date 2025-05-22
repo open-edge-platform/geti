@@ -93,7 +93,7 @@ spec:
             - name: DOWNLOAD_URL_VALIDITY_PERIOD
               value: "{{ .Values.global.download_url_validity_period }}"
             - name: WORKDIR
-              value: {{ .Values.mountPath }}
+              value: {{ .Values.diskSizeMountPath }}
             - name: MODEL_TEMPLATES_DIR
               value: /model_templates
             - name: DATABASE_ADDRESS
@@ -200,6 +200,10 @@ spec:
               subPath: {{ .Values.audit_logs_mount_path }}
             - mountPath: /tmp
               name: tmp
+            - name: disk-size
+              mountPath: {{ .Values.diskSizeMountPath }}
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: true
           ports:
             - name: project
               containerPort: {{ .Values.service.port }}
@@ -213,3 +217,6 @@ spec:
           emptyDir: {}
         - emptyDir: {}
           name: tmp
+        - name: disk-size
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim
