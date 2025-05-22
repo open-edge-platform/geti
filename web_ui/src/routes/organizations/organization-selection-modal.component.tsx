@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Dialog, DialogContainer, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { Button, Content, Dialog, DialogContainer, dimensionValue, Divider, Flex, Heading, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { noop } from 'lodash-es';
 
@@ -12,8 +11,6 @@ import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
-import { Button } from '../../shared/components/button/button.component';
-import { Divider } from '../../shared/components/divider/divider.component';
 import { formatUtcToLocal } from '../../shared/utils';
 import { isInvitedOrganization, isOrganizationVisible, isUserInvitedInOrg } from './util';
 

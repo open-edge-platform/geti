@@ -3,14 +3,22 @@
 
 import { CSSProperties } from 'react';
 
-import { Content, Dialog, Flex, Heading, Text, View } from '@adobe/react-spectrum';
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import {
+    ActionButton,
+    Checkbox,
+    Content,
+    Dialog,
+    dimensionValue,
+    Flex,
+    Heading,
+    Text,
+    useMediaQuery,
+    View,
+} from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { ActionButton } from '../../../../shared/components/button/button.component';
-import { Checkbox } from '../../../../shared/components/checkbox/checkbox.component';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { BaseLabelSearch } from '../../components/labels/label-search/base-label-search.component';
 import { useTaskChainOutput } from '../../providers/task-chain-provider/use-task-chain-output.hook';
 import { useTask } from '../../providers/task-provider/task-provider.component';

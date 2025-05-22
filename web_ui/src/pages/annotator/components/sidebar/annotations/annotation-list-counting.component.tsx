@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Text, View } from '@geti/ui';
 import { isEmpty, noop } from 'lodash-es';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';

@@ -3,10 +3,10 @@
 
 import { FC, ReactNode, useState } from 'react';
 
-import { Grid, minmax, Text, View } from '@adobe/react-spectrum';
+import { Grid, minmax, Text, View } from '@geti/ui';
 import { noop } from 'lodash-es';
 
-import { ConfigurableParametersComponents } from '../../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { ConfigurableParametersComponents } from '../../../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { Parameters } from '../../ui/parameters.component';
 import { TILING_MODES, TilingModes } from './tiling-modes.component';

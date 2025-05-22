@@ -3,19 +3,14 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import { Flex, Heading } from '@geti/ui';
+import { SortUp } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { usePress } from 'react-aria';
 
-import { SortUp } from '../../../assets/icons';
+import { SortDirection } from '../../../core/shared/query-parameters';
 
 import classes from './sort-by-attribute.module.scss';
-
-export enum SortDirection {
-    ASC = 'asc',
-    DESC = 'dsc',
-}
 
 interface SortByAttributeProps {
     label?: string;

@@ -3,7 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-export type SortDirection = 'ASC' | 'DESC' | undefined;
+import { SortDirection } from '../../../core/shared/query-parameters';
 
 export interface SortingOptions {
     sortBy: string | undefined;

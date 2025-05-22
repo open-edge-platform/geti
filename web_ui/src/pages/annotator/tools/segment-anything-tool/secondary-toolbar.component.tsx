@@ -1,16 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Switch, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, LoadingIndicator, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
+import { RightClick } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { RightClick } from '../../../../assets/icons';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolSettings, ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';

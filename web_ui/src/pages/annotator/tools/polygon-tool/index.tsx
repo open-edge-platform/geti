@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Polygon } from '../../../../assets/icons';
+import { Polygon } from '@geti/ui/icons';
+
 import PolygonImg from '../../../../assets/primary-tools/polygon.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
@@ -19,7 +20,7 @@ export const PolygonTool: ToolProps = {
     SecondaryToolbar,
     tooltip: {
         img: PolygonImg,
-        url: 'guide/annotations/annotation-tools.html#polygon-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#polygon-tool',
         title: toolTypeToLabelMapping[ToolType.PolygonTool],
         description: `The polygon tool allows for free form drawing around shapes.`,
     },

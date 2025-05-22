@@ -3,6 +3,7 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
+import { ActionButton } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, noop } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -18,7 +19,6 @@ import { MetricType, Test } from '../../../../../core/tests/tests.interface';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { getUniqueNameFromArray, hasEqualId, isNotCropTask } from '../../../../../shared/utils';
 import { SelectableOptimizationType } from '../../../project-details.interface';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
@@ -36,14 +36,15 @@ const TestButton = ({
     const navigate = useNavigate();
 
     return (
-        <QuietActionButton
+        <ActionButton
+            isQuiet
             onPress={() => {
                 navigate(paths.project.tests.index(projectIdentifier));
                 remove();
             }}
         >
             See progress
-        </QuietActionButton>
+        </ActionButton>
     );
 };
 

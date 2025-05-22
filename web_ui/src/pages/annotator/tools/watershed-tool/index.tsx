@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Watershed } from '../../../../assets/icons';
+import { Watershed } from '@geti/ui/icons';
+
 import ObjectColoringImg from '../../../../assets/primary-tools/object_coloring.webp';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolProps } from '../tools.interface';
@@ -18,7 +19,7 @@ export const WatershedTool: ToolProps = {
     Tool,
     tooltip: {
         img: ObjectColoringImg,
-        url: 'guide/annotations/annotation-tools.html#object-coloring-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#object-coloring-tool',
         title: toolTypeToLabelMapping[ToolType.WatershedTool],
         description: 'Simply select the brush and draw over the objects you want to annotate.',
     },

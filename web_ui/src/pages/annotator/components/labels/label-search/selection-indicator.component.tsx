@@ -3,10 +3,9 @@
 
 import { FC, PropsWithChildren } from 'react';
 
-import { dimensionValue } from '@react-spectrum/utils';
-
-import { AcceptSmall, Add, CloseSmall } from '../../../../../assets/icons';
-import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';
+import { dimensionValue } from '@geti/ui';
+import { AcceptSmall, Add, CloseSmall } from '@geti/ui/icons';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 
 const Wrapper: FC<PropsWithChildren & { ariaLabel?: string }> = ({ children, ariaLabel }) => {
     return (

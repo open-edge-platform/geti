@@ -23,6 +23,7 @@ import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';
 import { getErrorMessage } from '../../services/utils';
 import { NextPage } from '../../shared/infinite-query.interface';
+import { SortDirection } from '../../shared/query-parameters';
 import { Organization, OrganizationIdentifier, OrganizationsResponse } from '../organizations.interface';
 import { GetOrganizationsQueryOptions, OrganizationsService } from '../services/organizations-service.interface';
 import { getOrganizationsQueryOptionsDTO } from '../services/utils';
@@ -56,7 +57,7 @@ export const getOrganizationsQueryOptions = (
     organizationsService: OrganizationsService,
     options: GetOrganizationsQueryOptions = {
         sortBy: 'name',
-        sortDirection: 'ASC',
+        sortDirection: SortDirection.ASC,
         limit: ORGANIZATIONS_QUERY_LIMIT,
     }
 ) => {

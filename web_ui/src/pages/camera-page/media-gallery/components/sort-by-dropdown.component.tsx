@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Picker, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Picker, Text } from '@geti/ui';
 
 import { SortingOptions } from '../../util';
 

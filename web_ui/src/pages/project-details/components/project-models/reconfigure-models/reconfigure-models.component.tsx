@@ -4,23 +4,23 @@
 import { useEffect, useState } from 'react';
 
 import {
+    Button,
     ButtonGroup,
     Content,
     Dialog,
     DialogContainer,
     Divider,
     Flex,
+    Heading,
+    Loading,
+    LoadingIndicator,
     Text,
     Tooltip,
     TooltipTrigger,
-} from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+} from '@geti/ui';
 
-import { Button } from '../../../../../shared/components/button/button.component';
+import { ConfigurableParametersType } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
-import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
 import { useReconfigureParametersValue } from './use-reconfigure-parameters-value/use-reconfigure-parameters-value';
 
 import sharedClasses from '../../../../../shared/shared.module.scss';

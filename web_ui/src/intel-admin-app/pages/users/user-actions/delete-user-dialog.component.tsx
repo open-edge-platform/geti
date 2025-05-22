@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { AlertDialog, DialogContainer } from '@adobe/react-spectrum';
+import { AlertDialog, DialogContainer } from '@geti/ui';
 
 interface DeleteUserDialogProps {
     name: string;

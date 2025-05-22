@@ -3,7 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { Item, Picker, TextField } from '@adobe/react-spectrum';
+import { Item, Picker, TextField } from '@geti/ui';
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { StatusCodes } from 'http-status-codes';

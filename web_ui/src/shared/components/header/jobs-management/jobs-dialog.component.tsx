@@ -3,15 +3,15 @@
 
 import { Dispatch, Key, SetStateAction, useState } from 'react';
 
-import { Content, Dialog, Flex, Text } from '@adobe/react-spectrum';
+import { Content, Dialog, Flex, Text } from '@geti/ui';
 import { keepPreviousData } from '@tanstack/react-query';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { JobCount } from '../../../../core/jobs/jobs.interface';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { Tabs } from '../../tabs/tabs.component';
 import { TabItem } from '../../tabs/tabs.interface';
 import { Fullscreen } from './jobs-actions/fullscreen.component';

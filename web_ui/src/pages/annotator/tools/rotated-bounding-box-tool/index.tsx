@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RotatedBox } from '../../../../assets/icons';
+import { RotatedBox } from '@geti/ui/icons';
+
 import RotatedDetectionImg from '../../../../assets/primary-tools/rotated_detection.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
@@ -19,7 +20,7 @@ export const RotatedBoundingBoxTool: ToolProps = {
     StateProvider: ({ children }) => <>{children}</>,
     tooltip: {
         img: RotatedDetectionImg,
-        url: 'guide/annotations/annotation-tools.html#bounding-box-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#bounding-box-tool',
         title: toolTypeToLabelMapping[ToolType.RotatedBoxTool],
         description: `The tool intended for object detection task.
          A rotated bounding box acts as a normal bounding box, but it can be rotated to fit the object better.`,

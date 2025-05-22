@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Item, Picker } from '@adobe/react-spectrum';
+import { Item, Picker } from '@geti/ui';
 
 import classes from './collapsed-items-picker.module.scss';
 

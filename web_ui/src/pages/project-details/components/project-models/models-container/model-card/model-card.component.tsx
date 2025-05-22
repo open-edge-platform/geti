@@ -1,20 +1,18 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import { Flex, Heading, Tag, Text, View } from '@geti/ui';
+import { Fps, Image, Tag as TagIcon } from '@geti/ui/icons';
 import { clsx } from 'clsx';
 import { usePress } from 'react-aria';
 import { useNavigate } from 'react-router-dom';
 
-import { Fps, Image, Tag as TagIcon } from '../../../../../../assets/icons';
 import { isExclusive } from '../../../../../../core/labels/utils';
 import { ModelFormat } from '../../../../../../core/models/dtos/model-details.interface';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
 import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
-import { Tag } from '../../../../../../shared/components/tag/tag.component';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { isModelDeleted } from '../../../../utils';

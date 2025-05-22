@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Heading, Text, View } from '@adobe/react-spectrum';
+import { Heading, Text, View } from '@geti/ui';
 
 import { CreateWorkspaceDialog } from './create-workspace-dialog.component';
 

@@ -17,7 +17,7 @@ from pathlib import Path
 
 import requests
 
-DATA_URL_PREFIX = "https://storage.geti.infra-host.com/test-data/e2e-bdd"
+DATA_URL_PREFIX = "https://storage.geti.intel.com/test-data/e2e-bdd"
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ def download_file_from_remote_archive(remote_file_path: Path, local_file_path: P
     :raises RuntimeError: If the file download fails for any other reason
     """
     file_url = f"{DATA_URL_PREFIX}/{remote_file_path}"
+    logger.info(f"Downloading file from remote archive: {file_url}")
 
     # Download the file
     response = requests.get(file_url, stream=True, timeout=300)

@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Alert, Info } from '../../assets/icons';
+import { Alert, Info } from '@geti/ui/icons';
+
 import { NOTIFICATION_TYPE } from './notification-type.enum';
 
 import classes from './notification-toast.module.scss';

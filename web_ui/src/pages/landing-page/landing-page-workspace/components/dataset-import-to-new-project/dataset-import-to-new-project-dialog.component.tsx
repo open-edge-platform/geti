@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@adobe/react-spectrum';
+import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import { DatasetImportItem } from '../../../../../core/datasets/dataset.interface';

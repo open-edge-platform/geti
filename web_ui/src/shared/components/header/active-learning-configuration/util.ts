@@ -5,8 +5,11 @@ import { CSSProperties } from 'react';
 
 import { isEqual } from 'lodash-es';
 
+import {
+    BooleanGroupParams,
+    NumberGroupParams,
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { Task } from '../../../../core/projects/task.interface';
-import { BooleanGroupParams, NumberGroupParams } from '../../configurable-parameters/configurable-parameters.interface';
 
 interface AutoTrainingNotificationConfig {
     text: 'ON' | 'OFF' | 'SPLIT';

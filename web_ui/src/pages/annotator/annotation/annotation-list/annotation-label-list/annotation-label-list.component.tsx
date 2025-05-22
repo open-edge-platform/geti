@@ -3,10 +3,10 @@
 
 import { Fragment } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
+import { AiIcon, CaretRightIcon } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { AiIcon, CaretRightIcon } from '../../../../../assets/icons';
 import { Annotation, AnnotationLabel } from '../../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { isPrediction, showLabelScore } from '../../../../../core/labels/utils';

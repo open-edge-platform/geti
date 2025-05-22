@@ -3,16 +3,13 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
-import { TextFieldRef } from '@react-types/textfield';
+import { ActionButton, Flex, LoadingIndicator, TextFieldRef } from '@geti/ui';
+import { Edit } from '@geti/ui/icons';
 
-import { Edit } from '../../../../../assets/icons';
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { LimitedTextField } from '../../../../../shared/components/limited-text-field/limited-text-field.component';
-import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
 import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 import { ValidationErrorMsg } from '../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';

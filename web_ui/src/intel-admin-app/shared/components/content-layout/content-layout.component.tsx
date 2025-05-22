@@ -3,9 +3,8 @@
 
 import { FC, ReactNode } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { BreadcrumbItemProps, View } from '@geti/ui';
 
-import { BreadcrumbItemProps } from '../../../../shared/components/breadcrumbs/breadcrumb/breadcrumb.interface';
 import { Breadcrumbs } from '../breadcrumbs/breadcrumbs.component';
 
 import classes from './content-layout.module.scss';

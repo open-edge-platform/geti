@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { MediaItemView } from '../../../../../shared/components/media-item-view/media-item-view.component';

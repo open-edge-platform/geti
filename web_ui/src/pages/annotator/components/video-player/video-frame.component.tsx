@@ -3,10 +3,10 @@
 
 import { RefObject } from 'react';
 
+import { LoadingIndicator } from '@geti/ui';
 import { useSpinDelay } from 'spin-delay';
 
 import { VideoFrame as VideoFrameInterface } from '../../../../core/media/video.interface';
-import { LoadingIndicator } from '../../../../shared/components/loading/loading-indicator.component';
 import { useRequestVideoFrameCallback } from '../../hooks/use-request-video-frame-callback.hook';
 import { useStreamingVideoPlayer } from './streaming-video-player/streaming-video-player-provider.component';
 

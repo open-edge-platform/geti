@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, Flex } from '@geti/ui';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Label } from '../../../../core/labels/label.interface';

@@ -51,7 +51,7 @@ spec:
             - name: GOMEMLIMIT
               value: "{{ .Values.global.mem_limit }}"
             - name: WORKDIR
-              value: {{ .Values.mountPath }}
+              value: {{ .Values.diskSizeMountPath }}
             - name: MODELMESH_SERVICE
               value: {{ .Values.modelMesh.service }}
             - name: MODELMESH_PORT
@@ -128,6 +128,10 @@ spec:
             - mountPath: {{ .Values.mountPath }}
               name: data-storage
               subPath: binary_data
+            - name: disk-size
+              mountPath: {{ .Values.diskSizeMountPath }}
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: true
           lifecycle:
             preStop:
               exec:
@@ -141,3 +145,6 @@ spec:
         - name: data-storage
           emptyDir: {}
         {{- end }}
+        - name: disk-size
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim

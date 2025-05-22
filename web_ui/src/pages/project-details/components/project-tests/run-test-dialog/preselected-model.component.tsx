@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex } from '@adobe/react-spectrum';
+import { Divider, Flex, Tag } from '@geti/ui';
 
-import { Tag } from '../../../../../shared/components/tag/tag.component';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 
 interface PreselectedModelProps {

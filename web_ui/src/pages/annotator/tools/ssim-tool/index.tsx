@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DetectionTool } from '../../../../assets/icons';
+import { DetectionTool } from '@geti/ui/icons';
+
 import SSIMImg from '../../../../assets/primary-tools/ssim.webp';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
 import { ToolProps } from '../tools.interface';
@@ -20,7 +21,7 @@ export const SSIMTool: ToolProps = {
     supportedDomains: SSIM_SUPPORTED_DOMAINS,
     tooltip: {
         img: SSIMImg,
-        url: 'guide/annotations/annotation-tools.html#detection-assistant',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#detection-assistant-tool',
         title: toolTypeToLabelMapping[ToolType.SSIMTool],
         description:
             'Draw a box or a circle over an object and the system will mark all objects similar to the ' +

@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
+import { ActionButton, View } from '@geti/ui';
 
-import { ActionButton } from '../../../../shared/components/button/button.component';
 import { useAnnotationFilters } from './use-annotation-filters.hook';
 import { useHasStaleFilter } from './use-has-stale-filter.hook';
 

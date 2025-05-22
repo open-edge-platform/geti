@@ -3,11 +3,10 @@
 
 import { Fragment } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Flex } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Flex } from '@geti/ui';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import { Footer } from '../../../../pages/annotator/components/footer/annotator-footer.component';
-import { Button } from '../../button/button.component';
 import { PreviewTitle } from '../preview-title/preview-title.component';
 
 import classes from './media-item-annotations-preview-dialog.module.scss';

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, Text } from '@geti/ui';
 
 interface UsersCountProps {
     totalMatchedCount: number;

@@ -52,7 +52,6 @@ def _resolve_dataset_to_import(
     if not local_dataset_path.exists():
         remote_relative_path = Path(f"datasets/{dataset_name}")
         try:
-            logger.info(f"Downloading dataset file from remote archive: {remote_relative_path}")
             download_file_from_remote_archive(
                 remote_file_path=remote_relative_path,
                 local_file_path=local_dataset_path,

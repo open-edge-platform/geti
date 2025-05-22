@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { formatPerformanceScore } from '../../../annotator/components/utils';
 
 interface PerformanceProps {

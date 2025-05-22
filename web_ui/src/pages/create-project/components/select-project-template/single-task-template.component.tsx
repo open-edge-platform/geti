@@ -3,12 +3,11 @@
 
 import { useEffect, useState } from 'react';
 
-import { Grid, minmax, repeat } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Grid, minmax, repeat, useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { SUBDOMAIN } from '../../../../core/projects/project.interface';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { Card } from '../card.component';
 import { DomainCardsMetadata, SingleTemplateProps } from './project-template.interface';
 

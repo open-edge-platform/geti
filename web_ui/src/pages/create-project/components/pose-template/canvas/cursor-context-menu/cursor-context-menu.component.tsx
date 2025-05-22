@@ -3,13 +3,12 @@
 
 import { ReactNode, RefObject, useState } from 'react';
 
-import { View } from '@adobe/react-spectrum';
-import { DOMRefValue } from '@react-types/shared';
+import { View, type DOMRefValue } from '@geti/ui';
+import { ThemeProvider } from '@geti/ui/theme';
 import { OverlayContainer } from 'react-aria';
 
 import { useEventListener } from '../../../../../../hooks/event-listener/event-listener.hook';
 import { MouseEvents } from '../../../../../../shared/mouse-events';
-import { ThemeProvider } from '../../../../../../theme/theme-provider.component';
 
 export interface CursorContextMenuProps {
     isOpen: boolean;

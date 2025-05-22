@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { ColorThumb, Flex, Text, View } from '@geti/ui';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 
-import { COLOR_MODE } from '../../../../../assets/icons/color-mode.enum';
 import { LabelItemEditionState } from '../../../../../core/labels/label-tree-view.interface';
-import { ColorThumb } from '../../../color-thumb/color-thumb.component';
 import { isNewState } from '../utils';
 
 interface ItemEditionStateProps {

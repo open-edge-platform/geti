@@ -3,11 +3,11 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@adobe/react-spectrum';
+import { Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@geti/ui';
 
+import { ConfigurableParametersTaskChain } from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { Task } from '../../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';
-import { ConfigurableParametersTaskChain } from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { TaskSelection } from '../model-types/task-selection.component';
 import { DataManagement } from './data-management/data-management.component';
 import { ModelArchitectures } from './model-architectures/model-architectures.component';

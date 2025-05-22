@@ -3,10 +3,8 @@
 
 import { Key } from 'react';
 
-import { Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-
-import { SortUpDown } from '../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
+import { ActionButton, Item, Menu, MenuTrigger, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { SortUpDown } from '@geti/ui/icons';
 
 interface SortingOptions<T, K> {
     sortBy: T | K;
@@ -82,9 +80,9 @@ export const ProjectSorting = <T, K>({
     return (
         <MenuTrigger>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton key={'sort'} aria-label={'Sort'}>
+                <ActionButton isQuiet key={'sort'} aria-label={'Sort'}>
                     <SortUpDown />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Sort</Tooltip>
             </TooltipTrigger>
 

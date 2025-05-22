@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Text } from '@adobe/react-spectrum';
+import { Text } from '@geti/ui';
 
 interface EntitiesCounterProps {
     totalMatchedCount: number;

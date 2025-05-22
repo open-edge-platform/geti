@@ -1,13 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { View } from '@react-spectrum/view';
+import { ActionButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Tag, TagHalf } from '@geti/ui/icons';
 
-import { Tag, TagHalf } from '../../../assets/icons';
 import { Video } from '../../../core/media/video.interface';
 import { pluralize } from '../../utils';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 import classes from './annotation-indicator.module.scss';
 
@@ -52,7 +50,8 @@ export const VideoAnnotationIndicator = ({ video }: IndicatorProps) => {
             data-testid={'annotation-state-indicator-id'}
         >
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     zIndex={4}
                     UNSAFE_className={classes.annotationIndicator}
                     id={'annotated-button-tooltip'}
@@ -63,7 +62,7 @@ export const VideoAnnotationIndicator = ({ video }: IndicatorProps) => {
                     ) : (
                         <TagHalf id={`${videoId}-annotated-remove-id`} />
                     )}
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{tooltip}</Tooltip>
             </TooltipTrigger>
         </View>

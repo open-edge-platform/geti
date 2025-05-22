@@ -3,13 +3,12 @@
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useNavigate } from 'react-router-dom';
-import { VirtuosoMockContext } from 'react-virtuoso';
 
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { getMockedJob } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
-import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsList, JobsListProps } from './jobs-list.component';
 
 jest.mock('react-router-dom', () => ({
@@ -39,11 +38,7 @@ describe('jobs list', (): void => {
     };
 
     const renderComponent = async (customProps?: Partial<JobsListProps>): Promise<void> => {
-        render(
-            <VirtuosoMockContext.Provider value={{ viewportHeight: 400, itemHeight: 130 }}>
-                <JobsList {...mockJobsListProps} {...customProps} />
-            </VirtuosoMockContext.Provider>
-        );
+        render(<JobsList {...mockJobsListProps} {...customProps} />);
     };
 
     describe('render and navigation', () => {
@@ -94,8 +89,8 @@ describe('jobs list', (): void => {
                         metadata: {
                             test: {
                                 model: {
-                                    optimizationType: 'BO',
                                     id: 'id',
+                                    optimizationType: 'BO',
                                     modelTemplateId: 'template-id',
                                     architectureName: 'template',
                                     hasExplainableAI: false,

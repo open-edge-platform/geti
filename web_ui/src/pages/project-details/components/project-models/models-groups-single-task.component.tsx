@@ -3,7 +3,7 @@
 
 import { FC, Key, useState } from 'react';
 
-import { Flex, Heading } from '@adobe/react-spectrum';
+import { Flex, Heading } from '@geti/ui';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';
 import { ModelsContainer } from './models-container/models-container.component';

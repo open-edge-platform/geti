@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Heading, Text } from '@adobe/react-spectrum';
+import { Content, Heading, Text } from '@geti/ui';
 
 import { ConnectionLost } from '../../../assets/images';
 import { CustomerSupportLink } from '../../../shared/components/customer-support-link/customer-support-link.component';

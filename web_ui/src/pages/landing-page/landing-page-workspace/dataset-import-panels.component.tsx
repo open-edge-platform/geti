@@ -3,7 +3,7 @@
 
 import { Fragment } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';

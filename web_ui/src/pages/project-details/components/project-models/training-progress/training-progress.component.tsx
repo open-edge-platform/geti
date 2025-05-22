@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Heading, Text, View } from '@adobe/react-spectrum';
+import { Divider, Heading, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';

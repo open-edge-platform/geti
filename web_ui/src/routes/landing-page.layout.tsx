@@ -3,12 +3,11 @@
 
 import { Suspense } from 'react';
 
-import { Grid, View } from '@adobe/react-spectrum';
+import { Grid, Loading, View } from '@geti/ui';
 import { Outlet } from 'react-router-dom';
 
 import { LandingPageSidebar } from '../pages/landing-page/landing-page-sidebar/landing-page-sidebar.component';
 import { LandingPageHeader as Header } from '../shared/components/header/header.component';
-import { Loading } from '../shared/components/loading/loading.component';
 import { MaintenanceBanner } from './maintenance-banner/maintenance-banner.component';
 
 import classes from './routes.module.scss';

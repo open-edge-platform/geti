@@ -3,7 +3,7 @@
 
 import { Key, useMemo } from 'react';
 
-import { Item, Picker, Text } from '@adobe/react-spectrum';
+import { Item, Picker, Text } from '@geti/ui';
 
 import { Dataset } from '../../../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';

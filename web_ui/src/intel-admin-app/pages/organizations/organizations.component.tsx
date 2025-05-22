@@ -3,13 +3,14 @@
 
 import { useState } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import {
     ORGANIZATIONS_QUERY_LIMIT,
     useOrganizationsApi,
 } from '../../../core/organizations/hook/use-organizations-api.hook';
 import { GetOrganizationsQueryOptions } from '../../../core/organizations/services/organizations-service.interface';
+import { SortDirection } from '../../../core/shared/query-parameters';
 import { InvitationHeader } from './invitation-header.component';
 import { OrganizationsFilters } from './organizations-filters.component';
 import { OrganizationsTable } from './organizations-table.component';
@@ -22,7 +23,7 @@ const hasFilters = (filters: GetOrganizationsQueryOptions): boolean => {
 export const Organizations = (): JSX.Element => {
     const [organizationsQueryOptions, setOrganizationsQueryOptions] = useState<GetOrganizationsQueryOptions>({
         sortBy: 'createdAt',
-        sortDirection: 'DESC',
+        sortDirection: SortDirection.DESC,
         limit: ORGANIZATIONS_QUERY_LIMIT,
     });
 

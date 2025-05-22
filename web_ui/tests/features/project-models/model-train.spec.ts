@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { expect, Page } from '@playwright/test';
+import { orderBy } from 'lodash-es';
 
 import { ModelConfigurationOption } from '../../../src/pages/project-details/components/project-models/legacy-train-model-dialog/model-templates-selection/utils';
-import { sortAscending } from '../../../src/shared/utils';
 import {
     getMockedProjectStatusDTO,
     getMockedProjectStatusTask,
@@ -100,8 +100,8 @@ test.describe('Test model train dialog pipeline', () => {
                     ({ task_type }) => task_type === tasks[1]?.task_type
                 ) ?? [];
 
-            const sortedAlgorithmsForFirstTask = sortAscending(algorithmsForFirstTask, 'gigaflops');
-            const sortedAlgorithmsForSecondTask = sortAscending(algorithmsForSecondTask, 'gigaflops');
+            const sortedAlgorithmsForFirstTask = orderBy(algorithmsForFirstTask, 'gigaflops', 'asc');
+            const sortedAlgorithmsForSecondTask = orderBy(algorithmsForSecondTask, 'gigaflops', 'asc');
 
             const modelGroupsForFirstTask =
                 getModelGroups.model_groups?.map((modelGroup) => {

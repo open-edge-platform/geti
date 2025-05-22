@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Slider, View } from '@adobe/react-spectrum';
+import { Slider, View } from '@geti/ui';
 
 import { AdjustmentHeader, AdjustmentHeaderProps } from './adjustment-header.component';
 

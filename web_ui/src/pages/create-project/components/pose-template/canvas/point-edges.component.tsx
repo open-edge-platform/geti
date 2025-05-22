@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Delete } from '../../../../../assets/icons';
+import { ActionButton } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
+
 import { KeypointNode, Point } from '../../../../../core/annotations/shapes.interface';
 import { useSelected } from '../../../../../providers/selected-provider/selected-provider.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { EdgeLine } from '../util';
 import { Edge } from './edge.component';
 
@@ -40,12 +41,13 @@ export const PointEdges = ({ edges, isDisabled, onDelete, onNewIntermediatePoint
                 onRemoveSelected={removeSelected}
                 onResetAndSelect={setSelected}
                 contextMenu={
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         onPress={() => onDelete({ id, from, to })}
                         aria-label={`delete edge ${from.label.name} - ${to.label.name}`}
                     >
                         <Delete />
-                    </QuietActionButton>
+                    </ActionButton>
                 }
             />
         );

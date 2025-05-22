@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, ContextualHelp, Flex, Text, View } from '@adobe/react-spectrum';
+import { Content, ContextualHelp, Flex, Text, View } from '@geti/ui';
 import { useNumberFormatter } from 'react-aria';
 
 import { getFileSize } from '../../../../shared/utils';

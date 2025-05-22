@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Column, Row, TableBody, TableHeader, TableView } from '@adobe/react-spectrum';
+import { Column, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 import { fireEvent, renderHook, screen, waitFor } from '@testing-library/react';
 
 import { createInMemoryApiModelConfigParametersService } from '../../../../../../core/configurable-parameters/services/in-memory-api-model-config-parameters-service';

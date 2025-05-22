@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Text, View } from '@geti/ui';
 import { useNumberFormatter } from 'react-aria';
 
 interface PieChartProps {

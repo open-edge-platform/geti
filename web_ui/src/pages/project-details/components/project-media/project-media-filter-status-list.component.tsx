@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
+import { AcceptSmall } from '@geti/ui/icons';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 
-import { AcceptSmall } from '../../../../assets/icons';
-import { COLOR_MODE } from '../../../../assets/icons/color-mode.enum';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 
 interface StatusItem {

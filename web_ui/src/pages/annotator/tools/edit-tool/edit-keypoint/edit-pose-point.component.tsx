@@ -3,7 +3,8 @@
 
 import { useRef } from 'react';
 
-import { Invisible, Visible } from '../../../../../assets/icons';
+import { Invisible, Visible } from '@geti/ui/icons';
+
 import { RegionOfInterest } from '../../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';

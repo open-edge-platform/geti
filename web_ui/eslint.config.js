@@ -18,6 +18,31 @@ const compat = new FlatCompat({
 
 export default [
     ...sharedEslintConfig,
+    {
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: [
+                        {
+                            name: '@adobe/react-spectrum',
+                            message: 'Use component from the @geti/ui folder instead.',
+                        },
+                    ],
+                    patterns: [
+                        {
+                            group: ['@react-spectrum/*'],
+                            message: 'Use component from the @geti/ui folder instead.',
+                        },
+                        {
+                            group: ['@react-types/*'],
+                            message: 'Use type from the @geti/ui folder instead.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
     ...compat.extends('plugin:playwright/playwright-test').map((config) => ({
         ...config,
         files: ['tests/features/**/*.ts', 'tests/utils/**/*.ts', 'tests/fixtures/**/*.ts', 'tests/e2e/**/*.ts'],

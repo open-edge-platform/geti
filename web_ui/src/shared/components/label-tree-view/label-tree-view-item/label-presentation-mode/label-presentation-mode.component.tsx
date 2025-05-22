@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
-import { View } from '@react-spectrum/view';
+import { Flex, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import {

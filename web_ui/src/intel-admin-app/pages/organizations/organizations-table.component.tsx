@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@adobe/react-spectrum';
+import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { get } from 'lodash-es';
 
@@ -12,6 +12,7 @@ import { Organization } from '../../../core/organizations/organizations.interfac
 import { GetOrganizationsQueryOptions } from '../../../core/organizations/services/organizations-service.interface';
 import QUERY_KEYS from '../../../core/requests/query-keys';
 import { paths } from '../../../core/services/routes';
+import { SortDirection } from '../../../core/shared/query-parameters';
 import { useSortTable } from '../../../hooks/use-sort-table/use-sort-table.hook';
 import { DateCell } from '../../../shared/components/table/date-cell/date-cell.component';
 import { StatusCell } from '../../../shared/components/table/status-cell/status-cell.component';
@@ -109,7 +110,7 @@ export const OrganizationsTable = ({
                     onSortChange={(change) => {
                         sort({
                             sortBy: String(change.column),
-                            sortDirection: change.direction === 'ascending' ? 'ASC' : 'DESC',
+                            sortDirection: change.direction === 'ascending' ? SortDirection.ASC : SortDirection.DESC,
                         });
                     }}
                     sortDescriptor={{

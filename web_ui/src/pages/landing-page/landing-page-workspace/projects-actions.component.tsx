@@ -3,14 +3,13 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex, SearchField } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import { ProjectSortingOptions, ProjectsQueryOptions } from '../../../core/projects/services/project-service.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
-import { SearchField } from '../../../shared/components/search-field/search-field.component';
 import { NewProjectDialog } from '../../create-project/new-project-dialog.component';
 import { ProjectSorting } from './components/project-sorting/project-sorting.component';
 

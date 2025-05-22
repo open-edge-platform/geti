@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useMediaQuery } from '@react-spectrum/utils';
+import { useMediaQuery } from '@geti/ui';
+import { ThemeProvider } from '@geti/ui/theme';
 import { render, screen } from '@testing-library/react';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { checkTooltip } from '../../../../test-utils/utils';
-import { ThemeProvider } from '../../../../theme/theme-provider.component';
 import { StorageUsage } from './storage-usage.component';
 
 jest.mock('../../../../core/status/hooks/use-status.hook', () => ({
@@ -14,8 +14,8 @@ jest.mock('../../../../core/status/hooks/use-status.hook', () => ({
     useStatus: jest.fn(),
 }));
 
-jest.mock('@react-spectrum/utils', () => ({
-    ...jest.requireActual('@react-spectrum/utils'),
+jest.mock('@geti/ui', () => ({
+    ...jest.requireActual('@geti/ui'),
     useMediaQuery: jest.fn(() => true),
 }));
 

@@ -3,7 +3,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 
-import { Form } from '@adobe/react-spectrum';
+import { Form } from '@geti/ui';
 import { isEmpty, isFunction } from 'lodash-es';
 
 import { LimitedTextField } from '../../../../shared/components/limited-text-field/limited-text-field.component';

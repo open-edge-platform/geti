@@ -3,7 +3,7 @@
 
 import { ComponentProps } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { BarHorizontalChart } from '../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';

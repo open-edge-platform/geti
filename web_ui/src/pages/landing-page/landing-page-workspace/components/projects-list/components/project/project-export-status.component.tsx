@@ -3,7 +3,7 @@
 
 import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 
-import { ButtonGroup, Flex, Text, View } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ExportStatusStateDTO } from '../../../../../../../core/configurable-parameters/dtos/configurable-parameters.interface';
@@ -19,9 +19,7 @@ import { WorkspaceIdentifier } from '../../../../../../../core/workspaces/servic
 import { NOTIFICATION_TYPE } from '../../../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../../../notification/notification.component';
 import { ANIMATION_PARAMETERS } from '../../../../../../../shared/animation-parameters/animation-parameters';
-import { Button } from '../../../../../../../shared/components/button/button.component';
 import { JobProgress } from '../../../../../../../shared/components/header/jobs-management/job-progress.component';
-import { LoadingIndicator } from '../../../../../../../shared/components/loading/loading-indicator.component';
 import { ThinProgressBar } from '../../../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
 import { downloadFile, formatDownloadUrl, getDownloadNotificationMessage } from '../../../../../../../shared/utils';
 
@@ -52,15 +50,17 @@ interface ProjectExportStatusProps {
     setIsExporting: Dispatch<SetStateAction<boolean>>;
     workspaceIdentifier: WorkspaceIdentifier;
     exportProjectMutationIdentifier: ExportProjectMutationIdentifier;
+    onSelectItem?: () => void;
     onResetProjectExport: () => void;
 }
 
 export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
     projectId,
     isExporting,
-    setIsExporting,
     workspaceIdentifier,
     exportProjectMutationIdentifier,
+    onSelectItem,
+    setIsExporting,
     onResetProjectExport,
 }) => {
     const { router } = useApplicationServices();
@@ -126,10 +126,11 @@ export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
         <AnimatePresence mode={'wait'}>
             {isExporting && (
                 <motion.div
-                    variants={ANIMATION_PARAMETERS.FADE_ITEM}
+                    exit={'exit'}
                     initial={'hidden'}
                     animate={'visible'}
-                    exit={'exit'}
+                    variants={ANIMATION_PARAMETERS.FADE_ITEM}
+                    onAnimationComplete={onSelectItem}
                 >
                     <Flex
                         gap={'size-200'}

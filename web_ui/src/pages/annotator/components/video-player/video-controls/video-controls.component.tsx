@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup } from '@adobe/react-spectrum';
+import { ActionButton, ButtonGroup } from '@geti/ui';
+import { Pause, Play, StepBackward, StepForward } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 
-import { Pause, Play, StepBackward, StepForward } from '../../../../../assets/icons';
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useVideoKeyboardShortcuts } from '../../../hot-keys/use-video-keyboard-shortcuts/use-video-keyboard-shortcuts';
 import { VideoControls } from './video-controls.interface';
 
@@ -47,14 +46,15 @@ export const Controls = ({
                 activeTooltip={TOOLTIP.previous}
                 disabledTooltip={TOOLTIP.previous}
             >
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     id='video-player-go-to-previous-frame'
                     aria-label={TOOLTIP.previous}
                     onPress={videoControls.previous}
                     isDisabled={isDisabled.previous || !videoControls.canSelectPrevious}
                 >
                     <StepBackward />
-                </QuietActionButton>
+                </ActionButton>
             </TooltipWithDisableButton>
 
             {hasPlayAndPause &&
@@ -64,14 +64,15 @@ export const Controls = ({
                         activeTooltip={TOOLTIP.pause}
                         disabledTooltip={TOOLTIP.pause}
                     >
-                        <QuietActionButton
+                        <ActionButton
+                            isQuiet
                             id='video-player-pause'
                             aria-label={TOOLTIP.pause}
                             onPress={videoControls.pause}
                             isDisabled={isDisabled.pause}
                         >
                             <Pause />
-                        </QuietActionButton>
+                        </ActionButton>
                     </TooltipWithDisableButton>
                 ) : (
                     <TooltipWithDisableButton
@@ -79,26 +80,28 @@ export const Controls = ({
                         activeTooltip={playTooltip}
                         disabledTooltip={playTooltip}
                     >
-                        <QuietActionButton
+                        <ActionButton
+                            isQuiet
                             id='video-player-play'
                             aria-label={TOOLTIP.play}
                             onPress={videoControls.play}
                             isDisabled={isPlayDisabled}
                         >
                             <PlayIcon />
-                        </QuietActionButton>
+                        </ActionButton>
                     </TooltipWithDisableButton>
                 ))}
 
             <TooltipWithDisableButton placement={'bottom'} activeTooltip={TOOLTIP.next} disabledTooltip={TOOLTIP.next}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     id='video-player-go-to-next-frame'
                     aria-label={TOOLTIP.next}
                     onPress={videoControls.next}
                     isDisabled={isDisabled.next || !videoControls.canSelectNext}
                 >
                     <StepForward />
-                </QuietActionButton>
+                </ActionButton>
             </TooltipWithDisableButton>
         </ButtonGroup>
     );

@@ -3,7 +3,7 @@
 
 import { MouseEventHandler, MutableRefObject, useRef, useState } from 'react';
 
-import { Overlay } from '@react-spectrum/overlays';
+import { Overlay } from '@geti/ui';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';
 import { Label } from '../../../../../core/labels/label.interface';

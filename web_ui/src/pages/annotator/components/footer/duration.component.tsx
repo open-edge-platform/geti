@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, View } from '@geti/ui';
+import { TimeSmall } from '@geti/ui/icons';
 
-import { TimeSmall } from '../../../../assets/icons';
 import { isVideoFrame, Video, VideoFrame } from '../../../../core/media/video.interface';
 import { useDurationText } from '../../../../shared/hooks/data-format/use-duration-text.hook';
 

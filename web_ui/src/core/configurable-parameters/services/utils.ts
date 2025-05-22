@@ -4,13 +4,6 @@
 import { v4 as uuidV4 } from 'uuid';
 
 import {
-    ConfigurableParametersComponents,
-    ConfigurableParametersGroups,
-    ConfigurableParametersParams,
-    ConfigurableParametersTaskChain,
-    EntityIdentifier,
-} from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import {
     ConfigurableParametersDTO,
     ConfigurableParametersGroupsDTO,
     ConfigurableParametersParamsDTO,
@@ -25,6 +18,13 @@ import {
     TrainingConfigurationDTO,
     TrainingConfigurationUpdatePayloadDTO,
 } from '../dtos/configuration.interface';
+import {
+    ConfigurableParametersComponents,
+    ConfigurableParametersGroups,
+    ConfigurableParametersParams,
+    ConfigurableParametersTaskChain,
+    EntityIdentifier,
+} from './configurable-parameters.interface';
 import {
     ConfigurationParameter,
     ProjectConfiguration,

@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Dialog, Divider, Heading, View } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Content, Dialog, Divider, Heading, Text, View } from '@geti/ui';
 
 import { ErrorListItem } from '../../../../../../providers/media-upload-provider/media-upload.interface';
 

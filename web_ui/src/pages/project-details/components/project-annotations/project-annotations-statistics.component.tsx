@@ -3,8 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Flex, Grid, View } from '@adobe/react-spectrum';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
+import { Flex, Grid, Loading, useUnwrapDOMRef, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
 
@@ -13,7 +12,6 @@ import { Task } from '../../../../core/projects/task.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { paths } from '../../../../core/services/routes';
 import { useDatasetStatistics } from '../../../../core/statistics/hooks/use-dataset-statistics.hook';
-import { Loading } from '../../../../shared/components/loading/loading.component';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../media/providers/media-provider.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';

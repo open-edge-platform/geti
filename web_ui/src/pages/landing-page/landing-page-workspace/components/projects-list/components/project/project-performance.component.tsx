@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { Performance, PerformanceType, Score } from '../../../../../../../core/projects/task.interface';
-import { PressableElement } from '../../../../../../../shared/components/pressable-element/pressable-element.component';
 import { AccuracyHalfDonutChart } from '../../../../../../project-details/components/project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';
 
 interface ProjectPerformanceProps {

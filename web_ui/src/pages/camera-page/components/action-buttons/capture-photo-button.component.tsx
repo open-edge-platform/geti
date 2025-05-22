@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue } from '@geti/ui';
 import Webcam from 'react-webcam';
 import { v4 as uuid } from 'uuid';
 

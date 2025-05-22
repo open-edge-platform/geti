@@ -3,8 +3,7 @@
 
 import { ForwardedRef, forwardRef } from 'react';
 
-import { TextField } from '@adobe/react-spectrum';
-import { SpectrumTextFieldProps, TextFieldRef } from '@react-types/textfield';
+import { TextField, type SpectrumTextFieldProps, type TextFieldRef } from '@geti/ui';
 
 export const LimitedTextField = forwardRef(
     (props: SpectrumTextFieldProps, ref: ForwardedRef<TextFieldRef>): JSX.Element => {

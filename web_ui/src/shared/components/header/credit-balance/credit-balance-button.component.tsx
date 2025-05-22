@@ -3,13 +3,12 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { FocusableRef } from '@react-types/shared';
+import { ActionButton, Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
+import { CreditCard } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 
-import { CreditCard } from '../../../../assets/icons';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
 import { paths } from '../../../../core/services/routes';
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
@@ -20,7 +19,6 @@ import { useOrganizationIdentifier } from '../../../../hooks/use-organization-id
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { ONE_MINUTE } from '../../../utils';
-import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { CreditsToConsume } from './credits-to-consume.component';
 import { FuxNotification } from './fux-notification/fux-notification.component';
 import { isBalanceLow } from './util';
@@ -54,7 +52,8 @@ const CreditBalanceButtonDefault = forwardRef(
 
         return (
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     ref={ref}
                     width={15}
                     zIndex={1}
@@ -62,14 +61,14 @@ const CreditBalanceButtonDefault = forwardRef(
                     aria-label={'credit balance status'}
                     onPress={onPress}
                     UNSAFE_className={UNSAFE_className}
-                    colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                    colorVariant={isDarkMode ? 'dark' : 'light'}
                 >
                     {organizationBalance && isBalanceLow(organizationBalance) && (
                         <div className={classes.cornerIndicator} aria-label={`low credit indicator`}></div>
                     )}
 
                     <CreditCard />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Credit balance</Tooltip>
             </TooltipTrigger>
         );

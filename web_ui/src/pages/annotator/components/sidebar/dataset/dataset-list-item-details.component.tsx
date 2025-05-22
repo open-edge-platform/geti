@@ -3,7 +3,7 @@
 
 import { ComponentProps, useMemo } from 'react';
 
-import { Divider, Flex, Grid, minmax, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Grid, minmax, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 
@@ -11,7 +11,6 @@ import { isVideo } from '../../../../../core/media/video.interface';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { MediaItemView } from '../../../../../shared/components/media-item-view/media-item-view.component';
-import { PressableElement } from '../../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize } from '../../../../../shared/utils';
 import { getMediaId } from '../../../../media/utils';
@@ -44,7 +43,7 @@ export const DatasetListItemDetails = ({
     const id = getMediaId(mediaItem);
 
     const columns: ComponentProps<typeof Grid>['columns'] = useMemo(() => {
-        const initialColumns = ['var(--width)', minmax('size-1000', '1fr')];
+        const initialColumns = ['size-800', minmax('size-1000', '1fr')];
 
         if (datasetItemMenu !== undefined) {
             initialColumns.push('max-content');
@@ -64,7 +63,7 @@ export const DatasetListItemDetails = ({
                 <Grid
                     columns={columns}
                     width={'100%'}
-                    gap={'var(--gap)'}
+                    gap={'size-100'}
                     alignItems={'center'}
                     justifyContent={'center'}
                     rows={['size-800']}
@@ -78,7 +77,9 @@ export const DatasetListItemDetails = ({
                     </View>
                     <Flex direction={'column'} width={'100%'}>
                         <TooltipTrigger placement={'bottom'}>
-                            <PressableElement UNSAFE_className={classes.itemMediaName}>{name}</PressableElement>
+                            <PressableElement isTruncated UNSAFE_className={classes.itemMediaName}>
+                                {name}
+                            </PressableElement>
                             <Tooltip>{name}</Tooltip>
                         </TooltipTrigger>
 

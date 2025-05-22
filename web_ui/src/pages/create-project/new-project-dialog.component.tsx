@@ -3,22 +3,31 @@
 
 import { CSSProperties, FC, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Text } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
-import { View } from '@react-spectrum/view';
+import {
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    dimensionValue,
+    Divider,
+    Flex,
+    Heading,
+    Text,
+    useMediaQuery,
+    View,
+} from '@geti/ui';
+import { InfoOutline } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
-import { InfoOutline } from '../../assets/icons';
 import { DOMAIN } from '../../core/projects/core.interface';
 import { useProjectActions } from '../../core/projects/hooks/use-project-actions.hook';
 import { paths } from '../../core/services/routes';
 import { useWorkspaceIdentifier } from '../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { Button } from '../../shared/components/button/button.component';
 import { TooltipWithDisableButton } from '../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { isLargeSizeQuery } from '../../theme/queries';
 import { InfoSection } from './components/info-section/info-section.component';
 import { getStepInfo, getTotalSteps } from './components/utils';
 import { CreateProjectButton } from './create-project-button/create-project-button.component';

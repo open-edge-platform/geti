@@ -3,9 +3,8 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Flex, PressableElement, Tooltip, TooltipTrigger, View } from '@geti/ui';
 
-import { PressableElement } from '../../../../../../../shared/components/pressable-element/pressable-element.component';
 import { AccuracyHalfDonutChart } from './accuracy-half-donut-chart';
 
 interface AccuracyContainerProps {

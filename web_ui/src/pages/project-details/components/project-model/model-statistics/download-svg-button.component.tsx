@@ -3,11 +3,16 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { SpectrumActionButtonProps } from '@react-types/button';
-import { BackgroundColorValue } from '@react-types/shared';
+import {
+    ActionButton,
+    Tooltip,
+    TooltipTrigger,
+    View,
+    type ActionButtonProps,
+    type BackgroundColorValue,
+} from '@geti/ui';
+import { DownloadIcon } from '@geti/ui/icons';
 
-import { DownloadIcon } from '../../../../../assets/icons';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import {
@@ -18,11 +23,10 @@ import {
     getContainerElements,
     getVarColorToHex,
 } from '../../../../../shared/components/download-graph-menu/export-svg-utils';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './download-svg-button.module.scss';
 
-interface DownloadSvgButtonProps extends SpectrumActionButtonProps {
+interface DownloadSvgButtonProps extends ActionButtonProps {
     text?: string;
     tooltip?: string;
     fileName: string;
@@ -67,7 +71,8 @@ export const DownloadSvgButton = ({
             UNSAFE_style={{ width: 'fit-content' }}
         >
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     onPress={onDownloadPdf}
                     isDisabled={isDownloading}
                     {...props}
@@ -75,7 +80,7 @@ export const DownloadSvgButton = ({
                     UNSAFE_className={classes.downloadAllGraphs}
                 >
                     {text} <DownloadIcon />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{tooltip}</Tooltip>
             </TooltipTrigger>
         </View>

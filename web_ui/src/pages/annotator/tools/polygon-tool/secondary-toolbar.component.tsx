@@ -1,11 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Divider, Flex, Switch, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
 import { useDrawingToolsKeyboardShortcut } from '../../../annotator/hot-keys/use-drawing-tools-keyboard-shortcut/use-drawing-tools-keyboard-shortcut';
 import { ToolAnnotationContextProps } from '../tools.interface';
 import { blurActiveInput } from '../utils';

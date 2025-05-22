@@ -1,10 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-
-import { InfoOutline } from '../../../../../assets/icons';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
+import { ActionButton, Divider, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { InfoOutline } from '@geti/ui/icons';
 
 import classes from './dataset-accordion.module.scss';
 

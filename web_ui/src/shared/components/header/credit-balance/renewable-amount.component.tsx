@@ -1,11 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text } from '@adobe/react-spectrum';
+import { LoadingIndicator, Text } from '@geti/ui';
 
 import { useProducts } from '../../../../core/credits/products/hooks/use-products.hook';
 import { findPolicy, hasRenewableAmount } from '../../../../core/credits/products/hooks/utils';
-import { LoadingIndicator } from '../../loading/loading-indicator.component';
 import { getSingularOrPluralDays, remainingDaysUntilNextMonth } from './util';
 
 import classes from './credit-balance.module.scss';

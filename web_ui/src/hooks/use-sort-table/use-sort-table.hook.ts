@@ -3,6 +3,7 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
+import { SortDirection } from '../../core/shared/query-parameters';
 import { SortingOptions, SortingParams } from '../../shared/components/table/table.interface';
 
 interface UseSortTable<T extends Partial<SortingOptions>> {
@@ -28,12 +29,12 @@ export const useSortTable = <T extends Partial<SortingOptions>>({ queryOptions, 
             sortingOptions.sortBy === sortBy ||
             sortingOptions.sortBy === undefined
         ) {
-            if (sortingOptions.sortDirection === 'ASC') {
-                newSortingOptions.sortDirection = 'DESC';
-                newQueryOptions.sortDirection = 'DESC';
+            if (sortingOptions.sortDirection === SortDirection.ASC) {
+                newSortingOptions.sortDirection = SortDirection.DESC;
+                newQueryOptions.sortDirection = SortDirection.DESC;
             } else {
-                newSortingOptions.sortDirection = 'ASC';
-                newQueryOptions.sortDirection = 'ASC';
+                newSortingOptions.sortDirection = SortDirection.ASC;
+                newQueryOptions.sortDirection = SortDirection.ASC;
             }
         } else {
             // sorting by different column

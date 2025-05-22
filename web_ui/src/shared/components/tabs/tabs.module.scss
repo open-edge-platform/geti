@@ -7,10 +7,6 @@ div[class*='spectrum-Tabs-selectionIndicator'] {
     margin-top: var(--spectrum-global-dimension-size-100, var(--spectrum-alias-size-100)) !important;
     background-color: var(--spectrum-global-color-gray-50) !important;
     position: relative;
-
-    > div {
-        overflow-x: hidden !important;
-    }
 }
 
 .hideSelectionBar {

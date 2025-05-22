@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
+import { apiClient } from '@geti/core';
+
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import {
@@ -13,7 +14,7 @@ import { AllTasksDatasetStatistics, DatasetStatistics, DatasetStatisticsService 
 import { getAllTaskDatasetStatisticsDTO, getDatasetStatisticsEntity } from './utils';
 
 export const createApiDatasetStatisticsService: CreateApiService<DatasetStatisticsService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getAllTasksDatasetStatistics = async ({
         organizationId,

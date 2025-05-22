@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { apiClient } from '@geti/core';
 import { AxiosProgressEvent, AxiosResponse } from 'axios';
 
 import { DatasetIdentifier } from '../../../projects/dataset.interface';
-import { instance as defaultAxiosInstance } from '../../../services/axios-instance';
 import { CreateApiService } from '../../../services/create-api-service.interface';
 import { API_URLS } from '../../../services/urls';
 import { MEDIA_GROUP, MEDIA_TYPE } from '../../base-media.interface';
@@ -28,7 +28,7 @@ import { GetAdvancedFramesFilterProps, MediaService } from '../media-service.int
 import { getActiveMediaItems, getMediaFrameFromDTO, getMediaItemFromDTO } from '../utils';
 
 export const createApiMediaService: CreateApiService<MediaService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getActiveMedia = async (
         datasetIdentifier: DatasetIdentifier,

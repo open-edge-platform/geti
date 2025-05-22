@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Divider, Flex } from '@adobe/react-spectrum';
+import { Divider, Flex } from '@geti/ui';
 
 import { Task } from '../../../../core/projects/task.interface';
 import { PredictionsSettings } from './prediction-settings/predictions-settings.component';

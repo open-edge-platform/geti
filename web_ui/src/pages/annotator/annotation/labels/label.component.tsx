@@ -1,16 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
+import { AiIcon, ChevronRightSmallLight } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 import { useNumberFormatter, usePress } from 'react-aria';
 
-import { AiIcon, ChevronRightSmallLight } from '../../../../assets/icons';
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { isPrediction, showLabelScore } from '../../../../core/labels/utils';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { FullnameWithLoading } from '../../../../shared/components/users/fullname.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';

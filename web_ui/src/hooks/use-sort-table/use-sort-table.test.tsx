@@ -3,6 +3,7 @@
 
 import { act, renderHook } from '@testing-library/react';
 
+import { SortDirection } from '../../core/shared/query-parameters';
 import { useSortTable } from './use-sort-table.hook';
 
 describe('useSortTable', () => {
@@ -34,7 +35,7 @@ describe('useSortTable', () => {
         const [, sort] = result.current;
 
         act(() => {
-            sort({ sortBy: 'secondName', sortDirection: 'DESC' });
+            sort({ sortBy: 'secondName', sortDirection: SortDirection.DESC });
         });
 
         const [sortingOptions] = result.current;
@@ -58,7 +59,7 @@ describe('useSortTable', () => {
         const [, sort] = result.current;
 
         act(() => {
-            sort({ sortBy: 'secondName', sortDirection: 'ASC' });
+            sort({ sortBy: 'secondName', sortDirection: SortDirection.ASC });
         });
 
         const [sortingOptions] = result.current;
@@ -76,7 +77,7 @@ describe('useSortTable', () => {
         const [, sort] = result.current;
 
         act(() => {
-            sort({ sortBy: 'email', sortDirection: 'DESC' });
+            sort({ sortBy: 'email', sortDirection: SortDirection.DESC });
         });
 
         const [sortingOptions] = result.current;

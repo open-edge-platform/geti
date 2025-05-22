@@ -3,12 +3,22 @@
 
 import { useMemo } from 'react';
 
-import { DialogTrigger, Flex, Link, ProgressCircle, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { IconColorValue } from '@react-types/shared/src/dna';
+import {
+    ActionButton,
+    DialogTrigger,
+    Flex,
+    Link,
+    ProgressCircle,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+    View,
+    type IconColorValue,
+} from '@geti/ui';
+import { AcceptCircle, Alert, Image, Play, Refresh } from '@geti/ui/icons';
+import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
 import AlertCircle from '@spectrum-icons/workflow/AlertCircle';
 
-import { AcceptCircle, Alert, Image, Play, Refresh } from '../../../../../../assets/icons';
-import { COLOR_MODE } from '../../../../../../assets/icons/color-mode.enum';
 import { MEDIA_TYPE } from '../../../../../../core/media/base-media.interface';
 import {
     ErrorListItem,
@@ -16,7 +26,6 @@ import {
     QueuedListItem,
     SuccessListItem,
 } from '../../../../../../providers/media-upload-provider/media-upload.interface';
-import { ActionButton } from '../../../../../../shared/components/button/button.component';
 import { ThinProgressBar } from '../../../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
 import { TruncatedTextWithTooltip } from '../../../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize } from '../../../../../../shared/utils';

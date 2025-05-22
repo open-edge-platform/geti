@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Tag, Text } from '@geti/ui';
 
 import {
     LabelTreeGroupProps,
@@ -9,7 +9,6 @@ import {
 } from '../../../../../core/labels/label-tree-view.interface';
 import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
-import { Tag } from '../../../tag/tag.component';
 import { ItemEditionState } from '../item-edition-state/item-edition-state.component';
 
 import classes from './label-presentation-mode.module.scss';

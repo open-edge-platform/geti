@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, Loading, View } from '@geti/ui';
 import { sortBy } from 'lodash-es';
 
 import { useTrainingDatasetVideo } from '../../../../../../core/datasets/hooks/use-training-dataset.hook';
@@ -13,7 +13,6 @@ import {
 } from '../../../../../../core/media/media-filter.interface';
 import { Video, VideoFrame } from '../../../../../../core/media/video.interface';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Loading } from '../../../../../../shared/components/loading/loading.component';
 import { useConstructVideoFrame } from '../../../../../annotator/components/video-player/hooks/use-construct-video-frame.hook';
 import { VideoPlayerSlider } from '../../../../../annotator/components/video-player/video-player-slider/video-player-slider.component';
 import { TrainingDatasetVideoControls } from './training-dataset-video-controls.component';

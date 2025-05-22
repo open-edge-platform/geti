@@ -3,11 +3,9 @@
 
 import { ReactNode } from 'react';
 
-import { Divider, Flex, View } from '@adobe/react-spectrum';
+import { Breadcrumbs, BreadcrumbsProps, Divider, Flex, View } from '@geti/ui';
 
 import { TUTORIAL_CARD_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
-import { Breadcrumbs } from '../breadcrumbs/breadcrumbs.component';
-import { BreadcrumbsProps } from '../breadcrumbs/breadcrumbs.interface';
 import { TutorialCardBuilder } from '../tutorial-card/tutorial-card-builder.component';
 
 import classes from './page-layout.module.scss';

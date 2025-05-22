@@ -3,9 +3,9 @@
 
 import { useEffect } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 
-import { Alert } from '../../../../assets/icons';
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
 import { SliderAnimation } from '../../../../shared/components/slider-animation/slider-animation.component';

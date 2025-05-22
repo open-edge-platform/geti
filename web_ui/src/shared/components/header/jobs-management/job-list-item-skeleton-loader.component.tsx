@@ -3,9 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { Divider, Flex, View } from '@adobe/react-spectrum';
-
-import { Skeleton } from '../../skeleton/skeleton.component';
+import { Divider, Flex, Skeleton, View } from '@geti/ui';
 
 import classes from './job-list-item-skeleton-loader.module.scss';
 

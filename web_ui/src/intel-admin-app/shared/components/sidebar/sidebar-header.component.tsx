@@ -3,10 +3,9 @@
 
 import { FC } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, Skeleton, View } from '@geti/ui';
 
 import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
-import { Skeleton } from '../../../../shared/components/skeleton/skeleton.component';
 import { TruncatedTextWithTooltip } from '../../../../shared/components/truncated-text/truncated-text.component';
 
 import classes from './sidebar.module.scss';

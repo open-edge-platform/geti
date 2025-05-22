@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@react-spectrum/view';
+import { View } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 interface CPSelectableItemProps<T extends string | number> {

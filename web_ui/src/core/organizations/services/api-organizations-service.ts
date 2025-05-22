@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
+import { apiClient } from '@geti/core';
+
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { OrganizationDTO, OrganizationsResponseDTO } from '../dtos/organizations.interface';
@@ -15,7 +16,7 @@ import {
 } from './utils';
 
 export const createApiOrganizationsService: CreateApiService<OrganizationsService> = (
-    { instance: platformInstance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance: platformInstance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getOrganizations: OrganizationsService['getOrganizations'] = async (queryOptions) => {
         const { data } = await platformInstance.get<OrganizationsResponseDTO>(`${router.ORGANIZATIONS}`, {

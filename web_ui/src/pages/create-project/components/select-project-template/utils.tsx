@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Grid } from '@adobe/react-spectrum';
+import { Flex, Grid } from '@geti/ui';
 
 import {
     AnomalyClassificationImg,

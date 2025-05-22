@@ -1,11 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
+import {
+    ConfigParameterItemProp,
+    ConfigurableParametersGroups,
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ANIMATION_PARAMETERS } from '../../../animation-parameters/animation-parameters';
-import { ConfigParameterItemProp, ConfigurableParametersGroups } from '../configurable-parameters.interface';
 import { CPGroupItem } from '../cp-group-item/cp-group-item.component';
 
 interface CPGroupsListProps extends ConfigParameterItemProp {

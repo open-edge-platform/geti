@@ -3,8 +3,7 @@
 
 import { ComponentProps, CSSProperties, ReactNode } from 'react';
 
-import { TabPanels } from '@adobe/react-spectrum';
-import { SpectrumTabsProps } from '@react-types/tabs';
+import { TabPanels, type SpectrumTabsProps } from '@geti/ui';
 
 interface PanelOverflowY {
     panelOverflowY?: 'visible' | 'hidden' | 'clip' | 'scroll' | 'auto';

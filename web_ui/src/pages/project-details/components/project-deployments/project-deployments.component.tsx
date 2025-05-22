@@ -3,14 +3,13 @@
 
 import { useMemo, useState } from 'react';
 
-import { DialogContainer, Flex } from '@adobe/react-spectrum';
+import { Button, DialogContainer, Flex } from '@geti/ui';
 import { isEmpty, uniqBy } from 'lodash-es';
 
 import { DeploymentImg } from '../../../../assets/images';
 import { isVisualPromptModelGroup } from '../../../../core/annotations/services/visual-prompt-service';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
-import { Button } from '../../../../shared/components/button/button.component';
 import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
 import { TutorialCardBuilder } from '../../../../shared/components/tutorial-card/tutorial-card-builder.component';

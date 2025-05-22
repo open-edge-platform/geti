@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SpectrumDropZoneProps as DropZoneProps, DropZone as SpectrumDropZone } from '@adobe/react-spectrum';
+import { DropZone as SpectrumDropZone, type SpectrumDropZoneProps as DropZoneProps } from '@geti/ui';
 import clsx from 'clsx';
 
-import { GetElementType } from '../utils';
+import { GetElementType } from '../../types-utils/types';
 
 import classes from './drag-and-drop.module.scss';
 

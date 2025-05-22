@@ -4,8 +4,11 @@
 import { useState } from 'react';
 
 import {
+    ActionButton,
     Cell,
     Column,
+    DateRangePicker,
+    dimensionValue,
     Flex,
     Form,
     Heading,
@@ -15,19 +18,16 @@ import {
     TableView,
     Text,
     View,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
+import { Refresh } from '@geti/ui/icons';
 import { getLocalTimeZone } from '@internationalized/date';
-import { dimensionValue } from '@react-spectrum/utils';
 import { isNil } from 'lodash-es';
 import { DateValue } from 'react-aria';
 
-import { Refresh } from '../../../assets/icons';
 import { useTransactionsQueries } from '../../../core/credits/transactions/hooks/use-transactions.hook';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
-import { DateRangePicker } from '../../../shared/components/date-range-picker/date-range-picker.component';
 import { getClassServiceName } from '../../../shared/components/header/credit-balance/util';
 import { NotFound } from '../../../shared/components/not-found/not-found.component';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { formatDate, SpectrumTableLoadingState } from '../../../shared/utils';
 
 import classes from './usage.module.scss';
@@ -69,9 +69,9 @@ export const CreditConsumptionRecords = (): JSX.Element => {
                                 setFilterByDate(filterDate);
                             }}
                         />
-                        <QuietActionButton type={'reset'} aria-label={'reset calendar'}>
+                        <ActionButton isQuiet type={'reset'} aria-label={'reset calendar'}>
                             <Refresh />
-                        </QuietActionButton>
+                        </ActionButton>
                     </Flex>
                 </Form>
             </Flex>
