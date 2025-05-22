@@ -10,7 +10,9 @@ class CenterCrop(BaseModel):
         title="Enable center crop",
         description="Whether to apply center cropping to the image",
     )
-    ratio: float = Field(gt=0.0, default=1.0, title="Crop ratio", description="Ratio of original dimensions to keep when cropping")
+    ratio: float = Field(
+        gt=0.0, default=1.0, title="Crop ratio", description="Ratio of original dimensions to keep when cropping"
+    )
 
 
 class RandomResizeCrop(BaseModel):
@@ -20,7 +22,10 @@ class RandomResizeCrop(BaseModel):
         description="Whether to apply random resize and crop to the image",
     )
     ratio: float = Field(
-        gt=0.0, default=1.0, title="Crop resize ratio", description="Ratio of original dimensions to apply during resize crop operation"
+        gt=0.0,
+        default=1.0,
+        title="Crop resize ratio",
+        description="Ratio of original dimensions to apply during resize crop operation",
     )
 
 
@@ -30,7 +35,9 @@ class RandomAffine(BaseModel):
         title="Enable random affine",
         description="Whether to apply random affine transformations to the image",
     )
-    degrees: float = Field(gte=0.0, default=0.0, title="Rotation degrees", description="Maximum rotation angle in degrees")
+    degrees: float = Field(
+        ge=0.0, default=0.0, title="Rotation degrees", description="Maximum rotation angle in degrees"
+    )
     translate_x: float = Field(
         default=0.0,
         title="Horizontal translation",
@@ -73,7 +80,9 @@ class Tiling(BaseModel):
         default=False, title="Adaptive tiling", description="Whether to use adaptive tiling based on image content"
     )
     tile_size: int = Field(gt=0, default=128, title="Tile size", description="Size of each tile in pixels")
-    tile_overlap: int = Field(gt=0, default=64, title="Tile overlap", description="Overlap between adjacent tiles in pixels")
+    tile_overlap: int = Field(
+        gt=0, default=64, title="Tile overlap", description="Overlap between adjacent tiles in pixels"
+    )
 
 
 class AugmentationParameters(BaseModel):

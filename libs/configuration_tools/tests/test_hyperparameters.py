@@ -12,7 +12,9 @@ from geti_configuration_tools.hyperparameters import (
     EvaluationParameters,
     GaussianBlur,
     Hyperparameters,
+    MaxDetectionPerImage,
     RandomAffine,
+    RandomHorizontalFlip,
     RandomResizeCrop,
     Tiling,
     TrainingHyperParameters,
@@ -26,13 +28,13 @@ class TestHyperparameters:
             # Test case 1: Basic configuration
             (
                 {
-                    "dataset_preparation": {"augmentation": {"random_horizontal_flip": True}},
+                    "dataset_preparation": {"augmentation": {"random_horizontal_flip": {"enable": True}}},
                     "training": {"max_epochs": 50, "learning_rate": 0.01},
                     "evaluation": {},
                 },
                 Hyperparameters(
                     dataset_preparation=DatasetPreparationParameters(
-                        augmentation=AugmentationParameters(random_horizontal_flip=True)
+                        augmentation=AugmentationParameters(random_horizontal_flip=RandomHorizontalFlip(enable=True))
                     ),
                     training=TrainingHyperParameters(max_epochs=50, learning_rate=0.01),
                     evaluation=EvaluationParameters(),
@@ -43,38 +45,46 @@ class TestHyperparameters:
                 {
                     "dataset_preparation": {
                         "augmentation": {
-                            "center_crop": {"ratio": 0.8},
-                            "random_resize_crop": {"ratio": 0.5},
-                            "random_affine": {"degrees": 30, "translate_x": 0.1, "translate_y": 0.1, "scale": 0.9},
-                            "random_horizontal_flip": True,
-                            "gaussian_blur": {"kernel_size": 3},
-                            "tiling": {"adaptive_tiling": True, "tile_size": 224, "tile_overlap": 32},
+                            "center_crop": {"enable": True, "ratio": 0.8},
+                            "random_resize_crop": {"enable": True, "ratio": 0.5},
+                            "random_affine": {
+                                "enable": True,
+                                "degrees": 30,
+                                "translate_x": 0.1,
+                                "translate_y": 0.1,
+                                "scale": 0.9,
+                            },
+                            "random_horizontal_flip": {"enable": True},
+                            "gaussian_blur": {"enable": True, "kernel_size": 3},
+                            "tiling": {"enable": True, "adaptive_tiling": True, "tile_size": 224, "tile_overlap": 32},
                         }
                     },
                     "training": {
                         "max_epochs": 100,
                         "learning_rate": 0.001,
-                        "early_stopping": {"patience": 10},
-                        "max_detection_per_image": 100,
+                        "early_stopping": {"enable": True, "patience": 10},
+                        "max_detection_per_image": {"enable": True, "max_detection_per_image": 100},
                     },
                     "evaluation": {},
                 },
                 Hyperparameters(
                     dataset_preparation=DatasetPreparationParameters(
                         augmentation=AugmentationParameters(
-                            center_crop=CenterCrop(ratio=0.8),
-                            random_resize_crop=RandomResizeCrop(ratio=0.5),
-                            random_affine=RandomAffine(degrees=30, translate_x=0.1, translate_y=0.1, scale=0.9),
-                            random_horizontal_flip=True,
-                            gaussian_blur=GaussianBlur(kernel_size=3),
-                            tiling=Tiling(adaptive_tiling=True, tile_size=224, tile_overlap=32),
+                            center_crop=CenterCrop(enable=True, ratio=0.8),
+                            random_resize_crop=RandomResizeCrop(enable=True, ratio=0.5),
+                            random_affine=RandomAffine(
+                                enable=True, degrees=30, translate_x=0.1, translate_y=0.1, scale=0.9
+                            ),
+                            random_horizontal_flip=RandomHorizontalFlip(enable=True),
+                            gaussian_blur=GaussianBlur(enable=True, kernel_size=3),
+                            tiling=Tiling(enable=True, adaptive_tiling=True, tile_size=224, tile_overlap=32),
                         )
                     ),
                     training=TrainingHyperParameters(
                         max_epochs=100,
                         learning_rate=0.001,
-                        early_stopping=EarlyStopping(patience=10),
-                        max_detection_per_image=100,
+                        early_stopping=EarlyStopping(enable=True, patience=10),
+                        max_detection_per_image=MaxDetectionPerImage(enable=True, max_detection_per_image=100),
                     ),
                     evaluation=EvaluationParameters(),
                 ),
@@ -83,19 +93,27 @@ class TestHyperparameters:
             (
                 {
                     "dataset_preparation": {
-                        "augmentation": {"center_crop": {"ratio": 0.1}, "random_horizontal_flip": False}
+                        "augmentation": {
+                            "center_crop": {"enable": True, "ratio": 0.1},
+                            "random_horizontal_flip": {"enable": False},
+                        }
                     },
-                    "training": {"max_epochs": 1, "learning_rate": 0.0001, "early_stopping": {"patience": 1}},
+                    "training": {
+                        "max_epochs": 1,
+                        "learning_rate": 0.0001,
+                        "early_stopping": {"enable": True, "patience": 1},
+                    },
                     "evaluation": {},
                 },
                 Hyperparameters(
                     dataset_preparation=DatasetPreparationParameters(
                         augmentation=AugmentationParameters(
-                            center_crop=CenterCrop(ratio=0.1), random_horizontal_flip=False
+                            center_crop=CenterCrop(enable=True, ratio=0.1),
+                            random_horizontal_flip=RandomHorizontalFlip(enable=False),
                         )
                     ),
                     training=TrainingHyperParameters(
-                        max_epochs=1, learning_rate=0.0001, early_stopping=EarlyStopping(patience=1)
+                        max_epochs=1, learning_rate=0.0001, early_stopping=EarlyStopping(enable=True, patience=1)
                     ),
                     evaluation=EvaluationParameters(),
                 ),
@@ -124,7 +142,7 @@ class TestHyperparameters:
         with pytest.raises(ValidationError):
             Hyperparameters(
                 dataset_preparation=DatasetPreparationParameters(
-                    augmentation=AugmentationParameters(random_horizontal_flip=True)
+                    augmentation=AugmentationParameters(random_horizontal_flip=RandomHorizontalFlip(enable=True))
                 ),
                 training=TrainingHyperParameters(
                     max_epochs=-10,  # Invalid value

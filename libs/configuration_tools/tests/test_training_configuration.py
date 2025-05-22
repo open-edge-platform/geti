@@ -9,6 +9,7 @@ from geti_configuration_tools.hyperparameters import (
     AugmentationParameters,
     CenterCrop,
     DatasetPreparationParameters,
+    EarlyStopping,
     EvaluationParameters,
     Hyperparameters,
     TrainingHyperParameters,
@@ -17,8 +18,12 @@ from geti_configuration_tools.training_configuration import (
     Filtering,
     GlobalDatasetPreparationParameters,
     GlobalParameters,
+    MaxAnnotationObjects,
+    MaxAnnotationPixels,
+    MinAnnotationPixels,
+    NullTrainingConfiguration,
     SubsetSplit,
-    TrainingConfiguration, NullTrainingConfiguration,
+    TrainingConfiguration,
 )
 
 
@@ -27,15 +32,13 @@ def ftx_hyperparameters():
     yield Hyperparameters(
         dataset_preparation=DatasetPreparationParameters(
             augmentation=AugmentationParameters(
-                center_crop=CenterCrop(ratio=0.6),
+                center_crop=CenterCrop(enable=True, ratio=0.6),
             )
         ),
         training=TrainingHyperParameters(
             max_epochs=100,
-            early_stopping_epochs=10,
+            early_stopping=EarlyStopping(enable=True, patience=10),
             learning_rate=0.001,
-            learning_rate_warmup_epochs=5,
-            batch_size=32,
         ),
         evaluation=EvaluationParameters(),
     )
@@ -57,9 +60,9 @@ class TestTrainingConfiguration:
                         remixing=False,
                     ),
                     filtering=Filtering(
-                        min_annotation_pixels=10,
-                        max_annotation_pixels=1000,
-                        max_annotation_objects=100,
+                        min_annotation_pixels=MinAnnotationPixels(enable=True, min_annotation_pixels=10),
+                        max_annotation_pixels=MaxAnnotationPixels(enable=True, max_annotation_pixels=1000),
+                        max_annotation_objects=MaxAnnotationObjects(enable=True, max_annotation_objects=100),
                     ),
                 )
             ),
@@ -71,12 +74,15 @@ class TestTrainingConfiguration:
         assert training_config.global_parameters.dataset_preparation.subset_split.validation == 20
         assert training_config.global_parameters.dataset_preparation.subset_split.test == 10
         assert training_config.hyperparameters.training.max_epochs == 100
+        assert training_config.hyperparameters.training.early_stopping.enable
+        assert training_config.hyperparameters.training.early_stopping.patience == 10
 
     def test_invalid_subset_split(self, ftx_hyperparameters):
         # Test that validation fails when subset percentages don't add up to 100
         with pytest.raises(ValidationError) as excinfo:
             TrainingConfiguration(
                 id_=ID("test_training_config"),
+                task_id=ID("test_task"),
                 global_parameters=GlobalParameters(
                     dataset_preparation=GlobalDatasetPreparationParameters(
                         subset_split=SubsetSplit(
@@ -99,11 +105,15 @@ class TestTrainingConfiguration:
         with pytest.raises(ValidationError):
             TrainingConfiguration(
                 id_=ID("test_training_config"),
+                task_id=ID("test_task"),
                 global_parameters=GlobalParameters(
                     dataset_preparation=GlobalDatasetPreparationParameters(
                         subset_split=SubsetSplit(),
                         filtering=Filtering(
-                            min_annotation_pixels=0,  # Invalid: must be > 0
+                            min_annotation_pixels=MinAnnotationPixels(
+                                enable=True,
+                                min_annotation_pixels=0,  # Invalid: must be > 0
+                            ),
                         ),
                     )
                 ),

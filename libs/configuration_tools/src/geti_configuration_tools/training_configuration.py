@@ -5,13 +5,8 @@ from typing import Any
 from geti_types import ID, PersistentEntity
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .hyperparameters import (
-    AugmentationParameters,
-    DatasetPreparationParameters,
-    EvaluationParameters,
-    Hyperparameters,
-    TrainingHyperParameters,
-)
+from .hyperparameters import Hyperparameters
+from .utils import partial_model
 
 
 class SubsetSplit(BaseModel):
@@ -48,7 +43,7 @@ class MinAnnotationPixels(BaseModel):
         description="Whether to apply minimum annotation pixels filtering",
     )
     min_annotation_pixels: int = Field(
-        ge=1, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+        gt=0, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
     )
 
 
@@ -61,7 +56,7 @@ class MaxAnnotationPixels(BaseModel):
         description="Whether to apply maximum annotation pixels filtering",
     )
     max_annotation_pixels: int = Field(
-        ge=1, default=10000, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+        gt=0, default=10000, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
     )
 
 
@@ -74,21 +69,24 @@ class MaxAnnotationObjects(BaseModel):
         description="Whether to apply maximum annotation objects filtering",
     )
     max_annotation_objects: int = Field(
-        ge=1, default=10000, title="Maximum annotation objects", description="Maximum number of objects in an annotation"
+        gt=0,
+        default=10000,
+        title="Maximum annotation objects",
+        description="Maximum number of objects in an annotation",
     )
 
 
 class Filtering(BaseModel):
     """Parameters for filtering annotations in the dataset."""
 
-    min_annotation_pixels: MinAnnotationPixels | None = Field(
-        default=None, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+    min_annotation_pixels: MinAnnotationPixels = Field(
+        title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
     )
-    max_annotation_pixels: MaxAnnotationPixels | None = Field(
-        default=None, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    max_annotation_pixels: MaxAnnotationPixels = Field(
+        title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
     )
-    max_annotation_objects: MaxAnnotationObjects | None = Field(
-        default=None, title="Maximum annotation objects", description="Maximum number of objects in an annotation"
+    max_annotation_objects: MaxAnnotationObjects = Field(
+        title="Maximum annotation objects", description="Maximum number of objects in an annotation"
     )
 
 
@@ -98,8 +96,8 @@ class GlobalDatasetPreparationParameters(BaseModel):
     Controls data splitting and filtering before being passed for the training.
     """
 
-    subset_split: SubsetSplit | None = Field(default=None, title="Subset split", description="Configuration for splitting data into subsets")
-    filtering: Filtering | None = Field(default=None, title="Filtering", description="Configuration for filtering annotations")
+    subset_split: SubsetSplit = Field(title="Subset split", description="Configuration for splitting data into subsets")
+    filtering: Filtering = Field(title="Filtering", description="Configuration for filtering annotations")
 
 
 class GlobalParameters(BaseModel):
@@ -155,6 +153,7 @@ class TrainingConfiguration(BaseModel, PersistentEntity):
         return self.global_parameters == other.global_parameters and self.hyperparameters == other.hyperparameters
 
 
+@partial_model
 class NullTrainingConfiguration(TrainingConfiguration):
     """
     Null object implementation for TrainingConfiguration.
@@ -167,18 +166,18 @@ class NullTrainingConfiguration(TrainingConfiguration):
             self,
             id_=ID(),
             task_id=ID(),
-            global_parameters=GlobalParameters(
-                dataset_preparation=GlobalDatasetPreparationParameters()
-            ),
-            hyperparameters=Hyperparameters(
-                dataset_preparation=DatasetPreparationParameters(
-                    augmentation=AugmentationParameters(),
-                ),
-                training=TrainingHyperParameters(),
-                evaluation=EvaluationParameters(metric=None),
-            ),
             ephemeral=True,
         )
 
-    def model_dump(self) -> dict[str, Any]:
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:  # noqa: ARG002
         return {}
+
+
+@partial_model
+class PartialTrainingConfiguration(TrainingConfiguration):
+    """
+    A partial version of `TrainingConfiguration` with all fields optional.
+
+    Enables flexible updates and partial validation, making it suitable for scenarios
+    where only a subset of the configuration needs to be specified or changed.
+    """

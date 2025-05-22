@@ -3,9 +3,41 @@
 from unittest.mock import patch
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
+from geti_configuration_tools.training_configuration import TrainingConfiguration
 from storage.repos.training_configuration_repo import TrainingConfigurationRepo
 
 from iai_core.repos import TaskNodeRepo
+
+
+from typing import Optional, Type, Any, Tuple
+from copy import deepcopy
+
+from pydantic import BaseModel, create_model
+from pydantic.fields import FieldInfo
+
+
+def partial_model(model: Type[BaseModel]):
+    def make_field_optional(field: FieldInfo, default: Any = None) -> Tuple[Any, FieldInfo]:
+        new = deepcopy(field)
+        new.default = default
+        new.annotation = Optional[field.annotation]  # type: ignore
+        return new.annotation, new
+    return create_model(
+        f'Partial{model.__name__}',
+        __base__=model,
+        __module__=model.__module__,
+        **{
+            field_name: make_field_optional(field_info)
+            for field_name, field_info in model.model_fields.items()
+        }
+    )
+
+
+@partial_model
+class OptionalTrainingConfiguration(TrainingConfiguration):
+    """
+    d
+    """
 
 
 class TestTrainingConfigurationController:

@@ -4,6 +4,8 @@
 from geti_types import ID, PersistentEntity
 from pydantic import BaseModel, Field
 
+from .utils import partial_model
+
 
 class TrainConstraints(BaseModel):
     """Constraints applied for model training."""
@@ -47,11 +49,11 @@ class TaskConfig(BaseModel):
     """Configuration for a specific task within a project."""
 
     task_id: str = Field(title="Task ID", description="Unique identifier for the task")
-    training: TrainingParameters | None = Field(
-        default=None, title="Training parameters", description="Parameters controlling the training process"
+    training: TrainingParameters = Field(
+        title="Training parameters", description="Parameters controlling the training process"
     )
-    auto_training: AutoTrainingParameters | None = Field(
-        default=None, title="Auto-training parameters", description="Parameters controlling auto-training"
+    auto_training: AutoTrainingParameters = Field(
+        title="Auto-training parameters", description="Parameters controlling auto-training"
     )
 
 
@@ -112,3 +114,13 @@ class NullProjectConfiguration(ProjectConfiguration):
             task_configs=[],
             ephemeral=True,
         )
+
+
+@partial_model
+class PartialProjectConfiguration(ProjectConfiguration):
+    """
+    A partial version of `ProjectConfiguration` where all fields are optional.
+
+    This class is useful for update operations or PATCH endpoints, allowing clients
+    to provide only the fields they wish to modify, while leaving others unset.
+    """

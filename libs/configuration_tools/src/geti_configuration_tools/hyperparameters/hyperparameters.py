@@ -16,7 +16,7 @@ class EarlyStopping(BaseModel):
     enable: bool = Field(
         default=False,
         title="Enable early stopping",
-        description="Whether to stop training early when performance stops improving"
+        description="Whether to stop training early when performance stops improving",
     )
     patience: int = Field(
         gt=0,
@@ -26,20 +26,11 @@ class EarlyStopping(BaseModel):
     )
 
 
-class MaxEpochs(BaseModel):
-    max_epochs: int = Field(
-        gt=0,
-        default=1000,
-        title="Maximum epochs",
-        description="Maximum number of training epochs to run",
-    )
-
-
 class MaxDetectionPerImage(BaseModel):
     enable: bool = Field(
         default=False,
         title="Enable maximum detection per image",
-        description="Whether to limit the number of detections per image"
+        description="Whether to limit the number of detections per image",
     )
     max_detection_per_image: int = Field(
         default=10000,
@@ -52,26 +43,20 @@ class MaxDetectionPerImage(BaseModel):
     )
 
 
-class LearningRate(BaseModel):
-    learning_rate: float = Field(
-        gt=0.0, lt=1.0, default=0.001, title="Learning rate", description="Base learning rate for the optimizer"
-    )
-
-
 class TrainingHyperParameters(BaseModel):
     """Hyperparameters for model training process."""
 
-    max_epochs: MaxEpochs | None = Field(
-        default=None, title="Maximum epochs", description="Maximum number of training epochs to run"
+    max_epochs: int = Field(
+        gt=0, default=1000, title="Maximum epochs", description="Maximum number of training epochs to run"
     )
-    early_stopping: EarlyStopping | None = Field(
-        default=None, title="Early stopping", description="Configuration for early stopping mechanism"
+    early_stopping: EarlyStopping = Field(
+        default_factory=EarlyStopping, title="Early stopping", description="Configuration for early stopping mechanism"
     )
-    learning_rate: LearningRate | None = Field(
-        default=None, title="Learning rate", description="Base learning rate for the optimizer"
+    learning_rate: float = Field(
+        gt=0, lt=1, default=0.001, title="Learning rate", description="Base learning rate for the optimizer"
     )
-    max_detection_per_image: MaxDetectionPerImage | None = Field(
-        default=None,
+    max_detection_per_image: MaxDetectionPerImage = Field(
+        default_factory=MaxDetectionPerImage,
         title="Maximum number of detections per image",
         description=(
             "Maximum number of objects that can be detected in a single image, "

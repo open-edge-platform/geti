@@ -66,7 +66,7 @@ class TestProjectConfiguration:
                             "auto_training": {
                                 "enable": False,
                                 "enable_dynamic_required_annotations": False,
-                                "min_images_per_label": None,
+                                "min_images_per_label": 0,
                             },
                         },
                     ],
@@ -89,7 +89,7 @@ class TestProjectConfiguration:
                             auto_training=AutoTrainingParameters(
                                 enable=False,
                                 enable_dynamic_required_annotations=False,
-                                min_images_per_label=None,
+                                min_images_per_label=0,
                             ),
                         ),
                     ],
@@ -102,7 +102,7 @@ class TestProjectConfiguration:
         config = ProjectConfiguration(**project_config_dict)
 
         # Basic validation
-        assert config.id_ == expected_config.id_
+        assert config.project_id == expected_config.project_id
         assert config.task_configs
         assert len(config.task_configs) == len(expected_config.task_configs)
 
