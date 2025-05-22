@@ -4,8 +4,14 @@
 import { ComponentProps, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Flex, Text } from '@geti/ui';
+import { useNavigate } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { SearchRuleField, SearchRuleOperator } from '../../../../core/media/media-filter.interface';
+import { paths } from '../../../../core/services/routes';
+import { encodeFilterSearchParam } from '../../../../hooks/use-filter-search-param/use-filter-search-param.hook';
+import { useDatasetIdentifier } from '../../../../pages/annotator/hooks/use-dataset-identifier.hook';
+import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { trimText } from '../../../utils';
 import { withDownloadableSvg } from '../../download-graph-menu/with-downloadable-svg.hoc';
 import { ChartProps, Colors } from '../chart.interface';
@@ -62,6 +68,9 @@ export const BarHorizontalChart = ({
     allowDecimals = true,
     formatTooltipMessage = displayMessage,
 }: BarHorizontalChartProps): JSX.Element => {
+    const navigate = useNavigate();
+    const datasetIdentifier = useDatasetIdentifier();
+    const { project } = useProject();
     const [labelColors, setLabelColors] = useState<Colors[]>(colors || []);
     const [margin, setMargin] = useState<number>(0);
     const container = useRef<HTMLDivElement | null>(null);
@@ -94,6 +103,26 @@ export const BarHorizontalChart = ({
         // Remove margin from last bar
         return data.length * MIN_BAR_SIZE_WITH_MARGIN - BAR_MARGIN_SIZE;
     }, [data.length]);
+
+    const handleLabelClick = (labelName: string) => {
+        const labelId = project.labels.find((label) => label.name === labelName)?.id;
+        const search = {
+            condition: 'and',
+            rules: [
+                {
+                    field: SearchRuleField.LabelId,
+                    id: project.datasets[0].id,
+                    operator: SearchRuleOperator.In,
+                    value: [labelId],
+                },
+            ],
+        };
+        const encodedFilters = encodeFilterSearchParam(search);
+        const filter = `?filter=${encodedFilters.toString()}`;
+        const route = `${paths.project.dataset.media(datasetIdentifier)}${filter}`;
+
+        navigate(route);
+    };
 
     return (
         <div style={{ overflow: 'auto', height: '100%', width: '100%' }} ref={container} aria-label={ariaLabel}>
@@ -152,6 +181,7 @@ export const BarHorizontalChart = ({
                                     id={`${name}-id`}
                                     aria-label={name}
                                     aria-valuenow={value}
+                                    onClick={() => handleLabelClick(name)}
                                 />
                             ))
                         ) : (
