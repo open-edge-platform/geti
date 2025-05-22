@@ -897,18 +897,24 @@ class ConvertUtils:
             "positions": [],
         }
         point_cat: dm.PointsCategories = dm_categories.get(dm.AnnotationType.points, None)
+        logger.warning(f"{point_cat}")
         if point_cat:
             for cat in point_cat.items.values():
+                logger.warning(f"{cat}")
                 idx_to_label_name = {idx + 1: label for idx, label in enumerate(cat.labels)}
+                logger.warning(f"{idx_to_label_name}")
                 for joint in cat.joints:
+                    logger.warning(f"{joint}")
                     if len(joint) != 2:
                         logger.warning(f"Skip invalid joint: {joint}")
                         continue
                     joint_names = tuple(idx_to_label_name[idx] for idx in joint)
+                    logger.warning(f"{joint_names}")
                     if not include_all_labels and not any(label in selected_labels for label in joint_names):
                         continue
                     structure["edges"].append({"nodes": list(joint_names)})
                 for i in range(0, len(cat.positions), 2):
+                    logger.warning(f"{cat.positions[i]}, {cat.positions[i + 1]}")
                     structure["positions"].append(
                         {"label": cat.labels[i // 2], "x": cat.positions[i], "y": cat.positions[i + 1]}
                     )
