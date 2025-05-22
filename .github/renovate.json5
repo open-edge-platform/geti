@@ -58,7 +58,7 @@
       matchManagers: ["github-actions", "gomod", "pep621", "npm"],
     },
 
-    // Disable non-security upgrades for uv, playwright and Dockerfile syntax (docker/dockerfile)
+    // Disable non-security upgrades for playwright and Dockerfile syntax (docker/dockerfile)
     {
       enabled: false,
       matchDatasources: ["docker"],
