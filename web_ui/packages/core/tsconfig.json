@@ -1,4 +1,7 @@
 {
   "extends": "@geti/config/typescript",
-  "include": ["**/*"]
+  "include": ["./src", "./geti-type.d.ts"],
+  "compilerOptions": {
+    "types": ["node", "jest"]
+  }
 }

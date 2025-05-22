@@ -11,6 +11,7 @@
     "@adobe/react-spectrum": "^3.41.0",
     "@doodle3d/clipper-js": "^1.0.11",
     "@geti/ui": "*",
+    "@geti/core": "*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^1.26.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.53.0",
@@ -104,7 +105,7 @@
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
     "test:unit": "jest --config jest.config.js --watchAll=false",
     "test:unit:watch": "jest --config jest.config.js --watch",
-    "type-check": "tsc --noEmit && npm run type-check --workspace=@geti/ui"
+    "type-check": "tsc --noEmit && npm run type-check --workspace=@geti/ui && npm run type-check --workspace=@geti/core"
   },
   "browserslist": {
     "production": [
