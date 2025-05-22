@@ -11,6 +11,13 @@ on:
         description: "Docker image tag"
         type: string
         required: true
+    secrets:
+      AWS_ROLE:
+        required: true
+      AWS_REGION:
+        required: true
+      REGISTRY:
+        required: true
   workflow_dispatch:
     inputs:
       branch:
