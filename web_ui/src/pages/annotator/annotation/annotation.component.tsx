@@ -17,10 +17,12 @@ interface AnnotationProps {
     isOverlap?: boolean;
     selectedTask?: Task | null;
     isPredictionMode?: boolean;
+    maskId?: string;
 }
 
 export const Annotation = memo(
     ({
+        maskId,
         annotation,
         isPredictionMode = false,
         selectedTask = null,
@@ -43,6 +45,7 @@ export const Annotation = memo(
         return (
             <>
                 <g
+                    mask={maskId}
                     id={`canvas-annotation-${id}`}
                     {...defaultStyles}
                     strokeLinecap={'round'}
