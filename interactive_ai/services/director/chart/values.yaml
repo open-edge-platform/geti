@@ -1,4 +1,4 @@
-image: director
+image: broken
 
 imagePullPolicy: IfNotPresent
 
