@@ -194,7 +194,7 @@ describe('UploadLabelSelectorDialog', () => {
             expect(screen.getByRole('checkbox', { name: mockedLabel.name })).toBeChecked();
         });
 
-        // Delete the parent label vehicle
+        // Unselect the parent label vehicle
         await userEvent.click(screen.getByRole('checkbox', { name: mockVehicleLabel.name }));
 
         // All checkboxes should now be unchecked since removing a parent removes all children
