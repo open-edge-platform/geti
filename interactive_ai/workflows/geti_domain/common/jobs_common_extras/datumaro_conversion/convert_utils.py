@@ -814,6 +814,7 @@ class ConvertUtils:
                 dm_label_name_to_color[label_name] = colormap
 
         exported_project_type = ImportUtils.get_exported_project_type(dm_infos)
+        logger.warning(f"{exported_project_type}, {project_type}")
         if project_type != exported_project_type:
             labels = [{"name": label_name} for label_name in selected_labels]
             for label_meta in labels:

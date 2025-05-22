@@ -78,6 +78,7 @@ class DatumaroProjectParser(ProjectParser):
             selected_labels=selected_labels,
             include_all_labels=include_all_labels,
         )
+        logger.warning(f"{valid_labels}")
 
         self._task_name_to_label_metas: dict[str, dict[str, dict[str, Any]]] = (
             self._extract_labels_metadata_from_dm_dataset(
@@ -87,6 +88,7 @@ class DatumaroProjectParser(ProjectParser):
                 include_all_labels=include_all_labels,
             )
         )
+        logger.warning(f"{self._task_name_to_label_metas}")
 
         self._keypoint_structure: dict[str, list] = self._extract_keypoint_structure_from_dm_dataset(
             dm_categories=dm_categories,
@@ -212,6 +214,7 @@ class DatumaroProjectParser(ProjectParser):
         :param include_all_labels: if True, ignore selected_labels then include all possible labels for each task_type
         :return: A dictionary storing label_meta with label_name as key
         """
+        logger.warning("Inside _extract_labels_metadata_from_dm_dataset")
         (
             label_groups,
             label_name_to_parent,
