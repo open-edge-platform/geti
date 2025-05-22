@@ -2,7 +2,7 @@
 name = "geti-fastapi-tools"
 version = "1.0.0"
 description = "FastAPI-related utilities for Intel Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 dependencies = [
     "fastapi~=0.115",
     "PyJWT~=2.10",
