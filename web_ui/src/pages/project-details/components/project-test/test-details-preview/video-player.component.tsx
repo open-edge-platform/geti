@@ -3,14 +3,13 @@
 
 import { useEffect } from 'react';
 
-import { ButtonGroup, Flex, View } from '@geti/ui';
+import { ActionButton, ButtonGroup, Flex, View } from '@geti/ui';
 import { StepBackward, StepForward } from '@geti/ui/icons';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
 import { TestMediaItem } from '../../../../../core/tests/test-media.interface';
 import { usePrevious } from '../../../../../hooks/use-previous/use-previous.hook';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useConstructVideoFrame } from '../../../../annotator/components/video-player/hooks/use-construct-video-frame.hook';
 import { VideoPlayerSlider } from '../../../../annotator/components/video-player/video-player-slider/video-player-slider.component';
 import { useVideoControls } from './video-controls.hook';
@@ -64,22 +63,24 @@ export function VideoPlayer({
         >
             <Flex width='100%' gap='size-100' alignContent={'center'} alignItems='center'>
                 <ButtonGroup aria-label='Video controls'>
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         onPress={videoControls.previous}
                         aria-label='Go to previous frame'
                         isDisabled={!videoControls.canSelectPrevious}
                         id='video-player-go-to-previous-frame'
                     >
                         <StepBackward />
-                    </QuietActionButton>
-                    <QuietActionButton
+                    </ActionButton>
+                    <ActionButton
+                        isQuiet
                         onPress={videoControls.next}
                         aria-label='Go to next frame'
                         isDisabled={!videoControls.canSelectNext}
                         id='video-player-go-to-next-frame'
                     >
                         <StepForward />
-                    </QuietActionButton>
+                    </ActionButton>
                 </ButtonGroup>
 
                 <View flexGrow={1}>

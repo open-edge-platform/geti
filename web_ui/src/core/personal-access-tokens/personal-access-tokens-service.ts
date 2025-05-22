@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { instance as defaultAxiosInstance } from '../services/axios-instance';
+import { apiClient } from '@geti/core';
+
 import { CreateApiService } from '../services/create-api-service.interface';
 import { API_URLS } from '../services/urls';
 import {
@@ -16,7 +17,7 @@ import {
 } from './personal-access-tokens.interface';
 
 export const createApiPersonalAccessTokensService: CreateApiService<PersonalAccessTokensService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const createPersonalAccessToken = async (props: CreatePersonalAccessTokenPayload): Promise<PersonalAccessToken> => {
         const { data } = await instance.post<PersonalAccessToken>(

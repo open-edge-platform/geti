@@ -61,6 +61,7 @@ volumeSecurityContext:
 podAnnotations:
   proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
 mountPath: "/binary_data"
+diskSizeMountPath: "/disk_size"
 audit_logs_mount_path: "audit_logs"
 
 global:

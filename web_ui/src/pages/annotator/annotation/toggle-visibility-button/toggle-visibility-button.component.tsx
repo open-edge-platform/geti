@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
 import { Invisible, Visible } from '@geti/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorHotkeys } from '../../hooks/use-hotkeys-configuration.hook';
 import { HOTKEY_OPTIONS } from '../../hot-keys/utils';
@@ -40,7 +40,8 @@ export const ToggleVisibilityButton = ({
     useHotkeys(hotkeys.hideAllAnnotations, onPress, { ...HOTKEY_OPTIONS, enabled: !isDisabled }, [onPress]);
 
     return (
-        <QuietActionButton
+        <ActionButton
+            isQuiet
             onPress={onPress}
             aria-pressed={isHidden}
             isDisabled={isDisabled}
@@ -59,6 +60,6 @@ export const ToggleVisibilityButton = ({
                     className={colorMode === TOGGLE_VISIBILITY_COLOR_MODE.ALWAYS_GRAYED_OUT ? classes.hiddenColor : ''}
                 />
             )}
-        </QuietActionButton>
+        </ActionButton>
     );
 };

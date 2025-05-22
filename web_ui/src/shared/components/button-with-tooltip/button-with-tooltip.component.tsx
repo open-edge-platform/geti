@@ -3,12 +3,10 @@
 
 import { forwardRef, ReactNode } from 'react';
 
-import { Button, Tooltip, TooltipTrigger, type ButtonProps } from '@geti/ui';
+import { ActionButton, Button, Tooltip, TooltipTrigger, type ButtonProps } from '@geti/ui';
 import { clsx } from 'clsx';
 import { isNil } from 'lodash-es';
 import { Placement } from 'react-aria';
-
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 import classes from './button-with-tooltip.module.scss';
 
@@ -32,13 +30,14 @@ export const ButtonWithSpectrumTooltip = forwardRef((props: ButtonWithSpectrumTo
         ...rest
     } = props;
 
-    const ButtonComponent = isQuiet ? QuietActionButton : Button;
+    const ButtonComponent = isQuiet ? ActionButton : Button;
 
     return (
         <TooltipTrigger placement={tooltipPlacement} isDisabled={isNil(tooltip)}>
             <ButtonComponent
                 ref={ref}
                 variant={variant}
+                isQuiet={isQuiet}
                 UNSAFE_className={clsx(buttonClasses, !isClickable ? classes.tooltipBtn : '')}
                 {...rest}
             >

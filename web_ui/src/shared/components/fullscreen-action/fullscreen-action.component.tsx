@@ -3,14 +3,23 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Heading, Tooltip, TooltipTrigger } from '@geti/ui';
+import {
+    ActionButton,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Heading,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti/ui';
 import { Collapse, Expand } from '@geti/ui/icons';
 import { isString } from 'lodash-es';
 
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { DownloadGraphMenu } from '../download-graph-menu/download-graph-menu.component';
 import { DownloadableData } from '../download-graph-menu/export-csv-utils';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 import classes from './fullscreen-dialog.module.scss';
 
@@ -35,12 +44,13 @@ export const FullscreenAction = ({
     return (
         <DialogTrigger type='fullscreenTakeover'>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     aria-label={`Open in fullscreen ${title}`}
                     id={`${idMatchingFormat(svgTitle)}-open-fullscreen`}
                 >
                     <Expand />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Fullscreen</Tooltip>
             </TooltipTrigger>
 
@@ -66,9 +76,9 @@ export const FullscreenAction = ({
                         {actionButton}
 
                         <TooltipTrigger placement={'bottom'}>
-                            <QuietActionButton onPress={close} aria-label='Close fullscreen'>
+                            <ActionButton isQuiet onPress={close} aria-label='Close fullscreen'>
                                 <Collapse />
-                            </QuietActionButton>
+                            </ActionButton>
                             <Tooltip>Close fullscreen</Tooltip>
                         </TooltipTrigger>
                     </ButtonGroup>

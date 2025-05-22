@@ -44,6 +44,7 @@ volumeSecurityContext:
 
 secret_dir : "/mnt/smtp_server_secret"
 mountPath: "/binary_data"
+diskSizeMountPath: "/disk_size"
 audit_logs_mount_path: "audit_logs"
 
 global:
