@@ -2,6 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import os
+import re
 from collections.abc import Sequence
 
 from pymongo import MongoClient
@@ -17,7 +18,13 @@ def _get_connection_string() -> str:
     """Get the full URI to connect and authenticate with the MongoDB server"""
 
     def get_local_connection_string() -> str:
-        return os.environ.get("DATABASE_ADDRESS", "mongodb://localhost:27017/")
+        database_address = os.environ.get("DATABASE_ADDRESS", "mongodb://localhost:27017/")
+        database_username = "ferret"
+        database_password = "test"
+        if database_username and database_password:
+            add_creds_regex = r"\1" + database_username + ":" + database_password + "@"
+            return re.sub(r"(mongodb://)", add_creds_regex, database_address)
+        return database_address
 
     def get_aws_connection_string() -> str:
         database_address = os.environ.get("DATABASE_ADDRESS", None)
