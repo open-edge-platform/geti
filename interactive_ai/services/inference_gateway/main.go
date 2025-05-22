@@ -94,7 +94,7 @@ func createRouter(maxMultipartLimit int64, modelAccessSrv service.ModelAccessSer
 	videoRepo := minio.NewVideoRepositoryImpl()
 	imageRepo := minio.NewImageRepositoryImpl()
 	frameReader := new(frames.FramerReaderImpl)
-	frameExtractor := new(frames.FFmpegCLIFrameExtractor)
+	frameExtractor := frames.NewFFmpegCLIFrameExtractor()
 	mediaSrv := service.NewMediaServiceImpl(videoRepo, imageRepo, frameReader)
 	predict := usecase.NewPredict(modelAccessSrv, videoRepo, frameExtractor)
 	explain := usecase.NewExplain(modelAccessSrv, videoRepo, frameExtractor)

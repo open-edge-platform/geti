@@ -38,7 +38,7 @@ func BenchmarkExtractFramesCLIPipe(b *testing.B) {
 		b.Skip()
 	}
 	ctx := context.Background()
-	frameExtractor := new(FFmpegCLIFrameExtractor)
+	frameExtractor := NewFFmpegCLIFrameExtractor()
 	video := entities.NewVideo(ctx, VPath)
 	for range b.N {
 		pr, pw := io.Pipe()
