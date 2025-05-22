@@ -60,7 +60,7 @@ dev = [
     # We should upgrade to "docker~=7.1.0" to fix the issue but it is not compatible
     # with the version of Flytekit that we use. In the meantime, we downgrade
     # the "requests" package.
-    "requests==2.31",
+    "requests==2.32.2",
     "types-requests~=2.31",
 
     "asynctest==0.13.0",
@@ -69,7 +69,7 @@ dev = [
     "scikit-learn~=1.6",
     
     # For Datumaro Arrow data format export
-    "pyarrow==15.0.0",
+    "pyarrow==17.0.0",
 
     "workflows-common[evaluation,shard-dataset,datumaro-conversion]"
 ]
