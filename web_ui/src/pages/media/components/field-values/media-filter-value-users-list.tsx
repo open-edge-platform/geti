@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ComboBox, Item } from '@adobe/react-spectrum';
+import { ComboBox, Item } from '@geti/ui';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';

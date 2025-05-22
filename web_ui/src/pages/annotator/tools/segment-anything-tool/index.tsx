@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { SegmentAnythingIcon } from '../../../../assets/icons';
+import { SegmentAnythingIcon } from '@geti/ui/icons';
+
 import RITMImg from '../../../../assets/primary-tools/ritm.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
@@ -27,7 +28,7 @@ export const SegmentAnythingTool: ToolProps = {
     ],
     tooltip: {
         img: RITMImg,
-        url: 'guide/annotations/annotation-tools.html#automatic-segmentation',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#automatic-segmentation-tool',
         title: toolTypeToLabelMapping[ToolType.SegmentAnythingTool],
         description: 'Click on an object to draw a shape around it. Shift-click to subtract or add parts.',
     },

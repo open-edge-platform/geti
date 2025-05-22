@@ -1,13 +1,22 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import {
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogContainer,
+    dimensionValue,
+    Divider,
+    Flex,
+    Heading,
+    Text,
+} from '@geti/ui';
+import { CreditCard } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
 
-import { CreditCard } from '../../../../../assets/icons';
 import { CONTACT_SUPPORT } from '../../../../../core/const';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { openNewTab } from '../../../../../shared/utils';
 import { NotEnoughWarning } from '../not-enough-warning/not-enough-warning.component';
 

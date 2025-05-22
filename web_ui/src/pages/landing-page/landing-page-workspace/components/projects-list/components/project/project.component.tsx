@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Divider, Flex, Text, View } from '@adobe/react-spectrum';
+import { Divider, Flex, Text, View } from '@geti/ui';
 import dayjs from 'dayjs';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -30,7 +30,13 @@ import { ProjectThumbnail } from './project-thumbnail.component';
 import sharedClasses from '../../../../../../../shared/shared.module.scss';
 import classes from './project.module.scss';
 
-export const Project = ({ project }: { project: ProjectProps }): JSX.Element => {
+export const Project = ({
+    project,
+    onSelectItem,
+}: {
+    project: ProjectProps;
+    onSelectItem?: () => void;
+}): JSX.Element => {
     const navigate = useNavigate();
 
     const { id, name, creationDate, thumbnail, tasks, domains, performance } = project;
@@ -156,6 +162,7 @@ export const Project = ({ project }: { project: ProjectProps }): JSX.Element => 
                 <ProjectExportStatus
                     projectId={id}
                     isExporting={isExporting}
+                    onSelectItem={onSelectItem}
                     setIsExporting={setIsExporting}
                     workspaceIdentifier={{ organizationId, workspaceId }}
                     exportProjectMutationIdentifier={{

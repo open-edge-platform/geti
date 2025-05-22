@@ -35,6 +35,7 @@ ingress:
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*):train
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*):optimize
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/supported_algorithms
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/project_configuration
 
 serviceAccount:
   create: true
@@ -60,6 +61,7 @@ volumeSecurityContext:
 podAnnotations:
   proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
 mountPath: "/binary_data"
+diskSizeMountPath: "/disk_size"
 audit_logs_mount_path: "audit_logs"
 
 global:

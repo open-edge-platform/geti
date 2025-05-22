@@ -3,10 +3,8 @@
 
 import { ComponentProps, ReactNode, useState } from 'react';
 
-import { Flex, Header, View } from '@adobe/react-spectrum';
-
-import { ChevronDownLight, ChevronUpLight } from '../../../assets/icons';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
+import { ActionButton, Flex, Header, View } from '@geti/ui';
+import { ChevronDownLight, ChevronUpLight } from '@geti/ui/icons';
 
 import classes from './accordion.module.scss';
 
@@ -53,7 +51,8 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
                     <Flex justifyContent={justifyContentHeader} alignItems='center'>
                         <>{header}</>
                         {hasFoldButton && (
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 isDisabled={isDisabled}
                                 onPress={() => setIsSelected(!isSelected)}
                                 id={`${idPrefix}-fold-unfold-button`}
@@ -61,7 +60,7 @@ export const Accordion = (props: AccordionProps): JSX.Element => {
                                 aria-label={isSelected ? 'Close' : 'Open'}
                             >
                                 {isSelected ? <ChevronUpLight /> : <ChevronDownLight />}
-                            </QuietActionButton>
+                            </ActionButton>
                         )}
                     </Flex>
                 </Header>

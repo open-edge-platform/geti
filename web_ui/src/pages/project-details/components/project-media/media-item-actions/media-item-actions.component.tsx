@@ -3,9 +3,9 @@
 
 import { FC, Key } from 'react';
 
-import { DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton, DialogContainer, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Scope } from '@geti/ui/icons';
 
-import { Scope } from '../../../../../assets/icons';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { MediaIdentifier, MediaItem } from '../../../../../core/media/media.interface';
@@ -13,7 +13,6 @@ import { isVideo, isVideoFrame } from '../../../../../core/media/video.interface
 import { DatasetIdentifier } from '../../../../../core/projects/dataset.interface';
 import { isAnomalyDomain, isClassificationDomain } from '../../../../../core/projects/domains';
 import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { VideoPlayerDialog } from '../../../../annotator/components/range-based-video-player/video-player-dialog.component';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMediaItemQuery } from '../../../../annotator/providers/selected-media-item-provider/use-media-item-query.hook';
@@ -43,9 +42,9 @@ interface QuickAnnotationButtonProps {
 const QuickAnnotationButton: FC<QuickAnnotationButtonProps> = ({ onClick }) => {
     return (
         <TooltipTrigger>
-            <QuietActionButton onPress={onClick} aria-label={'Quick annotation'}>
+            <ActionButton isQuiet onPress={onClick} aria-label={'Quick annotation'}>
                 <Scope />
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>
                 <Text>Quick annotation</Text>
             </Tooltip>

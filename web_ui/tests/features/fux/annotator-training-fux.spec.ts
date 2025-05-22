@@ -11,6 +11,7 @@ import { registerStoreSettings } from '../../utils/api';
 import {
     getFinishedAutoTrainingJob,
     getFinishedTrainingJob,
+    getRunningAutoTrainingJob,
     getScheduledAutoTrainingCostJob,
     getScheduledAutoTrainingJob,
     getScheduledTrainingCostJob,
@@ -60,6 +61,30 @@ test.describe('Check FUX notifications in Annotator related to training', () => 
             await expect(page.getByText('Continue annotating')).toBeVisible();
 
             registerApiResponse('GetJobs', (_, res, ctx) => res(ctx.json(getScheduledAutoTrainingJob())));
+
+            await expect(page.getByText('Continue annotating')).toBeHidden();
+            await expect(page.getByText(autoTrainingNotificationRegex)).toBeVisible();
+        });
+
+        // eslint-disable-next-line max-len
+        test('With a running auto-training job, "Auto-training Notification" should appear and "Continue Annotating" notification should not be shown', async ({
+            page,
+            registerApiResponse,
+        }) => {
+            registerStoreSettings(registerApiResponse, {
+                [FUX_NOTIFICATION_KEYS.ANNOTATOR_CONTINUE_ANNOTATING]: {
+                    isEnabled: true,
+                },
+                [FUX_SETTINGS_KEYS.NEVER_ANNOTATED]: {
+                    value: false,
+                },
+            });
+
+            await goToAnnotatorInActiveMode(page);
+
+            await expect(page.getByText('Continue annotating')).toBeVisible();
+
+            registerApiResponse('GetJobs', (_, res, ctx) => res(ctx.json(getRunningAutoTrainingJob())));
 
             await expect(page.getByText('Continue annotating')).toBeHidden();
             await expect(page.getByText(autoTrainingNotificationRegex)).toBeVisible();

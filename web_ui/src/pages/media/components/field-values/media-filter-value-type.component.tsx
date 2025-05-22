@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Item, Key, Picker, View } from '@adobe/react-spectrum';
+import { Item, Key, Picker, View } from '@geti/ui';
 
 import { SearchRuleValue } from '../../../../core/media/media-filter.interface';
 import { MEDIA_TYPE_OPTIONS } from '../../utils';

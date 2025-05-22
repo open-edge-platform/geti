@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AlertDialog } from '@adobe/react-spectrum';
+import { AlertDialog } from '@geti/ui';
 
 import { ProjectIdentifier } from '../../../../../../../../../core/projects/core.interface';
 import { useClearProjectStorage } from '../../../../../../../../../hooks/use-clear-indexeddb-storage/use-clear-indexeddb-storage.hook';

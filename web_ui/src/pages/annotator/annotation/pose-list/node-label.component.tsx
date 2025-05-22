@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Text, View } from '@geti/ui';
+import { AiIcon } from '@geti/ui/icons';
 import { useNumberFormatter } from 'react-aria';
 
-import { AiIcon } from '../../../../assets/icons';
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { isPrediction } from '../../../../core/labels/utils';

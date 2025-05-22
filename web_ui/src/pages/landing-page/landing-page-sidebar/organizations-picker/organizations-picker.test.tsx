@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ThemeProvider } from '@geti/ui/theme';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
@@ -9,7 +10,6 @@ import { AccountStatus } from '../../../../core/organizations/organizations.inte
 import { createInMemoryOnboardingService } from '../../../../core/users/services/inmemory-onboarding-service';
 import { OrganizationMetadata } from '../../../../core/users/services/onboarding-service.interface';
 import { providersRender } from '../../../../test-utils/required-providers-render';
-import { ThemeProvider } from '../../../../theme/theme-provider.component';
 import { OrganizationsPicker } from './organizations-picker.component';
 
 jest.mock('../../../../core/organizations/hook/use-selected-organization.hook', () => ({

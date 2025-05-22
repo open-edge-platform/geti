@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { useParams } from 'react-router-dom';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
@@ -13,6 +13,7 @@ import { MediaItem } from '../../../../../core/media/media.interface';
 import { DatasetIdentifier } from '../../../../../core/projects/dataset.interface';
 import { TASK_TYPE } from '../../../../../core/projects/dtos/task.interface';
 import { getDomain } from '../../../../../core/projects/project.interface';
+import { SortDirection } from '../../../../../core/shared/query-parameters';
 import { useTests } from '../../../../../core/tests/hooks/use-tests.hook';
 import { TestImageMediaResult } from '../../../../../core/tests/test-image.interface';
 import { TestMediaItem } from '../../../../../core/tests/test-media.interface';
@@ -22,7 +23,6 @@ import { EditAnnotationsButton } from '../../../../../shared/components/media-it
 import { ImagePreviewNavigationControls } from '../../../../../shared/components/media-item-annotations-preview/media-item-annotations-preview-dialog/image-preview-navigation-controls/image-preview-navigation-controls.component';
 import { MediaItemAnnotationsPreviewDialog } from '../../../../../shared/components/media-item-annotations-preview/media-item-annotations-preview-dialog/media-item-annotations-preview-dialog.component';
 import { ViewModes } from '../../../../../shared/components/media-view-modes/utils';
-import { SortDirection } from '../../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
 import { useVisibleAnnotations } from '../../../../../shared/hooks/use-visible-annotations.hook';
 import { hasEqualDomain } from '../../../../../shared/utils';
 import { PreviewCanvasContent } from '../../../../annotator/components/annotator-preview/preview-canvas-content.component';

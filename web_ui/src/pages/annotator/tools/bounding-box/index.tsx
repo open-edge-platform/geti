@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { BoundingBox } from '../../../../assets/icons';
+import { BoundingBox } from '@geti/ui/icons';
+
 import DetectionImg from '../../../../assets/primary-tools/detection.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
@@ -18,7 +19,7 @@ export const BoundingBoxTool: ToolProps = {
     SecondaryToolbar,
     tooltip: {
         img: DetectionImg,
-        url: 'guide/annotations/annotation-tools.html#bounding-box-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#bounding-box-tool',
         title: toolTypeToLabelMapping[ToolType.BoxTool],
         description: `The tool intended for object detection task. A bounding box is a rectangle surrounding
         an object in an image.`,

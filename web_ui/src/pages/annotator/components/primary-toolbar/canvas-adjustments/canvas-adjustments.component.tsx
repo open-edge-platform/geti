@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import {
+    ActionButton,
     Content,
     Dialog,
     DialogTrigger,
@@ -13,10 +14,9 @@ import {
     Text,
     Tooltip,
     TooltipTrigger,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
+import { Adjustments, Close } from '@geti/ui/icons';
 
-import { Adjustments, Close } from '../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useAnnotatorCanvasSettings } from '../../../providers/annotator-canvas-settings-provider/annotator-canvas-settings-provider.component';
 import { AdjustmentsList } from './adjustments-list.component';
 
@@ -38,17 +38,17 @@ export const CanvasAdjustments = (): JSX.Element => {
                     !isOpen && handleSaveConfig();
                 }}
             >
-                <QuietActionButton aria-label={'Canvas adjustments'}>
+                <ActionButton isQuiet aria-label={'Canvas adjustments'}>
                     <Adjustments />
-                </QuietActionButton>
+                </ActionButton>
                 {(close): JSX.Element => (
                     <Dialog height={'36rem'} width={'32rem'} UNSAFE_className={classes.canvasDialog}>
                         <Heading>
                             <Flex justifyContent={'space-between'} alignItems={'center'}>
                                 <Text>Adjustments</Text>
-                                <QuietActionButton onPress={close} aria-label={'Close canvas adjustments'}>
+                                <ActionButton isQuiet onPress={close} aria-label={'Close canvas adjustments'}>
                                     <Close />
-                                </QuietActionButton>
+                                </ActionButton>
                             </Flex>
                         </Heading>
                         <Divider marginY={'size-150'} UNSAFE_className={classes.canvasAdjustmentsDivider} />

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Link, Text, View } from '@adobe/react-spectrum';
+import { Flex, Link, Text, View } from '@geti/ui';
+import { Info } from '@geti/ui/icons';
 
-import { Info } from '../../../../../assets/icons';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { NOTIFICATION_MESSAGE } from '../utils';
 

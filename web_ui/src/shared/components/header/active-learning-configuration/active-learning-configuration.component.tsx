@@ -2,24 +2,24 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import {
+    ActionButton,
     Content,
     Dialog,
     DialogTrigger,
     Divider,
     Flex,
     Heading,
+    LoadingIndicator,
     Tooltip,
     TooltipTrigger,
     View,
-} from '@adobe/react-spectrum';
+} from '@geti/ui';
+import { AutoTraining } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
 
-import { AutoTraining } from '../../../../assets/icons';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../core/projects/task.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
-import { LoadingIndicator } from '../../loading/loading-indicator.component';
-import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActiveLearningConfigurationContent } from './active-learning-configuration-content.component';
 import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
 import { AutoTrainingTask, getAllAutoTrainingValue, getNotificationConfig } from './util';
@@ -84,17 +84,18 @@ export const ActiveLearningConfiguration = ({
     return (
         <DialogTrigger type='popover' hideArrow>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     width={15}
                     isDisabled={isLoading}
                     id={'active-learning-configuration-button'}
                     aria-label={'Active learning configuration'}
-                    colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                    colorVariant={isDarkMode ? 'dark' : 'light'}
                     zIndex={1}
                 >
                     <AutoTraining width={15} aria-label={'tasks in progress'} />
                     {configParameters && <CornerIndicator autoTrainingTasks={filteredAutoTrainingTask} />}
-                </QuietActionButton>
+                </ActionButton>
 
                 <Tooltip>Active learning configuration</Tooltip>
             </TooltipTrigger>

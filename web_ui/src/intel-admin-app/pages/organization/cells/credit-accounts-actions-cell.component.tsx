@@ -3,13 +3,12 @@
 
 import { useState } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { ActionButton, Flex, Text } from '@geti/ui';
+import { Edit, MoreMenu, PieChart } from '@geti/ui/icons';
 
-import { Edit, MoreMenu, PieChart } from '../../../../assets/icons';
 import { CreditAccount } from '../../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
 import { MenuTrigger } from '../../../../shared/components/menu-trigger/menu-trigger.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { CreditAccountFormDialog } from '../dialogs/credit-account-form-dialog.component';
 import { EditCreditAccountBalanceDialog } from '../dialogs/edit-balance-dialog.component';
 
@@ -57,9 +56,9 @@ export const ActionsCell = (props: ActionsCellProps): JSX.Element => {
                 }}
                 renderContent={renderItems}
             >
-                <QuietActionButton>
+                <ActionButton isQuiet>
                     <MoreMenu />
-                </QuietActionButton>
+                </ActionButton>
             </MenuTrigger>
             <CreditAccountFormDialog
                 creditAccount={creditAccount}

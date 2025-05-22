@@ -3,10 +3,11 @@
 
 import { useState } from 'react';
 
+import { Button } from '@geti/ui';
+
 import { isVisualPromptModelGroup } from '../../../../../core/annotations/services/visual-prompt-service';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { hasActiveModels } from '../../../../../core/models/utils';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { TooltipWithDisableButton } from '../../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { NO_MODELS_MESSAGE } from '../../../utils';
 import { RunTestDialog } from './run-test-dialog.component';

@@ -3,11 +3,10 @@
 
 import { useEffect, useMemo } from 'react';
 
-import { Item, Menu, MenuTrigger, Text } from '@adobe/react-spectrum';
+import { ActionButton, Item, Menu, MenuTrigger, Text } from '@geti/ui';
+import { ChevronDownSmall } from '@geti/ui/icons';
 
-import { ChevronDownSmall } from '../../../assets/icons';
 import { SearchRuleField, SearchRuleOperator } from '../../../core/media/media-filter.interface';
-import { ActionButton } from '../../../shared/components/button/button.component';
 import { getKeyConfig, OPERATOR_OPTIONS } from '../utils';
 
 import classes from '../media-filter.module.scss';

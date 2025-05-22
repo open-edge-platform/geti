@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Grid, Item, Picker, repeat, Slider, View } from '@adobe/react-spectrum';
+import { Grid, Item, Picker, repeat, Slider, View } from '@geti/ui';
 import { uniqBy } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -17,10 +17,10 @@ import {
 import { isClassificationDomain, isSegmentationDomain } from '../../../../core/projects/domains';
 import { TASK_TYPE } from '../../../../core/projects/dtos/task.interface';
 import { getDomain } from '../../../../core/projects/project.interface';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';
 import { Test } from '../../../../core/tests/tests.interface';
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { SortDirection } from '../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
 import { hasEqualDomain, hasEqualId } from '../../../../shared/utils';
 import { TaskProvider } from '../../../annotator/providers/task-provider/task-provider.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ConfigurableParametersTaskChain } from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
+import { apiClient } from '@geti/core';
+
 import { ProjectIdentifier } from '../../projects/core.interface';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import {
@@ -12,6 +12,7 @@ import {
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
 import { ProjectConfigurationDTO, ProjectConfigurationUploadPayloadDTO } from '../dtos/configuration.interface';
+import { ConfigurableParametersTaskChain } from './configurable-parameters.interface';
 import {
     ProjectConfiguration,
     TrainingConfiguration,
@@ -70,7 +71,7 @@ export interface CreateApiModelConfigParametersService {
 }
 
 export const createApiModelConfigParametersService: CreateApiService<CreateApiModelConfigParametersService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getModelConfigParameters = async (
         projectIdentifier: ProjectIdentifier,

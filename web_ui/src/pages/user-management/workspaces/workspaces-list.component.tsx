@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Grid, repeat } from '@adobe/react-spectrum';
+import { Grid, repeat } from '@geti/ui';
 
 import { WorkspaceEntity } from '../../../core/workspaces/services/workspaces.interface';
 import { WorkspaceCard } from './workspace-card.component';

@@ -3,14 +3,10 @@
 
 import { useEffect, useState } from 'react';
 
-import { Flex, Link, Text } from '@adobe/react-spectrum';
+import { ActionButton, Flex, Link, Text } from '@geti/ui';
+import { CloseSmall, Info } from '@geti/ui/icons';
 import { createPortal } from 'react-dom';
 
-import { CloseSmall, Info } from '../../../../../assets/icons';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useShouldShowEmptyAnnotationsWarning } from '../../../hooks/use-should-show-empty-annotations-warning.hook';
 import { useTask } from '../../../providers/task-provider/task-provider.component';
 import { NOTIFICATION_MESSAGE } from '../utils';
@@ -53,9 +49,9 @@ export const EmptyAnnotationsNotification = (): JSX.Element => {
                             Go to detection
                         </Link>
                     </Flex>
-                    <QuietActionButton colorMode={ColorMode.LIGHT} onPress={() => setIsVisible(false)}>
+                    <ActionButton isQuiet colorVariant={'light'} onPress={() => setIsVisible(false)}>
                         <CloseSmall />
-                    </QuietActionButton>
+                    </ActionButton>
                 </Flex>
             </Flex>,
 

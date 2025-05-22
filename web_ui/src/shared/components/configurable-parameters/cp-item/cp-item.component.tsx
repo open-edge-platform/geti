@@ -1,13 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { Divider, Flex, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 
-import { Alert } from '../../../../assets/icons';
+import {
+    ConfigParameterItemProp,
+    ConfigurableParametersParams,
+} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
 import { InfoTooltip } from '../../info-tooltip/info-tooltip.component';
-import { PressableElement } from '../../pressable-element/pressable-element.component';
-import { ConfigParameterItemProp, ConfigurableParametersParams } from '../configurable-parameters.interface';
 import { CPEditableItem } from './cp-editable-item/cp-editable-item.component';
 import { CPStaticItem } from './cp-static-item/cp-static-item.component';
 import { ResetButton } from './reset-button/reset-button.component';

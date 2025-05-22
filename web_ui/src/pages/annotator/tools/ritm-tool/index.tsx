@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { MagicWandIcon } from '../../../../assets/icons';
+import { MagicWandIcon } from '@geti/ui/icons';
+
 import RITMImg from '../../../../assets/primary-tools/ritm.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
@@ -25,7 +26,7 @@ export const RITMTool: ToolProps = {
     ],
     tooltip: {
         img: RITMImg,
-        url: 'guide/annotations/annotation-tools.html#interactive-segmentation',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#interactive-segmentation-tool',
         title: toolTypeToLabelMapping[ToolType.RITMTool],
         description: 'Left-click on an object to draw a polygon around it.',
     },

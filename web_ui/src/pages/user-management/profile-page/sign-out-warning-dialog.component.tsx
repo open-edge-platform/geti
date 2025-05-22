@@ -3,7 +3,7 @@
 
 import { ReactElement } from 'react';
 
-import { AlertDialog, DialogTrigger } from '@adobe/react-spectrum';
+import { AlertDialog, DialogTrigger } from '@geti/ui';
 
 interface SignOutWarningDialogProps {
     handleSignOut: () => void;

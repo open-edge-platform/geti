@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
-import { PressableElement } from '../../../../shared/components/pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { OrganizationAdminsCopyText } from './organization-admins-copy-text.component';
 

@@ -3,8 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Heading, Text } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue, Flex, Heading, Text } from '@geti/ui';
 
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';

@@ -210,7 +210,7 @@ spec:
             - name: SPICEDB_SSL_CERTIFICATES_DIR
               value: "/etc/tls-secrets"
             - name: WORKDIR
-              value: {{ .Values.mountPath }}
+              value: {{ .Values.diskSizeMountPath }}
             - name: MODEL_TEMPLATES_DIR
               value: /model_templates
             - name: PLATFORM_VERSION
@@ -341,6 +341,10 @@ spec:
               readOnly: true
             - mountPath: /tmp
               name: temp
+            - name: disk-size
+              mountPath: {{ .Values.diskSizeMountPath }}
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: true
           ports:
             - name: resource
               containerPort: {{ .Values.service.ports.resource.port }}
@@ -358,6 +362,9 @@ spec:
         - name: data-storage
           emptyDir: {}
         {{- end }}
+        - name: disk-size
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim
         - name: config
           configMap:
             name: {{ .Release.Namespace }}-logging-config

@@ -3,11 +3,10 @@
 
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, Grid } from '@adobe/react-spectrum';
-import { Responsive } from '@react-types/shared';
+import { Flex, Grid, type DimensionValue, type Responsive } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { Delete } from '../../../../assets/icons';
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { HoveredProvider } from '../../../../providers/hovered-provider/hovered-provider.component';
 import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';

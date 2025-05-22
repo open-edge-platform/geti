@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Grid, minmax, repeat } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { Flex, Grid, minmax, repeat, Text } from '@geti/ui';
 
 import { TruncatedTextWithTooltip } from '../../truncated-text/truncated-text.component';
 import { convertColorToFadedColor, HexKeysType } from '../utils';

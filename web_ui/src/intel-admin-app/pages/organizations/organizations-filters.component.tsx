@@ -3,11 +3,10 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex, SearchField } from '@geti/ui';
 
 import { GetOrganizationsQueryOptions } from '../../../core/organizations/services/organizations-service.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';
-import { SearchField } from '../../../shared/components/search-field/search-field.component';
 import { EntitiesCounter } from '../../shared/components/entities-counter/entities-counter.component';
 import {
     ALL_ORGANIZATIONS,

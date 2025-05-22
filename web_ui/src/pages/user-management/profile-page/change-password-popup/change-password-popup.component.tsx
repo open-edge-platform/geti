@@ -3,16 +3,23 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogTrigger, Divider, Form } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import {
+    ActionButton,
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Form,
+    Heading,
+    PasswordField,
+} from '@geti/ui';
 import { ValidationError } from 'yup';
 
 import { useChangePassword } from '../../../../core/users/hook/use-users.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { Button } from '../../../../shared/components/button/button.component';
-import { PasswordField } from '../../../../shared/components/password-field/password-field.component';
-import { ColorMode, QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { CONFIRM_PASSWORD_ERROR_MESSAGE, encodeToBase64 } from '../../../../shared/utils';
 import { PasswordState } from '../../users/add-member-popup/add-member-popup.interface';
 import { handlePassword } from '../../users/add-member-popup/utils';
@@ -147,9 +154,9 @@ export const ChangePasswordPopup = ({ userId }: ChangePasswordPopupProps): JSX.E
 
     return (
         <DialogTrigger>
-            <QuietActionButton colorMode={ColorMode.BLUE} alignSelf='self-start' id={'change-password-button'}>
+            <ActionButton isQuiet colorVariant={'blue'} alignSelf='self-start' id={'change-password-button'}>
                 Change password
-            </QuietActionButton>
+            </ActionButton>
             {(close) => (
                 <Dialog UNSAFE_className={classes.popupBox}>
                     <Heading UNSAFE_className={classes.popupTitle}>Change password</Heading>

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Column, Flex, Heading, Row, TableBody, TableHeader, TableView } from '@adobe/react-spectrum';
+import { Column, Flex, Heading, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';

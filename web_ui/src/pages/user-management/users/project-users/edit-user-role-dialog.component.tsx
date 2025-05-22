@@ -3,7 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, Divider, Form, Heading } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
@@ -11,7 +11,6 @@ import { getRoleCreationPayload, getRoleDeletionPayload } from '../../../../core
 import { isOrganizationAdmin, isWorkspaceAdmin } from '../../../../core/users/user-role-utils';
 import { RESOURCE_TYPE, User, USER_ROLE } from '../../../../core/users/users.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
-import { Button } from '../../../../shared/components/button/button.component';
 import { RolePicker } from '../old-project-users/role-picker.component';
 import { UserSummary } from '../workspace-users/actions/user-summary.component';
 

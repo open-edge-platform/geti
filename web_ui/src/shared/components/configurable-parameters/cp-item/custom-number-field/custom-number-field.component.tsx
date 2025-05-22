@@ -3,11 +3,18 @@
 
 import { FocusEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
-import { ActionGroup, DimensionValue, Flex, Item, TextField, useNumberFormatter } from '@adobe/react-spectrum';
-import { Responsive } from '@react-types/shared';
-import { SpectrumTextFieldProps } from '@react-types/textfield';
+import {
+    ActionGroup,
+    Flex,
+    Item,
+    TextField,
+    useNumberFormatter,
+    type DimensionValue,
+    type Responsive,
+    type SpectrumTextFieldProps,
+} from '@geti/ui';
+import { ChevronDownLight, ChevronUpLight } from '@geti/ui/icons';
 
-import { ChevronDownLight, ChevronUpLight } from '../../../../../assets/icons';
 import { useDebouncedCallback } from '../../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { usePrevious } from '../../../../../hooks/use-previous/use-previous.hook';
 import { KeyMap } from '../../../../keyboard-events/keyboard.interface';

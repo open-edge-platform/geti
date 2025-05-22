@@ -3,14 +3,12 @@
 
 import { CSSProperties, ReactChild, ReactElement } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { ActionButton, Divider, Flex, Text } from '@geti/ui';
+import { CloseSmall } from '@geti/ui/icons';
 import clsx from 'clsx';
 import { isEmpty, isString } from 'lodash-es';
 import { useId } from 'react-aria';
 
-import { CloseSmall } from '../../assets/icons';
-import { Divider } from '../../shared/components/divider/divider.component';
-import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { NOTIFICATION_TYPE } from './notification-type.enum';
 import { getIcon, getTypeToastClass } from './utils';
 
@@ -78,7 +76,8 @@ export const CenterNotificationToast = ({
             {hasCloseButton && (
                 <>
                     <Divider orientation='vertical' size='S' UNSAFE_className={classes.notificationToastDivider} />
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         onPress={remove}
                         alignSelf={'center'}
                         aria-label={'close notification'}
@@ -94,7 +93,7 @@ export const CenterNotificationToast = ({
                             aria-label='close notification icon'
                             className={isWarning ? classes['close-notification-icon--warning'] : ''}
                         />
-                    </QuietActionButton>
+                    </ActionButton>
                 </>
             )}
         </div>

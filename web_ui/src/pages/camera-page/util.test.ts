@@ -2,12 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { DOMAIN } from '../../core/projects/core.interface';
-import * as canvasUtils from '../../shared/canvas-utils';
 import { getMockedScreenshot } from '../../test-utils/mocked-items-factory/mocked-camera';
 import { getMockedTask } from '../../test-utils/mocked-items-factory/mocked-tasks';
 import { UserCameraPermission } from '../camera-support/camera.interface';
 import {
-    getFileFromImage,
     getSingleValidTask,
     getSortingHandler,
     hasPermissionsDenied,
@@ -16,21 +14,6 @@ import {
 } from './util';
 
 describe('camera-page utils', () => {
-    it('applies filters and returns a png file', async () => {
-        const spyDrawImageOnCanvas = jest.spyOn(canvasUtils, 'drawImageOnCanvas');
-        const spyGetFileFromCanvas = jest.spyOn(canvasUtils, 'getFileFromCanvas');
-
-        const { file } = await getFileFromImage('image-url');
-
-        expect(file).toBeInstanceOf(File);
-        expect(spyDrawImageOnCanvas).toHaveBeenCalledWith(expect.any(Image));
-        expect(spyGetFileFromCanvas).toHaveBeenCalledWith(
-            expect.any(HTMLCanvasElement),
-            expect.stringContaining('.png'),
-            'image/png'
-        );
-    });
-
     it('hasPermissionsDenied', () => {
         expect(hasPermissionsDenied(UserCameraPermission.ERRORED)).toBe(true);
         expect(hasPermissionsDenied(UserCameraPermission.DENIED)).toBe(true);

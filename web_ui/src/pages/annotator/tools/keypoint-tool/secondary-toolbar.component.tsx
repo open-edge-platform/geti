@@ -1,15 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
+import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Delete, LineMappingLight, Reject } from '@geti/ui/icons';
 
-import { Delete, LineMappingLight, Reject } from '../../../../assets/icons';
 import { isKeypointAnnotation } from '../../../../core/annotations/services/utils';
 import { labelFromUser } from '../../../../core/annotations/utils';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { AcceptButton } from '../../../../shared/components/quiet-button/accept-button.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useVisibleAnnotations } from '../../hooks/use-visible-annotations.hook';
 import { useZoom } from '../../zoom/zoom-provider.component';
 import { ToolAnnotationContextProps } from '../tools.interface';
@@ -69,48 +66,52 @@ export const SecondaryToolbar = ({ annotationToolContext }: ToolAnnotationContex
             <Divider orientation='vertical' size='S' />
 
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     isDisabled={!hasAnnotations || hasCurrentBoundingBox}
                     onPress={handleDeleteAnnotation}
                     aria-label={'delete keypoint annotation'}
                 >
                     <Delete height={20} width={20} />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{`Delete keypoint annotation`}</Tooltip>
             </TooltipTrigger>
 
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     isDisabled={!hasAnnotations || hasCurrentBoundingBox}
                     aria-label={'mirror X-axis'}
                     onPress={() => handleMirrorAnnotation(PointAxis.X)}
                 >
                     <LineMappingLight height={20} width={20} />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Mirror X axis</Tooltip>
             </TooltipTrigger>
 
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     isDisabled={!hasAnnotations || hasCurrentBoundingBox}
                     aria-label={'mirror Y-axis'}
                     onPress={() => handleMirrorAnnotation(PointAxis.Y)}
                 >
                     <LineMappingLight style={{ transform: 'rotate(90deg)' }} height={20} width={20} />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Mirror Y axis</Tooltip>
             </TooltipTrigger>
 
             {hasCurrentBoundingBox && (
                 <>
                     <TooltipTrigger placement={'bottom'}>
-                        <QuietActionButton
+                        <ActionButton
+                            isQuiet
                             aria-label={'reject keypoint annotation'}
                             onPress={handleRejectAnnotation}
                             marginEnd={'size-100'}
                         >
                             <Reject height={20} width={20} />
-                        </QuietActionButton>
+                        </ActionButton>
                         <Tooltip>{`Reject keypoint annotation`}</Tooltip>
                     </TooltipTrigger>
 

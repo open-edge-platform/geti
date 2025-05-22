@@ -1,20 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { Text } from '@react-spectrum/text';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Switch, Text, useMediaQuery } from '@geti/ui';
+import { BoundingBox, BoundingCircle } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
-import { BoundingBox, BoundingCircle } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { Label } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { NumberSliderWithLocalHandler } from '../../../../shared/components/number-slider/number-slider-with-local-handler.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAddUnfinishedShape } from '../../hooks/use-add-unfinished-shape.hook';

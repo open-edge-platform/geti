@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Content, Heading, InlineAlert, Text } from '@adobe/react-spectrum';
+import { Content, Heading, InlineAlert, Text } from '@geti/ui';
 
 import { CustomerSupportLink } from '../../shared/components/customer-support-link/customer-support-link.component';
 

@@ -3,7 +3,7 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
-import { ComboBox, Flex, Item } from '@adobe/react-spectrum';
+import { ComboBox, Flex, Item, TextField } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 
@@ -14,7 +14,6 @@ import {
     DatasetImportTask,
     DatasetImportToNewProjectItem,
 } from '../../../../../core/datasets/dataset.interface';
-import { LimitedTextField } from '../../../../../shared/components/limited-text-field/limited-text-field.component';
 import { ValidationErrorMsg } from '../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { getRandomDistinctColor } from '../../../../create-project/components/distinct-colors';
 import {
@@ -143,7 +142,7 @@ export const DatasetImportToNewProjectDomain = ({
     return (
         <div aria-label='dataset-import-to-new-project-domain'>
             <Flex direction='column'>
-                <LimitedTextField
+                <TextField
                     width='100%'
                     value={projectName}
                     marginBottom={'size-50'}

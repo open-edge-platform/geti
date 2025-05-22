@@ -1,9 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Provider } from '@adobe/react-spectrum';
-
-import { Button } from '../button/button.component';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Provider } from '@geti/ui';
 
 interface CustomAlertDialogProps {
     open: boolean;

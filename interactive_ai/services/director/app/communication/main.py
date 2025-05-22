@@ -24,6 +24,7 @@ from communication.endpoints.configuration_endpoints import configuration_router
 from communication.endpoints.model_tests_endpoints import model_test_router
 from communication.endpoints.optimization_endpoints import optimization_router
 from communication.endpoints.prediction_endpoints import prediction_router
+from communication.endpoints.project_configuration_endpoints import project_configuration_router
 from communication.endpoints.status_endpoints import status_router
 from communication.endpoints.supported_algorithms_endpoints import supported_algorithms_router
 from communication.endpoints.training_endpoints import training_router
@@ -34,6 +35,7 @@ from coordination.dataset_manager.kafka_handler import (
     DatasetManagementMediaAndAnnotationKafkaHandler,
     DatasetManagementProjectEventsKafkaHandler,
 )
+from environment import get_gpu_provider
 from usecases.auto_train.kafka_handler import AutoTrainingKafkaHandler
 
 from geti_fastapi_tools.exceptions import GetiBaseException
@@ -43,14 +45,25 @@ from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry, KafkaTelemetr
 from iai_core.algorithms import ModelTemplateList
 
 
+def init_model_template_list() -> None:
+    """
+    Initializes the model template list to speed up project creation and obtaining model storages from DB.
+    When called the first time, ModelTemplateList loads all model templates from disk taking several seconds.
+    """
+    mtl = ModelTemplateList()
+    # Workaround (ITEP-67586): change some model defaults for Intel GPU
+    if get_gpu_provider() == "intel":
+        mtl._model_template_list["Custom_Object_Detection_YOLOX"].model_template.is_default_for_task = True
+        mtl._model_template_list["Custom_Object_Detection_Gen3_ATSS"].model_template.is_default_for_task = False
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # type: ignore # noqa: ANN201
     """
     Defines startup and shutdown of the fastAPI app
     """
-    # Initialize the model template list to speed up project creation and obtaining model storages from DB.
-    # When called the first time, ModelTemplateList loads all model templates from disk taking several seconds.
-    ModelTemplateList()
+    init_model_template_list()
+
     if ENABLE_TRACING:
         KafkaTelemetry.instrument()
     app.state.kafka_handlers = []
@@ -85,6 +98,7 @@ app.include_router(prediction_router)
 app.include_router(status_router)
 app.include_router(training_router)
 app.include_router(supported_algorithms_router)
+app.include_router(project_configuration_router)
 
 base_dir = os.path.dirname(__file__) + "/../../../api/schemas/"
 mongo_id_schema = RestApiValidator().load_schema_file_as_dict(base_dir + "mongo_id.yaml")

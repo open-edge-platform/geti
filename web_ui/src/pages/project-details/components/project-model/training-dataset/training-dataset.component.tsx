@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, Loading, View } from '@geti/ui';
 import { useNumberFormatter } from 'react-aria';
 
 import { useTrainingDatasetRevisionData } from '../../../../../core/datasets/hooks/use-training-dataset.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
-import { Loading } from '../../../../../shared/components/loading/loading.component';
 import { SubsetBucket } from './subset-bucket/subset-bucket.component';
 import { TrainingDatasetProps } from './training-dataset.interface';
 import { Subset } from './utils';

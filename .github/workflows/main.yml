@@ -108,7 +108,6 @@ jobs:
     needs: get-vars
     permissions:
       contents: read
-    secrets: inherit
     uses: ./.github/workflows/libs_test.yml
     if: ${{ !contains(needs.get-vars.outputs.libs-list, '[]') }}
     strategy:
@@ -124,7 +123,10 @@ jobs:
     permissions:
       contents: read
       id-token: write # is required by nested component-check
-    secrets: inherit
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REGISTRY: ${{ secrets.REGISTRY }}
     uses: ./.github/workflows/component.yml
     if: ${{ !contains(needs.get-vars.outputs.filtered-components-list, '[]') }}
     strategy:
@@ -143,7 +145,10 @@ jobs:
     permissions:
       contents: read
       id-token: write # is required by nested component-check
-    secrets: inherit
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REGISTRY: ${{ secrets.REGISTRY }}
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:

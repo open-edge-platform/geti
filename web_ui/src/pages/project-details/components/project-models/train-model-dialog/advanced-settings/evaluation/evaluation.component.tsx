@@ -3,13 +3,13 @@
 
 import { FC, useState } from 'react';
 
-import { Grid, Item, minmax, Picker, Text, View } from '@adobe/react-spectrum';
+import { Grid, Item, minmax, Picker, Text, View } from '@geti/ui';
 import { noop } from 'lodash-es';
 
 import {
     ConfigurableParametersParams,
     NumberGroupParams,
-} from '../../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+} from '../../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { Accordion } from '../ui/accordion/accordion.component';
 import { NumberParameter } from '../ui/number-parameter.component';
 import { ResetButton } from '../ui/reset-button.component';

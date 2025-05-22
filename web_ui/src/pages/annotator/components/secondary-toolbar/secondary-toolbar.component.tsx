@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Flex, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
-import { dimensionValue, useMediaQuery } from '@react-spectrum/utils';
+import { ButtonGroup, dimensionValue, Flex, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isEmpty, negate, noop } from 'lodash-es';
 import { useSearchParams } from 'react-router-dom';
@@ -12,7 +12,6 @@ import { MEDIA_ANNOTATION_STATUS } from '../../../../core/media/base.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isClassificationDomain } from '../../../../core/projects/domains';
 import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { AnnotationToolContext, ANNOTATOR_MODE } from '../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';

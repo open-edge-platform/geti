@@ -5,12 +5,13 @@ import '@testing-library/jest-dom';
 import 'core-js';
 import 'jest-canvas-mock';
 
-import { ComponentType, PropsWithChildren, ReactNode } from 'react';
+import { ReactNode } from 'react';
+
+import { isLargeSizeQuery as mockIsLargeSizeQuery } from '@geti/ui/theme';
 
 import { initializeMetrics } from './analytics/metrics';
 import { API_URLS } from './core/services/urls';
 import * as CanvasUtils from './shared/canvas-utils';
-import { isLargeSizeQuery as mockIsLargeSizeQuery } from './theme/queries';
 
 window.ResizeObserver = class ResizeObserver {
     observe() {
@@ -55,10 +56,6 @@ HTMLMediaElement.prototype.pause = async () => {
 jest.spyOn(window.HTMLElement.prototype, 'clientWidth', 'get').mockImplementation(() => 1000);
 jest.spyOn(window.HTMLElement.prototype, 'clientHeight', 'get').mockImplementation(() => 1000);
 
-jest.mock('screenfull', () => ({
-    onchange: jest.fn(),
-}));
-
 // We need to specifically mock this util because it uses `import.meta.url` which is not supported by jest.
 // More info at https://github.com/facebook/jest/issues/12183
 jest.mock('./hooks/use-load-ai-webworker/utils', () => ({ getWorker: jest.fn() }));
@@ -87,29 +84,15 @@ jest.mock('recharts', () => {
 
 jest.mock('@opentelemetry/core/build/src/platform/node/timer-util.js', () => ({ unrefTimer: jest.fn() }));
 
-jest.mock('react-virtuoso', () => {
-    const { VirtuosoGrid, Virtuoso, ...rest } = jest.requireActual('react-virtuoso');
-    const { forwardRef } = jest.requireActual('react');
-
-    const mockVirtuoso = <T extends { totalCount?: number; data?: never[] }>(
-        WrappedVirtuoso: ComponentType<PropsWithChildren<T>>
-    ) =>
-        forwardRef((props: T, ref: null) => {
-            return (
-                <WrappedVirtuoso initialItemCount={props?.totalCount ?? props.data?.length ?? 1} ref={ref} {...props} />
-            );
-        });
-    return { VirtuosoGrid: mockVirtuoso(VirtuosoGrid), Virtuoso: mockVirtuoso(Virtuoso), ...rest };
-});
-
 jest.mock('react-aria-components', () => {
     const { Virtualizer, ...rest } = jest.requireActual('react-aria-components');
     const { forwardRef } = jest.requireActual('react');
 
     const mockVirtualizer = () =>
         forwardRef((props: Record<string, unknown>, ref: unknown) => {
+            const layoutOptions = props.layoutOptions ?? {};
             // "rowHeight" is necessary for testing purposes, or the container will render empty
-            return <Virtualizer layoutOptions={{ rowHeight: 50 }} {...props} ref={ref} />;
+            return <Virtualizer {...props} layoutOptions={{ ...layoutOptions, rowHeight: 50 }} ref={ref} />;
         });
 
     return { Virtualizer: mockVirtualizer(), ...rest };

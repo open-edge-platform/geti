@@ -3,7 +3,7 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
-import { Flex, Item, Picker, Text } from '@adobe/react-spectrum';
+import { Flex, Item, Picker, Text } from '@geti/ui';
 import { capitalize, isEmpty } from 'lodash-es';
 
 import { useModels } from '../../../../core/models/hooks/use-models.hook';

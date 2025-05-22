@@ -3,7 +3,8 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { Delete, Edit, Invisible, Lock, Stamp, Unlock } from '../../../../assets/icons';
+import { Delete, Edit, Invisible, Lock, Stamp, Unlock } from '@geti/ui/icons';
+
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { Point } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';

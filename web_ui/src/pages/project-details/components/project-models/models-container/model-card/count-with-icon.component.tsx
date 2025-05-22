@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../../test-utils/id-utils';
 

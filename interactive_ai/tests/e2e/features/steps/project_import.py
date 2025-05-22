@@ -52,7 +52,6 @@ def _resolve_project_to_import(
     if not local_project_archive_path.exists():
         remote_relative_path = Path(f"projects/{project_archive_name}")
         try:
-            logger.info(f"Downloading project archive file from remote archive: {remote_relative_path}")
             download_file_from_remote_archive(
                 remote_file_path=remote_relative_path,
                 local_file_path=local_project_archive_path,

@@ -3,13 +3,13 @@
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
+import { BooleanGroupParams } from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { createInMemoryJobsService } from '../../../../core/jobs/services/in-memory-jobs-service';
 import { JobsResponse } from '../../../../core/jobs/services/jobs-service.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../core/projects/hooks/use-project-status.hook';
 import { Performance, PerformanceType, Task } from '../../../../core/projects/task.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
-import { BooleanGroupParams } from '../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { useAutoTrainingTasksConfig } from '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedProjectIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';

@@ -3,8 +3,7 @@
 
 import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Flex, Form } from '@adobe/react-spectrum';
-import { TextFieldRef } from '@react-types/textfield';
+import { Button, Flex, Form, TextField, TextFieldRef } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import {
@@ -16,7 +15,6 @@ import {
 import { getFlattenedLabels } from '../../../../../../core/labels/utils';
 import { DOMAIN } from '../../../../../../core/projects/core.interface';
 import { TaskMetadata } from '../../../../../../core/projects/task.interface';
-import { Button } from '../../../../../../shared/components/button/button.component';
 import { LabelEditionFieldsWrapper } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/label-edition-mode/label-edition-fields-wrapper.component';
 import { HotkeyNameField } from '../../../../../../shared/components/label-tree-view/label-tree-view-item/label-presentation-mode/hotkey-name-field/hotkey-name-field.component';
 import {
@@ -31,7 +29,6 @@ import {
     getGroupBasedOnRelationType,
     getNextColor,
 } from '../../../../../../shared/components/label-tree-view/utils';
-import { LimitedTextField } from '../../../../../../shared/components/limited-text-field/limited-text-field.component';
 import { ValidationErrorMsg } from '../../../../../../shared/components/validation-error-msg/validation-error-msg.component';
 import { isYupValidationError } from '../../../../../user-management/profile-page/utils';
 import { useUsedAnnotatorHotkeys } from '../../../use-used-annotator-hotkeys.hook';
@@ -258,7 +255,8 @@ export const LabelTreeLabel = forwardRef(
                             inheritHeight
                         />
 
-                        <LimitedTextField
+                        <TextField
+                            maxLength={100}
                             ref={inputRef}
                             width={'100%'}
                             value={newName}

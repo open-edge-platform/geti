@@ -1,11 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@react-spectrum/view';
+import { View } from '@geti/ui';
 
+import {
+    ConfigurableParametersProps,
+    ConfigurableParametersType,
+} from '../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
 import { TabItem } from '../tabs/tabs.interface';
-import { ConfigurableParametersProps, ConfigurableParametersType } from './configurable-parameters.interface';
 import { CPGroupsList } from './cp-groups-list/cp-groups-list.component';
 import { CPParamsList } from './cp-list/cp-list.component';
 import { SelectableCustomizedTabs } from './selectable-customized-tabs/selectable-customized-tabs.component';

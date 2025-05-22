@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ChevronLeft, ChevronRight } from '../../../../../../assets/icons';
-import { ActionButton } from '../../../../button/button.component';
+import { ActionButton } from '@geti/ui';
+import { ChevronLeft, ChevronRight } from '@geti/ui/icons';
 
 import classes from './image-preview-control.module.scss';
 

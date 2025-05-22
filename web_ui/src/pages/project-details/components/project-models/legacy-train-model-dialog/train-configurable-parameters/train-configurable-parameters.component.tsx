@@ -3,17 +3,17 @@
 
 import { Dispatch, SetStateAction, useEffect } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { Flex, View } from '@geti/ui';
 
 import { useConfigParameters } from '../../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
-import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
-import { ConfigParamsPlaceholder } from '../../../../../../shared/components/configurable-parameters/config-params-placeholder/config-params-placeholder.component';
-import { ConfigurableParameters } from '../../../../../../shared/components/configurable-parameters/configurable-parameters.component';
 import {
     ConfigurableParametersSingle,
     ConfigurableParametersTaskChain,
     ConfigurableParametersType,
-} from '../../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
+} from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
+import { ConfigParamsPlaceholder } from '../../../../../../shared/components/configurable-parameters/config-params-placeholder/config-params-placeholder.component';
+import { ConfigurableParameters } from '../../../../../../shared/components/configurable-parameters/configurable-parameters.component';
 import { SliderAnimation } from '../../../../../../shared/components/slider-animation/slider-animation.component';
 import { TrainModelSettingsItem } from '../train-model-settings-item/train-model-settings-item.component';
 import { RESHUFFLE_SUBSETS_TOOLTIP_MSG, TRAIN_FROM_SCRATCH_TOOLTIP_MSG } from '../utils';

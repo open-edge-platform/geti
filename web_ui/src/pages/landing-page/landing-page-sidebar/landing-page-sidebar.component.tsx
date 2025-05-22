@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Link as SpectrumLink, View } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Link as SpectrumLink, useMediaQuery, View } from '@geti/ui';
+import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { Link } from 'react-router-dom';
 
-import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '../../../assets/icons';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
@@ -14,7 +14,6 @@ import { MenuOption } from '../../../shared/components/menu-option.interface';
 import { ShowForOnPrem } from '../../../shared/components/show-for-onprem/show-for-onprem.component';
 import { SidebarMenu } from '../../../shared/components/sidebar-menu/sidebar-menu.component';
 import { idMatchingFormat } from '../../../test-utils/id-utils';
-import { isLargeSizeQuery } from '../../../theme/queries';
 import { OrganizationsPicker } from './organizations-picker/organizations-picker.component';
 import { StorageUsage } from './storage-usage/storage-usage.component';
 

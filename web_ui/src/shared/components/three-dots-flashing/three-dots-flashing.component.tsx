@@ -1,56 +1,65 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { CSSProperties } from 'react';
-
-import clsx from 'clsx';
-
-import { ColorMode } from '../quiet-button/quiet-action-button.component';
-
-import classes from './three-dots-flashing.component.module.scss';
+import { motion, Variants } from 'framer-motion';
 
 type Sizes = 'S' | 'M';
+type ColorVariant = 'dark' | 'light' | 'blue';
 
 interface ThreeDotsFlashingProps {
-    mode?: ColorMode;
+    variant?: ColorVariant;
     size?: Sizes;
     className?: string;
 }
 
-export const ThreeDotsFlashing = ({
-    mode = ColorMode.DARK,
-    size = 'M',
-    className,
-}: ThreeDotsFlashingProps): JSX.Element => {
-    const colors: Record<ColorMode, CSSProperties> = {
-        [ColorMode.DARK]: {
-            '--bgColorStartAnimation': 'var(--spectrum-global-color-gray-800)',
-            '--bgColorEndAnimation': 'var(--white-down)',
-        } as CSSProperties,
-        [ColorMode.LIGHT]: {
-            '--bgColorStartAnimation': 'var(--spectrum-global-color-gray-50)',
-            '--bgColorEndAnimation': 'var(--dark-down)',
-        } as CSSProperties,
-        [ColorMode.BLUE]: {
-            '--bgColorStartAnimation': 'var(--spectrum-global-color-gray-800)',
-            '--bgColorEndAnimation': 'var(--white-down)',
-        } as CSSProperties,
-    };
+const DOT_COLORS: Record<ColorVariant, string> = {
+    dark: 'var(--spectrum-global-color-gray-800)',
+    light: 'var(--spectrum-global-color-gray-50)',
+    blue: 'var(--spectrum-global-color-gray-800)',
+};
 
-    const sizes: Record<Sizes, CSSProperties> = {
-        S: {
-            '--dotSize': 'var(--spectrum-global-dimension-size-25)',
-        } as CSSProperties,
-        M: {
-            '--dotSize': 'var(--spectrum-global-dimension-size-50)',
-        } as CSSProperties,
+const DOT_SIZES: Record<Sizes, string> = {
+    S: 'var(--spectrum-global-dimension-size-25)',
+    M: 'var(--spectrum-global-dimension-size-50)',
+};
+
+export const ThreeDotsFlashing = ({ variant = 'dark', size = 'M', className }: ThreeDotsFlashingProps): JSX.Element => {
+    const dotColor = DOT_COLORS[variant];
+    const dotSize = DOT_SIZES[size];
+
+    const dotVariants: Variants = {
+        pulse: (i: number) => ({
+            scale: [1, 1.4, 1],
+            transition: {
+                duration: 1.1,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: i * 0.2,
+            },
+        }),
     };
 
     return (
         <div
-            style={{ ...colors[mode], ...sizes[size] }}
-            className={clsx(classes.flashingAnimation, className)}
-            aria-label={'three dots flashing animation'}
-        ></div>
+            style={{ display: 'flex', gap: dotSize, alignItems: 'center', justifyContent: 'center' }}
+            aria-label='three dots flashing animation'
+            className={className}
+        >
+            {[0, 1, 2].map((i) => (
+                <motion.div
+                    key={i}
+                    custom={i}
+                    variants={dotVariants}
+                    animate='pulse'
+                    style={{
+                        width: dotSize,
+                        height: dotSize,
+                        borderRadius: '50%',
+                        background: dotColor,
+                        willChange: 'transform',
+                    }}
+                />
+            ))}
+        </div>
     );
 };

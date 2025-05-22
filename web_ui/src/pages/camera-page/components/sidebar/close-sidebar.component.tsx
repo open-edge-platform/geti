@@ -3,13 +3,10 @@
 
 import { useRef } from 'react';
 
-import { Heading, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ActionButton, CustomPopover, Divider, Heading, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Adjustments } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import { Adjustments } from '../../../../assets/icons';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { DeviceSettings } from './device-settings.component';
 import { SidebarThumbnail } from './sidebar-thumbnail.component';
@@ -48,7 +45,8 @@ export const CloseSidebar = ({ screenshots, isLivePrediction }: CloseSidebarProp
             <Divider size={'S'} marginTop={'size-250'} />
 
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     ref={triggerRef}
                     marginX={'auto'}
                     marginTop={'size-150'}
@@ -56,7 +54,7 @@ export const CloseSidebar = ({ screenshots, isLivePrediction }: CloseSidebarProp
                     onPress={settingsPopoverState.toggle}
                 >
                     <Adjustments />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Settings</Tooltip>
             </TooltipTrigger>
 

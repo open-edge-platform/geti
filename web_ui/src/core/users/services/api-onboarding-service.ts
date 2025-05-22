@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { apiClient } from '@geti/core';
 import { isAxiosError } from 'axios';
 
 import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { is404Error } from '../../services/utils';
@@ -27,7 +27,7 @@ interface ProfileDTO {
 }
 
 export const createApiOnboardingService: CreateApiService<OnboardingService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getActiveUserProfile: OnboardingService['getActiveUserProfile'] = async () => {
         try {

@@ -3,7 +3,7 @@
 
 import { CSSProperties } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { View } from '@geti/ui';
 import { identity } from 'lodash-es';
 
 import { Layers } from '../../../../annotator/annotation/layers/layers.component';

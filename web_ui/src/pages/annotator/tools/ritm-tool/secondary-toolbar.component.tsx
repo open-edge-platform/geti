@@ -1,16 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Divider, Flex, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery } from '@geti/ui';
+import { RightClick } from '@geti/ui/icons';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isNil } from 'lodash-es';
 
-import { RightClick } from '../../../../assets/icons';
 import { Shape } from '../../../../core/annotations/shapes.interface';
 import { Label } from '../../../../core/labels/label.interface';
-import { Divider } from '../../../../shared/components/divider/divider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolSettings, ToolType } from '../../core/annotation-tool-context.interface';
 import { useAddUnfinishedShape } from '../../hooks/use-add-unfinished-shape.hook';

@@ -3,7 +3,7 @@
 
 import { memo, useMemo } from 'react';
 
-import { Divider, View } from '@adobe/react-spectrum';
+import { Divider, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ModelGroupsAlgorithmDetails } from '../../../../core/models/models.interface';

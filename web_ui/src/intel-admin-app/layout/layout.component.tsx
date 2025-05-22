@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Grid } from '@adobe/react-spectrum';
+import { Grid } from '@geti/ui';
 import { Outlet } from 'react-router-dom';
 
 import { Header } from './header.component';

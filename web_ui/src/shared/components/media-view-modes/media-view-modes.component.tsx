@@ -3,10 +3,10 @@
 
 import { Dispatch, Key, SetStateAction } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
+import { Grid, GridMedium, GridSmall, List } from '@geti/ui/icons';
 import { capitalize } from 'lodash-es';
 
-import { Grid, GridMedium, GridSmall, List } from '../../../assets/icons';
 import { MenuTriggerButton } from '../menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { VIEW_MODE_LABEL, ViewModes } from './utils';
 

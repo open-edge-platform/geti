@@ -3,9 +3,7 @@
 
 import { Key, useRef } from 'react';
 
-import { Flex, Grid, Text } from '@adobe/react-spectrum';
-import { useUnwrapDOMRef } from '@react-spectrum/utils';
-import { FocusableRefValue } from '@react-types/shared';
+import { Button, Flex, Grid, Text, useUnwrapDOMRef, type FocusableRefValue } from '@geti/ui';
 import Import from '@spectrum-icons/workflow/Import';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +16,6 @@ import { SignOutWarningDialog } from '../../../../../pages/user-management/profi
 import { UserPhotoPresentation } from '../../../../../pages/user-management/profile-page/user-photo-container/user-photo-presentation.component';
 import { getFullNameFromUser } from '../../../../../pages/user-management/users/users-table/utils';
 import { useMediaUpload } from '../../../../../providers/media-upload-provider/media-upload-provider.component';
-import { Button } from '../../../button/button.component';
 import { HeaderSubmenu } from '../header-submenu/header-submenu.component';
 
 import classes from '../header-actions.module.scss';

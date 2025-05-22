@@ -3,8 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Flex, Switch, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { TextFieldRef } from '@react-types/textfield';
+import { Flex, PressableElement, Switch, Text, TextField, TextFieldRef, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 
@@ -13,8 +12,6 @@ import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { newLabelNameSchema } from '../../../../../pages/create-project/components/utils';
 import { isYupValidationError } from '../../../../../pages/user-management/profile-page/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
-import { LimitedTextField } from '../../../limited-text-field/limited-text-field.component';
-import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { ValidationErrorMsg } from '../../../validation-error-msg/validation-error-msg.component';
 import { getEditedItem } from '../../utils';
 import { ItemEditionState } from '../item-edition-state/item-edition-state.component';
@@ -118,7 +115,8 @@ export const GroupEditionMode = ({
                 <Flex gap={'size-100'} width={'100%'} alignItems={'center'}>
                     <Flex width={'100%'}>
                         <TooltipTrigger placement={'top'}>
-                            <LimitedTextField
+                            <TextField
+                                maxLength={100}
                                 ref={inputRef}
                                 value={group?.name}
                                 width={'100%'}

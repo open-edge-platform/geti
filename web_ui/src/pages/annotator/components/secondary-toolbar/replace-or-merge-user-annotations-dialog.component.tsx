@@ -1,10 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Content, Dialog, Divider, Text } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import { Button, ButtonGroup, Content, Dialog, Divider, Heading, Text } from '@geti/ui';
 
-import { Button } from '../../../../shared/components/button/button.component';
 import { usePrediction } from '../../providers/prediction-provider/prediction-provider.component';
 
 interface ReplaceOrMergeUserAnnotationsDialogProps {

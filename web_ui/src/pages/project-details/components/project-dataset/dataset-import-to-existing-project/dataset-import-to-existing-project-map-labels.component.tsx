@@ -3,14 +3,13 @@
 
 import { useMemo } from 'react';
 
-import { Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@adobe/react-spectrum';
+import { ActionButton, Flex, Text, TextField, Tooltip, TooltipTrigger, View, VisuallyHidden } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 import { isEmpty, omitBy, sortBy } from 'lodash-es';
 
-import { Close } from '../../../../../assets/icons';
 import { DatasetImportToExistingProjectItem } from '../../../../../core/datasets/dataset.interface';
 import { Label } from '../../../../../core/labels/label.interface';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { hasEqualId, runWhenTruthy } from '../../../../../shared/utils';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { LabelSearch } from '../../../../annotator/components/labels/label-search/label-search.component';
@@ -86,12 +85,13 @@ const DatasetImportToExistingProjectMapLabel = ({
                     </View>
                     {selectedLabel && (
                         <TooltipTrigger placement='right'>
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 aria-label='clear-mapping-button'
                                 onPress={() => onMappingClear(mappingLabelName)}
                             >
                                 <Close width='16px' height='16px' />
-                            </QuietActionButton>
+                            </ActionButton>
                             <Tooltip>Clear mapping</Tooltip>
                         </TooltipTrigger>
                     )}

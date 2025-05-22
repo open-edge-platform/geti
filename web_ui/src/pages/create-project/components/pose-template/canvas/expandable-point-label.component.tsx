@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, Text } from '@geti/ui';
+import { AiIcon } from '@geti/ui/icons';
 import clsx from 'clsx';
 import { useHover, useNumberFormatter } from 'react-aria';
 
-import { AiIcon } from '../../../../../assets/icons';
 import { AnnotationLabel } from '../../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
 import { isPrediction } from '../../../../../core/labels/utils';

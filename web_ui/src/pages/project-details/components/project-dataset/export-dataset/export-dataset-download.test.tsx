@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { defaultTheme, Provider } from '@adobe/react-spectrum';
+import { defaultTheme, Provider } from '@geti/ui';
 import { fireEvent, RenderResult, screen } from '@testing-library/react';
 
 import { ExportDatasetLSData, ExportFormats } from '../../../../../core/projects/dataset.interface';

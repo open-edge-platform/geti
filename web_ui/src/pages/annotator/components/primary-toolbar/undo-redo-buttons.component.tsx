@@ -1,11 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
-import { Flex } from '@react-spectrum/layout';
+import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Redo, Undo } from '@geti/ui/icons';
 
-import { Redo, Undo } from '../../../../assets/icons';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useUndoRedoKeyboardShortcuts } from '../../hot-keys/use-undo-redo-keyboard-shortcuts/use-undo-redo-keyboard-shortcuts';
 import { useUndoRedo } from '../../tools/undo-redo/undo-redo-provider.component';
 
@@ -25,7 +23,8 @@ export const UndoRedoButtons = ({ isDisabled }: { isDisabled: boolean }): JSX.El
             data-testid='undo-redo-tools'
         >
             <TooltipTrigger placement={'right'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     id='undo-button'
                     data-testid='undo-button'
                     onPress={undo}
@@ -33,12 +32,13 @@ export const UndoRedoButtons = ({ isDisabled }: { isDisabled: boolean }): JSX.El
                     isDisabled={!canUndo || isDisabled}
                 >
                     <Undo />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Undo</Tooltip>
             </TooltipTrigger>
 
             <TooltipTrigger placement={'right'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     id='redo-button'
                     data-testid='redo-button'
                     aria-label='redo'
@@ -46,7 +46,7 @@ export const UndoRedoButtons = ({ isDisabled }: { isDisabled: boolean }): JSX.El
                     isDisabled={!canRedo || isDisabled}
                 >
                     <Redo />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>Redo</Tooltip>
             </TooltipTrigger>
         </Flex>

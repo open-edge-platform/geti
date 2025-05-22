@@ -3,7 +3,7 @@
 
 import { ReactNode, useState } from 'react';
 
-import { View } from '@adobe/react-spectrum';
+import { Skeleton, View } from '@geti/ui';
 import { useSpinDelay } from 'spin-delay';
 
 import { getAnnotationStateForTask } from '../../../core/annotations/utils';
@@ -12,7 +12,6 @@ import { MediaItem } from '../../../core/media/media.interface';
 import { isVideo, isVideoFrame } from '../../../core/media/video.interface';
 import { AnnotationStateIndicator } from '../annotation-indicator/annotation-state-indicator.component';
 import { VideoAnnotationIndicator } from '../annotation-indicator/video-annotation-indicator.component';
-import { Skeleton } from '../skeleton/skeleton.component';
 import { VideoFrameNumberIndicator } from '../video-indicator/video-frame-number-indicator.component';
 import { VideoIndicator } from '../video-indicator/video-indicator.component';
 

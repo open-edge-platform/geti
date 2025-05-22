@@ -3,11 +3,11 @@
 
 import { CSSProperties } from 'react';
 
-import { Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@adobe/react-spectrum';
+import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { Copy, DownloadIcon } from '@geti/ui/icons';
 import { isEmpty, isFunction } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
-import { Copy, DownloadIcon } from '../../../../assets/icons';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { JobType } from '../../../../core/jobs/jobs.const';
@@ -24,8 +24,6 @@ import { paths } from '../../../../core/services/routes';
 import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { downloadFile, formatDownloadUrl, sanitize } from '../../../utils';
-import { ActionButton } from '../../button/button.component';
-import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActionLink } from './action-link.component';
 import { JobListItemSkeletonLoader } from './job-list-item-skeleton-loader.component';
 import { JobsDiscardAction } from './jobs-discard-action.component';
@@ -55,14 +53,15 @@ const DownloadExportButton = ({ job }: { job: JobExportStatus | JobProjectExport
 
     return (
         <TooltipTrigger placement={'bottom'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 height={'size-300'}
                 marginEnd={'size-100'}
                 aria-label={props.label}
                 onPress={() => downloadFile(src, props.name)}
             >
                 <DownloadIcon />
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>{props.tooltip}</Tooltip>
         </TooltipTrigger>
     );
@@ -93,6 +92,7 @@ interface JobsListItemProps {
     discardType?: DISCARD_TYPE;
     style?: CSSProperties;
     jobClickHandler?: () => void;
+    onSelectItem: () => void;
 }
 export const JobsListItem = ({
     job,
@@ -100,6 +100,7 @@ export const JobsListItem = ({
     expanded = false,
     style = {},
     jobClickHandler,
+    onSelectItem,
 }: JobsListItemProps) => {
     const { FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
     const navigate = useNavigate();
@@ -230,7 +231,7 @@ export const JobsListItem = ({
 
             <Divider size='S' marginX='size-250' />
 
-            <JobsListItemStatus expanded={expanded} job={job} />
+            <JobsListItemStatus expanded={expanded} job={job} onExpandChange={onSelectItem} />
         </View>
     );
 };

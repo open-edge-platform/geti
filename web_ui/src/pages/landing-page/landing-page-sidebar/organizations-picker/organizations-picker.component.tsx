@@ -3,8 +3,7 @@
 
 import { useRef } from 'react';
 
-import { Flex, Item, ListBox, Picker, View } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { CustomPopover, dimensionValue, Flex, Item, ListBox, Picker, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isNil } from 'lodash-es';
 
@@ -18,7 +17,6 @@ import {
     isOrganizationVisible,
     isUserInvitedInOrg,
 } from '../../../../routes/organizations/util';
-import { CustomPopover } from '../../../../shared/components/custom-popover/custom-popover.component';
 import { PhotoPlaceholder } from '../../../../shared/components/photo-placeholder/photo-placeholder.component';
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { hasEqualId, isNonEmptyString } from '../../../../shared/utils';

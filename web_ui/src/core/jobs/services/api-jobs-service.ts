@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { apiClient } from '@geti/core';
 import { AxiosResponse } from 'axios';
 
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
@@ -12,7 +12,7 @@ import { getJobCountEntity, getJobEntity } from '../utils';
 import { JobsQueryParams, JobsResponse, JobsService } from './jobs-service.interface';
 
 export const createApiJobsService: CreateApiService<JobsService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getJobs = async (
         workspaceIdentifier: WorkspaceIdentifier,

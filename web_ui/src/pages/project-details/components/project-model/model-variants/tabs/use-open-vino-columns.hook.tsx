@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Cell } from '@adobe/react-spectrum';
+import { Cell } from '@geti/ui';
 import { QueryObserverResult } from '@tanstack/react-query';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';

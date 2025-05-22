@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ThemeProvider } from '@geti/ui/theme';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { mockedProjectContextProps } from '../../../../../test-utils/mocked-items-factory/mocked-project';
-import { ThemeProvider } from '../../../../../theme/theme-provider.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { ExportImportDatasetButtons } from './export-import-dataset-buttons.component';
 import { ExportImportDatasetDialogProvider } from './export-import-dataset-dialog-provider.component';

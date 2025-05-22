@@ -3,11 +3,11 @@
 
 import { useMemo } from 'react';
 
-import { ButtonGroup, View } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, View } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { capitalize, isEmpty } from 'lodash-es';
 
-import { Alert } from '../../../../../assets/icons';
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP_TO_STATUS } from '../../../../../core/datasets/dataset.const';
 import {
     DATASET_IMPORT_DIALOG_BUTTONS,
@@ -20,7 +20,6 @@ import {
 } from '../../../../../core/datasets/dataset.interface';
 import { matchStatus } from '../../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useTusUpload } from '../../../../../providers/tus-upload-provider/tus-upload-provider.component';
-import { Button } from '../../../../../shared/components/button/button.component';
 import { InfoSection } from '../../../../create-project/components/info-section/info-section.component';
 
 interface DatasetImportToNewProjectDialogButtonsProps {

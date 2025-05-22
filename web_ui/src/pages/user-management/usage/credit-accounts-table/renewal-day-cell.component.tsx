@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text, View } from '@adobe/react-spectrum';
+import { Text, View } from '@geti/ui';
 
 import { CreditAccount } from '../../../../core/credits/credits.interface';
 import { ordinalSuffixOf } from '../../../../shared/utils';

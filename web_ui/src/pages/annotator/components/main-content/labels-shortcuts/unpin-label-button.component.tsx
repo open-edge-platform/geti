@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Unpin } from '../../../../../assets/icons';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
+import { ActionButton } from '@geti/ui';
+import { Unpin } from '@geti/ui/icons';
+
 import { useRenderDelay } from '../../../../../shared/hooks/use-render-delay.hook';
 
 interface UnpinLabelButtonProps {

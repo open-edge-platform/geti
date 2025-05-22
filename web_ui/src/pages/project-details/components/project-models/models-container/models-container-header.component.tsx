@@ -1,18 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
-import { Heading } from '@react-spectrum/text';
+import { ActionButton, Flex, Heading, Tag } from '@geti/ui';
+import { ChevronUpLight } from '@geti/ui/icons';
 import { clsx } from 'clsx';
 import { motion } from 'framer-motion';
 import { usePress } from 'react-aria';
 
-import { ChevronUpLight } from '../../../../../assets/icons';
 import { isVisualPromptModel } from '../../../../../core/annotations/services/visual-prompt-service';
 import { PerformanceCategory } from '../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
 import { InfoTooltip } from '../../../../../shared/components/info-tooltip/info-tooltip.component';
-import { Tag } from '../../../../../shared/components/tag/tag.component';
 import { ModelArchitectureTooltipText } from '../model-architecture-tooltip.component';
 import { DeprecatedTag } from './model-card/deprecated-model-tag.component';
 import { ObsoleteTag } from './model-card/obsolete-model-tag.component';

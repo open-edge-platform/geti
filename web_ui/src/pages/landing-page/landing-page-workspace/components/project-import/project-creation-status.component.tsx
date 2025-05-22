@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text } from '@adobe/react-spectrum';
+import { Flex, LoadingIndicator, Text } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useImportProjectStatusQuery } from '../../../../../core/projects/hooks/use-import-project-status.hook';
@@ -13,7 +13,6 @@ import {
 } from '../../../../../providers/projects-import-provider/project-import.interface';
 import { useProjectsImportProvider } from '../../../../../providers/projects-import-provider/projects-import-provider.component';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { LoadingIndicator } from '../../../../../shared/components/loading/loading-indicator.component';
 import { ProjectStatusHeader } from './project-status-header.component';
 
 import classes from './project-import.module.scss';

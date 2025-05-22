@@ -1,10 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text } from '@adobe/react-spectrum';
-import { StyleProps } from '@react-types/shared';
-
-import { ActionButton } from '../button/button.component';
+import { ActionButton, Text, type StyleProps } from '@geti/ui';
 
 interface LinkButtonProps extends StyleProps {
     text: string;

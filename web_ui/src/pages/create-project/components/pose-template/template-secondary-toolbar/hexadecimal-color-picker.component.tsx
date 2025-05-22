@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Color, ColorEditor, ColorPicker } from '@adobe/react-spectrum';
+import { Color, ColorEditor, ColorPicker } from '@geti/ui';
 
 import { useDebouncedCallback } from '../../../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { rgbToHex } from '../util';

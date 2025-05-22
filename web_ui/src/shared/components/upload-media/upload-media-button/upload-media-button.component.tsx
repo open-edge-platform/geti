@@ -3,17 +3,17 @@
 
 import { ComponentProps, Key, useRef } from 'react';
 
+import { Button } from '@geti/ui';
+import { Share } from '@geti/ui/icons';
 import { isFirefox } from '@react-aria/utils';
 import { isFunction } from 'lodash-es';
 
-import { Share } from '../../../../assets/icons';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../../core/status/hooks/utils';
 import { UPLOAD_MEDIA_LABEL } from '../../../../pages/project-details/components/project-media/utils';
 import { mediaExtensionHandler } from '../../../../providers/media-upload-provider/media-upload.validator';
 import { CANT_UPLOAD_FOLDER_FIREFOX } from '../../../custom-notification-messages';
 import { VALID_MEDIA_TYPES_DISPLAY } from '../../../media-utils';
-import { Button } from '../../button/button.component';
 import { MenuTriggerButton } from '../../menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { useOnFileInputChange } from '../useFileInputChange.hook';
 import { onMenuAction } from '../utils';

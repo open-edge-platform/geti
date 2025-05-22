@@ -3,14 +3,12 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, useNumberFormatter } from '@adobe/react-spectrum';
+import { ActionButton, Tooltip, TooltipTrigger, useNumberFormatter } from '@geti/ui';
+import { Add, Remove } from '@geti/ui/icons';
 import clsx from 'clsx';
 import { useControls } from 'react-zoom-pan-pinch';
 
-import { Add, Remove } from '../../../../../assets/icons';
 import { useEventListener } from '../../../../../hooks/event-listener/event-listener.hook';
-import { ActionButton } from '../../../../../shared/components/button/button.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from '../annotator-footer.module.scss';
 
@@ -54,14 +52,15 @@ export const ZoomLevel = ({ zoom }: ZoomLevelProps): JSX.Element => {
 
     return (
         <>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 onPress={() => {
                     zoomOut(zoomStep);
                 }}
                 aria-label={'Zoom out'}
             >
                 <Remove />
-            </QuietActionButton>
+            </ActionButton>
             <TooltipTrigger placement={'top'}>
                 <ActionButton
                     isQuiet
@@ -82,14 +81,15 @@ export const ZoomLevel = ({ zoom }: ZoomLevelProps): JSX.Element => {
                 </ActionButton>
                 <Tooltip>Zoom level</Tooltip>
             </TooltipTrigger>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 aria-label={'Zoom in'}
                 onPress={() => {
                     zoomIn(zoomStep);
                 }}
             >
                 <Add />
-            </QuietActionButton>
+            </ActionButton>
         </>
     );
 };

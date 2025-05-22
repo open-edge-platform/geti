@@ -3,7 +3,7 @@
 
 import { Key, useState } from 'react';
 
-import { Flex, Item, Picker } from '@adobe/react-spectrum';
+import { Flex, Item, Picker } from '@geti/ui';
 
 import {
     TrainingModelBarRadialChart,

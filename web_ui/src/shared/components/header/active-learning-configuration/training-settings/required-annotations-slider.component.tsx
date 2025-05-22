@@ -3,16 +3,15 @@
 
 import { FC, useState } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Slider, Text, View } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
-import { findRequiredImagesAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
-import { Task } from '../../../../../core/projects/task.interface';
 import {
     ConfigurableParametersTaskChain,
     NumberGroupParams,
-} from '../../../configurable-parameters/configurable-parameters.interface';
-import { Slider } from '../../../slider/slider.component';
+} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { findRequiredImagesAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
+import { Task } from '../../../../../core/projects/task.interface';
 
 interface RequiredAnnotationsSliderProps {
     task: Task;

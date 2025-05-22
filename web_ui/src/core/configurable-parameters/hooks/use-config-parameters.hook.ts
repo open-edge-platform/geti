@@ -6,12 +6,12 @@ import { AxiosError } from 'axios';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { ConfigurableParametersTaskChain } from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';
 import { getErrorMessage } from '../../services/utils';
 import { ConfigurableParametersReconfigureDTO } from '../dtos/configurable-parameters.interface';
+import { ConfigurableParametersTaskChain } from '../services/configurable-parameters.interface';
 
 interface UseConfigParameters {
     useGetConfigParameters: (isQueryEnabled: boolean) => UseQueryResult<ConfigurableParametersTaskChain[], AxiosError>;

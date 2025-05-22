@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Grid, minmax, Text, useNumberFormatter } from '@adobe/react-spectrum';
+import { Divider, Grid, minmax, Text, useNumberFormatter } from '@geti/ui';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../core/media/video.interface';
@@ -49,9 +49,9 @@ export const TestMediaItemDetailsCard = ({
             >
                 <Grid
                     alignItems={'center'}
-                    gap={'var(--gap)'}
+                    gap={'size-100'}
                     rows={['size-800']}
-                    columns={['var(--width)', minmax('size-1000', '1fr'), 'max-content']}
+                    columns={['size-800', minmax('size-1000', '1fr'), 'max-content']}
                 >
                     <MediaItemView
                         mediaItem={mediaItem.media}

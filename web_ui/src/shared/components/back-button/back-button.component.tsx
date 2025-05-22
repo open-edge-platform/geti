@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Back } from '../../../assets/icons';
-import { ActionButton } from '../button/button.component';
+import { ActionButton } from '@geti/ui';
+import { Back } from '@geti/ui/icons';
 
 interface BackButtonProps {
     onPress: () => void;

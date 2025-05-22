@@ -1,17 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Text, View } from '@adobe/react-spectrum';
-import { dimensionValue } from '@react-spectrum/utils';
+import { Loading, Text, View, VirtualizedListLayout } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
-import { Virtuoso } from 'react-virtuoso';
+import { Selection } from 'react-aria-components';
 
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
-import { Loading } from '../../loading/loading.component';
-import { SortByAttribute, SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
+import { SortDirection } from '../../../../core/shared/query-parameters';
+import { SortByAttribute } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsListItem } from './jobs-list-item.component';
 import { DISCARD_TYPE, JOB_STATE_TO_DISCARD_TYPE } from './utils';
 
@@ -43,11 +42,10 @@ export const JobsList = ({
     gap = 10,
 }: JobsListProps): JSX.Element => {
     const discardType: DISCARD_TYPE | undefined = JOB_STATE_TO_DISCARD_TYPE[jobState];
+    const [selected, setSelected] = useState<Selection>(new Set([]));
 
-    const handleFetchNextPage = async () => {
-        if (hasNextPage && !isFetchingNextPage) {
-            await fetchNextPage();
-        }
+    const handleFetchNextPage = () => {
+        hasNextPage && fetchNextPage();
     };
 
     if (isLoading || isEmpty(jobs)) {
@@ -60,7 +58,7 @@ export const JobsList = ({
     }
 
     return (
-        <View paddingTop={'size-50'} overflow={'hidden'} width={'100%'}>
+        <View paddingTop={'size-50'} width={'100%'}>
             <View marginBottom={'size-100'}>
                 <SortByAttribute
                     sortIconId={SORT_ICON_ID}
@@ -69,21 +67,24 @@ export const JobsList = ({
                     setSortDirection={setSortDirection}
                 />
             </View>
-            <Virtuoso
-                style={{ height: `calc(100% - ${dimensionValue('size-400')})` }}
-                data={jobs}
-                endReached={handleFetchNextPage}
-                itemContent={(index, job) => {
-                    return (
-                        <JobsListItem
-                            key={job.id}
-                            job={job}
-                            discardType={discardType}
-                            jobClickHandler={jobClickHandler}
-                            style={{ marginBottom: index === jobs.length - 1 ? 0 : gap }}
-                        />
-                    );
-                }}
+
+            <VirtualizedListLayout
+                items={jobs}
+                selected={selected}
+                isLoading={isFetchingNextPage}
+                layoutOptions={{ gap }}
+                idFormatter={({ id }) => id}
+                textValueFormatter={({ name }) => name}
+                onLoadMore={handleFetchNextPage}
+                containerHeight={'calc(100% - size-350)'}
+                renderItem={(job) => (
+                    <JobsListItem
+                        job={job}
+                        discardType={discardType}
+                        jobClickHandler={jobClickHandler}
+                        onSelectItem={() => setSelected(new Set([job.id]))}
+                    />
+                )}
             />
         </View>
     );

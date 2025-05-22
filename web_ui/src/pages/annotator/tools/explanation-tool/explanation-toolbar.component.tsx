@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Picker } from '@adobe/react-spectrum';
+import { Divider, Flex, Item, Picker, Switch } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -12,9 +12,7 @@ import { Label } from '../../../../core/labels/label.interface';
 import { getNonEmptyLabelsFromProject } from '../../../../core/labels/utils';
 import { CANVAS_ADJUSTMENTS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
-import { Divider } from '../../../../shared/components/divider/divider.component';
 import { NumberSlider } from '../../../../shared/components/number-slider/number-slider.component';
-import { Switch } from '../../../../shared/components/switch/switch.component';
 import { hasEqualId } from '../../../../shared/utils';
 import { isEmptyLabelAnnotation } from '../../../utils';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';

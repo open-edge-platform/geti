@@ -189,20 +189,6 @@ export default [
 
             'import/order': ['off'],
 
-            'no-restricted-imports': [
-                'error',
-                {
-                    name: '@adobe/react-spectrum',
-                    importNames: ['Button'],
-                    message: "Use 'Button' from shared folder instead.",
-                },
-                {
-                    name: '@adobe/react-spectrum',
-                    importNames: ['ActionButton'],
-                    message: "Use 'ActionButton' from shared folder instead.",
-                },
-            ],
-
             'import/no-unresolved': [
                 2,
                 {

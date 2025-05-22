@@ -3,7 +3,7 @@
 
 import { useCallback } from 'react';
 
-import { Flex, Text, View } from '@adobe/react-spectrum';
+import { Flex, Text, View } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { capitalize, isEmpty } from 'lodash-es';
 

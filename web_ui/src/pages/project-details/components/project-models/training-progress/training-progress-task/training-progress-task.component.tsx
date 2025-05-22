@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Grid, repeat } from '@adobe/react-spectrum';
+import { Grid, repeat } from '@geti/ui';
 
 import { TrainingProgressTaskItem } from './training-progress-task-item/training-progress-task-item.component';
 

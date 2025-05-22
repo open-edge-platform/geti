@@ -3,11 +3,10 @@
 
 import { useEffect, useRef } from 'react';
 
-import { TextFieldRef } from '@react-types/textfield';
+import { TextField, TextFieldRef } from '@geti/ui';
 import { noop } from 'lodash-es';
 
 import { LabelItemEditionState } from '../../../../../../core/labels/label-tree-view.interface';
-import { LimitedTextField } from '../../../../limited-text-field/limited-text-field.component';
 
 interface NameEditionFieldProps {
     value: string | undefined;
@@ -33,7 +32,8 @@ export const NameEditionField = ({
     }, [labelState]);
 
     return (
-        <LimitedTextField
+        <TextField
+            maxLength={100}
             minWidth={0}
             width={'100%'}
             value={value}

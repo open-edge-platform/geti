@@ -7,17 +7,14 @@ import { cloneDeep, isNil } from 'lodash-es';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import {
-    ConfigurableParametersParams,
-    ConfigurableParametersTaskChain,
-} from '../../../shared/components/configurable-parameters/configurable-parameters.interface';
-import {
-    getReconfigureParametersDTO,
-    updateSelectedParameter,
-} from '../../../shared/components/configurable-parameters/utils';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import QUERY_KEYS from '../../requests/query-keys';
 import { useApplicationServices } from '../../services/application-services-provider.component';
+import {
+    ConfigurableParametersParams,
+    ConfigurableParametersTaskChain,
+} from '../services/configurable-parameters.interface';
+import { getReconfigureParametersDTO, updateSelectedParameter } from '../utils';
 
 interface UseReconfigureParams {
     configParameters: ConfigurableParametersTaskChain[];

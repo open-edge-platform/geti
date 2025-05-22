@@ -3,13 +3,9 @@
 
 import { Key } from 'react';
 
-import { Flex, View } from '@adobe/react-spectrum';
+import { ActionButton, Flex, View } from '@geti/ui';
 import { usePress } from 'react-aria';
 
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { UserPhotoPreview } from './user-photo-preview.component';
 
 import sharedClasses from '../../../../../shared/shared.module.scss';
@@ -49,22 +45,24 @@ export const UserPhoto = ({
                 </div>
             </View>
             <Flex marginTop={'size-200'} justifyContent={'space-between'} alignItems={'center'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     onPress={handleUploadClick}
                     UNSAFE_className={classes.userPhotoBtn}
-                    colorMode={ColorMode.BLUE}
+                    colorVariant={'blue'}
                     isDisabled={isLoading}
                 >
                     Change
-                </QuietActionButton>
-                <QuietActionButton
+                </ActionButton>
+                <ActionButton
+                    isQuiet
                     onPress={handleDeleteUserPhoto}
                     UNSAFE_className={classes.userPhotoBtn}
-                    colorMode={ColorMode.BLUE}
+                    colorVariant={'blue'}
                     isDisabled={isLoading}
                 >
                     Remove
-                </QuietActionButton>
+                </ActionButton>
             </Flex>
         </Flex>
     );

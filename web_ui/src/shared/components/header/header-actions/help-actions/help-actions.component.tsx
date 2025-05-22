@@ -1,19 +1,19 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Key } from 'react';
+import { FC, Key, ReactNode } from 'react';
 
+import { HelpIcon } from '@geti/ui/icons';
 import { ValueType } from '@opentelemetry/api';
+import { Link } from 'react-router-dom';
 
 import { useAnalytics } from '../../../../../analytics/analytics-provider.component';
 import { getMetricName } from '../../../../../analytics/metrics';
-import { HelpIcon } from '../../../../../assets/icons';
 import { CONTACT_SUPPORT as CONTACT_SUPPORT_URL } from '../../../../../core/const';
 import { paths } from '../../../../../core/services/routes';
 import { useDocsUrl } from '../../../../../hooks/use-docs-url/use-docs-url.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useResetAllTutorials } from '../../../../hooks/use-tutorial-enablement.hook';
-import { RouterLink as Link } from '../../../router-link/router-link.component';
 import { HeaderSubmenu } from '../header-submenu/header-submenu.component';
 
 import classes from './help-actions.module.scss';
@@ -51,6 +51,14 @@ const useCollectOpeningUserGuideMetric = (): UseCollectOpeningUserGuideMetric =>
     };
 };
 
+const ActionLink: FC<{ children: ReactNode; to: string }> = ({ children, to }) => {
+    return (
+        <Link to={to} className={classes.link} viewTransition>
+            {children}
+        </Link>
+    );
+};
+
 export const HelpActions = ({ isDarkMode }: HelpActionsProps): JSX.Element => {
     const docsUrl = useDocsUrl();
     const resetAll = useResetAllTutorials();
@@ -70,18 +78,14 @@ export const HelpActions = ({ isDarkMode }: HelpActionsProps): JSX.Element => {
             children: [
                 {
                     id: HelpActionsItems.USER_GUIDE,
-                    text: (
-                        <Link to={docsUrl} UNSAFE_className={classes.link}>
-                            {HelpActionsItems.USER_GUIDE}
-                        </Link>
-                    ),
+                    text: <ActionLink to={docsUrl}>{HelpActionsItems.USER_GUIDE}</ActionLink>,
                 },
                 {
                     id: HelpActionsItems.ABOUT,
                     text: (
-                        <Link to={paths.organization.about({ organizationId })} UNSAFE_className={classes.link}>
+                        <ActionLink to={paths.organization.about({ organizationId })}>
                             {HelpActionsItems.ABOUT}
-                        </Link>
+                        </ActionLink>
                     ),
                 },
                 {
@@ -90,19 +94,11 @@ export const HelpActions = ({ isDarkMode }: HelpActionsProps): JSX.Element => {
                 },
                 {
                     id: HelpActionsItems.CONTACT_SUPPORT,
-                    text: (
-                        <Link to={CONTACT_SUPPORT_URL} UNSAFE_className={classes.link}>
-                            {HelpActionsItems.CONTACT_SUPPORT}
-                        </Link>
-                    ),
+                    text: <ActionLink to={CONTACT_SUPPORT_URL}>{HelpActionsItems.CONTACT_SUPPORT}</ActionLink>,
                 },
                 {
                     id: HelpActionsItems.REST_API_SPECS,
-                    text: (
-                        <Link to={paths.restApiSpecs({})} UNSAFE_className={classes.link}>
-                            {HelpActionsItems.REST_API_SPECS}
-                        </Link>
-                    ),
+                    text: <ActionLink to={paths.restApiSpecs({})}>{HelpActionsItems.REST_API_SPECS}</ActionLink>,
                 },
             ],
             id: 'docs-id',

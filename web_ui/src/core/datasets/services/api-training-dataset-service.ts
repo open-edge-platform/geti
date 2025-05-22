@@ -1,13 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { apiClient } from '@geti/core';
+
 import { MediaAdvancedFilterDTO, MediaItemDTO } from '../../media/dtos/media.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';
 import { MediaAdvancedFilterResponse } from '../../media/media.interface';
 import { getMediaItemFromDTO } from '../../media/services/utils';
 import { VideoFrame } from '../../media/video.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { NextPageURL } from '../../shared/infinite-query.interface';
@@ -44,7 +45,7 @@ export interface TrainingDatasetService {
 }
 
 export const createApiTrainingDatasetService: CreateApiService<TrainingDatasetService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getTrainingDatasetRevision = async (
         projectIdentifier: ProjectIdentifier,

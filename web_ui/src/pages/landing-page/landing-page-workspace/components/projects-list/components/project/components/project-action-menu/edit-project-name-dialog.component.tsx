@@ -3,14 +3,13 @@
 
 import { FormEvent, useState } from 'react';
 
-import { ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading } from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useProjectActions } from '../../../../../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';
 import { useWorkspaceIdentifier } from '../../../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { Button } from '../../../../../../../../../shared/components/button/button.component';
-import { LimitedTextField } from '../../../../../../../../../shared/components/limited-text-field/limited-text-field.component';
+import { MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME } from '../../../../../../../../create-project/components/utils';
 
 interface EditProjectNameDialogProps {
     onClose: () => void;
@@ -67,7 +66,8 @@ export const EditProjectNameDialog = ({ onClose, isOpen, project }: EditProjectN
                     <Divider />
                     <Content>
                         <Form onSubmit={handleEditProjectName}>
-                            <LimitedTextField
+                            <TextField
+                                maxLength={MAX_NUMBER_OF_CHARACTERS_OF_PROJECT_NAME}
                                 //eslint-disable-next-line jsx-a11y/no-autofocus
                                 autoFocus
                                 value={newProjectName}

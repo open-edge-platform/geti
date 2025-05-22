@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useNumberFormatter } from '@adobe/react-spectrum';
+import { useNumberFormatter } from '@geti/ui';
 import { useSliderState } from 'react-stately';
 
 import { LabeledVideoRange } from '../../../../../core/annotations/labeled-video-range.interface';

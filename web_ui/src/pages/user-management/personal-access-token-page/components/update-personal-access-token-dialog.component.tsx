@@ -3,20 +3,10 @@
 
 import { useState } from 'react';
 
-import {
-    ButtonGroup,
-    Content,
-    Dialog,
-    DialogContainer,
-    Divider,
-    Heading,
-    TextField,
-    View,
-} from '@adobe/react-spectrum';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, TextField, View } from '@geti/ui';
 import { OverlayTriggerState } from 'react-stately';
 
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
-import { Button } from '../../../../shared/components/button/button.component';
 import { PersonalAccessTokenExpirationDatepicker } from './personal-access-token-expiration-datepicker.component';
 
 import classes from '../personal-access-token-page.module.scss';

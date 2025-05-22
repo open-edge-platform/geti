@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Text, View } from '@adobe/react-spectrum';
+import { Switch, Text, View } from '@geti/ui';
 
-import { Switch } from '../../../../switch/switch.component';
-import { BooleanGroupParams } from '../../../configurable-parameters.interface';
+import { BooleanGroupParams } from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ResetButtonHandler } from '../cp-editable-item.interface';
 
 interface CPBooleanProps extends ResetButtonHandler {

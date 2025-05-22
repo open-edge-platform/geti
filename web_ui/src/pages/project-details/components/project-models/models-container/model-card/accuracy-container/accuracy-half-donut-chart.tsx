@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { dimensionValue } from '@react-spectrum/utils';
+import { dimensionValue } from '@geti/ui';
 import { Label, Pie, PieChart } from 'recharts';
 
 import { getProgressScoreColor } from '../../../../../../../shared/utils';

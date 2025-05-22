@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
+import { FitScreen } from '@geti/ui/icons';
 import { useControls } from 'react-zoom-pan-pinch';
-
-import { FitScreen } from '../../../../assets/icons';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 
 export const FitImageToScreenButton = (): JSX.Element => {
     const { resetTransform } = useControls();
@@ -14,13 +13,14 @@ export const FitImageToScreenButton = (): JSX.Element => {
     };
 
     return (
-        <QuietActionButton
+        <ActionButton
+            isQuiet
             key={'fit-image-to-screen-button'}
             id='fit-image-to-screen-button'
             aria-label='Fit image to screen'
             onPress={handleFitImageToScreen}
         >
             <FitScreen />
-        </QuietActionButton>
+        </ActionButton>
     );
 };

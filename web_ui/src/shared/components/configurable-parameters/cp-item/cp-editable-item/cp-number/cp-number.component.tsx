@@ -3,11 +3,10 @@
 
 import { useMemo } from 'react';
 
-import { Flex, NumberField, Slider, Text, useNumberFormatter } from '@adobe/react-spectrum';
-import { useMediaQuery } from '@react-spectrum/utils';
+import { Flex, NumberField, Slider, Text, useMediaQuery, useNumberFormatter } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
-import { isLargeSizeQuery } from '../../../../../../theme/queries';
-import { NumberGroupParams } from '../../../configurable-parameters.interface';
+import { NumberGroupParams } from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ResetButtonHandler } from '../cp-editable-item.interface';
 
 import classes from './cp-number.module.scss';

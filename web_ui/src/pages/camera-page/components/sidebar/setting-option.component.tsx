@@ -3,11 +3,10 @@
 
 import { Key, useState } from 'react';
 
-import { Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { ActionButton, Flex, Heading, Item, Picker, Slider, Tooltip, TooltipTrigger } from '@geti/ui';
+import { Revisit } from '@geti/ui/icons';
 import { capitalize, words } from 'lodash-es';
 
-import { Revisit } from '../../../../assets/icons';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { DeviceConfiguration } from '../../providers/util';
 
 import classes from './sidebar.module.scss';
@@ -41,9 +40,9 @@ export const SettingOption = ({ label, config, onChange }: SettingOptionProps) =
                 </Heading>
 
                 <TooltipTrigger placement={'bottom'}>
-                    <QuietActionButton aria-label={`reset ${label}`} onPress={() => updateValue(config.value)}>
+                    <ActionButton isQuiet aria-label={`reset ${label}`} onPress={() => updateValue(config.value)}>
                         <Revisit />
-                    </QuietActionButton>
+                    </ActionButton>
                     <Tooltip>{`Reset ${label}`}</Tooltip>
                 </TooltipTrigger>
             </Flex>

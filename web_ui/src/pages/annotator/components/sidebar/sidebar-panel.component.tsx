@@ -3,13 +3,11 @@
 
 import { MutableRefObject, ReactNode, useRef, useState } from 'react';
 
-import { DimensionValue, Flex, View } from '@adobe/react-spectrum';
-import { Overlay } from '@react-spectrum/overlays';
+import { Flex, Overlay, View, type DimensionValue, type Responsive, type StyleProps } from '@geti/ui';
+import { Datasets, Edit, Manifest } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
-import { Responsive, StyleProps } from '@react-types/shared';
 import { useOverlay } from 'react-aria';
 
-import { Datasets, Edit, Manifest } from '../../../../assets/icons';
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { AnnotationListContainer } from '../../annotation/annotation-list/annotation-list-container/annotation-list-container.component';
 import { AnnotationListCounting } from './annotations/annotation-list-counting.component';

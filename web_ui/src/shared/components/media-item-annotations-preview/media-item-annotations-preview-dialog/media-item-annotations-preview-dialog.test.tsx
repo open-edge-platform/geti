@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
 import { screen } from '@testing-library/react';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
@@ -11,7 +12,6 @@ import {
     mockedProjectContextProps,
 } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
-import { ActionButton } from '../../button/button.component';
 import { MediaItemAnnotationsPreviewDialog } from './media-item-annotations-preview-dialog.component';
 
 jest.mock('../../../../pages/annotator/zoom/zoom-provider.component', () => ({

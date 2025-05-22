@@ -3,11 +3,10 @@
 
 import { ReactNode } from 'react';
 
-import { Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { formatUtcToLocal } from '../../../../utils';
-import { PressableElement } from '../../../pressable-element/pressable-element.component';
 import { TruncatedText } from '../../../truncated-text/truncated-text.component';
 import { TableCellProps } from '../../table.interface';
 

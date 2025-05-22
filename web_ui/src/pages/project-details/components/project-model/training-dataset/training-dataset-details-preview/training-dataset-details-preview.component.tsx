@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex } from '@adobe/react-spectrum';
+import { Flex } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 
 import { PredictionMode } from '../../../../../../core/annotations/services/prediction-service.interface';

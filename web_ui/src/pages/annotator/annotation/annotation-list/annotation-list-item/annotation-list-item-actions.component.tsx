@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex } from '@adobe/react-spectrum';
+import { ActionButton, Flex } from '@geti/ui';
+import { Invisible } from '@geti/ui/icons';
 
-import { Invisible } from '../../../../../assets/icons';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { ToggleLockButton } from '../../toggle-lock-button/toggle-lock-button.component';
 import { TOGGLE_VISIBILITY_COLOR_MODE } from '../../toggle-visibility-button/toggle-visibility-button.component';
 
@@ -42,14 +41,15 @@ export const AnnotationListItemActions = ({
                 />
             )}
             {isHidden && (
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     id={`annotation-list-item-${annotationId}-visibility-off`}
                     onPress={() => showAnnotation(annotationId)}
                     isDisabled={isDisabled}
                     aria-label='Show'
                 >
                     <Invisible className={textColor} />
-                </QuietActionButton>
+                </ActionButton>
             )}
         </Flex>
     );

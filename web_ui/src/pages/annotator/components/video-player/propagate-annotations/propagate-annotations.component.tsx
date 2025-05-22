@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DialogTrigger } from '@adobe/react-spectrum';
+import { DialogTrigger } from '@geti/ui';
 
 import { usePropagateAnnotations } from '../hooks/use-propagate-annotations.hook';
 import { PropagateAnnotationsButton } from './propagate-annotations-button.component';

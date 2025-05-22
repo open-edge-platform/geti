@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { BoundingCircle } from '../../../../assets/icons';
+import { BoundingCircle } from '@geti/ui/icons';
+
 import CircleImg from '../../../../assets/primary-tools/circle.webp';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ToolLabel, ToolType } from '../../core/annotation-tool-context.interface';
@@ -19,7 +20,7 @@ export const CircleTool: ToolProps = {
     SecondaryToolbar,
     tooltip: {
         img: CircleImg,
-        url: 'guide/annotations/annotation-tools.html#circle-tool',
+        url: 'docs/user-guide/geti-fundamentals/annotations/annotation-tools#circle-tool',
         title: toolTypeToLabelMapping[ToolType.CircleTool],
         description: `Its purpose is to simplify annotation of circular objects.`,
     },

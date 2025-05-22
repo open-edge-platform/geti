@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Radio, RadioGroup, Text, Tooltip, TooltipTrigger } from '@adobe/react-spectrum';
+import { Flex, Heading, Radio, RadioGroup, Text, Tooltip, TooltipTrigger } from '@geti/ui';
 
 import { PerformanceCategory } from '../../../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../../../../../../../core/supported-algorithms/supported-algorithms.interface';

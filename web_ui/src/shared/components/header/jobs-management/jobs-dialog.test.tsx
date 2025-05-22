@@ -2,9 +2,14 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { JobsDialog } from './jobs-dialog.component';
+
+const checkComboBoxValue = (comboBoxName: string, value: string) => {
+    expect(screen.getByRole('button', { name: `${comboBoxName} ${value}` })).toBeInTheDocument();
+};
 
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
@@ -75,5 +80,20 @@ describe('jobs dialog', (): void => {
         expect(screen.getByRole('tab', { name: 'Scheduled jobs' })).toHaveAttribute('aria-selected', 'false');
         expect(screen.getByRole('tab', { name: 'Cancelled jobs' })).toHaveAttribute('aria-selected', 'false');
         expect(screen.getByRole('tab', { name: 'Failed jobs' })).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('should properly reset combobox filters', async (): Promise<void> => {
+        renderComponent();
+
+        checkComboBoxValue('Job scheduler filter job type', 'All job types');
+        await userEvent.click(screen.getByLabelText('Job scheduler filter job type'));
+        await userEvent.keyboard('{arrowdown}');
+        await userEvent.keyboard('{arrowdown}');
+        await userEvent.keyboard('{enter}');
+
+        checkComboBoxValue('Job scheduler filter job type', 'Train');
+
+        await userEvent.click(screen.getByLabelText('Reset all filters'));
+        checkComboBoxValue('Job scheduler filter job type', 'All job types');
     });
 });

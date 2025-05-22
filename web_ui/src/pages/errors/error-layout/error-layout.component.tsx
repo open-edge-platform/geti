@@ -3,9 +3,8 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, IllustratedMessage, View } from '@adobe/react-spectrum';
-
-import { Close } from '../../../assets/icons';
+import { Flex, IllustratedMessage, View } from '@geti/ui';
+import { Close } from '@geti/ui/icons';
 
 import classes from './error-layout.module.scss';
 

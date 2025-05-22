@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { Flex, Grid, Heading, View } from '@adobe/react-spectrum';
+import { Flex, Grid, Heading, View } from '@geti/ui';
 import { FocusScope } from 'react-aria';
 
 import { hasMaxAllowedAnnotations } from '../../core/annotations/utils';
