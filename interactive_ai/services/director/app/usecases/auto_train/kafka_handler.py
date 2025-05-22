@@ -40,7 +40,7 @@ class AutoTrainingKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         ]
         # Workaround (ITEP-67586): change some model defaults for Intel GPU
         # This is done by reconfiguring the active model immediately after project creation
-        if get_gpu_provider() == "intel":
+        if get_gpu_provider() != "intel":
             subs.append(TopicSubscription(topic="project_creations", callback=self.on_project_created))
         return subs
 

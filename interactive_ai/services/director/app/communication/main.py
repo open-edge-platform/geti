@@ -52,7 +52,7 @@ def init_model_template_list() -> None:
     """
     mtl = ModelTemplateList()
     # Workaround (ITEP-67586): change some model defaults for Intel GPU
-    if get_gpu_provider() == "intel":
+    if get_gpu_provider() != "intel":
         mtl._model_template_list["Custom_Object_Detection_YOLOX"].model_template.is_default_for_task = True
         mtl._model_template_list["Custom_Object_Detection_Gen3_ATSS"].model_template.is_default_for_task = False
 
