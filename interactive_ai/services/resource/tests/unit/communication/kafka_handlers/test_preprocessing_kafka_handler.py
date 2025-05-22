@@ -1,20 +1,16 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from datetime import datetime
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from communication.kafka_handlers.preprocessing_kafka_handler import PreprocessingKafkaHandler
+from usecases.media_preprocessing_status_usecase import MediaPreprocessingStatusUseCase
 
 from geti_kafka_tools import KafkaRawMessage
 from geti_types import ID
 from iai_core.entities.dataset_storage import DatasetStorageIdentifier
-from iai_core.entities.image import Image
-from iai_core.entities.media import MediaPreprocessing, MediaPreprocessingStatus
-from iai_core.entities.video import Video
-from iai_core.repos import ImageRepo, VideoRepo
-from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 DATASET_STORAGE_ID: DatasetStorageIdentifier = DatasetStorageIdentifier(
     workspace_id=ID("63b183d00000000000000001"),
@@ -58,8 +54,8 @@ class TestPreprocessingKafkaHandler:
     @pytest.mark.parametrize(
         "media_type, update_method_name",
         [
-            ("IMAGE", "update_image"),
-            ("VIDEO", "update_video"),
+            ("IMAGE", "update_image_preprocessing_status"),
+            ("VIDEO", "update_video_preprocessing_status"),
         ],
     )
     @patch.object(PreprocessingKafkaHandler, "__init__", new=mock_init)
@@ -68,7 +64,7 @@ class TestPreprocessingKafkaHandler:
         message: KafkaRawMessage = kafka_message(event="MEDIA_UPLOADED", media_type=media_type)
 
         # Act
-        with patch.object(PreprocessingKafkaHandler, update_method_name) as mock_update:
+        with patch.object(MediaPreprocessingStatusUseCase, update_method_name) as mock_update:
             PreprocessingKafkaHandler().on_media_preprocessing(message)
 
         # Assert
@@ -87,11 +83,13 @@ class TestPreprocessingKafkaHandler:
         message: KafkaRawMessage = kafka_message(event=event, media_type="IMAGE", preprocessing=preprocessing)
 
         # Act
-        with patch.object(PreprocessingKafkaHandler, "update_image") as mock_update_image:
+        with patch.object(
+            MediaPreprocessingStatusUseCase, "update_image_preprocessing_status"
+        ) as mock_update_image_preprocessing_status:
             PreprocessingKafkaHandler().on_media_preprocessing(message)
 
         # Assert
-        mock_update_image.assert_called_once_with(
+        mock_update_image_preprocessing_status.assert_called_once_with(
             dataset_storage_identifier=DATASET_STORAGE_ID,
             image_id=ID("media_id"),
             event=event,
@@ -111,97 +109,15 @@ class TestPreprocessingKafkaHandler:
         message: KafkaRawMessage = kafka_message(event=event, media_type="VIDEO", preprocessing=preprocessing)
 
         # Act
-        with patch.object(PreprocessingKafkaHandler, "update_video") as mock_update_video:
+        with patch.object(
+            MediaPreprocessingStatusUseCase, "update_video_preprocessing_status"
+        ) as mock_update_video_preprocessing_status:
             PreprocessingKafkaHandler().on_media_preprocessing(message)
 
         # Assert
-        mock_update_video.assert_called_once_with(
+        mock_update_video_preprocessing_status.assert_called_once_with(
             dataset_storage_identifier=DATASET_STORAGE_ID,
             video_id=ID("media_id"),
             event=event,
             preprocessing=preprocessing,
         )
-
-    @pytest.mark.parametrize(
-        "event, status, preprocessing",
-        [
-            ("MEDIA_PREPROCESSING_STARTED", MediaPreprocessingStatus.IN_PROGRESS, None),
-            ("MEDIA_PREPROCESSING_FINISHED", MediaPreprocessingStatus.FINISHED, {"success": True}),
-            (
-                "MEDIA_PREPROCESSING_FINISHED",
-                MediaPreprocessingStatus.FAILED,
-                {"success": False, "message": "Failure message"},
-            ),
-        ],
-    )
-    @patch.object(DatasetStorageFilterRepo, "__init__", new=mock_init)
-    @patch.object(ImageRepo, "__init__", new=mock_init)
-    @patch.object(PreprocessingKafkaHandler, "__init__", new=mock_init)
-    def test_update_image(self, event, status, preprocessing) -> None:
-        # Arrange
-        image_id = ID("image_id")
-        image = MagicMock(spec=Image)
-        image.preprocessing = MediaPreprocessing(status=MediaPreprocessingStatus.SCHEDULED)
-
-        # Act
-        with (
-            patch.object(ImageRepo, "get_by_id", return_value=image) as mock_get_by_id,
-            patch.object(ImageRepo, "save") as mock_save,
-            patch.object(DatasetStorageFilterRepo, "update_preprocessing_status") as mock_update_preprocessing_status,
-        ):
-            PreprocessingKafkaHandler.update_image(
-                dataset_storage_identifier=DATASET_STORAGE_ID,
-                image_id=image_id,
-                event=event,
-                preprocessing=preprocessing,
-            )
-
-        # Assert
-        mock_get_by_id.assert_called_once_with(image_id)
-        mock_save.assert_called_once_with(image)
-        assert image.preprocessing.status == status
-        if preprocessing and "message" in preprocessing:
-            assert image.preprocessing.message == preprocessing["message"]
-        mock_update_preprocessing_status.assert_called_once_with(media_id=image.id_, status=status)
-
-    @pytest.mark.parametrize(
-        "event, status, preprocessing",
-        [
-            ("MEDIA_PREPROCESSING_STARTED", MediaPreprocessingStatus.IN_PROGRESS, None),
-            ("MEDIA_PREPROCESSING_FINISHED", MediaPreprocessingStatus.FINISHED, {"success": True}),
-            (
-                "MEDIA_PREPROCESSING_FINISHED",
-                MediaPreprocessingStatus.FAILED,
-                {"success": False, "message": "Failure message"},
-            ),
-        ],
-    )
-    @patch.object(DatasetStorageFilterRepo, "__init__", new=mock_init)
-    @patch.object(VideoRepo, "__init__", new=mock_init)
-    @patch.object(PreprocessingKafkaHandler, "__init__", new=mock_init)
-    def test_update_video(self, event, status, preprocessing) -> None:
-        # Arrange
-        video_id = ID("video_id")
-        video = MagicMock(spec=Video)
-        video.preprocessing = MediaPreprocessing(status=MediaPreprocessingStatus.SCHEDULED)
-
-        # Act
-        with (
-            patch.object(VideoRepo, "get_by_id", return_value=video) as mock_get_by_id,
-            patch.object(VideoRepo, "save") as mock_save,
-            patch.object(DatasetStorageFilterRepo, "update_preprocessing_status") as mock_update_preprocessing_status,
-        ):
-            PreprocessingKafkaHandler.update_video(
-                dataset_storage_identifier=DATASET_STORAGE_ID,
-                video_id=video_id,
-                event=event,
-                preprocessing=preprocessing,
-            )
-
-        # Assert
-        mock_get_by_id.assert_called_once_with(video_id)
-        mock_save.assert_called_once_with(video)
-        assert video.preprocessing.status == status
-        if preprocessing and "message" in preprocessing:
-            assert video.preprocessing.message == preprocessing["message"]
-        mock_update_preprocessing_status.assert_called_once_with(media_id=video.id_, status=status)

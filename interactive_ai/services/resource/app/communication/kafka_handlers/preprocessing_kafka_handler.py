@@ -1,15 +1,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import logging
-from typing import Any
+
+from usecases.media_preprocessing_status_usecase import MediaPreprocessingStatusUseCase
 
 from geti_kafka_tools import BaseKafkaHandler, KafkaRawMessage, TopicSubscription
 from geti_types import CTX_SESSION_VAR, ID, Singleton
 from iai_core.entities.dataset_storage import DatasetStorageIdentifier
-from iai_core.entities.image import Image
-from iai_core.entities.video import Video
-from iai_core.repos import ImageRepo, VideoRepo
-from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 from iai_core.session.session_propagation import setup_session_kafka
 
 logger = logging.getLogger(__name__)
@@ -40,68 +37,26 @@ class PreprocessingKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
             project_id=ID(value["project_id"]),
             dataset_storage_id=ID(value["dataset_storage_id"]),
         )
+        if event not in ("MEDIA_PREPROCESSING_STARTED", "MEDIA_PREPROCESSING_FINISHED"):
+            return
 
-        if event in ("MEDIA_PREPROCESSING_STARTED", "MEDIA_PREPROCESSING_FINISHED"):
-            try:
-                media_id = ID(value["media_id"])
-                media_type = value["media_type"]
+        try:
+            media_id = ID(value["media_id"])
+            media_type = value["media_type"]
 
-                if media_type == "IMAGE":
-                    PreprocessingKafkaHandler.update_image(
-                        dataset_storage_identifier=dataset_storage_identifier,
-                        image_id=media_id,
-                        event=event,
-                        preprocessing=value.get("preprocessing"),
-                    )
-                else:
-                    PreprocessingKafkaHandler.update_video(
-                        dataset_storage_identifier=dataset_storage_identifier,
-                        video_id=media_id,
-                        event=event,
-                        preprocessing=value.get("preprocessing"),
-                    )
-            except Exception as ex:
-                logger.error(f"Failed to handle {event} preprocessing event, reason = {ex}")
-
-    @staticmethod
-    def _update_preprocessing(media: Image | Video, event: str, preprocessing: dict[str, Any] | None) -> None:
-        if event == "MEDIA_PREPROCESSING_STARTED":
-            media.preprocessing.started()
-        elif preprocessing is not None and preprocessing["success"]:
-            media.preprocessing.finished()
-        elif preprocessing is not None:
-            media.preprocessing.failed(preprocessing.get("message", ""))
-
-    @staticmethod
-    def update_image(
-        dataset_storage_identifier: DatasetStorageIdentifier,
-        image_id: ID,
-        event: str,
-        preprocessing: dict | None,
-    ) -> None:
-        image_repo = ImageRepo(dataset_storage_identifier=dataset_storage_identifier)
-        image = image_repo.get_by_id(image_id)
-        PreprocessingKafkaHandler._update_preprocessing(media=image, event=event, preprocessing=preprocessing)
-        image_repo.save(image)
-
-        DatasetStorageFilterRepo(dataset_storage_identifier=dataset_storage_identifier).update_preprocessing_status(
-            media_id=image.id_,
-            status=image.preprocessing.status,
-        )
-
-    @staticmethod
-    def update_video(
-        dataset_storage_identifier: DatasetStorageIdentifier,
-        video_id: ID,
-        event: str,
-        preprocessing: dict | None,
-    ) -> None:
-        video_repo = VideoRepo(dataset_storage_identifier=dataset_storage_identifier)
-        video = video_repo.get_by_id(video_id)
-        PreprocessingKafkaHandler._update_preprocessing(media=video, event=event, preprocessing=preprocessing)
-        video_repo.save(video)
-
-        DatasetStorageFilterRepo(dataset_storage_identifier=dataset_storage_identifier).update_preprocessing_status(
-            media_id=video.id_,
-            status=video.preprocessing.status,
-        )
+            if media_type == "IMAGE":
+                MediaPreprocessingStatusUseCase.update_image_preprocessing_status(
+                    dataset_storage_identifier=dataset_storage_identifier,
+                    image_id=media_id,
+                    event=event,
+                    preprocessing=value.get("preprocessing"),
+                )
+            else:
+                MediaPreprocessingStatusUseCase.update_video_preprocessing_status(
+                    dataset_storage_identifier=dataset_storage_identifier,
+                    video_id=media_id,
+                    event=event,
+                    preprocessing=value.get("preprocessing"),
+                )
+        except Exception as ex:
+            logger.error(f"Failed to handle {event} preprocessing event, reason = {ex}")
