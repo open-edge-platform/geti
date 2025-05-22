@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"geti.com/iai_core/entities"
+	"geti.com/iai_core/storage"
 )
 
 func TestLoad(t *testing.T) {

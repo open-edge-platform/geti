@@ -54,9 +54,9 @@ lint: lint-install
 	$(GOBIN)/golangci-lint run --fix --timeout $(TIMEOUT)
 
 lint-install:
-	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "$$($(GOBIN)/golangci-lint --version | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')" != "$(GOLANGCI_LINT_VERSION)" ]; then \
-		@echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..." \
-		GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
+	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "v$$($(GOBIN)/golangci-lint version --short | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+		echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..."; \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(GOBIN) $(GOLANGCI_LINT_VERSION); \
 		echo "golangci-lint $(GOLANGCI_LINT_VERSION) installed at $(GOBIN)/golangci-lint"; \
 	else \
 		echo "golangci-lint $(GOLANGCI_LINT_VERSION) is already installed"; \
