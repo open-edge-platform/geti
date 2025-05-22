@@ -10,6 +10,7 @@ import { User } from '../../../../../core/users/users.interface';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedUser } from '../../../../../test-utils/mocked-items-factory/mocked-users';
 import { projectRender as render } from '../../../../../test-utils/project-provider-render';
+import { FiltersType } from './jobs-dialog.interface';
 import { JobsFiltering } from './jobs-filtering.component';
 
 const mockedProject = getMockedProject({});
@@ -32,10 +33,7 @@ jest.mock('../../../../../core/users/hook/use-users.hook', () => ({
     })),
 }));
 
-interface AppProps {
-    projectIdFilter: string | undefined;
-    userIdFilter: string | undefined;
-    jobTypeFilter: JobType | undefined;
+interface AppProps extends FiltersType {
     users: User[];
 }
 
@@ -65,7 +63,7 @@ describe('jobs filtering', (): void => {
         jest.clearAllMocks();
     });
 
-    const App = ({ projectIdFilter, userIdFilter, jobTypeFilter, users }: AppProps): JSX.Element => {
+    const App = ({ projectId, userId, jobTypes, users }: AppProps): JSX.Element => {
         // @ts-expect-error we only mock useGetUsersQuery
         jest.mocked(useUsers).mockImplementation(() => ({
             useGetUsersQuery: () => {
@@ -84,10 +82,10 @@ describe('jobs filtering', (): void => {
 
         return (
             <JobsFiltering
-                defaultValues={{
-                    projectIdFilter,
-                    userIdFilter,
-                    jobTypeFilter: jobTypeFilter === undefined ? [] : [jobTypeFilter],
+                values={{
+                    projectId,
+                    userId,
+                    jobTypes: jobTypes === undefined ? [] : jobTypes,
                 }}
                 onChange={mockOnChange}
             />
@@ -95,9 +93,9 @@ describe('jobs filtering', (): void => {
     };
 
     const renderComponent = async (
-        projectIdFilter?: string,
-        userIdFilter?: string,
-        jobTypeFilter?: JobType,
+        projectId?: string,
+        userId?: string,
+        jobTypes: JobType[] = [],
         users: User[] = []
     ): Promise<void> => {
         const projectService = createInMemoryProjectService();
@@ -108,15 +106,9 @@ describe('jobs filtering', (): void => {
                 nextPage: null,
             };
         });
-        await render(
-            <App
-                projectIdFilter={projectIdFilter}
-                userIdFilter={userIdFilter}
-                jobTypeFilter={jobTypeFilter}
-                users={users}
-            />,
-            { services: { projectService } }
-        );
+        await render(<App projectId={projectId} userId={userId} jobTypes={jobTypes} users={users} />, {
+            services: { projectService },
+        });
     };
 
     it('should properly render base component', async (): Promise<void> => {
@@ -126,7 +118,7 @@ describe('jobs filtering', (): void => {
         expect(screen.getByLabelText(/filter job type/)).toHaveTextContent('All job types');
     });
 
-    it('should populate project filter with projectIdFilter if defined', async (): Promise<void> => {
+    it('should populate project filter with projectId if defined', async (): Promise<void> => {
         await renderComponent('222222', '3');
 
         await waitFor(() => {
@@ -134,7 +126,7 @@ describe('jobs filtering', (): void => {
         });
     });
 
-    it('should populate user filter with userIdFilter if defined', async (): Promise<void> => {
+    it('should populate user filter with userId if defined', async (): Promise<void> => {
         const users = [
             mockedUser,
             { ...mockedUser, id: '2', email: 'admin2@example.com', firstName: 'Administrator 2' },
@@ -144,8 +136,8 @@ describe('jobs filtering', (): void => {
         expect(screen.getByLabelText(/filter user/)).toHaveTextContent('admin2@example.com');
     });
 
-    it('should populate job type filter with jobTypeFilter if defined', async (): Promise<void> => {
-        await renderComponent(undefined, undefined, JobType.OPTIMIZATION_POT);
+    it('should populate job type filter with jobTypes if defined', async (): Promise<void> => {
+        await renderComponent(undefined, undefined, [JobType.OPTIMIZATION_POT]);
         expect(screen.getByLabelText(/filter job type/)).toHaveTextContent('Optimize');
     });
 
@@ -197,26 +189,48 @@ describe('jobs filtering', (): void => {
         expect(screen.getByRole('option', { name: 'Optimize' })).toHaveAttribute('data-key', 'optimize');
     });
 
-    it('should trigger onChange event with selected filters', async (): Promise<void> => {
-        const users = [
-            mockedUser,
-            { ...mockedUser, id: '2', email: 'admin2@example.com', firstName: 'Administrator 2' },
-            { ...mockedUser, id: '3', email: 'admin3@example.com', firstName: 'Administrator 3' },
-        ];
+    it.each([
+        {
+            filterName: /filter project/,
+            filterValue: 'Test project 2',
+            changedValues: {
+                projectId: '222222',
+            },
+        },
+        {
+            filterName: /filter user/,
+            filterValue: 'admin3@example.com',
+            changedValues: {
+                userId: '3',
+            },
+        },
+        {
+            filterName: /filter job type/,
+            filterValue: 'Optimize',
+            changedValues: {
+                jobTypes: ['optimize_pot'],
+            },
+        },
+    ])(
+        `should trigger onChange event with selected filter `,
+        async ({ filterName, filterValue, changedValues }): Promise<void> => {
+            const users = [
+                mockedUser,
+                { ...mockedUser, id: '2', email: 'admin2@example.com', firstName: 'Administrator 2' },
+                { ...mockedUser, id: '3', email: 'admin3@example.com', firstName: 'Administrator 3' },
+            ];
 
-        await renderComponent(undefined, undefined, undefined, users);
+            await renderComponent(undefined, undefined, undefined, users);
 
-        fireEvent.click(screen.getByRole('button', { name: /filter project/ }));
-        fireEvent.click(await screen.findByRole('option', { name: 'Test project 2' }));
-        expect(mockOnChange).toHaveBeenCalledWith('222222', undefined, []);
-
-        fireEvent.click(screen.getByRole('button', { name: /filter user/ }));
-        fireEvent.click(screen.getByRole('option', { name: 'admin3@example.com' }));
-        expect(mockOnChange).toHaveBeenCalledWith('222222', '3', []);
-
-        fireEvent.click(screen.getByRole('button', { name: /filter job type/ }));
-        fireEvent.click(screen.getByRole('option', { name: 'Optimize' }));
-
-        expect(mockOnChange).toHaveBeenCalledWith('222222', '3', ['optimize_pot']);
-    });
+            fireEvent.click(screen.getByRole('button', { name: filterName }));
+            fireEvent.click(await screen.findByRole('option', { name: filterValue }));
+            const defaultValues = {
+                userId: undefined,
+                jobTypes: [],
+                projectId: undefined,
+            };
+            const expected = { ...defaultValues, ...changedValues };
+            expect(mockOnChange).toHaveBeenNthCalledWith(1, expect.objectContaining(expected));
+        }
+    );
 });

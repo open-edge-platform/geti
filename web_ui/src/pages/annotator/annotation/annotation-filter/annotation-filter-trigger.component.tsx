@@ -3,13 +3,12 @@
 
 import { useState } from 'react';
 
-import { DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
+import { CornerIndicator, DialogTrigger, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Filter } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { QuietToggleButton } from '../../../../shared/components/quiet-button/quiet-toggle-button.component';
 import { AnnotationFilterDialog } from './annotation-filter-dialog.component';
-import { CornerIndicator } from './corner-indicator.component';
 import { useAnnotationFilters } from './use-annotation-filters.hook';
 
 interface AnnotationsFilterTriggerProps {

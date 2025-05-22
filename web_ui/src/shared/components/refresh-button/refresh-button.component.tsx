@@ -15,6 +15,7 @@ interface RefreshButtonProps {
     isDisabled?: boolean;
 }
 
+// TODO: look through all the buttons with Refresh icon and make it consistent; then think about moving to @geti/ui
 export const RefreshButton = ({
     id,
     tooltip,
