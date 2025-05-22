@@ -158,7 +158,7 @@ Intel® Geti™ is a powerful tool to build vision models for a wide range of pr
 
 ## 🙌 Contributing
 
-We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING) to get started.
+We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 <p align="center">
   <b>Thank you 👏 to all our contributors!</b>
