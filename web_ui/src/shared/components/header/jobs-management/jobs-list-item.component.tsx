@@ -24,7 +24,6 @@ import { paths } from '../../../../core/services/routes';
 import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { downloadFile, formatDownloadUrl, sanitize } from '../../../utils';
-import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActionLink } from './action-link.component';
 import { JobListItemSkeletonLoader } from './job-list-item-skeleton-loader.component';
 import { JobsDiscardAction } from './jobs-discard-action.component';
@@ -54,14 +53,15 @@ const DownloadExportButton = ({ job }: { job: JobExportStatus | JobProjectExport
 
     return (
         <TooltipTrigger placement={'bottom'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 height={'size-300'}
                 marginEnd={'size-100'}
                 aria-label={props.label}
                 onPress={() => downloadFile(src, props.name)}
             >
                 <DownloadIcon />
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>{props.tooltip}</Tooltip>
         </TooltipTrigger>
     );

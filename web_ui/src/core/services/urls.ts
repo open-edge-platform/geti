@@ -22,6 +22,7 @@ import { OrganizationIdentifier } from '../organizations/organizations.interface
 import { ProjectIdentifier } from '../projects/core.interface';
 import { DatasetIdentifier } from '../projects/dataset.interface';
 import { ProjectsQueryOptions } from '../projects/services/project-service.interface';
+import { SortDirection } from '../shared/query-parameters';
 import { TaskIdentifier } from '../statistics/dtos/dataset-statistics.interface';
 import { MemberRoleDTO, ResourceTypeDTO } from '../users/users.interface';
 import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
@@ -471,7 +472,7 @@ const JOBS_QUERY_PARAMS = (workspaceIdentifier: WorkspaceIdentifier, queryParams
     if (skip) params.append('skip', skip.toString());
     if (limit) params.append('limit', limit.toString());
     // job_manager.py:89 use "desc"
-    if (sortDirection) params.append('sort_direction', sortDirection === 'dsc' ? 'desc' : 'asc');
+    if (sortDirection) params.append('sort_direction', sortDirection === SortDirection.DESC ? 'desc' : 'asc');
 
     return `${baseUrl}${params.toString()}`;
 };

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Flex, Heading, View } from '@geti/ui';
+import { ActionButton, Content, Flex, Heading, View } from '@geti/ui';
 import { Alert, Close } from '@geti/ui/icons';
 import dayjs from 'dayjs';
 
@@ -9,7 +9,6 @@ import { useMaintenanceQuery } from '../../core/maintenance/hooks/use-maintenanc
 import { GENERAL_SETTINGS_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../core/user-settings/utils';
-import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './maintenance-banner.module.scss';
 
@@ -65,14 +64,15 @@ export const MaintenanceBanner = () => {
                         Scheduled maintenance
                     </Flex>
                 </Heading>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     onPress={handleDismissBanner}
                     aria-label='dismiss banner'
                     UNSAFE_className={classes.closeButton}
                     id={'dismiss-maintenance-banner-id'}
                 >
                     <Close />
-                </QuietActionButton>
+                </ActionButton>
             </Flex>
             <Content UNSAFE_className={classes.content} id={'maintenance-banner-content-id'}>
                 We will be performing a scheduled update from <b>{fromTime}</b> to <b>{toTime} UTC</b>. During this

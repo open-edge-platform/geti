@@ -14,6 +14,7 @@ import {
     sortModelsGroupsByModelSize,
     sortModelsGroupsByScore,
 } from '../../../../core/models/utils';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { ButtonWithSpectrumTooltip } from '../../../../shared/components/button-with-tooltip/button-with-tooltip.component';
 
 export enum ModelsSortingOptions {
@@ -33,16 +34,22 @@ export const MODEL_SORTING_FUNCTIONS: Record<
     ModelsSortingOptions,
     (modelsGroups: ModelGroupsAlgorithmDetails[]) => ModelGroupsAlgorithmDetails[]
 > = {
-    [ModelsSortingOptions.SCORE_ASC]: (modelsGroups) => sortModelsGroupsByScore(modelsGroups, 'ASC'),
-    [ModelsSortingOptions.SCORE_DESC]: (modelsGroups) => sortModelsGroupsByScore(modelsGroups, 'DESC'),
-    [ModelsSortingOptions.COMPLEXITY_ASC]: (modelsGroups) => sortModelsGroupsByComplexity(modelsGroups, 'ASC'),
-    [ModelsSortingOptions.COMPLEXITY_DESC]: (modelsGroups) => sortModelsGroupsByComplexity(modelsGroups, 'DESC'),
-    [ModelsSortingOptions.CREATION_TIME_ASC]: (modelsGroups) => sortModelsGroupsByCreationTime(modelsGroups, 'ASC'),
-    [ModelsSortingOptions.CREATION_TIME_DESC]: (modelsGroups) => sortModelsGroupsByCreationTime(modelsGroups, 'DESC'),
-    [ModelsSortingOptions.SIZE_ASC]: (modelsGroups) => sortModelsGroupsByModelSize(modelsGroups, 'ASC'),
-    [ModelsSortingOptions.SIZE_DESC]: (modelsGroups) => sortModelsGroupsByModelSize(modelsGroups, 'DESC'),
-    [ModelsSortingOptions.ACTIVE_MODEL_ASC]: (modelsGroups) => sortModelsGroupsByActiveModel(modelsGroups, 'ASC'),
-    [ModelsSortingOptions.ACTIVE_MODEL_DESC]: (modelsGroups) => sortModelsGroupsByActiveModel(modelsGroups, 'DESC'),
+    [ModelsSortingOptions.SCORE_ASC]: (modelsGroups) => sortModelsGroupsByScore(modelsGroups, SortDirection.ASC),
+    [ModelsSortingOptions.SCORE_DESC]: (modelsGroups) => sortModelsGroupsByScore(modelsGroups, SortDirection.DESC),
+    [ModelsSortingOptions.COMPLEXITY_ASC]: (modelsGroups) =>
+        sortModelsGroupsByComplexity(modelsGroups, SortDirection.ASC),
+    [ModelsSortingOptions.COMPLEXITY_DESC]: (modelsGroups) =>
+        sortModelsGroupsByComplexity(modelsGroups, SortDirection.DESC),
+    [ModelsSortingOptions.CREATION_TIME_ASC]: (modelsGroups) =>
+        sortModelsGroupsByCreationTime(modelsGroups, SortDirection.ASC),
+    [ModelsSortingOptions.CREATION_TIME_DESC]: (modelsGroups) =>
+        sortModelsGroupsByCreationTime(modelsGroups, SortDirection.DESC),
+    [ModelsSortingOptions.SIZE_ASC]: (modelsGroups) => sortModelsGroupsByModelSize(modelsGroups, SortDirection.ASC),
+    [ModelsSortingOptions.SIZE_DESC]: (modelsGroups) => sortModelsGroupsByModelSize(modelsGroups, SortDirection.DESC),
+    [ModelsSortingOptions.ACTIVE_MODEL_ASC]: (modelsGroups) =>
+        sortModelsGroupsByActiveModel(modelsGroups, SortDirection.ASC),
+    [ModelsSortingOptions.ACTIVE_MODEL_DESC]: (modelsGroups) =>
+        sortModelsGroupsByActiveModel(modelsGroups, SortDirection.DESC),
 };
 
 const ModelsSortingMenu: FC<{ selectedSortingOption: ModelsSortingOptions; onSort: (key: Key) => void }> = ({

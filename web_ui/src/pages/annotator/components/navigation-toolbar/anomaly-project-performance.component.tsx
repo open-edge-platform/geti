@@ -1,12 +1,22 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Content, Dialog, DialogTrigger, Divider, Flex, Heading, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import {
+    ActionButton,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Flex,
+    Heading,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti/ui';
 import { ScoreMetric } from '@geti/ui/icons';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { AnomalyTaskPerformance } from '../../../../core/projects/task.interface';
-import { ColorMode, QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { AnomalyProjectPerformanceChart } from './anomaly-project-performance-chart.component';
 import { ProjectPerformanceTooltip } from './project-performance-tooltip.component';
 
@@ -24,9 +34,9 @@ export const AnomalyProjectPerformance = ({
     return (
         <DialogTrigger type='popover' hideArrow>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton colorMode={ColorMode.DARK} aria-label={'project performance'}>
+                <ActionButton isQuiet aria-label={'project performance'}>
                     <ScoreMetric className={classes.anomalyPerformanceIcon} />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>
                     <ProjectPerformanceTooltip
                         key={'performance'}

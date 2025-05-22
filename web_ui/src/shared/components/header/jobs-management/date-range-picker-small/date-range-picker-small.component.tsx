@@ -4,6 +4,7 @@
 import { FC, ReactNode, useState } from 'react';
 
 import {
+    ActionButton,
     Content,
     DateField,
     Dialog,
@@ -20,8 +21,6 @@ import Calendar from '@spectrum-icons/workflow/Calendar';
 import { isFunction } from 'lodash-es';
 import isEmpty from 'lodash/isEmpty';
 import { RangeCalendarProps } from 'react-aria-components';
-
-import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
 interface DateRangePickerSmall extends Omit<RangeCalendarProps<DateValue>, 'focusedValue' | 'onFocusChange'> {
     hasManualEdition?: boolean;
@@ -71,9 +70,9 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({
     return (
         <DialogTrigger type='popover'>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton aria-label='Select date range'>
+                <ActionButton isQuiet aria-label='Select date range'>
                     <Calendar />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{rangeText}</Tooltip>
             </TooltipTrigger>
             <Dialog>

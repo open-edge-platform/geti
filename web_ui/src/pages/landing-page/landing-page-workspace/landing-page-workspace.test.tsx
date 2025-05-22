@@ -2,7 +2,6 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { screen } from '@testing-library/react';
-import { VirtuosoMockContext } from 'react-virtuoso';
 
 import { projectListRender as render } from '../../../test-utils/projects-list-providers-render';
 import { LandingPageWorkspace as Workspace } from './landing-page-workspace.component';
@@ -44,11 +43,7 @@ describe('Landing page workspace', () => {
 
     //TODO: Move tests to playwright or handle differently - should be disabled because of library downgrade
     it('renders project list correctly', async () => {
-        await render(
-            <VirtuosoMockContext.Provider value={{ viewportHeight: 900, itemHeight: 100 }}>
-                <Workspace />
-            </VirtuosoMockContext.Provider>
-        );
+        await render(<Workspace />);
 
         expect(await screen.findByText('Test project 1')).toBeInTheDocument();
         expect(screen.getByText('Test project 2')).toBeInTheDocument();

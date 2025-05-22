@@ -3,13 +3,12 @@
 
 import { CSSProperties } from 'react';
 
-import { Button, ButtonGroup, Flex, Heading, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
+import { ActionButton, Button, ButtonGroup, Flex, Heading, Item, Menu, MenuTrigger, Text, View } from '@geti/ui';
 import { MoreMenu } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { TUTORIAL_CARD_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useDocsUrl } from '../../../hooks/use-docs-url/use-docs-url.hook';
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 import { onPressLearnMore } from '../tutorials/utils';
 import { getCardData } from './utils';
 
@@ -61,14 +60,15 @@ export const TutorialCard = ({
                 </Flex>
 
                 <MenuTrigger>
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         id={`${id}-more-btn-id`}
                         aria-label='Open to dismiss all help dialogs'
                         data-testid={`${id}-more-btn-id`}
                         UNSAFE_className={classes.moreMenu}
                     >
                         <MoreMenu />
-                    </QuietActionButton>
+                    </ActionButton>
                     <Menu id={`${id}-tutorial-card-menu-id`} onAction={onPressDismissAll}>
                         <Item key={id} test-id={`${id}-dismiss-all-id`} textValue='Dismiss all'>
                             Dismiss all

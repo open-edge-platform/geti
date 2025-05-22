@@ -19,8 +19,8 @@ import {
     TooltipTrigger,
 } from '@geti/ui';
 
+import { ConfigurableParametersType } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { ConfigurableParameters } from '../../../../../shared/components/configurable-parameters/configurable-parameters.component';
-import { ConfigurableParametersType } from '../../../../../shared/components/configurable-parameters/configurable-parameters.interface';
 import { useReconfigureParametersValue } from './use-reconfigure-parameters-value/use-reconfigure-parameters-value';
 
 import sharedClasses from '../../../../../shared/shared.module.scss';

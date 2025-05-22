@@ -5,12 +5,12 @@ import '@wessberg/pointer-events';
 
 import { ReactNode } from 'react';
 
+import { ThemeProvider } from '@geti/ui/theme';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { Polygon } from '../../../../../core/annotations/shapes.interface';
 import { ShapeType } from '../../../../../core/annotations/shapetype.enum';
 import { KeyMap } from '../../../../../shared/keyboard-events/keyboard.interface';
-import { ThemeProvider } from '../../../../../theme/theme-provider.component';
 import { AnnotatorContextMenuProvider } from '../../../providers/annotator-context-menu-provider/annotator-context-menu-provider.component';
 import { EditPoints } from './edit-points.component';
 

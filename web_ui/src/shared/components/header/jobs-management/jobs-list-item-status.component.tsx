@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { Flex, LoadingIndicator, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ActionButton, Flex, LoadingIndicator, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Alert, ChevronDownSmallLight } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { isFunction, maxBy } from 'lodash-es';
@@ -12,7 +12,6 @@ import { JobStepState } from '../../../../core/jobs/jobs.const';
 import { Job, JobStep } from '../../../../core/jobs/jobs.interface';
 import { ANIMATION_PARAMETERS } from '../../../animation-parameters/animation-parameters';
 import { isNonEmptyArray } from '../../../utils';
-import { QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ThinProgressBar } from '../../thin-progress-bar/thin-progress-bar.component';
 import { JobsListItemDetailedProgress } from './jobs-list-item-progress.component';
 import { getJobDuration, getStepProgress, getStepProgressNumber } from './utils';
@@ -78,7 +77,8 @@ export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: Jo
                 <Flex alignItems='center' marginY='size-100'>
                     {isNonEmptyArray(job.steps) && (
                         <Flex justifyContent={'space-between'} alignItems={'center'}>
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 id={`job-scheduler-${job.id}-action-expand`}
                                 data-testid={`job-scheduler-${job.id}-action-expand`}
                                 onPress={onExpandHandler}
@@ -92,7 +92,7 @@ export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: Jo
                                         <ChevronDownSmallLight width={24} height={24} />
                                     </View>
                                 </motion.div>
-                            </QuietActionButton>
+                            </ActionButton>
                         </Flex>
                     )}
                 </Flex>

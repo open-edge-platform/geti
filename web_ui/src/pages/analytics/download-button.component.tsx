@@ -1,10 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Text, View } from '@geti/ui';
+import { ActionButton, Flex, Text, View } from '@geti/ui';
 import { DownloadIcon } from '@geti/ui/icons';
 
-import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { idMatchingFormat } from '../../test-utils/id-utils';
 
 import classes from './analytics.module.scss';
@@ -16,7 +15,8 @@ interface DownloadButtonProps {
 
 export const DownloadButton = ({ exportName, handlePress }: DownloadButtonProps): JSX.Element => {
     return (
-        <QuietActionButton
+        <ActionButton
+            isQuiet
             aria-label={`Download ${exportName}`}
             onPress={handlePress}
             UNSAFE_className={classes.exportAnalyticsData}
@@ -28,6 +28,6 @@ export const DownloadButton = ({ exportName, handlePress }: DownloadButtonProps)
                     <DownloadIcon />
                 </View>
             </Flex>
-        </QuietActionButton>
+        </ActionButton>
     );
 };

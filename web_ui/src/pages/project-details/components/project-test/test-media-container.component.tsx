@@ -17,10 +17,10 @@ import {
 import { isClassificationDomain, isSegmentationDomain } from '../../../../core/projects/domains';
 import { TASK_TYPE } from '../../../../core/projects/dtos/task.interface';
 import { getDomain } from '../../../../core/projects/project.interface';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { TestMediaItem } from '../../../../core/tests/test-media.interface';
 import { Test } from '../../../../core/tests/tests.interface';
 import { CardContent } from '../../../../shared/components/card-content/card-content.component';
-import { SortDirection } from '../../../../shared/components/sort-by-attribute/sort-by-attribute.component';
 import { hasEqualDomain, hasEqualId } from '../../../../shared/utils';
 import { TaskProvider } from '../../../annotator/providers/task-provider/task-provider.component';
 import { useProject } from '../../providers/project-provider/project-provider.component';

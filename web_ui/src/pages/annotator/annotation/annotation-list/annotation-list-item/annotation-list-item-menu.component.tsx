@@ -3,10 +3,8 @@
 
 import { Key } from 'react';
 
-import { Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
+import { ActionButton, Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
 import { Delete, Edit, Invisible, Lock, MoreMenu, Unlock, Visible } from '@geti/ui/icons';
-
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './annotation-list-item.module.scss';
 
@@ -75,9 +73,14 @@ export const AnnotationListItemMenu = ({
 
     return (
         <MenuTrigger>
-            <QuietActionButton aria-label='Show actions' id={`annotation-list-item-${id}-menu`} isDisabled={isDisabled}>
+            <ActionButton
+                isQuiet
+                aria-label='Show actions'
+                id={`annotation-list-item-${id}-menu`}
+                isDisabled={isDisabled}
+            >
                 <MoreMenu className={isHidden ? classes.hiddenAnnotation : ''} />
-            </QuietActionButton>
+            </ActionButton>
             <Menu onAction={onAction} disabledKeys={disabledKeys}>
                 {isHidden ? (
                     <Item key={MENU_ACTIONS.SHOW} textValue='Show'>

@@ -4,12 +4,12 @@
 import { useEffect } from 'react';
 
 import { Flex, Heading, Radio, RadioGroup, Text, useMediaQuery, View } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEqual } from 'lodash-es';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Arrow } from '../../../../shared/components/arrow/arrow.component';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { Card } from '../card.component';
 import { TaskChainMetadata, TaskChainTemplateProps } from './project-template.interface';
 

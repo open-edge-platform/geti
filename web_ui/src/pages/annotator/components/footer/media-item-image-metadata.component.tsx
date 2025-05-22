@@ -2,9 +2,9 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useMediaQuery } from '@geti/ui';
+import { isLargeSizeQuery } from '@geti/ui/theme';
 
 import { MediaItem } from '../../../../core/media/media.interface';
-import { isLargeSizeQuery } from '../../../../theme/queries';
 import { LastAnnotator } from './last-annotator.component';
 import { MediaNameAndResolution } from './media-name-and-resolution.component';
 

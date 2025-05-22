@@ -15,7 +15,7 @@ import {
     EntityTaskIdentifierDTO,
     NumberGroupParamsDTO,
     SelectableGroupParamsDTO,
-} from '../../../core/configurable-parameters/dtos/configurable-parameters.interface';
+} from '../dtos/configurable-parameters.interface';
 
 interface ConfigParametersId {
     id: string;

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Provider, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ActionButton, Flex, Provider, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { InstallPWA } from '@geti/ui/icons';
 
 import { AutoTrainingCreditsModalFactory } from '../../../../pages/annotator/notification/auto-training-credits-modal/auto-training-credits-modal.component';
@@ -9,7 +9,6 @@ import { ManualTrainingCreditDeductionNotificationFactory } from '../../../../pa
 import { useProgressiveWebApp } from '../../../../providers/progressive-web-app-provider/progressive-web-app-provider.component';
 import { useIsCreditAccountEnabled } from '../../../hooks/use-is-credit-account-enabled';
 import { AutoTrainingCoachMark } from '../../coach-mark/fux-notifications/auto-training-coach-mark.component';
-import { ColorMode, QuietActionButton } from '../../quiet-button/quiet-action-button.component';
 import { ActiveLearningConfiguration } from '../active-learning-configuration/active-learning-configuration.component';
 import { CreditBalanceStatus } from '../credit-balance/credit-balance-status.component';
 import { JobsActionIcon } from '../jobs-management/jobs-action-icon.component';
@@ -40,15 +39,16 @@ export const HeaderActions = ({ isDarkMode, isProject, isAnomalyProject }: Heade
                 >
                     {isPWAReady && (
                         <TooltipTrigger placement={'bottom'}>
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 key='install-app'
                                 id='install-app'
-                                colorMode={isDarkMode ? ColorMode.DARK : ColorMode.LIGHT}
+                                colorVariant={isDarkMode ? 'dark' : 'light'}
                                 aria-label='Install Geti (PWA)'
                                 onPress={handlePromptInstallApp}
                             >
                                 <InstallPWA />
-                            </QuietActionButton>
+                            </ActionButton>
                             <Tooltip>Install Geti (PWA)</Tooltip>
                         </TooltipTrigger>
                     )}

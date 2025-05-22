@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { apiClient } from '@geti/core';
+
 import { isNotCropDomain } from '../../../shared/utils';
 import {
     ExportDatasetStatusDTO,
@@ -14,7 +16,6 @@ import {
 import { JobState, JobStepState } from '../../jobs/jobs.const';
 import { JobExportStatus, JobProjectExportStatus, JobStatusIdentifier } from '../../jobs/jobs.interface';
 import { getJobActiveStep, getJobEntity } from '../../jobs/utils';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
@@ -66,7 +67,7 @@ export const JobStateToExportStatus: Record<JobState, ExportStatusStateDTO> = {
 };
 
 export const createApiProjectService: CreateApiService<ProjectService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const getProjects: ProjectService['getProjects'] = async (
         workspaceIdentifier: WorkspaceIdentifier,

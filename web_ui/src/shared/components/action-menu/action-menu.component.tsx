@@ -3,10 +3,18 @@
 
 import { Key } from 'react';
 
-import { Icon, Item, Menu, MenuTrigger as SpectrumMenuTrigger, Text, Tooltip, TooltipTrigger } from '@geti/ui';
+import {
+    ActionButton,
+    Icon,
+    Item,
+    Menu,
+    MenuTrigger as SpectrumMenuTrigger,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti/ui';
 import { MoreMenu } from '@geti/ui/icons';
 
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 import { MenuAction } from './menu-action.interface';
 
 interface ActionMenuProps<T> {
@@ -28,9 +36,9 @@ export const ActionMenu = <T extends string>({
     return (
         <SpectrumMenuTrigger>
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton id={id} data-testid={id} aria-label={ariaLabel}>
+                <ActionButton isQuiet id={id} data-testid={id} aria-label={ariaLabel}>
                     <MoreMenu />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{tooltipMessage}</Tooltip>
             </TooltipTrigger>
             <Menu onAction={onAction} disabledKeys={disabledKeys} items={items}>

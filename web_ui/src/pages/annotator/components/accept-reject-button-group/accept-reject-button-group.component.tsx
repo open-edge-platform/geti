@@ -1,13 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ButtonGroup, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, ButtonGroup, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Reject } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../../../shared/animation-parameters/animation-parameters';
 import { AcceptButton } from '../../../../shared/components/quiet-button/accept-button.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 import { useAnnotatorHotkeys } from '../../hooks/use-hotkeys-configuration.hook';
 import { useAcceptRejectShortcut } from './use-accept-reject-shortcut/use-accept-reject-shortcut.hook';
 
@@ -43,7 +42,8 @@ export const AcceptRejectButtonGroup = ({
                 <motion.div variants={ANIMATION_PARAMETERS.FADE_ITEM} initial={'hidden'} animate={'visible'}>
                     <ButtonGroup>
                         <TooltipTrigger placement={'bottom'}>
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 key={`reject-${id}-annotation`}
                                 onPress={handleRejectAnnotation}
                                 id={`reject-${id}-annotation`}
@@ -51,7 +51,7 @@ export const AcceptRejectButtonGroup = ({
                                 marginEnd={'size-100'}
                             >
                                 <Reject height={20} width={20} />
-                            </QuietActionButton>
+                            </ActionButton>
                             <Tooltip>{`Reject annotations - ${hotkeys.close.slice(0, 3).toUpperCase()}`}</Tooltip>
                         </TooltipTrigger>
 

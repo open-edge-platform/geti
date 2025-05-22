@@ -3,20 +3,19 @@
 
 import { motion, Variants } from 'framer-motion';
 
-import { ColorMode } from '../quiet-button/quiet-action-button.component';
-
 type Sizes = 'S' | 'M';
+type ColorVariant = 'dark' | 'light' | 'blue';
 
 interface ThreeDotsFlashingProps {
-    mode?: ColorMode;
+    variant?: ColorVariant;
     size?: Sizes;
     className?: string;
 }
 
-const DOT_COLORS: Record<ColorMode, string> = {
-    [ColorMode.DARK]: 'var(--spectrum-global-color-gray-800)',
-    [ColorMode.LIGHT]: 'var(--spectrum-global-color-gray-50)',
-    [ColorMode.BLUE]: 'var(--spectrum-global-color-gray-800)',
+const DOT_COLORS: Record<ColorVariant, string> = {
+    dark: 'var(--spectrum-global-color-gray-800)',
+    light: 'var(--spectrum-global-color-gray-50)',
+    blue: 'var(--spectrum-global-color-gray-800)',
 };
 
 const DOT_SIZES: Record<Sizes, string> = {
@@ -24,12 +23,8 @@ const DOT_SIZES: Record<Sizes, string> = {
     M: 'var(--spectrum-global-dimension-size-50)',
 };
 
-export const ThreeDotsFlashing = ({
-    mode = ColorMode.DARK,
-    size = 'M',
-    className,
-}: ThreeDotsFlashingProps): JSX.Element => {
-    const dotColor = DOT_COLORS[mode];
+export const ThreeDotsFlashing = ({ variant = 'dark', size = 'M', className }: ThreeDotsFlashingProps): JSX.Element => {
+    const dotColor = DOT_COLORS[variant];
     const dotSize = DOT_SIZES[size];
 
     const dotVariants: Variants = {

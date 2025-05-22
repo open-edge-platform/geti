@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { cloneDeep } from 'lodash-es';
+import { cloneDeep, orderBy } from 'lodash-es';
 
-import { sortAscending } from '../../../src/shared/utils';
 import { test as baseTest } from '../../fixtures/base-test';
 import { extendWithOpenApi } from '../../fixtures/open-api';
 import { supportedAlgorithms } from '../../fixtures/open-api/mocks';
@@ -32,7 +31,7 @@ export const testWithModels = extendWithOpenApi(baseTest).extend<ModelsFixtures>
                 supportedAlgorithms.supported_algorithms?.filter(({ task_type }) => task_type === task?.task_type) ??
                 [];
 
-            const sortedAlgorithms = sortAscending(algorithmsPerTask, 'gigaflops');
+            const sortedAlgorithms = orderBy(algorithmsPerTask, 'gigaflops', 'asc');
 
             const model_groups = getModelGroups.model_groups?.map((modelGroup) => {
                 return { ...modelGroup, task_id: task?.id, model_template_id: sortedAlgorithms[0].model_template_id };

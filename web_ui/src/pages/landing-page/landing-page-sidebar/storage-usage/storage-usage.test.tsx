@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useMediaQuery } from '@geti/ui';
+import { ThemeProvider } from '@geti/ui/theme';
 import { render, screen } from '@testing-library/react';
 
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { checkTooltip } from '../../../../test-utils/utils';
-import { ThemeProvider } from '../../../../theme/theme-provider.component';
 import { StorageUsage } from './storage-usage.component';
 
 jest.mock('../../../../core/status/hooks/use-status.hook', () => ({

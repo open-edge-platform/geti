@@ -10,7 +10,10 @@ import {
     SpectrumButtonProps,
 } from '@adobe/react-spectrum';
 import { FocusableRef, FocusableRefValue } from '@react-types/shared';
+import clsx from 'clsx';
 import { Link } from 'react-router-dom';
+
+import buttonClasses from './button.module.scss';
 
 type VariantWithoutLegacyButtonVariant = Exclude<SpectrumButtonProps['variant'], 'cta' | 'overBackground'>;
 
@@ -32,7 +35,18 @@ function LinkBuilder({ href, target, rel }: { href: string; target?: LinkProps['
 
 export interface ActionButtonProps extends SpectrumActionButtonProps {
     ref?: Ref<FocusableRefValue<HTMLElement, HTMLButtonElement>>;
+    colorVariant?: ButtonColorVariant;
 }
+
+type ButtonColorVariant = 'dark' | 'light' | 'blue';
+
+const getActionButtonClass = (colorVariant: ButtonColorVariant = 'dark') => {
+    return colorVariant === 'dark'
+        ? buttonClasses.actionButtonDark
+        : colorVariant === 'light'
+          ? buttonClasses.actionButtonLight
+          : buttonClasses.actionButtonBlue;
+};
 
 export const Button = forwardRef((props: ButtonProps, ref: ButtonProps['ref']) => {
     const elementType =
@@ -44,5 +58,8 @@ export const Button = forwardRef((props: ButtonProps, ref: ButtonProps['ref']) =
 });
 
 export const ActionButton = forwardRef((props: ActionButtonProps, ref: ActionButtonProps['ref']) => {
-    return <SpectrumActionButton {...props} ref={ref} />;
+    const { colorVariant, UNSAFE_className, ...rest } = props;
+    const buttonClass = getActionButtonClass(colorVariant);
+
+    return <SpectrumActionButton {...rest} ref={ref} UNSAFE_className={clsx(buttonClass, UNSAFE_className)} />;
 });

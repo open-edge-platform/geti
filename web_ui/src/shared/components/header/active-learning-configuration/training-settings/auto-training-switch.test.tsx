@@ -3,6 +3,11 @@
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
+import {
+    BooleanGroupParams,
+    ConfigurableParametersTaskChain,
+    NumberGroupParams,
+} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { JobState } from '../../../../../core/jobs/jobs.const';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
@@ -12,11 +17,6 @@ import { getMockedProjectIdentifier } from '../../../../../test-utils/mocked-ite
 import { getMockedModelVersion } from '../../../../../test-utils/mocked-items-factory/mocked-model';
 import { getMockedTask } from '../../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectRender as render } from '../../../../../test-utils/project-provider-render';
-import {
-    BooleanGroupParams,
-    ConfigurableParametersTaskChain,
-    NumberGroupParams,
-} from '../../../configurable-parameters/configurable-parameters.interface';
 import { getAllJobs } from '../../jobs-management/utils';
 import { AutoTrainingSwitch } from './auto-training-switch.component';
 

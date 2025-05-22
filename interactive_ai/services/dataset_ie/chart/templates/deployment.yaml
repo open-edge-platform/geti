@@ -110,7 +110,7 @@ spec:
             - name: MIN_FREE_SPACE_GIB
               value: "{{ .Values.global.min_free_disk_space_gib }}"
             - name: WORKDIR
-              value: {{ .Values.mountPath }}
+              value: {{ .Values.diskSizeMountPath }}
             - name: MODEL_TEMPLATES_DIR
               value: /model_templates
             - name: DATABASE_ADDRESS
@@ -240,6 +240,10 @@ spec:
               subPath: {{ .Values.audit_logs_mount_path }}
             - mountPath: /tmp
               name: tmp
+            - name: disk-size
+              mountPath: {{ .Values.diskSizeMountPath }}
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: true
           ports:
             - name: dataset
               containerPort: {{ .Values.service.port }}
@@ -259,3 +263,6 @@ spec:
         {{- end }}
         - emptyDir: {}
           name: tmp
+        - name: disk-size
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim

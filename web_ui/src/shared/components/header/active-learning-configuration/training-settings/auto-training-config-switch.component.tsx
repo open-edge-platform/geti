@@ -6,13 +6,13 @@ import { FC } from 'react';
 import { Flex, Switch, Text } from '@geti/ui';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
-import { findAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
-import { Task } from '../../../../../core/projects/task.interface';
-import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import {
     BooleanGroupParams,
     ConfigurableParametersTaskChain,
-} from '../../../configurable-parameters/configurable-parameters.interface';
+} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { findAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
+import { Task } from '../../../../../core/projects/task.interface';
+import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 
 interface AutoTrainingConfigSwitchProps {
     task: Task;

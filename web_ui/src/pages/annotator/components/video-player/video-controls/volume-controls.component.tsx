@@ -1,10 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger } from '@geti/ui';
 import { SoundOff, SoundOn } from '@geti/ui/icons';
-
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface VolumeControlsProps {
     isMuted: boolean;
@@ -14,13 +12,14 @@ interface VolumeControlsProps {
 export const VolumeControls = ({ isMuted, setIsMuted }: VolumeControlsProps) => {
     return (
         <TooltipTrigger placement={'bottom'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 id='video-player-mute'
                 onPress={() => setIsMuted(!isMuted)}
                 aria-label={isMuted ? 'Unmute video' : 'Mute video'}
             >
                 {isMuted ? <SoundOff /> : <SoundOn />}
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>{isMuted ? 'Unmute video' : 'Mute video'}</Tooltip>
         </TooltipTrigger>
     );

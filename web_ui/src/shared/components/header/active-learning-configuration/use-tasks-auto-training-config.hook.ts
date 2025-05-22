@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useConfigParameters } from '../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
+import { ConfigurableParametersTaskChain } from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import {
     findAutoTrainingConfig,
     findDynamicRequiredAnnotationsConfig,
@@ -10,7 +11,6 @@ import {
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
 import { isNotCropTask } from '../../../utils';
-import { ConfigurableParametersTaskChain } from '../../configurable-parameters/configurable-parameters.interface';
 import { AutoTrainingTask } from './util';
 
 export const useAutoTrainingTasksConfig = (

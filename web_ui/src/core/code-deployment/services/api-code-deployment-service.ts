@@ -1,14 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { apiClient } from '@geti/core';
+
 import { downloadFile } from '../../../shared/utils';
-import { instance as defaultAxiosInstance } from '../../services/axios-instance';
 import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { CodeDeploymentService, DownloadDeploymentPackageBodyDTO } from './code-deployment-service.interface';
 
 export const createApiCodeDeploymentService: CreateApiService<CodeDeploymentService> = (
-    { instance, router } = { instance: defaultAxiosInstance, router: API_URLS }
+    { instance, router } = { instance: apiClient, router: API_URLS }
 ) => {
     const downloadDeploymentPackage: CodeDeploymentService['downloadDeploymentPackage'] = async (
         projectIdentifier,

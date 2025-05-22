@@ -3,12 +3,11 @@
 
 import { ComponentProps, MutableRefObject, ReactNode } from 'react';
 
-import { Button, CustomPopover, Divider, Flex, Popover, Text } from '@geti/ui';
+import { ActionButton, Button, CustomPopover, Divider, Flex, Popover, Text } from '@geti/ui';
 import { Close } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
 
 import { openNewTab } from '../../../../utils';
-import { QuietActionButton } from '../../../quiet-button/quiet-action-button.component';
 
 import classes from './fux-notification.module.scss';
 
@@ -45,7 +44,8 @@ export const FuxNotification = ({ docUrl, placement, triggerRef, state, onClose,
 
                 <Divider order={3} orientation='vertical' size='S' UNSAFE_className={classes.divider} />
 
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     order={4}
                     onPress={() => {
                         state.close();
@@ -55,7 +55,7 @@ export const FuxNotification = ({ docUrl, placement, triggerRef, state, onClose,
                     UNSAFE_className={classes.close}
                 >
                     <Close />
-                </QuietActionButton>
+                </ActionButton>
             </Flex>
         </CustomPopover>
     );

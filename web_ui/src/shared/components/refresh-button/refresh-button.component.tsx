@@ -1,10 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Refresh } from '@geti/ui/icons';
-
-import { QuietActionButton } from '../quiet-button/quiet-action-button.component';
 
 import classes from './refresh-button.module.scss';
 
@@ -28,7 +26,8 @@ export const RefreshButton = ({
 }: RefreshButtonProps): JSX.Element => {
     return (
         <TooltipTrigger placement={'bottom'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 id={id}
                 aria-label={ariaLabel}
                 isDisabled={isLoading || isDisabled}
@@ -36,7 +35,7 @@ export const RefreshButton = ({
                 onPress={onPress}
             >
                 <Refresh />
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>{tooltip}</Tooltip>
         </TooltipTrigger>
     );

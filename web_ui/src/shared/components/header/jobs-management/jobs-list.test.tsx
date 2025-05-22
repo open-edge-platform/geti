@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { JobState, JobType } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
+import { SortDirection } from '../../../../core/shared/query-parameters';
 import { getMockedJob } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
-import { SortDirection } from '../../sort-by-attribute/sort-by-attribute.component';
 import { JobsList, JobsListProps } from './jobs-list.component';
 
 jest.mock('react-router-dom', () => ({

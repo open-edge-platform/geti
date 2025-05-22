@@ -7,6 +7,11 @@ import { Divider, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
 import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
+import {
+    BooleanGroupParams,
+    ConfigurableParametersTaskChain,
+    NumberGroupParams,
+} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { useGetRunningJobs } from '../../../../../core/jobs/hooks/use-jobs.hook';
 import { RunningJobProps, RunningTrainingJob } from '../../../../../core/jobs/jobs.interface';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
@@ -17,11 +22,6 @@ import { paths } from '../../../../../core/services/routes';
 import { useRequiredAnnotations } from '../../../../../pages/annotator/hooks/use-required-annotations.hook';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { formatDate } from '../../../../utils';
-import {
-    BooleanGroupParams,
-    ConfigurableParametersTaskChain,
-    NumberGroupParams,
-} from '../../../configurable-parameters/configurable-parameters.interface';
 import { LinkNewTab } from '../../../link-new-tab/link-new-tab.component';
 import { getAllJobs } from '../../jobs-management/utils';
 import { ToggleTrainingButton } from '../start-stop-training-button/start-stop-training-button.component';

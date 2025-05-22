@@ -53,7 +53,7 @@ spec:
             - name: MIN_FREE_SPACE_GIB
               value: "{{ .Values.global.min_free_disk_space_gib }}"
             - name: WORKDIR
-              value: {{ .Values.mountPath }}
+              value: {{ .Values.diskSizeMountPath }}
             {{- if .Values.global.enable_object_storage }}
             - name: S3_CREDENTIALS_PROVIDER
               valueFrom:
@@ -126,6 +126,10 @@ spec:
             - mountPath: {{ .Values.mountPath }}
               name: data-storage
               subPath: binary_data
+            - name: disk-size
+              mountPath: {{ .Values.diskSizeMountPath }}
+              subPath: {{ .Values.audit_logs_mount_path }}
+              readOnly: true
           lifecycle:
             preStop:
               exec:
@@ -139,3 +143,6 @@ spec:
         - name: data-storage
           emptyDir: {}
         {{- end }}
+        - name: disk-size
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim
