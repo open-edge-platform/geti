@@ -218,6 +218,11 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Namespace }}-configuration
                   key: platformVersion
+            - name: INSTALLATION_PROFILE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-configuration
+                  key: installation_profile
             - name: BUILD_VERSION
               valueFrom:
                 configMapKeyRef:
