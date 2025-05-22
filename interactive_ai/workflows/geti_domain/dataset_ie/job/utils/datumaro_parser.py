@@ -54,11 +54,13 @@ class DatumaroProjectParser(ProjectParser):
         self._project_name: str = project_name
         self._project_type: GetiProjectType = project_type
         self._color_by_label = color_by_label if color_by_label else {}
-
+        logger.warning(f"{project_type}")
         (
             self._task_names_ordered,
             self._task_name_to_task_type,
         ) = self._process_task_types(project_type=project_type)
+
+        logger.warning(f"{self._task_names_ordered}, {self._task_name_to_task_type}")
 
         if (
             FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
@@ -657,7 +659,7 @@ def get_project_metas_with_labels(
     # Extract project meta-data that will be utilized when build a REST API response
     project_metas_with_labels: list[dict[str, Any]] = []
     for project_type in filtered_supported_project_types:
-        logger.warning(f"Before try: {project_metas_with_labels}")
+        logger.warning(f"Before try: {filtered_supported_project_types}")
         try:
             project_parser = DatumaroProjectParser(
                 project_name=f"prepare {ImportUtils.project_type_to_rest_api_string(project_type)} project",
