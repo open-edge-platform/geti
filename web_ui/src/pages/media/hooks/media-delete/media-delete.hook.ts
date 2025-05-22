@@ -18,7 +18,7 @@ interface UseDeleteMediaMutation {
     deleteMedia: UseMutationResult<unknown, AxiosError, MediaItem[]>;
 }
 
-const BATCH_SIZE = 1000;
+const BATCH_SIZE = 300;
 
 const getQueriesAndPreviousItems = (
     previousItems: [QueryKey, InfiniteData<MediaAdvancedFilterResponse> | undefined][]
