@@ -25,4 +25,20 @@ export default [
             ],
         },
     },
+    {
+        files: ['./src/**/*.{ts,tsx}'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['@geti/core'],
+                            message: 'Importing files from @geti/core is not allowed.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
 ];
