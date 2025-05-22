@@ -3,10 +3,9 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ActionButton, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Fps } from '@geti/ui/icons';
 
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { FRAME_STEP_TO_DISPLAY_ALL_FRAMES } from '../../utils';
 
 import classes from './frame-step.module.scss';
@@ -34,7 +33,8 @@ export const FrameStep = ({ isDisabled, step, setStep, defaultFps }: FrameStepPr
 
     return (
         <TooltipTrigger placement={'top'}>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 isDisabled={isDisabled}
                 onPress={handleFpsToggle}
                 position={'relative'}
@@ -54,7 +54,7 @@ export const FrameStep = ({ isDisabled, step, setStep, defaultFps }: FrameStepPr
                 >
                     {isAllMode ? FrameMode.ALL_FRAMES : FrameMode.ONE_FRAME}
                 </View>
-            </QuietActionButton>
+            </ActionButton>
             <Tooltip>{isAllMode ? 'Show 1 frame per second' : 'Show all frames'}</Tooltip>
         </TooltipTrigger>
     );

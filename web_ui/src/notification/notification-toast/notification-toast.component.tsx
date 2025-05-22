@@ -3,12 +3,11 @@
 
 import { ReactElement } from 'react';
 
-import { Flex, Heading, Text } from '@geti/ui';
+import { ActionButton, Flex, Heading, Text } from '@geti/ui';
 import { CloseSmall } from '@geti/ui/icons';
 import clsx from 'clsx';
 import { isEmpty } from 'lodash-es';
 
-import { QuietActionButton } from '../../shared/components/quiet-button/quiet-action-button.component';
 import { NOTIFICATION_TYPE } from './notification-type.enum';
 import { getIcon, getTypeToastClass } from './utils';
 
@@ -69,7 +68,8 @@ export const NotificationToast = ({
                     </Flex>
                 )}
             </Flex>
-            <QuietActionButton
+            <ActionButton
+                isQuiet
                 onPress={remove}
                 aria-label='close notification'
                 UNSAFE_className={clsx([
@@ -84,7 +84,7 @@ export const NotificationToast = ({
                     aria-label='close notification icon'
                     className={isWarning ? classes['close-notification-icon--warning'] : ''}
                 />
-            </QuietActionButton>
+            </ActionButton>
         </div>
     );
 };

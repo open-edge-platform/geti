@@ -3,7 +3,14 @@
 
 import { useState } from 'react';
 
-import { Tooltip, TooltipTrigger, View, type ActionButtonProps, type BackgroundColorValue } from '@geti/ui';
+import {
+    ActionButton,
+    Tooltip,
+    TooltipTrigger,
+    View,
+    type ActionButtonProps,
+    type BackgroundColorValue,
+} from '@geti/ui';
 import { DownloadIcon } from '@geti/ui/icons';
 
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
@@ -16,7 +23,6 @@ import {
     getContainerElements,
     getVarColorToHex,
 } from '../../../../../shared/components/download-graph-menu/export-svg-utils';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './download-svg-button.module.scss';
 
@@ -65,7 +71,8 @@ export const DownloadSvgButton = ({
             UNSAFE_style={{ width: 'fit-content' }}
         >
             <TooltipTrigger placement={'bottom'}>
-                <QuietActionButton
+                <ActionButton
+                    isQuiet
                     onPress={onDownloadPdf}
                     isDisabled={isDownloading}
                     {...props}
@@ -73,7 +80,7 @@ export const DownloadSvgButton = ({
                     UNSAFE_className={classes.downloadAllGraphs}
                 >
                     {text} <DownloadIcon />
-                </QuietActionButton>
+                </ActionButton>
                 <Tooltip>{tooltip}</Tooltip>
             </TooltipTrigger>
         </View>

@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ActionButton } from '@geti/ui';
 import { MoreMenu } from '@geti/ui/icons';
 
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';
 import { MenuTrigger } from '../../../../shared/components/menu-trigger/menu-trigger.component';
-import { QuietActionButton } from '../../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface ContentMenuProps {
     point: KeypointNode;
@@ -24,9 +24,9 @@ export const ContentMenu = ({ point, onUpdate }: ContentMenuProps) => {
             items={[option]}
             onAction={() => onUpdate({ ...point, isVisible: !point.isVisible })}
         >
-            <QuietActionButton aria-label='menu trigger'>
+            <ActionButton isQuiet aria-label='menu trigger'>
                 <MoreMenu />
-            </QuietActionButton>
+            </ActionButton>
         </MenuTrigger>
     );
 };

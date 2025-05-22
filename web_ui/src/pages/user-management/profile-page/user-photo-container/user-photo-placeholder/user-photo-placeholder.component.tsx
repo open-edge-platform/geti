@@ -3,15 +3,11 @@
 
 import { ComponentProps } from 'react';
 
-import { View } from '@geti/ui';
+import { ActionButton, View } from '@geti/ui';
 import { isNil } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { PhotoPlaceholder } from '../../../../../shared/components/photo-placeholder/photo-placeholder.component';
-import {
-    ColorMode,
-    QuietActionButton,
-} from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 
 import classes from './user-photo-placeholder.module.scss';
 
@@ -58,9 +54,9 @@ export const UserPhotoPlaceholder = ({
                 <PhotoPlaceholder name={userName} email={email} width={width} height={height} />
             </div>
             {handleUploadClick && !disableUpload && (
-                <QuietActionButton marginTop={'size-200'} onPress={handleUploadClick} colorMode={ColorMode.BLUE}>
+                <ActionButton isQuiet marginTop={'size-200'} onPress={handleUploadClick} colorVariant={'blue'}>
                     Upload image
-                </QuietActionButton>
+                </ActionButton>
             )}
         </>
     );

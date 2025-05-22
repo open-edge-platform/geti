@@ -1,12 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, View } from '@geti/ui';
+import { ActionButton, Divider, Flex, View } from '@geti/ui';
 import { Redo, Undo } from '@geti/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { KeypointNode } from '../../../../../core/annotations/shapes.interface';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { CTRL_OR_COMMAND_KEY } from '../../../../../shared/hotkeys';
 import { UndoRedoActions } from '../../../../annotator/core/undo-redo-actions.interface';
 import { EdgeLine } from '../util';
@@ -33,12 +32,12 @@ export const TemplatePrimaryToolbar = ({ undoRedoActions, isHotKeysVisible }: Te
     return (
         <View gridArea={'primaryToolbar'} backgroundColor={'gray-200'} padding={'size-100'}>
             <Flex direction={'column'} gap={'size-50'}>
-                <QuietActionButton onPress={undo} aria-label='undo' isDisabled={!canUndo}>
+                <ActionButton isQuiet onPress={undo} aria-label='undo' isDisabled={!canUndo}>
                     <Undo />
-                </QuietActionButton>
-                <QuietActionButton onPress={redo} aria-label='redo' isDisabled={!canRedo}>
+                </ActionButton>
+                <ActionButton isQuiet onPress={redo} aria-label='redo' isDisabled={!canRedo}>
                     <Redo />
-                </QuietActionButton>
+                </ActionButton>
 
                 <Divider size={'S'} />
 

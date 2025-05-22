@@ -16,7 +16,6 @@ import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-a
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
-import { QuietActionButton } from '../../../../../shared/components/quiet-button/quiet-action-button.component';
 import { addAlgorithmDetails } from '../../project-models/utils';
 
 import classes from './open-notification-toast.module.scss';
@@ -34,9 +33,9 @@ const GoToModelsPageButton = ({ onClick, remove = noop }: { onClick: () => void;
 );
 
 const DismissButton = ({ remove = noop }: { remove?: () => void }) => (
-    <QuietActionButton UNSAFE_className={classes.primaryButton} onPress={remove}>
+    <ActionButton isQuiet UNSAFE_className={classes.primaryButton} onPress={remove}>
         Dismiss
-    </QuietActionButton>
+    </ActionButton>
 );
 
 const isDeprecated = ({ lifecycleStage }: ModelGroupsAlgorithmDetails) => lifecycleStage === LifecycleStage.DEPRECATED;

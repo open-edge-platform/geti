@@ -1,11 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AlertDialog, DialogContainer, type ActionButtonProps } from '@geti/ui';
+import { ActionButton, AlertDialog, DialogContainer, type ActionButtonProps } from '@geti/ui';
 import { Delete } from '@geti/ui/icons';
 import { OverlayTriggerState } from 'react-stately';
-
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 
 interface DeleteItemButtonProps extends Omit<ActionButtonProps, 'isQuiet'> {
     id: string;
@@ -21,9 +19,9 @@ export const DeleteItemButton = ({
 }: DeleteItemButtonProps): JSX.Element => {
     return (
         <>
-            <QuietActionButton onPress={alertDialogState.toggle} {...styleProps} aria-label={'delete'}>
+            <ActionButton isQuiet onPress={alertDialogState.toggle} {...styleProps} aria-label={'delete'}>
                 <Delete />
-            </QuietActionButton>
+            </ActionButton>
 
             <DialogContainer onDismiss={alertDialogState.close}>
                 {alertDialogState.isOpen && (

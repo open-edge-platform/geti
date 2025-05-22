@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { CustomPopover, Flex, View, type ActionButtonProps } from '@geti/ui';
+import { ActionButton, CustomPopover, Flex, View, type ActionButtonProps } from '@geti/ui';
 import Checkmark from '@spectrum-icons/workflow/Checkmark';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
@@ -12,7 +12,6 @@ import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 import { recursivelyAddLabel, recursivelyRemoveLabels } from '../../../core/labels/label-resolver';
 import { Label } from '../../../core/labels/label.interface';
 import { isAnomalyDomain } from '../../../core/projects/domains';
-import { QuietActionButton } from '../../../shared/components/quiet-button/quiet-action-button.component';
 import { TaskLabelTreeSearch } from '../../../shared/components/task-label-tree-search/task-label-tree-search.component';
 import { hasEqualId } from '../../../shared/utils';
 import { useTask } from '../../annotator/providers/task-provider/task-provider.component';
@@ -73,7 +72,8 @@ export const LabelSelector = ({
         <>
             <Flex>
                 {isEmpty(selectedLabels) ? (
-                    <QuietActionButton
+                    <ActionButton
+                        isQuiet
                         ref={triggerRef}
                         {...buttonStyles}
                         id={'select-label-button-id'}
@@ -87,7 +87,7 @@ export const LabelSelector = ({
                         }}
                     >
                         {name}
-                    </QuietActionButton>
+                    </ActionButton>
                 ) : (
                     selectedLabels.map((label: Label) => {
                         const { name: selectedLabelName, color } = label;
@@ -98,7 +98,8 @@ export const LabelSelector = ({
                         );
 
                         return (
-                            <QuietActionButton
+                            <ActionButton
+                                isQuiet
                                 key={label.id}
                                 id={`label-button-${label.id}-id`}
                                 ref={triggerRef}
@@ -113,7 +114,7 @@ export const LabelSelector = ({
                                 }}
                             >
                                 {selectedLabelName}
-                            </QuietActionButton>
+                            </ActionButton>
                         );
                     })
                 )}
