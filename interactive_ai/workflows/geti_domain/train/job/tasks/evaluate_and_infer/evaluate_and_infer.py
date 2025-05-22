@@ -280,7 +280,7 @@ def evaluate_and_infer(
             train_data=train_data.train_data,
             dataset_id=train_data.dataset_id,
             base_model_id=train_data.train_output_model_ids.base,
-            mo_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            mo_model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=report_evaluate_progress,
         )
 
@@ -302,7 +302,7 @@ def evaluate_and_infer(
         register_models(
             project_id=ID(train_data.train_data.project_id),
             model_id=ID(train_data.train_output_model_ids.base),
-            optimized_model_id=ID(train_data.train_output_model_ids.mo_fp32_with_xai),
+            optimized_model_id=ID(train_data.train_output_model_ids.mo_with_xai),
             model_storage_id=ID(train_data.train_data.model_storage_id),
             task_id=ID(train_data.train_data.task_id),
         )
@@ -315,7 +315,7 @@ def evaluate_and_infer(
         post_model_acceptance(
             train_data=train_data.train_data,
             base_model_id=train_data.train_output_model_ids.base,
-            inference_model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            inference_model_id=train_data.train_output_model_ids.mo_with_xai,
         )
     except Exception as err:
         logger.error("Error occurred during model activation", exc_info=err)
@@ -330,7 +330,7 @@ def evaluate_and_infer(
             train_data=train_data.train_data,
             training_dataset_id=train_data.dataset_id,
             train_inference_subset_id=train_inference_subset_id,
-            model_id=train_data.train_output_model_ids.mo_fp32_with_xai,
+            model_id=train_data.train_output_model_ids.mo_with_xai,
             progress_callback=report_task_infer_progress,
         )
     except Exception:

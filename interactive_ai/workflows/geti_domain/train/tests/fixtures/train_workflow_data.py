@@ -29,13 +29,13 @@ def fxt_train_output_models(fxt_model, fxt_train_output_model_ids) -> TrainOutpu
         return model
 
     model_base = _create_model(fxt_train_output_model_ids.base)
-    model_mo_fp32_with_xai = _create_model(fxt_train_output_model_ids.mo_fp32_with_xai)
+    model_mo_with_xai = _create_model(fxt_train_output_model_ids.mo_with_xai)
     model_mo_fp32_without_xai = _create_model(fxt_train_output_model_ids.mo_fp32_without_xai)
     model_mo_fp16_without_xai = _create_model(fxt_train_output_model_ids.mo_fp16_without_xai)
     model_onnx = _create_model(fxt_train_output_model_ids.onnx)
     models = [
         model_base,
-        model_mo_fp32_with_xai,
+        model_mo_with_xai,
         model_mo_fp32_without_xai,
         model_mo_fp16_without_xai,
         model_onnx,

@@ -25,6 +25,7 @@ from iai_core.entities.subset import Subset
 from iai_core.entities.task_node import TaskNode
 from iai_core.repos import ModelRepo
 from jobs_common.exceptions import CommandInitializationFailedException, TrainingPodFailedException
+from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common.tasks.utils.secrets import JobMetadata
 from jobs_common_extras.mlflow.adapters.geti_otx_interface import GetiOTXInterfaceAdapter
 from jobs_common_extras.mlflow.utils.train_output_models import TrainOutputModelIds, TrainOutputModels
@@ -203,13 +204,12 @@ def _get_export_parameters(
 def prepare_train(train_data: TrainWorkflowData, dataset: Dataset) -> TrainOutputModels:
     """Function should be called in prior to model training Flyte task.
 
-    It creates iai-core model entities and prepares MLFlow experiement buckets for
+    It creates iai-core model entities and prepares MLFlow experiment buckets for
     the subsequent model training Flyte task.
 
     :param train_data: Data class defining data used for training and providing helpers to get
         frequently used objects
     :param dataset: dataset to train on
-    :param hyper_parameters: ConfigurableParameters to use for training
     """
     project, task_node = train_data.get_common_entities()
 
@@ -238,12 +238,13 @@ def prepare_train(train_data: TrainWorkflowData, dataset: Dataset) -> TrainOutpu
         previous_revision=input_model,
         previous_trained_revision=input_model,
     )
+    use_fp16 = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_FP16_INFERENCE)
     output_models = TrainOutputModels(
         base=output_base_model,
-        mo_fp32_with_xai=model_builder.create_model(
+        mo_with_xai=model_builder.create_model(
             model_format=ModelFormat.OPENVINO,
             has_xai_head=True,
-            precision=[ModelPrecision.FP32],
+            precision=[ModelPrecision.FP16 if use_fp16 else ModelPrecision.FP32],
             model_optimization_type=ModelOptimizationType.MO,
             previous_revision=output_base_model,
             previous_trained_revision=output_base_model,
