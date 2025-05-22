@@ -54,9 +54,7 @@ export const useDeleteMediaMutation = (): UseDeleteMediaMutation => {
             // Batching the delete requests to avoid browser simultaneous requests limit
             const batches = chunk(mediaItems, BATCH_SIZE);
             for (const batch of batches) {
-                await Promise.all(
-                    batch.map((mediaItem) => mediaService.deleteMedia(datasetIdentifier, mediaItem))
-                );
+                await Promise.all(batch.map((mediaItem) => mediaService.deleteMedia(datasetIdentifier, mediaItem)));
             }
         },
         onError: (error, _variables, previousItems) => {
