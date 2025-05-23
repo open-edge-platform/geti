@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { isFunction } from 'lodash-es';
 
+import { getFailedJobMessage } from '../../../../packages/core/src/services/utils';
 import {
     isJobCancel,
     isJobDone,
@@ -12,7 +13,6 @@ import {
     isJobSettled,
 } from '../../../shared/components/header/jobs-management/utils';
 import { JobGeneralProps } from '../../jobs/jobs.interface';
-import { getFailedJobMessage } from '../../services/utils';
 import { IntervalJobHandlers } from './dataset-import.interface';
 
 export const getIntervalJobHandlers =

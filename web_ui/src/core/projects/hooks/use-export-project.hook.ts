@@ -5,9 +5,9 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import { getErrorMessage } from '../../../../packages/core/src/services/utils';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { getErrorMessage } from '../../services/utils';
 import { ProjectIdentifier } from '../core.interface';
 import { ProjectExport } from '../project.interface';
 

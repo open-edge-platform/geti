@@ -4,8 +4,8 @@
 import { AxiosError, AxiosResponse } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
-import { getMockedJob, getMockedJobStep } from '../../test-utils/mocked-items-factory/mocked-jobs';
-import { JobStepState } from '../jobs/jobs.const';
+import { JobStepState } from '../../../../src/core/jobs/jobs.const';
+import { getMockedJob, getMockedJobStep } from '../../../../src/test-utils/mocked-items-factory/mocked-jobs';
 import {
     FORBIDDEN_MESSAGE,
     getErrorMessageByStatusCode,

@@ -3,10 +3,10 @@
 
 import axios, { AxiosError, isCancel } from 'axios';
 
-import { getErrorMessageByStatusCode, isAuthenticationResponseUrl } from '../../../../src/core/services/utils';
 import { LOCAL_STORAGE_KEYS } from '../../../../src/shared/local-storage-keys';
 import { removeLocalStorageKey } from '../../../../src/shared/utils';
 import { CSRF_HEADERS } from '../services/security';
+import { getErrorMessageByStatusCode, isAuthenticationResponseUrl } from '../services/utils';
 
 /*
     Axios instance used for Intel® Geti™ requests

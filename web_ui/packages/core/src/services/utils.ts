@@ -5,11 +5,11 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { get } from 'lodash-es';
 
-import { isNonEmptyString } from '../../shared/utils';
-import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';
-import { JobGeneralProps } from '../jobs/jobs.interface';
-import { getJobActiveStep } from '../jobs/utils';
-import { AdvancedFilterSortingOptions } from '../media/media-filter.interface';
+import { VideoPaginationOptions } from '../../../../src/core/annotations/services/video-pagination-options.interface';
+import { JobGeneralProps } from '../../../../src/core/jobs/jobs.interface';
+import { getJobActiveStep } from '../../../../src/core/jobs/utils';
+import { AdvancedFilterSortingOptions } from '../../../../src/core/media/media-filter.interface';
+import { isNonEmptyString } from '../../../../src/shared/utils';
 
 export const NETWORK_ERROR_MESSAGE = 'Network error: Please check your connection and try again';
 export const UNPROCESSABLE_ENTITY_MESSAGE = 'Unable to process request';

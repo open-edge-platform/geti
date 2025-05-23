@@ -2,11 +2,11 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core/src/services/routes';
+import { FORBIDDEN_MESSAGE } from '@geti/core/src/services/utils';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Flex, Heading, Text } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Forbidden } from '../../../assets/images';
-import { FORBIDDEN_MESSAGE } from '../../../core/services/utils';
 
 import classes from './access-denied-dialog.module.scss';
 
