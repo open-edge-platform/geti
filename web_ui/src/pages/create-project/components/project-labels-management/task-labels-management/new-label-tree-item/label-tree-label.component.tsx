@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, ForwardedRef, forwardRef, useEffect, useRef, useState } from 'react';
 
 import { Button, Flex, Form, TextField, TextFieldRef } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
@@ -112,15 +112,13 @@ export const LabelTreeLabel = forwardRef(
             setNewColor(c);
         };
 
-        const formHasError = useMemo(() => {
-            return Object.values(validationErrors).some((error) => !!error);
-        }, [validationErrors]);
+        const formHasError = Object.values(validationErrors).some(Boolean);
 
         useEffect(() => {
             if (isSingleLabelTree && !!setDialogValidationError && (isDirty.name || isDirty.hotkey)) {
                 setDialogValidationError(formHasError ? 'Fix all the errors before moving forward' : undefined);
             }
-        }, [formHasError, isSingleLabelTree, setDialogValidationError, isDirty.name, isDirty.hotkey]);
+        }, [isSingleLabelTree, setDialogValidationError, isDirty.name, isDirty.hotkey, formHasError]);
 
         const cleanForm = (newLabel: LabelTreeLabelProps) => {
             setNewName('');
@@ -203,7 +201,6 @@ export const LabelTreeLabel = forwardRef(
             const nameValid = validateName(value);
 
             if (isSingleLabelTree && nameValid) {
-                confirmNewLabel(false, { name: value });
                 debouncedConfirm(value);
             }
         };
