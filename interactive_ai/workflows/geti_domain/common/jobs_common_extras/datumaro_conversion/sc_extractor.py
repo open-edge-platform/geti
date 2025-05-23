@@ -169,9 +169,9 @@ class ScExtractor(dm_DatasetBase):
         if keypoint_structure:
             joints = []
             for edge in keypoint_structure._edges:
-                node_1 = self._label_id_to_idx[edge.node_1]
-                node_2 = self._label_id_to_idx[edge.node_2]
-                joints.append([node_1, node_2])
+                node_1 = self._label_id_to_idx[edge.node_1] + 1
+                node_2 = self._label_id_to_idx[edge.node_2] + 1
+                joints.append([node_1, node_2])  # Joints start at 1 index
             positions = []
             for position in keypoint_structure._positions:
                 positions.extend([position.x, position.y])

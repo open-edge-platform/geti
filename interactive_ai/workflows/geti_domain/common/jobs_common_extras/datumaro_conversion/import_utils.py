@@ -465,7 +465,7 @@ class ImportUtils:
         return {label_cat[label_id].name: types for label_id, types in label_idx_to_ann_types.items()}
 
     @classmethod
-    def get_valid_project_labels(  # noqa: C901, PLR0915
+    def get_valid_project_labels(  # noqa: C901
         cls,
         project_type: GetiProjectType,
         dm_infos: dict[str, Any],
@@ -488,7 +488,6 @@ class ImportUtils:
 
         def _get_valid_labels_based_on_domain(label_domain: Domain) -> set[str]:
             valid_labels = set()
-            logger.warning("In _get_valid_labels_based_on_domain")
             for label_name, ann_types in label_to_ann_types.items():
                 domains = set()
                 for ann_type in ann_types:
@@ -497,7 +496,6 @@ class ImportUtils:
                 if label_domain in domains:
                     valid_labels.add(label_name)
 
-                logger.warning(f"{label_name}, {ann_types}")
                 if (
                     project_type == GetiProjectType.CHAINED_DETECTION_CLASSIFICATION
                     and Domain.CLASSIFICATION in domains
@@ -507,14 +505,11 @@ class ImportUtils:
 
         def _get_keypoint_labels() -> dict[str, list[str]]:
             keypoint_labels: dict[str, list[str]] = {}
-            logger.warning("In _get_keypoint_labels")
             point_cat: dm.PointsCategories = dm_categories.get(dm.AnnotationType.points, None)
-            logger.warning(f"{point_cat}")
             if point_cat:
                 label_cat: dm.LabelCategories = dm_categories[dm.AnnotationType.label]
                 for label_id, cat in point_cat.items.items():
                     try:
-                        logger.warning(f"{label_id}, {cat}")
                         label = label_cat[label_id].name
                         keypoint_labels[label] = cat.labels
                     except IndexError:
@@ -558,8 +553,6 @@ class ImportUtils:
                 all_valid_label_names.update(label_names)
         elif project_type == GetiProjectType.KEYPOINT_DETECTION:
             keypoint_labels = _get_keypoint_labels()
-            logger.warning("In _get_keypoint_labels")
-            logger.warning(f"{keypoint_labels}")
             valid_keypoint_labels = []
             for bbox_label, point_labels in keypoint_labels.items():
                 try:

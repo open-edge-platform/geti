@@ -54,13 +54,10 @@ class DatumaroProjectParser(ProjectParser):
         self._project_name: str = project_name
         self._project_type: GetiProjectType = project_type
         self._color_by_label = color_by_label if color_by_label else {}
-        logger.warning(f"{project_type}")
         (
             self._task_names_ordered,
             self._task_name_to_task_type,
         ) = self._process_task_types(project_type=project_type)
-
-        logger.warning(f"{self._task_names_ordered}, {self._task_name_to_task_type}")
 
         if (
             FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
@@ -78,7 +75,6 @@ class DatumaroProjectParser(ProjectParser):
             selected_labels=selected_labels,
             include_all_labels=include_all_labels,
         )
-        logger.warning(f"{valid_labels}")
 
         self._task_name_to_label_metas: dict[str, dict[str, dict[str, Any]]] = (
             self._extract_labels_metadata_from_dm_dataset(
@@ -88,21 +84,14 @@ class DatumaroProjectParser(ProjectParser):
                 include_all_labels=include_all_labels,
             )
         )
-        logger.warning(f"{self._task_name_to_label_metas}")
 
         self._keypoint_structure: dict[str, list] = self._extract_keypoint_structure_from_dm_dataset(
             dm_categories=dm_categories,
             selected_labels=valid_labels,
             include_all_labels=include_all_labels,
         )
-        logger.warning(
-            f"valid_labels {valid_labels}, "
-            f"keypoint_structure {self._keypoint_structure}, "
-            f"task_name_to_label_metas {self._task_name_to_label_metas}"
-        )
 
         self._validate()
-        logger.warning("validation passed")
 
     def _validate(self):
         """
@@ -214,7 +203,6 @@ class DatumaroProjectParser(ProjectParser):
         :param include_all_labels: if True, ignore selected_labels then include all possible labels for each task_type
         :return: A dictionary storing label_meta with label_name as key
         """
-        logger.warning("Inside _extract_labels_metadata_from_dm_dataset")
         (
             label_groups,
             label_name_to_parent,
@@ -662,7 +650,6 @@ def get_project_metas_with_labels(
     # Extract project meta-data that will be utilized when build a REST API response
     project_metas_with_labels: list[dict[str, Any]] = []
     for project_type in filtered_supported_project_types:
-        logger.warning(f"Before try: {filtered_supported_project_types}")
         try:
             project_parser = DatumaroProjectParser(
                 project_name=f"prepare {ImportUtils.project_type_to_rest_api_string(project_type)} project",
@@ -672,7 +659,6 @@ def get_project_metas_with_labels(
                 label_to_ann_types=label_to_ann_types,
                 include_all_labels=True,
             )
-            logger.warning(f"project_parser:{project_parser}")
             n_project_label_metas = 0
             for task_name in project_parser.get_tasks_names():
                 n_project_label_metas += len(project_parser.get_custom_labels_names_by_task(task_name=task_name))
