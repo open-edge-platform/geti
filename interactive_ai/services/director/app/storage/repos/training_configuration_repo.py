@@ -60,15 +60,16 @@ class TrainingConfigurationRepo(ProjectBasedSessionRepo[TrainingConfiguration]):
 
     def get_by_task_id(self, task_id: ID) -> TrainingConfiguration:
         """
-        Get a TrainingConfiguration by task ID.
+        Get a TrainingConfiguration by task ID only. This returns task-level configuration
+        that does not have an associated model manifest ID.
 
         :param task_id: The task ID to search for.
         :return: The TrainingConfiguration object if found, otherwise NullTrainingConfiguration.
         """
-        task_filter = {"task_id": IDToMongo.forward(instance=task_id)}
+        task_filter = {"task_id": IDToMongo.forward(instance=task_id), "model_manifest_id": {"$exists": False}}
         return self.get_one(extra_filter=task_filter)
 
-    def get_by_model_manifest_id(self, model_manifest_id: ID) -> TrainingConfiguration:
+    def get_by_model_manifest_id(self, model_manifest_id: str) -> TrainingConfiguration:
         """
         Get a TrainingConfiguration by model manifest ID.
 

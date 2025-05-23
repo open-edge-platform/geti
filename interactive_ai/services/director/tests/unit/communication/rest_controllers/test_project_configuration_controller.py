@@ -5,9 +5,9 @@ import pytest
 from testfixtures import compare
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
+from communication.exceptions import ProjectConfigurationNotFoundException
 from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
-from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import ID, ProjectIdentifier
 
 
@@ -41,5 +41,5 @@ class TestProjectConfigurationRESTController:
         workspace_id = ID("dummy_workspace_id")
         project_identifier = ProjectIdentifier(workspace_id=workspace_id, project_id=project_id)
 
-        with pytest.raises(ProjectNotFoundException):
+        with pytest.raises(ProjectConfigurationNotFoundException):
             project_configuration_controller.get_configuration(project_identifier=project_identifier)
