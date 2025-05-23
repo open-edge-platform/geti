@@ -1,0 +1,12 @@
+# SPDX-FileCopyrightText: (C) 2025 Intel Corporation
+# SPDX-License-Identifier: LicenseRef-Intel
+---
+specSchema: "Registry"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: istio-official
+description: "Istio Official Registry"
+type: "HELM"
+
+rootUrl: "https://istio-release.storage.googleapis.com/charts"
