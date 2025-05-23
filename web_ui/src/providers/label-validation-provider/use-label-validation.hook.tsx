@@ -89,8 +89,9 @@ export function useLabelValidation({
         }
     }, [domain, labels]);
 
-    const hasError = Object.values(validationErrors).some(Boolean) || !!treeValidationError;
+    const hasError = Object.values(validationErrors).some(Boolean) || Boolean(treeValidationError);
 
+    // TODO: might be removed after the refactor
     const updateDialogValidationError = useCallback(() => {
         if (setDialogValidationError) {
             setDialogValidationError(hasError ? 'Fix all the errors before moving forward' : undefined);
