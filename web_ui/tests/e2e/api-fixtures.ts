@@ -3,9 +3,8 @@
 
 import https from 'https';
 
-import { API_URLS } from '@geti/core';
+import { addHostToApiUrls, API_URLS } from '@geti/core';
 import { ApplicationServices } from '@geti/core/src/services/application-services.interface';
-import { addHostToApiUrls } from '@geti/core/src/services/use-api-router.hook';
 import Headers from '@mjackson/headers';
 import { APIRequestContext, test as baseTest } from '@playwright/test';
 import axios, { AxiosAdapter, AxiosHeaders } from 'axios';

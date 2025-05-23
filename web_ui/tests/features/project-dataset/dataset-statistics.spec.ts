@@ -132,7 +132,7 @@ test.describe('Dataset statistics', () => {
         });
     });
 
-    test.only('Displays and downloads dataset statistics', async ({ datasetStatisticsPage, registerApiResponse }) => {
+    test('Displays and downloads dataset statistics', async ({ datasetStatisticsPage, registerApiResponse }) => {
         registerApiResponse('FilterMedia', (_, res, ctx) => {
             return res(
                 ctx.json({
