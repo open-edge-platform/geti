@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { LabelItemType, LabelTreeItem } from '../../core/labels/label-tree-view.interface';
+import { DOMAIN } from '../../core/projects/core.interface';
 import {
     LabelFieldsDirty,
     LabelFieldsErrors,
@@ -15,6 +16,8 @@ export interface UseLabelValidationProps {
     currentLabelId?: string;
     usedAnnotatorHotkeys?: string[];
     setDialogValidationError?: (msg: string | undefined) => void;
+    domain?: DOMAIN;
+    labels?: LabelTreeItem[];
 }
 
 export interface UseLabelValidationResult {
@@ -24,6 +27,8 @@ export interface UseLabelValidationResult {
     setDirty: React.Dispatch<React.SetStateAction<LabelFieldsDirty>>;
     validateName: (changedName: string) => boolean;
     validateHotkey: (changedHotkey: string | undefined) => boolean;
+    validateTree: () => boolean;
+    treeValidationError: string | undefined;
     updateDialogValidationError: () => void;
     hasError: boolean;
 }
