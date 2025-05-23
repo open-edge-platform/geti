@@ -241,12 +241,13 @@ func ModifyOrganizationUsers(s *GRPCServer, ctx context.Context, membership mode
 		logger.Errorf("error during processing REQ users: %v", err)
 		return status.Errorf(codes.Unknown, "unexpected error: %v", err)
 	}
-	if org.Status == "ACT" {
+	switch org.Status {
+	case "ACT":
 		errSend := sendActivationMessage(membership, config.OrganizationAcceptRequestedAccessTopic, config.OrganizationAcceptRequestedAccessMessage)
 		if errSend != nil {
 			return status.Errorf(codes.Unknown, "unexpected error: %v", err)
 		}
-	} else if org.Status == "DEL" {
+	case "DEL":
 		errSend := sendActivationMessage(membership, config.OrganizationRejectRequestedAccessTopic, config.OrganizationRejectRequestedAccessMessage)
 		if errSend != nil {
 			return status.Errorf(codes.Unknown, "unexpected error: %v", err)
@@ -648,7 +649,8 @@ func (s *GRPCServer) Delete(_ context.Context, req *pb.OrganizationIdRequest) (*
 		}
 		for _, relationship := range workspaceRelationships {
 			subjectType := relationship.GetSubject().GetObject().GetObjectType()
-			if subjectType == "organization" {
+			switch subjectType {
+			case "organization":
 				err := rolesMgr.ChangeOrganizationRelation(relationship.Resource.ObjectType,
 					relationship.Resource.ObjectId, []string{relationship.Relation}, relationship.Subject.Object.ObjectId,
 					authzed.RelationshipUpdate_OPERATION_DELETE)
@@ -656,7 +658,7 @@ func (s *GRPCServer) Delete(_ context.Context, req *pb.OrganizationIdRequest) (*
 					logger.Errorf("failed to delete organization relationships: %v", err)
 					return nil, status.Errorf(codes.Unknown, "unexpected error")
 				}
-			} else if subjectType == "user" {
+			case "user":
 				err := rolesMgr.ChangeUserRelation(relationship.Resource.ObjectType,
 					relationship.Resource.ObjectId, []string{relationship.Relation}, relationship.Subject.Object.ObjectId,
 					authzed.RelationshipUpdate_OPERATION_DELETE)
@@ -664,7 +666,7 @@ func (s *GRPCServer) Delete(_ context.Context, req *pb.OrganizationIdRequest) (*
 					logger.Errorf("failed to delete user relationships: %v", err)
 					return nil, status.Errorf(codes.Unknown, "unexpected error")
 				}
-			} else {
+			default:
 				logger.Errorf("unknown subject type relationships to delete: %v", subjectType)
 				return nil, status.Errorf(codes.Unknown, "unexpected error")
 			}
