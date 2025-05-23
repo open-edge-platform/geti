@@ -4,7 +4,7 @@
 name = "user-directory"
 version = "1.0.0"
 description = "User Directory service for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "confluent-kafka==2.3.0",

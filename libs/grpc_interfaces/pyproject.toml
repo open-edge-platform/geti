@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Geti GRPC interfaces with clients"
 authors = [{ name = "Intel" }]
 license = { text = "Copyright (c) Intel - All Rights Reserved. Unauthorized copying of any part of the software via any medium is strictly prohibited. Proprietary and confidential." }
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "grpcio~=1.62"
