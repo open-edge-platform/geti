@@ -4,15 +4,15 @@
 import { waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 
-import { renderHookWithProviders } from '../../test-utils/render-hook-with-providers';
-import { server } from '../annotations/services/test-utils';
+import { server } from '../../../../src/core/annotations/services/test-utils';
+import { isAdminLocation } from '../../../../src/core/services/utils';
+import { renderHookWithProviders } from '../../../../src/test-utils/render-hook-with-providers';
 import { DeploymentConfiguration, useDeploymentConfigQuery } from './use-deployment-config-query.hook';
-import { isAdminLocation } from './utils';
 
 // Note: On setupTests we're globally mocking this hook, so to test it here we need to override to the default (initial) value
 jest.mock('./use-deployment-config-query.hook', () => jest.requireActual('./use-deployment-config-query.hook'));
-jest.mock('./utils', () => ({
-    ...jest.requireActual('./utils'),
+jest.mock('../../../../src/core/services/utils', () => ({
+    ...jest.requireActual('../../../../src/core/services/utils'),
     isAdminLocation: jest.fn(() => false),
 }));
 
@@ -58,7 +58,7 @@ describe('useDeploymentConfigQuery', () => {
             const { result } = renderDeploymentConfigHook();
 
             await waitFor(() => {
-                expect(result.current).not.toBeUndefined();
+                expect(result.current).not.toBeNull();
             });
 
             const data = result.current.data;
@@ -74,7 +74,7 @@ describe('useDeploymentConfigQuery', () => {
             const { result } = renderDeploymentConfigHook({ isAdmin: true });
 
             await waitFor(() => {
-                expect(result.current).not.toBeUndefined();
+                expect(result.current).not.toBeNull();
             });
 
             const data = result.current.data;

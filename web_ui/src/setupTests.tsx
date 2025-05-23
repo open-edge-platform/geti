@@ -136,8 +136,8 @@ const mockConfig = {
     docsUrl: 'https://docs.geti.intel.com/',
     configUrl: 'https://config.geti.example.com',
 };
-jest.mock('./core/services/use-deployment-config-query.hook', () => ({
-    ...jest.requireActual('./core/services/use-deployment-config-query.hook'),
+jest.mock('@geti/core/src/services/use-deployment-config-query.hook', () => ({
+    ...jest.requireActual('@geti/core/src/services/use-deployment-config-query.hook'),
     useDeploymentConfigQuery: jest.fn(() => ({
         data: mockConfig,
     })),

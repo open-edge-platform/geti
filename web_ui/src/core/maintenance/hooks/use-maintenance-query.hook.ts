@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useFeatureFlags } from '../../feature-flags/hooks/use-feature-flags.hook';
 import QUERY_KEYS from '../../requests/query-keys';
-import { useDeploymentConfigQuery } from '../../services/use-deployment-config-query.hook';
 import { MaintenanceResponse } from '../services/maintenance.interface';
 
 export const useMaintenanceQuery = (): UseQueryResult<MaintenanceResponse, AxiosError> => {

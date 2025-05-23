@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
 import { renderHook } from '@testing-library/react';
 
-import { useDeploymentConfigQuery } from '../services/use-deployment-config-query.hook';
 import { useOIDCConfiguration } from './use-oidc-configuration.hook';
 
-jest.mock('../services/use-deployment-config-query.hook', () => ({
+jest.mock('@geti/core/src/services/use-deployment-config-query.hook', () => ({
     useDeploymentConfigQuery: jest.fn(),
 }));
 
