@@ -68,6 +68,11 @@ report: venv
 	  uvx junit2html "$$file" "reports/html/$$basefile.html"; \
 	done
 
+ruff:
+	uv sync --only-dev
+	uv run ruff check --config pyproject.toml
+	uv run ruff format --check --config pyproject.toml
+
 mypy:
 	uv sync --only-dev
 	uv run mypy features --config-file=pyproject.toml --install-types --non-interactive
