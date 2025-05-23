@@ -1,3 +1,5 @@
+include ../../../Makefile.shared-python
+
 MAKEFILE_DIR := $(shell pwd)
 OPENAPI_YAML_SPEC := ../../../docs/rest_api/openapi_internal.yaml
 OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
