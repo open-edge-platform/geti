@@ -4,6 +4,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { isEmpty, isEqual } from 'lodash-es';
@@ -18,7 +19,6 @@ import { isClassificationDomain } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
-import { getErrorMessage } from '../../../../core/services/utils';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserProjectSettings } from '../../../../core/user-settings/hooks/use-project-settings.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';

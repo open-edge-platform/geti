@@ -22,11 +22,11 @@ import { OrganizationIdentifier } from '../../../../src/core/organizations/organ
 import { ProjectIdentifier } from '../../../../src/core/projects/core.interface';
 import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interface';
 import { ProjectsQueryOptions } from '../../../../src/core/projects/services/project-service.interface';
-import { addVideoPaginationSearchParams, buildAdvancedFilterSearchOptions } from '../../../../src/core/services/utils';
 import { SortDirection } from '../../../../src/core/shared/query-parameters';
 import { TaskIdentifier } from '../../../../src/core/statistics/dtos/dataset-statistics.interface';
 import { MemberRoleDTO, ResourceTypeDTO } from '../../../../src/core/users/users.interface';
 import { WorkspaceIdentifier } from '../../../../src/core/workspaces/services/workspaces.interface';
+import { addVideoPaginationSearchParams, buildAdvancedFilterSearchOptions } from './utils';
 
 const API = '/api';
 

@@ -8,11 +8,11 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
+import { getErrorMessage } from '../../../../packages/core/src/services/utils';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { ModelIdentifier } from '../../models/models.interface';
 import QUERY_KEYS from '../../requests/query-keys';
-import { getErrorMessage } from '../../services/utils';
 import { ModelMetrics } from '../model-statistics.interface';
 
 export const useModelStatistics = (modelIdentifier: ModelIdentifier): UseQueryResult<ModelMetrics, AxiosError> => {

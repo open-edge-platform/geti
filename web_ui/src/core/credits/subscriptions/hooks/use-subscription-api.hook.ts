@@ -19,12 +19,12 @@ import {
 } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
 
+import { getErrorMessage } from '../../../../../packages/core/src/services/utils';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { useFeatureFlags } from '../../../feature-flags/hooks/use-feature-flags.hook';
 import { OrganizationIdentifier } from '../../../organizations/organizations.interface';
 import QUERY_KEYS from '../../../requests/query-keys';
-import { getErrorMessage } from '../../../services/utils';
 import { Quota, QuotasResponse } from '../quotas.interface';
 import { GetQuotasQueryOptions, SubscriptionsService } from '../services/subscription-service.interface';
 import { Subscription } from '../subscription.interface';

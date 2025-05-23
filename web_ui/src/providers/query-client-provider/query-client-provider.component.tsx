@@ -3,6 +3,7 @@
 
 import { ReactNode, useLayoutEffect, useMemo, useRef } from 'react';
 
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import {
     DefaultOptions,
     QueryCache,
@@ -14,7 +15,6 @@ import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { get } from 'lodash-es';
 
-import { getErrorMessage } from '../../core/services/utils';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';

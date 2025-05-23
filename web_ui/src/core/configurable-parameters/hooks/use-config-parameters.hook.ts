@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import { useMutation, UseMutationResult, useQuery, UseQueryOptions, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -9,7 +10,6 @@ import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/noti
 import { useNotification } from '../../../notification/notification.component';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import QUERY_KEYS from '../../requests/query-keys';
-import { getErrorMessage } from '../../services/utils';
 import { ConfigurableParametersReconfigureDTO } from '../dtos/configurable-parameters.interface';
 import { ConfigurableParametersTaskChain } from '../services/configurable-parameters.interface';
 
