@@ -1,0 +1,24 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+#  hostnames:
+#    - "*.intel.com"  # only for SaaS
+  rules:
+    - matches:
+        - path:
+            type: RegularExpression
+            value: /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/jobs(/|$)(.*)
+      backendRefs:
+        - name: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+          port: {{ .Values.microservice.service.ports.http }}
+{{- end}}

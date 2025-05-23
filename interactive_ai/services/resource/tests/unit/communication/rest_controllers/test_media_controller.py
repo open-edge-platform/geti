@@ -9,11 +9,7 @@ import pytest
 from fastapi import UploadFile
 from testfixtures import compare
 
-from communication.exceptions import (
-    LabelNotFoundException,
-    MediaUploadedWithNoLabelToAnomalyTaskException,
-    VideoThumbnailNotFoundException,
-)
+from communication.exceptions import LabelNotFoundException, MediaUploadedWithNoLabelToAnomalyTaskException
 from communication.rest_controllers import MediaRESTController
 from communication.rest_views.filtered_dataset_rest_views import FilteredDatasetRESTView
 from communication.rest_views.media_rest_views import MediaRESTViews
@@ -25,7 +21,6 @@ from usecases.query_builder import QueryResults
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
 from geti_fastapi_tools.responses import success_response_rest
-from geti_kafka_tools import publish_event
 from geti_types import ID, DatasetStorageIdentifier, MediaType
 from iai_core.entities.datasets import Dataset, DatasetPurpose
 from iai_core.entities.label import NullLabel
@@ -554,50 +549,26 @@ class TestMediaRESTController:
             )
             assert thumbnail == image_thumbnail
 
-    def test_get_thumbnail_video_stream_location(
-        self,
-        request,
-        fxt_project,
-        fxt_unannotated_video_factory,
-    ) -> None:
-        """
-        This test saves a video without a thumbnail video, requests the thumbnail and then checks that the
-        thumbnail video generation is started.
-        """
-        # Hook for event publishing
-        patch_publish_event = patch(
-            "communication.rest_controllers.media_controller.publish_event",
-            side_effect=publish_event,
+    def test_get_thumbnail_video_stream_location(self) -> None:
+        # Arrange
+        dataset_storage_identifier = MagicMock(spec=DatasetStorageIdentifier)
+        video_id = MagicMock(spec=ID)
+
+        # Act
+        with patch.object(
+            MediaManager, "get_video_thumbnail_stream_location", return_value="video_thumbnail_stream_location"
+        ) as mock_get_video_thumbnail_stream_location:
+            result = MediaRESTController.get_video_thumbnail_stream_location(
+                dataset_storage_identifier=dataset_storage_identifier,
+                video_id=video_id,
+            )
+
+        # Assert
+        mock_get_video_thumbnail_stream_location.assert_called_once_with(
+            dataset_storage_identifier=dataset_storage_identifier,
+            video_id=video_id,
         )
-
-        dataset_storage = fxt_project.get_training_dataset_storage()
-        video = fxt_unannotated_video_factory(project=fxt_project, width=20, height=20, number_of_frames=6)
-
-        with (
-            patch.object(MediaManager, "get_video_by_id", return_value=video) as mock_get_video_by_id,
-            patch_publish_event as patched_pub_video_gen,
-            pytest.raises(VideoThumbnailNotFoundException),
-        ):
-            MediaRESTController.get_video_thumbnail_stream_location(
-                dataset_storage_identifier=dataset_storage.identifier,
-                video_id=video.id_,
-            )
-
-            mock_get_video_by_id.assert_called_once_with(
-                dataset_storage_identifier=dataset_storage.identifier,
-                video_id=video.id_,
-            )
-            patched_pub_video_gen.assert_called_once_with(
-                topic="thumbnail_video_missing",
-                body={
-                    "workspace_id": fxt_project.workspace_id,
-                    "project_id": dataset_storage.identifier.project_id,
-                    "dataset_storage_id": fxt_project.get_training_dataset_storage().id_,
-                    "video_id": video.id_,
-                },
-                key=str(video.id_).encode(),
-                headers_getter=ANY,
-            )
+        assert result == "video_thumbnail_stream_location"
 
     @pytest.mark.parametrize(
         "lazyfxt_dataset_id, lazyfxt_video_id, expected_called_rest_view",

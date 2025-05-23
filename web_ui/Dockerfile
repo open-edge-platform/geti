@@ -4,7 +4,7 @@
 # build_rest_api_specs
 #############
 
-FROM node:22.12-bookworm-slim AS build_rest_api_specs
+FROM node:22.12-bookworm-slim@sha256:35531c52ce27b6575d69755c73e65d4468dba93a25644eed56dc12879cae9213 AS build_rest_api_specs
 
 ARG LOCATION=/home/app/rest-api-specs/
 
@@ -20,7 +20,7 @@ RUN npm run build:rest-openapi-spec
 #############
 # web_ui_deps
 #############
-FROM node:22.12-bookworm-slim AS web_ui_deps
+FROM node:22.12-bookworm-slim@sha256:35531c52ce27b6575d69755c73e65d4468dba93a25644eed56dc12879cae9213 AS web_ui_deps
 
 ARG LOCATION=/home/app/web_ui/
 
@@ -49,7 +49,7 @@ RUN npm run build
 # web_ui
 #######
 
-FROM nginx:1.27-bookworm AS web_ui
+FROM nginx:1.27-bookworm@sha256:fb39280b7b9eba5727c884a3c7810002e69e8f961cc373b89c92f14961d903a0 AS web_ui
 
 COPY --link --from=web_ui_deps /home/app/web_ui/build/app/ /usr/share/nginx/webui/
 COPY --link --from=web_ui_deps /home/app/web_ui/build/admin/ /usr/share/nginx/admin-app/
