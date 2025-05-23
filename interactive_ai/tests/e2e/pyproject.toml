@@ -24,7 +24,7 @@ dev = [
 ]
 
 [tool.uv.sources]
-geti_client = { path = "geti_client", editable = true }
+geti_client = { path = "rest_client", editable = true }
 
 [tool.ruff]
 target-version = "py310"

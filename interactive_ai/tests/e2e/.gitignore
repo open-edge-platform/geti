@@ -1,6 +1,6 @@
 .openapi_spec_hash
 data
 openapitools.json
-geti_client
+rest_client
 reports
 uv.lock
