@@ -4,7 +4,7 @@
 import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../../../../packages/core/src/services/create-api-service.interface';
-import { API_URLS } from '../../../services/urls';
+import { API_URLS } from '../../../../../packages/core/src/services/urls';
 import { TransactionsAggregatesDTO, TransactionsResponseDTO } from '../dtos/transactions.interface';
 import { TransactionsService } from './transactions-service.interface';
 import { getTransactionResponseEntity, getTransactionsAggregatesResponseEntity } from './utils';

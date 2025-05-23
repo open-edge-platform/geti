@@ -6,13 +6,13 @@ import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
 import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getIds } from '../../../shared/utils';
 import { Label } from '../../labels/label.interface';
 import { MediaItem } from '../../media/media.interface';
 import { mediaIdentifierToDTO } from '../../media/services/utils';
 import { Video } from '../../media/video.interface';
 import { DatasetIdentifier } from '../../projects/dataset.interface';
-import { API_URLS } from '../../services/urls';
 import { Annotation } from '../annotation.interface';
 import {
     AnnotationResultDTO,

@@ -5,6 +5,7 @@ import { isObject } from 'lodash-es';
 import { rest } from 'msw';
 
 import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getMockedLabel } from '../../../test-utils/mocked-items-factory/mocked-labels';
 import {
     getMockedImageMediaItem,
@@ -13,7 +14,6 @@ import {
 import { LABEL_BEHAVIOUR } from '../../labels/label.interface';
 import { MEDIA_TYPE } from '../../media/base-media.interface';
 import { MediaItem } from '../../media/media.interface';
-import { API_URLS } from '../../services/urls';
 import { RangeAnnotationDTO } from '../dtos/annotation.interface';
 import { ShapeType } from '../shapetype.enum';
 import { labelFromUser } from '../utils';

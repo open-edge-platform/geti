@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import { isFunction, isString } from 'lodash-es';
 
-import { API_URLS } from './urls';
+import { API_URLS } from '../../../packages/core/src/services/urls';
 import { useDeploymentConfigQuery } from './use-deployment-config-query.hook';
 
 // A route can be defined either as a constant string or a function returning a stirng

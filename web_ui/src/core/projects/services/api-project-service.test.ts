@@ -5,6 +5,7 @@ import { isEqual } from 'lodash-es';
 import { rest } from 'msw';
 
 import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getMockedDatasetIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedProject, getMockedProjectDTO } from '../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedTask } from '../../../test-utils/mocked-items-factory/mocked-tasks';
@@ -12,7 +13,6 @@ import { server } from '../../annotations/services/test-utils';
 import { ExportStatusStateDTO } from '../../configurable-parameters/dtos/configurable-parameters.interface';
 import { LABEL_BEHAVIOUR, LabelsRelationType } from '../../labels/label.interface';
 import { GROUP_SEPARATOR } from '../../labels/utils';
-import { API_URLS } from '../../services/urls';
 import { DOMAIN } from '../core.interface';
 import { CreateDatasetResponseDTO, DeleteDatasetResponse, ExportFormats } from '../dataset.interface';
 import { EditProjectProps, ProjectCreation, ProjectProps } from '../project.interface';

@@ -5,12 +5,12 @@ import { apiClient } from '@geti/core';
 import { orderBy } from 'lodash-es';
 
 import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { mapSearchRulesToDto } from '../../datasets/services/utils';
 import { JobTestDTO } from '../../jobs/dtos/jobs-dto.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';
 import { ModelsGroups } from '../../models/models.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import { API_URLS } from '../../services/urls';
 import { TestMediaAdvancedFilterDTO } from '../dtos/test-media.interface';
 import { TestDTO, TestsDTO } from '../dtos/tests.interface';
 import { TestMediaAdvancedFilter } from '../test-media.interface';

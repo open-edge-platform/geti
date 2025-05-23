@@ -3,30 +3,30 @@
 
 import { isEmpty, isNil } from 'lodash-es';
 
-import { PredictionCache, PredictionId } from '../annotations/services/prediction-service.interface';
-import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';
-import { Rect } from '../annotations/shapes.interface';
-import { CreditAccountIdentifier } from '../credits/credits.interface';
+import { PredictionCache, PredictionId } from '../../../../src/core/annotations/services/prediction-service.interface';
+import { VideoPaginationOptions } from '../../../../src/core/annotations/services/video-pagination-options.interface';
+import { Rect } from '../../../../src/core/annotations/shapes.interface';
+import { CreditAccountIdentifier } from '../../../../src/core/credits/credits.interface';
 import {
     GetTransactionsAggregatesQueryOptions,
     GetTransactionsQueryOptions,
-} from '../credits/transactions/services/transactions-service.interface';
-import { JobTypePayload } from '../jobs/jobs.const';
-import { JobsQueryParams } from '../jobs/services/jobs-service.interface';
-import { MEDIA_GROUP, MEDIA_TYPE } from '../media/base-media.interface';
-import { AdvancedFilterSortingOptions } from '../media/media-filter.interface';
-import { MediaIdentifier } from '../media/media.interface';
-import { isVideo } from '../media/video.interface';
-import { ModelGroupIdentifier, ModelIdentifier } from '../models/models.interface';
-import { OrganizationIdentifier } from '../organizations/organizations.interface';
-import { ProjectIdentifier } from '../projects/core.interface';
-import { DatasetIdentifier } from '../projects/dataset.interface';
-import { ProjectsQueryOptions } from '../projects/services/project-service.interface';
-import { SortDirection } from '../shared/query-parameters';
-import { TaskIdentifier } from '../statistics/dtos/dataset-statistics.interface';
-import { MemberRoleDTO, ResourceTypeDTO } from '../users/users.interface';
-import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
-import { addVideoPaginationSearchParams, buildAdvancedFilterSearchOptions } from './utils';
+} from '../../../../src/core/credits/transactions/services/transactions-service.interface';
+import { JobTypePayload } from '../../../../src/core/jobs/jobs.const';
+import { JobsQueryParams } from '../../../../src/core/jobs/services/jobs-service.interface';
+import { MEDIA_GROUP, MEDIA_TYPE } from '../../../../src/core/media/base-media.interface';
+import { AdvancedFilterSortingOptions } from '../../../../src/core/media/media-filter.interface';
+import { MediaIdentifier } from '../../../../src/core/media/media.interface';
+import { isVideo } from '../../../../src/core/media/video.interface';
+import { ModelGroupIdentifier, ModelIdentifier } from '../../../../src/core/models/models.interface';
+import { OrganizationIdentifier } from '../../../../src/core/organizations/organizations.interface';
+import { ProjectIdentifier } from '../../../../src/core/projects/core.interface';
+import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interface';
+import { ProjectsQueryOptions } from '../../../../src/core/projects/services/project-service.interface';
+import { addVideoPaginationSearchParams, buildAdvancedFilterSearchOptions } from '../../../../src/core/services/utils';
+import { SortDirection } from '../../../../src/core/shared/query-parameters';
+import { TaskIdentifier } from '../../../../src/core/statistics/dtos/dataset-statistics.interface';
+import { MemberRoleDTO, ResourceTypeDTO } from '../../../../src/core/users/users.interface';
+import { WorkspaceIdentifier } from '../../../../src/core/workspaces/services/workspaces.interface';
 
 const API = '/api';
 

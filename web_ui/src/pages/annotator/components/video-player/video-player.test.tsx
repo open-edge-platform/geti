@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { API_URLS } from '@geti/core/src/services/urls';
 import { LoadingIndicator } from '@geti/ui';
 import { act, fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
@@ -13,7 +14,6 @@ import { isVideoFrame, VideoFrame } from '../../../../core/media/video.interface
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { API_URLS } from '../../../../core/services/urls';
 import { getMockedDatasetIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedVideoFrameMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';

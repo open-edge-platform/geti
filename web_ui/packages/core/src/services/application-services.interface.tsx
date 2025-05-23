@@ -24,7 +24,6 @@ import { OrganizationsService } from '../../../../src/core/organizations/service
 import { PersonalAccessTokensService } from '../../../../src/core/personal-access-tokens/personal-access-tokens.interface';
 import { PlatformUtilsService } from '../../../../src/core/platform-utils/services/utils.interface';
 import { ProjectService } from '../../../../src/core/projects/services/project-service.interface';
-import { API_URLS } from '../../../../src/core/services/urls';
 import { ApiModelStatisticsServiceInterface } from '../../../../src/core/statistics/services/api-model-statistics-service';
 import { DatasetStatisticsService } from '../../../../src/core/statistics/services/dataset-statistics.interface';
 import { StatusService } from '../../../../src/core/status/services/status-service.interface';
@@ -34,6 +33,7 @@ import { UserSettingsService } from '../../../../src/core/user-settings/services
 import { OnboardingService } from '../../../../src/core/users/services/onboarding-service.interface';
 import { UsersService } from '../../../../src/core/users/services/users-service.interface';
 import { WorkspacesService } from '../../../../src/core/workspaces/services/workspaces-service.interface';
+import { API_URLS } from './urls';
 
 export interface ApplicationServices {
     router: typeof API_URLS;

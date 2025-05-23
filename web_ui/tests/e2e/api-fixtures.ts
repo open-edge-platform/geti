@@ -9,7 +9,7 @@ import { APIRequestContext, test as baseTest } from '@playwright/test';
 import axios, { AxiosAdapter, AxiosHeaders } from 'axios';
 
 import { getApiServices } from '../../packages/core/src/services/get-api-services';
-import { API_URLS } from '../../src/core/services/urls';
+import { API_URLS } from '../../packages/core/src/services/urls';
 import { addHostToApiUrls } from '../../src/core/services/use-api-router.hook';
 
 export interface ServiceConfiguration {

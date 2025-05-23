@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { API_URLS } from '@geti/core/src/services/urls';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,7 +9,6 @@ import { Annotation } from '../../../../../core/annotations/annotation.interface
 import { createInMemoryAnnotationService } from '../../../../../core/annotations/services/in-memory-annotation-service';
 import { ShapeType } from '../../../../../core/annotations/shapetype.enum';
 import { labelFromUser } from '../../../../../core/annotations/utils';
-import { API_URLS } from '../../../../../core/services/urls';
 import { getMockedAnnotation } from '../../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedDatasetIdentifier } from '../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';

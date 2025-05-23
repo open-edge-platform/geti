@@ -4,8 +4,8 @@
 import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import { API_URLS } from '../../services/urls';
 import { SupportedAlgorithmsResponseDTO } from '../dtos/supported-algorithms.interface';
 import { SupportedAlgorithm } from '../supported-algorithms.interface';
 import { SupportedAlgorithmsService } from './supported-algorithms.interface';
