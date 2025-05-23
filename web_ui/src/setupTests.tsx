@@ -7,7 +7,7 @@ import 'jest-canvas-mock';
 
 import { ReactNode } from 'react';
 
-import { API_URLS } from '@geti/core/src/services/urls';
+import { API_URLS } from '@geti/core';
 import { isLargeSizeQuery as mockIsLargeSizeQuery } from '@geti/ui/theme';
 
 import { initializeMetrics } from './analytics/metrics';

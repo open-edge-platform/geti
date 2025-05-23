@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { API_URLS } from '@geti/core/src/services/urls';
+import { API_URLS } from '@geti/core';
 import { Page } from '@playwright/test';
 
 import { AccountStatusDTO } from '../../../../src/core/organizations/dtos/organizations.interface';
