@@ -303,7 +303,7 @@ class TestParseDatasetNewProject:
                 {"label": "right_ankle", "x": 0.3, "y": 0.0},
             ],
         }
-        if fxt_keypoint_detection:
+        if True:
             dataset_info = DatasetInfo(
                 exported_project_type=GetiProjectType.KEYPOINT_DETECTION,
                 label_names=keypoint_labels,

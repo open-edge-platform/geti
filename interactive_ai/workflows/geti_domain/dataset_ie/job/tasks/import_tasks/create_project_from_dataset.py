@@ -58,6 +58,7 @@ def create_project_from_dataset(
     project_type_str: str,
     label_names: list[str],
     color_by_label: dict[str, str],
+    keypoint_structure: dict[str, list[dict]],  # noqa: ARG001 TODO: need to handle this
     user_id: str,
 ) -> None:
     """
@@ -68,6 +69,7 @@ def create_project_from_dataset(
     :param project_type_str: type of project to create
     :param label_names: list of names of labels from dataset to import to project
     :param color_by_label: mapping of label names to their colors
+    :param keypoint_structure: keypoints edges and positions
     :param user_id: id of the user creating the project
     """
     import_id_ = ImportUtils.get_validated_mongo_id(id=import_id, id_name="Import Dataset ID")
