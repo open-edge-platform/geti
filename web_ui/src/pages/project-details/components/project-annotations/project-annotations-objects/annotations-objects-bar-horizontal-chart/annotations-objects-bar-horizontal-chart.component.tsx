@@ -28,9 +28,6 @@ export const AnnotationObjectsBarHorizontalChart = ({
     const { project } = useProject();
     const title = 'Number of objects per label';
 
-    console.log({ datasetIdentifier });
-    console.log({ project });
-
     const handleLabelClick = (labelName: string) => {
         const labelId = project.labels.find((label) => label.name === labelName)?.id;
 
@@ -56,7 +53,9 @@ export const AnnotationObjectsBarHorizontalChart = ({
 
         navigate(route);
     };
-
+    console.log(data);
+    console.log(title);
+    console.log(colors);
     return (
         <BarHorizontalChart
             title={title}
