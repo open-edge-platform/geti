@@ -24,7 +24,7 @@ build-image-xpu: install_common_libs
 		-f ./Dockerfile.xpu .
 
 build-image:
-	#make build-image-gpu
+	make build-image-gpu
 	make build-image-xpu
 
 push-image-gpu:
@@ -36,7 +36,7 @@ push-image-xpu:
 	@docker push ${IMAGES_REGISTRY}/${XPU_IMAGE_NAME}:${TAG}
 
 push-image:
-	# make push-image-gpu
+	make push-image-gpu
 	make push-image-xpu
 
 # TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
