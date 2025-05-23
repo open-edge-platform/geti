@@ -25,6 +25,7 @@ export const ProjectThumbnail = ({
     errorClassName,
 }: ProjectThumbnailProps): JSX.Element => {
     const [isImgLoadError, setIsImgLoadError] = useState<boolean>(false);
+    const src = isImgLoadError ? NO_IMAGE_ICON : thumbnail;
 
     const onError = (): void => {
         !isImgLoadError && setIsImgLoadError(true);
@@ -34,10 +35,11 @@ export const ProjectThumbnail = ({
         <img
             id={id}
             alt={alt}
+            key={src}
+            src={src}
             width={width}
             height={height}
             onError={onError}
-            src={isImgLoadError ? NO_IMAGE_ICON : thumbnail}
             className={!isImgLoadError ? className : errorClassName}
         />
     );

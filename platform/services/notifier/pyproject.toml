@@ -4,7 +4,7 @@
 name = "notifier"
 version = "1.0.0"
 description = "Notification handler for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "aiosmtplib==2.0.2",

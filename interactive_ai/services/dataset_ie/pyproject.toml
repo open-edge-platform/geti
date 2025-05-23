@@ -2,7 +2,7 @@
 name = "dataset-ie"
 version = "1.0.0"
 description = "Dataset import export service for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "python-multipart==0.0.20",
