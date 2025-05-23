@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
-import { DatasetImportItem } from '../../core/datasets/dataset.interface';
-import { getMockedLabel } from '../../test-utils/mocked-items-factory/mocked-labels';
+import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
+import { DatasetImportItem } from '../../../../core/datasets/dataset.interface';
+import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getDatasetImportInitialState, getLabelsMap, matchStatus } from './utils';
 
 describe('import to existing project utils', () => {

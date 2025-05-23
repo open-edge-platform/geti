@@ -11,11 +11,11 @@ import { DATASET_IMPORT_DIALOG_BUTTONS, DATASET_IMPORT_STATUSES } from '../../..
 import { DatasetImportDialogButton, DatasetImportItem } from '../../../../core/datasets/dataset.interface';
 import { getCurrentJob } from '../../../../core/datasets/utils';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
-import { useDatasetImportToExistingProject } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
-import { matchStatus } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useTusUpload } from '../../../../providers/tus-upload-provider/tus-upload-provider.component';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { isNonEmptyString } from '../../../../shared/utils';
+import { useDatasetImportToExistingProject } from '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
+import { matchStatus } from '../../providers/dataset-import-to-existing-project-provider/utils';
 
 interface DatasetImportToExistingProjectDialogButtonsProps {
     deletionDialogTriggerState: OverlayTriggerState;

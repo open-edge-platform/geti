@@ -5,8 +5,8 @@ import {
     DATASET_IMPORT_STATUSES,
     DATASET_IMPORT_TO_NEW_PROJECT_STEP,
     DATASET_IMPORT_WARNING_TYPE,
-} from '../../core/datasets/dataset.enum';
-import { getFileSize } from '../../shared/utils';
+} from '../../../../core/datasets/dataset.enum';
+import { getFileSize } from '../../../../shared/utils';
 import {
     formatDatasetPrepareImportResponse,
     getBytesRemaining,
@@ -14,8 +14,8 @@ import {
     getTimeRemaining,
 } from './utils';
 
-jest.mock('../../shared/utils', () => ({
-    ...jest.requireActual('../../shared/utils'),
+jest.mock('../../../../shared/utils', () => ({
+    ...jest.requireActual('../../../../shared/utils'),
     getFileSize: jest.fn(),
 }));
 

@@ -3,7 +3,7 @@
 
 import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../../core/datasets/dataset.interface';
-import { matchStatus } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
+import { matchStatus } from '../../providers/dataset-import-to-existing-project-provider/utils';
 
 export const isErrorStatus = (datasetImportItem: DatasetImportItem) => {
     return matchStatus(datasetImportItem, [

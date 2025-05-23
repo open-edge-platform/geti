@@ -12,11 +12,11 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock(
-    '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component',
+    '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component',
     () => {
         return {
             ...jest.requireActual(
-                '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component'
+                '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component'
             ),
             useDatasetImportToNewProject: jest.fn(() => {
                 return {

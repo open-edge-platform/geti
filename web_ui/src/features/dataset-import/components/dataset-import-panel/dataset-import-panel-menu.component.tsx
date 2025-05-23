@@ -10,8 +10,8 @@ import { capitalize, difference, isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../../core/datasets/dataset.interface';
-import { matchStatus } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useTusUpload } from '../../../../providers/tus-upload-provider/tus-upload-provider.component';
+import { matchStatus } from '../../providers/dataset-import-to-existing-project-provider/utils';
 import { isUploadingStatus } from './util';
 
 enum MENU_ITEMS {
