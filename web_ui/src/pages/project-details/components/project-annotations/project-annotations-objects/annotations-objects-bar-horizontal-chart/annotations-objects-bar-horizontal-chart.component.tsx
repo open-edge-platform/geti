@@ -1,3 +1,6 @@
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
 import { useNavigate } from 'react-router-dom';
 
 import { SearchRuleField, SearchRuleOperator } from '../../../../../../core/media/media-filter.interface';
