@@ -30,8 +30,9 @@ LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 Intel® Geti™ enables anyone to build computer vision AI models in a fraction of the time and with minimal data. The software provides you with a seamless, end-to-end workflow to prepare state-of-the-art computer vision models in minutes.
 
-
-
+<p align="center">
+ <img src="https://github.com/user-attachments/assets/af76a999-74d2-48bd-ae31-094e88a0d2e9" width="600"/>
+</p>
 
 ### Key features
 
