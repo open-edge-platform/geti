@@ -5,11 +5,11 @@ import { useCallback } from 'react';
 
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-import { isImage } from '../media/image.interface';
-import { MediaItem } from '../media/media.interface';
-import { isVideo, isVideoFrame } from '../media/video.interface';
-import { DatasetIdentifier } from '../projects/dataset.interface';
-import { paths } from '../../../packages/core/src/services/routes';
+import { isImage } from '../../../../src/core/media/image.interface';
+import { MediaItem } from '../../../../src/core/media/media.interface';
+import { isVideo, isVideoFrame } from '../../../../src/core/media/video.interface';
+import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interface';
+import { paths } from './routes';
 
 const mediaPath = ({
     organizationId,

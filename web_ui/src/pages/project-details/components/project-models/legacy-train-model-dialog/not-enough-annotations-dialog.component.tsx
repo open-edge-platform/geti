@@ -3,11 +3,11 @@
 
 import { CSSProperties, FC, Key } from 'react';
 
+import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@geti/ui';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
 import { Task } from '../../../../../core/projects/task.interface';
-import { useNavigateToAnnotatorRoute } from '../../../../../core/services/use-navigate-to-annotator-route.hook';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { NotEnoughWarning } from '../../common/not-enough-warning/not-enough-warning.component';
 import { TaskSelection } from './model-templates-selection/task-selection.component';
