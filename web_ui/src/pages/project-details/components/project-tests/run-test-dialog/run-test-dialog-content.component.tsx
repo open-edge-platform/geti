@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import {
     Button,
     ButtonGroup,
@@ -20,7 +21,6 @@ import {
 import { Link } from 'react-router-dom';
 
 import { isVisualPromptModel } from '../../../../../core/annotations/services/visual-prompt-service';
-import { paths } from '@geti/core/src/services/routes';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { WarningMessage } from '../../../../../shared/components/warning-message/warning-message.component';
 import {

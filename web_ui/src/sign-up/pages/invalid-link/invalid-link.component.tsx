@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Button, Heading, Text } from '@geti/ui';
 
 import { BrokenBulb } from '../../../assets/images';
-import { paths } from '@geti/core/src/services/routes';
 import { ErrorLayout } from '../../../pages/errors/error-layout/error-layout.component';
 import { redirectTo } from '../../../shared/utils';
 

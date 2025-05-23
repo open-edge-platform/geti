@@ -3,6 +3,7 @@
 
 import { FC } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { Divider, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
@@ -18,7 +19,6 @@ import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { isActiveModel } from '../../../../../core/models/utils';
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { Task } from '../../../../../core/projects/task.interface';
-import { paths } from '@geti/core/src/services/routes';
 import { useRequiredAnnotations } from '../../../../../pages/annotator/hooks/use-required-annotations.hook';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 import { formatDate } from '../../../../utils';

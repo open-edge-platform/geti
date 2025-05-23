@@ -3,6 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { Flex, Grid, Loading, useUnwrapDOMRef, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
@@ -10,7 +11,6 @@ import { Navigate } from 'react-router-dom';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { paths } from '@geti/core/src/services/routes';
 import { useDatasetStatistics } from '../../../../core/statistics/hooks/use-dataset-statistics.hook';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../media/providers/media-provider.component';

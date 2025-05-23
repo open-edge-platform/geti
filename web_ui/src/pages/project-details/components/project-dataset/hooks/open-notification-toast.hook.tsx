@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { ActionButton } from '@geti/ui';
 import { isEmpty, noop } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { ModelGroupsAlgorithmDetails } from '../../../../../core/models/models.interface';
 import { hasActiveModels } from '../../../../../core/models/utils';
-import { paths } from '@geti/core/src/services/routes';
 import { LifecycleStage } from '../../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';

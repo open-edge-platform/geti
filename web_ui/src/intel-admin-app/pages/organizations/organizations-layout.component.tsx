@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core/src/services/routes';
+
 import { ContentLayout } from '../../shared/components/content-layout/content-layout.component';
 import { Organizations } from './organizations.component';
 

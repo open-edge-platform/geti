@@ -3,12 +3,12 @@
 
 import { useEffect } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { Flex, Loading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { NoTrainedModels } from '../../../../../assets/images';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
-import { paths } from '@geti/core/src/services/routes';
 import { EmptyData } from '../../../../../shared/components/empty-data/empty-data.component';
 import { MediaDropBoxHeader } from '../../../../../shared/components/media-drop/media-drop-box-header.component';
 import { MediaDropBox } from '../../../../../shared/components/media-drop/media-drop-box.component';

@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core/src/services/routes';
+
 import { expect, test } from '../../fixtures/base-test';
 
 const annotatorUrl = paths.project.annotator.image({

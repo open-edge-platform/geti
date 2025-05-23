@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 
-import { paths } from '@geti/core/src/services/routes';
 import { providersRender } from '../../../test-utils/required-providers-render';
 import { LandingPageSidebar } from './landing-page-sidebar.component';
 
