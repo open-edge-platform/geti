@@ -1,0 +1,57 @@
+.exportStatusContainer {
+    position: relative;
+    margin: var(--spectrum-global-dimension-size-250) 0;
+    background: var(--spectrum-global-color-gray-75);
+}
+
+.exportStatusTitle {
+    margin: 0;
+    margin-bottom: var(--spectrum-global-dimension-size-100);
+    font-size: var(--spectrum-global-dimension-size-200);
+    font-weight: normal;
+}
+
+.exportDialogBody {
+    padding: var(--spectrum-global-dimension-size-250) !important;
+    background: var(--spectrum-global-color-gray-50) !important;
+}
+
+.smallHeader {
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.linkButton {
+    &:not(:hover) {
+        color: var(--energy-blue);
+
+        > svg {
+            fill: var(--energy-blue) !important;
+        }
+    }
+}
+
+.messages {
+    display: flex;
+    align-items: center;
+    margin-top: var(--spectrum-global-dimension-size-300);
+    margin-bottom: var(--spectrum-global-dimension-size-115);
+
+    svg {
+        fill: var(--spectrum-semantic-notice-color-icon);
+        margin-right: var(--spectrum-global-dimension-size-150);
+    }
+}
+
+.messageList {
+    position: relative;
+    list-style-type: disc;
+
+    li {
+        margin-left: var(--spectrum-global-dimension-size-600);
+
+        &::marker {
+            color: var(--spectrum-alias-icon-color);
+        }
+    }
+}
