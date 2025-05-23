@@ -3,7 +3,7 @@
 
 import { Key, useState } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Flex } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';

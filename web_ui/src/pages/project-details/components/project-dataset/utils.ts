@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 
 import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportItem } from '../../../../core/datasets/dataset.interface';

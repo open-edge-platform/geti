@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 
 import { TruncatedText } from '../../../shared/components/truncated-text/truncated-text.component';

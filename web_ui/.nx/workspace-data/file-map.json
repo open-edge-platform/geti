@@ -9,38 +9,123 @@
   "nxJsonPlugins": [],
   "fileMap": {
     "projectFileMap": {
-      "@geti/config": [
+      "@geti/core": [
         {
-          "file": "packages/config/lint/eslint.config.js",
-          "hash": "6587621844457120942"
+          "file": "packages/core/eslint.config.js",
+          "hash": "10586081436179389448"
         },
         {
-          "file": "packages/config/package.json",
-          "hash": "4138820227761157656"
+          "file": "packages/core/geti-type.d.ts",
+          "hash": "5711253543159418347"
         },
         {
-          "file": "packages/config/test/jest.config.js",
-          "hash": "11148113043830781493"
+          "file": "packages/core/index.ts",
+          "hash": "7439345091698020125"
         },
         {
-          "file": "packages/config/test/jest.global.js",
-          "hash": "9188150355208818450"
+          "file": "packages/core/jest.config.js",
+          "hash": "7088269557993372223"
         },
         {
-          "file": "packages/config/test/transformers/babelTransform.js",
-          "hash": "17420902566167113133"
+          "file": "packages/core/package.json",
+          "hash": "10740799985031127693",
+          "deps": [
+            "@geti/config",
+            "npm:@testing-library/react",
+            "npm:@testing-library/user-event",
+            "npm:@types/jest",
+            "npm:@types/node",
+            "npm:eslint",
+            "npm:eslint-plugin-header",
+            "npm:eslint-plugin-import",
+            "npm:eslint-plugin-jest",
+            "npm:eslint-plugin-jsx-a11y",
+            "npm:eslint-plugin-react",
+            "npm:eslint-plugin-react-hooks",
+            "npm:jest",
+            "npm:typescript",
+            "npm:axios"
+          ]
         },
         {
-          "file": "packages/config/test/transformers/cssTransform.js",
-          "hash": "2139936657583514815"
+          "file": "packages/core/src/client/axios-instance.ts",
+          "hash": "17157549157844354745"
         },
         {
-          "file": "packages/config/test/transformers/fileTransform.js",
-          "hash": "3601517691759192325"
+          "file": "packages/core/src/requests/query-keys.ts",
+          "hash": "13100956640072146318"
         },
         {
-          "file": "packages/config/typescript/tsconfig.base.json",
-          "hash": "4149020491132501184"
+          "file": "packages/core/src/services/application-services-provider.component.tsx",
+          "hash": "13578024252468603069"
+        },
+        {
+          "file": "packages/core/src/services/application-services.interface.tsx",
+          "hash": "15103426655965578377"
+        },
+        {
+          "file": "packages/core/src/services/create-api-service.interface.ts",
+          "hash": "7587190123354582275"
+        },
+        {
+          "file": "packages/core/src/services/get-api-services.ts",
+          "hash": "12134132294606089679"
+        },
+        {
+          "file": "packages/core/src/services/get-in-memory-services.ts",
+          "hash": "10006058721551749563"
+        },
+        {
+          "file": "packages/core/src/services/routes.ts",
+          "hash": "2855829217851242751"
+        },
+        {
+          "file": "packages/core/src/services/security.ts",
+          "hash": "16954793565145297282"
+        },
+        {
+          "file": "packages/core/src/services/test-utils.ts",
+          "hash": "9867014565885049693"
+        },
+        {
+          "file": "packages/core/src/services/urls.test.ts",
+          "hash": "12821186988892214174"
+        },
+        {
+          "file": "packages/core/src/services/urls.ts",
+          "hash": "11666405095190152427"
+        },
+        {
+          "file": "packages/core/src/services/use-api-router.hook.test.ts",
+          "hash": "12039900928206589314"
+        },
+        {
+          "file": "packages/core/src/services/use-api-router.hook.ts",
+          "hash": "15903196106861625922"
+        },
+        {
+          "file": "packages/core/src/services/use-deployment-config-query.hook.test.tsx",
+          "hash": "9074718926522952675"
+        },
+        {
+          "file": "packages/core/src/services/use-deployment-config-query.hook.ts",
+          "hash": "6033658533856221828"
+        },
+        {
+          "file": "packages/core/src/services/use-navigate-to-annotator-route.hook.ts",
+          "hash": "18181975546986546568"
+        },
+        {
+          "file": "packages/core/src/services/utils.test.ts",
+          "hash": "10880209613278545366"
+        },
+        {
+          "file": "packages/core/src/services/utils.ts",
+          "hash": "17260962892918268584"
+        },
+        {
+          "file": "packages/core/tsconfig.json",
+          "hash": "6016086249329100908"
         }
       ],
       "@geti/ui": [
@@ -867,115 +952,38 @@
           "hash": "13828484965417379356"
         }
       ],
-      "@geti/core": [
+      "@geti/config": [
         {
-          "file": "packages/core/eslint.config.js",
-          "hash": "10586081436179389448"
+          "file": "packages/config/lint/eslint.config.js",
+          "hash": "6587621844457120942"
         },
         {
-          "file": "packages/core/geti-type.d.ts",
-          "hash": "5711253543159418347"
+          "file": "packages/config/package.json",
+          "hash": "4138820227761157656"
         },
         {
-          "file": "packages/core/index.ts",
-          "hash": "7439345091698020125"
+          "file": "packages/config/test/jest.config.js",
+          "hash": "11148113043830781493"
         },
         {
-          "file": "packages/core/jest.config.js",
-          "hash": "7088269557993372223"
+          "file": "packages/config/test/jest.global.js",
+          "hash": "9188150355208818450"
         },
         {
-          "file": "packages/core/package.json",
-          "hash": "10740799985031127693",
-          "deps": [
-            "@geti/config",
-            "npm:@testing-library/react",
-            "npm:@testing-library/user-event",
-            "npm:@types/jest",
-            "npm:@types/node",
-            "npm:eslint",
-            "npm:eslint-plugin-header",
-            "npm:eslint-plugin-import",
-            "npm:eslint-plugin-jest",
-            "npm:eslint-plugin-jsx-a11y",
-            "npm:eslint-plugin-react",
-            "npm:eslint-plugin-react-hooks",
-            "npm:jest",
-            "npm:typescript",
-            "npm:axios"
-          ]
+          "file": "packages/config/test/transformers/babelTransform.js",
+          "hash": "17420902566167113133"
         },
         {
-          "file": "packages/core/src/client/axios-instance.ts",
-          "hash": "17157549157844354745"
+          "file": "packages/config/test/transformers/cssTransform.js",
+          "hash": "2139936657583514815"
         },
         {
-          "file": "packages/core/src/services/application-services-provider.component.tsx",
-          "hash": "13578024252468603069"
+          "file": "packages/config/test/transformers/fileTransform.js",
+          "hash": "3601517691759192325"
         },
         {
-          "file": "packages/core/src/services/application-services.interface.tsx",
-          "hash": "15103426655965578377"
-        },
-        {
-          "file": "packages/core/src/services/create-api-service.interface.ts",
-          "hash": "7587190123354582275"
-        },
-        {
-          "file": "packages/core/src/services/get-api-services.ts",
-          "hash": "12134132294606089679"
-        },
-        {
-          "file": "packages/core/src/services/get-in-memory-services.ts",
-          "hash": "10006058721551749563"
-        },
-        {
-          "file": "packages/core/src/services/routes.ts",
-          "hash": "2855829217851242751"
-        },
-        {
-          "file": "packages/core/src/services/security.ts",
-          "hash": "16954793565145297282"
-        },
-        {
-          "file": "packages/core/src/services/test-utils.ts",
-          "hash": "9867014565885049693"
-        },
-        {
-          "file": "packages/core/src/services/urls.test.ts",
-          "hash": "12821186988892214174"
-        },
-        {
-          "file": "packages/core/src/services/urls.ts",
-          "hash": "11666405095190152427"
-        },
-        {
-          "file": "packages/core/src/services/use-api-router.hook.test.ts",
-          "hash": "12039900928206589314"
-        },
-        {
-          "file": "packages/core/src/services/use-api-router.hook.ts",
-          "hash": "15903196106861625922"
-        },
-        {
-          "file": "packages/core/src/services/use-deployment-config-query.hook.test.tsx",
-          "hash": "9074718926522952675"
-        },
-        {
-          "file": "packages/core/src/services/use-deployment-config-query.hook.ts",
-          "hash": "6033658533856221828"
-        },
-        {
-          "file": "packages/core/src/services/utils.test.ts",
-          "hash": "10880209613278545366"
-        },
-        {
-          "file": "packages/core/src/services/utils.ts",
-          "hash": "17260962892918268584"
-        },
-        {
-          "file": "packages/core/tsconfig.json",
-          "hash": "6016086249329100908"
+          "file": "packages/config/typescript/tsconfig.base.json",
+          "hash": "4149020491132501184"
         }
       ]
     },
@@ -1014,7 +1022,7 @@
       },
       {
         "file": "Dockerfile",
-        "hash": "16875057462754106400"
+        "hash": "14909277469739463178"
       },
       {
         "file": "Makefile",
@@ -1090,7 +1098,7 @@
       },
       {
         "file": "dex_templates/Dockerfile",
-        "hash": "18205061915483102144"
+        "hash": "3332929468298185225"
       },
       {
         "file": "dex_templates/Makefile",
@@ -1870,23 +1878,23 @@
       },
       {
         "file": "src/core/configurable-parameters/hooks/use-config-parameters.hook.ts",
-        "hash": "12211557856408589919"
+        "hash": "13918960196303100534"
       },
       {
         "file": "src/core/configurable-parameters/hooks/use-project-configuration.hook.ts",
-        "hash": "16971448088213287794"
+        "hash": "3810589024237280230"
       },
       {
         "file": "src/core/configurable-parameters/hooks/use-reconfig-auto-training.hook.test.tsx",
-        "hash": "12360826113784888962"
+        "hash": "4087819008894390940"
       },
       {
         "file": "src/core/configurable-parameters/hooks/use-reconfig-auto-training.hook.ts",
-        "hash": "18144646921015510189"
+        "hash": "6283150518657868687"
       },
       {
         "file": "src/core/configurable-parameters/hooks/use-training-configuration.hook.ts",
-        "hash": "12146005899016202422"
+        "hash": "2642852170757901166"
       },
       {
         "file": "src/core/configurable-parameters/services/api-model-config-parameters-service.test.ts",
@@ -1938,7 +1946,7 @@
       },
       {
         "file": "src/core/credits/hooks/use-credits-api.hook.ts",
-        "hash": "4636866086491823470"
+        "hash": "5025760744592202942"
       },
       {
         "file": "src/core/credits/products/dtos/products.interface.ts",
@@ -1946,7 +1954,7 @@
       },
       {
         "file": "src/core/credits/products/hooks/use-products.hook.ts",
-        "hash": "5053392920996699016"
+        "hash": "5025603155192642330"
       },
       {
         "file": "src/core/credits/products/hooks/utils.test.ts",
@@ -2002,7 +2010,7 @@
       },
       {
         "file": "src/core/credits/subscriptions/hooks/use-subscription-api.hook.ts",
-        "hash": "8855972617382183580"
+        "hash": "7105651215959983963"
       },
       {
         "file": "src/core/credits/subscriptions/quotas.interface.ts",
@@ -2034,7 +2042,7 @@
       },
       {
         "file": "src/core/credits/transactions/hooks/use-transactions.hook.ts",
-        "hash": "7619570565989587760"
+        "hash": "13251841810451799206"
       },
       {
         "file": "src/core/credits/transactions/hooks/utils.test.ts",
@@ -2094,7 +2102,7 @@
       },
       {
         "file": "src/core/datasets/hooks/use-dataset-import-queries.hook.ts",
-        "hash": "6881034829718882033"
+        "hash": "10988581401405934179"
       },
       {
         "file": "src/core/datasets/hooks/use-dataset-import-queries.test.tsx",
@@ -2102,7 +2110,7 @@
       },
       {
         "file": "src/core/datasets/hooks/use-training-dataset.hook.ts",
-        "hash": "12361226952596765557"
+        "hash": "10823049789145889886"
       },
       {
         "file": "src/core/datasets/hooks/utils.test.ts",
@@ -2158,7 +2166,7 @@
       },
       {
         "file": "src/core/feature-flags/hooks/use-feature-flag-query.hook.ts",
-        "hash": "14309198708783107045"
+        "hash": "11640094470293239936"
       },
       {
         "file": "src/core/feature-flags/hooks/use-feature-flags.hook.ts",
@@ -2190,7 +2198,7 @@
       },
       {
         "file": "src/core/jobs/hooks/use-jobs.hook.ts",
-        "hash": "13794043423804286278"
+        "hash": "3790520317363198613"
       },
       {
         "file": "src/core/jobs/hooks/utils.test.tsx",
@@ -2198,7 +2206,7 @@
       },
       {
         "file": "src/core/jobs/hooks/utils.ts",
-        "hash": "7875615531898508434"
+        "hash": "6971541107420975500"
       },
       {
         "file": "src/core/jobs/jobs.const.ts",
@@ -2278,7 +2286,7 @@
       },
       {
         "file": "src/core/maintenance/hooks/use-maintenance-query.hook.ts",
-        "hash": "15761154175827196157"
+        "hash": "7564398150408854998"
       },
       {
         "file": "src/core/maintenance/services/api-maintenance-service.test.ts",
@@ -2382,7 +2390,7 @@
       },
       {
         "file": "src/core/models/hooks/use-models.hook.ts",
-        "hash": "17769310784775421689"
+        "hash": "9194478654919875990"
       },
       {
         "file": "src/core/models/models.interface.ts",
@@ -2430,11 +2438,11 @@
       },
       {
         "file": "src/core/organizations/hook/use-organizations-api.hook.ts",
-        "hash": "17905482318163456792"
+        "hash": "11934910388228465606"
       },
       {
         "file": "src/core/organizations/hook/use-selected-organization.hook.test.tsx",
-        "hash": "10070690750484871256"
+        "hash": "13104720860405621070"
       },
       {
         "file": "src/core/organizations/hook/use-selected-organization.hook.ts",
@@ -2462,7 +2470,7 @@
       },
       {
         "file": "src/core/personal-access-tokens/hooks/use-personal-access-token.hook.ts",
-        "hash": "11067077894852685275"
+        "hash": "3379147727888610686"
       },
       {
         "file": "src/core/personal-access-tokens/hooks/use-personal-access-token.test.tsx",
@@ -2494,7 +2502,7 @@
       },
       {
         "file": "src/core/platform-utils/hooks/use-platform-utils.hook.ts",
-        "hash": "400591282804698034"
+        "hash": "16576650209455160286"
       },
       {
         "file": "src/core/platform-utils/hooks/use-platform-utils.test.tsx",
@@ -2546,7 +2554,7 @@
       },
       {
         "file": "src/core/projects/hooks/use-export-project-status.hook.ts",
-        "hash": "4476882365561632408"
+        "hash": "11198949962333389817"
       },
       {
         "file": "src/core/projects/hooks/use-export-project.hook.test.tsx",
@@ -2562,7 +2570,7 @@
       },
       {
         "file": "src/core/projects/hooks/use-import-project-status.hook.ts",
-        "hash": "16933571204280774645"
+        "hash": "2043347187644285687"
       },
       {
         "file": "src/core/projects/hooks/use-import-project.hook.test.tsx",
@@ -2582,7 +2590,7 @@
       },
       {
         "file": "src/core/projects/hooks/use-project-actions.hook.ts",
-        "hash": "13434841876380127386"
+        "hash": "12189466681079542078"
       },
       {
         "file": "src/core/projects/hooks/use-project-dataset.hook.test.tsx",
@@ -2590,11 +2598,11 @@
       },
       {
         "file": "src/core/projects/hooks/use-project-dataset.hook.ts",
-        "hash": "829659459247081386"
+        "hash": "7281333849347328563"
       },
       {
         "file": "src/core/projects/hooks/use-project-status.hook.ts",
-        "hash": "6993355373512382968"
+        "hash": "1580601286234032129"
       },
       {
         "file": "src/core/projects/hooks/utils.test.ts",
@@ -2653,10 +2661,6 @@
         "hash": "4142687503208507482"
       },
       {
-        "file": "src/core/requests/query-keys.ts",
-        "hash": "16406113968138114285"
-      },
-      {
         "file": "src/core/server/combine.js",
         "hash": "5405674753947703041"
       },
@@ -2685,10 +2689,6 @@
         "hash": "4082253461459417801"
       },
       {
-        "file": "src/core/services/use-navigate-to-annotator-route.hook.ts",
-        "hash": "8264450461055905057"
-      },
-      {
         "file": "src/core/shared/dto/infinite-query.interface.ts",
         "hash": "6094076567977486348"
       },
@@ -2714,11 +2714,11 @@
       },
       {
         "file": "src/core/statistics/hooks/use-dataset-statistics.hook.ts",
-        "hash": "14202136624425733644"
+        "hash": "15453426995704290551"
       },
       {
         "file": "src/core/statistics/hooks/use-model-statistics.hook.ts",
-        "hash": "2520805302578448786"
+        "hash": "2515205082028779981"
       },
       {
         "file": "src/core/statistics/model-statistics.interface.ts",
@@ -2758,7 +2758,7 @@
       },
       {
         "file": "src/core/status/hooks/use-status.hook.ts",
-        "hash": "9048087928048338753"
+        "hash": "9665805047987762989"
       },
       {
         "file": "src/core/status/hooks/utils.ts",
@@ -2798,7 +2798,7 @@
       },
       {
         "file": "src/core/supported-algorithms/hooks/use-supported-algorithms.hook.ts",
-        "hash": "16446981986312590641"
+        "hash": "8299520421102905887"
       },
       {
         "file": "src/core/supported-algorithms/hooks/use-tasks-with-supported-algorithms.ts",
@@ -2850,7 +2850,7 @@
       },
       {
         "file": "src/core/tests/hooks/use-tests.hook.ts",
-        "hash": "7919927182781633160"
+        "hash": "5029438813831171291"
       },
       {
         "file": "src/core/tests/services/api-tests-service.ts",
@@ -2898,7 +2898,7 @@
       },
       {
         "file": "src/core/user-settings/hooks/use-global-settings.hook.ts",
-        "hash": "4020791504597505706"
+        "hash": "9722576114433374330"
       },
       {
         "file": "src/core/user-settings/hooks/use-global-settings.test.ts",
@@ -2906,7 +2906,7 @@
       },
       {
         "file": "src/core/user-settings/hooks/use-project-settings.hook.ts",
-        "hash": "12179820584423987436"
+        "hash": "3195762005906692082"
       },
       {
         "file": "src/core/user-settings/hooks/use-project-settings.test.ts",
@@ -2950,11 +2950,11 @@
       },
       {
         "file": "src/core/users/hook/use-profile.hook.ts",
-        "hash": "13937786664855354737"
+        "hash": "15198388952703550304"
       },
       {
         "file": "src/core/users/hook/use-users.hook.ts",
-        "hash": "15314539616707353602"
+        "hash": "10312419344607489"
       },
       {
         "file": "src/core/users/hook/use-users.interface.ts",
@@ -3010,7 +3010,7 @@
       },
       {
         "file": "src/core/workspaces/hooks/use-workspaces.hook.ts",
-        "hash": "9978698139317300040"
+        "hash": "929789948450746974"
       },
       {
         "file": "src/core/workspaces/services/api-workspaces-service.ts",
@@ -3242,7 +3242,7 @@
       },
       {
         "file": "src/intel-admin-app/layout/navbar.component.tsx",
-        "hash": "11912324742697772120"
+        "hash": "5514775976843346988"
       },
       {
         "file": "src/intel-admin-app/pages/organization/cells/credit-accounts-actions-cell.component.tsx",
@@ -3286,15 +3286,15 @@
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-credit-accounts.component.tsx",
-        "hash": "9976400343440559963"
+        "hash": "17645221540987377423"
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-layout.component.tsx",
-        "hash": "326364188572436616"
+        "hash": "3460416643821843662"
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-overview.component.tsx",
-        "hash": "17490569418363350394"
+        "hash": "13210691474760504915"
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-overview.test.tsx",
@@ -3306,11 +3306,11 @@
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-service-limits.component.tsx",
-        "hash": "7386519908019694624"
+        "hash": "3159022293714018181"
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-sidebar.component.tsx",
-        "hash": "5329185720592598622"
+        "hash": "7090351572957283244"
       },
       {
         "file": "src/intel-admin-app/pages/organization/organization-users.component.tsx",
@@ -3358,7 +3358,7 @@
       },
       {
         "file": "src/intel-admin-app/pages/organizations/invite-organization.component.tsx",
-        "hash": "4999357176429716286"
+        "hash": "13428280414906781795"
       },
       {
         "file": "src/intel-admin-app/pages/organizations/organizations-filters.component.tsx",
@@ -3366,7 +3366,7 @@
       },
       {
         "file": "src/intel-admin-app/pages/organizations/organizations-layout.component.tsx",
-        "hash": "5229640845160532986"
+        "hash": "15631583475101733566"
       },
       {
         "file": "src/intel-admin-app/pages/organizations/organizations-menu.component.tsx",
@@ -3378,7 +3378,7 @@
       },
       {
         "file": "src/intel-admin-app/pages/organizations/organizations-table.component.tsx",
-        "hash": "9279923602306211899"
+        "hash": "17869440400496464553"
       },
       {
         "file": "src/intel-admin-app/pages/organizations/organizations-table.test.tsx",
@@ -4122,11 +4122,11 @@
       },
       {
         "file": "src/pages/annotator/components/back-home/back-home.component.tsx",
-        "hash": "3554895183198307542"
+        "hash": "4141869918961598202"
       },
       {
         "file": "src/pages/annotator/components/back-home/back-home.test.tsx",
-        "hash": "2233360726509576162"
+        "hash": "8172449951451375598"
       },
       {
         "file": "src/pages/annotator/components/circle-size-preview/circle-size-preview.component.tsx",
@@ -4402,7 +4402,7 @@
       },
       {
         "file": "src/pages/annotator/components/navigation-toolbar/anomaly-project-performance-chart.component.tsx",
-        "hash": "3037291003715565972"
+        "hash": "14441467593760672312"
       },
       {
         "file": "src/pages/annotator/components/navigation-toolbar/anomaly-project-performance.component.tsx",
@@ -4458,7 +4458,7 @@
       },
       {
         "file": "src/pages/annotator/components/navigation-toolbar/project-performance.component.tsx",
-        "hash": "6764393532436932768"
+        "hash": "5802296197161359103"
       },
       {
         "file": "src/pages/annotator/components/navigation-toolbar/settings/active-learning-settings.component.tsx",
@@ -4618,7 +4618,7 @@
       },
       {
         "file": "src/pages/annotator/components/range-based-video-player/use-labeled-video-ranges.hook.ts",
-        "hash": "15374926132803674715"
+        "hash": "394493279512132803"
       },
       {
         "file": "src/pages/annotator/components/range-based-video-player/video-content.component.tsx",
@@ -4722,7 +4722,7 @@
       },
       {
         "file": "src/pages/annotator/components/secondary-toolbar/submit-button.component.tsx",
-        "hash": "3393943373248522571"
+        "hash": "5028166366174925325"
       },
       {
         "file": "src/pages/annotator/components/secondary-toolbar/submit-button.test.tsx",
@@ -4762,7 +4762,7 @@
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/dataset-accordion.component.tsx",
-        "hash": "11965274986956527643"
+        "hash": "17414512821610604498"
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/dataset-accordion.module.scss",
@@ -4818,7 +4818,7 @@
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/dataset-picker/dataset-picker.component.tsx",
-        "hash": "15037248047774917225"
+        "hash": "3723812326766180044"
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/dataset-picker/dataset-picker.test.tsx",
@@ -4826,11 +4826,11 @@
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/empty-dataset.component.tsx",
-        "hash": "16777456248524972928"
+        "hash": "3290645981782593071"
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/use-delete-dataset-item.hook.ts",
-        "hash": "465750142223557207"
+        "hash": "11507551900007052870"
       },
       {
         "file": "src/pages/annotator/components/sidebar/dataset/utils.ts",
@@ -4930,7 +4930,7 @@
       },
       {
         "file": "src/pages/annotator/components/video-player/hooks/use-play-video.hook.ts",
-        "hash": "3837358010946764305"
+        "hash": "11865624341319157544"
       },
       {
         "file": "src/pages/annotator/components/video-player/hooks/use-propagate-annotations.hook.ts",
@@ -4942,7 +4942,7 @@
       },
       {
         "file": "src/pages/annotator/components/video-player/hooks/use-video-annotations-query.hook.ts",
-        "hash": "15396899152591119383"
+        "hash": "1357451182561908410"
       },
       {
         "file": "src/pages/annotator/components/video-player/hooks/use-video-controls-with-save-confirmation.hook.ts",
@@ -4958,7 +4958,7 @@
       },
       {
         "file": "src/pages/annotator/components/video-player/hooks/use-video-predictions-query.hook.ts",
-        "hash": "1842508463233957097"
+        "hash": "16243982002705904428"
       },
       {
         "file": "src/pages/annotator/components/video-player/hooks/use-video-timeline-queries.hook.ts",
@@ -5010,7 +5010,7 @@
       },
       {
         "file": "src/pages/annotator/components/video-player/streaming-video-player/use-buffer-streaming-queries.hook.ts",
-        "hash": "1335457269635324746"
+        "hash": "590834284608105081"
       },
       {
         "file": "src/pages/annotator/components/video-player/streaming-video-player/use-video-streaming-annotations.hook.ts",
@@ -5518,7 +5518,7 @@
       },
       {
         "file": "src/pages/annotator/providers/dataset-provider/use-optimistically-update-annotation-status.hook.ts",
-        "hash": "16079720962118469748"
+        "hash": "12252976211270245532"
       },
       {
         "file": "src/pages/annotator/providers/prediction-provider/prediction-provider.component.tsx",
@@ -5534,7 +5534,7 @@
       },
       {
         "file": "src/pages/annotator/providers/prediction-provider/use-inference-server-status.ts",
-        "hash": "17030331307994957739"
+        "hash": "4884052760973728710"
       },
       {
         "file": "src/pages/annotator/providers/prediction-provider/use-merge-annotations.hook.test.tsx",
@@ -5550,7 +5550,7 @@
       },
       {
         "file": "src/pages/annotator/providers/prediction-provider/use-prediction-roi-query.hook.ts",
-        "hash": "1407683572731902280"
+        "hash": "8576328698322257676"
       },
       {
         "file": "src/pages/annotator/providers/prediction-provider/utils.test.ts",
@@ -5558,7 +5558,7 @@
       },
       {
         "file": "src/pages/annotator/providers/prediction-provider/utils.ts",
-        "hash": "14566168653130177298"
+        "hash": "17095110986299225035"
       },
       {
         "file": "src/pages/annotator/providers/preview-canvas-settings-provider/preview-canvas-settings-provider.component.tsx",
@@ -5570,11 +5570,11 @@
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/default-selected-media-item-provider.component.tsx",
-        "hash": "4606560707477584416"
+        "hash": "2719228084281107872"
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/selected-media-item-provider.component.tsx",
-        "hash": "16047856699253051289"
+        "hash": "3052941623071096938"
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/selected-media-item.interface.ts",
@@ -5582,15 +5582,15 @@
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/use-annotations-query.hook.ts",
-        "hash": "4449482906768243148"
+        "hash": "14418229837816547360"
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/use-load-image-query.hook.ts",
-        "hash": "17814080049076566871"
+        "hash": "270124046145894788"
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/use-media-item-query.hook.ts",
-        "hash": "11812941520022262070"
+        "hash": "5857271418308328767"
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/use-predictions-query.hook.test.tsx",
@@ -5598,7 +5598,7 @@
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/use-predictions-query.hook.ts",
-        "hash": "10701102108535513997"
+        "hash": "3293790379525368220"
       },
       {
         "file": "src/pages/annotator/providers/selected-media-item-provider/use-selected-inference-model.ts",
@@ -5630,7 +5630,7 @@
       },
       {
         "file": "src/pages/annotator/providers/submit-annotations-provider/use-submit-annotations-mutation.hook.ts",
-        "hash": "5492313152240977742"
+        "hash": "11599711702536725704"
       },
       {
         "file": "src/pages/annotator/providers/submit-annotations-provider/utils.test.ts",
@@ -6678,7 +6678,7 @@
       },
       {
         "file": "src/pages/camera-page/components/sidebar/sidebar-thumbnail.component.tsx",
-        "hash": "9036905829126376603"
+        "hash": "18358012141607198257"
       },
       {
         "file": "src/pages/camera-page/components/sidebar/sidebar-thumbnail.test.tsx",
@@ -6766,7 +6766,7 @@
       },
       {
         "file": "src/pages/camera-page/media-gallery/media-gallery.component.tsx",
-        "hash": "9722471230973658136"
+        "hash": "4029366694316861394"
       },
       {
         "file": "src/pages/camera-page/media-gallery/media-gallery.test.tsx",
@@ -7246,7 +7246,7 @@
       },
       {
         "file": "src/pages/create-project/new-project-dialog.component.tsx",
-        "hash": "6570042993636992166"
+        "hash": "17010512533225653123"
       },
       {
         "file": "src/pages/create-project/new-project-dialog.module.scss",
@@ -7266,7 +7266,7 @@
       },
       {
         "file": "src/pages/errors/bad-request/bad-request.component.tsx",
-        "hash": "13732211607619385487"
+        "hash": "1464576430258084880"
       },
       {
         "file": "src/pages/errors/error-boundary.component.tsx",
@@ -7286,11 +7286,11 @@
       },
       {
         "file": "src/pages/errors/general-error-screen/general-error-screen.component.tsx",
-        "hash": "2476662137189560228"
+        "hash": "7944873155470842807"
       },
       {
         "file": "src/pages/errors/internal-server-error/internal-server-error.component.tsx",
-        "hash": "7549587189742499234"
+        "hash": "9681547105664778244"
       },
       {
         "file": "src/pages/errors/invalid-organization/invalid-organization-screen.component.tsx",
@@ -7322,7 +7322,7 @@
       },
       {
         "file": "src/pages/landing-page/landing-page-sidebar/landing-page-sidebar.component.tsx",
-        "hash": "13934027909187245209"
+        "hash": "17885353648211774536"
       },
       {
         "file": "src/pages/landing-page/landing-page-sidebar/landing-page-sidebar.module.scss",
@@ -7330,7 +7330,7 @@
       },
       {
         "file": "src/pages/landing-page/landing-page-sidebar/landing-page.sidebar.test.tsx",
-        "hash": "8569020628803927104"
+        "hash": "3798217406419338595"
       },
       {
         "file": "src/pages/landing-page/landing-page-sidebar/organizations-picker/organizations-picker.component.tsx",
@@ -7414,7 +7414,7 @@
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/components/project-import/project-creation-status.component.tsx",
-        "hash": "3511860580208040161"
+        "hash": "815494433381367654"
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/components/project-import/project-import-file-picker.component.tsx",
@@ -7494,11 +7494,11 @@
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/components/projects-list/components/project/project-thumbnail.component.tsx",
-        "hash": "15881081213298254458"
+        "hash": "17356603714329296359"
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/components/projects-list/components/project/project.component.tsx",
-        "hash": "612922793188749419"
+        "hash": "9506088654703942984"
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/components/projects-list/components/project/project.module.scss",
@@ -7518,7 +7518,7 @@
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/dataset-import-panels.component.tsx",
-        "hash": "7448413708964386571"
+        "hash": "7618973109537664664"
       },
       {
         "file": "src/pages/landing-page/landing-page-workspace/landing-page-workspace.component.tsx",
@@ -7702,19 +7702,19 @@
       },
       {
         "file": "src/pages/media/hooks/media-delete/media-delete.hook.ts",
-        "hash": "13499036566413875735"
+        "hash": "13659755255230598385"
       },
       {
         "file": "src/pages/media/hooks/media-items/active-media-query.hook.ts",
-        "hash": "14938102751752478606"
+        "hash": "8501789005802798201"
       },
       {
         "file": "src/pages/media/hooks/media-items/advanced-filter-query.hook.ts",
-        "hash": "4193812632353228913"
+        "hash": "12474113817166810918"
       },
       {
         "file": "src/pages/media/hooks/media-items/advanced-frames-filter-query.hook.ts",
-        "hash": "16710653079006721941"
+        "hash": "2562873655723512085"
       },
       {
         "file": "src/pages/media/hooks/media-items/advanced-media-filter.hook.ts",
@@ -7890,7 +7890,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-annotations/project-annotations-statistics.component.tsx",
-        "hash": "16209139206978258089"
+        "hash": "3265548600095679920"
       },
       {
         "file": "src/pages/project-details/components/project-annotations/project-annotations-statistics.test.tsx",
@@ -7946,7 +7946,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-dataset/dataset-imports.component.tsx",
-        "hash": "401078515151242243"
+        "hash": "814069456487049502"
       },
       {
         "file": "src/pages/project-details/components/project-dataset/dataset-tab-list.component.tsx",
@@ -7954,11 +7954,11 @@
       },
       {
         "file": "src/pages/project-details/components/project-dataset/dataset-tab-panel.component.tsx",
-        "hash": "11586959558480686636"
+        "hash": "4570023388561936115"
       },
       {
         "file": "src/pages/project-details/components/project-dataset/dataset-tab-panel.test.tsx",
-        "hash": "1817025967099484105"
+        "hash": "9929503451338244292"
       },
       {
         "file": "src/pages/project-details/components/project-dataset/export-dataset/dataset-statistics.test.tsx",
@@ -8034,7 +8034,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-dataset/hooks/open-notification-toast.hook.tsx",
-        "hash": "1240983803050176964"
+        "hash": "6517671311567501984"
       },
       {
         "file": "src/pages/project-details/components/project-dataset/hooks/open-notification-toast.module.scss",
@@ -8182,7 +8182,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-media/anomaly-media-content.component.tsx",
-        "hash": "3625113924258394921"
+        "hash": "17871615986382488023"
       },
       {
         "file": "src/pages/project-details/components/project-media/anomaly-media-header-information.component.tsx",
@@ -8222,7 +8222,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-media/media-content.component.tsx",
-        "hash": "7663812205749220718"
+        "hash": "12905519135145778734"
       },
       {
         "file": "src/pages/project-details/components/project-media/media-count.component.tsx",
@@ -8238,7 +8238,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-media/media-item-actions/media-item-menu.component.tsx",
-        "hash": "14089178748337196136"
+        "hash": "7174112535183125673"
       },
       {
         "file": "src/pages/project-details/components/project-media/media-item-details.component.tsx",
@@ -8250,7 +8250,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-media/media-item-factory.component.tsx",
-        "hash": "15636394400988182151"
+        "hash": "13870725278663088974"
       },
       {
         "file": "src/pages/project-details/components/project-media/media-item-tooltip-message/media-item-tooltip-message.test.tsx",
@@ -8290,15 +8290,15 @@
       },
       {
         "file": "src/pages/project-details/components/project-media/training-notification/anomaly-projects-notification.component.tsx",
-        "hash": "5334576451170596983"
+        "hash": "18090196757805334706"
       },
       {
         "file": "src/pages/project-details/components/project-media/training-notification/use-show-start-training.hook.test.tsx",
-        "hash": "8654931716187065513"
+        "hash": "316453948327395271"
       },
       {
         "file": "src/pages/project-details/components/project-media/training-notification/use-show-start-training.hook.tsx",
-        "hash": "10479841782047874517"
+        "hash": "10493982347447236808"
       },
       {
         "file": "src/pages/project-details/components/project-media/upload-label-selector-dialog/upload-label-selector-dialog.component.tsx",
@@ -8402,7 +8402,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-model/hooks/use-pot-model/use-pot-model.hook.ts",
-        "hash": "17183559716807774772"
+        "hash": "1254729487683736112"
       },
       {
         "file": "src/pages/project-details/components/project-model/hooks/use-selected-model/use-selected-model.hook.ts",
@@ -8542,7 +8542,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-model/model-variants/model-variants.component.tsx",
-        "hash": "5984345592532191121"
+        "hash": "16916199659466434380"
       },
       {
         "file": "src/pages/project-details/components/project-model/model-variants/model-variants.module.scss",
@@ -8598,7 +8598,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-model/model-variants/use-is-model-being-optimized.hook.ts",
-        "hash": "967542001587756155"
+        "hash": "8985621850436176142"
       },
       {
         "file": "src/pages/project-details/components/project-model/model-variants/utils.test.ts",
@@ -8610,7 +8610,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-model/project-model.component.tsx",
-        "hash": "3191050344331301478"
+        "hash": "14312300257830529842"
       },
       {
         "file": "src/pages/project-details/components/project-model/project-model.module.scss",
@@ -8690,7 +8690,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-models/hooks/use-is-training.hook.ts",
-        "hash": "8515504818980007652"
+        "hash": "10072910824437240080"
       },
       {
         "file": "src/pages/project-details/components/project-models/legacy-train-model-dialog/model-templates-selection/model-template/model-template.component.tsx",
@@ -8742,7 +8742,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-models/legacy-train-model-dialog/not-enough-annotations-dialog.component.tsx",
-        "hash": "13564234667618934514"
+        "hash": "16861407494049108657"
       },
       {
         "file": "src/pages/project-details/components/project-models/legacy-train-model-dialog/train-configurable-parameters/train-configurable-parameters.component.tsx",
@@ -8838,7 +8838,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-models/models-container/model-card/model-card.component.tsx",
-        "hash": "8538947622349003719"
+        "hash": "13807605729161820847"
       },
       {
         "file": "src/pages/project-details/components/project-models/models-container/model-card/model-card.interface.ts",
@@ -9110,7 +9110,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-models/train-model-dialog/not-enough-annotations-dialog.component.tsx",
-        "hash": "6973703483927926938"
+        "hash": "9786699680858751156"
       },
       {
         "file": "src/pages/project-details/components/project-models/train-model-dialog/selectable-card/selectable-card.component.tsx",
@@ -9186,7 +9186,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-models/training-progress/use-training-progress/use-training-progress.hook.ts",
-        "hash": "814834823364173755"
+        "hash": "1601142682574547536"
       },
       {
         "file": "src/pages/project-details/components/project-models/training-progress/use-training-progress/use-training-progress.test.tsx",
@@ -9214,7 +9214,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-sidebar/project-sidebar.component.tsx",
-        "hash": "16805858568924561319"
+        "hash": "9863610792119364707"
       },
       {
         "file": "src/pages/project-details/components/project-sidebar/project-sidebar.module.scss",
@@ -9254,7 +9254,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-test/project-test.component.tsx",
-        "hash": "3210353068421876357"
+        "hash": "3100052843356550779"
       },
       {
         "file": "src/pages/project-details/components/project-test/project-test.module.scss",
@@ -9278,7 +9278,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-test/test-details-preview/use-test-results-query.hook.ts",
-        "hash": "4045344251299498018"
+        "hash": "8746392117418092308"
       },
       {
         "file": "src/pages/project-details/components/project-test/test-details-preview/video-controls.hook.ts",
@@ -9338,7 +9338,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-tests/project-tests.component.tsx",
-        "hash": "3644662741872081747"
+        "hash": "8989817255835201396"
       },
       {
         "file": "src/pages/project-details/components/project-tests/project-tests.module.scss",
@@ -9350,7 +9350,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-tests/quick-inference/contents.component.tsx",
-        "hash": "2626801394884080504"
+        "hash": "10187238375486630085"
       },
       {
         "file": "src/pages/project-details/components/project-tests/quick-inference/image-section.component.tsx",
@@ -9414,7 +9414,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-tests/run-test-dialog/run-test-dialog-content.component.tsx",
-        "hash": "15352847877004871066"
+        "hash": "6264948645768301985"
       },
       {
         "file": "src/pages/project-details/components/project-tests/run-test-dialog/run-test-dialog-content.test.tsx",
@@ -9434,7 +9434,7 @@
       },
       {
         "file": "src/pages/project-details/components/project-tests/run-test-dialog/use-run-test-dialog-state.hook.tsx",
-        "hash": "17661386108754808440"
+        "hash": "12218392249411214549"
       },
       {
         "file": "src/pages/project-details/components/project-tests/test-item-submenu.component.tsx",
@@ -9478,7 +9478,7 @@
       },
       {
         "file": "src/pages/project-details/hooks/use-export-dataset.hook.ts",
-        "hash": "5884124062484729484"
+        "hash": "7577252215451451259"
       },
       {
         "file": "src/pages/project-details/hooks/use-local-storage-export-dataset.hook.ts",
@@ -9530,7 +9530,7 @@
       },
       {
         "file": "src/pages/sign-up/request-access-confirmation.component.tsx",
-        "hash": "17008208736135434644"
+        "hash": "12251179974656574733"
       },
       {
         "file": "src/pages/sign-up/request-access-flow.component.tsx",
@@ -9554,7 +9554,7 @@
       },
       {
         "file": "src/pages/sign-up/sign-up.component.tsx",
-        "hash": "12106993913438589530"
+        "hash": "4796704341135164821"
       },
       {
         "file": "src/pages/sign-up/sign-up.test.tsx",
@@ -9658,7 +9658,7 @@
       },
       {
         "file": "src/pages/user-management/profile-page/profile-page.component.tsx",
-        "hash": "1375142202484429426"
+        "hash": "3234667504485291655"
       },
       {
         "file": "src/pages/user-management/profile-page/profile-page.module.scss",
@@ -9750,7 +9750,7 @@
       },
       {
         "file": "src/pages/user-management/storage/projects-storage/project-storage-table.component.tsx",
-        "hash": "5539621372313318377"
+        "hash": "3173144562738304924"
       },
       {
         "file": "src/pages/user-management/storage/projects-storage/project-storage-toggle-button.component.tsx",
@@ -9882,7 +9882,7 @@
       },
       {
         "file": "src/pages/user-management/users/add-member-popup/add-member-popup.component.tsx",
-        "hash": "13025166598315642158"
+        "hash": "13997947802413514234"
       },
       {
         "file": "src/pages/user-management/users/add-member-popup/add-member-popup.interface.ts",
@@ -9962,11 +9962,11 @@
       },
       {
         "file": "src/pages/user-management/users/project-users/remove-user-from-project-dialog.component.tsx",
-        "hash": "14960968034897043001"
+        "hash": "11398917730248539234"
       },
       {
         "file": "src/pages/user-management/users/project-users/remove-user-from-project-dialog.test.tsx",
-        "hash": "8134007491147792185"
+        "hash": "1159979544553116576"
       },
       {
         "file": "src/pages/user-management/users/users-header.component.tsx",
@@ -10058,7 +10058,7 @@
       },
       {
         "file": "src/pages/user-management/users/workspace-users/actions/remove-user-dialog.component.tsx",
-        "hash": "13721068914882535574"
+        "hash": "13335681336086787681"
       },
       {
         "file": "src/pages/user-management/users/workspace-users/actions/roles-validation.test.ts",
@@ -10170,7 +10170,7 @@
       },
       {
         "file": "src/providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component.tsx",
-        "hash": "10267341236228807460"
+        "hash": "13440503509911011049"
       },
       {
         "file": "src/providers/dataset-import-to-existing-project-provider/utils.test.ts",
@@ -10182,7 +10182,7 @@
       },
       {
         "file": "src/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component.tsx",
-        "hash": "11503187449466729903"
+        "hash": "13307371519832175728"
       },
       {
         "file": "src/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.test.tsx",
@@ -10198,7 +10198,7 @@
       },
       {
         "file": "src/providers/dataset-provider/dataset-provider.component.tsx",
-        "hash": "10411018007917085825"
+        "hash": "14881734498866872664"
       },
       {
         "file": "src/providers/hovered-provider/hovered-provider.component.tsx",
@@ -10238,7 +10238,7 @@
       },
       {
         "file": "src/providers/media-upload-provider/use-media-upload-mutations.ts",
-        "hash": "7347506554511268902"
+        "hash": "13018242099560760002"
       },
       {
         "file": "src/providers/media-upload-provider/use-upload-queue-ref.hook.ts",
@@ -10334,7 +10334,7 @@
       },
       {
         "file": "src/routes/app-routes.component.tsx",
-        "hash": "1272750501405917026"
+        "hash": "9916997001650621835"
       },
       {
         "file": "src/routes/auth/auth.layout.tsx",
@@ -10358,11 +10358,11 @@
       },
       {
         "file": "src/routes/intel-admin-routes.tsx",
-        "hash": "13908248335538741325"
+        "hash": "2583616613619743036"
       },
       {
         "file": "src/routes/intel-admin/redirect.component.tsx",
-        "hash": "1091847388571808815"
+        "hash": "10246270362820277745"
       },
       {
         "file": "src/routes/landing-page.layout.tsx",
@@ -10490,7 +10490,7 @@
       },
       {
         "file": "src/routes/users/index.route.tsx",
-        "hash": "8216021306265279131"
+        "hash": "8176086907141465820"
       },
       {
         "file": "src/service-worker.ts",
@@ -11090,7 +11090,7 @@
       },
       {
         "file": "src/shared/components/header/active-learning-configuration/training-settings/auto-training-switch.component.tsx",
-        "hash": "7830541254985291525"
+        "hash": "9567830954801068576"
       },
       {
         "file": "src/shared/components/header/active-learning-configuration/training-settings/auto-training-switch.test.tsx",
@@ -11126,7 +11126,7 @@
       },
       {
         "file": "src/shared/components/header/credit-balance/credit-balance-button.component.tsx",
-        "hash": "3526513359633372084"
+        "hash": "7422149231564380228"
       },
       {
         "file": "src/shared/components/header/credit-balance/credit-balance-button.test.tsx",
@@ -11134,11 +11134,11 @@
       },
       {
         "file": "src/shared/components/header/credit-balance/credit-balance-status.component.tsx",
-        "hash": "10090984450375105263"
+        "hash": "10528194043113391045"
       },
       {
         "file": "src/shared/components/header/credit-balance/credit-balance-status.test.tsx",
-        "hash": "8796726254792151507"
+        "hash": "15909969197495532217"
       },
       {
         "file": "src/shared/components/header/credit-balance/credit-balance.module.scss",
@@ -11202,7 +11202,7 @@
       },
       {
         "file": "src/shared/components/header/header-actions/help-actions/help-actions.component.tsx",
-        "hash": "1272482041092239284"
+        "hash": "13375666174980960935"
       },
       {
         "file": "src/shared/components/header/header-actions/help-actions/help-actions.module.scss",
@@ -11222,7 +11222,7 @@
       },
       {
         "file": "src/shared/components/header/header.component.tsx",
-        "hash": "7960489542786760998"
+        "hash": "1972041618661624913"
       },
       {
         "file": "src/shared/components/header/header.module.scss",
@@ -11354,7 +11354,7 @@
       },
       {
         "file": "src/shared/components/header/jobs-management/jobs-list-item.component.tsx",
-        "hash": "7374896593174677115"
+        "hash": "3717017913617634693"
       },
       {
         "file": "src/shared/components/header/jobs-management/jobs-list-item.test.tsx",
@@ -11634,7 +11634,7 @@
       },
       {
         "file": "src/shared/components/media-item-annotations-preview/edit-annotations-button/edit-annotations-button.component.tsx",
-        "hash": "18325480833647120004"
+        "hash": "9344042950558812969"
       },
       {
         "file": "src/shared/components/media-item-annotations-preview/edit-annotations-button/edit-annotations-button.test.tsx",
@@ -12194,7 +12194,7 @@
       },
       {
         "file": "src/sign-up/pages/forgot-password/forgot-password.component.tsx",
-        "hash": "8290267634413496916"
+        "hash": "8793885670456916225"
       },
       {
         "file": "src/sign-up/pages/forgot-password/forgot-password.module.scss",
@@ -12206,11 +12206,11 @@
       },
       {
         "file": "src/sign-up/pages/invalid-link/invalid-link.component.tsx",
-        "hash": "13458019834793165511"
+        "hash": "17424978997030036339"
       },
       {
         "file": "src/sign-up/pages/registration/registration.component.tsx",
-        "hash": "3633693190460160462"
+        "hash": "8170623490001247786"
       },
       {
         "file": "src/sign-up/pages/registration/registration.module.scss",
@@ -12390,7 +12390,7 @@
       },
       {
         "file": "src/test-utils/required-providers-render.tsx",
-        "hash": "7526939562001683293"
+        "hash": "17531037165700439415"
       },
       {
         "file": "src/test-utils/utils.ts",
@@ -12690,7 +12690,7 @@
       },
       {
         "file": "tests/features/annotator/tools/ritm-tool.spec.ts",
-        "hash": "9742710025286730922"
+        "hash": "2261350921575500084"
       },
       {
         "file": "tests/features/annotator/tools/rotated-bounding-box.spec.ts",
@@ -12766,7 +12766,7 @@
       },
       {
         "file": "tests/features/components/error-boundary.spec.ts",
-        "hash": "4950066593649779883"
+        "hash": "11176755038149159540"
       },
       {
         "file": "tests/features/components/general-ui.spec.ts",
@@ -12778,15 +12778,15 @@
       },
       {
         "file": "tests/features/credit-system/credits-low-notifications.spec.ts",
-        "hash": "18064918796043640852"
+        "hash": "5226434510536211296"
       },
       {
         "file": "tests/features/credit-system/global-modals.spec.ts",
-        "hash": "13145762969842998790"
+        "hash": "11060590032049787352"
       },
       {
         "file": "tests/features/credit-system/manual-training.spec.ts",
-        "hash": "11048137031064769027"
+        "hash": "2293173182947813496"
       },
       {
         "file": "tests/features/credit-system/mocks.ts",
@@ -12810,7 +12810,7 @@
       },
       {
         "file": "tests/features/fux/dataset-page-fux.spec.ts",
-        "hash": "6313831222451182461"
+        "hash": "15853915649907037244"
       },
       {
         "file": "tests/features/fux/deployments-page-fux.spec.ts",
@@ -12818,7 +12818,7 @@
       },
       {
         "file": "tests/features/fux/labels-page-fux.spec.ts",
-        "hash": "1644396294235187797"
+        "hash": "11159253311312259320"
       },
       {
         "file": "tests/features/fux/models-page-fux.spec.ts",
@@ -12886,7 +12886,7 @@
       },
       {
         "file": "tests/features/profile-page/mocks.ts",
-        "hash": "13004738207967075036"
+        "hash": "17764230031704322196"
       },
       {
         "file": "tests/features/profile-page/personal-access-token.spec.ts",
@@ -12974,7 +12974,7 @@
       },
       {
         "file": "tests/features/project-dataset/project-dataset-tabs.spec.tsx",
-        "hash": "4358664779404329170"
+        "hash": "8588345264423284521"
       },
       {
         "file": "tests/features/project-dataset/project-media/anomaly-media.spec.ts",
@@ -12982,15 +12982,15 @@
       },
       {
         "file": "tests/features/project-dataset/project-media/camera.spec.ts",
-        "hash": "6102243141291443060"
+        "hash": "9974059265200055185"
       },
       {
         "file": "tests/features/project-dataset/project-media/classification-media.spec.ts",
-        "hash": "6047212473884525550"
+        "hash": "15978388012779826931"
       },
       {
         "file": "tests/features/project-dataset/project-media/project-media.spec.ts",
-        "hash": "4310048717538367337"
+        "hash": "5044568571431679647"
       },
       {
         "file": "tests/features/project-dataset/project-media/upload-media.spec.ts",
@@ -13078,7 +13078,7 @@
       },
       {
         "file": "tests/features/project-users/project-users.spec.ts",
-        "hash": "10467211076445477240"
+        "hash": "4061574663872441949"
       },
       {
         "file": "tests/features/project-users/utils.ts",
@@ -13210,7 +13210,7 @@
       },
       {
         "file": "tests/fixtures/page-objects/dataset-statistics-page.ts",
-        "hash": "2654448224871533587"
+        "hash": "7844149016534215408"
       },
       {
         "file": "tests/fixtures/page-objects/filter-dialog-page.ts",
@@ -13238,11 +13238,11 @@
       },
       {
         "file": "tests/fixtures/page-objects/members-page.ts",
-        "hash": "14388598945031691731"
+        "hash": "16536736524043955278"
       },
       {
         "file": "tests/fixtures/page-objects/model-metrics-page.ts",
-        "hash": "3910548231264811843"
+        "hash": "17296409900537552495"
       },
       {
         "file": "tests/fixtures/page-objects/models-page.ts",

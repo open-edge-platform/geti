@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Divider, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 

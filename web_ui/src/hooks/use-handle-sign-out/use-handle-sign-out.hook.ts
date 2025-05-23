@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { useAuth } from 'react-oidc-context';
 
 import { useLogoutMutation } from '../../core/auth/hooks/use-logout-mutation.hook';

@@ -2,3 +2,4 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 export { apiClient } from './src/client/axios-instance';
+export { paths } from './src/services/routes';

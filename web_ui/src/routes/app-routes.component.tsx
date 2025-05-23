@@ -3,7 +3,7 @@
 
 import { Suspense, useEffect } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { IntelBrandedLoading } from '@geti/ui';
 import { negate } from 'lodash-es';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';

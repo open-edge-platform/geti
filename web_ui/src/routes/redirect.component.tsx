@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
 import { invoke } from 'lodash-es';
 import { Navigate } from 'react-router-dom';

@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { useNavigate } from 'react-router-dom';
 
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';

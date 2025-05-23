@@ -3,7 +3,7 @@
 
 import { Key, useMemo } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { useNavigate } from 'react-router-dom';
 
 import { ModelsGroups, ModelVersion } from '../../../../../../core/models/models.interface';

@@ -3,7 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import {
     Button,
     ButtonGroup,

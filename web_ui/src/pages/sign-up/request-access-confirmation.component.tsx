@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Heading } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 

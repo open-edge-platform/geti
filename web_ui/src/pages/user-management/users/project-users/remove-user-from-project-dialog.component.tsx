@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
-import { paths } from '@geti/core/src/services/routes';
 import { AlertDialog } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
