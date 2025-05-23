@@ -40,9 +40,9 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:
           {{- if (eq .Values.global.installation_profile "lite") }}
-            {{ toYaml .Values.microservice.liteResources | nindent 12 }}
+            {{ toYaml .Values.liteResources | nindent 12 }}
           {{- else }}
-            {{ toYaml .Values.microservice.standardResources | nindent 12 }}
+            {{ toYaml .Values.standardResources | nindent 12 }}
           {{- end }}
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
