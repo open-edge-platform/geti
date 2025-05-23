@@ -8,13 +8,15 @@ from enum import Enum
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query, Request, UploadFile
-from starlette.responses import Response
+from starlette import status
+from starlette.responses import JSONResponse, Response
 
 from communication.constants import MAX_N_MEDIA_RETURNED
 from communication.exceptions import NotEnoughSpaceException
 from communication.rest_controllers.media_controller import MediaRESTController
 from communication.rest_data_validator import MediaRestValidator
 from communication.rest_utils import convert_numpy_to_jpeg_response, send_file_from_path_or_url, stream_to_jpeg_response
+from features.feature_flags import FeatureFlag
 from usecases.dataset_filter import DatasetFilter, DatasetFilterField, DatasetFilterSortDirection
 
 from geti_fastapi_tools.dependencies import (
@@ -29,6 +31,7 @@ from geti_fastapi_tools.dependencies import (
     get_workspace_id,
     setup_session_fastapi,
 )
+from geti_feature_tools import FeatureFlagProvider
 from geti_types import ID, DatasetStorageIdentifier, MediaType
 from iai_core.utils.filesystem import check_free_space_for_upload
 
@@ -98,7 +101,7 @@ def post_image(
     file: UploadFile = Depends(MediaRestValidator.validate_image_file),  # noqa: FAST002
     upload_info: dict = UploadInfo,
     user_id: ID = Depends(get_user_id_fastapi),  # noqa: FAST002
-) -> dict[str, Any]:
+) -> Response:
     """
     Upload an image to a dataset. Allowed formats are {MediaRestValidator.SUPPORTED_IMAGE_TYPES}.
     Height and width of the images must be between {MIN_MEDIA_SIZE} and {MAX_IMAGE_SIZE}
@@ -112,13 +115,19 @@ def post_image(
         upload_size=int(request.headers["content-length"]),
         exception_type=NotEnoughSpaceException,
     )
-    return MediaRESTController.upload_media(
+    content = MediaRESTController.upload_media(
         user_id=user_id,
         dataset_storage_identifier=dataset_storage_identifier,
         label_info=upload_info,
         media_type=MediaType.IMAGE,
         file_from_request=file,
     )
+    status_code = (
+        status.HTTP_202_ACCEPTED
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING)
+        else status.HTTP_200_OK
+    )
+    return JSONResponse(content=content, status_code=status_code)
 
 
 @media_router.post("/media/videos")
@@ -128,7 +137,7 @@ def post_video(
     upload_info: dict = UploadInfo,
     file: UploadFile = Depends(MediaRestValidator.validate_video_file),  # noqa: FAST002
     user_id: ID = Depends(get_user_id_fastapi),  # noqa: FAST002
-) -> dict[str, Any]:
+) -> Response:
     """
     Upload a video to a dataset. Allowed formats are {MediaRestValidator.SUPPORTED_VIDEO_TYPES}
     The maximum resolution for videos is {MAX_VIDEO_HEIGHT} x {MAX_VIDEO_WIDTH} and the
@@ -142,13 +151,19 @@ def post_video(
         upload_size=int(request.headers["content-length"]),
         exception_type=NotEnoughSpaceException,
     )
-    return MediaRESTController.upload_media(
+    content = MediaRESTController.upload_media(
         user_id=user_id,
         dataset_storage_identifier=dataset_storage_identifier,
         label_info=upload_info,
         media_type=MediaType.VIDEO,
         file_from_request=file,
     )
+    status_code = (
+        status.HTTP_202_ACCEPTED
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING)
+        else status.HTTP_200_OK
+    )
+    return JSONResponse(content=content, status_code=status_code)
 
 
 @media_router.get("/media/images/{image_id}")

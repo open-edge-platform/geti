@@ -13,6 +13,7 @@ from pymongo.cursor import Cursor
 
 from iai_core.entities.annotation_scene_state import AnnotationState
 from iai_core.entities.dataset_storage_filter_data import DatasetStorageFilterData, NullDatasetStorageFilterData
+from iai_core.entities.media import MediaPreprocessingStatus
 from iai_core.entities.video_annotation_statistics import VideoAnnotationStatistics
 from iai_core.repos.base.dataset_storage_based_repo import DatasetStorageBasedSessionRepo
 from iai_core.repos.base.session_repo import QueryAccessMode
@@ -159,6 +160,17 @@ class DatasetStorageFilterRepo(DatasetStorageBasedSessionRepo[DatasetStorageFilt
                 },
                 upsert=True,
             )
+
+    def update_preprocessing_status(self, media_id: ID, status: MediaPreprocessingStatus) -> None:
+        """
+        Updates a DatasetStorageFilterData entity in the database with new media preprocessing status.
+        :param media_id: media ID
+        :param status: media preprocessing status
+        """
+        data_filter = self.preliminary_query_match_filter(access_mode=QueryAccessMode.WRITE)
+        data_filter["media_identifier.media_id"] = IDToMongo.forward(media_id)
+
+        self._collection.update_many(filter=data_filter, update={"$set": {"preprocessing": status.value}}, upsert=False)
 
     def delete_all_by_media_id(self, media_id: ID) -> None:
         """
