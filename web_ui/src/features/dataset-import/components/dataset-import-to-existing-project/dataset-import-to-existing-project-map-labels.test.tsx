@@ -38,10 +38,10 @@ const mockProjectLabels: Label[] = [
 
 const mockPatchActiveDatasetImport = jest.fn();
 jest.mock(
-    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
+    '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
     () => ({
         ...jest.requireActual(
-            '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+            '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
         ),
         useDatasetImportToExistingProject: jest.fn(() => ({ patchActiveDatasetImport: mockPatchActiveDatasetImport })),
     })

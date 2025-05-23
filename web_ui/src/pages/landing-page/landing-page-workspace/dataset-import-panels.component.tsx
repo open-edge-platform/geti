@@ -17,10 +17,10 @@ import { useJobs } from '../../../core/jobs/hooks/use-jobs.hook';
 import { DatasetImportPanel } from '../../../features/dataset-import/components/dataset-import-panel/dataset-import-panel.component';
 import { DatasetImportToNewProjectDialog } from '../../../features/dataset-import/components/dataset-import-to-new-project/dataset-import-to-new-project-dialog.component';
 import { useDatasetImportQueries } from '../../../features/dataset-import/hooks/use-dataset-import-queries.hook';
+import { useDatasetImportToNewProject } from '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
+import { formatDatasetPrepareImportResponse } from '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/utils';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { useDatasetImportToNewProject } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
-import { formatDatasetPrepareImportResponse } from '../../../providers/dataset-import-to-new-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { isNonEmptyString } from '../../../shared/utils';
 

@@ -10,9 +10,9 @@ import { isEmpty, omitBy, sortBy } from 'lodash-es';
 import { DatasetImportToExistingProjectItem } from '../../../../core/datasets/dataset.interface';
 import { Label } from '../../../../core/labels/label.interface';
 import { LabelSearch } from '../../../../pages/annotator/components/labels/label-search/label-search.component';
-import { useDatasetImportToExistingProject } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { hasEqualId, runWhenTruthy } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
+import { useDatasetImportToExistingProject } from '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 
 interface DatasetImportToExistingProjectMapLabelsProps {
     projectLabels: Label[];

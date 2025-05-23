@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
-import { DatasetImportItem, DatasetImportToExistingProjectItem } from '../../core/datasets/dataset.interface';
-import { Label } from '../../core/labels/label.interface';
+import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
+import { DatasetImportItem, DatasetImportToExistingProjectItem } from '../../../../core/datasets/dataset.interface';
+import { Label } from '../../../../core/labels/label.interface';
 
 export const matchStatus = (
     datasetImportItem: DatasetImportItem | undefined,

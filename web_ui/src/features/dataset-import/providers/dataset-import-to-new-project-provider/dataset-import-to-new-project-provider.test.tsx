@@ -3,18 +3,18 @@
 
 import { waitFor } from '@testing-library/react';
 
-import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
-import { createInMemoryDatasetImportService } from '../../core/datasets/services/in-memory-dataset-import-service';
-import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
-import { getMockedWorkspaceIdentifier } from '../../test-utils/mocked-items-factory/mocked-identifiers';
-import { getMockedDatasetImportItem } from '../../test-utils/mocked-items-factory/mocked-jobs';
-import { providersRender as render } from '../../test-utils/required-providers-render';
+import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
+import { createInMemoryDatasetImportService } from '../../../../core/datasets/services/in-memory-dataset-import-service';
+import { LOCAL_STORAGE_KEYS } from '../../../../shared/local-storage-keys';
+import { getMockedWorkspaceIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
+import { getMockedDatasetImportItem } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
+import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { DatasetImportToNewProjectProvider } from './dataset-import-to-new-project-provider.component';
 
 const mockedWorkspaceIdentifier = getMockedWorkspaceIdentifier();
 
-jest.mock('../workspaces-provider/use-workspace-identifier.hook', () => ({
-    ...jest.requireActual('../workspaces-provider/use-workspace-identifier.hook'),
+jest.mock('../../../../providers/workspaces-provider/use-workspace-identifier.hook', () => ({
+    ...jest.requireActual('../../../../providers/workspaces-provider/use-workspace-identifier.hook'),
     useWorkspaceIdentifier: jest.fn(() => mockedWorkspaceIdentifier),
 }));
 

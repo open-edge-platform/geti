@@ -5,7 +5,7 @@ import { ReactElement } from 'react';
 
 import { RenderResult } from '@testing-library/react';
 
-import { DatasetImportToNewProjectProvider } from '../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
+import { DatasetImportToNewProjectProvider } from '../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { ProjectsImportProvider } from '../providers/projects-import-provider/projects-import-provider.component';
 import { CustomRenderOptions, providersRender } from './required-providers-render';
 

@@ -16,8 +16,8 @@ import {
 } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportDialogButton, DatasetImportToNewProjectItem } from '../../../../core/datasets/dataset.interface';
 import { InfoSection } from '../../../../pages/create-project/components/info-section/info-section.component';
-import { matchStatus } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useTusUpload } from '../../../../providers/tus-upload-provider/tus-upload-provider.component';
+import { matchStatus } from '../../providers/dataset-import-to-existing-project-provider/utils';
 
 interface DatasetImportToNewProjectDialogButtonsProps {
     deletionDialogTrigger: OverlayTriggerState;

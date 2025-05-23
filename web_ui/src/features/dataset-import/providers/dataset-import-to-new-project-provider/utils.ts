@@ -6,13 +6,13 @@ import duration from 'dayjs/plugin/duration.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { isEmpty } from 'lodash-es';
 
-import { DATASET_IMPORT_STATUSES, DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../core/datasets/dataset.enum';
+import { DATASET_IMPORT_STATUSES, DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../../../core/datasets/dataset.enum';
 import {
     DatasetImportSupportedProjectType,
     DatasetImportToNewProjectItem,
     DatasetImportWarning,
-} from '../../core/datasets/dataset.interface';
-import { getFileSize } from '../../shared/utils';
+} from '../../../../core/datasets/dataset.interface';
+import { getFileSize } from '../../../../shared/utils';
 
 export const getDatasetImportInitialState = (data: {
     id: string;

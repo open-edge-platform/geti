@@ -19,26 +19,26 @@ import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError, HttpStatusCode } from 'axios';
 import { isEmpty, noop } from 'lodash-es';
 
-import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
+import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
 import {
     DatasetImportItem,
     DatasetImportLabel,
     DatasetImportToNewProjectItem,
-} from '../../core/datasets/dataset.interface';
-import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useDatasetImportQueries } from '../../features/dataset-import/hooks/use-dataset-import-queries.hook';
-import { useLocalStorageDatasetImport } from '../../features/dataset-import/hooks/use-local-storage-dataset-import.hook';
-import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
-import { useNotification } from '../../notification/notification.component';
-import { getRandomDistinctColor } from '../../pages/create-project/components/distinct-colors';
-import { getImportDatasetToNewProjectKey } from '../../shared/local-storage-keys';
-import { MissingProviderError } from '../../shared/missing-provider-error';
-import { getFileSize, isNonEmptyString, runWhenTruthy } from '../../shared/utils';
-import { idMatchingFormat } from '../../test-utils/id-utils';
+} from '../../../../core/datasets/dataset.interface';
+import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
+import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
+import { useNotification } from '../../../../notification/notification.component';
+import { getRandomDistinctColor } from '../../../../pages/create-project/components/distinct-colors';
+import { useTusUpload } from '../../../../providers/tus-upload-provider/tus-upload-provider.component';
+import { getUploadId, onErrorMessage, throttleProgress } from '../../../../providers/tus-upload-provider/util';
+import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
+import { getImportDatasetToNewProjectKey } from '../../../../shared/local-storage-keys';
+import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { getFileSize, isNonEmptyString, runWhenTruthy } from '../../../../shared/utils';
+import { idMatchingFormat } from '../../../../test-utils/id-utils';
+import { useDatasetImportQueries } from '../../hooks/use-dataset-import-queries.hook';
+import { useLocalStorageDatasetImport } from '../../hooks/use-local-storage-dataset-import.hook';
 import { matchStatus } from '../dataset-import-to-existing-project-provider/utils';
-import { useTusUpload } from '../tus-upload-provider/tus-upload-provider.component';
-import { getUploadId, onErrorMessage, throttleProgress } from '../tus-upload-provider/util';
-import { useWorkspaceIdentifier } from '../workspaces-provider/use-workspace-identifier.hook';
 import {
     formatDatasetPrepareImportResponse,
     getBytesRemaining,

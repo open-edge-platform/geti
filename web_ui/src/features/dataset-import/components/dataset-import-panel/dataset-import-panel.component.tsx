@@ -21,12 +21,12 @@ import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../../core/status/hooks/utils';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
-import { matchStatus } from '../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { JobListItemProgressStatus } from '../../../../shared/components/header/jobs-management/jobs-list-item-progress.component';
 import { ThinProgressBar } from '../../../../shared/components/thin-progress-bar/thin-progress-bar.component';
 import { onValidFileList } from '../../../../shared/utils';
 import { useDatasetImportQueries } from '../../hooks/use-dataset-import-queries.hook';
+import { matchStatus } from '../../providers/dataset-import-to-existing-project-provider/utils';
 import { DatasetImportPanelMenu } from './dataset-import-panel-menu.component';
 import { isDetailsAvailable, isErrorStatus, isUploadingStatus } from './util';
 

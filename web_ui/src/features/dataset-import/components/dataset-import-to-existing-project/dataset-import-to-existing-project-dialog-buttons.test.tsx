@@ -59,10 +59,10 @@ jest.mock('../../../../providers/tus-upload-provider/tus-upload-provider.compone
 }));
 
 jest.mock(
-    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
+    '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
     () => ({
         ...jest.requireActual(
-            '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+            '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
         ),
         useDatasetImportToExistingProject: jest.fn(() => ({
             abortDatasetImportAction: mockAbortDatasetImportAction,

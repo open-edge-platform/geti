@@ -11,7 +11,7 @@ import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { ExportImportDatasetDialogProvider } from '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component';
-import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
+import { DatasetImportToExistingProjectProvider } from '../../../../features/dataset-import/providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { MediaUploadProvider } from '../../../../providers/media-upload-provider/media-upload-provider.component';
 import { getMockedDataset } from '../../../../test-utils/mocked-items-factory/mocked-datasets';

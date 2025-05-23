@@ -6,13 +6,13 @@ import { fireEvent, screen } from '@testing-library/react';
 import { DATASET_IMPORT_STATUSES } from '../../../../core/datasets/dataset.enum';
 import { DatasetImportToExistingProjectItem } from '../../../../core/datasets/dataset.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
-import { useDatasetImportToExistingProject } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import {
     getMockedProject,
     mockedProjectContextProps,
 } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectListRender } from '../../../../test-utils/projects-list-providers-render';
+import { useDatasetImportToExistingProject } from '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetImportToExistingProjectDialog } from './dataset-import-to-existing-project-dialog.component';
 
 const mockDatasetImportItem: DatasetImportToExistingProjectItem = {
@@ -67,10 +67,10 @@ jest.mock('../../../../pages/project-details/providers/project-provider/project-
 }));
 
 jest.mock(
-    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
+    '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
     () => ({
         ...jest.requireActual(
-            '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+            '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
         ),
         useDatasetImportToExistingProject: jest.fn(() => ({
             isReady: () => jest.fn(),
@@ -97,7 +97,7 @@ describe(DatasetImportToExistingProjectDialog, () => {
         const mockedSetActiveDatasetImportId = jest.fn();
         jest.mocked(useDatasetImportToExistingProject).mockReturnValue({
             ...jest.requireActual(
-                '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
             ),
             isReady: jest.fn(),
             setActiveDatasetImportId: mockedSetActiveDatasetImportId,
@@ -127,7 +127,7 @@ describe(DatasetImportToExistingProjectDialog, () => {
         async ({ status }) => {
             jest.mocked(useDatasetImportToExistingProject).mockReturnValue({
                 ...jest.requireActual(
-                    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                    '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
                 ),
                 isReady: jest.fn(),
                 activeDatasetImport: { ...mockDatasetImportItem, status },
@@ -148,7 +148,7 @@ describe(DatasetImportToExistingProjectDialog, () => {
         async ({ status }) => {
             jest.mocked(useDatasetImportToExistingProject).mockReturnValue({
                 ...jest.requireActual(
-                    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                    '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
                 ),
                 isReady: jest.fn(),
                 activeDatasetImport: { ...mockDatasetImportItem, labels: ['a', 'z'], status },
@@ -168,7 +168,7 @@ describe(DatasetImportToExistingProjectDialog, () => {
     it('Display proper information when there is no label to map in dataset importing', async () => {
         jest.mocked(useDatasetImportToExistingProject).mockReturnValue({
             ...jest.requireActual(
-                '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
             ),
             isReady: jest.fn(),
             activeDatasetImport: {
@@ -187,7 +187,7 @@ describe(DatasetImportToExistingProjectDialog, () => {
         const mockedImportDatasetJob = jest.fn();
         jest.mocked(useDatasetImportToExistingProject).mockReturnValue({
             ...jest.requireActual(
-                '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                '../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
             ),
             isReady: jest.fn(() => true),
             importDataset: jest.fn(),
