@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Button } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../../core/services/routes';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 
 export const TakeShotsButton = (): JSX.Element => {

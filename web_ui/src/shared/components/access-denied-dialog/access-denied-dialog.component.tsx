@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Flex, Heading, Text } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { Forbidden } from '../../../assets/images';
-import { paths } from '../../../core/services/routes';
 import { FORBIDDEN_MESSAGE } from '../../../core/services/utils';
 
 import classes from './access-denied-dialog.module.scss';

@@ -3,7 +3,7 @@
 
 import { expect, Page } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { GLOBAL_MODALS_KEYS } from '../../../src/core/user-settings/dtos/user-settings.interface';
 import { test } from '../../fixtures/base-test';
 import { productsPolicy } from '../../mocks/credit-system/mocks';

@@ -4,7 +4,7 @@
 import { Heading, Link } from '@geti/ui';
 import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
 
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';

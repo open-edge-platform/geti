@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import { InferenceServerStatusResult } from '../../../../core/annotations/services/prediction-service.interface';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { useTask } from '../task-provider/task-provider.component';
 
 export const useInferenceServerStatus = (

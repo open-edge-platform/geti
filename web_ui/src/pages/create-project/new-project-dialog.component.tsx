@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { DOMAIN } from '../../core/projects/core.interface';
 import { useProjectActions } from '../../core/projects/hooks/use-project-actions.hook';
-import { paths } from '../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useWorkspaceIdentifier } from '../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { TooltipWithDisableButton } from '../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { InfoSection } from './components/info-section/info-section.component';

@@ -3,6 +3,7 @@
 
 import { apiClient } from '@geti/core';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import {
     JobImportDatasetToExistingProjectStatusDTO,
     JobImportDatasetToNewProjectStatusDTO,
@@ -18,7 +19,6 @@ import {
 } from '../../jobs/jobs.interface';
 import { getJobEntity } from '../../jobs/utils';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import {

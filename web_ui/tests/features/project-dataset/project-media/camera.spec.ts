@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '../../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { expect, test } from '../../../fixtures/base-test';
 import { project as AnomalyProject } from '../../../mocks/anomaly/anomaly-classification/mocks';
 import { project as ClassificationProject } from '../../../mocks/classification/classification.mock';

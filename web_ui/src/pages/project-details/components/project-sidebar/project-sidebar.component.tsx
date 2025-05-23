@@ -7,7 +7,7 @@ import { Datasets, Deployments, Model, Shield, Tag, Users } from '@geti/ui/icons
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { RESOURCE_TYPE } from '../../../../core/users/users.interface';
 import { Arrow } from '../../../../shared/components/arrow/arrow.component';
 import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';

@@ -3,8 +3,8 @@
 
 import { apiClient } from '@geti/core';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { ModelIdentifier } from '../../models/models.interface';
-import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { ModelStatisticsDTO } from '../dtos/model-statistics.interface';
 import { TrainingModelStatistic, TrainingModelStatisticsGroup } from '../model-statistics.interface';

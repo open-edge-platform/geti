@@ -4,7 +4,7 @@
 import { NavLink } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 
 import classes from './layout.module.scss';
 

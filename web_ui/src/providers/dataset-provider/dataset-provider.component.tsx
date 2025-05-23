@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { CreateDatasetBody, CreateDatasetResponse, Dataset } from '../../core/projects/dataset.interface';
 import { useProjectDataset } from '../../core/projects/hooks/use-project-dataset.hook';
-import { paths } from '../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { usePinnedCollapsedItems } from '../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.hook';
 import {
     PinnedCollapsedItemsAction,

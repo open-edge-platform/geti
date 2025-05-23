@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
 import { useTransactionsQueries } from '../../../../core/credits/transactions/hooks/use-transactions.hook';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { formatDate, ONE_MINUTE } from '../../../utils';

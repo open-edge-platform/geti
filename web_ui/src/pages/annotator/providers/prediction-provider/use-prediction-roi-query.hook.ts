@@ -3,6 +3,7 @@
 
 import { useLayoutEffect, useRef } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -14,7 +15,6 @@ import {
 } from '../../../../core/annotations/services/prediction-service.interface';
 import { getPredictionCache } from '../../../../core/annotations/services/utils';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useAnnotatorMode } from '../../hooks/use-annotator-mode';

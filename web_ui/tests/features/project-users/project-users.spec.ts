@@ -3,7 +3,7 @@
 
 import { expect } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { test } from '../../fixtures/base-test';
 import { project } from '../../mocks/segmentation/mocks';
 import { registerUserApis } from './utils';

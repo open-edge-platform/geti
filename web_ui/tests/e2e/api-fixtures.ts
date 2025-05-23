@@ -3,12 +3,12 @@
 
 import https from 'https';
 
+import { ApplicationServices } from '@geti/core/src/services/application-services.interface';
 import Headers from '@mjackson/headers';
 import { APIRequestContext, test as baseTest } from '@playwright/test';
 import axios, { AxiosAdapter, AxiosHeaders } from 'axios';
 
-import { ApplicationServices } from '../../src/core/services/application-services.interface';
-import { getApiServices } from '../../src/core/services/get-api-services';
+import { getApiServices } from '../../packages/core/src/services/get-api-services';
 import { API_URLS } from '../../src/core/services/urls';
 import { addHostToApiUrls } from '../../src/core/services/use-api-router.hook';
 

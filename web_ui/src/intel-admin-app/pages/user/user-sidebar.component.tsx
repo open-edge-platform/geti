@@ -3,7 +3,8 @@
 
 import { FC } from 'react';
 
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
+
 import { MenuOption } from '../../../shared/components/menu-option.interface';
 import { Sidebar } from '../../shared/components/sidebar/sidebar.component';
 import { User } from '../users/mocked-user';

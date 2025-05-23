@@ -11,7 +11,7 @@ import { isExclusive } from '../../../../../../core/labels/utils';
 import { ModelFormat } from '../../../../../../core/models/dtos/model-details.interface';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
-import { paths } from '../../../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';

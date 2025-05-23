@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { LABEL_BEHAVIOUR } from '../../../../core/labels/label.interface';
@@ -8,7 +9,6 @@ import { createInMemoryMediaService } from '../../../../core/media/services/in-m
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { ApplicationServicesContextProps } from '../../../../core/services/application-services-provider.component';
 import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
 import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';

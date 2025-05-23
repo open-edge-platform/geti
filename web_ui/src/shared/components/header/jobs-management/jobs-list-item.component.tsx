@@ -3,6 +3,7 @@
 
 import { CSSProperties } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Copy, DownloadIcon } from '@geti/ui/icons';
 import { isEmpty, isFunction } from 'lodash-es';
@@ -19,8 +20,7 @@ import {
     isJobTest,
     isJobTrain,
 } from '../../../../core/jobs/utils';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useClipboard } from '../../../../hooks/use-clipboard/use-clipboard.hook';
 import { useWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { downloadFile, formatDownloadUrl, sanitize } from '../../../utils';

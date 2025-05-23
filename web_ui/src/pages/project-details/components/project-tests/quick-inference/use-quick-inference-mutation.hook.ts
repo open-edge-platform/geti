@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -9,7 +10,6 @@ import {
     InferenceResult,
 } from '../../../../../core/annotations/services/inference-service.interface';
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
-import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { getErrorMessageByStatusCode } from '../../../../../core/services/utils';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';

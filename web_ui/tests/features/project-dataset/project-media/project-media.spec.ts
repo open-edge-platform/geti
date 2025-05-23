@@ -6,7 +6,7 @@ import { range } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
 import { OpenApiResponseBody } from '../../../../src/core/server/types';
-import { paths } from '../../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { ViewModes } from '../../../../src/shared/components/media-view-modes/utils';
 import { delay } from '../../../../src/shared/utils';
 import { test } from '../../../fixtures/base-test';

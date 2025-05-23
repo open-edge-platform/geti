@@ -3,7 +3,7 @@
 
 import { apiClient } from '@geti/core';
 
-import { CreateApiService } from '../../../services/create-api-service.interface';
+import { CreateApiService } from '@geti/core/src/services/create-api-service.interface';
 import { API_URLS } from '../../../services/urls';
 import { ProductDTO, ProductsResponseDTO } from '../dtos/products.interface';
 import { Product, ProductsResponse } from '../products.interface';

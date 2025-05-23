@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError, isAxiosError } from 'axios';
 
@@ -10,7 +11,6 @@ import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/noti
 import { useNotification } from '../../../notification/notification.component';
 import { ExportStatusStateDTO } from '../../configurable-parameters/dtos/configurable-parameters.interface';
 import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { getErrorMessage } from '../../services/utils';
 import { ProjectImportIdentifier, ProjectImportStatus } from '../project.interface';
 import { IMPORT_STATUS_ERROR } from './use-import-project.hook';

@@ -18,7 +18,7 @@ import { ResourceNotFound } from '../pages/errors/resource-not-found/resource-no
 import { useProject } from '../pages/project-details/providers/project-provider/project-provider.component';
 import { useWorkspaceIdentifier } from '../providers/workspaces-provider/use-workspace-identifier.hook';
 import { LOCAL_STORAGE_KEYS } from '../shared/local-storage-keys';
-import { paths } from './../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 
 export const RedirectToOptimizedModel = () => {
     const modelIdentifier = useModelIdentifier();

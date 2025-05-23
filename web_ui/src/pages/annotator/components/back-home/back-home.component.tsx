@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import {
     encodeFilterSearchParam,
     getFilterParam,

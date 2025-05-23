@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     InfiniteData,
     infiniteQueryOptions,
@@ -24,7 +25,6 @@ import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/noti
 import { useNotification } from '../../../notification/notification.component';
 import { OrganizationIdentifier } from '../../organizations/organizations.interface';
 import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { getErrorMessage } from '../../services/utils';
 import {
     CreditAccount,

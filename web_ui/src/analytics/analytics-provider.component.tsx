@@ -3,11 +3,11 @@
 
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { Meter } from '@opentelemetry/api';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 
 import { usePlatformUtils } from '../core/platform-utils/hooks/use-platform-utils.hook';
-import { useApplicationServices } from '../core/services/application-services-provider.component';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
 import { MissingProviderError } from '../shared/missing-provider-error';
 import { createPeriodicMetricExporter, initializeMetrics } from './metrics';

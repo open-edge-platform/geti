@@ -4,7 +4,7 @@
 import { Page } from '@playwright/test';
 
 import { ModelIdentifier } from '../../../src/core/models/models.interface';
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { BarChartPage, LineChartPage, RadialChartPage, TextChartPage } from './chart-pages';
 
 export class ModelMetricsPage {

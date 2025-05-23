@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { defaultTheme, Provider } from '@geti/ui';
 import { UseQueryResult } from '@tanstack/react-query';
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { AxiosError } from 'axios';
 
-import { paths } from '../../../../core/services/routes';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { TOO_LOW_FREE_DISK_SPACE_IN_BYTES } from '../../../../core/status/hooks/utils';
 import { StatusProps } from '../../../../core/status/status.interface';

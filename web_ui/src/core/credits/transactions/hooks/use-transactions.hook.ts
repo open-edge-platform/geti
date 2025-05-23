@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     InfiniteData,
     QueryKey,
@@ -15,7 +16,6 @@ import { AxiosError } from 'axios';
 
 import { useProjectActions } from '../../../projects/hooks/use-project-actions.hook';
 import QUERY_KEYS from '../../../requests/query-keys';
-import { useApplicationServices } from '../../../services/application-services-provider.component';
 import { NextPage } from '../../../shared/infinite-query.interface';
 import { WorkspaceIdentifier } from '../../../workspaces/services/workspaces.interface';
 import {

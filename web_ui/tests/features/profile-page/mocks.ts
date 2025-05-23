@@ -4,7 +4,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { AccountStatusDTO } from '../../../src/core/organizations/dtos/organizations.interface';
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { ResourceTypeDTO, UserDTO, UserRoleDTO } from '../../../src/core/users/users.interface';
 
 export const ACCOUNT_URL = (organizationId: string, tab: string) => `${paths.account.index({ organizationId })}/${tab}`;

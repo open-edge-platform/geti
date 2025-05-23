@@ -9,7 +9,7 @@ import { isImage } from '../media/image.interface';
 import { MediaItem } from '../media/media.interface';
 import { isVideo, isVideoFrame } from '../media/video.interface';
 import { DatasetIdentifier } from '../projects/dataset.interface';
-import { paths } from './routes';
+import { paths } from '../../../packages/core/src/services/routes';
 
 const mediaPath = ({
     organizationId,

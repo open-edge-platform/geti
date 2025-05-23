@@ -4,8 +4,8 @@
 import { apiClient } from '@geti/core';
 import { isAxiosError } from 'axios';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
-import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { is404Error } from '../../services/utils';
 import { GenerateTokenDTO } from '../dtos/onboarding.interface';

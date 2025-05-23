@@ -4,7 +4,7 @@
 import { Page } from '@playwright/test';
 
 import { DatasetIdentifier } from '../../../src/core/projects/dataset.interface';
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { BarChartPage, ObjectSizeDistributionChartPage } from './chart-pages';
 
 export class DatasetStatisticsPage {

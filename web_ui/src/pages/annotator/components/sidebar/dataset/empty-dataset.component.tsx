@@ -5,7 +5,7 @@ import { Flex, Link, Text, View } from '@geti/ui';
 import { InfoOutline } from '@geti/ui/icons';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { paths } from '../../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useDataset } from '../../../providers/dataset-provider/dataset-provider.component';
 
 interface EmptyDataSetProps {

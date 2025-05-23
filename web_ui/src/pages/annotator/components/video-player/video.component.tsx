@@ -3,9 +3,10 @@
 
 import { CSSProperties, DetailedHTMLProps, RefObject, VideoHTMLAttributes } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { VideoFrame } from '../../../../core/media/video.interface';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { useDatasetIdentifier } from '../../hooks/use-dataset-identifier.hook';
 
 const useVideoSrc = (videoFrame: VideoFrame) => {
