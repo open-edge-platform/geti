@@ -3,6 +3,7 @@
 
 import { Key } from 'react';
 
+import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
 import { Button, Flex, Item, TabList, TabPanels, Tabs, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +11,6 @@ import { useOverlayTriggerState } from 'react-stately';
 
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
-import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
 import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { CoachMark } from '../../../../shared/components/coach-mark/coach-mark.component';
 import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';

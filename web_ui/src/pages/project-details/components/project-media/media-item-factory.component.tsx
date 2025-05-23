@@ -3,8 +3,9 @@
 
 import { memo } from 'react';
 
+import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
+
 import { MediaItem } from '../../../../core/media/media.interface';
-import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
 import { isSelected } from '../../../annotator/components/sidebar/dataset/utils';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';

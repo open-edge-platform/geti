@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
+import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { LABEL_BEHAVIOUR } from '../../../../core/labels/label.interface';
@@ -9,7 +10,6 @@ import { createInMemoryMediaService } from '../../../../core/media/services/in-m
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { useNavigateToAnnotatorRoute } from '../../../../core/services/use-navigate-to-annotator-route.hook';
 import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { MediaUploadProvider } from '../../../../providers/media-upload-provider/media-upload-provider.component';
@@ -24,8 +24,8 @@ import { DatasetTabPanel } from './dataset-tab-panel.component';
 import { ExportImportDatasetDialogProvider } from './export-dataset/export-import-dataset-dialog-provider.component';
 import { NO_MEDIA_MESSAGE } from './utils';
 
-jest.mock('../../../../core/services/use-navigate-to-annotator-route.hook', () => ({
-    ...jest.requireActual('../../../../core/services/use-navigate-to-annotator-route.hook'),
+jest.mock('@geti/core/src/services/use-navigate-to-annotator-route.hook', () => ({
+    ...jest.requireActual('@geti/core/src/services/use-navigate-to-annotator-route.hook'),
     useNavigateToAnnotatorRoute: jest.fn(),
 }));
 
