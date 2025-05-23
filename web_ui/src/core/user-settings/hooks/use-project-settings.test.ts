@@ -5,10 +5,10 @@ import { act, waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 
 import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getMockedProjectIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
 import { server } from '../../annotations/services/test-utils';
-import { API_URLS } from '../../services/urls';
 import { FEATURES_KEYS } from '../dtos/user-settings.interface';
 import { UserProjectSettings } from '../services/user-settings.interface';
 import { INITIAL_PROJECT_SETTINGS } from '../utils';

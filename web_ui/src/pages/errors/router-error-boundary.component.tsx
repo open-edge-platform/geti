@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { API_URLS } from '@geti/core/src/services/urls';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { AxiosError, isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 
-import { API_URLS } from '../../core/services/urls';
 import { ErrorFallback } from './error-boundary.component';
 import { InvalidOrganizationsScreen } from './invalid-organization/invalid-organization-screen.component';
 

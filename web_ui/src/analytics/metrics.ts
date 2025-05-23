@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { API_URLS } from '@geti/core/src/services/urls';
 import { metrics } from '@opentelemetry/api';
 import { OTLPMetricExporter } from '@opentelemetry/exporter-metrics-otlp-http';
 import { Resource } from '@opentelemetry/resources';
 import { ConsoleMetricExporter, MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
 
-import { API_URLS } from '../core/services/urls';
 import { DEFAULT_EXPORTER_CONFIG, ResourceInfo } from './utils';
 
 export const getMetricName = (suffix: string) => `geti.application.ui.${suffix}`;

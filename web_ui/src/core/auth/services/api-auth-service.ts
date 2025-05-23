@@ -4,7 +4,7 @@
 import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
-import { API_URLS } from '../../services/urls';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { AuthService } from './auth-service.interface';
 
 export const createApiAuthService: CreateApiService<AuthService> = (

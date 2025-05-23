@@ -3,12 +3,12 @@
 
 import { apiClient } from '@geti/core';
 
+import { API_URLS } from '../../../../../packages/core/src/services/urls';
 import { Label } from '../../../labels/label.interface';
 import { MediaItem } from '../../../media/media.interface';
 import { mediaIdentifierToDTO } from '../../../media/services/utils';
 import { isVideo } from '../../../media/video.interface';
 import { DatasetIdentifier } from '../../../projects/dataset.interface';
-import { API_URLS } from '../../../services/urls';
 import { ImageIdDTO, VideoFrameIdDTO } from '../../dtos/annotation.interface';
 import { NewPredictionsDTO } from '../../dtos/prediction.interface';
 import { InferenceResult } from '../inference-service.interface';

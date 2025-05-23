@@ -7,10 +7,10 @@ import 'jest-canvas-mock';
 
 import { ReactNode } from 'react';
 
+import { API_URLS } from '@geti/core/src/services/urls';
 import { isLargeSizeQuery as mockIsLargeSizeQuery } from '@geti/ui/theme';
 
 import { initializeMetrics } from './analytics/metrics';
-import { API_URLS } from './core/services/urls';
 import * as CanvasUtils from './shared/canvas-utils';
 
 window.ResizeObserver = class ResizeObserver {

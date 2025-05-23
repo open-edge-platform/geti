@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { API_URLS } from '@geti/core/src/services/urls';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { createInMemoryMediaService } from '../../../../core/media/services/in-memory-media-service/in-memory-media-service';
-import { API_URLS } from '../../../../core/services/urls';
 import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { MediaUploadProvider } from '../../../../providers/media-upload-provider/media-upload-provider.component';
