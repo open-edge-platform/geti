@@ -67,7 +67,7 @@ report: venv
 	@mkdir -p $(MAKEFILE_DIR)/reports/html
 	@. $(ACTIVATE); for file in reports/junit/*.xml; do \
 	  basefile=$$(basename "$$file" .xml); \
-	  junit2html "$$file" "reports/html/$$basefile.html"; \
+	  uvx junit2html "$$file" "reports/html/$$basefile.html"; \
 	done
 
 mypy: venv
