@@ -12,6 +12,7 @@ dependencies = [
     "opencv-python-headless~=4.11",
     "pillow~=11.1.0",
     "urllib3~=2.3.0",
+    "geti_client"
 ]
 
 [dependency-groups]
@@ -21,6 +22,9 @@ dev = [
     "mypy~=1.15",
     "types-requests"
 ]
+
+[tool.uv.sources]
+geti_client = { path = "geti_client", editable = true }
 
 [tool.ruff]
 target-version = "py310"

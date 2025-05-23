@@ -4,19 +4,15 @@ MAKEFILE_DIR := $(shell pwd)
 OPENAPI_YAML_SPEC := ../../../docs/rest_api/openapi_internal.yaml
 OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
 CLIENT_NAME := geti_client
-CLIENT_PATH := rest_client
 SPEC_HASH_FILE := .openapi_spec_hash
 
 .PHONY: all check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke
 
-all: test
+all: tests
 
 venv:
-	uv sync
-
-venv-dev: venv
 	$(MAKE) generate_client_if_needed;
-	uv pip install -e $(CLIENT_PATH)
+	uv sync
 
 check_yaml_spec:
 	@if [ ! -f $(OPENAPI_YAML_SPEC) ]; then \
@@ -30,11 +26,11 @@ generate_json_spec: check_yaml_spec
 
 generate_client: generate_json_spec
 	@command -v openapi-generator-cli >/dev/null 2>&1 || { echo >&2 "openapi-generator-cli is not installed. Aborting."; exit 1; }
-	openapi-generator-cli generate -i $(OPENAPI_JSON_SPEC) -g python -o $(CLIENT_PATH) --package-name $(CLIENT_NAME)
+	openapi-generator-cli generate -i $(OPENAPI_JSON_SPEC) -g python -o $(CLIENT_NAME) --package-name $(CLIENT_NAME)
 
 generate_client_if_needed: generate_json_spec
 	@SHA=$$(sha256sum $(OPENAPI_JSON_SPEC) | cut -d ' ' -f 1); \
-	if [ -d $(CLIENT_PATH) ] && [ -f $(SPEC_HASH_FILE) ] && [ "$$(cat $(SPEC_HASH_FILE))" = "$$SHA" ]; then \
+	if [ -d $(CLIENT_NAME) ] && [ -f $(SPEC_HASH_FILE) ] && [ "$$(cat $(SPEC_HASH_FILE))" = "$$SHA" ]; then \
 		echo "geti_client is already up to date"; \
 	else \
 		echo "OpenAPI spec has changed, regenerating geti_client"; \
@@ -42,7 +38,7 @@ generate_client_if_needed: generate_json_spec
 	fi; \
 	echo $$SHA > $(SPEC_HASH_FILE)
 
-tests: venv-dev
+tests: venv
 	@if [ -z "$(FEATURE)" ]; then \
 	  echo "Selected features: all"; \
 	  TARGET="features"; \
@@ -58,14 +54,14 @@ tests: venv-dev
 	fi; \
 	uv run -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
-test_wip: venv-dev
+test_wip: venv
 	@echo "Running WIP tests..."
 	uv run behave --wip features
 
-test_smoke: venv-dev
+test_smoke: venv
 	@$(MAKE) tests BDD_TAG=@smoke
 
-report: venv-dev
+report: venv
 	@echo "Generating HTML report..."
 	@mkdir -p $(MAKEFILE_DIR)/reports/html
 	@. $(ACTIVATE); for file in reports/junit/*.xml; do \
