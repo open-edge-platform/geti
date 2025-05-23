@@ -18,8 +18,8 @@ import (
 const RecoverModelTimeoutSeconds = 20
 
 type modelRegistrationConfig struct {
-	Service string `env:"MODELREGISTRATION_SERVICE" envDefault:"impt-modelregistration"`
-	Port    int    `env:"MODELREGISTRATION_PORT" envDefault:"5555"`
+	Service string `env:"MODELREGISTRATION_SERVICE"        envDefault:"impt-modelregistration"`
+	Port    int    `env:"MODELREGISTRATION_PORT"           envDefault:"5555"`
 	Address string `env:"MODELREGISTRATION_ADDRESS,expand" envDefault:"passthrough:///$MODELREGISTRATION_SERVICE.impt:${MODELREGISTRATION_PORT}"`
 }
 

@@ -24,11 +24,11 @@ func NewPipelineController(inferenceController InferenceController) *PipelineCon
 }
 
 type pipelineStatusRequest struct {
-	ProjectID  string `uri:"project_id" binding:"required,len=24,hexadecimal"`
+	ProjectID  string `uri:"project_id"  binding:"required,len=24,hexadecimal"`
 	PipelineID string `uri:"pipeline_id" binding:"required,activeOr24Hex"`
 }
 
-// pipelineRequest are extracted from URL path
+// pipelineRequest are extracted from URL path.
 type pipelineRequest struct {
 	PipelineIDAndAction string `uri:"pipeline_id" binding:"required"`
 
@@ -43,7 +43,7 @@ func (r pipelineRequest) GetActionAndID() (*sdkentities.ID, entities.ActionType,
 	return r.InferenceRequest.GetActionAndID(r.PipelineIDAndAction, "pipeline")
 }
 
-// Status returns the status of the inference server for a specific pipeline
+// Status returns the status of the inference server for a specific pipeline.
 func (pc *PipelineController) Status(c *gin.Context) {
 	var params pipelineStatusRequest
 	if err := c.ShouldBindUri(&params); err != nil {

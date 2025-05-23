@@ -14,11 +14,6 @@ type HTTPError struct {
 	StatusCode int    `json:"http_status"` // HTTP status code associated with the exception.
 }
 
-// Error returns the status code and error message for the HTTP error, example 404: image is not found
-func (e HTTPError) Error() string {
-	return e.Message
-}
-
 // NewNotFoundError creates a new error that represents an HTTP 404 Not Found error with a custom message.
 // It is used when a requested resource is not found in the server.
 func NewNotFoundError(message string) *HTTPError {
@@ -51,7 +46,7 @@ func NewBadRequestError(message string) *HTTPError {
 }
 
 // NewNotImplementedError creates a new error that represents and HTTP 501 Not Implemented error with a custom message.
-// This error should be used to indicate that the server does not support the functionality required to fulfill the request
+// This error should be used to indicate that the server does not support the functionality required to fulfill the request.
 func NewNotImplementedError(message string) *HTTPError {
 	return &HTTPError{
 		ErrorCode:  "not_implemented",
@@ -68,4 +63,9 @@ func NewUnsupportedMediaType(message string) *HTTPError {
 		Message:    message,
 		StatusCode: http.StatusUnsupportedMediaType,
 	}
+}
+
+// Error returns the status code and error message for the HTTP error, example 404: image is not found.
+func (e HTTPError) Error() string {
+	return e.Message
 }

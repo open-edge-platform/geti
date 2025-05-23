@@ -41,7 +41,26 @@ type InferParameters struct {
 	hyperParameters *string
 }
 
-// GetByteData returns the byte array containing the media data
+// NewInferParameters initializes the InferParameters.
+func NewInferParameters(
+	buf *bytes.Buffer,
+	pipelineName string,
+	includeXAI bool,
+	roi entities.Roi,
+	labelOnly bool,
+	hyperParameters *string,
+) *InferParameters {
+	return &InferParameters{
+		imageReader:     bytes.NewReader(buf.Bytes()),
+		pipelineName:    pipelineName,
+		includeXAI:      includeXAI,
+		roi:             roi,
+		labelOnly:       labelOnly,
+		hyperParameters: hyperParameters,
+	}
+}
+
+// GetByteData returns the byte array containing the media data.
 func (ip *InferParameters) GetByteData() ([]byte, error) {
 	if _, err := ip.imageReader.Seek(0, 0); err != nil {
 		return nil, fmt.Errorf("failed to seek image: %w", err)
@@ -56,18 +75,6 @@ func (ip *InferParameters) GetByteData() ([]byte, error) {
 	return mediaBytes, nil
 }
 
-// NewInferParameters initializes the InferParameters
-func NewInferParameters(buf *bytes.Buffer, pipelineName string, includeXAI bool, roi entities.Roi, labelOnly bool, hyperParameters *string) *InferParameters {
-	return &InferParameters{
-		imageReader:     bytes.NewReader(buf.Bytes()),
-		pipelineName:    pipelineName,
-		includeXAI:      includeXAI,
-		roi:             roi,
-		labelOnly:       labelOnly,
-		hyperParameters: hyperParameters,
-	}
-}
-
 type ModelAccessService interface {
 	InferImageBytes(ctx context.Context, params InferParameters) (*pb.ModelInferResponse, error)
 	TryRecoverModel(ctx context.Context, params InferParameters) (*pb.ModelInferResponse, error)
@@ -79,7 +86,10 @@ type ModelAccessServiceImpl struct {
 	registrationClient *grpc.ModelMeshRegistrationClient
 }
 
-func NewModelAccessService(meshClient *grpc.ModelMeshClient, registrationClient *grpc.ModelMeshRegistrationClient) *ModelAccessServiceImpl {
+func NewModelAccessService(
+	meshClient *grpc.ModelMeshClient,
+	registrationClient *grpc.ModelMeshRegistrationClient,
+) *ModelAccessServiceImpl {
 	return &ModelAccessServiceImpl{
 		meshClient:         meshClient,
 		registrationClient: registrationClient,
@@ -87,7 +97,10 @@ func NewModelAccessService(meshClient *grpc.ModelMeshClient, registrationClient 
 }
 
 // InferImageBytes sends an inference request to a model in ModelMesh and returns the response.
-func (s *ModelAccessServiceImpl) InferImageBytes(ctx context.Context, params InferParameters) (*pb.ModelInferResponse, error) {
+func (s *ModelAccessServiceImpl) InferImageBytes(
+	ctx context.Context,
+	params InferParameters,
+) (*pb.ModelInferResponse, error) {
 	ctx, span := telemetry.Tracer().Start(ctx, "infer-image-bytes")
 	defer span.End()
 
@@ -102,7 +115,7 @@ func (s *ModelAccessServiceImpl) InferImageBytes(ctx context.Context, params Inf
 
 	if e != nil {
 		logger.TracingLog(ctx).Infof("grpc error encountered: %v", e)
-		switch status.Code(e) {
+		switch status.Code(e) { //nolint:exhaustive // other gRPC error codes are wrapped with a generic error message
 		case codes.NotFound:
 			return nil, ErrModelNotFound
 		case codes.InvalidArgument:
@@ -115,14 +128,17 @@ func (s *ModelAccessServiceImpl) InferImageBytes(ctx context.Context, params Inf
 	return response, nil
 }
 
-// TryRecoverModel Checks for a model not found error and retries initializing the model through model registration
-func (s *ModelAccessServiceImpl) TryRecoverModel(ctx context.Context, params InferParameters) (*pb.ModelInferResponse, error) {
+// TryRecoverModel Checks for a model not found error and retries initializing the model through model registration.
+func (s *ModelAccessServiceImpl) TryRecoverModel(
+	ctx context.Context,
+	params InferParameters,
+) (*pb.ModelInferResponse, error) {
 	ctx, span := telemetry.Tracer().Start(ctx, "try-recover-model")
 	defer span.End()
 
 	if recovered := s.registrationClient.RecoverModel(ctx, params.pipelineName); recovered {
 		logger.TracingLog(ctx).Info("Model recovered successfully, awaiting model readiness")
-		for retries := 0; retries < ModelReadyRetries; retries++ {
+		for range ModelReadyRetries {
 			if modelOk := s.meshClient.GetModelReady(ctx, params.pipelineName); modelOk {
 				return s.InferImageBytes(ctx, params)
 			}

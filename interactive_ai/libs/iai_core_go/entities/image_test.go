@@ -23,16 +23,34 @@ func TestFullImageID(t *testing.T) {
 			action: func() string {
 				return fullImageID.GetPath()
 			},
-			want: filepath.Join("organizations", fullImageID.OrganizationID.String(), "workspaces", fullImageID.WorkspaceID.String(), "projects",
-				fullImageID.ProjectID.String(), "dataset_storages", fullImageID.DatasetID.String(), fullImageID.ImageID.String()),
+			want: filepath.Join(
+				"organizations",
+				fullImageID.OrganizationID.String(),
+				"workspaces",
+				fullImageID.WorkspaceID.String(),
+				"projects",
+				fullImageID.ProjectID.String(),
+				"dataset_storages",
+				fullImageID.DatasetID.String(),
+				fullImageID.ImageID.String(),
+			),
 		},
 		{
 			name: "GetThumbnailPath",
 			action: func() string {
 				return fullImageID.GetThumbnailPath()
 			},
-			want: filepath.Join("organizations", fullImageID.OrganizationID.String(), "workspaces", fullImageID.WorkspaceID.String(), "projects",
-				fullImageID.ProjectID.String(), "dataset_storages", fullImageID.DatasetID.String(), fullImageID.ImageID.String()+"_thumbnail"),
+			want: filepath.Join(
+				"organizations",
+				fullImageID.OrganizationID.String(),
+				"workspaces",
+				fullImageID.WorkspaceID.String(),
+				"projects",
+				fullImageID.ProjectID.String(),
+				"dataset_storages",
+				fullImageID.DatasetID.String(),
+				fullImageID.ImageID.String()+"_thumbnail",
+			),
 		},
 	}
 

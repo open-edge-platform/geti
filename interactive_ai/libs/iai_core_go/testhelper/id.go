@@ -2,7 +2,7 @@ package testhelper
 
 import (
 	"crypto/rand"
-	"fmt"
+	"encoding/hex"
 	"testing"
 
 	"github.com/google/uuid"
@@ -11,13 +11,14 @@ import (
 )
 
 func getMongoLikeID(t *testing.T) string {
-	randomBytes := make([]byte, 12)
+	const randomByteSize = 12
+	randomBytes := make([]byte, randomByteSize)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
 		t.Fatalf("Cannot generate new value")
 	}
 
-	return fmt.Sprintf("%x", randomBytes)
+	return hex.EncodeToString(randomBytes)
 }
 
 func GetFullImageID(t *testing.T) *sdkentities.FullImageID {

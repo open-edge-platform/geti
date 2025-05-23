@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
 	"image/jpeg"
 	"testing"
 
@@ -19,6 +18,7 @@ import (
 	predictv2 "geti.com/predict/mock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -79,7 +79,9 @@ func TestErrors(t *testing.T) {
 					ModelInfer(mock.Anything, mock.Anything).
 					Return(nil, status.Error(codes.DeadlineExceeded, "deadline exceeded"))
 			},
-			wantErr: fmt.Errorf("failed model infer request: deadline exceeded"),
+			wantErr: errors.New(
+				"failed model infer request: rpc error: code = DeadlineExceeded desc = deadline exceeded",
+			),
 		},
 		{
 			name: "Remote connection error",
@@ -88,7 +90,9 @@ func TestErrors(t *testing.T) {
 					ModelInfer(mock.Anything, mock.Anything).
 					Return(nil, status.Error(codes.Unavailable, "remote connection failure"))
 			},
-			wantErr: fmt.Errorf("failed model infer request: remote connection failure"),
+			wantErr: errors.New(
+				"failed model infer request: rpc error: code = Unavailable desc = remote connection failure",
+			),
 		},
 		{
 			name: "General error",
@@ -97,7 +101,7 @@ func TestErrors(t *testing.T) {
 					ModelInfer(mock.Anything, mock.Anything).
 					Return(nil, errors.New("general error"))
 			},
-			wantErr: fmt.Errorf("failed model infer request: general error"),
+			wantErr: errors.New("failed model infer request: general error"),
 		},
 	}
 
@@ -109,7 +113,7 @@ func TestErrors(t *testing.T) {
 
 			_, err := modelAccessSrv.InferImageBytes(ctx, *createInferParameters())
 
-			assert.Error(t, err, tt.wantErr)
+			assert.ErrorContains(t, err, tt.wantErr.Error())
 
 			inferenceMock.ExpectedCalls = nil
 			inferenceMock.Calls = nil
@@ -127,7 +131,7 @@ func TestInferImageBytes(t *testing.T) {
 	// Format expected request
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, img, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	var pbRequest pb.ModelInferRequest
 	pbRequest.ModelName = pipelineName
@@ -201,7 +205,7 @@ func TestInferImageBytes(t *testing.T) {
 	response, err := modelAccessSrv.InferImageBytes(context.Background(), *inferParams)
 
 	// Assert response is as expected
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, testMapData, response.GetParameters()["maps"].GetStringParam())
 	assert.Equal(t, testPredictionsData, response.GetParameters()["predictions"].GetStringParam())
 	assert.Equal(t, pipelineName, response.GetModelName())
@@ -212,21 +216,21 @@ func TestInferParameters(t *testing.T) {
 	pipelineName := "project_id-model_id"
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, img, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	ip := NewInferParameters(buf, pipelineName, true, entities.Roi{}, false, nil)
 
 	// Assert that reading works once
 	imageBytes, e := ip.GetByteData()
-	assert.Nil(t, e)
+	require.NoError(t, e)
 	newBuf := new(bytes.Buffer)
 	err = jpeg.Encode(newBuf, img, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, newBuf.Bytes(), imageBytes)
 
 	// Assert that reading works the second time as well
 	imageBytes2, e2 := ip.GetByteData()
-	assert.Nil(t, e2)
+	require.NoError(t, e2)
 	assert.NotNil(t, imageBytes2)
 	assert.Equal(t, newBuf.Bytes(), imageBytes2)
 }
@@ -236,16 +240,16 @@ func TestInferHyperParameters(t *testing.T) {
 	pipelineName := "project_id-model_id"
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, img, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	hp := "{'task_id':1, 'confidence_treshold':0.35}"
 
 	ip := NewInferParameters(buf, pipelineName, true, entities.Roi{}, false, &hp)
 
 	imageBytes, e := ip.GetByteData()
-	assert.Nil(t, e)
+	require.NoError(t, e)
 	newBuf := new(bytes.Buffer)
 	err = jpeg.Encode(newBuf, img, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, newBuf.Bytes(), imageBytes)
 	assert.Equal(t, ip.hyperParameters, &hp)
 }
@@ -254,9 +258,8 @@ func TestInferHyperParameters(t *testing.T) {
 // 1. Pass 'Model not found error' and inference parameters to error handler function
 // 2. Expect a RecoverModel call to model registration microservice -> mock Success response
 // 3. Expect a 'Get Model status' call to ModelMesh -> mock ModelReady response
-// 4. Expect a 'ModelInfer' call to ModelMesh runtime -> mock predictions response
+// 4. Expect a 'ModelInfer' call to ModelMesh runtime -> mock predictions response.
 func TestHandleModelNotFoundError(t *testing.T) {
-
 	// Prepare InferImage call parameters
 	img := testhelpers.GetUniformTestImage(10, 10, uint8(155))
 	pipelineName := "project_id-model_id"
@@ -277,7 +280,7 @@ func TestHandleModelNotFoundError(t *testing.T) {
 	// Create media buffer
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, img, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	inferParams := NewInferParameters(buf, pipelineName, false, entities.Roi{}, false, nil)
 
@@ -333,6 +336,6 @@ func TestHandleModelNotFoundError(t *testing.T) {
 	inferResponse, inferErr := modelAccessSrv.TryRecoverModel(context.Background(), *inferParams)
 
 	// Assert no errors arise and predictions are returned
-	assert.Nil(t, inferErr)
+	require.NoError(t, inferErr)
 	assert.Equal(t, testPredictionsData, inferResponse.GetParameters()["predictions"].GetStringParam())
 }

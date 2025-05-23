@@ -16,9 +16,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"inference_gateway/app/entities"
-	mockcontrollers "inference_gateway/app/mock/controllers"
-	mockservice "inference_gateway/app/mock/service"
-	mockusecase "inference_gateway/app/mock/usecase"
+	"inference_gateway/app/service"
 	"inference_gateway/app/usecase"
 )
 
@@ -28,11 +26,11 @@ func TestInferenceController_InferOne(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest(http.MethodGet, "/path", nil)
 
-	modelAccessMock := mockservice.NewMockModelAccessService(t)
-	cacheMock := mockservice.NewMockCacheService(t)
-	predictMock := mockusecase.NewMockInfer[usecase.BatchPredictionJSON](t)
-	explainMock := mockusecase.NewMockInfer[usecase.BatchExplainJSON](t)
-	requestHandlerMock := mockcontrollers.NewMockRequestHandler(t)
+	modelAccessMock := service.NewMockModelAccessService(t)
+	cacheMock := service.NewMockCacheService(t)
+	predictMock := usecase.NewMockInfer[usecase.BatchPredictionJSON](t)
+	explainMock := usecase.NewMockInfer[usecase.BatchExplainJSON](t)
+	requestHandlerMock := NewMockRequestHandler(t)
 
 	entityID := sdkentities.ID{ID: "active"}
 	fullVideoID := sdkentities.GetFullVideoID(t)
@@ -49,7 +47,13 @@ func TestInferenceController_InferOne(t *testing.T) {
 		UseCache:       entities.Always,
 	}
 
-	inferenceCtrl := NewInferenceControllerImpl(modelAccessMock, cacheMock, requestHandlerMock, predictMock, explainMock)
+	inferenceCtrl := NewInferenceControllerImpl(
+		modelAccessMock,
+		cacheMock,
+		requestHandlerMock,
+		predictMock,
+		explainMock,
+	)
 
 	tests := []struct {
 		name            string
@@ -82,7 +86,6 @@ func TestInferenceController_InferOne(t *testing.T) {
 				assert.Equal(t, []byte("cached"), result)
 
 				predictMock.AssertNotCalled(t, "One", c.Request.Context(), requestData)
-
 			},
 		},
 		{
@@ -111,7 +114,6 @@ func TestInferenceController_InferOne(t *testing.T) {
 				assert.Equal(t, []byte("no prediction found"), result)
 
 				predictMock.AssertNotCalled(t, "One", c.Request.Context(), requestData)
-
 			},
 		},
 		{
@@ -250,7 +252,11 @@ func TestInferenceController_InferOne(t *testing.T) {
 
 				assert.Nil(t, result)
 				assert.Equal(t, http.StatusBadRequest, err.StatusCode)
-				assert.Equal(t, "Invalid parameter: `use_cache=always` is not supported for the `explain` endpoint.", err.Error())
+				assert.Equal(
+					t,
+					"Invalid parameter: `use_cache=always` is not supported for the `explain` endpoint.",
+					err.Error(),
+				)
 			},
 		},
 		{
@@ -322,11 +328,11 @@ func TestInferenceController_InferBatch(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest(http.MethodGet, "/path", nil)
 
-	modelAccessMock := mockservice.NewMockModelAccessService(t)
-	cacheMock := mockservice.NewMockCacheService(t)
-	predictMock := mockusecase.NewMockInfer[usecase.BatchPredictionJSON](t)
-	explainMock := mockusecase.NewMockInfer[usecase.BatchExplainJSON](t)
-	requestHandlerMock := mockcontrollers.NewMockRequestHandler(t)
+	modelAccessMock := service.NewMockModelAccessService(t)
+	cacheMock := service.NewMockCacheService(t)
+	predictMock := usecase.NewMockInfer[usecase.BatchPredictionJSON](t)
+	explainMock := usecase.NewMockInfer[usecase.BatchExplainJSON](t)
+	requestHandlerMock := NewMockRequestHandler(t)
 
 	entityID := sdkentities.ID{ID: "active"}
 	fullVideoID := sdkentities.GetFullVideoID(t)
@@ -345,10 +351,20 @@ func TestInferenceController_InferBatch(t *testing.T) {
 		StartFrame:     1,
 		EndFrame:       5,
 		LabelOnly:      true,
-		MediaInfo:      &entities.MediaInfo{FrameIndex: 1, DatasetID: fullVideoID.DatasetID, VideoID: fullVideoID.VideoID},
+		MediaInfo: &entities.MediaInfo{
+			FrameIndex: 1,
+			DatasetID:  fullVideoID.DatasetID,
+			VideoID:    fullVideoID.VideoID,
+		},
 	}
 
-	inferenceCtrl := NewInferenceControllerImpl(modelAccessMock, cacheMock, requestHandlerMock, predictMock, explainMock)
+	inferenceCtrl := NewInferenceControllerImpl(
+		modelAccessMock,
+		cacheMock,
+		requestHandlerMock,
+		predictMock,
+		explainMock,
+	)
 
 	tests := []struct {
 		name            string
@@ -550,13 +566,19 @@ func TestInferenceController_IsModelReady(t *testing.T) {
 	c, _ := gin.CreateTestContext(w)
 	c.Request = httptest.NewRequest(http.MethodGet, "/path", nil)
 
-	modelAccessMock := mockservice.NewMockModelAccessService(t)
-	cacheMock := mockservice.NewMockCacheService(t)
-	predictMock := mockusecase.NewMockInfer[usecase.BatchPredictionJSON](t)
-	explainMock := mockusecase.NewMockInfer[usecase.BatchExplainJSON](t)
-	requestHandlerMock := mockcontrollers.NewMockRequestHandler(t)
+	modelAccessMock := service.NewMockModelAccessService(t)
+	cacheMock := service.NewMockCacheService(t)
+	predictMock := usecase.NewMockInfer[usecase.BatchPredictionJSON](t)
+	explainMock := usecase.NewMockInfer[usecase.BatchExplainJSON](t)
+	requestHandlerMock := NewMockRequestHandler(t)
 
-	inferenceCtrl := NewInferenceControllerImpl(modelAccessMock, cacheMock, requestHandlerMock, predictMock, explainMock)
+	inferenceCtrl := NewInferenceControllerImpl(
+		modelAccessMock,
+		cacheMock,
+		requestHandlerMock,
+		predictMock,
+		explainMock,
+	)
 
 	modelAccessMock.EXPECT().
 		IsModelReady(c.Request.Context(), "dummy_id").

@@ -20,19 +20,33 @@ import (
 	"inference_gateway/app/usecase"
 )
 
-// MaxBatchPredictions Maximum amount of predictions that are allowed to be processed in one batch request
-const MaxBatchPredictions = 20
+const (
+	Active              = "active"
+	MaxBatchPredictions = 20 // Maximum amount of predictions that are allowed to be processed in one batch request.
+)
 
 type InferenceController interface {
-	Predict(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (int, []byte, *httperrors.HTTPError)
+	Predict(
+		c *gin.Context,
+		params *entities.InferenceRequest,
+		entityID sdkentities.ID,
+	) (int, []byte, *httperrors.HTTPError)
 	Explain(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) ([]byte, *httperrors.HTTPError)
-	BatchPredict(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (*usecase.BatchPredictionJSON, *httperrors.HTTPError)
-	BatchExplain(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (*usecase.BatchExplainJSON, *httperrors.HTTPError)
+	BatchPredict(
+		c *gin.Context,
+		params *entities.InferenceRequest,
+		entityID sdkentities.ID,
+	) (*usecase.BatchPredictionJSON, *httperrors.HTTPError)
+	BatchExplain(
+		c *gin.Context,
+		params *entities.InferenceRequest,
+		entityID sdkentities.ID,
+	) (*usecase.BatchExplainJSON, *httperrors.HTTPError)
 	IsModelReady(c *gin.Context, entityID string) bool
 }
 
 // InferenceControllerImpl is a base controller that provides access to underlying usecase/service layer to
-// controllers that embeds it
+// controllers that embeds it.
 type InferenceControllerImpl struct {
 	cacheSrv    service.CacheService
 	modelAccess service.ModelAccessService
@@ -42,8 +56,13 @@ type InferenceControllerImpl struct {
 	RequestHandler
 }
 
-func NewInferenceControllerImpl(modelAccess service.ModelAccessService, cacheSrv service.CacheService, requestHandler RequestHandler,
-	predict usecase.Infer[usecase.BatchPredictionJSON], explain usecase.Infer[usecase.BatchExplainJSON]) *InferenceControllerImpl {
+func NewInferenceControllerImpl(
+	modelAccess service.ModelAccessService,
+	cacheSrv service.CacheService,
+	requestHandler RequestHandler,
+	predict usecase.Infer[usecase.BatchPredictionJSON],
+	explain usecase.Infer[usecase.BatchExplainJSON],
+) *InferenceControllerImpl {
 	return &InferenceControllerImpl{
 		modelAccess:    modelAccess,
 		cacheSrv:       cacheSrv,
@@ -53,17 +72,9 @@ func NewInferenceControllerImpl(modelAccess service.ModelAccessService, cacheSrv
 	}
 }
 
-var (
-	cacheModeToPredictionTypeMap = map[string]entities.CacheMode{
-		"always": entities.Always,
-		"never":  entities.Never,
-		"auto":   entities.Auto,
-	}
-)
-
 func ValidateModelID(fl validator.FieldLevel) bool {
 	field := fl.Field().String()
-	if field == "active" {
+	if field == Active {
 		return true
 	}
 	matchHex24 := regexp.MustCompile(`^[a-fA-F0-9]{24}$`).MatchString
@@ -72,6 +83,11 @@ func ValidateModelID(fl validator.FieldLevel) bool {
 
 // CacheModeFromString parses a prediction type string. Default fallback value is Never.
 func CacheModeFromString(str string) entities.CacheMode {
+	cacheModeToPredictionTypeMap := map[string]entities.CacheMode{
+		"always": entities.Always,
+		"never":  entities.Never,
+		"auto":   entities.Auto,
+	}
 	cacheMode, ok := cacheModeToPredictionTypeMap[strings.ToLower(str)]
 	if !ok {
 		cacheMode = entities.Never
@@ -96,7 +112,11 @@ func wrapHTTPError(err error) *httperrors.HTTPError {
 	}
 }
 
-func (ic *InferenceControllerImpl) Predict(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (int, []byte, *httperrors.HTTPError) {
+func (ic *InferenceControllerImpl) Predict(
+	c *gin.Context,
+	params *entities.InferenceRequest,
+	entityID sdkentities.ID,
+) (int, []byte, *httperrors.HTTPError) {
 	req, err := ic.NewPredictionRequest(c, params, entityID)
 	if err != nil {
 		return http.StatusBadRequest, nil, httperrors.NewBadRequestError(err.Error())
@@ -123,13 +143,19 @@ func (ic *InferenceControllerImpl) Predict(c *gin.Context, params *entities.Infe
 	return http.StatusOK, jsonResp, nil
 }
 
-func (ic *InferenceControllerImpl) Explain(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) ([]byte, *httperrors.HTTPError) {
+func (ic *InferenceControllerImpl) Explain(
+	c *gin.Context,
+	params *entities.InferenceRequest,
+	entityID sdkentities.ID,
+) ([]byte, *httperrors.HTTPError) {
 	req, err := ic.NewPredictionRequest(c, params, entityID)
 	if err != nil {
 		return nil, httperrors.NewBadRequestError(err.Error())
 	}
 	if req.UseCache == entities.Always {
-		return nil, httperrors.NewBadRequestError("Invalid parameter: `use_cache=always` is not supported for the `explain` endpoint.")
+		return nil, httperrors.NewBadRequestError(
+			"Invalid parameter: `use_cache=always` is not supported for the `explain` endpoint.",
+		)
 	}
 	result, err := ic.explainUC.One(c.Request.Context(), req)
 	if err != nil {
@@ -138,24 +164,37 @@ func (ic *InferenceControllerImpl) Explain(c *gin.Context, params *entities.Infe
 
 	jsonResp, err := req.ToExplainBytes(result)
 	if err != nil {
-		return nil, httperrors.NewInternalServerError(fmt.Sprintf("failed to construct JSON response from prediction string: %s", err))
+		return nil, httperrors.NewInternalServerError(
+			fmt.Sprintf("failed to construct JSON response from prediction string: %s", err),
+		)
 	}
 
 	return jsonResp, nil
 }
 
-func (ic *InferenceControllerImpl) batchRequest(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (*entities.BatchPredictionRequestData, error) {
+func (ic *InferenceControllerImpl) batchRequest(
+	c *gin.Context,
+	params *entities.InferenceRequest,
+	entityID sdkentities.ID,
+) (*entities.BatchPredictionRequestData, error) {
 	req, err := ic.NewBatchPredictionRequest(c, params, entityID)
 	if err != nil {
 		return nil, err
 	}
 	if req.ExceedsMaxPredictions(MaxBatchPredictions) {
-		return nil, fmt.Errorf("too many predictions requested: the maximum amount per request is %d", MaxBatchPredictions)
+		return nil, fmt.Errorf(
+			"too many predictions requested: the maximum amount per request is %d",
+			MaxBatchPredictions,
+		)
 	}
 	return req, nil
 }
 
-func (ic *InferenceControllerImpl) BatchPredict(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (*usecase.BatchPredictionJSON, *httperrors.HTTPError) {
+func (ic *InferenceControllerImpl) BatchPredict(
+	c *gin.Context,
+	params *entities.InferenceRequest,
+	entityID sdkentities.ID,
+) (*usecase.BatchPredictionJSON, *httperrors.HTTPError) {
 	req, err := ic.batchRequest(c, params, entityID)
 	if err != nil {
 		return nil, httperrors.NewBadRequestError(err.Error())
@@ -167,7 +206,11 @@ func (ic *InferenceControllerImpl) BatchPredict(c *gin.Context, params *entities
 	return result, nil
 }
 
-func (ic *InferenceControllerImpl) BatchExplain(c *gin.Context, params *entities.InferenceRequest, entityID sdkentities.ID) (*usecase.BatchExplainJSON, *httperrors.HTTPError) {
+func (ic *InferenceControllerImpl) BatchExplain(
+	c *gin.Context,
+	params *entities.InferenceRequest,
+	entityID sdkentities.ID,
+) (*usecase.BatchExplainJSON, *httperrors.HTTPError) {
 	req, err := ic.batchRequest(c, params, entityID)
 	if err != nil {
 		return nil, httperrors.NewBadRequestError(err.Error())

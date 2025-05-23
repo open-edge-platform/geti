@@ -21,7 +21,6 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"inference_gateway/app/entities"
-	mockcontrollers "inference_gateway/app/mock/controllers"
 	"inference_gateway/app/service"
 	"inference_gateway/app/usecase"
 )
@@ -40,7 +39,7 @@ func (suite *PipelineControllerSuite) SetupTest() {
 
 func (suite *PipelineControllerSuite) TestPipelineController_Status() {
 	t := suite.T()
-	inferenceCtrlMock := mockcontrollers.NewMockInferenceController(t)
+	inferenceCtrlMock := NewMockInferenceController(t)
 	fullID := sdkentities.GetFullTestID(t)
 
 	tests := []struct {
@@ -148,7 +147,7 @@ func (suite *PipelineControllerSuite) TestPipelineController_Status() {
 				tt.setupMocks()
 			}
 
-			req, _ := http.NewRequest("GET", tt.giveRequest, nil)
+			req, _ := http.NewRequest(http.MethodGet, tt.giveRequest, nil)
 			resp := httptest.NewRecorder()
 			req.Context()
 			router.ServeHTTP(resp, req)
@@ -164,7 +163,7 @@ func (suite *PipelineControllerSuite) TestPipelineController_Status() {
 
 func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 	t := suite.T()
-	inferenceMock := mockcontrollers.NewMockInferenceController(t)
+	inferenceMock := NewMockInferenceController(t)
 
 	fullTestID := sdkentities.GetFullTestID(t)
 	inferenceRequest := &entities.InferenceRequest{
@@ -265,8 +264,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchPredictActive_OK",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				var batchResp usecase.BatchPredictionJSON
 				batchResp.BatchPredictions = append(batchResp.BatchPredictions, []byte(`{"score": 0.5}`))
@@ -293,8 +296,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchPredict_Err",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_predict",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				inferenceMock.EXPECT().
 					BatchPredict(mock.AnythingOfType("*gin.Context"), inferenceRequest, sdkentities.ID{ID: "active"}).
@@ -304,8 +311,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchExplainActive_OK",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				var batchResp usecase.BatchExplainJSON
 				batchResp.BatchExplain = append(batchResp.BatchExplain, []byte(`{"score": 0.5}`))
@@ -332,8 +343,12 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 		},
 		{
 			name: "BatchExplain_Err",
-			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
-				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
+			giveRequest: fmt.Sprintf(
+				"/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:batch_explain",
+				fullTestID.OrganizationID,
+				fullTestID.WorkspaceID,
+				fullTestID.ProjectID,
+			),
 			setupMocks: func() {
 				var batchResp usecase.BatchExplainJSON
 				batchResp.BatchExplain = append(batchResp.BatchExplain, []byte(`{"score": 0.5}`))
@@ -347,11 +362,16 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 			name: "Unknown",
 			giveRequest: fmt.Sprintf("/api/v1/organizations/%s/workspaces/%s/projects/%s/pipelines/active:unknown",
 				fullTestID.OrganizationID, fullTestID.WorkspaceID, fullTestID.ProjectID),
-			wantErrMsg: fmt.Sprintf("Action `unknown` is not a valid action. Choose one of %s", entities.SupportedActions),
+			wantErrMsg: fmt.Sprintf(
+				"Action `unknown` is not a valid action. Choose one of %s",
+				entities.GetSupportedActions(),
+			),
 		},
 	}
 
-	pipelines := router.Group("/api/v1/organizations/:organization_id/workspaces/:workspace_id/projects/:project_id/pipelines/:pipeline_id")
+	pipelines := router.Group(
+		"/api/v1/organizations/:organization_id/workspaces/:workspace_id/projects/:project_id/pipelines/:pipeline_id",
+	)
 	{
 		pipelines.POST("", pipelineCtrl.Infer)
 	}
@@ -362,7 +382,7 @@ func (suite *PipelineControllerSuite) TestPipelineController_Infer() {
 				tt.setupMocks()
 			}
 
-			req, _ := http.NewRequest("POST", tt.giveRequest, nil)
+			req, _ := http.NewRequest(http.MethodPost, tt.giveRequest, nil)
 			resp := httptest.NewRecorder()
 			router.ServeHTTP(resp, req)
 

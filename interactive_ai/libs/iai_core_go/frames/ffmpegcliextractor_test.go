@@ -62,7 +62,7 @@ func (suite *FFmpegFrameExtractorTestSuite) TearDownSuite() {
 func (suite *FFmpegFrameExtractorTestSuite) TestFrameExtractor() {
 	ctx := context.Background()
 	pr, pw := io.Pipe()
-	frameExtractor := new(FFmpegCLIFrameExtractor)
+	frameExtractor := NewFFmpegCLIFrameExtractor()
 	start, end, skip := 30, 90, 10
 	wantTotal := (end-start)/skip + 1
 	done := frameExtractor.Start(ctx, suite.video, start, end, skip, pw)

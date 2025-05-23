@@ -18,8 +18,8 @@ type CacheService interface {
 }
 
 type directorConfig struct {
-	Service string `env:"DIRECTOR_MS_SERVICE" envDefault:"impt-director"`
-	Port    int    `env:"DIRECTOR_MS_PORT" envDefault:"4999"`
+	Service string `env:"DIRECTOR_MS_SERVICE"        envDefault:"impt-director"`
+	Port    int    `env:"DIRECTOR_MS_PORT"           envDefault:"4999"`
 	Address string `env:"DIRECTOR_MS_ADDRESS,expand" envDefault:"http://$DIRECTOR_MS_SERVICE.impt:${DIRECTOR_MS_PORT}"`
 }
 

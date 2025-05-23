@@ -1,9 +1,12 @@
-quiet: False
-disable-version-string: True
-with-expecter: True
-mockname: "Mock{{.InterfaceName}}"
-filename: "mock_{{.InterfaceName | snakecase}}.go"
-dir: "mock/{{.InterfaceDirRelative}}"
+all: false
+dir: "{{.InterfaceDir}}"
+filename: mocks.go
+formatter: goimports
+log-level: info
+structname: "{{.Mock}}{{.InterfaceName}}"
+pkgname: "{{.SrcPackageName}}"
+recursive: false
+template: testify
 packages:
   geti.com/iai_core/storage:
     config:

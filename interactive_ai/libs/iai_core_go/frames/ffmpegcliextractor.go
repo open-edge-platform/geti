@@ -18,12 +18,23 @@ import (
 	"geti.com/iai_core/telemetry"
 )
 
+const MsPerSecond = 1000
+
 type CLIFrameExtractor interface {
 	Start(ctx context.Context, video *entities.Video, start, end, skip int, writer io.WriteCloser) <-chan error
 	Read(ctx context.Context, pr io.ReadCloser) <-chan *FrameData
 }
 
 type FFmpegCLIFrameExtractor struct {
+	jpegStartMarker []byte
+	jpegEndMarker   []byte
+}
+
+func NewFFmpegCLIFrameExtractor() *FFmpegCLIFrameExtractor {
+	return &FFmpegCLIFrameExtractor{
+		jpegStartMarker: []byte{0xFF, 0xD8},
+		jpegEndMarker:   []byte{0xFF, 0xD9},
+	}
 }
 
 type FrameData struct {
@@ -31,7 +42,12 @@ type FrameData struct {
 	Data  []byte
 }
 
-func (s *FFmpegCLIFrameExtractor) Start(ctx context.Context, video *entities.Video, start, end, skip int, writer io.WriteCloser) <-chan error {
+func (s *FFmpegCLIFrameExtractor) Start(
+	ctx context.Context,
+	video *entities.Video,
+	start, end, skip int,
+	writer io.WriteCloser,
+) <-chan error {
 	logger.TracingLog(ctx).Infof("Starting frame extraction process for %q, frames requested start=%d, end=%d, "+
 		"skip=%d, video fps %g...", video.FilePath, start, end, skip, video.FPS)
 	done := make(chan error)
@@ -41,7 +57,7 @@ func (s *FFmpegCLIFrameExtractor) Start(ctx context.Context, video *entities.Vid
 
 		// Convert FPS to millisecond timestamp at which the video should be loaded in
 		inputFlags := ffmpeg.KwArgs{
-			"ss": fmt.Sprintf("%dms", int((float64(start)/video.FPS)*1000)),
+			"ss": fmt.Sprintf("%dms", int((float64(start)/video.FPS)*MsPerSecond)),
 		}
 
 		// Account for case where batch is smaller than frame skip which combined with vf FPS filter can mean that no
@@ -80,11 +96,6 @@ func (s *FFmpegCLIFrameExtractor) Start(ctx context.Context, video *entities.Vid
 	return done
 }
 
-var (
-	jpegStartMarker = []byte{0xFF, 0xD8}
-	jpegEndMarker   = []byte{0xFF, 0xD9}
-)
-
 // Read reads frame bytes from the provided pipe reader.
 // It continuously reads from the pipe and processes the data to detect complete JPEG frames.
 // When a complete JPEG frame is detected, it extracts the frame bytes and sends them as a byte slice to the output channel.
@@ -105,7 +116,7 @@ func (s *FFmpegCLIFrameExtractor) Read(ctx context.Context, pr io.ReadCloser) <-
 		reader := bufio.NewReader(pr)
 		cnt := 0
 		for {
-			_, err := reader.ReadBytes(jpegStartMarker[0])
+			_, err := reader.ReadBytes(s.jpegStartMarker[0])
 			if err == io.EOF {
 				break
 			}
@@ -115,16 +126,16 @@ func (s *FFmpegCLIFrameExtractor) Read(ctx context.Context, pr io.ReadCloser) <-
 			}
 
 			var jpegBuffer bytes.Buffer
-			jpegBuffer.Write([]byte{jpegStartMarker[0]})
+			jpegBuffer.Write([]byte{s.jpegStartMarker[0]})
 
 			for {
-				b, err := reader.ReadByte()
-				if err != nil {
-					logger.TracingLog(ctx).Errorf("Error reading JPEG data %s", err)
+				b, readErr := reader.ReadByte()
+				if readErr != nil {
+					logger.TracingLog(ctx).Errorf("Error reading JPEG data %s", readErr)
 					break
 				}
 				jpegBuffer.WriteByte(b)
-				if jpegBuffer.Len() >= 2 && bytes.HasSuffix(jpegBuffer.Bytes(), jpegEndMarker) {
+				if jpegBuffer.Len() >= 2 && bytes.HasSuffix(jpegBuffer.Bytes(), s.jpegEndMarker) {
 					break
 				}
 			}

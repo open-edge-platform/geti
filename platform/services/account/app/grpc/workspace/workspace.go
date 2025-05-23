@@ -136,7 +136,8 @@ func (s *GRPCServer) Delete(_ context.Context, req *pb.WorkspaceIdRequest) (*emp
 	}
 	for _, relationship := range workspaceRelationships {
 		subjectType := relationship.GetSubject().GetObject().GetObjectType()
-		if subjectType == "organization" {
+		switch subjectType {
+		case "organization":
 			err := rolesMgr.ChangeOrganizationRelation(relationship.Resource.ObjectType,
 				relationship.Resource.ObjectId, []string{relationship.Relation}, relationship.Subject.Object.ObjectId,
 				authzed.RelationshipUpdate_OPERATION_DELETE)
@@ -144,7 +145,7 @@ func (s *GRPCServer) Delete(_ context.Context, req *pb.WorkspaceIdRequest) (*emp
 				logger.Errorf("failed to delete organization relationships: %v", err)
 				return nil, status.Errorf(codes.Unknown, "unexpected error")
 			}
-		} else if subjectType == "user" {
+		case "user":
 			err := rolesMgr.ChangeUserRelation(relationship.Resource.ObjectType,
 				relationship.Resource.ObjectId, []string{relationship.Relation}, relationship.Subject.Object.ObjectId,
 				authzed.RelationshipUpdate_OPERATION_DELETE)
@@ -152,7 +153,7 @@ func (s *GRPCServer) Delete(_ context.Context, req *pb.WorkspaceIdRequest) (*emp
 				logger.Errorf("failed to delete user relationships: %v", err)
 				return nil, status.Errorf(codes.Unknown, "unexpected error")
 			}
-		} else {
+		default:
 			logger.Errorf("unknown subject type relationships to delete: %v", subjectType)
 			return nil, status.Errorf(codes.Unknown, "unexpected error")
 		}

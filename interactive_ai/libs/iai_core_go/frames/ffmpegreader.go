@@ -11,7 +11,7 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
-// FrameReader provides methods to read a single frame
+// FrameReader provides methods to read a single frame.
 type FrameReader interface {
 	ReadFrameToBuffer(path string, frameNum int) (*bytes.Buffer, error)
 	ReadFrameToBufferFps(path string, frameNum int, fps float64) (*bytes.Buffer, error)
@@ -20,7 +20,7 @@ type FrameReader interface {
 type FramerReaderImpl struct {
 }
 
-// ReadFrameToBuffer Reads a frame from a video into memory
+// ReadFrameToBuffer Reads a frame from a video into memory.
 func (s FramerReaderImpl) ReadFrameToBuffer(path string, frameNum int) (*bytes.Buffer, error) {
 	buf := bytes.NewBuffer(nil)
 	err := ffmpeg.Input(path).
@@ -35,13 +35,13 @@ func (s FramerReaderImpl) ReadFrameToBuffer(path string, frameNum int) (*bytes.B
 }
 
 // ReadFrameToBufferFps Reads a frame from a video into memory. FPS is used to determine at which timestamp the video should
-// be loaded to speed up frame reading. If FPS is 0 or negative, it fallbacks to non-optimised version of frame extraction
+// be loaded to speed up frame reading. If FPS is 0 or negative, it fallbacks to non-optimised version of frame extraction.
 func (s FramerReaderImpl) ReadFrameToBufferFps(path string, frameNum int, fps float64) (*bytes.Buffer, error) {
 	if fps <= 0 {
 		return s.ReadFrameToBuffer(path, frameNum)
 	}
 	// Convert FPS to millisecond timestamp at which the video should be loaded in
-	milliSeconds := int((float64(frameNum) / fps) * 1000)
+	milliSeconds := int((float64(frameNum) / fps) * MsPerSecond)
 	msString := strconv.Itoa(milliSeconds) + "ms"
 
 	buf := bytes.NewBuffer(nil)

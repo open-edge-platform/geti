@@ -35,12 +35,12 @@ func StartMinioContainer(ctx context.Context) (testcontainers.Container, error) 
 		Started:          true,
 	})
 	if err != nil {
-		return minioContainer, fmt.Errorf("failed to get container host: %s", err)
+		return minioContainer, fmt.Errorf("failed to get container host: %w", err)
 	}
 
 	endpoint, err := minioContainer.Endpoint(ctx, "")
 	if err != nil {
-		return minioContainer, fmt.Errorf("failed to get container endpoint: %s", err)
+		return minioContainer, fmt.Errorf("failed to get container endpoint: %w", err)
 	}
 
 	_ = os.Setenv("S3_CREDENTIALS_PROVIDER", credentialsProvider)

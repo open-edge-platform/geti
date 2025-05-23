@@ -11,6 +11,10 @@ import (
 	httperrors "geti.com/iai_core/errors"
 )
 
+const (
+	expectedRoiComponentsCount = 4
+)
+
 type Roi struct {
 	X      int
 	Y      int
@@ -18,7 +22,7 @@ type Roi struct {
 	Height int
 }
 
-// IsNull Checks if ROI has empty values
+// IsNull Checks if ROI has empty values.
 func (roi *Roi) IsNull() bool {
 	return roi.X == 0 && roi.Y == 0 && roi.Width == 0 && roi.Height == 0
 }
@@ -27,10 +31,10 @@ func RoiFromString(roi string) (Roi, error) {
 	if roi == "" {
 		return Roi{0, 0, 0, 0}, nil
 	}
-	roiStrings := strings.SplitN(roi, ",", -1)
+	roiStrings := strings.Split(roi, ",")
 	expectedFormatErrorMsg := "Expected format for the ROI is `<int, int, int, int>`, corresponding to `<left, top, width, height>` pixel coordinates."
 
-	if len(roiStrings) != 4 {
+	if len(roiStrings) != expectedRoiComponentsCount {
 		e := httperrors.NewBadRequestError(
 			fmt.Sprintf(
 				"Invalid ROI parameter provided: %s. %s",
@@ -44,7 +48,7 @@ func RoiFromString(roi string) (Roi, error) {
 	y, errTop := strconv.Atoi(strings.TrimSpace(roiStrings[1]))
 	width, errWidth := strconv.Atoi(strings.TrimSpace(roiStrings[2]))
 	height, errHeight := strconv.Atoi(strings.TrimSpace(roiStrings[3]))
-	conversionErrors := [4]error{errTop, errLeft, errHeight, errWidth}
+	conversionErrors := [expectedRoiComponentsCount]error{errTop, errLeft, errHeight, errWidth}
 	for _, value := range conversionErrors {
 		if value != nil {
 			e := httperrors.NewBadRequestError(

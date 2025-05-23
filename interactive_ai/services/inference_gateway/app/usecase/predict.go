@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+//nolint:dupl // Will be refactored in the future
 package usecase
 
 import (
@@ -29,7 +30,11 @@ type Predict struct {
 	semaCh         chan struct{}
 }
 
-func NewPredict(modelAccess service.ModelAccessService, videoRepo storage.VideoRepository, frameExtractor frames.CLIFrameExtractor) *Predict {
+func NewPredict(
+	modelAccess service.ModelAccessService,
+	videoRepo storage.VideoRepository,
+	frameExtractor frames.CLIFrameExtractor,
+) *Predict {
 	return &Predict{
 		modelAccess:    modelAccess,
 		videoRepo:      videoRepo,
@@ -45,7 +50,14 @@ type BatchPredictionJSON struct {
 func (uc *Predict) One(ctx context.Context, request *entities.PredictionRequestData) (string, error) {
 	modelName := request.ProjectID.String() + "-" + request.ModelID.String()
 
-	inferParams := service.NewInferParameters(request.Media, modelName, false, request.Roi, request.LabelOnly, request.HyperParameters)
+	inferParams := service.NewInferParameters(
+		request.Media,
+		modelName,
+		false,
+		request.Roi,
+		request.LabelOnly,
+		request.HyperParameters,
+	)
 	response, err := uc.modelAccess.InferImageBytes(ctx, *inferParams)
 
 	if errors.Is(err, service.ErrModelNotFound) {
@@ -60,7 +72,10 @@ func (uc *Predict) One(ctx context.Context, request *entities.PredictionRequestD
 	return response.GetParameters()["predictions"].GetStringParam(), nil
 }
 
-func (uc *Predict) Batch(ctx context.Context, request *entities.BatchPredictionRequestData) (*BatchPredictionJSON, error) {
+func (uc *Predict) Batch(
+	ctx context.Context,
+	request *entities.BatchPredictionRequestData,
+) (*BatchPredictionJSON, error) {
 	fullVideoID := sdkentities.NewFullVideoID(request.OrganizationID.String(),
 		request.WorkspaceID.String(), request.ProjectID.String(),
 		request.MediaInfo.DatasetID.String(), request.MediaInfo.VideoID.String())
@@ -94,9 +109,9 @@ func (uc *Predict) Batch(ctx context.Context, request *entities.BatchPredictionR
 				return inferErr
 			}
 
-			jsonData, err := req.ToPredictBytes(result)
-			if err != nil {
-				return fmt.Errorf("failed to construct JSON response from prediction string: %w", err)
+			jsonData, reqErr := req.ToPredictBytes(result)
+			if reqErr != nil {
+				return fmt.Errorf("failed to construct JSON response from prediction string: %w", reqErr)
 			}
 			inferResults[frame.Index] = jsonData
 			return nil
@@ -106,11 +121,11 @@ func (uc *Predict) Batch(ctx context.Context, request *entities.BatchPredictionR
 	err = <-doneCh
 	if err != nil {
 		telemetry.RecordError(span, err)
-		return nil, fmt.Errorf("error during frame extraction process: %s", err)
+		return nil, fmt.Errorf("error during frame extraction process: %w", err)
 	}
-	if err := g.Wait(); err != nil {
+	if err = g.Wait(); err != nil {
 		telemetry.RecordError(span, err)
-		return nil, fmt.Errorf("error during one of the inference requests: %s", err)
+		return nil, fmt.Errorf("error during one of the inference requests: %w", err)
 	}
 
 	var batchPredictionJSON BatchPredictionJSON

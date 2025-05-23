@@ -9,12 +9,11 @@ import (
 	"strings"
 )
 
-const bucketNamePrefix = "BUCKET_NAME_"
-
 // GetBucketName returns the bucket name based on the given object type.
 // It retrieves the bucket name from the corresponding environment variable.
 // If the environment variable is not set, it returns an error.
 func GetBucketName(objectType string) (string, error) {
+	const bucketNamePrefix = "BUCKET_NAME_"
 	bucketNameEnvVariable := bucketNamePrefix + strings.ToUpper(strings.ReplaceAll(objectType, "_", ""))
 	bucketName := os.Getenv(bucketNameEnvVariable)
 	if bucketName == "" {

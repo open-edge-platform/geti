@@ -9,6 +9,7 @@ import (
 
 	sdkentities "geti.com/iai_core/entities"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInferenceRequest_GetActionAndID(t *testing.T) {
@@ -32,7 +33,7 @@ func TestInferenceRequest_GetActionAndID(t *testing.T) {
 		{
 			name:      "ErrBadRequest_UnknownAction",
 			giveParam: "000:unknown",
-			wantError: fmt.Sprintf("Action `unknown` is not a valid action. Choose one of %v", SupportedActions),
+			wantError: fmt.Sprintf("Action `unknown` is not a valid action. Choose one of %v", GetSupportedActions()),
 		},
 		{
 			name:       "OK",
@@ -53,7 +54,7 @@ func TestInferenceRequest_GetActionAndID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			pipelineID, action, e := req.GetActionAndID(tt.giveParam, "pipeline")
 			if tt.wantError != "" {
-				assert.ErrorContains(t, e, tt.wantError)
+				require.ErrorContains(t, e, tt.wantError)
 				assert.Empty(t, action)
 				assert.Nil(t, pipelineID)
 			} else {
@@ -63,4 +64,12 @@ func TestInferenceRequest_GetActionAndID(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestIsActionSupported(t *testing.T) {
+	validAction := "predict"
+	invalidAction := "invalid_action"
+
+	assert.True(t, IsActionSupported(validAction))
+	assert.False(t, IsActionSupported(invalidAction))
 }

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestResizeAndCropImage(t *testing.T) {
@@ -25,7 +26,7 @@ func TestResizeAndCropImage(t *testing.T) {
 	// pass the function our media, and request a 50x50 thumbnail
 	thumbnail, err := resizeCropper.CropImage(buf, 50, 50)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// the resulting image should be a 50x50 thumbnail
 	assert.Equal(t, 50, thumbnail.Bounds().Dx())
@@ -37,6 +38,6 @@ func TestResizeAndCropImage_NotMedia(t *testing.T) {
 	// pass the function our media, and request a 50x50 thumbnail
 	thumbnail, err := resizeCropper.CropImage(strings.NewReader("not_media"), 50, 50)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Nil(t, thumbnail)
 }

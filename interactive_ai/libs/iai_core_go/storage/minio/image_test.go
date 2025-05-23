@@ -19,14 +19,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"geti.com/iai_core/entities"
-	mockstorage "geti.com/iai_core/mock/storage"
+	"geti.com/iai_core/storage"
 )
 
 func TestLoad(t *testing.T) {
 
 	fullImageID := entities.GetFullImageID(t)
 	ctx := context.Background()
-	mockObjStorageHandler := mockstorage.NewMockObjectStorageHandler(t)
+	mockObjStorageHandler := storage.NewMockObjectStorageHandler(t)
 	imageRepo := &ImageRepositoryImpl{ObjectStorageHandler: mockObjStorageHandler}
 
 	tests := []struct {
@@ -93,7 +93,7 @@ func TestSave(t *testing.T) {
 	require.NoError(t, jpeg.Encode(buf, media, nil))
 	require.NoError(t, os.Setenv("BUCKET_NAME_THUMBNAILS", thumbnailType))
 
-	mockObjStorageHandler := mockstorage.NewMockObjectStorageHandler(t)
+	mockObjStorageHandler := storage.NewMockObjectStorageHandler(t)
 	imageRepo := &ImageRepositoryImpl{ObjectStorageHandler: mockObjStorageHandler}
 
 	mockObjStorageHandler.EXPECT().

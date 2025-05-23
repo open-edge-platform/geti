@@ -4,11 +4,12 @@
 CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 include $(CWD)/Makefile.shared
 
-.PHONY: build deps clean tests test-unit-default test-integration-default coverage static-code-analysis-default lint lint-install
+.PHONY: build deps clean tests test-unit-default test-integration-default coverage static-code-analysis-default lint lint-install mocks mocks-install
 
 GOPATH ?= $(HOME)/go
 GOBIN ?= $(GOPATH)/bin
-GOLANGCI_LINT_VERSION = v1.64.2
+GOLANGCI_LINT_VERSION = v2.1.6
+MOCKERY_VERSION = v3.2.5
 TIMEOUT = 15m
 
 # Go commands
@@ -53,12 +54,26 @@ lint: lint-install
 	$(GOBIN)/golangci-lint run --fix --timeout $(TIMEOUT)
 
 lint-install:
-	@echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..."
-	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "$$($(GOBIN)/golangci-lint --version | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')" != "$(GOLANGCI_LINT_VERSION)" ]; then \
-		GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION); \
+	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "v$$($(GOBIN)/golangci-lint version --short)" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+		echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..."; \
+		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(GOBIN) $(GOLANGCI_LINT_VERSION); \
 		echo "golangci-lint $(GOLANGCI_LINT_VERSION) installed at $(GOBIN)/golangci-lint"; \
 	else \
-		echo "golangci-lint $(GOLANGCI_LINT_VERSION) already installed"; \
+		echo "golangci-lint $(GOLANGCI_LINT_VERSION) is already installed"; \
+	fi
+
+## Generate mocks for interfaces
+mocks: mocks-install
+	@echo "Generating mocks..."
+	$(GOBIN)/mockery
+
+mocks-install:
+	@if ! command -v $(GOBIN)/mockery >/dev/null 2>&1; then \
+		echo "Installing mockery $(MOCKERY_VERSION)..."; \
+		go install github.com/vektra/mockery/v3@$(MOCKERY_VERSION); \
+		echo "mockery $(MOCKERY_VERSION) installed at $(GOBIN)/mockery"; \
+	else \
+		echo "mockery $(MOCKERY_VERSION) is already installed"; \
 	fi
 
 ##

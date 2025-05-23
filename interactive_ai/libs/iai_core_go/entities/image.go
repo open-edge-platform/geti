@@ -7,15 +7,21 @@ import (
 	"path/filepath"
 )
 
-// FullImageID represents full path to the image
+// FullImageID represents full path to the image.
 type FullImageID struct {
 	ContextID
 
 	ImageID ID
 }
 
-// NewFullImageID creates new FullImageID instance
-func NewFullImageID(organizationID string, workspaceID string, projectID string, datasetID string, imageID string) *FullImageID {
+// NewFullImageID creates new FullImageID instance.
+func NewFullImageID(
+	organizationID string,
+	workspaceID string,
+	projectID string,
+	datasetID string,
+	imageID string,
+) *FullImageID {
 	return &FullImageID{
 		ContextID: ContextID{
 			OrganizationID: ID{organizationID},
@@ -27,13 +33,22 @@ func NewFullImageID(organizationID string, workspaceID string, projectID string,
 	}
 }
 
-// GetPath construct the path to the image based on IDs
+// GetPath construct the path to the image based on IDs.
 func (iid FullImageID) GetPath() string {
-	return filepath.Join("organizations", iid.OrganizationID.String(), "workspaces", iid.WorkspaceID.String(), "projects",
-		iid.ProjectID.String(), "dataset_storages", iid.DatasetID.String(), iid.ImageID.String())
+	return filepath.Join(
+		"organizations",
+		iid.OrganizationID.String(),
+		"workspaces",
+		iid.WorkspaceID.String(),
+		"projects",
+		iid.ProjectID.String(),
+		"dataset_storages",
+		iid.DatasetID.String(),
+		iid.ImageID.String(),
+	)
 }
 
-// GetThumbnailPath construct the path to the image thumbnail based on IDs
+// GetThumbnailPath construct the path to the image thumbnail based on IDs.
 func (iid FullImageID) GetThumbnailPath() string {
 	return iid.GetPath() + "_thumbnail"
 }

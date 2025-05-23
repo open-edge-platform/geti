@@ -1124,9 +1124,10 @@ func RollbackRoleOps(alreadyAppliedRoleOps []*pb.UserRoleOperation, userID strin
 	copy(rollbackInitRolesOps, alreadyAppliedRoleOps)
 
 	for _, roleop := range rollbackInitRolesOps {
-		if roleop.Operation == "CREATE" || roleop.Operation == "TOUCH" {
+		switch roleop.Operation {
+		case "CREATE", "TOUCH":
 			roleop.Operation = "DELETE"
-		} else if roleop.Operation == "DELETE" {
+		case "DELETE":
 			roleop.Operation = "CREATE"
 		}
 	}

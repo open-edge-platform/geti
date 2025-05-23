@@ -43,7 +43,7 @@ func TestCacheControl(t *testing.T) {
 			router.GET(tt.path, func(c *gin.Context) {
 				c.Status(tt.giveCode)
 			})
-			req, _ := http.NewRequest("GET", tt.path, nil)
+			req, _ := http.NewRequest(http.MethodGet, tt.path, nil)
 			resp := httptest.NewRecorder()
 			router.ServeHTTP(resp, req)
 			assert.Equal(t, tt.wantCache, resp.Header().Get("Cache-Control"))

@@ -21,13 +21,9 @@ import (
 	"geti.com/iai_core/logger"
 )
 
-var (
-	serviceName        = env.GetEnv("OTEL_SERVICE_NAME", "")
-	otlpTracesReceiver = env.GetEnv("OTLP_TRACES_RECEIVER", "")
-)
-
 // Middleware is the wrapper around otelgin.Middleware and returns a middleware for gin to trace incoming requests.
 func Middleware() gin.HandlerFunc {
+	serviceName := env.GetEnv("OTEL_SERVICE_NAME", "")
 	return otelgin.Middleware(serviceName)
 }
 
@@ -35,8 +31,11 @@ func Middleware() gin.HandlerFunc {
 // This function should be triggered at the start of the app.
 // Returns shutdown function used for cleanup.
 func SetupTracing(ctx context.Context) func() {
-	var exporter sdktrace.SpanExporter
-	var err error
+	var (
+		err      error
+		exporter sdktrace.SpanExporter
+	)
+	otlpTracesReceiver := env.GetEnv("OTLP_TRACES_RECEIVER", "")
 
 	if otlpTracesReceiver != "" {
 		exporter, err = otlptrace.New(
@@ -70,7 +69,7 @@ func SetupTracing(ctx context.Context) func() {
 	otel.SetTextMapPropagator(propagator)
 
 	shutdown := func() {
-		if err := tracerProvider.Shutdown(ctx); err != nil {
+		if err = tracerProvider.Shutdown(ctx); err != nil {
 			logger.Log().Errorf("Cannot shutdown exporter: %v", err)
 		}
 	}
@@ -79,6 +78,7 @@ func SetupTracing(ctx context.Context) func() {
 
 // Tracer creates tracer with serviceName name.
 func Tracer() trace.Tracer {
+	serviceName := env.GetEnv("OTEL_SERVICE_NAME", "")
 	return otel.Tracer(serviceName)
 }
 

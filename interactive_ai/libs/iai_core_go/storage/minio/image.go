@@ -36,7 +36,10 @@ func NewImageRepositoryImpl() *ImageRepositoryImpl {
 // - An io.ReadCloser that allows reading the thumbnail image data.
 // - A metadata that contains the size and the content type of the image.
 // - An error if the thumbnail retrieval fails, otherwise nil.
-func (repo *ImageRepositoryImpl) LoadImageByID(ctx context.Context, imageID *entities.FullImageID) (io.ReadCloser, *entities.ObjectMetadata, error) {
+func (repo *ImageRepositoryImpl) LoadImageByID(
+	ctx context.Context,
+	imageID *entities.FullImageID,
+) (io.ReadCloser, *entities.ObjectMetadata, error) {
 	c, span := telemetry.Tracer().Start(ctx, "load-image")
 	defer span.End()
 	reader, metadata, err := repo.GetObjectByType(c, imageType, imageID.GetPath())
@@ -52,7 +55,10 @@ func (repo *ImageRepositoryImpl) LoadImageByID(ctx context.Context, imageID *ent
 // - An io.ReadCloser that allows reading the thumbnail image data.
 // - A metadata that contains the size and the content type of the thumbnail image.
 // - An error if the thumbnail retrieval fails, otherwise nil.
-func (repo *ImageRepositoryImpl) LoadThumbnailByID(ctx context.Context, imageID *entities.FullImageID) (io.ReadCloser, *entities.ObjectMetadata, error) {
+func (repo *ImageRepositoryImpl) LoadThumbnailByID(
+	ctx context.Context,
+	imageID *entities.FullImageID,
+) (io.ReadCloser, *entities.ObjectMetadata, error) {
 	c, span := telemetry.Tracer().Start(ctx, "load-thumbnail")
 	defer span.End()
 	reader, metadata, err := repo.GetObjectByType(c, thumbnailType, imageID.GetThumbnailPath())
@@ -65,7 +71,11 @@ func (repo *ImageRepositoryImpl) LoadThumbnailByID(ctx context.Context, imageID 
 
 // SaveThumbnail uploads a thumbnail image in MinIO storage.
 // It returns an error if the thumbnail upload fails, otherwise nil.
-func (repo *ImageRepositoryImpl) SaveThumbnail(ctx context.Context, imageID *entities.FullImageID, thumbnail image.Image) error {
+func (repo *ImageRepositoryImpl) SaveThumbnail(
+	ctx context.Context,
+	imageID *entities.FullImageID,
+	thumbnail image.Image,
+) error {
 	c, span := telemetry.Tracer().Start(ctx, "save-thumbnail")
 	defer span.End()
 	thumbName := imageID.GetThumbnailPath()

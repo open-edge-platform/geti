@@ -28,7 +28,10 @@ func NewVideoRepositoryImpl() *VideoRepositoryImpl {
 }
 
 // LoadVideoByID is used to load a video by its ID.
-func (repo *VideoRepositoryImpl) LoadVideoByID(ctx context.Context, videoID *entities.FullVideoID) (*entities.Video, error) {
+func (repo *VideoRepositoryImpl) LoadVideoByID(
+	ctx context.Context,
+	videoID *entities.FullVideoID,
+) (*entities.Video, error) {
 	c, span := telemetry.Tracer().Start(ctx, "load-video")
 	defer span.End()
 	baseURL := videoID.GetPath()

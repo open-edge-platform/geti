@@ -20,7 +20,10 @@ type ObjectStorageHandler interface {
 // ImageRepository defines the interface for operations related to image storage and retrieval.
 type ImageRepository interface {
 	LoadImageByID(ctx context.Context, imageID *entities.FullImageID) (io.ReadCloser, *entities.ObjectMetadata, error)
-	LoadThumbnailByID(ctx context.Context, imageID *entities.FullImageID) (io.ReadCloser, *entities.ObjectMetadata, error)
+	LoadThumbnailByID(
+		ctx context.Context,
+		imageID *entities.FullImageID,
+	) (io.ReadCloser, *entities.ObjectMetadata, error)
 	SaveThumbnail(ctx context.Context, imageID *entities.FullImageID, thumbnail image.Image) error
 }
 

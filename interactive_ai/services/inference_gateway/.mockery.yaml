@@ -1,16 +1,19 @@
-quiet: False
-disable-version-string: True
-with-expecter: True
-mockname: "Mock{{.InterfaceName}}"
-filename: "mock_{{.InterfaceName | snakecase}}.go"
-dir: "mock/{{.InterfaceDirRelative}}"
+all: false
+dir: "{{.InterfaceDir}}"
+filename: mocks.go
+formatter: goimports
+log-level: info
+structname: "{{.Mock}}{{.InterfaceName}}"
+pkgname: "{{.SrcPackageName}}"
+recursive: false
+template: testify
 packages:
-  inference_gateway/service:
+  inference_gateway/app/service:
     config:
       all: True
-  inference_gateway/usecase:
+  inference_gateway/app/usecase:
     config:
       all: True
-  inference_gateway/controllers:
+  inference_gateway/app/controllers:
     config:
       all: True
