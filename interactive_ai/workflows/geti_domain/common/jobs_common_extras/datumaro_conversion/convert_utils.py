@@ -908,7 +908,7 @@ class ConvertUtils:
                     if len(joint) != 2:
                         logger.warning(f"Skip invalid joint: {joint}")
                         continue
-                    joint_names = tuple(idx_to_label_name[idx] for idx in joint)
+                    joint_names = tuple(idx_to_label_name[idx + 1] for idx in joint)
                     logger.warning(f"{joint_names}")
                     logger.warning(f"{include_all_labels}, {any(label in selected_labels for label in joint_names)}")
                     if not include_all_labels and not any(label in selected_labels for label in joint_names):
