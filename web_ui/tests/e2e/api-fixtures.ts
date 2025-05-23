@@ -5,11 +5,12 @@ import https from 'https';
 
 import { API_URLS } from '@geti/core';
 import { ApplicationServices } from '@geti/core/src/services/application-services.interface';
-import { getApiServices } from '@geti/core/src/services/get-api-services';
 import { addHostToApiUrls } from '@geti/core/src/services/use-api-router.hook';
 import Headers from '@mjackson/headers';
 import { APIRequestContext, test as baseTest } from '@playwright/test';
 import axios, { AxiosAdapter, AxiosHeaders } from 'axios';
+
+import { getApiServices } from '../../packages/core/src/services/get-api-services';
 
 export interface ServiceConfiguration {
     router: typeof API_URLS;
