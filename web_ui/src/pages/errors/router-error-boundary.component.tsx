@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { API_URLS } from '@geti/core/src/services/urls';
+import { API_URLS } from '@geti/core';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { AxiosError, isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';

@@ -3,9 +3,9 @@
 
 import https from 'https';
 
+import { API_URLS } from '@geti/core';
 import { ApplicationServices } from '@geti/core/src/services/application-services.interface';
 import { getApiServices } from '@geti/core/src/services/get-api-services';
-import { API_URLS } from '@geti/core/src/services/urls';
 import { addHostToApiUrls } from '@geti/core/src/services/use-api-router.hook';
 import Headers from '@mjackson/headers';
 import { APIRequestContext, test as baseTest } from '@playwright/test';

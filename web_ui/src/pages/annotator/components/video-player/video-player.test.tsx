@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { API_URLS } from '@geti/core/src/services/urls';
+import { API_URLS } from '@geti/core';
 import { LoadingIndicator } from '@geti/ui';
 import { act, fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
