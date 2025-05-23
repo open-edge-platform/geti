@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -41,3 +42,4 @@ spec:
         - type: Pods
           value: 2
           periodSeconds: 60
+{{- end }}

@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -8,7 +9,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "auth-proxy.name" . }}
-  {{- if or .Values.global.running_on_vm (eq .Values.global.installation_profile "lite") }}
+  {{- if .Values.global.running_on_vm }}
   minReplicas: 1
   maxReplicas: 1
   {{- else }}
@@ -30,3 +31,4 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
+{{- end }}
