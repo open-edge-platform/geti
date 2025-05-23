@@ -77,8 +77,6 @@ export const BackHome = (): JSX.Element => {
     const { isSingleDomainProject } = useProject();
     const [searchParams] = useSearchParams();
 
-    console.log({ paths });
-
     const handleGoBack = () => {
         confirmSaveAnnotations(async () => {
             // Remember the filter that the user used in the annotator
