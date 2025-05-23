@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { dimensionValue, Flex, Link as SpectrumLink, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import useVirtual from 'react-cool-virtual';

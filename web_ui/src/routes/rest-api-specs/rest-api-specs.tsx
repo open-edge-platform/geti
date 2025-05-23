@@ -11,7 +11,7 @@ import classes from './rest-api-specs.module.scss';
 
 import '@scalar/api-reference-react/style.css';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 
 const Header = () => {
     return (

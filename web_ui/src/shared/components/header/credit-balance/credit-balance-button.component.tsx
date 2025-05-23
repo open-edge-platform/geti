@@ -3,7 +3,7 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { ActionButton, Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
 import { CreditCard } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';

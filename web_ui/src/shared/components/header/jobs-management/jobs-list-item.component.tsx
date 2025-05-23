@@ -3,8 +3,8 @@
 
 import { CSSProperties } from 'react';
 
+import { paths } from '@geti/core';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
-import { paths } from '@geti/core/src/services/routes';
 import { ActionButton, Divider, Flex, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Copy, DownloadIcon } from '@geti/ui/icons';
 import { isEmpty, isFunction } from 'lodash-es';

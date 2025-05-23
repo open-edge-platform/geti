@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Flex, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -76,6 +76,8 @@ export const BackHome = (): JSX.Element => {
     const { confirmSaveAnnotations } = useSubmitAnnotations();
     const { isSingleDomainProject } = useProject();
     const [searchParams] = useSearchParams();
+
+    console.log({ paths });
 
     const handleGoBack = () => {
         confirmSaveAnnotations(async () => {

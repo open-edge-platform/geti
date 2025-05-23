@@ -3,7 +3,7 @@
 
 import { FC, Key, ReactNode } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { HelpIcon } from '@geti/ui/icons';
 import { ValueType } from '@opentelemetry/api';
 import { Link } from 'react-router-dom';

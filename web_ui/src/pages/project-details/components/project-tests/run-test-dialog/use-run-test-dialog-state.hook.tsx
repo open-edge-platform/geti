@@ -3,8 +3,8 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
+import { paths } from '@geti/core';
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
-import { paths } from '@geti/core/src/services/routes';
 import { ActionButton } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, noop } from 'lodash-es';

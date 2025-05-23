@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Flex, Text } from '@geti/ui';
 import { Datasets, Deployments, Model, Shield, Tag, Users } from '@geti/ui/icons';
 

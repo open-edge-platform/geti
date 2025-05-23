@@ -3,7 +3,7 @@
 
 import { createContext, Dispatch, ReactNode, useContext } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { isEmpty } from 'lodash-es';

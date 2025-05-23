@@ -3,7 +3,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { ActionGroup, Button, ButtonGroup, Divider, Flex, Form, Item, Key, Text, TextField, View } from '@geti/ui';
 import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
 import DeleteOutline from '@spectrum-icons/workflow/DeleteOutline';

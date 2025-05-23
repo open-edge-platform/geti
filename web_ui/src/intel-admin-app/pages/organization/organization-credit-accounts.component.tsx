@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Button, Flex, Loading, Skeleton, Text, View } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 

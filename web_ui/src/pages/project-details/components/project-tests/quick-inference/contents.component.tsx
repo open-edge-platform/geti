@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Flex, Loading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 

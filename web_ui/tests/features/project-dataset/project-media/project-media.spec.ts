@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { expect } from '@playwright/test';
 import { range } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';

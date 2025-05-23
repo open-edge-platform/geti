@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { ActionButton } from '@geti/ui';
 import { isEmpty, noop } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';

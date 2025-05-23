@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Divider, Flex, Link as SpectrumLink, useMediaQuery, View } from '@geti/ui';
 import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '@geti/ui/icons';
 import { isLargeSizeQuery } from '@geti/ui/theme';

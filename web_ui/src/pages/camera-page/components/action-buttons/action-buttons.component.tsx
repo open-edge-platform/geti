@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { AlertDialog, Button, ButtonGroup, DialogTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { NavigateFunction, useNavigate } from 'react-router-dom';

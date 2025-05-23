@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 

@@ -3,7 +3,7 @@
 
 import { ComponentProps, Dispatch, useCallback, useMemo } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Flex, Heading, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';

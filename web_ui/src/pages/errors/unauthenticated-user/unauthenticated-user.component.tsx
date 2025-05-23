@@ -3,7 +3,7 @@
 
 import { useEffect } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Button, Heading, Text } from '@geti/ui';
 
 import { Unauthorized } from '../../../assets/images';

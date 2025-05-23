@@ -3,7 +3,7 @@
 
 import { Key, useRef, useState } from 'react';
 
-import { paths } from '@geti/core/src/services/routes';
+import { paths } from '@geti/core';
 import { Flex, Grid, Loading, useUnwrapDOMRef, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
