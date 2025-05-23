@@ -24,6 +24,12 @@ RUN echo "deb [arch=amd64,i386 signed-by=/usr/share/keyrings/intel-graphics.gpg]
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     libze-intel-gpu1 libze1 intel-opencl-icd clinfo libze-dev intel-ocloc
+# Remove unnecessary packages and files to reduce the final image size
+RUN apt-get purge -y --auto-remove gpg wget && \
+    rm -rf /root/.cache \
+    /var/cache/apt/* /var/lib/apt/lists/* /var/log/* \
+    /tmp/* \
+    /usr/share/man/* /usr/share/doc/*
 
 # Copy the service dependencies
 COPY --link --from=libs . libs
