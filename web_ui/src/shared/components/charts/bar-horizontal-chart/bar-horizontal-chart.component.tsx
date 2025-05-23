@@ -4,6 +4,7 @@
 import { ComponentProps, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Flex, Text } from '@geti/ui';
+import { isFunction } from 'lodash-es';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { trimText } from '../../../utils';
@@ -18,7 +19,7 @@ type FormatTooltipMessage = ComponentProps<typeof CustomTooltipChart>['displayMe
 
 type XTickFormatter = ComponentProps<typeof XAxis>['tickFormatter'];
 
-interface BarHorizontalChartProps extends ChartProps {
+export interface BarHorizontalChartProps extends ChartProps {
     barSize?: number;
     xPadding?: {
         right?: number;
@@ -33,6 +34,7 @@ interface BarHorizontalChartProps extends ChartProps {
     formatTooltipMessage?: FormatTooltipMessage;
     xTickFormatter?: XTickFormatter;
     ariaLabel?: string;
+    handleLabelClick?: (labelName: string) => void;
 }
 
 const LEFT_MARGIN = -70;
@@ -61,6 +63,7 @@ export const BarHorizontalChart = ({
     ariaLabel,
     allowDecimals = true,
     formatTooltipMessage = displayMessage,
+    handleLabelClick,
 }: BarHorizontalChartProps): JSX.Element => {
     const [labelColors, setLabelColors] = useState<Colors[]>(colors || []);
     const [margin, setMargin] = useState<number>(0);
@@ -152,6 +155,7 @@ export const BarHorizontalChart = ({
                                     id={`${name}-id`}
                                     aria-label={name}
                                     aria-valuenow={value}
+                                    onClick={isFunction(handleLabelClick) ? () => handleLabelClick(name) : undefined}
                                 />
                             ))
                         ) : (
