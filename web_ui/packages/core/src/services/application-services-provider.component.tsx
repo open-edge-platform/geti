@@ -3,12 +3,12 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
-import { useApiRouter } from '../../../../src/core/services/use-api-router.hook';
 import { MissingProviderError } from '../../../../src/shared/missing-provider-error';
 import { apiClient } from '../client/axios-instance';
 import { ApplicationServices } from './application-services.interface';
 import { getApiServices } from './get-api-services';
 import { getInMemoryServices } from './get-in-memory-services';
+import { useApiRouter } from './use-api-router.hook';
 
 export type ApplicationServicesContextProps = ApplicationServices;
 
