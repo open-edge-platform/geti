@@ -46,6 +46,7 @@ class TestExportManager:
             ("anom_class", "datumaro"): self._assert_datumaro_export_valid,
             ("anom_seg", "datumaro"): self._assert_datumaro_export_valid,
             ("anom_det", "datumaro"): self._assert_datumaro_export_valid,
+            ("keypoint", "datumaro"): self._assert_datumaro_export_valid,
         }
 
     @patch("jobs_common.tasks.utils.secrets.set_env_vars", new=return_none)
@@ -69,6 +70,7 @@ class TestExportManager:
             ("fxt_annotated_anomaly_cls_project_with_video", "anom_class", "datumaro"),
             ("fxt_annotated_anomaly_det_project", "anom_det", "datumaro"),
             ("fxt_annotated_anomaly_seg_project", "anom_seg", "datumaro"),
+            ("fxt_annotated_keypoint_det_project", "keypoint", "datumaro"),
         ],
     )
     def test_export_projects(

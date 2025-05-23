@@ -2627,8 +2627,8 @@ evaluation = [
 [package.metadata]
 requires-dist = [
     { name = "dataclasses-json", specifier = "==0.5.7" },
-    { name = "datumaro", marker = "extra == 'datumaro-conversion'", specifier = "==1.8.0" },
-    { name = "datumaro", marker = "extra == 'shard-dataset'", specifier = "==1.8.0" },
+    { name = "datumaro", marker = "extra == 'datumaro-conversion'", specifier = "==1.10.0" },
+    { name = "datumaro", marker = "extra == 'shard-dataset'", specifier = "==1.10.0" },
     { name = "flytekit", specifier = "==1.10.2" },
     { name = "flytekitplugins-pod", specifier = "==1.2.4" },
     { name = "geti-k8s-tools", editable = "../../../../libs/k8s_tools" },

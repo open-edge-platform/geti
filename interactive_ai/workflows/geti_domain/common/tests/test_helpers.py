@@ -273,6 +273,7 @@ def generate_random_annotated_project(
     max_size_shape: int = 100,
     configurable_parameters: HyperParameters[ConfigurableParameters] | None = None,
     label_configs=None,
+    keypoint_structure=None,
 ) -> tuple[Project, LabelSchema]:
     """
     Will create a randomly annotated project in the default workspace with images
@@ -295,6 +296,7 @@ def generate_random_annotated_project(
     :param configurable_parameters: [Optionally] Set the configurable parameters for
         the newly created task in the project
     :param label_configs: List of label configuration which is a dictionary of label attributes
+    :param keypoint_structure: Keypoint structure to assign to the project, only for Keypoint Detection projects
     :return: Generated project
     """
 
@@ -324,6 +326,7 @@ def generate_random_annotated_project(
         labels=label_configs,
         model_template_id=model_template_id,
         configurable_parameters=parameter_data,
+        keypoint_structure=keypoint_structure,
     )
     dataset_storage = project_input.get_training_dataset_storage()
     dataset_storage_identifier = dataset_storage.identifier

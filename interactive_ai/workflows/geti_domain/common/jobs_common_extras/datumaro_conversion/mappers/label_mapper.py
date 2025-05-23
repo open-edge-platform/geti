@@ -8,6 +8,7 @@ import datumaro as dm
 from datumaro.components.annotation import GroupType as DmGroupType
 from geti_types import ID
 from iai_core.entities.color import Color
+from iai_core.entities.keypoint_structure import KeypointStructure
 from iai_core.entities.label import Label
 from iai_core.entities.label_schema import LabelGroupType, LabelSchema
 
@@ -59,8 +60,8 @@ class LabelTreeMapper:
     color_key = "__color__"
 
     @classmethod
-    def forward(
-        cls, label_schema: LabelSchema, include_empty: bool = False
+    def forward(  # noqa: C901
+        cls, label_schema: LabelSchema, include_empty: bool = False, keypoint_structure: KeypointStructure | None = None
     ) -> tuple[dm.LabelCategories, dm.PointsCategories]:
         """Convert SC label list and their tree info to Datumaro LabelCategories"""
         # labels = label_schema.get_labels(include_empty=include_empty)
@@ -78,7 +79,17 @@ class LabelTreeMapper:
 
         label_cat = dm.LabelCategories()
         point_cat = dm.PointsCategories()
-        point_cat.add(label_id=0, labels=[str(label.id_) for label in labels], joints=[])
+        if keypoint_structure:
+            label_id_to_idx = {label.id_: idx for idx, label in enumerate(labels)}
+            joints = []
+            for edge in keypoint_structure._edges:
+                node_1 = label_id_to_idx[edge.node_1]
+                node_2 = label_id_to_idx[edge.node_2]
+                joints.append([node_1, node_2])
+            positions = []
+            for position in keypoint_structure._positions:
+                positions.extend([position.x, position.y])
+            point_cat.add(label_id=0, labels=[str(label.id_) for label in labels], joints=joints, positions=positions)
 
         for label in labels:
             parent = parent_map.get(label)
@@ -125,11 +136,13 @@ class LabelSchemaMapper:
     """Mapping LabelSchema between Datumaro and SC"""
 
     @staticmethod
-    def forward(label_schema: LabelSchema, include_empty: bool = False) -> DmLabelSchemaInfo:
+    def forward(
+        label_schema: LabelSchema, include_empty: bool = False, keypoint_structure: KeypointStructure | None = None
+    ) -> DmLabelSchemaInfo:
         """Convert SC LabelSchema to DmLabelSchemaInfo"""
 
         label_schema_id = label_schema.id_
-        label_cat, point_cat = LabelTreeMapper.forward(label_schema, include_empty)
+        label_cat, point_cat = LabelTreeMapper.forward(label_schema, include_empty, keypoint_structure)
         label_cat = LabelGroupsMapper.update(label_cat, label_schema, include_empty)
 
         mask_cat = dm.MaskCategories(

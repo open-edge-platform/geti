@@ -827,15 +827,16 @@ class ProjectBuilder:
         :return: the KeypointStructure
         """
         label_name_to_id: dict[str, ID] = {label.name: label.id_ for label in labels}
+        label_ids = [label.id_ for label in labels]
         edges = []
         for edge in keypoint_structure_data["edges"]:
-            node_1 = label_name_to_id[edge["nodes"][0]]
-            node_2 = label_name_to_id[edge["nodes"][1]]
+            node_1 = ID(edge["nodes"][0]) if ID(edge["nodes"][0]) in label_ids else label_name_to_id[edge["nodes"][0]]
+            node_2 = ID(edge["nodes"][1]) if ID(edge["nodes"][1]) in label_ids else label_name_to_id[edge["nodes"][1]]
             edges.append(KeypointEdge(node_1=node_1, node_2=node_2))
 
         positions = []
         for position in keypoint_structure_data["positions"]:
-            node = label_name_to_id[position["label"]]
+            node = ID(position["label"]) if ID(position["label"]) in label_ids else label_name_to_id[position["label"]]
             x = position["x"]
             y = position["y"]
             positions.append(KeypointPosition(node=node, x=x, y=y))

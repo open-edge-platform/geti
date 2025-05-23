@@ -13,11 +13,12 @@ from iai_core.entities.datasets import Dataset
 from iai_core.entities.label import Label
 from iai_core.entities.label_schema import LabelSchema
 from iai_core.entities.scored_label import ScoredLabel
-from iai_core.entities.shapes import Ellipse, Point, Polygon, Rectangle
+from iai_core.entities.shapes import Ellipse, Keypoint, Point, Polygon, Rectangle
 
 from jobs_common_extras.datumaro_conversion.mappers.annotation_scene_mapper import AnnotationSceneMapper, LabelMap
 from jobs_common_extras.datumaro_conversion.mappers.dataset_item_mapper import (
     EllipseMapper,
+    KeypointMapper,
     LabelMapper,
     PolygonMapper,
     RectangleMapper,
@@ -118,6 +119,22 @@ class TestPolygonMapper:
         mapped_polygon = PolygonMapper.forward(polygon)
 
         assert mapped_polygon == expected_mapped_polygon
+
+
+class TestKeypointMapper:
+    def test_forward(self) -> None:
+        modification_date = datetime.datetime.now(tz=datetime.timezone.utc)
+        keypoint = Keypoint(x=0.5, y=0.6, is_visible=True, modification_date=modification_date)
+        expected_mapped_keypoint = {
+            "type": "KEYPOINT",
+            "points": [0.5, 0.6],
+            "modification_date": modification_date.strftime("%Y-%m-%dT%H:%M:%S.%f"),
+            "visibility": [dm.Points.Visibility.visible],
+        }
+
+        mapped_keypoint = KeypointMapper.forward(keypoint)
+
+        assert mapped_keypoint == expected_mapped_keypoint
 
 
 class TestShapeMapper:
