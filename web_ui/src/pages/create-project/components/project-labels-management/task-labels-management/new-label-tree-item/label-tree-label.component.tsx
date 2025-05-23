@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FormEvent, ForwardedRef, forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { FormEvent, ForwardedRef, forwardRef, useEffect, useRef, useState } from 'react';
 
 import { Button, Flex, Form, TextField, TextFieldRef } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
@@ -83,21 +83,41 @@ export const LabelTreeLabel = forwardRef(
 
         const inputRef = useRef<TextFieldRef>(null);
 
-        const projectLabelsFlattenedWithoutGroups = useMemo(() => getFlattenedLabels(projectLabels), [projectLabels]);
+        const validateName = (changedName: string): boolean => {
+            try {
+                const currentLabelId = isSingleLabelTree && labels.length >= 1 ? labels[0].id : undefined;
+
+                newLabelNameSchema(
+                    changedName,
+                    currentLabelId,
+                    getFlattenedLabels(projectLabels),
+                    LabelItemType.LABEL
+                ).validateSync({ name: changedName }, { abortEarly: false });
+
+                validationErrors.name &&
+                    setValidationErrors(() => ({ ...validationErrors, name: DEFAULT_LABEL_INPUT_ERRORS.name }));
+
+                return true;
+            } catch (errors: unknown) {
+                if (isYupValidationError(errors)) {
+                    setValidationErrors({ ...validationErrors, name: errors.errors[0] });
+                }
+
+                return false;
+            }
+        };
 
         const handleColorChange = (c: string) => {
             setNewColor(c);
         };
 
-        const formHasError = useMemo(() => {
-            const hasError = Object.values(validationErrors).some((error) => !!error);
+        const formHasError = Object.values(validationErrors).some(Boolean);
 
+        useEffect(() => {
             if (isSingleLabelTree && !!setDialogValidationError && (isDirty.name || isDirty.hotkey)) {
-                setDialogValidationError(hasError ? 'Fix all the errors before moving forward' : undefined);
+                setDialogValidationError(formHasError ? 'Fix all the errors before moving forward' : undefined);
             }
-
-            return hasError;
-        }, [isSingleLabelTree, setDialogValidationError, validationErrors, isDirty]);
+        }, [isSingleLabelTree, setDialogValidationError, isDirty.name, isDirty.hotkey, formHasError]);
 
         const cleanForm = (newLabel: LabelTreeLabelProps) => {
             setNewName('');
@@ -146,36 +166,13 @@ export const LabelTreeLabel = forwardRef(
             event.preventDefault();
         };
 
-        const validateName = (changedName: string): boolean => {
-            try {
-                const currentLabelId = isSingleLabelTree && labels.length >= 1 ? labels[0].id : undefined;
-
-                newLabelNameSchema(
-                    changedName,
-                    currentLabelId,
-                    projectLabelsFlattenedWithoutGroups,
-                    LabelItemType.LABEL
-                ).validateSync({ name: changedName }, { abortEarly: false });
-
-                validationErrors.name &&
-                    setValidationErrors(() => ({ ...validationErrors, name: DEFAULT_LABEL_INPUT_ERRORS.name }));
-
-                return true;
-            } catch (errors: unknown) {
-                if (isYupValidationError(errors)) {
-                    setValidationErrors({ ...validationErrors, name: errors.errors[0] });
-                }
-                return false;
-            }
-        };
-
         const validateHotkey = (changedHotkey: string | undefined): boolean => {
             try {
                 const currentLabelId = isSingleLabelTree && labels.length >= 1 ? labels[0].id : undefined;
 
                 newLabelHotkeySchema(
                     currentLabelId,
-                    projectLabelsFlattenedWithoutGroups,
+                    getFlattenedLabels(projectLabels),
                     usedAnnotatorHotkeys
                 ).validateSync({
                     hotkey: changedHotkey,
@@ -196,9 +193,9 @@ export const LabelTreeLabel = forwardRef(
 
         const handleNameChange = (value: string) => {
             setDirtyOnChange('name');
+            setNewName(value);
 
             const nameValid = validateName(value);
-            setNewName(value);
 
             if (isSingleLabelTree && nameValid) {
                 confirmNewLabel(false, { name: value });
@@ -227,12 +224,6 @@ export const LabelTreeLabel = forwardRef(
             // Set focus on name field on mounting
             inputRef.current && inputRef.current.focus();
         }, []);
-
-        useEffect(() => {
-            validateName(newName);
-
-            // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [projectLabelsFlattenedWithoutGroups]);
 
         return (
             <Form onSubmit={handleOnSubmit}>

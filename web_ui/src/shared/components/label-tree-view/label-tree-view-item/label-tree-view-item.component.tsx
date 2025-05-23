@@ -64,11 +64,6 @@ export const LabelTreeViewItem = ({
 
     const savedItem = useRef<LabelTreeItem>({ ...item });
 
-    useEffect(() => {
-        savedItem.current = { ...item };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
     const isTaskChainProject = domains.length > 1;
     const isAnomalyProject = !isTaskChainProject && isAnomalyDomain(domains[0]);
 
@@ -78,8 +73,6 @@ export const LabelTreeViewItem = ({
         item.open !== isOpen && setIsOpen(item.open);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item.open]);
-
-    useEffect(() => setInEditMode(item.inEditMode), [item.inEditMode]);
 
     const flatProjectItems = useMemo(() => {
         return getFlattenedItems(projectLabels);

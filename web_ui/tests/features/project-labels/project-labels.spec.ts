@@ -94,7 +94,12 @@ test.describe('Labels editor', () => {
                         ],
                     },
                 };
+
                 return res(ctx.status(200), ctx.json(projectWithLabel));
+            });
+
+            registerApiResponse('EditProject', (req, res, ctx) => {
+                return res(ctx.json(req.body));
             });
 
             await page.locator('role=button[name="Save"]').click();

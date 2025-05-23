@@ -14,8 +14,9 @@ interface RevisitAlertDialogProps {
 }
 
 export const RevisitAlertDialog = ({ flattenNewLabels, save }: RevisitAlertDialogProps): JSX.Element => {
-    const changedLabelsNames = flattenNewLabels.map(({ name }) => `"${name}"`).join(', ');
     const url = useDocsUrl();
+
+    const changedLabelsNames = flattenNewLabels.map(({ name }) => `"${name}"`).join(', ');
     const docsUrl = `${url}${DocsUrl.REVISIT_LABELS}`;
     const learnMore = (
         <>

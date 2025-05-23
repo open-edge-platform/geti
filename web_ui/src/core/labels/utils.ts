@@ -119,7 +119,7 @@ export const getLabelId = (namespace: string, label: Label | undefined): string 
         .toLowerCase();
 };
 
-export const getNewLabelPayloadNew = (label: LabelTreeLabelProps, revisit: boolean) => {
+export const getNewLabelPayload = (label: LabelTreeLabelProps, revisit: boolean) => {
     const { name, color, hotkey, group, behaviour, parentLabelId } = label;
 
     return {

@@ -66,11 +66,10 @@ const NewProjectDialogInner: FC<NewProjectDialogInnerProps> = ({ onCloseDialog }
 
     const { content, hasNextStep, hasPreviousStep, goToNextStep, goToPreviousStep, validationError, metadata } =
         useNewProjectDialog();
-    const { name, selectedDomains, projectTypeMetadata } = metadata;
+    const { name, selectedDomains, currentStep, projectTypeMetadata } = metadata;
 
-    // Content (<ProjectLabelsManagement />) gets the correct "selectedDomain" as props
-    const isClassificationDomain = content.props.selectedDomain === DOMAIN.CLASSIFICATION;
-    const isPoseTemplate = metadata.currentStep === STEPS.POSE_TEMPLATE;
+    const isClassificationDomain = selectedDomains.includes(DOMAIN.CLASSIFICATION);
+    const isPoseTemplate = currentStep === STEPS.POSE_TEMPLATE;
 
     const showClassificationInfo = isClassificationDomain && !hasNextStep;
 
@@ -97,7 +96,7 @@ const NewProjectDialogInner: FC<NewProjectDialogInnerProps> = ({ onCloseDialog }
         );
     };
 
-    const stepInfo = getStepInfo(metadata.currentStep);
+    const stepInfo = getStepInfo(currentStep);
     const numberOfSteps = getTotalSteps(metadata);
 
     return (
@@ -106,7 +105,7 @@ const NewProjectDialogInner: FC<NewProjectDialogInnerProps> = ({ onCloseDialog }
             minWidth={{ base: 'auto', L: '90rem' }}
             UNSAFE_style={isLargeSize ? paddingStyle : tabletPaddingStyle}
         >
-            <Heading id={`${metadata.currentStep}-title-id`}>
+            <Heading id={`${currentStep}-title-id`}>
                 <Flex direction={'column'} marginBottom={'size-250'}>
                     <Text>{stepInfo.title}</Text>
                     <Flex UNSAFE_className={classes.createProject} justifyContent={'space-between'}>
@@ -120,9 +119,7 @@ const NewProjectDialogInner: FC<NewProjectDialogInnerProps> = ({ onCloseDialog }
             <Divider />
             <Content UNSAFE_style={{ overflowX: 'hidden' }}>
                 {content}
-                {(metadata.currentStep === 'name-project' || metadata.currentStep === 'select-template') && (
-                    <Divider size='S' />
-                )}
+                {(currentStep === 'name-project' || currentStep === 'select-template') && <Divider size='S' />}
             </Content>
 
             <ButtonGroup UNSAFE_style={{ paddingTop: 'size-300' }}>
@@ -203,7 +200,7 @@ export const NewProjectDialog = ({ buttonText, openImportDatasetDialog }: NewPro
             <DialogContainer onDismiss={handleCloseDialog}>
                 {isOpen && (
                     <NewProjectDialogProvider>
-                        <NewProjectDialogInner onCloseDialog={handleCloseDialog} />{' '}
+                        <NewProjectDialogInner onCloseDialog={handleCloseDialog} />
                     </NewProjectDialogProvider>
                 )}
             </DialogContainer>

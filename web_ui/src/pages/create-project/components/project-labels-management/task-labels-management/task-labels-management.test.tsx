@@ -85,7 +85,7 @@ describe('Task label management', () => {
         await userEvent.type(input, 'Test label');
 
         await userEvent.keyboard('{Enter}');
-        expect(nextMock).toHaveBeenCalledWith();
+        expect(nextMock).toHaveBeenCalled();
     });
 
     it('should disabled the "add" button after adding a label', async () => {
