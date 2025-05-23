@@ -3,6 +3,7 @@
 
 import { createContext, Dispatch, ReactNode, useContext } from 'react';
 
+import { paths } from '@geti/core';
 import { UseMutationResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { isEmpty } from 'lodash-es';
@@ -10,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { CreateDatasetBody, CreateDatasetResponse, Dataset } from '../../core/projects/dataset.interface';
 import { useProjectDataset } from '../../core/projects/hooks/use-project-dataset.hook';
-import { paths } from '../../core/services/routes';
 import { usePinnedCollapsedItems } from '../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.hook';
 import {
     PinnedCollapsedItemsAction,

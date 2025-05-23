@@ -46,8 +46,8 @@ const mockedProjectService = createInMemoryProjectService();
 const mockedFeatureFlagService = createInMemoryApiFeatureFlagService();
 const mockedDatasetImportService = createInMemoryDatasetImportService();
 
-jest.mock('../../../core/services/application-services-provider.component', () => ({
-    ...jest.requireActual('../../../core/services/application-services-provider.component'),
+jest.mock('@geti/core/src/services/application-services-provider.component', () => ({
+    ...jest.requireActual('@geti/core/src/services/application-services-provider.component'),
     useApplicationServices: () => ({
         projectService: mockedProjectService,
         featureFlagService: mockedFeatureFlagService,

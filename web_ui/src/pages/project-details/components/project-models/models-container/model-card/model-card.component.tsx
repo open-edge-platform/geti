@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Flex, Heading, Tag, Text, View } from '@geti/ui';
 import { Fps, Image, Tag as TagIcon } from '@geti/ui/icons';
 import { clsx } from 'clsx';
@@ -11,7 +12,6 @@ import { isExclusive } from '../../../../../../core/labels/utils';
 import { ModelFormat } from '../../../../../../core/models/dtos/model-details.interface';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
-import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { API_URLS } from '@geti/core';
 import { Page } from '@playwright/test';
 
 import { AccountStatusDTO } from '../../../../src/core/organizations/dtos/organizations.interface';
-import { API_URLS } from '../../../../src/core/services/urls';
 import { expect, test } from '../../../fixtures/base-test';
 import { notFoundHandler } from '../../../fixtures/open-api/setup-open-api-handlers';
 import { OnboardingPage } from '../../../fixtures/page-objects/onboarding-page';

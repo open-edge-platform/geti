@@ -3,10 +3,10 @@
 
 import { useEffect, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useGetRunningJobs } from '../../../../../core/jobs/hooks/use-jobs.hook';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 
 export const useIsTraining = (): boolean => {

@@ -3,10 +3,10 @@
 
 import { rest } from 'msw';
 
+import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getMockedWorkspaceIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { server } from '../../annotations/services/test-utils';
-import { apiRequestUrl } from '../../services/test-utils';
-import { API_URLS } from '../../services/urls';
 import { createInMemoryJobsService } from './in-memory-jobs-service';
 import { JobsResponse } from './jobs-service.interface';
 

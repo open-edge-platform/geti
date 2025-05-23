@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import { paths } from '@geti/core';
 import {
     Button,
     ButtonGroup,
@@ -19,7 +20,6 @@ import {
 } from '@geti/ui';
 import { ValidationError } from 'yup';
 
-import { paths } from '../../../core/services/routes';
 import { useUserRegister } from '../../../core/users/hook/use-users.hook';
 import { isYupValidationError } from '../../../pages/user-management/profile-page/utils';
 import { PasswordState } from '../../../pages/user-management/users/add-member-popup/add-member-popup.interface';

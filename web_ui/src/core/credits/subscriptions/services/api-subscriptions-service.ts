@@ -3,8 +3,8 @@
 
 import { apiClient } from '@geti/core';
 
-import { CreateApiService } from '../../../services/create-api-service.interface';
-import { API_URLS } from '../../../services/urls';
+import { CreateApiService } from '../../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../../packages/core/src/services/urls';
 import { SubscriptionDTO } from '../dtos/subscription.interface';
 import { SubscriptionsService } from './subscription-service.interface';
 import { getQuotaDTO, getQuotasResponseEntity, getSubscriptionEntity } from './utils';

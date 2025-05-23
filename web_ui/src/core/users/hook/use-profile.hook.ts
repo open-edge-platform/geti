@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 
-import QUERY_KEYS from '../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../core/services/application-services-provider.component';
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { OnboardingService } from '../services/onboarding-service.interface';
 
 const profileQueryOptions = (onboardingService: OnboardingService) => {

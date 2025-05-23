@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Navigate, Outlet, Route } from 'react-router-dom';
 
-import { paths } from '../core/services/routes';
 import { Layout } from '../intel-admin-app/layout/layout.component';
 import { OrganizationCreditAccounts } from '../intel-admin-app/pages/organization/organization-credit-accounts.component';
 import { OrganizationLayout } from '../intel-admin-app/pages/organization/organization-layout.component';

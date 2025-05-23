@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import {
     Button,
     ButtonGroup,
@@ -18,7 +19,6 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { ValidationError } from 'yup';
 
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { getRoleDTO } from '../../../../core/users/services/utils';
 import { RESOURCE_TYPE, USER_ROLE, UserCreationDTO } from '../../../../core/users/users.interface';

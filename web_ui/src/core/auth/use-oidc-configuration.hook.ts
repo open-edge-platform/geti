@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
 import { AuthProviderProps } from 'react-oidc-context';
 
-import { useDeploymentConfigQuery } from '../../core/services/use-deployment-config-query.hook';
 import { oidcConfigCidaas, oidcConfigDex, oidcConfigIntelSSO } from './../../core/auth/configuration';
 
 export const useOIDCConfiguration = (isAdmin: boolean): AuthProviderProps => {

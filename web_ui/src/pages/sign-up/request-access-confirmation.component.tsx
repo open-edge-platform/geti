@@ -3,10 +3,10 @@
 
 import { FC } from 'react';
 
+import { paths } from '@geti/core';
 import { Heading } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 
-import { paths } from '../../core/services/routes';
 import { Container } from './container.component';
 import { useShowRequestAccessConfirmation } from './use-show-request-access-confirmation.hook';
 

@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { expect, Page } from '@playwright/test';
 
 import { Point, Rect } from '../../../../src/core/annotations/shapes.interface';
 import { ShapeType } from '../../../../src/core/annotations/shapetype.enum';
-import { paths } from '../../../../src/core/services/routes';
 import { isShapeWithinRoi } from '../../../../src/pages/annotator/tools/utils';
 import { annotatorTest as test } from '../../../fixtures/annotator-test';
 import { OpenApiFixtures } from '../../../fixtures/open-api';

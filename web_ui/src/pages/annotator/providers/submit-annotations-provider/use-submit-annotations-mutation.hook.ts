@@ -3,6 +3,7 @@
 
 import { MutableRefObject, useCallback, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { isEmpty, isFunction } from 'lodash-es';
@@ -10,7 +11,6 @@ import { isEmpty, isFunction } from 'lodash-es';
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { getAnnotationStateForTask } from '../../../../core/annotations/utils';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../core/media/base.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { useFuxNotifications } from '../../../../hooks/use-fux-notifications/use-fux-notifications.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { useCollectAnnotatorMetrics } from '../../analytics-hooks/use-collect-annotator-metrics.hook';

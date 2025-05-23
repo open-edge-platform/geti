@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { expect, Page } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
 import {
     getMockedProjectStatusDTO,
     getMockedProjectStatusTask,

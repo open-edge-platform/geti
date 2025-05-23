@@ -3,12 +3,12 @@
 
 import { useMemo } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult } from '@tanstack/react-query';
 import { AxiosError, isAxiosError } from 'axios';
 import { isEmpty, isEqual, negate } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
-import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { hasEqualId } from '../../../../../shared/utils';

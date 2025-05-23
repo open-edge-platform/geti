@@ -3,7 +3,7 @@
 
 import { apiClient } from '@geti/core';
 
-import { CreateApiService } from '../../services/create-api-service.interface';
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { MaintenanceResponse, MaintenanceService } from './maintenance.interface';
 
 export const createApiMaintenanceService: CreateApiService<MaintenanceService> = () => {

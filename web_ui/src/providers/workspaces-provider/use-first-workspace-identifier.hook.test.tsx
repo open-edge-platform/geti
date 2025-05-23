@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
+import { paths } from '@geti/core';
 import { waitFor } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 
 import { renderHookWithProviders } from '../../test-utils/render-hook-with-providers';
-import { paths } from './../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from './use-first-workspace-identifier.hook';
 
 describe('useFirstWorkspaceIdentifier', () => {

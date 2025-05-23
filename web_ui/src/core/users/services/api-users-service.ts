@@ -3,8 +3,8 @@
 
 import { apiClient } from '@geti/core';
 
-import { CreateApiService } from '../../services/create-api-service.interface';
-import { API_URLS } from '../../services/urls';
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { ForgotPasswordDTO, ResetPasswordDTO, UpdatePasswordDTO, UserRegistrationDTO } from '../dtos/members.interface';
 import { RolesResponseDTO, UpdateRolesDTO, UserDTO, UsersResponseDTO } from '../users.interface';
 import { UsersService } from './users-service.interface';

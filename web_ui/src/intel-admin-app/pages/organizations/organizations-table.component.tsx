@@ -3,6 +3,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import { paths } from '@geti/core';
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { get } from 'lodash-es';
@@ -10,8 +12,6 @@ import { get } from 'lodash-es';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { Organization } from '../../../core/organizations/organizations.interface';
 import { GetOrganizationsQueryOptions } from '../../../core/organizations/services/organizations-service.interface';
-import QUERY_KEYS from '../../../core/requests/query-keys';
-import { paths } from '../../../core/services/routes';
 import { SortDirection } from '../../../core/shared/query-parameters';
 import { useSortTable } from '../../../hooks/use-sort-table/use-sort-table.hook';
 import { DateCell } from '../../../shared/components/table/date-cell/date-cell.component';

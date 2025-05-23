@@ -3,6 +3,7 @@
 
 import { ComponentProps, Dispatch, useCallback, useMemo } from 'react';
 
+import { paths } from '@geti/core';
 import { Flex, Heading, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import { MediaUploadAnomalousIcon, MediaUploadNormalIcon } from '../../../../assets/images';
 import { Label } from '../../../../core/labels/label.interface';
 import { isAnomalous, isExclusive } from '../../../../core/labels/utils';
-import { paths } from '../../../../core/services/routes';
 import { TUTORIAL_CARD_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { DatasetMediaUploadActions } from '../../../../providers/media-upload-provider/media-upload-reducer-actions';
 import {

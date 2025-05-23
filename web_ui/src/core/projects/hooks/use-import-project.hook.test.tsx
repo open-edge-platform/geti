@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
+import { ApplicationServicesProvider } from '@geti/core/src/services/application-services-provider.component';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
-import { ApplicationServicesProvider } from '../../services/application-services-provider.component';
 import { ProjectImport, ProjectImportIdentifier } from '../project.interface';
 import { createInMemoryProjectService } from '../services/in-memory-project-service';
 import { ProjectService } from '../services/project-service.interface';

@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     Button,
     ButtonGroup,
@@ -19,7 +20,6 @@ import {
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import dayjs from 'dayjs';
 
-import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 import { downloadFile, getDateTimeInISOAndUTCOffsetFormat, getDownloadNotificationMessage } from '../../shared/utils';

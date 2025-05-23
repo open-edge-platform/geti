@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -12,7 +13,6 @@ import {
     useOrganizationsApi,
 } from '../../../core/organizations/hook/use-organizations-api.hook';
 import { GetOrganizationsQueryOptions } from '../../../core/organizations/services/organizations-service.interface';
-import QUERY_KEYS from '../../../core/requests/query-keys';
 import { ErrorMessage } from '../../../pages/user-management/users/add-member-popup/error-message/error-message.component';
 import { validateEmail } from '../../../pages/user-management/users/utils';
 

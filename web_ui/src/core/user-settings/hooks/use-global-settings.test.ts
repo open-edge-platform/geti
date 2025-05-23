@@ -4,10 +4,10 @@
 import { act, waitFor } from '@testing-library/react';
 import { rest } from 'msw';
 
+import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
 import { server } from '../../annotations/services/test-utils';
-import { apiRequestUrl } from '../../services/test-utils';
-import { API_URLS } from '../../services/urls';
 import { GENERAL_SETTINGS_KEYS } from '../dtos/user-settings.interface';
 import { INITIAL_GLOBAL_SETTINGS } from '../utils';
 import { useUserGlobalSettings } from './use-global-settings.hook';

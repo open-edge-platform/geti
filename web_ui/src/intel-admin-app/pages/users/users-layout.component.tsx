@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core';
+
 import { ContentLayout } from '../../shared/components/content-layout/content-layout.component';
 import { Users } from './users.component';
 

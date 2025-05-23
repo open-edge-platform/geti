@@ -3,7 +3,8 @@
 
 import { Dispatch, useCallback, useRef } from 'react';
 
-import { useApplicationServices } from '../../core/services/application-services-provider.component';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+
 import { ConcurrentItemProcessor } from '../../shared/concurrent-item-processor/concurrent-item-processor';
 import { DatasetMediaUploadActions, MediaUploadActionTypes } from './media-upload-reducer-actions';
 import { QueuedListItem, ValidationFailReason } from './media-upload.interface';

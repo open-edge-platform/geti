@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
+import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
 import { screen, waitFor } from '@testing-library/react';
 
 import { FeatureFlags } from '../../../../core/feature-flags/services/feature-flag-service.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { ApplicationServicesContextProps } from '../../../../core/services/application-services-provider.component';
-import { useDeploymentConfigQuery } from '../../../../core/services/use-deployment-config-query.hook';
 import {
     MEDIA_CONTENT_BUCKET,
     MediaUploadPerDataset,
@@ -37,8 +37,8 @@ jest.mock('../../../media/providers/media-provider.component', () => ({
     })),
 }));
 
-jest.mock('../../../../core/services/use-deployment-config-query.hook', () => ({
-    ...jest.requireActual('../../../../core/services/use-deployment-config-query.hook'),
+jest.mock('@geti/core/src/services/use-deployment-config-query.hook', () => ({
+    ...jest.requireActual('@geti/core/src/services/use-deployment-config-query.hook'),
     useDeploymentConfigQuery: jest.fn(),
 }));
 

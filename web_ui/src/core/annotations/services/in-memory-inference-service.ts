@@ -3,11 +3,11 @@
 
 import { AxiosInstance } from 'axios';
 
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { Label } from '../../labels/label.interface';
 import { MediaItem } from '../../media/media.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import { DatasetIdentifier } from '../../projects/dataset.interface';
-import { API_URLS } from '../../services/urls';
 import { Annotation } from '../annotation.interface';
 import { ShapeType } from '../shapetype.enum';
 import { labelFromModel } from '../utils';

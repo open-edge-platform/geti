@@ -3,15 +3,15 @@
 
 import { useEffect, useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { useFeatureFlags } from '../../feature-flags/hooks/use-feature-flags.hook';
-import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { StatusProps } from '../status.interface';
 import {
     isBelowLowFreeDiskSpace,

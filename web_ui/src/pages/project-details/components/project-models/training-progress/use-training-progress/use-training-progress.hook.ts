@@ -3,6 +3,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
@@ -10,7 +11,6 @@ import { useGetRunningJobs } from '../../../../../../core/jobs/hooks/use-jobs.ho
 import { JobState } from '../../../../../../core/jobs/jobs.const';
 import { RunningTrainingJob } from '../../../../../../core/jobs/jobs.interface';
 import { JobsResponse } from '../../../../../../core/jobs/services/jobs-service.interface';
-import QUERY_KEYS from '../../../../../../core/requests/query-keys';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
 import { getAllJobs, isRunningTrainingJob } from '../../../../../../shared/components/header/jobs-management/utils';
 import { useIsTraining } from '../../hooks/use-is-training.hook';

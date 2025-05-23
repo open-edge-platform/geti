@@ -3,9 +3,9 @@
 
 import { rest } from 'msw';
 
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getMockedProjectIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { server } from '../../annotations/services/test-utils';
-import { API_URLS } from '../../services/urls';
 import { createApiSupportedAlgorithmsService } from './api-supported-algorithms-service';
 import { mockedSupportedAlgorithms, mockedSupportedAlgorithmsDTO } from './test-utils';
 

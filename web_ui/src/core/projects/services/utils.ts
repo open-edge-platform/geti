@@ -3,6 +3,7 @@
 
 import { differenceBy, omit } from 'lodash-es';
 
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { hasEqualId } from '../../../shared/utils';
 import { fetchLabelsTree } from '../../labels/annotator-utils/labels-utils';
 import {
@@ -31,7 +32,6 @@ import {
     isAnomalous,
     isEmptyLabel,
 } from '../../labels/utils';
-import { API_URLS } from '../../services/urls';
 import { DOMAIN } from '../core.interface';
 import { Dataset } from '../dataset.interface';
 import { isKeypointDetection } from '../domains';

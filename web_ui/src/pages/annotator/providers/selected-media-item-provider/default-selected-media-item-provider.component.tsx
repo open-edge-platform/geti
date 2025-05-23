@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { noop } from 'lodash-es';
 
 import { PredictionResult } from '../../../../core/annotations/services/prediction-service.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { SelectedMediaItemContext, SelectedMediaItemProps } from './selected-media-item-provider.component';
 import { SelectedMediaItem } from './selected-media-item.interface';
 

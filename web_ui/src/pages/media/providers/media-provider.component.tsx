@@ -3,12 +3,12 @@
 
 import { createContext, ReactNode, useCallback, useContext, useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { InfiniteData } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
 import { AdvancedFilterOptions } from '../../../core/media/media-filter.interface';
 import { MediaAdvancedCount, MediaAdvancedFilterResponse, MediaItem } from '../../../core/media/media.interface';
-import { useApplicationServices } from '../../../core/services/application-services-provider.component';
 import { useFilterSearchParam } from '../../../hooks/use-filter-search-param/use-filter-search-param.hook';
 import { useSortingParams } from '../../../hooks/use-sorting-params/use-sorting-params.hook';
 import { MissingProviderError } from '../../../shared/missing-provider-error';

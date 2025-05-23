@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import { Button, Content, Dialog, DialogContainer, dimensionValue, Divider, Flex, Heading, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { noop } from 'lodash-es';
 
-import { getErrorMessage } from '../../core/services/utils';
 import { useOnboardUserMutation } from '../../core/users/hook/use-onboard-user-mutation.hook';
 import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';

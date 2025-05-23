@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     InfiniteData,
     QueryKey,
@@ -12,8 +14,6 @@ import { AxiosError } from 'axios';
 
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../../../core/media/media-filter.interface';
 import { MediaAdvancedFramesFilterResponse } from '../../../../core/media/media.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { NextPageURL } from '../../../../core/shared/infinite-query.interface';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 

@@ -3,8 +3,9 @@
 
 import { Key } from 'react';
 
+import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
+
 import { MediaItem } from '../../../../../core/media/media.interface';
-import { useNavigateToAnnotatorRoute } from '../../../../../core/services/use-navigate-to-annotator-route.hook';
 import { MediaItemMenuActions } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-actions.enum';
 import { MediaItemMenuWithDeletion } from '../../../../../shared/components/media-item-menu-with-deletion/media-item-menu-with-deletion.component';
 import { downloadMediaItem } from '../../../../../shared/media-utils';

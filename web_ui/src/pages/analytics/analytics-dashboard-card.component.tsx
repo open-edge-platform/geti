@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { Button, Divider, Flex, Heading, Text, View } from '@geti/ui';
 import { AnalyticsIcon, ExternalLinkIcon } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 
-import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';
 import { openNewTab } from '../../shared/utils';
 
