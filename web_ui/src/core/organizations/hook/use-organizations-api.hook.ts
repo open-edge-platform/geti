@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     InfiniteData,
     infiniteQueryOptions,
@@ -20,7 +21,6 @@ import { AxiosError } from 'axios';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { getErrorMessage } from '../../services/utils';
 import { NextPage } from '../../shared/infinite-query.interface';
 import { SortDirection } from '../../shared/query-parameters';

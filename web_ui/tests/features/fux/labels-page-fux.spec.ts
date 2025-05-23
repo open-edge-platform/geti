@@ -3,7 +3,7 @@
 
 import { expect } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../src/core/user-settings/dtos/user-settings.interface';
 import { test } from '../../fixtures/base-test';
 import { registerStoreSettings } from '../../utils/api';

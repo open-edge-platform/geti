@@ -3,7 +3,7 @@
 
 import { cloneDeep } from 'lodash-es';
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { DatasetTabActions } from '../../../src/pages/project-details/components/project-dataset/utils';
 import { test as baseTest, expect } from '../../fixtures/base-test';
 import { extendWithOpenApi } from '../../fixtures/open-api';

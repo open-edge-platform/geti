@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { TaskIdentifier } from '../dtos/dataset-statistics.interface';
 import { AllTasksDatasetStatistics, DatasetStatistics } from '../services/dataset-statistics.interface';
 

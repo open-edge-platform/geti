@@ -3,9 +3,9 @@
 
 import { FC } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 
-import { paths } from '../../../core/services/routes';
 import { TruncatedText } from '../../../shared/components/truncated-text/truncated-text.component';
 import { User } from './mocked-user';
 import { UserActions } from './user-actions/user-actions.component';

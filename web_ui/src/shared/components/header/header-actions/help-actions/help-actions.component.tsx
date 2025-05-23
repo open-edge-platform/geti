@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { useAnalytics } from '../../../../../analytics/analytics-provider.component';
 import { getMetricName } from '../../../../../analytics/metrics';
 import { CONTACT_SUPPORT as CONTACT_SUPPORT_URL } from '../../../../../core/const';
-import { paths } from '../../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useDocsUrl } from '../../../../../hooks/use-docs-url/use-docs-url.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useResetAllTutorials } from '../../../../hooks/use-tutorial-enablement.hook';

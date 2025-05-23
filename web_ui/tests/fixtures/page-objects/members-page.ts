@@ -3,7 +3,7 @@
 
 import { expect, Locator, Page } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { USER_ROLE } from '../../../src/core/users/users.interface';
 
 export class MembersPage {

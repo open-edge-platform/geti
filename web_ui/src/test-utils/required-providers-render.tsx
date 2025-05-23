@@ -3,6 +3,10 @@
 
 import { ReactElement, ReactNode, Suspense } from 'react';
 
+import {
+    ApplicationServicesContextProps,
+    ApplicationServicesProvider,
+} from '@geti/core/src/services/application-services-provider.component';
 import { defaultTheme, IntelBrandedLoading, Provider as ThemeProvider } from '@geti/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, RenderOptions, RenderResult } from '@testing-library/react';
@@ -12,10 +16,6 @@ import { MemoryRouter as Router } from 'react-router-dom';
 import { CustomFeatureFlags, DEV_FEATURE_FLAGS } from '../core/feature-flags/services/feature-flag-service.interface';
 import { AccountStatusDTO } from '../core/organizations/dtos/organizations.interface';
 import QUERY_KEYS from '../core/requests/query-keys';
-import {
-    ApplicationServicesContextProps,
-    ApplicationServicesProvider,
-} from '../core/services/application-services-provider.component';
 import { OnboardingProfile } from '../core/users/services/onboarding-service.interface';
 import { NotificationProvider, Notifications } from '../notification/notification.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';

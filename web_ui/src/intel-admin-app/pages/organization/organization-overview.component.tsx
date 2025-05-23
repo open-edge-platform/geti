@@ -14,7 +14,7 @@ import { useOverlayTriggerState } from 'react-stately';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { AccountStatus, Organization } from '../../../core/organizations/organizations.interface';
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { PhotoPlaceholder } from '../../../shared/components/photo-placeholder/photo-placeholder.component';
 import { Header } from '../../shared/components/header/header.component';

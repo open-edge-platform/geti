@@ -4,7 +4,7 @@
 import { Button, Content, Heading, Text } from '@geti/ui';
 
 import { LinkExpiredImage } from '../../../assets/images';
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { CustomerSupportLink } from '../../../shared/components/customer-support-link/customer-support-link.component';
 import { redirectTo } from '../../../shared/utils';
 

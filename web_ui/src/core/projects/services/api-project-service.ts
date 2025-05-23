@@ -3,6 +3,7 @@
 
 import { apiClient } from '@geti/core';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { isNotCropDomain } from '../../../shared/utils';
 import {
     ExportDatasetStatusDTO,
@@ -16,7 +17,6 @@ import {
 import { JobState, JobStepState } from '../../jobs/jobs.const';
 import { JobExportStatus, JobProjectExportStatus, JobStatusIdentifier } from '../../jobs/jobs.interface';
 import { getJobActiveStep, getJobEntity } from '../../jobs/utils';
-import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { DOMAIN, ProjectIdentifier } from '../core.interface';

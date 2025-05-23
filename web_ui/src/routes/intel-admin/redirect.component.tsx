@@ -4,7 +4,7 @@
 import { Navigate, Outlet, useParams } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from './../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 
 export const RedirectToTheOrganizations = (): JSX.Element => {
     return <Navigate to={paths.intelAdmin.organizations({})} replace />;

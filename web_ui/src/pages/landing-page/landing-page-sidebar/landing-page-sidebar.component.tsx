@@ -7,7 +7,7 @@ import { isLargeSizeQuery } from '@geti/ui/theme';
 import { Link } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { MenuItemImage } from '../../../shared/components/menu-item-image/menu-item-image.component';
 import { MenuOption } from '../../../shared/components/menu-option.interface';

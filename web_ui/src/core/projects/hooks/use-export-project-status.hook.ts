@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { isFunction, once } from 'lodash-es';
@@ -11,7 +12,6 @@ import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/noti
 import { useNotification } from '../../../notification/notification.component';
 import { JobProjectExportStatus } from '../../jobs/jobs.interface';
 import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { ProjectExportIdentifier } from '../project.interface';
 import { JobStateToExportStatus } from '../services/api-project-service';
 import { isResponseErrorQuery, isStateError } from './utils';

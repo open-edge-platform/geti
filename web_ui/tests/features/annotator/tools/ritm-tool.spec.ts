@@ -5,7 +5,7 @@ import { expect, Page } from '@playwright/test';
 
 import { Point, Rect } from '../../../../src/core/annotations/shapes.interface';
 import { ShapeType } from '../../../../src/core/annotations/shapetype.enum';
-import { paths } from '../../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { isShapeWithinRoi } from '../../../../src/pages/annotator/tools/utils';
 import { annotatorTest as test } from '../../../fixtures/annotator-test';
 import { OpenApiFixtures } from '../../../fixtures/open-api';

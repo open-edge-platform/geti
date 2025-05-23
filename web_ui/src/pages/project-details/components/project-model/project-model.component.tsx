@@ -9,7 +9,7 @@ import { useMatch, useNavigate } from 'react-router-dom';
 import { isVisualPromptModelGroup } from '../../../../core/annotations/services/visual-prompt-service';
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { ModelIdentifier, ModelsGroups } from '../../../../core/models/models.interface';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { LifecycleStage } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { useSupportedAlgorithms } from '../../../../core/supported-algorithms/hooks/use-supported-algorithms.hook';
 import { useModelIdentifier } from '../../../../hooks/use-model-identifier/use-model-identifier.hook';

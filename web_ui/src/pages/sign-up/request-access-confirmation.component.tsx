@@ -6,7 +6,7 @@ import { FC } from 'react';
 import { Heading } from '@geti/ui';
 import { Navigate } from 'react-router-dom';
 
-import { paths } from '../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { Container } from './container.component';
 import { useShowRequestAccessConfirmation } from './use-show-request-access-confirmation.hook';
 

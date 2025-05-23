@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { isEmpty } from 'lodash-es';
 import { useMatch } from 'react-router-dom';
 
-import { paths } from '../../../core/services/routes';
 import { useCameraParams } from './camera-params.hook';
 
 export const useCameraStoreName = () => {

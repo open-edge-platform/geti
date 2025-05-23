@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { getMockedDataset } from '../../../../test-utils/mocked-items-factory/mocked-datasets';
 import { getMockedDatasetIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';

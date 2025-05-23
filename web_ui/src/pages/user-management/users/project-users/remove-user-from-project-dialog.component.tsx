@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { getRoleDeletionPayload } from '../../../../core/users/services/utils';
 import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';

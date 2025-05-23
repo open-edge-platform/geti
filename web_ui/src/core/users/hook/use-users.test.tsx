@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
+import { ApplicationServicesProvider } from '@geti/core/src/services/application-services-provider.component';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 
 import { getMockedUser } from '../../../test-utils/mocked-items-factory/mocked-users';
-import { ApplicationServicesProvider } from '../../services/application-services-provider.component';
 import { createInMemoryUsersService } from '../services/in-memory-users-service';
 import { useUsers } from './use-users.hook';
 

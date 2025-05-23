@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { Cell, Text } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { OptimizedModel, TrainedModel } from '../../../../../../core/models/optimized-models.interface';
-import { useApplicationServices } from '../../../../../../core/services/application-services-provider.component';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { useFormatModelAccuracy } from '../../../../../../shared/hooks/use-format-model-accuracy.hook';

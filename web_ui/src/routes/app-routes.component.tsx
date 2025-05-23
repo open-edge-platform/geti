@@ -28,7 +28,7 @@ import { InvalidLink } from '../sign-up/pages/invalid-link/invalid-link.componen
 import { Registration } from '../sign-up/pages/registration/registration.component';
 import { ResetPassword } from '../sign-up/pages/reset-password/reset-password.component';
 import { UserNotFound } from '../sign-up/pages/user-not-found/user-not-found.component';
-import { paths } from './../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { MediaUploadProvider } from './../providers/media-upload-provider/media-upload-provider.component';
 import { ProjectsImportProvider } from './../providers/projects-import-provider/projects-import-provider.component';
 import { AboutRoute } from './about.route';

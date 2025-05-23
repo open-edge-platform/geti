@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { InfiniteData, QueryKey, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import { MediaAdvancedFilterResponse, MediaItem } from '../../../../core/media/media.interface';
 import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { getErrorMessage } from '../../../../core/services/utils';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';

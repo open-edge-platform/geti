@@ -3,6 +3,7 @@
 
 import { Key, useEffect, useMemo, useState } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { ActionButton } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, noop } from 'lodash-es';
@@ -12,7 +13,6 @@ import { isVisualPromptModel } from '../../../../../core/annotations/services/vi
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { DOMAIN, ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import QUERY_KEYS from '../../../../../core/requests/query-keys';
-import { paths } from '../../../../../core/services/routes';
 import { JobInfoStatus } from '../../../../../core/tests/dtos/tests.interface';
 import { useTests } from '../../../../../core/tests/hooks/use-tests.hook';
 import { MetricType, Test } from '../../../../../core/tests/tests.interface';

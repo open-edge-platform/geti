@@ -3,7 +3,7 @@
 
 import { expect, Page } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import {
     getMockedProjectStatusDTO,
     getMockedProjectStatusTask,

@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { DatasetIdentifier } from '../../../core/projects/dataset.interface';
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useViewMode } from '../../../hooks/use-view-mode/use-view-mode.hook';
 import { MEDIA_CONTENT_BUCKET } from '../../../providers/media-upload-provider/media-upload.interface';
 import { MediaViewModes } from '../../../shared/components/media-view-modes/media-view-modes.component';

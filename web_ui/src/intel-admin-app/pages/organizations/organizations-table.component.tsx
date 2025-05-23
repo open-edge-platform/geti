@@ -11,7 +11,7 @@ import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-f
 import { Organization } from '../../../core/organizations/organizations.interface';
 import { GetOrganizationsQueryOptions } from '../../../core/organizations/services/organizations-service.interface';
 import QUERY_KEYS from '../../../core/requests/query-keys';
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { SortDirection } from '../../../core/shared/query-parameters';
 import { useSortTable } from '../../../hooks/use-sort-table/use-sort-table.hook';
 import { DateCell } from '../../../shared/components/table/date-cell/date-cell.component';

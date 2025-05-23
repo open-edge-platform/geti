@@ -3,13 +3,13 @@
 
 import { ReactNode } from 'react';
 
+import { ApplicationServicesProvider } from '@geti/core/src/services/application-services-provider.component';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { clearDatasetStorage } from '../../../hooks/use-clear-indexeddb-storage/use-clear-indexeddb-storage.hook';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { getMockedDataset } from '../../../test-utils/mocked-items-factory/mocked-datasets';
-import { ApplicationServicesProvider } from '../../services/application-services-provider.component';
 import { CreateDatasetBody, CreateDatasetResponse, DeleteDatasetResponse } from '../dataset.interface';
 import { createInMemoryProjectService } from '../services/in-memory-project-service';
 import { ProjectService } from '../services/project-service.interface';

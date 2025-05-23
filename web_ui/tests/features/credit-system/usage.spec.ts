@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { expect } from '@playwright/test';
 
-import { paths } from '../../../src/core/services/routes';
 import { GLOBAL_MODALS_KEYS } from '../../../src/core/user-settings/dtos/user-settings.interface';
 import { test } from '../../fixtures/base-test';
 import { registerStoreSettings } from '../../utils/api';

@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../core/projects/hooks/use-project-status.hook';
 import { Performance, PerformanceType } from '../../../../core/projects/task.interface';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { AccuracyHalfDonutChart } from '../../../project-details/components/project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';
 import { AnomalyProjectPerformance } from './anomaly-project-performance.component';
 import { ProjectPerformanceTooltip } from './project-performance-tooltip.component';

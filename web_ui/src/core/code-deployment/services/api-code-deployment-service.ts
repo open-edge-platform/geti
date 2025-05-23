@@ -3,8 +3,8 @@
 
 import { apiClient } from '@geti/core';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { downloadFile } from '../../../shared/utils';
-import { CreateApiService } from '../../services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { CodeDeploymentService, DownloadDeploymentPackageBodyDTO } from './code-deployment-service.interface';
 

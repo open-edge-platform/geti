@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { createInMemoryApiMaintenanceService } from '../../core/maintenance/services/in-memory-api-maintenance-service';
 import { MaintenanceResponse } from '../../core/maintenance/services/maintenance.interface';
-import { ApplicationServicesContextProps } from '../../core/services/application-services-provider.component';
 import { GENERAL_SETTINGS_KEYS } from '../../core/user-settings/dtos/user-settings.interface';
 import { createInMemoryUserSettingsService } from '../../core/user-settings/services/in-memory-user-settings-service';
 import { getMockedMaintenanceInfo } from '../../test-utils/mocked-items-factory/mocked-maintenance';

@@ -3,7 +3,7 @@
 
 import { apiClient } from '@geti/core';
 
-import { CreateApiService } from '../../services/create-api-service.interface';
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { API_URLS } from '../../services/urls';
 import { SettingsResponseDTO } from '../dtos/user-settings.interface';
 import { INITIAL_GLOBAL_SETTINGS, INITIAL_PROJECT_SETTINGS } from '../utils';

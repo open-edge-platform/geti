@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { Item, Picker, TextField } from '@geti/ui';
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
@@ -14,7 +15,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useSelectedOrganization } from '../../core/organizations/hook/use-selected-organization.hook';
-import { paths } from '../../core/services/routes';
 import { useOnboardUserMutation } from '../../core/users/hook/use-onboard-user-mutation.hook';
 import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { isOrgVisibleAndUserInvitedInOrg } from '../../routes/organizations/util';

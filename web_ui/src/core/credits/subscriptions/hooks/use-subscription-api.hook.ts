@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     InfiniteData,
     infiniteQueryOptions,
@@ -23,7 +24,6 @@ import { useNotification } from '../../../../notification/notification.component
 import { useFeatureFlags } from '../../../feature-flags/hooks/use-feature-flags.hook';
 import { OrganizationIdentifier } from '../../../organizations/organizations.interface';
 import QUERY_KEYS from '../../../requests/query-keys';
-import { useApplicationServices } from '../../../services/application-services-provider.component';
 import { getErrorMessage } from '../../../services/utils';
 import { Quota, QuotasResponse } from '../quotas.interface';
 import { GetQuotasQueryOptions, SubscriptionsService } from '../services/subscription-service.interface';

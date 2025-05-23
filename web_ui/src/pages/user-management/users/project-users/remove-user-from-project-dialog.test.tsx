@@ -5,7 +5,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { createInMemoryUsersService } from '../../../../core/users/services/in-memory-users-service';
 import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
 import { getMockedUser } from '../../../../test-utils/mocked-items-factory/mocked-users';

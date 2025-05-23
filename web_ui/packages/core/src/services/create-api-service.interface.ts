@@ -3,7 +3,7 @@
 
 import { AxiosInstance } from 'axios';
 
-import { API_URLS } from './urls';
+import { API_URLS } from '../../../../src/core/services/urls';
 
 export interface CreateApiService<Type> {
     (arg?: { instance: AxiosInstance; router: typeof API_URLS }): Type;

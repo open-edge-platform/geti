@@ -3,13 +3,13 @@
 
 import { useState } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { AlertDialog, Button, ButtonGroup, DialogTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useIsMounted } from 'usehooks-ts';
 
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import { paths } from '../../../../core/services/routes';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { runWhen } from '../../../../shared/utils';

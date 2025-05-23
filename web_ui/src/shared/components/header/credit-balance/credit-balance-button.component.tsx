@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';

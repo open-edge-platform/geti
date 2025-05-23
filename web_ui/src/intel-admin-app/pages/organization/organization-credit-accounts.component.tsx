@@ -10,7 +10,7 @@ import { NewCreditAccount } from '../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../core/credits/hooks/use-credits-api.hook';
 import { useSubscriptions } from '../../../core/credits/subscriptions/hooks/use-subscription-api.hook';
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { Header } from '../../shared/components/header/header.component';
 import { CreditAccountFormDialog } from './dialogs/credit-account-form-dialog.component';
 import { useOrganization } from './hooks/organization.hook';

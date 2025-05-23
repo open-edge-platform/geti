@@ -4,7 +4,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 
 import { createInMemoryCreditsService } from '../../../../core/credits/services/in-memory-credits-service';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { createInMemoryUsersService } from '../../../../core/users/services/in-memory-users-service';
 import {
     getMockedOrganizationAdminUser,

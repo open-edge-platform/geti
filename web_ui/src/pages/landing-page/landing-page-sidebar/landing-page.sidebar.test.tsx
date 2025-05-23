@@ -3,7 +3,7 @@
 
 import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
 
-import { paths } from '../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { providersRender } from '../../../test-utils/required-providers-render';
 import { LandingPageSidebar } from './landing-page-sidebar.component';
 

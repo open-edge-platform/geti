@@ -9,7 +9,7 @@ import {
     ProjectSortingOptions,
     ProjectsQueryOptions,
 } from '../../../../core/projects/services/project-service.interface';
-import { paths } from '../../../../core/services/routes';
+import { paths } from '@geti/core/src/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize, SpectrumTableLoadingState } from '../../../../shared/utils';

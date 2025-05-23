@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
@@ -13,7 +14,6 @@ import { JobExportStatus, JobStatusIdentifier } from '../../../core/jobs/jobs.in
 import { ExportDatasetIdentifier, ExportDatasetStatusIdentifier } from '../../../core/projects/dataset.interface';
 import { isStateDone, isStateError } from '../../../core/projects/hooks/utils';
 import QUERY_KEYS from '../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { useLocalStorageExportDataset } from './use-local-storage-export-dataset.hook';

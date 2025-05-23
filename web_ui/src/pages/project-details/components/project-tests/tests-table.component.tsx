@@ -3,6 +3,7 @@
 
 import { ReactNode, useMemo, useState } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import {
     Cell,
     Column,
@@ -24,7 +25,6 @@ import { Link } from 'react-router-dom';
 
 import { NoTests as NoTestsImage } from '../../../../assets/images';
 import { isAnomalyDomain, isDetectionDomain, isSegmentationDomain } from '../../../../core/projects/domains';
-import { paths } from '../../../../core/services/routes';
 import { JobInfoStatus } from '../../../../core/tests/dtos/tests.interface';
 import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { isTestJobCompleted } from '../../../../core/tests/utils';
