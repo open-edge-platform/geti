@@ -65,7 +65,11 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 20
           resources:
-            {{ toYaml .Values.resources | nindent 12 }}
+          {{- if (eq .Values.global.installation_profile "lite") }}
+            {{ toYaml .Values.microservice.liteResources | nindent 12 }}
+          {{- else }}
+            {{ toYaml .Values.microservice.standardResources | nindent 12 }}
+          {{- end }}
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           command:
