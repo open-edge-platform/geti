@@ -189,20 +189,21 @@ describe('UploadLabelSelectorDialog', () => {
 
         expect(screen.getByTestId('accept-button-id')).toBeEnabled();
 
-        // The container with all the selected labels should now be present
-        const selectedLabelsContainer = screen.getByLabelText('label search results');
-
+        // All checkboxes should be checked since selecting a leaf node selects its parents
         mockLabelsWithChildren.forEach((mockedLabel) => {
-            expect(within(selectedLabelsContainer).queryByText(mockedLabel.name)).toBeInTheDocument();
+            expect(screen.getByRole('checkbox', { name: mockedLabel.name })).toBeChecked();
         });
 
-        // Delete the previously added label
-        await userEvent.click(within(selectedLabelsContainer).getByText(mockVehicleLabel.name));
+        // Unselect the parent label vehicle
+        await userEvent.click(screen.getByRole('checkbox', { name: mockVehicleLabel.name }));
 
-        // Verify that the label and its children got removed
+        // All checkboxes should now be unchecked since removing a parent removes all children
         mockLabelsWithChildren.forEach((mockedLabel) => {
-            expect(within(selectedLabelsContainer).queryByText(mockedLabel.name)).not.toBeInTheDocument();
+            expect(screen.getByRole('checkbox', { name: mockedLabel.name })).not.toBeChecked();
         });
+
+        // Accept button should be disabled since no labels are selected
+        expect(screen.getByTestId('accept-button-id')).toBeDisabled();
     });
 
     it('should handle adding labels from the same group', async () => {

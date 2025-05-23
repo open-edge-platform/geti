@@ -12,6 +12,12 @@ import { Task } from '../../../../../core/projects/task.interface';
 import { TaskLabelTreeSearch } from '../../../../../shared/components/task-label-tree-search/task-label-tree-search.component';
 import { hasEqualId, isNotCropTask, runWhenTruthy } from '../../../../../shared/utils';
 
+const ResultWrapper = ({ children }: { children: React.ReactNode }) => (
+    <View backgroundColor={'gray-50'} marginY='size-100'>
+        {children}
+    </View>
+);
+
 interface UploadLabelSelectorDialogProps {
     tasks: Task[];
     isActivated: boolean;
@@ -107,11 +113,7 @@ export const UploadLabelSelectorDialog = ({
                                     isSelected={selectedLabels.some(hasEqualId(label.id))}
                                 />
                             )}
-                            ResultWrapper={({ children }) => (
-                                <View backgroundColor={'gray-50'} marginY='size-100'>
-                                    {children}
-                                </View>
-                            )}
+                            ResultWrapper={ResultWrapper}
                         />
                     </Content>
                 </Dialog>
