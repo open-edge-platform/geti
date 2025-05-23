@@ -3,6 +3,7 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -12,7 +13,6 @@ import {
     PredictionResult,
 } from '../../../../../core/annotations/services/prediction-service.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useInterval } from '../../../../../hooks/use-interval/use-interval.hook';
 import { loadImage } from '../../../../../shared/utils';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';

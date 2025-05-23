@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { paths } from '@geti/core/src/services/routes';
 import { AlertDialog } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { paths } from '@geti/core/src/services/routes';
 import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { getRoleDeletionPayload } from '../../../../core/users/services/utils';
 import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';

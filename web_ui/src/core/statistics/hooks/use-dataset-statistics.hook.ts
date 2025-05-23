@@ -5,7 +5,7 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-import QUERY_KEYS from '../../requests/query-keys';
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { TaskIdentifier } from '../dtos/dataset-statistics.interface';
 import { AllTasksDatasetStatistics, DatasetStatistics } from '../services/dataset-statistics.interface';
 

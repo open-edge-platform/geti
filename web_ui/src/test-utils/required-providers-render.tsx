@@ -3,6 +3,7 @@
 
 import { ReactElement, ReactNode, Suspense } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import {
     ApplicationServicesContextProps,
     ApplicationServicesProvider,
@@ -15,7 +16,6 @@ import { MemoryRouter as Router } from 'react-router-dom';
 
 import { CustomFeatureFlags, DEV_FEATURE_FLAGS } from '../core/feature-flags/services/feature-flag-service.interface';
 import { AccountStatusDTO } from '../core/organizations/dtos/organizations.interface';
-import QUERY_KEYS from '../core/requests/query-keys';
 import { OnboardingProfile } from '../core/users/services/onboarding-service.interface';
 import { NotificationProvider, Notifications } from '../notification/notification.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';

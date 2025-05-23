@@ -6,9 +6,9 @@ import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useFeatureFlags } from '../../feature-flags/hooks/use-feature-flags.hook';
-import QUERY_KEYS from '../../requests/query-keys';
 import { MaintenanceResponse } from '../services/maintenance.interface';
 
 export const useMaintenanceQuery = (): UseQueryResult<MaintenanceResponse, AxiosError> => {

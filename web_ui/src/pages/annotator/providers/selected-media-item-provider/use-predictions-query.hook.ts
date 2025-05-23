@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { QueryKey, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -21,7 +22,6 @@ import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideoFrame } from '../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
 import { isKeypointDetection } from '../../../../core/projects/domains';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { useTask } from '../task-provider/task-provider.component';
 import { updateVideoTimelineQuery } from './utils';
 

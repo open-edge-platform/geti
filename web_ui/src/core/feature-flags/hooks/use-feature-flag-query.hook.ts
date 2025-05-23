@@ -6,7 +6,7 @@ import { useSuspenseQuery, UseSuspenseQueryOptions, UseSuspenseQueryResult } fro
 import { AxiosError } from 'axios';
 import { isEmpty } from 'lodash-es';
 
-import QUERY_KEYS from '../../requests/query-keys';
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { FeatureFlags, FeatureFlagService } from '../services/feature-flag-service.interface';
 
 const featureFlagQueryOptions = (

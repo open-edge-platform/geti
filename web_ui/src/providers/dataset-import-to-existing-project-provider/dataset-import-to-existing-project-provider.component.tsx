@@ -3,6 +3,7 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
@@ -12,7 +13,6 @@ import { DatasetImportToExistingProjectItem } from '../../core/datasets/dataset.
 import { useDatasetImportQueries } from '../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { ProjectIdentifier } from '../../core/projects/core.interface';
 import { CreateDatasetResponse } from '../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../core/requests/query-keys';
 import { useLocalStorageDatasetImport } from '../../features/dataset-import/hooks/use-local-storage-dataset-import.hook';
 import { PinnedCollapsedItemsAction } from '../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.interface';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';

@@ -3,6 +3,7 @@
 
 import { Dispatch } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { getErrorMessage } from '@geti/core/src/services/utils';
 import { Query, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AxiosError, AxiosResponse, isCancel } from 'axios';
@@ -13,7 +14,6 @@ import { AdvancedFilterOptions, SearchOptionsRule } from '../../core/media/media
 import { UploadMediaMutationResponse } from '../../core/media/media.interface';
 import { MediaService } from '../../core/media/services/media-service.interface';
 import { DatasetIdentifier } from '../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../core/requests/query-keys';
 import { useDebouncedCallback } from '../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { MediaItemDTO } from './../../core/media/dtos/media.interface';
 import { DatasetMediaUploadActions, MediaUploadActionTypes } from './media-upload-reducer-actions';

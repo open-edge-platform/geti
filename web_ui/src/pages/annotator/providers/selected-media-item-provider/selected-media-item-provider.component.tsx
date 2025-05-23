@@ -3,6 +3,7 @@
 
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
 import { getErrorMessage } from '@geti/core/src/services/utils';
@@ -18,7 +19,6 @@ import { MediaItem } from '../../../../core/media/media.interface';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { isClassificationDomain } from '../../../../core/projects/domains';
 import { Task } from '../../../../core/projects/task.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { FEATURES_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserProjectSettings } from '../../../../core/user-settings/hooks/use-project-settings.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
