@@ -3,11 +3,11 @@
 
 import { CSSProperties, Dispatch, SetStateAction } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { Flex, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { TUTORIAL_CARD_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
 import { useSortingParams } from '../../../../../hooks/use-sorting-params/use-sorting-params.hook';
 import { Accordion } from '../../../../../shared/components/accordion/accordion.component';

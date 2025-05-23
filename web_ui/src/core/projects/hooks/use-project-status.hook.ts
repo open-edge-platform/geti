@@ -5,7 +5,7 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-import QUERY_KEYS from '../../requests/query-keys';
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { ProjectIdentifier } from '../core.interface';
 import { ProjectStatus } from '../project-status.interface';
 

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,7 +13,6 @@ import { useDatasetImportQueries } from '../../../../core/datasets/hooks/use-dat
 import { getCurrentJob, isImportingExistingProjectJob, isPreparingJob } from '../../../../core/datasets/utils';
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { ProjectProps } from '../../../../core/projects/project.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { useDatasetImportToExistingProject } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';

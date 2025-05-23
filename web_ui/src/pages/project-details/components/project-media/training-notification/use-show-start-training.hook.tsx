@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { useQueryClient } from '@tanstack/react-query';
@@ -13,7 +14,6 @@ import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-fea
 import { Label } from '../../../../../core/labels/label.interface';
 import { isAnomalous, isExclusive } from '../../../../../core/labels/utils';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';

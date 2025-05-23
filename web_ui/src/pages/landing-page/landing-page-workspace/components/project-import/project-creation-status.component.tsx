@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { Flex, LoadingIndicator, Text } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useImportProjectStatusQuery } from '../../../../../core/projects/hooks/use-import-project-status.hook';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import {
     ProjectCreatingStatus,
     ProjectImportBase,

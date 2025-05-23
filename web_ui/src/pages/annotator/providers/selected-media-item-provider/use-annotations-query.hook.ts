@@ -3,6 +3,7 @@
 
 import { useEffect } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { getErrorMessageByStatusCode } from '@geti/core/src/services/utils';
 import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
@@ -14,7 +15,6 @@ import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideoFrame } from '../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { updateVideoTimelineQuery } from './utils';

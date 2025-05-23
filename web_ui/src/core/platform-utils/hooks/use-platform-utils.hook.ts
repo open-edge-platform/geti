@@ -7,8 +7,8 @@ import { AxiosError } from 'axios';
 import { useAuth } from 'react-oidc-context';
 import { v4 as uuid } from 'uuid';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { useFeatureFlags } from '../../feature-flags/hooks/use-feature-flags.hook';
-import QUERY_KEYS from '../../requests/query-keys';
 import { ProductInfoEntity, WorkflowId } from '../services/utils.interface';
 
 interface UsePlatformUtils {

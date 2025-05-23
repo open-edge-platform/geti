@@ -5,8 +5,8 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import QUERY_KEYS from '../../requests/query-keys';
 import {
     CreateApiModelConfigParametersService,
     ProjectConfigurationQueryParameters,

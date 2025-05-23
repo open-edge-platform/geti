@@ -18,10 +18,10 @@ import {
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { getErrorMessage } from '../../../../packages/core/src/services/utils';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import QUERY_KEYS from '../../requests/query-keys';
 import { NextPage } from '../../shared/infinite-query.interface';
 import { SortDirection } from '../../shared/query-parameters';
 import { Organization, OrganizationIdentifier, OrganizationsResponse } from '../organizations.interface';

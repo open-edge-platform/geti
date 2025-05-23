@@ -5,10 +5,10 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { clearDatasetStorage } from '../../../hooks/use-clear-indexeddb-storage/use-clear-indexeddb-storage.hook';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import QUERY_KEYS from '../../requests/query-keys';
 import {
     CreateDatasetBody,
     CreateDatasetResponse,

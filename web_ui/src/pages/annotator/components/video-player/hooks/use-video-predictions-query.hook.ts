@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
@@ -9,7 +10,6 @@ import { PredictionMode } from '../../../../../core/annotations/services/predict
 import { VideoPaginationOptions } from '../../../../../core/annotations/services/video-pagination-options.interface';
 import { Video } from '../../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { useInferenceServerStatus } from '../../../providers/prediction-provider/use-inference-server-status';
 import { useTask } from '../../../providers/task-provider/task-provider.component';

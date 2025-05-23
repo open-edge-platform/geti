@@ -3,13 +3,13 @@
 
 import { useEffect, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { sortBy } from 'lodash-es';
 
 import { PredictionMode } from '../../../../../core/annotations/services/prediction-service.interface';
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { usePrevious } from '../../../../../hooks/use-previous/use-previous.hook';
 import { ANNOTATOR_MODE } from '../../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';

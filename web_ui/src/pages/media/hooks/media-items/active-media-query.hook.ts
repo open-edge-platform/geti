@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { InfiniteData, QueryKey, useInfiniteQuery, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import { MediaItemResponse } from '../../../../core/media/media.interface';
 import { MediaService } from '../../../../core/media/services/media-service.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { NextPageURL } from '../../../../core/shared/infinite-query.interface';
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { useTask } from '../../../annotator/providers/task-provider/task-provider.component';
