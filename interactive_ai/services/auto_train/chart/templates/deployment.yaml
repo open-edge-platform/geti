@@ -67,10 +67,12 @@ spec:
               value: /model_templates
             - name: JOB_SERVICE_ADDRESS
               value: {{ .Release.Namespace }}-jobs-ms:50051
+            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
               value: "true"
+            {{- end }}
             - name: OTEL_SERVICE_NAME
               value: auto-train-controller
             - name: OTLP_TRACES_RECEIVER

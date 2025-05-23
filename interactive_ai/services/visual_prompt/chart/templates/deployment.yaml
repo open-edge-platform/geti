@@ -111,10 +111,12 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Namespace }}-configuration
                   key: platformVersion
+            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
               value: "true"
+            {{- end }}
             - name: OTEL_SERVICE_NAME
               value: visual-prompt-microservice
             - name: K8S_POD_NAME

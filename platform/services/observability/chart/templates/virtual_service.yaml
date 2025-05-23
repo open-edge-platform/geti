@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 ---
 {{- if not .Values.global.istio_ambient_mesh }}
 apiVersion: networking.istio.io/v1beta1
@@ -36,4 +37,5 @@ spec:
         host: {{ include "observability.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port:
           number: {{ .Values.port }}
+{{- end }}
 {{- end }}

@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 ---
 {{- if not .Values.global.istio_ambient_mesh }}
 apiVersion: networking.istio.io/v1alpha3
@@ -46,4 +47,5 @@ spec:
               header:
                 key: x-local-rate-limit
                 value: 'true'
+{{- end }}
 {{- end }}
