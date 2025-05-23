@@ -3,8 +3,10 @@
 
 import { useCallback, useState } from 'react';
 
-import { LabelItemType } from '../../core/labels/label-tree-view.interface';
+import { LabelItemType, LabelTreeItem } from '../../core/labels/label-tree-view.interface';
+import { DOMAIN } from '../../core/projects/core.interface';
 import { newLabelHotkeySchema, newLabelNameSchema } from '../../pages/create-project/components/utils';
+import { validateLabelsSchema } from '../../pages/create-project/utils';
 import { isYupValidationError } from '../../pages/user-management/profile-page/utils';
 import {
     DEFAULT_LABEL_INPUT_DIRTY,
@@ -15,17 +17,19 @@ import {
 import { UseLabelValidationProps, UseLabelValidationResult } from './label-validation-types';
 
 export function useLabelValidation({
-    initialName = '',
-    initialHotkey = '',
     projectLabels = [],
     labelType = LabelItemType.LABEL,
     currentLabelId,
     usedAnnotatorHotkeys = [],
     setDialogValidationError,
-}: UseLabelValidationProps): UseLabelValidationResult {
+    domain,
+    labels,
+}: UseLabelValidationProps & { domain?: DOMAIN; labels?: LabelTreeItem[] }): UseLabelValidationResult {
     const [validationErrors, setValidationErrors] = useState<LabelFieldsErrors>(DEFAULT_LABEL_INPUT_ERRORS);
+    const [treeValidationError, setTreeValidationError] = useState<string | undefined>(undefined);
     const [isDirty, setDirty] = useState<LabelFieldsDirty>(DEFAULT_LABEL_INPUT_DIRTY);
 
+    // Field-level validation
     const validateName = useCallback(
         (changedName: string): boolean => {
             try {
@@ -33,7 +37,6 @@ export function useLabelValidation({
                     { name: changedName },
                     { abortEarly: false }
                 );
-                // Always clear error on success
                 setValidationErrors((prev) => ({ ...prev, name: '' }));
 
                 return true;
@@ -68,13 +71,31 @@ export function useLabelValidation({
         [currentLabelId, projectLabels, usedAnnotatorHotkeys]
     );
 
+    // Tree-level validation
+    const validateTree = useCallback(() => {
+        if (!domain || !labels) return true;
+
+        try {
+            validateLabelsSchema(domain).validateSync({ labels }, { abortEarly: false });
+            setTreeValidationError(undefined);
+
+            return true;
+        } catch (error: unknown) {
+            if (isYupValidationError(error)) {
+                setTreeValidationError(error.errors.join('\r\n'));
+            }
+
+            return false;
+        }
+    }, [domain, labels]);
+
+    const hasError = Object.values(validationErrors).some(Boolean) || !!treeValidationError;
+
     const updateDialogValidationError = useCallback(() => {
         if (setDialogValidationError) {
-            const formHasError = Object.values(validationErrors).some(Boolean);
-
-            setDialogValidationError(formHasError ? 'Fix all the errors before moving forward' : undefined);
+            setDialogValidationError(hasError ? 'Fix all the errors before moving forward' : undefined);
         }
-    }, [setDialogValidationError, validationErrors]);
+    }, [setDialogValidationError, hasError]);
 
     return {
         validationErrors,
@@ -83,7 +104,9 @@ export function useLabelValidation({
         setDirty,
         validateName,
         validateHotkey,
+        validateTree,
+        treeValidationError,
         updateDialogValidationError,
-        hasError: Object.values(validationErrors).some(Boolean),
+        hasError,
     };
 }
