@@ -53,9 +53,7 @@ export const AnnotationObjectsBarHorizontalChart = ({
 
         navigate(route);
     };
-    console.log(data);
-    console.log(title);
-    console.log(colors);
+
     return (
         <BarHorizontalChart
             title={title}
