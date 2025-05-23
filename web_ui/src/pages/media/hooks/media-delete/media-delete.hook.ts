@@ -18,6 +18,7 @@ interface UseDeleteMediaMutation {
     deleteMedia: UseMutationResult<unknown, AxiosError, MediaItem[]>;
 }
 
+// Empirically determined batch size that not causes browser to throw an net::ERR_INSUFFICIENT_RESOURCES
 const BATCH_SIZE = 300;
 
 const getQueriesAndPreviousItems = (
@@ -53,9 +54,15 @@ export const useDeleteMediaMutation = (): UseDeleteMediaMutation => {
         mutationFn: async (mediaItems) => {
             // Batching the delete requests to avoid browser simultaneous requests limit
             const batches = chunk(mediaItems, BATCH_SIZE);
+            const promises = [];
             for (const batch of batches) {
-                await Promise.all(batch.map((mediaItem) => mediaService.deleteMedia(datasetIdentifier, mediaItem)));
+                const batchPromises = batch.map((mediaItem) => {
+                    return mediaService.deleteMedia(datasetIdentifier, mediaItem);
+                });
+                await Promise.all(batchPromises);
+                promises.push(...batchPromises);
             }
+            return Promise.all(promises);
         },
         onError: (error, _variables, previousItems) => {
             if (previousItems !== undefined) {
