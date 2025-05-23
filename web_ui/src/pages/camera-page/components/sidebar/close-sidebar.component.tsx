@@ -33,12 +33,6 @@ export const CloseSidebar = ({ screenshots, isLivePrediction }: CloseSidebarProp
                         Images
                     </Heading>
                     <Text UNSAFE_className={classes.closeSidebarValue}>{screenshots.length}</Text>
-
-                    <Divider size={'S'} marginTop={'size-250'} />
-                    <Heading level={3} UNSAFE_className={classes.closeSidebarTitle}>
-                        Videos
-                    </Heading>
-                    <Text UNSAFE_className={classes.closeSidebarValue}>13(12:10:22)</Text>
                 </>
             )}
 
