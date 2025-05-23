@@ -1,5 +1,3 @@
-include ../../../Makefile.shared-python
-
 MAKEFILE_DIR := $(shell pwd)
 OPENAPI_YAML_SPEC := ../../../docs/rest_api/openapi_internal.yaml
 OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
@@ -7,9 +5,7 @@ CLIENT_NAME := geti_client
 CLIENT_PATH := rest_client
 SPEC_HASH_FILE := .openapi_spec_hash
 
-.PHONY: all check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke
-
-all: tests
+.PHONY: all check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke mypy
 
 venv:
 	$(MAKE) generate_client_if_needed;
@@ -70,8 +66,9 @@ report: venv
 	  uvx junit2html "$$file" "reports/html/$$basefile.html"; \
 	done
 
-mypy: venv
-	uv run mypy features --config-file=pyproject.toml
+mypy:
+	uv sync --only-dev
+	uv run mypy features --config-file=pyproject.toml --install-types --non-interactive
 
 build-image:
 	@echo "Skipping build image stage for e2e tests"
