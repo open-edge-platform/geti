@@ -40,7 +40,7 @@ lint: lint-install
 	$(GOBIN)/golangci-lint run --fix --timeout $(TIMEOUT)
 
 lint-install:
-	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "v$$($(GOBIN)/golangci-lint version --short | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+')" != "$(GOLANGCI_LINT_VERSION)" ]; then \
+	@if ! command -v $(GOBIN)/golangci-lint >/dev/null 2>&1 || [ "v$$($(GOBIN)/golangci-lint version --short)" != "$(GOLANGCI_LINT_VERSION)" ]; then \
 		echo "Installing golangci-lint $(GOLANGCI_LINT_VERSION)..."; \
 		curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(GOBIN) $(GOLANGCI_LINT_VERSION); \
 		echo "golangci-lint $(GOLANGCI_LINT_VERSION) installed at $(GOBIN)/golangci-lint"; \
