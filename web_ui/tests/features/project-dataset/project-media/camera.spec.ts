@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core/src/services/routes';
+
 import { expect, test } from '../../../fixtures/base-test';
 import { project as AnomalyProject } from '../../../mocks/anomaly/anomaly-classification/mocks';
 import { project as ClassificationProject } from '../../../mocks/classification/classification.mock';

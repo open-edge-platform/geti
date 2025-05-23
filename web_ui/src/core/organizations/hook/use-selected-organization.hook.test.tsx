@@ -4,12 +4,12 @@
 import { act, waitFor } from '@testing-library/react';
 import { useLocation, useParams } from 'react-router-dom';
 
+import { paths } from '../../../../packages/core/src/services/routes';
 import {
     getMockedUserGlobalSettings,
     getMockedUserGlobalSettingsObject,
 } from '../../../test-utils/mocked-items-factory/mocked-settings';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
-import { paths } from '../../../../packages/core/src/services/routes';
 import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
 import { useProfileQuery } from '../../users/hook/use-profile.hook';

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Button, Content, Dialog, DialogTrigger, Divider, Flex, Heading, ProgressCircle, Text, View } from '@geti/ui';
 import { isEmpty, overSome } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
 import { useTransactionsQueries } from '../../../../core/credits/transactions/hooks/use-transactions.hook';
-import { paths } from '@geti/core/src/services/routes';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { formatDate, ONE_MINUTE } from '../../../utils';

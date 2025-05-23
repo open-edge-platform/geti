@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { dimensionValue, Flex, Link as SpectrumLink, Text, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import useVirtual from 'react-cool-virtual';
 import { Link } from 'react-router-dom';
 
-import { paths } from '@geti/core/src/services/routes';
 import { isVideoFile } from '../../../../shared/media-utils';
 import { Screenshot } from '../../../camera-support/camera.interface';
 import { useCameraParams } from '../../hooks/camera-params.hook';

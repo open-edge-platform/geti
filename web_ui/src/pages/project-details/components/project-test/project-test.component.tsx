@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Loading } from '@geti/ui';
 import { useParams } from 'react-router-dom';
 
-import { paths } from '@geti/core/src/services/routes';
 import { useTests } from '../../../../core/tests/hooks/use-tests.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';

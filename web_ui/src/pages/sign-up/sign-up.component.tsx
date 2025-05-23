@@ -3,10 +3,10 @@
 
 import { ReactNode } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
 import { Navigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '@geti/core/src/services/routes';
 import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { SignUpOnSaas } from './sign-up-on-saas.component';

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Cell, Column, Row, TableBody, TableHeader, TableView, Text } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 
@@ -9,7 +10,6 @@ import {
     ProjectSortingOptions,
     ProjectsQueryOptions,
 } from '../../../../core/projects/services/project-service.interface';
-import { paths } from '@geti/core/src/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { getFileSize, SpectrumTableLoadingState } from '../../../../shared/utils';

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Page } from '@playwright/test';
 
 import { ModelIdentifier } from '../../../src/core/models/models.interface';
-import { paths } from '@geti/core/src/services/routes';
 import { BarChartPage, LineChartPage, RadialChartPage, TextChartPage } from './chart-pages';
 
 export class ModelMetricsPage {

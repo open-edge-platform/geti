@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Skeleton } from '@geti/ui';
 
-import { paths } from '@geti/core/src/services/routes';
 import { DetailsContentLayout } from '../../shared/components/details-content-layout/details-content-layout.component';
 import { useOrganization } from './hooks/organization.hook';
 import { OrganizationSidebar } from './organization-sidebar.component';

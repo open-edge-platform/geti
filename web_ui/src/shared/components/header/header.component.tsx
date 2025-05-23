@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core/src/services/routes';
 import { Flex, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as Logo } from '../../../assets/geti.svg';
-import { paths } from '@geti/core/src/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { BackButton } from '../back-button/back-button.component';
 import { HeaderActions } from './header-actions/header-actions.component';

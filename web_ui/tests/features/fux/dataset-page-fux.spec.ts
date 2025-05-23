@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core/src/services/routes';
+
 import {
     FUX_NOTIFICATION_KEYS,
     FUX_SETTINGS_KEYS,
