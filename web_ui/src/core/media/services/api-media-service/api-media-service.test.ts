@@ -3,9 +3,9 @@
 
 import { rest } from 'msw';
 
+import { apiRequestUrl } from '../../../../../packages/core/src/services/test-utils';
 import { getMockedDatasetIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { server } from '../../../annotations/services/test-utils';
-import { apiRequestUrl } from '../../../services/test-utils';
 import { API_URLS } from '../../../services/urls';
 import { MEDIA_TYPE } from '../../base-media.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../base.interface';

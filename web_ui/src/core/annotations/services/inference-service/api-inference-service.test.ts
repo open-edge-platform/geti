@@ -4,6 +4,7 @@
 import { partial } from 'lodash-es';
 import { rest } from 'msw';
 
+import { apiRequestUrl } from '../../../../../packages/core/src/services/test-utils';
 import { loadImageFromFile } from '../../../../shared/media-utils';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
@@ -13,7 +14,6 @@ import {
 } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { LABEL_BEHAVIOUR } from '../../../labels/label.interface';
 import { MEDIA_TYPE } from '../../../media/base-media.interface';
-import { apiRequestUrl } from '../../../services/test-utils';
 import { API_URLS } from '../../../services/urls';
 import { TaskChainInput } from '../../annotation.interface';
 import { Rect } from '../../shapes.interface';

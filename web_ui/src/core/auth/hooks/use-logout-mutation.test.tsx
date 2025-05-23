@@ -8,8 +8,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook } from '@testing-library/react';
 import { rest } from 'msw';
 
+import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
 import { server } from '../../annotations/services/test-utils';
-import { apiRequestUrl } from '../../services/test-utils';
 import { API_URLS } from '../../services/urls';
 import { useLogoutMutation } from './use-logout-mutation.hook';
 

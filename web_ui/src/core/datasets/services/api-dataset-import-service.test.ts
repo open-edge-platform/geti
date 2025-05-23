@@ -3,9 +3,9 @@
 
 import { rest } from 'msw';
 
+import { apiRequestUrl } from '../../../../packages/core/src/services/test-utils';
 import { getMockedDatasetIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { server } from '../../annotations/services/test-utils';
-import { apiRequestUrl } from '../../services/test-utils';
 import { API_URLS } from '../../services/urls';
 import { DATASET_IMPORT_TASK_TYPE } from '../dataset.enum';
 import { DATASET_IMPORT_TASK_TYPE_DTO } from '../dtos/dataset.enum';
