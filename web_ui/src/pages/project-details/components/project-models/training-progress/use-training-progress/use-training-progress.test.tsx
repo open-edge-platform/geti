@@ -18,6 +18,7 @@ jest.mock('../../hooks/use-is-training.hook', () => ({
 
 jest.mock('../../../../../../core/jobs/hooks/use-jobs.hook', () => ({
     useGetRunningJobs: jest.fn(() => ({ data: { pages: [] } })),
+    useGetScheduledJobs: jest.fn(() => ({ data: { pages: [] } })),
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -56,7 +57,7 @@ describe('useTrainingProgress', () => {
         expect(result.current.showTrainingProgress).toBe(false);
     });
 
-    it('should return running job item when there is running job assigned to the task', async () => {
+    it('should return a list of running and/or scheduled job items when there is running job assigned to the task', async () => {
         const jobs = [
             getMockedJob({
                 state: JobState.RUNNING,
@@ -102,12 +103,13 @@ describe('useTrainingProgress', () => {
 
         jest.mocked(useIsTraining).mockReturnValue(true);
         // @ts-expect-error We don't care about mocking other rq vars
-        jest.mocked(useGetRunningJobs).mockReturnValue({ data: { pages: [{ jobs }] } });
+        jest.mocked(useGetRunningJobs).mockReturnValue({ data: { pages: [{ jobs }] }, isSuccess: true });
 
         const { result } = renderHook(() => useTrainingProgress(taskId), { wrapper });
 
         expect(result.current.showTrainingProgress).toBe(true);
-        expect('trainingDetails' in result.current && result.current.trainingDetails).toEqual(jobs[0]);
+        // returns only the job assigned to the task
+        expect('trainingDetails' in result.current && result.current.trainingDetails).toEqual([jobs[0]]);
     });
 
     it('should not return running job item when there is running job but assigned to another task', async () => {

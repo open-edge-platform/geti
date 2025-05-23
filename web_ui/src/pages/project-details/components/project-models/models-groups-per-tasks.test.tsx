@@ -114,6 +114,7 @@ jest.mock('./hooks/use-is-training.hook', () => ({
 
 jest.mock('../../../../core/jobs/hooks/use-jobs.hook', () => ({
     useGetRunningJobs: jest.fn(() => ({ data: [] })),
+    useGetScheduledJobs: jest.fn(() => ({ data: [] })),
 }));
 
 describe('ModelsGroupsPerTasks', () => {

@@ -13,6 +13,21 @@
     }
 }
 
+.modelCardNotTraining {
+    padding: var(--spectrum-global-dimension-size-200);
+}
+
+.modelCardTraining {
+    padding: var(--spectrum-global-dimension-size-200);
+    padding-bottom: 0;
+}
+
+.threeDotsFlashing {
+    display: inline-block;
+    margin-left: var(--spectrum-global-dimension-size-150);
+    margin-right: var(--spectrum-global-dimension-size-150);
+}
+
 .labelsOutOfDateTag {
     background-color: var(--brand-daisy-tint) !important;
     color: var(--text-dark-default) !important;

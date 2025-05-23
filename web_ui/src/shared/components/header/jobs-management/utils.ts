@@ -56,6 +56,9 @@ export const isJobExportDone = (job: Job): job is JobExportStatus =>
 export const isRunningTrainingJob = (job?: Job): job is RunningTrainingJob =>
     isJobRunning(job) && job?.type === JobType.TRAIN;
 
+export const isRunningOrScheduledTrainingJob = (job?: Job): job is RunningTrainingJob =>
+    (isJobRunning(job) || isJobScheduled(job)) && job?.type === JobType.TRAIN;
+
 export const isCancellableJob = (job: Job): boolean => job.cancellationInfo.isCancellable;
 
 export const getAllJobs = (data?: InfiniteData<JobsResponse>) =>

@@ -81,7 +81,7 @@ describe('ModelPerformance', () => {
         await checkTooltip(screen.getByLabelText('Image score value'), ANOMALY_IMAGE_PERFORMANCE_TOOLTIP_MESSAGE);
 
         await checkTooltip(
-            screen.getByText('Object score is not available'),
+            screen.getByText('Object score not available'),
             ANOMALY_OBJECT_PERFORMANCE_N_A_TOOLTIP_MESSAGE
         );
     });

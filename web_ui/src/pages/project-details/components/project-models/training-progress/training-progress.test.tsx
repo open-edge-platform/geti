@@ -26,8 +26,8 @@ describe('Training progress', () => {
     const projectIdentifier = getMockedProjectIdentifier();
 
     it('Should display correct information about training progress', async () => {
-        const trainingDetails = mockedRunningTrainingJobs[0];
-        const archName = trainingDetails.metadata.task.modelArchitecture as string;
+        const trainingDetails = [mockedRunningTrainingJobs[0]];
+        const archName = trainingDetails[0].metadata.task.modelArchitecture as string;
 
         jest.mocked(useTrainingProgress).mockImplementation(() => ({
             showTrainingProgress: true,

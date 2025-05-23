@@ -9,7 +9,7 @@ describe('Accuracy container', () => {
     it('should show "N/A" if value is null', () => {
         render(<AccuracyContainer value={null} heading='Accuracy' />);
 
-        expect(screen.getByText('Accuracy is not available')).toBeInTheDocument();
+        expect(screen.getByText('Accuracy not available')).toBeInTheDocument();
     });
 
     it('should show score value properly rounded', () => {

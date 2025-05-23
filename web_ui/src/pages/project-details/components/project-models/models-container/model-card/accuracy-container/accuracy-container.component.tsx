@@ -35,9 +35,7 @@ export const AccuracyContainer = ({
                     height='size-1250'
                 >
                     {value === null ? (
-                        <View UNSAFE_style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                            {heading} is not available
-                        </View>
+                        <View UNSAFE_style={{ fontWeight: 'bold', textAlign: 'center' }}>{heading} not available</View>
                     ) : (
                         <AccuracyHalfDonutChart id={id} value={value} title={heading} isDisabled={isDisabled} />
                     )}

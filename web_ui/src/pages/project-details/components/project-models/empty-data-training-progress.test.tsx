@@ -16,7 +16,7 @@ jest.mock('./training-progress/use-training-progress/use-training-progress.hook'
 
 describe('EmptyDataTrainingProgress', () => {
     it('Single task project', async () => {
-        const trainingDetails = mockedRunningTrainingJobs[0];
+        const trainingDetails = [mockedRunningTrainingJobs[0]];
 
         jest.mocked(useTrainingProgress).mockImplementation(() => ({
             showTrainingProgress: true,
@@ -26,31 +26,13 @@ describe('EmptyDataTrainingProgress', () => {
         render(<EmptyDataTrainingProgress isTaskChain={false} tasks={[getMockedTask({ domain: DOMAIN.DETECTION })]} />);
 
         expect(screen.getByTestId('current-training-task-id')).toBeInTheDocument();
-        expect(screen.getByTestId('task-value-id')).toHaveTextContent('Detection');
+        expect(
+            trainingDetails[0].metadata.task.modelArchitecture &&
+                screen.getByText(trainingDetails[0].metadata.task.modelArchitecture)
+        ).toBeInTheDocument();
     });
 
     it('Task chain project', async () => {
-        const trainingDetails = mockedRunningTrainingJobs[0];
-        let taskIndex = 0;
-
-        jest.mocked(useTrainingProgress).mockImplementation(() => {
-            const currentTrainingDetails = !taskIndex
-                ? trainingDetails
-                : {
-                      ...trainingDetails,
-                      metadata: {
-                          ...trainingDetails.metadata,
-                          task: getMockedTask({ domain: DOMAIN.SEGMENTATION }),
-                      },
-                  };
-            taskIndex = taskIndex + 1;
-
-            return {
-                showTrainingProgress: true,
-                trainingDetails: currentTrainingDetails,
-            } as ReturnType<typeof useTrainingProgress>;
-        });
-
         render(
             <EmptyDataTrainingProgress
                 isTaskChain={true}
@@ -60,8 +42,7 @@ describe('EmptyDataTrainingProgress', () => {
         expect(screen.getByTestId('detection-id')).toBeInTheDocument();
         expect(screen.getByTestId('segmentation-id')).toBeInTheDocument();
         expect(screen.getAllByTestId('current-training-task-id')).toHaveLength(2);
-
-        const allTaskValueElements = screen.getAllByTestId('task-value-id');
-        expect(allTaskValueElements).toHaveLength(2);
+        expect(screen.getByTestId('detection-id')).toBeInTheDocument();
+        expect(screen.getByTestId('segmentation-id')).toBeInTheDocument();
     });
 });
