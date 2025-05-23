@@ -25,7 +25,7 @@ build-image-xpu: install_common_libs
 
 build-image:
 	make build-image-gpu
-	make build-image-xpu
+	# make build-image-xpu
 
 push-image-gpu:
 	@echo "Pushing docker image for component: ${GPU_IMAGE_NAME}"
@@ -37,7 +37,7 @@ push-image-xpu:
 
 push-image:
 	make push-image-gpu
-	make push-image-xpu
+	# make push-image-xpu
 
 # TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
 test-unit: venv
