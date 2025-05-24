@@ -9,7 +9,7 @@ from geti_configuration_tools.project_configuration import (
     ProjectConfiguration,
     TaskConfig,
     TrainConstraints,
-    TrainingParameters,
+    TrainingParameters, PartialTaskConfig, PartialProjectConfiguration
 )
 
 
@@ -121,3 +121,16 @@ class TestProjectConfiguration:
             assert task_config.auto_training.min_images_per_label == (
                 expected_task_config.auto_training.min_images_per_label
             )
+
+    def test_partial_task_config(self):
+        # Test partial model creation
+        partial_task_config = PartialTaskConfig.model_validate(
+            {
+                "task_id": "partial_task",
+                "training": {"constraints": {"min_images_per_label": 5}},
+            }
+        )
+
+        assert partial_task_config.task_id == "partial_task"
+        assert partial_task_config.training.constraints.min_images_per_label == 5
+        assert partial_task_config.auto_training is None

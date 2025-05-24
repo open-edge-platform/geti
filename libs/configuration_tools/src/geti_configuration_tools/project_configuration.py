@@ -117,6 +117,16 @@ class NullProjectConfiguration(ProjectConfiguration):
 
 
 @partial_model
+class PartialTaskConfig(TaskConfig):
+    """
+    A partial version of `TaskConfig` where all fields are optional.
+
+    This class is useful for update operations or PATCH endpoints, allowing clients
+    to provide only the fields they wish to modify, while leaving others unset.
+    """
+
+
+@partial_model
 class PartialProjectConfiguration(ProjectConfiguration):
     """
     A partial version of `ProjectConfiguration` where all fields are optional.
