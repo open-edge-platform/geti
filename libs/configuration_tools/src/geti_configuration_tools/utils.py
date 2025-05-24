@@ -2,12 +2,14 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from copy import deepcopy
-from typing import Any, Optional
+from functools import cache
+from typing import Any, Optional, cast, get_args
 
 from pydantic import BaseModel, create_model
 from pydantic.fields import FieldInfo
 
 
+@cache  # avoids creating many classes with same name
 def partial_model(model: type[BaseModel]) -> type[BaseModel]:
     """
     Creates a new Pydantic model class with all fields made optional.
@@ -22,19 +24,34 @@ def partial_model(model: type[BaseModel]) -> type[BaseModel]:
 
     The new model class inherits from the original model, with its name prefixed
     with "Partial" (e.g., "PartialProjectConfiguration").
-
-    See https://stackoverflow.com/questions/67699451/make-every-field-as-optional-with-pydantic/76560886#76560886
     """
 
-    def make_field_optional(field: FieldInfo, default: Any = None) -> tuple[Any, FieldInfo]:
-        new = deepcopy(field)
-        new.default = default
-        new.annotation = Optional[field.annotation]  # type: ignore[assignment]  # noqa: UP007
-        return new.annotation, new
+    @cache
+    def make_field_optional(field: FieldInfo) -> tuple[Any, FieldInfo]:
+        field.default = None
+        field.default_factory = None
+        field.annotation = Optional[field.annotation]  # type: ignore[assignment] # noqa: UP007
+        return field.annotation, field
+
+    partial_fields = {}
+    for field_name, field_info in model.model_fields.items():
+        new_field = deepcopy(field_info)
+        if not new_field.is_required() and (optional_annotation := get_args(new_field.annotation)):
+            # field is already optional, but we still need to make sure that its nested fields are optional too
+            field_type, _ = optional_annotation  # tuple (annotation_type, None)
+            new_field = FieldInfo(annotation=field_type)
+        if type(new_field.annotation) is type(BaseModel):
+            partial_inner_model = partial_model(cast("type[BaseModel]", new_field.annotation))
+            partial_fields[field_name] = (
+                partial_inner_model | None,
+                FieldInfo(annotation=partial_inner_model, default=None),
+            )
+        else:
+            partial_fields[field_name] = make_field_optional(new_field)
 
     return create_model(  # type: ignore[call-overload]
         f"Partial{model.__name__}",
         __base__=model,
         __module__=model.__module__,
-        **{field_name: make_field_optional(field_info) for field_name, field_info in model.model_fields.items()},
+        **partial_fields,
     )

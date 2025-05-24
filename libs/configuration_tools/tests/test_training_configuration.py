@@ -22,6 +22,8 @@ from geti_configuration_tools.training_configuration import (
     MaxAnnotationPixels,
     MinAnnotationPixels,
     NullTrainingConfiguration,
+    PartialGlobalParameters,
+    PartialTrainingConfiguration,
     SubsetSplit,
     TrainingConfiguration,
 )
@@ -44,28 +46,33 @@ def ftx_hyperparameters():
     )
 
 
+@pytest.fixture
+def fxt_global_parameters():
+    yield GlobalParameters(
+        dataset_preparation=GlobalDatasetPreparationParameters(
+            subset_split=SubsetSplit(
+                training=70,
+                validation=20,
+                test=10,
+                auto_selection=True,
+                remixing=False,
+            ),
+            filtering=Filtering(
+                min_annotation_pixels=MinAnnotationPixels(enable=True, min_annotation_pixels=10),
+                max_annotation_pixels=MaxAnnotationPixels(enable=True, max_annotation_pixels=1000),
+                max_annotation_objects=MaxAnnotationObjects(enable=True, max_annotation_objects=100),
+            ),
+        )
+    )
+
+
 class TestTrainingConfiguration:
-    def test_valid_training_configuration(self, ftx_hyperparameters):
+    def test_valid_training_configuration(self, fxt_global_parameters, ftx_hyperparameters):
         # Create a valid TrainingConfiguration
         training_config = TrainingConfiguration(
             id_=ID("test_training_config"),
             task_id=ID("test_task"),
-            global_parameters=GlobalParameters(
-                dataset_preparation=GlobalDatasetPreparationParameters(
-                    subset_split=SubsetSplit(
-                        training=70,
-                        validation=20,
-                        test=10,
-                        auto_selection=True,
-                        remixing=False,
-                    ),
-                    filtering=Filtering(
-                        min_annotation_pixels=MinAnnotationPixels(enable=True, min_annotation_pixels=10),
-                        max_annotation_pixels=MaxAnnotationPixels(enable=True, max_annotation_pixels=1000),
-                        max_annotation_objects=MaxAnnotationObjects(enable=True, max_annotation_objects=100),
-                    ),
-                )
-            ),
+            global_parameters=fxt_global_parameters,
             hyperparameters=ftx_hyperparameters,
         )
 
@@ -122,5 +129,87 @@ class TestTrainingConfiguration:
 
     def test_null_training_configuration(self):
         null_training_config = NullTrainingConfiguration()
-
         assert null_training_config.model_dump() == {}
+
+    def test_partial_training_configuration(self, fxt_global_parameters, ftx_hyperparameters):
+        """Test that PartialTrainingConfiguration works correctly with both partial and complete configurations."""
+        partial_training_config_incomplete = PartialTrainingConfiguration.model_validate(
+            {
+                "id_": ID("partial_config"),
+                "task_id": ID("test_task"),
+                "model_manifest_id": "test_manifest",
+                "global_parameters": {
+                    "dataset_preparation": {
+                        "filtering": {
+                            "min_annotation_pixels": {
+                                "min_annotation_pixels": 42,
+                            },
+                        }
+                    }
+                },
+            }
+        )
+        global_parameters = partial_training_config_incomplete.global_parameters
+        assert partial_training_config_incomplete.model_manifest_id == "test_manifest"
+        assert partial_training_config_incomplete.id_ == ID("partial_config")
+        assert partial_training_config_incomplete.task_id == ID("test_task")
+        assert global_parameters.dataset_preparation.filtering.min_annotation_pixels.min_annotation_pixels == 42
+        assert global_parameters.dataset_preparation.filtering.min_annotation_pixels.enable is None
+        assert global_parameters.dataset_preparation.subset_split is None
+
+        # Full configuration
+        training_config = TrainingConfiguration(
+            id_=ID("test_training_config"),
+            task_id=ID("test_task"),
+            global_parameters=fxt_global_parameters,
+            hyperparameters=ftx_hyperparameters,
+        )
+        full_training_config_dict = training_config.model_dump()
+        full_training_config_dict["id_"] = ID("full_config")
+        partial_training_config_full = PartialTrainingConfiguration.model_validate(full_training_config_dict)
+
+        assert partial_training_config_full.model_dump() == training_config.model_dump()
+
+    def test_partial_global_parameters(self, fxt_global_parameters):
+        """Test that PartialGlobalParameters works correctly with both partial and complete configurations."""
+        # Test with a partial configuration
+        partial_global_params = PartialGlobalParameters.model_validate(
+            {
+                "dataset_preparation": {
+                    "subset_split": {
+                        "training": 42,
+                        "validation": 48,
+                        "test": 10,
+                    }
+                }
+            }
+        )
+
+        # Verify that specified fields are set correctly
+        assert partial_global_params.dataset_preparation.subset_split.training == 42
+        assert partial_global_params.dataset_preparation.subset_split.validation == 48
+        assert partial_global_params.dataset_preparation.subset_split.test == 10
+
+        # Verify that subset validator still works e.g. sum must be 100
+        with pytest.raises(ValidationError):
+            PartialGlobalParameters.model_validate(
+                {
+                    "dataset_preparation": {
+                        "subset_split": {
+                            "training": 1,
+                            "validation": 1,
+                            "test": 1,
+                        }
+                    }
+                }
+            )
+
+        # Verify that unspecified fields are None
+        assert partial_global_params.dataset_preparation.subset_split
+        assert partial_global_params.dataset_preparation.filtering is None
+
+        # Test with a full configuration
+        full_global_params_dict = fxt_global_parameters.model_dump()
+        partial_global_params_full = PartialGlobalParameters.model_validate(full_global_params_dict)
+
+        assert partial_global_params_full.model_dump() == fxt_global_parameters.model_dump()

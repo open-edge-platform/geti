@@ -181,3 +181,13 @@ class PartialTrainingConfiguration(TrainingConfiguration):
     Enables flexible updates and partial validation, making it suitable for scenarios
     where only a subset of the configuration needs to be specified or changed.
     """
+
+
+@partial_model
+class PartialGlobalParameters(GlobalParameters):
+    """
+    A partial version of `GlobalParameters` with all fields optional.
+
+    Enables flexible updates and partial validation, making it suitable for scenarios
+    where only a subset of the configuration needs to be specified or changed.
+    """

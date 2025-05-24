@@ -3,6 +3,8 @@
 
 from pydantic import BaseModel, Field
 
+from geti_configuration_tools.utils import partial_model
+
 from .augmentation import AugmentationParameters
 
 
@@ -79,3 +81,13 @@ class Hyperparameters(BaseModel):
     dataset_preparation: DatasetPreparationParameters
     training: TrainingHyperParameters
     evaluation: EvaluationParameters
+
+
+@partial_model
+class PartialHyperparameters(Hyperparameters):
+    """
+    A partial version of `Hyperparameters` with all fields optional.
+
+    Enables flexible updates and partial validation, making it suitable for scenarios
+    where only a subset of the configuration needs to be specified or changed.
+    """

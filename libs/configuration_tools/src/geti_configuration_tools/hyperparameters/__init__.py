@@ -16,6 +16,7 @@ from .hyperparameters import (
     EvaluationParameters,
     Hyperparameters,
     MaxDetectionPerImage,
+    PartialHyperparameters,
     TrainingHyperParameters,
 )
 
@@ -28,6 +29,7 @@ __all__ = [
     "GaussianBlur",
     "Hyperparameters",
     "MaxDetectionPerImage",
+    "PartialHyperparameters",
     "RandomAffine",
     "RandomHorizontalFlip",
     "RandomResizeCrop",

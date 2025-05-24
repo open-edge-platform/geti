@@ -13,6 +13,7 @@ from geti_configuration_tools.hyperparameters import (
     GaussianBlur,
     Hyperparameters,
     MaxDetectionPerImage,
+    PartialHyperparameters,
     RandomAffine,
     RandomHorizontalFlip,
     RandomResizeCrop,
@@ -149,4 +150,68 @@ class TestHyperparameters:
                     learning_rate=0.01,
                 ),
                 evaluation=EvaluationParameters(),
+            )
+
+    def test_partial_hyperparameters(self):
+        """Test that PartialHyperparameters works correctly with both partial and complete configurations."""
+        # Test with a partial configuration
+        partial_hyperparams = PartialHyperparameters.model_validate(
+            {
+                "training": {
+                    "learning_rate": 0.005,
+                    "early_stopping": {
+                        "enable": True,
+                    },
+                }
+            }
+        )
+
+        # Verify that specified fields are set correctly
+        assert partial_hyperparams.training.learning_rate == 0.005
+        assert partial_hyperparams.training.early_stopping.enable is True
+
+        # Verify that unspecified fields are None
+        assert partial_hyperparams.dataset_preparation is None
+        assert partial_hyperparams.evaluation is None
+        assert partial_hyperparams.training.max_epochs is None
+        assert partial_hyperparams.training.early_stopping.patience is None
+
+        # Test with a nested partial configuration
+        nested_partial_hyperparams = PartialHyperparameters.model_validate(
+            {"dataset_preparation": {"augmentation": {"center_crop": {"ratio": 0.75}}}}
+        )
+
+        # Verify that nested fields are set correctly
+        assert nested_partial_hyperparams.dataset_preparation.augmentation.center_crop.ratio == 0.75
+        assert nested_partial_hyperparams.dataset_preparation.augmentation.center_crop.enable is None
+
+        # Test with a full configuration
+        full_hyperparams = Hyperparameters(
+            dataset_preparation=DatasetPreparationParameters(
+                augmentation=AugmentationParameters(
+                    center_crop=CenterCrop(enable=True, ratio=0.6),
+                )
+            ),
+            training=TrainingHyperParameters(
+                max_epochs=100,
+                early_stopping=EarlyStopping(enable=True, patience=10),
+                learning_rate=0.001,
+            ),
+            evaluation=EvaluationParameters(),
+        )
+
+        full_hyperparams_dict = full_hyperparams.model_dump()
+        partial_hyperparams_full = PartialHyperparameters.model_validate(full_hyperparams_dict)
+
+        # Verify that the full configuration converted to partial is identical to the original
+        assert partial_hyperparams_full.model_dump() == full_hyperparams.model_dump()
+
+        # Verify that validation still works for partial models
+        with pytest.raises(ValidationError):
+            PartialHyperparameters.model_validate(
+                {
+                    "training": {
+                        "learning_rate": -0.1  # Invalid: must be > 0
+                    }
+                }
             )
