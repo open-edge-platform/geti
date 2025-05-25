@@ -14,7 +14,7 @@ import {
 } from './utils';
 
 interface ModelPerformanceProps {
-    performance: ModelPerformanceInterface | undefined;
+    performance?: ModelPerformanceInterface;
     genericId: string;
     isDisabled?: boolean;
     isModelTraining?: boolean;

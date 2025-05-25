@@ -15,7 +15,7 @@ interface AnomalyTaskPerformance {
     localScore: number | null;
 }
 
-export type ModelPerformance = TaskPerformance | AnomalyTaskPerformance | undefined;
+export type ModelPerformance = TaskPerformance | AnomalyTaskPerformance;
 
 export interface ModelVersion {
     id: string;
