@@ -3,7 +3,9 @@
 
 import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
 
+import { JobState } from '../../../../../../core/jobs/jobs.const';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
+import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { formatDate } from '../../../../../../shared/utils';
 import { TrainingModelCardProps } from '../model-card/model-card.interface';
 import { ModelInfoFields } from '../model-card/model-info-fields.component';
@@ -19,6 +21,7 @@ export const TrainingModelCard = ({ job }: TrainingModelCardProps) => {
         model.modelVersions.find((modelVersion) => modelVersion.groupName == job.metadata.task.modelArchitecture)
     );
     const genericId = `training-model-${job.metadata.trainedModel.modelId}`;
+    // incrementing model version by 1 to show the next version that will be created after training
     const modelVersion = (trainedModel?.modelVersions[0].version ?? 0) + 1;
 
     return (
@@ -46,9 +49,27 @@ export const TrainingModelCard = ({ job }: TrainingModelCardProps) => {
                             </Text>
                         </Flex>
                         <Flex alignItems={'center'} gap='size-150'>
-                            <Heading id={`version-${genericId}-id`} data-testid={`version-${genericId}-id`} margin={0}>
-                                Version {modelVersion}
-                            </Heading>
+                            {job.state === JobState.RUNNING ? (
+                                <Heading
+                                    id={`version-${genericId}-id`}
+                                    data-testid={`version-${genericId}-id`}
+                                    margin={0}
+                                    UNSAFE_className={classes.threeDotsFlashing}
+                                >
+                                    Version {modelVersion}
+                                </Heading>
+                            ) : (
+                                <>
+                                    <Heading
+                                        id={`version-${genericId}-id`}
+                                        data-testid={`version-${genericId}-id`}
+                                        margin={0}
+                                    >
+                                        Version
+                                    </Heading>
+                                    <ThreeDotsFlashing className={classes.modelVersionThreeDotsFlashing} />
+                                </>
+                            )}
                         </Flex>
                         <Text
                             id={`model-info-${genericId}-id`}
