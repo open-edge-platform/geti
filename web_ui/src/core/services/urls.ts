@@ -620,7 +620,7 @@ const TEST_MEDIA_FILTER = (
 
     if (sortingOptions?.sortBy) {
         searchOptionsUrl.set('sort_by', sortingOptions?.sortBy ?? 'score');
-        searchOptionsUrl.set('sort_direction', sortingOptions?.sortDir ?? 'asc');
+        searchOptionsUrl.set('sort_direction', sortingOptions?.sortDir?.toLocaleLowerCase() ?? 'asc');
     }
 
     searchOptionsUrl.set('limit', mediaItemsLoadSize?.toString() ?? '');
