@@ -42,7 +42,7 @@ dev = [
     # We should upgrade to "docker~=7.1.0" to fix the issue but it is not compatible
     # with the version of Flytekit that we use. In the meantime, we downgrade
     # the "requests" package.
-    "requests==2.31",
+    "requests==2.32.2",
     "types-requests~=2.31",
 ]
 
