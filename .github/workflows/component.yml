@@ -47,6 +47,9 @@ jobs:
       PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
       GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
     steps:
+      - name: Delete huge unnecessary tools folder
+        run: rm -rf /opt/hostedtoolcache
+
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
