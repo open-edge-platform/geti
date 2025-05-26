@@ -165,7 +165,7 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(_ *testing.T) {
 			tt.setupMocks()
-			uc := NewGetOrCreateImageThumbnail(mockRepo, mockCropper)
+			uc, _ := NewGetOrCreateImageThumbnail(mockRepo, mockCropper)
 
 			reader, metadata, err := uc.Execute(ctx, fullImageID)
 			tt.wantAsserts(reader, metadata, err)

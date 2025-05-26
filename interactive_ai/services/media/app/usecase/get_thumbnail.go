@@ -11,8 +11,8 @@ import (
 	sdkentities "geti.com/iai_core/entities"
 	"geti.com/iai_core/logger"
 	"geti.com/iai_core/storage"
+	"github.com/caarlos0/env/v11"
 
-	"media/app/config"
 	"media/app/service"
 )
 
@@ -20,6 +20,10 @@ const defaultThumbSize = 256
 
 type NotFoundError struct {
 	Message string
+}
+
+type EnvsConfig struct {
+	AsynchronousMediaPreprocessing bool `env:"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING" envDefault:"false"`
 }
 
 func (e *NotFoundError) Error() string {
@@ -33,20 +37,27 @@ type IGetOrCreateThumbnail interface {
 type GetOrCreateThumbnail struct {
 	imageRepo storage.ImageRepository
 	cropper   service.Cropper
+	cfg       EnvsConfig
 }
 
-func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper service.Cropper) *GetOrCreateThumbnail {
+func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper service.Cropper) (*GetOrCreateThumbnail, error) {
+	cfg := EnvsConfig{}
+	if err := env.Parse(&cfg); err != nil {
+		logger.Log().Errorf("Failed to parse environment variables: %s", err)
+		return nil, err
+	}
 	return &GetOrCreateThumbnail{
 		imageRepo: imageRepo,
 		cropper:   cropper,
-	}
+		cfg:       cfg,
+	}, nil
 }
 
 // Execute generates a thumbnail for the image with the specified ID and saves it to the storage.
 // The method is agnostic to S3 being enabled or disabled.
 func (uc *GetOrCreateThumbnail) Execute(ctx context.Context, imageID *sdkentities.FullImageID) (io.ReadCloser, *sdkentities.ObjectMetadata, error) {
 	thumbnail, metadata, err := uc.imageRepo.LoadThumbnailByID(ctx, imageID)
-	if err != nil && config.AsynchronousMediaPreprocessing(ctx) {
+	if err != nil && uc.cfg.AsynchronousMediaPreprocessing {
 		return nil, nil, &NotFoundError{"Thumbnail not found"}
 	}
 	if err != nil {
