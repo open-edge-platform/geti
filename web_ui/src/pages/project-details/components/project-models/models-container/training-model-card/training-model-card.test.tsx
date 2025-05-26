@@ -1,57 +1,91 @@
-import { screen } from '@testing-library/react';
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { JobState } from '../../../../../../core/jobs/jobs.const';
-import { providersRender as render } from '../../../../../../test-utils/required-providers-render';
+import { screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import dayjs from 'dayjs';
+
+import { JobState, JobType } from '../../../../../../core/jobs/jobs.const';
+import { RunningTrainingJob } from '../../../../../../core/jobs/jobs.interface';
+import { ModelsGroups } from '../../../../../../core/models/models.interface';
+import { createInMemoryModelsService } from '../../../../../../core/models/services/in-memory-models-service';
+import { formatDate } from '../../../../../../shared/utils';
+import { getMockedProjectIdentifier } from '../../../../../../test-utils/mocked-items-factory/mocked-identifiers';
+import { getMockedJob } from '../../../../../../test-utils/mocked-items-factory/mocked-jobs';
+import { getMockedModelGroups } from '../../../../../../test-utils/mocked-items-factory/mocked-model';
+import { providersRender } from '../../../../../../test-utils/required-providers-render';
+import { ProjectProvider } from '../../../../providers/project-provider/project-provider.component';
 import { TrainingModelCard } from './training-model-card.component';
 
-const mockJob = {
-    state: JobState.RUNNING,
-    metadata: {
-        task: {
-            modelArchitecture: 'ResNet',
-        },
-        trainedModel: {
-            modelId: '123',
-        },
-    },
-    creationTime: '2024-05-21T12:00:00Z',
-};
-
-jest.mock('../../../../../../core/models/hooks/use-models.hook', () => ({
-    useModels: () => ({
-        useProjectModelsQuery: () => ({
-            data: [
-                {
-                    modelVersions: [{ groupName: 'ResNet', version: 1 }],
-                },
-            ],
-        }),
+jest.mock('react-router-dom', () => ({
+    ...jest.requireActual('react-router-dom'),
+    useNavigate: jest.fn(),
+    useParams: () => ({
+        projectId: 'project-id',
+        workspaceId: 'workspace-id',
+        organizationId: 'organization-id',
     }),
 }));
 
-jest.mock('../model-card/model-performance.component', () => ({
-    ModelPerformance: () => <div data-testid='model-performance' />,
-}));
-
-jest.mock('../model-card/model-info-fields.component', () => ({
-    ModelInfoFields: (props: any) => <div data-testid='model-info-fields'>{JSON.stringify(props)}</div>,
-}));
-
 describe('TrainingModelCard', () => {
-    it('renders with correct version and architecture', () => {
-        render(<TrainingModelCard job={mockJob as any} />);
-        expect(screen.getByLabelText(/ResNet version 2/i)).toBeInTheDocument();
-        expect(screen.getByTestId('version-training-model-123-id')).toHaveTextContent('Version 2');
-    });
+    const render = async ({ job, modelGroup }: { job: RunningTrainingJob; modelGroup: ModelsGroups[] }) => {
+        const modelsService = createInMemoryModelsService();
+        modelsService.getModels = jest.fn(async () => modelGroup);
 
-    it('renders trained date', () => {
-        render(<TrainingModelCard job={mockJob as any} />);
-        expect(screen.getByTestId('trained-model-date-id')).toHaveTextContent('Trained: 21 May 2024, 12:00 PM');
-    });
+        providersRender(
+            <ProjectProvider projectIdentifier={getMockedProjectIdentifier()}>
+                <TrainingModelCard job={job} />
+            </ProjectProvider>,
+            {
+                services: {
+                    modelsService,
+                },
+            }
+        );
 
-    it('renders ModelPerformance and ModelInfoFields', () => {
-        render(<TrainingModelCard job={mockJob as any} />);
-        expect(screen.getByTestId('model-performance')).toBeInTheDocument();
-        expect(screen.getByTestId('model-info-fields')).toBeInTheDocument();
+        await waitForElementToBeRemoved(screen.getByRole('progressbar'));
+    };
+
+    it('should display increased model version from the previously trained model, creation time, loading model info and inform that score is not available', async () => {
+        const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
+
+        const mockedJob = getMockedJob({
+            state: JobState.RUNNING,
+            type: JobType.TRAIN,
+            creationTime: formattedCreationDate,
+            metadata: {
+                task: {
+                    taskId: 'segmentation-id',
+                    modelArchitecture: 'YoloV4',
+                    name: 'Segmentation',
+                    datasetStorageId: 'dataset-storage-id',
+                    modelTemplateId: 'template-id',
+                },
+                project: {
+                    id: '123',
+                    name: 'example project',
+                },
+                trainedModel: {
+                    modelId: 'model-id',
+                },
+            },
+        }) as RunningTrainingJob;
+        const mockedGenericId = `training-model-${mockedJob.metadata.trainedModel.modelId}`;
+        const mockedModelGroup = [getMockedModelGroups()];
+        await render({ job: mockedJob, modelGroup: mockedModelGroup });
+
+        expect(screen.getByTestId(`version-${mockedGenericId}-id`)).toHaveTextContent(
+            `Version ${mockedModelGroup[0].modelVersions[0].version + 1}`
+        );
+
+        expect(screen.getByText(`Score not available`)).toBeInTheDocument();
+        expect(screen.getByTestId('trained-model-date-id')).toHaveTextContent(`Trained: ${formattedCreationDate}`);
+
+        await waitFor(() => {
+            const container = screen.getByTestId(`model-info-${mockedGenericId}-id`);
+
+            expect(container).toHaveTextContent('Model weight size');
+            expect(container).toHaveTextContent('Total size');
+            expect(container).toHaveTextContent('Complexity');
+        });
     });
 });

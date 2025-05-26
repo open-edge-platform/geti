@@ -1,4 +1,7 @@
-import { Text } from '@adobe/react-spectrum';
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+import { Text } from '@geti/ui';
 
 import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dots-flashing/three-dots-flashing.component';
 

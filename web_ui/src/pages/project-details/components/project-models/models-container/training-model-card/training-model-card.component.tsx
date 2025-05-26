@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Heading, Text, View } from '@adobe/react-spectrum';
+import { Flex, Heading, Text, View } from '@geti/ui';
 
 import { JobState } from '../../../../../../core/jobs/jobs.const';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
