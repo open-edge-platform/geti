@@ -1,4 +1,5 @@
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { ResponsiveContainer } from 'recharts';
 
 import { createInMemoryProjectService } from '../../../../../../core/projects/services/in-memory-project-service';
 import { getMockedLabel } from '../../../../../../test-utils/mocked-items-factory/mocked-labels';
@@ -47,9 +48,14 @@ describe('AnnotationsObjectsBarHorizontalChart', () => {
         });
         projectService.getProject = async () => mockProject;
 
-        render(<AnnotationObjectsBarHorizontalChart title='Objects Chart' data={data} colors={mockedColors} />, {
-            services: { projectService },
-        });
+        render(
+            <ResponsiveContainer>
+                <AnnotationObjectsBarHorizontalChart title='Objects Chart' data={data} colors={mockedColors} />
+            </ResponsiveContainer>,
+            {
+                services: { projectService },
+            }
+        );
         await waitForElementToBeRemoved(screen.getByRole('progressbar'));
     };
 
