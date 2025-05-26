@@ -2,7 +2,7 @@
 name = "director"
 version = "1.0.0"
 description = "Director service for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
   "attrs>=21.4.0",

@@ -1,5 +1,3 @@
-include ../../../Makefile.shared-python
-
 MAKEFILE_DIR := $(shell pwd)
 OPENAPI_YAML_SPEC := ../../../docs/rest_api/openapi_internal.yaml
 OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
@@ -7,16 +5,11 @@ CLIENT_NAME := geti_client
 CLIENT_PATH := rest_client
 SPEC_HASH_FILE := .openapi_spec_hash
 
-.PHONY: all check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke
-
-all: test
+.PHONY: all check_yaml_spec generate_json_spec generate_client generate_client_if_needed test test_wip test_smoke mypy
 
 venv:
-	uv sync
-
-venv-dev: venv
 	$(MAKE) generate_client_if_needed;
-	uv pip install -e $(CLIENT_PATH)
+	uv sync
 
 check_yaml_spec:
 	@if [ ! -f $(OPENAPI_YAML_SPEC) ]; then \
@@ -42,7 +35,7 @@ generate_client_if_needed: generate_json_spec
 	fi; \
 	echo $$SHA > $(SPEC_HASH_FILE)
 
-tests: venv-dev
+tests: venv
 	@if [ -z "$(FEATURE)" ]; then \
 	  echo "Selected features: all"; \
 	  TARGET="features"; \
@@ -58,23 +51,22 @@ tests: venv-dev
 	fi; \
 	uv run -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
-test_wip: venv-dev
+test_wip: venv
 	@echo "Running WIP tests..."
 	uv run behave --wip features
 
-test_smoke: venv-dev
+test_smoke: venv
 	@$(MAKE) tests BDD_TAG=@smoke
 
-report: venv-dev
+report: venv
 	@echo "Generating HTML report..."
 	@mkdir -p $(MAKEFILE_DIR)/reports/html
 	@. $(ACTIVATE); for file in reports/junit/*.xml; do \
 	  basefile=$$(basename "$$file" .xml); \
-	  junit2html "$$file" "reports/html/$$basefile.html"; \
+	  uvx junit2html "$$file" "reports/html/$$basefile.html"; \
 	done
 
-mypy: venv
+static-code-analysis: venv
+	uv run ruff check --config pyproject.toml
+	uv run ruff format --check --config pyproject.toml
 	uv run mypy features --config-file=pyproject.toml
-
-build-image:
-	@echo "Skipping build image stage for e2e tests"

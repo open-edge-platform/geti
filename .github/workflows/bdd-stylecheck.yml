@@ -1,0 +1,48 @@
+name: BDD style check
+on:
+  pull_request:
+    paths:
+      - 'interactive_ai/tests/e2e/**'
+      - '.github/workflows/bdd-stylecheck.yml'
+  merge_group:
+    paths:
+      - 'interactive_ai/tests/e2e/**'
+      - '.github/workflows/bdd-stylecheck.yml'
+
+permissions: {} # No permissions by default on workflow level
+
+jobs:
+  style-checks:
+    name: Style checks
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@f3121ef80ee2c4902cefcba4d30c2d17aa8baea7
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Node
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: "18.17.0"
+
+      - name: Install swagger-cli and openapi-generator-cli
+        run: |
+          npm config set registry "http://registry.npmjs.org/"
+          npm install -g @apidevtools/swagger-cli
+          npm install -g @openapitools/openapi-generator-cli
+
+      - name: Static code analysis
+        working-directory: interactive_ai/tests/e2e
+        run: make static-code-analysis

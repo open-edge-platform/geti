@@ -30,7 +30,7 @@ export class ProjectTestPage {
     async countImages() {
         const info = this.page.getByText(/(\d)+ images, (\d)+ frames from (\d)+ videos/i);
         const imagesInBucketBelowThreshold = this.getImagesCount(await info.nth(0).textContent());
-        const imagesInBucketAboveThreshold = this.getImagesCount(await info.nth(0).textContent());
+        const imagesInBucketAboveThreshold = this.getImagesCount(await info.nth(1).textContent());
 
         return imagesInBucketBelowThreshold + imagesInBucketAboveThreshold;
     }

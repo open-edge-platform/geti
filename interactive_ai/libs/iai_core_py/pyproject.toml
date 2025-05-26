@@ -2,7 +2,7 @@
 name = "iai-core"
 version = "1.0.0"
 description = "Core Python library for Geti Interactive AI"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "attrs~=24.3",

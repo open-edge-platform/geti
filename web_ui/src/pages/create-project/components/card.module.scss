@@ -19,6 +19,11 @@
     cursor: not-allowed;
 }
 
+.card {
+    flex: 1;
+    cursor: pointer;
+}
+
 .cardBody:last-child {
     border-top-left-radius: 0;
     border-top-right-radius: 0;

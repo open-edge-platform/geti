@@ -273,18 +273,13 @@ interactive_ai/workflows/geti_domain/train:
   - Makefile.shared
   - .github/workflows/component.yml
 # TODO: Re-enable CVS-166868
-#interactive_ai/workflows/otx_domain/trainer/otx_v2:
-#  - interactive_ai/workflows/otx_domain/trainer/otx_v2/**
-#  - libs/telemetry_tools/**
-#  - libs/kafka_tools/**
-#  - Makefile.shared-python
-#  - Makefile.shared
-#  - .github/workflows/component.yml
-interactive_ai/tests/e2e:
-  - interactive_ai/tests/e2e/**
-  - Makefile.shared-python
-  - Makefile.shared
-  - .github/workflows/component.yml
+# interactive_ai/workflows/otx_domain/trainer/otx_v2:
+#   - interactive_ai/workflows/otx_domain/trainer/otx_v2/**
+#   - libs/telemetry_tools/**
+#   - libs/kafka_tools/**
+#   - Makefile.shared-python
+#   - Makefile.shared
+#   - .github/workflows/component.yml
 
 # Web UI
 web_ui:
