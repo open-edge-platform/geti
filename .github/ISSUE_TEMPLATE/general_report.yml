@@ -54,9 +54,11 @@ body:
   - type: input
     id: version
     attributes:
-      label: 📦 Project version
-      description: Version of this project (e.g. `v1.2.3`, commit hash, or branch name)
-      placeholder: "e.g. v1.2.3"
+      label: 📦 Geti version
+      description: Version of this project (e.g. `2.10.0`, commit hash, or branch name)
+      placeholder: "e.g. 2.10.0"
+    validations:
+      required: true
 
   - type: input
     id: os
@@ -67,8 +69,8 @@ body:
   - type: input
     id: openvino
     attributes:
-      label: OpenVINO Version (if applicable)
-      placeholder: "e.g. 2023.2"
+      label: Browser (if applicable)
+      placeholder: "e.g. Chrome, version 136.0.7103.114"
 
   - type: input
     id: python-version
@@ -80,7 +82,7 @@ body:
     id: hardware
     attributes:
       label: Hardware
-      placeholder: "e.g. Intel CPU, NVIDIA GPU, VPU..."
+      placeholder: "e.g. Intel CPU, GPU, RAM"
 
   - type: textarea
     id: context
