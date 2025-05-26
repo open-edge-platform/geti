@@ -4,15 +4,21 @@
 package config
 
 import (
-	"media/app/utils"
+	"context"
+
+	"geti.com/iai_core/logger"
+	"github.com/caarlos0/env/v11"
 )
 
-const (
-	featureFlagAsynchronousMediaPreprocessing = "FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING"
-	featureFlagDefaultValue                   = false
-)
+type envsConfig struct {
+	AsynchronousMediaPreprocessing bool `env:"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING" envDefault:"false"`
+}
 
-//goland:noinspection GoCommentStart
-var (
-	FeatureFlagAsynchronousMediaPreprocessing = utils.GetBoolEnvOrDefault(featureFlagAsynchronousMediaPreprocessing, featureFlagDefaultValue)
-)
+func AsynchronousMediaPreprocessing(ctx context.Context) bool {
+	cfg := envsConfig{}
+	if err := env.Parse(&cfg); err != nil {
+		logger.TracingLog(ctx).Errorf("Failed to parse environment variables: %s", err)
+		return false
+	}
+	return cfg.AsynchronousMediaPreprocessing
+}

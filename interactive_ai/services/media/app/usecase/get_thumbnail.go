@@ -46,7 +46,7 @@ func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper ser
 // The method is agnostic to S3 being enabled or disabled.
 func (uc *GetOrCreateThumbnail) Execute(ctx context.Context, imageID *sdkentities.FullImageID) (io.ReadCloser, *sdkentities.ObjectMetadata, error) {
 	thumbnail, metadata, err := uc.imageRepo.LoadThumbnailByID(ctx, imageID)
-	if err != nil && config.FeatureFlagAsynchronousMediaPreprocessing {
+	if err != nil && config.AsynchronousMediaPreprocessing(ctx) {
 		return nil, nil, &NotFoundError{"Thumbnail not found"}
 	}
 	if err != nil {

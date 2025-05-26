@@ -8,6 +8,7 @@ replace geti.com/iai_core => ./../../libs/iai_core_go
 
 require (
 	geti.com/iai_core v1.0.0
+	github.com/caarlos0/env/v11 v11.2.2
 	github.com/gin-contrib/pprof v1.5.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
