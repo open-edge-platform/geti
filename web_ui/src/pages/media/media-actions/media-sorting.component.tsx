@@ -33,7 +33,7 @@ export const MediaSorting = ({
 
     const onSortMenuAction = (key: Key) => {
         const [sortBy, sortDir] = String(key).split(KEY_SEPARATOR);
-        setSortingOptions({ sortBy: sortBy.toUpperCase(), sortDir });
+        setSortingOptions({ sortBy: sortBy.toUpperCase(), sortDir: sortDir === 'asc' ? 'asc' : 'dsc' });
     };
 
     return (
