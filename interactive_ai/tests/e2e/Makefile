@@ -1,5 +1,3 @@
-include ../../../Makefile.shared-python
-
 MAKEFILE_DIR := $(shell pwd)
 OPENAPI_YAML_SPEC := ../../../docs/rest_api/openapi_internal.yaml
 OPENAPI_JSON_SPEC := /tmp/openapi_internal.json
@@ -68,11 +66,7 @@ report: venv
 	  uvx junit2html "$$file" "reports/html/$$basefile.html"; \
 	done
 
-static-code-analysis:
-	uv sync --only-dev
+static-code-analysis: venv
 	uv run ruff check --config pyproject.toml
 	uv run ruff format --check --config pyproject.toml
-	uv run mypy features --config-file=pyproject.toml --install-types --non-interactive
-
-build-image:
-	@echo "Skipping build image stage for e2e tests"
+	uv run mypy features --config-file=pyproject.toml
