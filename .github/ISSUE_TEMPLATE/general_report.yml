@@ -48,7 +48,7 @@ body:
     id: screenshots
     attributes:
       label: 🖼️ Screenshots, video recordings or logs
-      description: Upload screenshots, logs, or recordings that help explain the issue.
+      description: Upload screenshots, logs, or recordings that help explaining the issue.
       placeholder: "Drag and drop files, or paste logs here..."
 
   - type: input
