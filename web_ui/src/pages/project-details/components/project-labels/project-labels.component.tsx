@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 
 import { Button, DialogContainer, Divider, Flex, Loading, Tooltip, TooltipTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
@@ -15,6 +15,7 @@ import { getFlattenedItems, getFlattenedLabels, getNonEmptyLabelsFromProject } f
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { isClassificationDomain } from '../../../../core/projects/domains';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
+import { ProjectProps } from '../../../../core/projects/project.interface';
 import { TaskMetadata } from '../../../../core/projects/task.interface';
 import { useHistoryBlock } from '../../../../hooks/use-history-block/use-history-block.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
@@ -33,7 +34,7 @@ export const ProjectLabels = (): JSX.Element => {
     const { editProjectLabelsMutation } = useProjectActions();
     const datasetIdentifier = useDatasetIdentifier();
 
-    const { project, isTaskChainProject, reload, isSingleDomainProject } = useProject();
+    const { project, isTaskChainProject, isSingleDomainProject } = useProject();
 
     const [isDirty, setIsDirty] = useState<boolean>(false);
     const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
@@ -44,10 +45,6 @@ export const ProjectLabels = (): JSX.Element => {
     const { addNotification } = useNotification();
 
     const [isOpen, setIsOpen, onUnsavedAction] = useHistoryBlock(isEditionEnabled);
-
-    useEffect(() => {
-        setTasksMetadata(getTasksMetadata(project.tasks));
-    }, [project]);
 
     const hasMinimumNumberOfLabels = (): boolean => {
         const labelsToBeRemoved = getFlattenedItems(tasksMetadata.flatMap((task) => task.labels)).filter(
@@ -117,8 +114,7 @@ export const ProjectLabels = (): JSX.Element => {
                 shouldRevisit,
             },
             {
-                onSettled: reload,
-                onSuccess: () => {
+                onSuccess: (updatedProject: ProjectProps) => {
                     const message = `Labels have been changed successfully.${
                         shouldRevisit ? ' All affected images are assigned the Revisit status. ' : ''
                     }`;
@@ -126,6 +122,7 @@ export const ProjectLabels = (): JSX.Element => {
                     addNotification({ message, type: NOTIFICATION_TYPE.INFO });
                     setIsDirty(false);
                     setEditionEnablement(false);
+                    setTasksMetadata(getTasksMetadata(updatedProject.tasks));
                 },
             }
         );
