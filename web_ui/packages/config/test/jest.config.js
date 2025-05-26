@@ -11,9 +11,9 @@ export default {
     setupFiles: ['react-app-polyfill/jsdom'],
     testEnvironment: 'jsdom',
     transform: {
-        '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': path.resolve(dirname, '../../../config/jest/babelTransform.js'),
-        '^.+\\.css$': path.resolve(dirname, '../../../config/jest/cssTransform.js'),
-        '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)': path.resolve(dirname, '../../../config/jest/fileTransform.js'),
+        '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': path.resolve(dirname, './transformers/babelTransform.js'),
+        '^.+\\.css$': path.resolve(dirname, './transformers/cssTransform.js'),
+        '^(?!.*\\.(js|jsx|mjs|cjs|ts|tsx|css|json)$)': path.resolve(dirname, './transformers/fileTransform.js'),
     },
     transformIgnorePatterns: ['node_modules/?!(pretty-bytes)'],
     moduleNameMapper: {

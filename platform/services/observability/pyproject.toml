@@ -4,7 +4,7 @@
 name = "observability"
 version = "1.0.0"
 description = "Observability service for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 dependencies = [
     "kubernetes==24.2.0",
     "uvicorn==0.19.0",

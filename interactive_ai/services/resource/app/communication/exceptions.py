@@ -1061,3 +1061,18 @@ class ExportableCodeNotInitializedException(GetiBaseException):
             error_code="exportable_code_not_found",
             http_status=http.HTTPStatus.NOT_FOUND,
         )
+
+
+class MediaNotPreprocessedException(GetiBaseException):
+    """
+    This exception is raised when media artifacts (i.e. thumbnail) are requested, but media is not preprocessed yet.
+
+    :param media_id: the ID of the media
+    """
+
+    def __init__(self, media_id: ID) -> None:
+        super().__init__(
+            message=f"The media (ID:{media_id}) is not yet preprocessed, please try later.",
+            error_code="media_is_not_preprocessed",
+            http_status=http.HTTPStatus.PRECONDITION_FAILED,
+        )
