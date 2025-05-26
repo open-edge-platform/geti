@@ -25,6 +25,34 @@ jest.mock('react-router-dom', () => ({
         organizationId: 'organization-id',
     }),
 }));
+jest.mock('../../../../../../hooks/use-project-identifier/use-project-identifier', () => {
+    return {
+        useProjectIdentifier: jest.fn(() => {
+            return {
+                workspaceId: 'workspace-id',
+                projectId: 'project-id',
+            };
+        }),
+    };
+});
+jest.mock('../../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms', () => ({
+    ...jest.requireActual('../../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms'),
+    useTasksWithSupportedAlgorithms: () => ({
+        tasksWithSupportedAlgorithms: {
+            '321': [
+                {
+                    domain: 'Classification',
+                    summary: 'Class-Incremental Image Classification for EfficientNet-B0',
+                    gigaflops: 0.81,
+                    isDefaultAlgorithm: true,
+                    modelSize: 4.09,
+                    name: 'EfficientNet-B0',
+                    modelTemplateId: 'Custom_Image_Classification_EfficinetNet-B0',
+                },
+            ],
+        },
+    }),
+}));
 
 describe('TrainingModelCard', () => {
     const render = async ({ job, modelGroup }: { job: RunningTrainingJob; modelGroup: ModelsGroups[] }) => {
@@ -45,9 +73,9 @@ describe('TrainingModelCard', () => {
         await waitForElementToBeRemoved(screen.getByRole('progressbar'));
     };
 
+    // eslint-disable-next-line max-len
     it('should display increased model version from the previously trained model, creation time, loading model info and inform that score is not available', async () => {
         const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
-
         const mockedJob = getMockedJob({
             state: JobState.RUNNING,
             type: JobType.TRAIN,
@@ -55,7 +83,7 @@ describe('TrainingModelCard', () => {
             metadata: {
                 task: {
                     taskId: 'segmentation-id',
-                    modelArchitecture: 'YoloV4',
+                    modelArchitecture: 'SSD',
                     name: 'Segmentation',
                     datasetStorageId: 'dataset-storage-id',
                     modelTemplateId: 'template-id',
@@ -76,6 +104,47 @@ describe('TrainingModelCard', () => {
         expect(screen.getByTestId(`version-${mockedGenericId}-id`)).toHaveTextContent(
             `Version ${mockedModelGroup[0].modelVersions[0].version + 1}`
         );
+
+        expect(screen.getByText(`Score not available`)).toBeInTheDocument();
+        expect(screen.getByTestId('trained-model-date-id')).toHaveTextContent(`Trained: ${formattedCreationDate}`);
+
+        await waitFor(() => {
+            const container = screen.getByTestId(`model-info-${mockedGenericId}-id`);
+
+            expect(container).toHaveTextContent('Model weight size');
+            expect(container).toHaveTextContent('Total size');
+            expect(container).toHaveTextContent('Complexity');
+        });
+    });
+
+    // eslint-disable-next-line max-len
+    it('should display model version 1 if there were not previously trained model in that architecture, creation time, loading model info and inform that score is not available', async () => {
+        const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
+        const mockedJob = getMockedJob({
+            state: JobState.RUNNING,
+            type: JobType.TRAIN,
+            creationTime: formattedCreationDate,
+            metadata: {
+                task: {
+                    taskId: 'segmentation-id',
+                    modelArchitecture: 'SSD',
+                    name: 'Segmentation',
+                    datasetStorageId: 'dataset-storage-id',
+                    modelTemplateId: 'template-id',
+                },
+                project: {
+                    id: '123',
+                    name: 'example project',
+                },
+                trainedModel: {
+                    modelId: 'model-id',
+                },
+            },
+        }) as RunningTrainingJob;
+        const mockedGenericId = `training-model-${mockedJob.metadata.trainedModel.modelId}`;
+        await render({ job: mockedJob, modelGroup: [] });
+
+        expect(screen.getByTestId(`version-${mockedGenericId}-id`)).toHaveTextContent(`Version 1`);
 
         expect(screen.getByText(`Score not available`)).toBeInTheDocument();
         expect(screen.getByTestId('trained-model-date-id')).toHaveTextContent(`Trained: ${formattedCreationDate}`);
