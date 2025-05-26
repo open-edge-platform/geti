@@ -51,13 +51,13 @@ jobs:
         run: rm -rf /opt/hostedtoolcache
 
       - name: Checkout code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.1.2
         with:
           persist-credentials: false
           ref: ${{ inputs.branch || '' }}
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        uses: aws-actions/configure-aws-credentials@b47578312673ae6fa5b5096b330d9fbac3d116df # v4.2.1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           role-session-name: Github
