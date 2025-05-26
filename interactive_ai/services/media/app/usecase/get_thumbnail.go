@@ -13,6 +13,7 @@ import (
 	"geti.com/iai_core/storage"
 
 	"media/app/service"
+	"media/app/config"
 )
 
 const defaultThumbSize = 256
@@ -45,6 +46,9 @@ func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper ser
 // The method is agnostic to S3 being enabled or disabled.
 func (uc *GetOrCreateThumbnail) Execute(ctx context.Context, imageID *sdkentities.FullImageID) (io.ReadCloser, *sdkentities.ObjectMetadata, error) {
 	thumbnail, metadata, err := uc.imageRepo.LoadThumbnailByID(ctx, imageID)
+	if err != nil && config.FeatureFlagAsynchronousMediaPreprocessing {
+	    return nil, nil, &NotFoundError{"Thumbnail not found"}
+	}
 	if err != nil {
 		logger.TracingLog(ctx).Infof(
 			"Thumbnail for Image with ID %s does not yet exist. Attempting to generate one.", imageID)
