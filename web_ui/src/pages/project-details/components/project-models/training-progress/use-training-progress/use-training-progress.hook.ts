@@ -16,7 +16,6 @@ import {
     getAllJobs,
     isRunningOrScheduledTrainingJob,
 } from '../../../../../../shared/components/header/jobs-management/utils';
-import { useIsTraining } from '../../hooks/use-is-training.hook';
 
 interface UseTrainingProgressDetails {
     showTrainingProgress: true;
@@ -29,7 +28,7 @@ interface UseTrainingProgressNoDetails {
 
 type UseTrainingProgress = UseTrainingProgressDetails | UseTrainingProgressNoDetails;
 
-const useTrainingProgressJobs = (isTraining: boolean) => {
+const useTrainingProgressJobs = () => {
     const queryClient = useQueryClient();
     const projectIdentifier = useProjectIdentifier();
     const prevJobsSize = useRef<number>();
@@ -51,7 +50,6 @@ const useTrainingProgressJobs = (isTraining: boolean) => {
     const { data: runningJobsData, isSuccess: runningJobsIsSuccess } = useGetRunningJobs({
         projectId: projectIdentifier.projectId,
         queryOptions: {
-            enabled: isTraining,
             refetchIntervalInBackground: true,
             queryKey: QUERY_KEYS.JOBS_KEY(projectIdentifier, JobState.RUNNING, areTrainingDetails),
         },
@@ -60,18 +58,20 @@ const useTrainingProgressJobs = (isTraining: boolean) => {
     const { data: scheduledJobsData, isSuccess: scheduledJobsIsSuccess } = useGetScheduledJobs({
         projectId: projectIdentifier.projectId,
         queryOptions: {
-            enabled: isTraining,
             refetchIntervalInBackground: true,
             queryKey: QUERY_KEYS.JOBS_KEY(projectIdentifier, JobState.SCHEDULED, areTrainingDetails),
         },
     });
 
     useEffect(() => {
-        if (!runningJobsIsSuccess || !scheduledJobsIsSuccess) {
+        if (!runningJobsIsSuccess && !scheduledJobsIsSuccess) {
             return;
         }
 
-        handleSuccess({ ...runningJobsData, ...scheduledJobsData });
+        handleSuccess({
+            pages: [...(runningJobsData?.pages ?? []), ...(scheduledJobsData?.pages ?? [])],
+            pageParams: [...(runningJobsData?.pageParams ?? []), ...(scheduledJobsData?.pageParams ?? [])],
+        });
     }, [runningJobsData, runningJobsIsSuccess, handleSuccess, scheduledJobsData, scheduledJobsIsSuccess]);
 
     const runningJobs = runningJobsData?.pages?.flatMap((jobsResponse) => jobsResponse.jobs) ?? [];
@@ -81,19 +81,18 @@ const useTrainingProgressJobs = (isTraining: boolean) => {
 };
 
 export const useTrainingProgress = (taskId: string): UseTrainingProgress => {
-    const isTraining = useIsTraining();
-    const data = useTrainingProgressJobs(isTraining);
+    const data = useTrainingProgressJobs();
 
-    const getTrainingDetails = (): RunningTrainingJob[] | undefined => {
+    const getTrainingDetails = (): RunningTrainingJob[] => {
         const jobsPerTask = data.filter(
             (job) => isRunningOrScheduledTrainingJob(job) && taskId === job.metadata.task.taskId
         ) as RunningTrainingJob[];
-        return !isEmpty(jobsPerTask) ? jobsPerTask : undefined;
+        return jobsPerTask;
     };
 
     const trainingDetails = getTrainingDetails();
 
-    if (isTraining && trainingDetails) {
+    if (!isEmpty(trainingDetails)) {
         return {
             showTrainingProgress: true,
             trainingDetails,
