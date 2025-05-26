@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
-import { Flex, Link as SpectrumLink, Text, View, VirtualizeHorizontalGrid } from '@geti/ui';
+import { Flex, Link as SpectrumLink, Text, View, VirtualizedHorizontalGrid } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { Link } from 'react-router-dom';
 
@@ -45,9 +45,9 @@ export const SidebarThumbnail = ({ screenshots, isCloseSidebar = false }: Sideba
 
     return (
         <>
-            <VirtualizeHorizontalGrid
-                key={screenshots.length}
+            <VirtualizedHorizontalGrid
                 items={screenshots}
+                key={screenshots.map(getId).join('-')}
                 containerHeight={isCloseSidebar ? `size-800` : `size-1250`}
                 size={isCloseSidebar ? 60 : 96}
                 idFormatter={getId}

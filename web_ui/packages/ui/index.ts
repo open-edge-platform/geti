@@ -155,4 +155,4 @@ export {
     DropIndicator,
     useDragAndDrop,
 } from 'react-aria-components';
-export { VirtualizeHorizontalGrid } from './src/virtualize-horizontal-grid/virtualize-horizontal-grid';
+export { VirtualizedHorizontalGrid } from './src/virtualized-horizontal-grid/virtualized-horizontal-grid';

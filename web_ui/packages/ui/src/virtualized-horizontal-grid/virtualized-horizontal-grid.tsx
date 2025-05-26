@@ -9,9 +9,9 @@ import { ListBox as AriaComponentsListBox, ListBoxItem, Virtualizer } from 'reac
 
 import { HorizontalLayout, HorizontalLayoutOptions } from './horizontal-layout';
 
-import classes from './virtualize-horizontal-grid.module.scss';
+import classes from './virtualized-horizontal-grid.module.scss';
 
-interface VirtualizeHorizontalGridProps<T> {
+interface VirtualizedHorizontalGridProps<T> {
     items: T[];
     size: number;
     containerHeight?: Responsive<DimensionValue>;
@@ -20,14 +20,14 @@ interface VirtualizeHorizontalGridProps<T> {
     textValueFormatter: (item: T) => string;
 }
 
-export const VirtualizeHorizontalGrid = <T,>({
+export const VirtualizedHorizontalGrid = <T,>({
     size,
     items,
     containerHeight,
     renderItem,
     idFormatter,
     textValueFormatter,
-}: VirtualizeHorizontalGridProps<T>) => {
+}: VirtualizedHorizontalGridProps<T>) => {
     return (
         <View position={'relative'} width={'100%'} height={`calc(${containerHeight} + 1px)`}>
             <Virtualizer<HorizontalLayoutOptions> layout={HorizontalLayout} layoutOptions={{ size, gap: 4 }}>

@@ -4,6 +4,7 @@
 import { InvalidationContext } from '@react-stately/virtualizer';
 import { Key, Layout, LayoutInfo, Rect, Size } from 'react-aria-components';
 
+const DEFAULT_GAP = 8;
 const DEFAULT_SIZE = 100;
 
 export interface HorizontalLayoutOptions {
@@ -17,7 +18,7 @@ export class HorizontalLayout extends Layout {
 
     constructor(options: HorizontalLayoutOptions = {}) {
         super();
-        this.gap = options.gap ?? 8;
+        this.gap = options.gap ?? DEFAULT_GAP;
         this.size = options.size ?? DEFAULT_SIZE;
     }
 
@@ -31,23 +32,28 @@ export class HorizontalLayout extends Layout {
         const keys = Array.from(this.virtualizer.collection.getKeys());
         const startIndex = Math.max(0, Math.floor(rect.x / sizeWithGap));
         const endIndex = Math.min(keys.length - 1, Math.ceil(rect.maxX / sizeWithGap));
-        const layoutInfos = [];
+        const layoutInfos: LayoutInfo[] = [];
 
         for (let i = startIndex; i <= endIndex; i++) {
-            layoutInfos.push(this.getLayoutInfo(keys[i]));
+            const layoutInfo = this.getLayoutInfo(keys[i]);
+            layoutInfo && layoutInfos.push(layoutInfo);
         }
 
         // Always add persisted keys (e.g. the focused item), even when out of view.
         for (const key of this.virtualizer.persistedKeys) {
             const item = this.virtualizer.collection.getItem(key);
-            if (item?.index && item.index < startIndex) {
-                layoutInfos.unshift(this.getLayoutInfo(key));
-            } else if (item?.index && item.index > endIndex) {
-                layoutInfos.push(this.getLayoutInfo(key));
+            const layoutInfo = this.getLayoutInfo(key);
+            const isValidItemWithLayoutInfo = item?.index !== undefined && layoutInfo;
+
+            if (isValidItemWithLayoutInfo && item.index < startIndex) {
+                layoutInfos.unshift(layoutInfo);
+            }
+            if (isValidItemWithLayoutInfo && item.index > endIndex) {
+                layoutInfos.push(layoutInfo);
             }
         }
 
-        return layoutInfos as LayoutInfo[];
+        return layoutInfos;
     }
 
     // Provide a LayoutInfo for a specific item.
