@@ -73,7 +73,6 @@ describe('TrainingModelCard', () => {
         await waitForElementToBeRemoved(screen.getByRole('progressbar'));
     };
 
-    // eslint-disable-next-line max-len
     it('should display increased model version from the previously trained model, creation time, loading model info and inform that score is not available', async () => {
         const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
         const mockedJob = getMockedJob({
@@ -117,7 +116,6 @@ describe('TrainingModelCard', () => {
         });
     });
 
-    // eslint-disable-next-line max-len
     it('should display model version 1 if there were not previously trained model in that architecture, creation time, loading model info and inform that score is not available', async () => {
         const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
         const mockedJob = getMockedJob({
