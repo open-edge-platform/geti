@@ -1,9 +1,11 @@
 import { screen } from '@testing-library/react';
 
+import { JobState } from '../../../../../../core/jobs/jobs.const';
 import { providersRender as render } from '../../../../../../test-utils/required-providers-render';
 import { TrainingModelCard } from './training-model-card.component';
 
 const mockJob = {
+    state: JobState.RUNNING,
     metadata: {
         task: {
             modelArchitecture: 'ResNet',

@@ -54,7 +54,6 @@ export const TrainingModelCard = ({ job }: TrainingModelCardProps) => {
                                     id={`version-${genericId}-id`}
                                     data-testid={`version-${genericId}-id`}
                                     margin={0}
-                                    UNSAFE_className={classes.threeDotsFlashing}
                                 >
                                     Version {modelVersion}
                                 </Heading>
