@@ -8,6 +8,9 @@ on:
     paths:
       - 'interactive_ai/tests/e2e/**'
       - '.github/workflows/bdd-stylecheck.yml'
+
+permissions: {} # No permissions by default on workflow level
+
 jobs:
   style-checks:
     name: Style checks
@@ -15,7 +18,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    runs-on: sonoma-creek-c1m2
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
