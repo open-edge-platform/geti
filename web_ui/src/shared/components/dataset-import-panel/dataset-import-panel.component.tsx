@@ -56,7 +56,7 @@ const StatusIcon = ({ datasetImportItem }: { datasetImportItem: DatasetImportIte
     }
 
     if (isErrorStatus(datasetImportItem)) {
-        return <Alert size='S' UNSAFE_className={classes.negative} data-testid='alert-icon' />;
+        return <Alert className={classes.negative} data-testid='alert-icon' />;
     }
 
     return <InfoOutline width={16} height={16} data-testid='info-icon' />;
