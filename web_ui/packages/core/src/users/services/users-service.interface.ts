@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
+import { AccountStatusDTO } from '../../../../../src/core/organizations/dtos/organizations.interface';
 import { ForgotPasswordDTO, ResetPasswordDTO, UpdatePasswordDTO, UserRegistrationDTO } from '../dtos/members.interface';
 import {
     MemberRole,

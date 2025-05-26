@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RESOURCE_TYPE, Role, USER_ROLE } from '../../users/users.interface';
+import { RESOURCE_TYPE, Role, USER_ROLE } from '@geti/core/src/users/users.interface';
+
 import {
     AccountStatusDTO,
     GetOrganizationsQueryOptionsDTO,

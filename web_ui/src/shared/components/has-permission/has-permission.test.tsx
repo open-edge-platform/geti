@@ -3,13 +3,13 @@
 
 import { ReactNode } from 'react';
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
+import { getUserEntity } from '@geti/core/src/users/services/utils';
+import { RESOURCE_TYPE, ResourceTypeDTO, UserDTO, UserRoleDTO } from '@geti/core/src/users/users.interface';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useParams } from 'react-router-dom';
 
 import { AccountStatusDTO } from '../../../core/organizations/dtos/organizations.interface';
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
-import { getUserEntity } from '../../../core/users/services/utils';
-import { RESOURCE_TYPE, ResourceTypeDTO, UserDTO, UserRoleDTO } from '../../../core/users/users.interface';
 import { RequiredProviders } from '../../../test-utils/required-providers-render';
 import { useCheckPermission } from './has-permission.component';
 import { OPERATION } from './has-permission.interface';

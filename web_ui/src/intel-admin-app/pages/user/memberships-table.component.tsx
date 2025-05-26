@@ -3,9 +3,9 @@
 
 import { FC } from 'react';
 
+import { USER_ROLE } from '@geti/core/src/users/users.interface';
 import { Cell, Column, Row, TableBody, TableHeader, TableView } from '@geti/ui';
 
-import { USER_ROLE } from '../../../core/users/users.interface';
 import { DateCell } from '../../../shared/components/table/date-cell/date-cell.component';
 import { StatusCell } from '../../../shared/components/table/status-cell/status-cell.component';
 import { OrganizationNameCell } from '../organizations/cells/organization-name-cell.component';

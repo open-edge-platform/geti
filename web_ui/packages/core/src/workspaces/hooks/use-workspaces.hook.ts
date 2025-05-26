@@ -9,11 +9,11 @@ import {
     UseSuspenseQueryResult,
 } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { useApplicationServices } from 'src/services/application-services-provider.component';
 
 import { NOTIFICATION_TYPE } from '../../../../../src/notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../src/notification/notification.component';
 import QUERY_KEYS from '../../requests/query-keys';
+import { useApplicationServices } from '../../services/application-services-provider.component';
 import { getErrorMessage } from '../../services/utils';
 import { WorkspaceEntity } from '../services/workspaces.interface';
 

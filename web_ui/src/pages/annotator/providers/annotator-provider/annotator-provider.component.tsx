@@ -3,6 +3,8 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isVideoFrame } from '../../../../core/media/video.interface';
@@ -14,7 +16,6 @@ import {
     UserProjectSettings,
     UseSettings,
 } from '../../../../core/user-settings/services/user-settings.interface';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { HoveredProvider } from '../../../../providers/hovered-provider/hovered-provider.component';
 import { SelectedProvider } from '../../../../providers/selected-provider/selected-provider.component';
 import { MissingProviderError } from '../../../../shared/missing-provider-error';

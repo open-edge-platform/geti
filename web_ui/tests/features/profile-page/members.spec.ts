@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { USER_ROLE_MAPPING } from '../../../src/core/users/services/utils';
-import { ResourceTypeDTO, USER_ROLE, UserDTO, UserRoleDTO } from '../../../src/core/users/users.interface';
+import { USER_ROLE_MAPPING } from '@geti/core/src/users/services/utils';
+import { ResourceTypeDTO, USER_ROLE, UserDTO, UserRoleDTO } from '@geti/core/src/users/users.interface';
+
 import { expect, test } from '../../fixtures/base-test';
 import { MembersPage } from '../../fixtures/page-objects/members-page';
 import { registerApiMembers } from './api';

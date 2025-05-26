@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { USER_ROLE, WorkspaceRole } from '@geti/core/src/users/users.interface';
 import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Button } from '@geti/ui';
 
-import { USER_ROLE, WorkspaceRole } from '../../../../../../core/users/users.interface';
 import { useUserRoles } from './user-user-roles.hook';
 import { getUpdatedWorkspaceRoles } from './utils';
 import { WorkspaceRoleRow } from './workspace-role-row.component';

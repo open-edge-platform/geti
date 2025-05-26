@@ -4,7 +4,7 @@
 import { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
-import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
+import { AccountStatusDTO } from '../../../../../src/core/organizations/dtos/organizations.interface';
 import {
     MemberRole,
     Resource,

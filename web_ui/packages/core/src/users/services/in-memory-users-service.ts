@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getMockedUser } from '../../../test-utils/mocked-items-factory/mocked-users';
+import { getMockedUser } from '../../../../../src/test-utils/mocked-items-factory/mocked-users';
 import { UsersService } from './users-service.interface';
 import { getRoleEntity } from './utils';
 

@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
+import { ResourceTypeDTO, UserDTO, UserRoleDTO } from '@geti/core/src/users/users.interface';
 import { v4 as uuid } from 'uuid';
 
 import { AccountStatusDTO } from '../../../src/core/organizations/dtos/organizations.interface';
-import { ResourceTypeDTO, UserDTO, UserRoleDTO } from '../../../src/core/users/users.interface';
 
 export const ACCOUNT_URL = (organizationId: string, tab: string) => `${paths.account.index({ organizationId })}/${tab}`;
 

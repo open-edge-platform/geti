@@ -24,7 +24,7 @@ import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interfa
 import { ProjectsQueryOptions } from '../../../../src/core/projects/services/project-service.interface';
 import { SortDirection } from '../../../../src/core/shared/query-parameters';
 import { TaskIdentifier } from '../../../../src/core/statistics/dtos/dataset-statistics.interface';
-import { MemberRoleDTO, ResourceTypeDTO } from '../../../../src/core/users/users.interface';
+import { MemberRoleDTO, ResourceTypeDTO } from '../users/users.interface';
 import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
 import { addVideoPaginationSearchParams, buildAdvancedFilterSearchOptions } from './utils';
 

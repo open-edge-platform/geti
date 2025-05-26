@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
+
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
 import { AccountStatus } from '../../core/organizations/organizations.interface';
-import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 
 export const useShowRequestAccessConfirmation = (): boolean => {

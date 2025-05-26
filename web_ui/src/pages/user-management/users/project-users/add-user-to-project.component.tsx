@@ -3,12 +3,12 @@
 
 import { FC, useMemo, useState } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { getRoleCreationPayload } from '@geti/core/src/users/services/utils';
+import { RESOURCE_TYPE, User, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { Button, ButtonGroup, Content, Dialog, Divider, Grid, Heading } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
-import { getRoleCreationPayload } from '../../../../core/users/services/utils';
-import { RESOURCE_TYPE, User, USER_ROLE } from '../../../../core/users/users.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { hasEqualId } from '../../../../shared/utils';
 import { RolePicker } from '../old-project-users/role-picker.component';

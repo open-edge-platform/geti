@@ -4,12 +4,12 @@
 import { Key, useRef } from 'react';
 
 import { paths } from '@geti/core';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { User } from '@geti/core/src/users/users.interface';
 import { Button, Flex, Grid, Text, useUnwrapDOMRef, type FocusableRefValue } from '@geti/ui';
 import Import from '@spectrum-icons/workflow/Import';
 import { useNavigate } from 'react-router-dom';
 
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
-import { User } from '../../../../../core/users/users.interface';
 import { useHandleSignOut } from '../../../../../hooks/use-handle-sign-out/use-handle-sign-out.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { SignOutWarningDialog } from '../../../../../pages/user-management/profile-page/sign-out-warning-dialog.component';

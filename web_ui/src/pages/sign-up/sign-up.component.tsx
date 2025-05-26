@@ -4,10 +4,10 @@
 import { ReactNode } from 'react';
 
 import { paths } from '@geti/core';
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
 import { Navigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { SignUpOnSaas } from './sign-up-on-saas.component';
 import { useShowRequestAccessConfirmation } from './use-show-request-access-confirmation.hook';
