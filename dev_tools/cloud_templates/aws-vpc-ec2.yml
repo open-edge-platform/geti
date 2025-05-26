@@ -26,7 +26,7 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 192.168.1.0/24
-      MapPublicIpOnLaunch: false
+      MapPublicIpOnLaunch: true
       AvailabilityZone: !Select [0, !GetAZs ''] # Select Availability Zone, index starts from 0
 
   RouteTable:
@@ -82,6 +82,6 @@ Outputs:
     Description: EC2 Instance ID
     Value: !Ref EC2Instance
 
-  PrivateIP:
-    Description: Private IP of the EC2 instance
-    Value: !GetAtt EC2Instance.PrivateIp
+  PublicIP:
+    Description: Public IP of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicIp
