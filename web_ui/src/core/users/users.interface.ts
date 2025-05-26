@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceEntity } from '../../../packages/core/src/workspaces/services/workspaces.interface';
 import { AccountStatusDTO } from '../organizations/dtos/organizations.interface';
 import { AccountStatus } from '../organizations/organizations.interface';
 import { InfiniteQueryDTO } from '../shared/dto/infinite-query.interface';
 import { QueryParametersDTO } from '../shared/dto/query-parameters';
 import { InfiniteQuery } from '../shared/infinite-query.interface';
 import { QueryParameters } from '../shared/query-parameters';
-import { WorkspaceEntity } from '../workspaces/services/workspaces.interface';
 
 export interface UserDTO {
     id: string;

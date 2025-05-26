@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
+
 import { WorkspaceRole } from '../../../../../../core/users/users.interface';
-import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
 
 export function useUserRoles(workspaces: WorkspaceEntity[], workspaceRoles: WorkspaceRole[]) {
     //TODO: add check to have at least one admin in the workspace

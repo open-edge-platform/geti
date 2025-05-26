@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { InfiniteQueryDTO } from '../../shared/dto/infinite-query.interface';
+import { InfiniteQueryDTO } from '../../../../../src/core/shared/dto/infinite-query.interface';
 
 export interface WorkspaceDTO {
     id: string;

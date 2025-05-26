@@ -30,7 +30,7 @@ import { createInMemoryTestsService } from '../../../../src/core/tests/services/
 import { createInMemoryUserSettingsService } from '../../../../src/core/user-settings/services/in-memory-user-settings-service';
 import { createInMemoryUsersService } from '../../../../src/core/users/services/in-memory-users-service';
 import { createInMemoryOnboardingService } from '../../../../src/core/users/services/inmemory-onboarding-service';
-import { createInMemoryApiWorkspacesService } from '../../../../src/core/workspaces/services/in-memory-api-workspaces-service';
+import { createInMemoryApiWorkspacesService } from '../workspaces/services/in-memory-api-workspaces-service';
 import { ApplicationServices, ServiceConfiguration } from './application-services.interface';
 
 export const getInMemoryServices = (serviceConfiguration: ServiceConfiguration): ApplicationServices => {

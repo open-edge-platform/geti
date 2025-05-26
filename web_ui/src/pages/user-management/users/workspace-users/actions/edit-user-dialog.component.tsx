@@ -3,6 +3,7 @@
 
 import { FC, FormEvent, useState } from 'react';
 
+import { WorkspaceEntity, WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
@@ -17,7 +18,6 @@ import {
     USER_ROLE,
     WorkspaceRole,
 } from '../../../../../core/users/users.interface';
-import { WorkspaceEntity, WorkspaceIdentifier } from '../../../../../core/workspaces/services/workspaces.interface';
 import { useWorkspaces } from '../../../../../providers/workspaces-provider/workspaces-provider.component';
 import { RolePicker } from '../../old-project-users/role-picker.component';
 import { getAvailableRoles } from './roles-validation';

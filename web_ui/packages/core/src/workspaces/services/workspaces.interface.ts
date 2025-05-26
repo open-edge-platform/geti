@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { OrganizationIdentifier } from '../../organizations/organizations.interface';
+import { OrganizationIdentifier } from '../../../../../src/core/organizations/organizations.interface';
 
 export interface WorkspaceIdentifier extends OrganizationIdentifier {
     workspaceId: string;

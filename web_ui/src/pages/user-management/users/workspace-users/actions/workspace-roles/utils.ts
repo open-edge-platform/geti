@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
+
 import { RESOURCE_TYPE, RoleResource, WorkspaceRole } from '../../../../../../core/users/users.interface';
-import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
 import { hasEqualId } from '../../../../../../shared/utils';
 
 export const getUpdatedWorkspaceRoles = <T>(editedWorkspaceRole: T, index: number, workspaceRoles: T[]): T[] => {

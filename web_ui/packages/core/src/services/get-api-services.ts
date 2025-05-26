@@ -30,7 +30,7 @@ import { createApiTestsService } from '../../../../src/core/tests/services/api-t
 import { createApiUserSettingsService } from '../../../../src/core/user-settings/services/api-user-settings-service';
 import { createApiOnboardingService } from '../../../../src/core/users/services/api-onboarding-service';
 import { createApiUsersService } from '../../../../src/core/users/services/api-users-service';
-import { createApiWorkspacesService } from '../../../../src/core/workspaces/services/api-workspaces-service';
+import { createApiWorkspacesService } from '../workspaces/services/api-workspaces-service';
 import { ApplicationServices, ServiceConfiguration } from './application-services.interface';
 
 export const getApiServices = (serviceConfiguration: ServiceConfiguration): ApplicationServices => {

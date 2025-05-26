@@ -3,13 +3,13 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
+import { Workspace } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Cell, Column, Flex, Row, TableBody, TableHeader, TableView, View } from '@geti/ui';
 import { get, isEmpty } from 'lodash-es';
 
 import { SortDirection } from '../../../../core/shared/query-parameters';
 import { isOrganizationAdmin } from '../../../../core/users/user-role-utils';
 import { User, UsersQueryParams } from '../../../../core/users/users.interface';
-import { Workspace } from '../../../../core/workspaces/services/workspaces.interface';
 import { useSortTable } from '../../../../hooks/use-sort-table/use-sort-table.hook';
 import { NotFound } from '../../../../shared/components/not-found/not-found.component';
 import { CasualCell } from '../../../../shared/components/table/components/casual-cell/casual-cell.component';

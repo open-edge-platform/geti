@@ -32,7 +32,7 @@ import { TestsService } from '../../../../src/core/tests/services/tests-service.
 import { UserSettingsService } from '../../../../src/core/user-settings/services/user-settings.interface';
 import { OnboardingService } from '../../../../src/core/users/services/onboarding-service.interface';
 import { UsersService } from '../../../../src/core/users/services/users-service.interface';
-import { WorkspacesService } from '../../../../src/core/workspaces/services/workspaces-service.interface';
+import { WorkspacesService } from '../workspaces/services/workspaces-service.interface';
 import { API_URLS } from './urls';
 
 export interface ApplicationServices {
