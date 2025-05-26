@@ -102,7 +102,7 @@ const TestDetailsPreviewContent = ({
 
     const testMediaItemsQuery = useMediaItemsOfTestQuery(projectIdentifier, testId ?? '', filter, {
         sortBy: SearchRuleField.Score,
-        sortDir,
+        sortDir: sortDir === SortDirection.ASC ? 'asc' : 'dsc',
     });
 
     const { isFetching, hasNextPage, fetchNextPage } = testMediaItemsQuery;
