@@ -6,6 +6,7 @@ package utils
 import (
 	"os"
 	"strconv"
+
 	"geti.com/iai_core/logger"
 )
 

@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	featureFlagAsynchronousMediaPreprocessing      = "FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING"
-	featureFlagDefaultValue                        = false
+	featureFlagAsynchronousMediaPreprocessing = "FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING"
+	featureFlagDefaultValue                   = false
 )
 
 //goland:noinspection GoCommentStart
 var (
-	FeatureFlagAsynchronousMediaPreprocessing        = utils.GetBoolEnvOrDefault(featureFlagAsynchronousMediaPreprocessing, featureFlagDefaultValue)
+	FeatureFlagAsynchronousMediaPreprocessing = utils.GetBoolEnvOrDefault(featureFlagAsynchronousMediaPreprocessing, featureFlagDefaultValue)
 )

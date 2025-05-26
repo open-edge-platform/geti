@@ -12,8 +12,8 @@ import (
 	"geti.com/iai_core/logger"
 	"geti.com/iai_core/storage"
 
-	"media/app/service"
 	"media/app/config"
+	"media/app/service"
 )
 
 const defaultThumbSize = 256
@@ -47,7 +47,7 @@ func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper ser
 func (uc *GetOrCreateThumbnail) Execute(ctx context.Context, imageID *sdkentities.FullImageID) (io.ReadCloser, *sdkentities.ObjectMetadata, error) {
 	thumbnail, metadata, err := uc.imageRepo.LoadThumbnailByID(ctx, imageID)
 	if err != nil && config.FeatureFlagAsynchronousMediaPreprocessing {
-	    return nil, nil, &NotFoundError{"Thumbnail not found"}
+		return nil, nil, &NotFoundError{"Thumbnail not found"}
 	}
 	if err != nil {
 		logger.TracingLog(ctx).Infof(
