@@ -123,7 +123,7 @@ const expectNumberOfObjectsPerLabelToBeEqualCSV = (expected: Statistics['objects
 
 const expectClickingBarOnHorizontalBarChartToRedirectToFilteredDatasetPage = async (
     datasetStatisticsPage: DatasetStatisticsPage,
-    page: Page,
+    page: Page
 ) => {
     const barChart = datasetStatisticsPage.getBarChart('Number of objects per label');
 
@@ -250,12 +250,10 @@ test.describe('Dataset statistics', () => {
 
     test('Redirects to filtered media page when clicking Label on AnnotationObjectsBarHorizontalChart', async ({
         datasetStatisticsPage,
-        page
+        page,
     }) => {
         await datasetStatisticsPage.openByURL();
 
-        await expectClickingBarOnHorizontalBarChartToRedirectToFilteredDatasetPage(
-            datasetStatisticsPage, page
-        );
+        await expectClickingBarOnHorizontalBarChartToRedirectToFilteredDatasetPage(datasetStatisticsPage, page);
     });
 });
