@@ -142,6 +142,7 @@ export { Skeleton } from './src/skeleton/skeleton.component';
 export { Divider } from './src/divider/divider.component';
 export { VirtualizedListLayout } from './src/virtualize-list-layout/virtualize-list-layout';
 export { CornerIndicator } from './src/corner-indicator/corner-indicator.component';
+export { VirtualizedHorizontalGrid } from './src/virtualized-horizontal-grid/virtualized-horizontal-grid';
 
 export {
     ListBox as AriaComponentsListBox,
@@ -155,4 +156,3 @@ export {
     DropIndicator,
     useDragAndDrop,
 } from 'react-aria-components';
-export { VirtualizedHorizontalGrid } from './src/virtualized-horizontal-grid/virtualized-horizontal-grid';
