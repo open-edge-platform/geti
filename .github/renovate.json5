@@ -140,8 +140,6 @@
   // Enable security upgrades
   vulnerabilityAlerts: {
     enabled: true,
-    separateMajorMinor: false,
-    separateMinorPatch: false,
   },
   osvVulnerabilityAlerts: true,
   dependencyDashboard: true,
