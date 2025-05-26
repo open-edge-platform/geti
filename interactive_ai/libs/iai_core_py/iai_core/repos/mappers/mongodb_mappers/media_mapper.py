@@ -170,7 +170,7 @@ class ImageToMongo(
             width=int(instance["width"]),
             height=int(instance["height"]),
             size=int(instance["size"]),
-            preprocessing=MediaPreprocessingToMongo.backward(instance["preprocessing"])
+            preprocessing=MediaPreprocessingToMongo.backward(instance["preprocessing"]),
         )
 
 
@@ -223,5 +223,5 @@ class VideoToMongo(IMapperForward[Video, dict], IMapperBackward[Video, dict]):
             height=instance.get("height"),  # type: ignore
             total_frames=instance.get("total_frames"),  # type: ignore
             size=int(instance["size"]),
-            preprocessing=MediaPreprocessingToMongo.backward(instance["preprocessing"])
+            preprocessing=MediaPreprocessingToMongo.backward(instance["preprocessing"]),
         )
