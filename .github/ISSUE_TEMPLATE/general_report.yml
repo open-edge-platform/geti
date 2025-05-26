@@ -67,7 +67,7 @@ body:
       placeholder: "e.g. Windows 11, Ubuntu 22.04"
 
   - type: input
-    id: openvino
+    id: browser
     attributes:
       label: Browser (if applicable)
       placeholder: "e.g. Chrome, version 136.0.7103.114"
