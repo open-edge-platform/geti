@@ -7,7 +7,6 @@ requires-python = ">=3.10, <3.11"
 dependencies = [
     "behave~=1.2.7.dev6",
     "requests~=2.32",
-    "junit2html~=31.0.2",
     "numpy==1.26.4",
     "opencv-python-headless~=4.11",
     "pillow~=11.1.0",
