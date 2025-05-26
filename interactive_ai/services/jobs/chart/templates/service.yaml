@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+  labels:
+    {{- include "jobs-ms.labels" . | nindent 4 }}
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "true"
+    {{- end }}
+spec:
+  type: {{ .Values.microservice.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.microservice.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+    - name: grpc
+      port: {{ .Values.microservice.service.ports.grpc }}
+      targetPort: {{ .Values.microservice.service.ports.grpc }}
+      protocol: TCP
+  selector:
+    {{- include "jobs-ms.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduler
+  labels:
+    {{- include "jobs-scheduler.labels" . | nindent 4 }}
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "true"
+    {{- end }}
+spec:
+  type: {{ .Values.scheduler.service.type }}
+  ports:
+    - name: grpc
+      port: {{ .Values.scheduler.service.ports.grpc }}
+      targetPort: {{ .Values.scheduler.service.ports.grpc }}
+      protocol: TCP
+  selector:
+    {{- include "jobs-scheduler.selectorLabels" . | nindent 4 }}

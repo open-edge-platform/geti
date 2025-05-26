@@ -2,7 +2,7 @@
 name = "geti-k8s-tools"
 version = "1.0.1"
 description = "Library for getting info about node resources availability"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 dependencies = [
     "kubernetes-asyncio==29.0.0"
 ]

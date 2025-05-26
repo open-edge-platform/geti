@@ -1,0 +1,34 @@
+{{- if .Values.microservice.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+  {{- if .Values.global.running_on_vm }}
+  minReplicas: 1
+  maxReplicas: 1
+  {{- else }}
+  minReplicas: {{ .Values.microservice.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.microservice.autoscaling.maxReplicas }}
+  {{- end }}
+  metrics:
+  - type: ContainerResource
+    containerResource:
+      name: cpu
+      container: {{ .Chart.Name }}-ms
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.microservice.autoscaling.targetCPUUtilizationPercentage }}
+  - type: ContainerResource
+    containerResource:
+      name: memory
+      container: {{ .Chart.Name }}-ms
+      target:
+        type: Utilization
+        averageUtilization: {{ .Values.microservice.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}

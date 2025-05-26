@@ -2,7 +2,7 @@
 name = "model-registration"
 version = "1.0.0"
 description = "Model registration service for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 
 dependencies = [
     "openvino_model_api==0.3.0.2",

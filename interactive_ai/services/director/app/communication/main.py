@@ -35,6 +35,7 @@ from coordination.dataset_manager.kafka_handler import (
     DatasetManagementMediaAndAnnotationKafkaHandler,
     DatasetManagementProjectEventsKafkaHandler,
 )
+from environment import get_gpu_provider
 from usecases.auto_train.kafka_handler import AutoTrainingKafkaHandler
 
 from geti_fastapi_tools.exceptions import GetiBaseException
@@ -44,14 +45,25 @@ from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry, KafkaTelemetr
 from iai_core.algorithms import ModelTemplateList
 
 
+def init_model_template_list() -> None:
+    """
+    Initializes the model template list to speed up project creation and obtaining model storages from DB.
+    When called the first time, ModelTemplateList loads all model templates from disk taking several seconds.
+    """
+    mtl = ModelTemplateList()
+    # Workaround (ITEP-67586): change some model defaults for Intel GPU
+    if get_gpu_provider() == "intel":
+        mtl._model_template_list["Custom_Object_Detection_YOLOX"].model_template.is_default_for_task = True
+        mtl._model_template_list["Custom_Object_Detection_Gen3_ATSS"].model_template.is_default_for_task = False
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # type: ignore # noqa: ANN201
     """
     Defines startup and shutdown of the fastAPI app
     """
-    # Initialize the model template list to speed up project creation and obtaining model storages from DB.
-    # When called the first time, ModelTemplateList loads all model templates from disk taking several seconds.
-    ModelTemplateList()
+    init_model_template_list()
+
     if ENABLE_TRACING:
         KafkaTelemetry.instrument()
     app.state.kafka_handlers = []

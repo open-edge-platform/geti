@@ -4,7 +4,7 @@
 name = "acc_tests"
 version = "1.0.0"
 description = "Account service component tests for Geti"
-requires-python = ">=3.10, <3.14"
+requires-python = ">=3.10, <3.11"
 dependencies = [
     "cryptography==43.0.1",
     "PyJWT[crypto]==2.9.0",

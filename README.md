@@ -34,7 +34,6 @@ Intel® Geti™ enables anyone to build computer vision AI models in a fraction 
  <img src="https://github.com/user-attachments/assets/af76a999-74d2-48bd-ae31-094e88a0d2e9" width="600"/>
 </p>
 
-
 ### Key features
 
 <details>
@@ -158,7 +157,7 @@ Intel® Geti™ is a powerful tool to build vision models for a wide range of pr
 
 ## 🙌 Contributing
 
-We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING) to get started.
+We welcome contributions! Check out our [Contributing Guide](CONTRIBUTING.md) to get started.
 
 <p align="center">
   <b>Thank you 👏 to all our contributors!</b>
