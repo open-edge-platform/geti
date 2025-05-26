@@ -70,7 +70,7 @@ export const GroupCreation = ({
     };
 
     useEffect(() => {
-        //Note: validate name at the beginning to disable create button
+        // Note: validate name at the beginning to disable create button
         validateName(name);
         inputRef.current?.focus();
         // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -13,7 +13,7 @@ import {
     getDeletedLabelPayload,
     getFlattenedItems,
     getLabelPayload,
-    getNewLabelPayloadNew,
+    getNewLabelPayload,
     onlyLabelsFilter,
 } from '../../labels/utils';
 import { JobStateToExportStatus } from '../services/api-project-service';
@@ -33,16 +33,14 @@ export const getEditLabelsPayload = (
 
     const validLabels = flatItems.filter(onlyLabelsFilter);
 
-    const labelsPayloads = validLabels.map((label): EditedLabel => {
+    return validLabels.map((label): EditedLabel => {
         const { state, parentLabelId } = label;
+
         if (isNewState(state)) {
             const parentElement = validLabels.find(({ id }) => parentLabelId === id);
+            const newLabel = parentElement ? { ...label, parentLabelId: parentElement.name } : label;
 
-            if (parentElement === undefined) {
-                return getNewLabelPayloadNew(label, shouldRevisit);
-            }
-
-            return getNewLabelPayloadNew({ ...label, parentLabelId: parentElement.name }, shouldRevisit);
+            return getNewLabelPayload(newLabel, shouldRevisit);
         }
 
         if (state === LabelItemEditionState.REMOVED) {
@@ -51,8 +49,6 @@ export const getEditLabelsPayload = (
 
         return getLabelPayload(label);
     });
-
-    return labelsPayloads;
 };
 
 export const getEditTasksEntity = (projectTasks: EditTask[], tasksMetadata: TaskMetadata[], shouldRevisit: boolean) => {

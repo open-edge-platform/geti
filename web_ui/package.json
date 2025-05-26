@@ -101,7 +101,7 @@
     "start": "rsbuild dev --environment dev",
     "test:component": "npx playwright test --config=playwright.config.ts",
     "test:component:ui": "npm run test:component -- --ui",
-    "test:coverage": "npm test -- --coverage",
+    "test:coverage": "npm run test:unit -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
     "test:unit": "jest --config jest.config.js --watchAll=false",
     "test:unit:watch": "jest --config jest.config.js --watch",
