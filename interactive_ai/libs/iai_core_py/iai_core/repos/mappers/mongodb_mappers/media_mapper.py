@@ -171,9 +171,6 @@ class ImageToMongo(
             height=int(instance["height"]),
             size=int(instance["size"]),
             preprocessing=MediaPreprocessingToMongo.backward(instance["preprocessing"])
-            # TODO: remove in scope of CVS-163688
-            if "preprocessing" in instance
-            else MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED),
         )
 
 
@@ -227,7 +224,4 @@ class VideoToMongo(IMapperForward[Video, dict], IMapperBackward[Video, dict]):
             total_frames=instance.get("total_frames"),  # type: ignore
             size=int(instance["size"]),
             preprocessing=MediaPreprocessingToMongo.backward(instance["preprocessing"])
-            # TODO: remove in scope of CVS-163688
-            if "preprocessing" in instance
-            else MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED),
         )
