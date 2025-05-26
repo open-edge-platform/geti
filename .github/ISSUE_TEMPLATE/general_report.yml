@@ -55,7 +55,7 @@ body:
     id: version
     attributes:
       label: 📦 Geti version
-      description: Version of this project (e.g. `2.10.0`, commit hash, or branch name)
+      description: Version of the application (e.g. `2.10.0`, commit hash, or branch name)
       placeholder: "e.g. 2.10.0"
     validations:
       required: true
