@@ -28,7 +28,7 @@ interface UseMediaUploadQueries {
 }
 
 const getMediaQueryFilter = (datasetIdentifier: DatasetIdentifier, labelIds: string[]) => {
-    const queryKey = QUERY_KEYS.ADVANCED_MEDIA_ITEMS(datasetIdentifier, {}, { sortBy: '', sortDir: '' });
+    const queryKey = QUERY_KEYS.ADVANCED_MEDIA_ITEMS(datasetIdentifier, {}, { sortBy: '', sortDir: undefined });
 
     return {
         // First find all queries related to fetching media, ignoring the filters and sorting options

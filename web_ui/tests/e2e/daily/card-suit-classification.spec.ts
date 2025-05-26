@@ -150,6 +150,9 @@ test(
 
             // The model should be better than just throwing a coin
             expect(score).toBeGreaterThanOrEqual(25);
+            await expect(async () => {
+                expect(await testPage.countImages()).toBe(32);
+            }).toPass();
             console.info('Simple Card classification finished!');
         });
     }

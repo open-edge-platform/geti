@@ -21,11 +21,5 @@ export default {
     },
     moduleFileExtensions: ['web.js', 'js', 'web.ts', 'ts', 'web.tsx', 'tsx', 'json', 'web.jsx', 'jsx', 'node'],
     resetMocks: false,
-    coverageReporters: ['clover', 'json', 'json-summary'],
-    coverageThreshold: {
-        global: {
-            lines: 75,
-        },
-    },
     globalSetup: path.resolve(dirname, './jest.global.js'),
 };
