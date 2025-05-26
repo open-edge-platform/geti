@@ -40,7 +40,7 @@
   // Set limit to 5
   ignorePresets: [":prHourlyLimit2"],
   prHourlyLimit: 5,
-  ignorePaths: [], // to include tests folders as well for security upgrades
+  ignorePaths: [], // to include tests folders as well as `config:base` ignores it
 
   packageRules: [
     // Enable pinning for container images
@@ -137,7 +137,7 @@
     },
   ],
 
-  // Enable security upgrades, group it in one PR
+  // Enable security upgrades
   vulnerabilityAlerts: {
     enabled: true,
     separateMajorMinor: false,
