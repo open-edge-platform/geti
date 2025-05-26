@@ -47,7 +47,7 @@ body:
   - type: textarea
     id: screenshots
     attributes:
-      label: 🖼️ Screenshots or Logs
+      label: 🖼️ Screenshots, video recordings or logs
       description: Upload screenshots, logs, or recordings that help explain the issue.
       placeholder: "Drag and drop files, or paste logs here..."
 
