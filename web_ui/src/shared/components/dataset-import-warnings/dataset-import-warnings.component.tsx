@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Heading, Text, View } from '@geti/ui';
-import { Image } from '@geti/ui/icons';
-import Alert from '@spectrum-icons/workflow/Alert';
+import { Alert, Image } from '@geti/ui/icons';
 import { capitalize } from 'lodash-es';
 
 import { DATASET_IMPORT_WARNING_TYPE } from '../../../core/datasets/dataset.enum';

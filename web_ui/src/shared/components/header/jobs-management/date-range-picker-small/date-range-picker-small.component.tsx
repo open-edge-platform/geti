@@ -16,8 +16,8 @@ import {
     TooltipTrigger,
     useDateFormatter,
 } from '@geti/ui';
+import { Calendar } from '@geti/ui/icons';
 import { DateValue, getLocalTimeZone } from '@internationalized/date';
-import Calendar from '@spectrum-icons/workflow/Calendar';
 import { isFunction } from 'lodash-es';
 import isEmpty from 'lodash/isEmpty';
 import { RangeCalendarProps } from 'react-aria-components';

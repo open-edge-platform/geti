@@ -20,8 +20,8 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@geti/ui';
+import { LinkOut } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import LinkOut from '@spectrum-icons/workflow/LinkOut';
 
 import { DOCS_BASE_URL } from '../../../../../core/const';
 import { DOMAIN } from '../../../../../core/projects/core.interface';

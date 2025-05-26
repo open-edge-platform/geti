@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Heading, Link } from '@geti/ui';
-import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
+import { CloudErrorIcon } from '@geti/ui/icons';
 
 import { paths } from '../../../core/services/routes';
 import { redirectTo } from '../../../shared/utils';
