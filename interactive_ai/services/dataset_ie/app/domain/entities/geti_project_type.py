@@ -16,6 +16,7 @@ class GetiProjectType(Enum):
     ANOMALY_CLASSIFICATION = auto()
     ANOMALY_DETECTION = auto()
     ANOMALY_SEGMENTATION = auto()
+    ANOMALY = auto()
     ROTATED_DETECTION = auto()  # ui project name is Detection Oriented
     CHAINED_DETECTION_CLASSIFICATION = auto()
     CHAINED_DETECTION_SEGMENTATION = auto()

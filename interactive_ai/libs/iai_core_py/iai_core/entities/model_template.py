@@ -264,6 +264,10 @@ class TaskType(Enum):
         17,
         TaskInfo(domain=Domain.KEYPOINT_DETECTION, is_trainable=True, is_anomaly=False, is_global=False, is_local=True),
     )
+    ANOMALY = (
+        18,
+        TaskInfo(domain=Domain.ANOMALY, is_trainable=True, is_anomaly=True, is_global=True, is_local=False),
+    )
 
     def __str__(self) -> str:
         """Returns name."""

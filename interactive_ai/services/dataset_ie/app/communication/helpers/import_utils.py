@@ -6,10 +6,7 @@ This module implements import utilities
 
 import logging
 
-from geti_feature_tools.feature_flags import FeatureFlagProvider
-
 from domain.entities.geti_project_type import GetiProjectType
-from features.feature_flags import FeatureFlag
 
 from iai_core.entities.label import Domain
 from iai_core.entities.model_template import TaskType, task_type_to_label_domain
@@ -27,6 +24,7 @@ SUPPORTED_DOMAINS = [
     Domain.ANOMALY_CLASSIFICATION,
     Domain.ANOMALY_DETECTION,
     Domain.ANOMALY_SEGMENTATION,
+    Domain.ANOMALY,
     Domain.ROTATED_DETECTION,
 ]
 
@@ -40,11 +38,6 @@ class ImportUtils:
         :param task_type: OTX task type identifier
         :return: task name for REST API
         """
-        if (
-            FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            and task_type == TaskType.ANOMALY_CLASSIFICATION
-        ):
-            return "anomaly"
         return task_type.name.lower() if task_type != TaskType.ROTATED_DETECTION else STR_DETECTION_ORIENTED
 
     @staticmethod
@@ -61,8 +54,6 @@ class ImportUtils:
             GetiProjectType.CHAINED_DETECTION_SEGMENTATION: "detection_segmentation",
             GetiProjectType.ROTATED_DETECTION: STR_DETECTION_ORIENTED,
         }
-        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION):
-            exceptions[GetiProjectType.ANOMALY_CLASSIFICATION] = "anomaly"
         return exceptions.get(geti_project_type, geti_project_type.name.lower())
 
     @staticmethod
@@ -141,6 +132,7 @@ class ImportUtils:
             TaskType.ANOMALY_CLASSIFICATION,
             TaskType.ANOMALY_DETECTION,
             TaskType.ANOMALY_SEGMENTATION,
+            TaskType.ANOMALY,
             TaskType.ROTATED_DETECTION,
         ]
 

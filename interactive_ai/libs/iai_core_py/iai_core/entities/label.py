@@ -43,6 +43,7 @@ class Domain(Enum):
     ANOMALY_CLASSIFICATION = auto()
     ANOMALY_DETECTION = auto()
     ANOMALY_SEGMENTATION = auto()
+    ANOMALY = auto()
     INSTANCE_SEGMENTATION = auto()
     ROTATED_DETECTION = auto()
     ACTION_CLASSIFICATION = auto()
