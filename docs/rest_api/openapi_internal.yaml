@@ -1,6 +1,6 @@
 openapi: "3.1.0"
 info:
-  version: 2.10.0
+  version: 2.10.1
   title: Intel® Geti™ REST API
   description: REST API documentation for Intel® Geti™.
 
