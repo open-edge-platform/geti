@@ -3,7 +3,17 @@
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
-import { Button, Flex, PressableElement, Switch, Text, TextFieldRef, Tooltip, TooltipTrigger } from '@geti/ui';
+import {
+    Button,
+    Flex,
+    PressableElement,
+    Switch,
+    Text,
+    TextField,
+    TextFieldRef,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { ValidationError } from 'yup';
 
@@ -16,7 +26,6 @@ import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { filterGroups } from '../../../../../core/labels/utils';
 import { newLabelNameSchema } from '../../../../../pages/create-project/components/utils';
 import { isYupValidationError } from '../../../../../pages/user-management/profile-page/utils';
-import { LimitedTextField } from '../../../limited-text-field/limited-text-field.component';
 import { ValidationErrorMsg } from '../../../validation-error-msg/validation-error-msg.component';
 import { getNewGroup } from '../../utils';
 import { MULTIPLE_SELECTION_SWITCH_TOOLTIP, NEW_GROUP_FIELD_TOOLTIP } from './utils';
@@ -101,7 +110,8 @@ export const GroupCreation = ({
                     <Flex gap={'size-100'} width={'100%'} alignItems={'center'}>
                         <Flex width={'100%'}>
                             <TooltipTrigger placement={'top'}>
-                                <LimitedTextField
+                                <TextField
+                                    maxLength={100}
                                     ref={inputRef}
                                     value={name}
                                     width={'100%'}

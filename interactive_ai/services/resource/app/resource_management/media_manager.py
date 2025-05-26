@@ -6,6 +6,7 @@
 import datetime
 import functools
 import logging
+import os
 import subprocess
 from pathlib import Path
 from typing import BinaryIO
@@ -25,13 +26,17 @@ from communication.constants import (
 from communication.exceptions import (
     FileNotFoundException,
     ImageNotFoundException,
+    MediaNotPreprocessedException,
     ProjectLockedException,
     VideoFrameNotFoundException,
     VideoFrameOutOfRangeException,
     VideoNotFoundException,
+    VideoThumbnailNotFoundException,
 )
+from features.feature_flags import FeatureFlag
 
 from geti_fastapi_tools.exceptions import InvalidMediaException
+from geti_feature_tools import FeatureFlagProvider
 from geti_kafka_tools import publish_event
 from geti_telemetry_tools import unified_tracing
 from geti_telemetry_tools.metrics import (
@@ -112,6 +117,15 @@ class MediaManager:
         :return BinaryIO: image bytes stream that is a RGB representation of the image thumbnail
         """
         thumbnail_filename = Video.thumbnail_filename_by_video_id(str(video_id))
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING):
+            video = VideoRepo(dataset_storage_identifier).get_by_id(video_id)
+            if not video.preprocessing.status.is_finished():
+                raise MediaNotPreprocessedException(media_id=video_id)
+            return ThumbnailBinaryRepo(dataset_storage_identifier).get_by_filename(
+                filename=thumbnail_filename,
+                binary_interpreter=StreamBinaryInterpreter(),
+            )
+
         try:
             return ThumbnailBinaryRepo(dataset_storage_identifier).get_by_filename(
                 filename=thumbnail_filename,
@@ -149,6 +163,15 @@ class MediaManager:
         """
 
         thumbnail_filename = Image.thumbnail_filename_by_image_id(str(image_id))
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING):
+            image = ImageRepo(dataset_storage_identifier).get_by_id(image_id)
+            if not image.preprocessing.status.is_finished():
+                raise MediaNotPreprocessedException(media_id=image_id)
+            return ThumbnailBinaryRepo(dataset_storage_identifier).get_by_filename(
+                filename=thumbnail_filename,
+                binary_interpreter=StreamBinaryInterpreter(),
+            )
+
         try:
             return ThumbnailBinaryRepo(dataset_storage_identifier).get_by_filename(
                 filename=thumbnail_filename,
@@ -164,6 +187,57 @@ class MediaManager:
                 media_numpy=image_numpy_data,
                 thumbnail_binary_filename=thumbnail_filename,
             )
+
+    @staticmethod
+    @unified_tracing
+    def get_video_thumbnail_stream_location(
+        dataset_storage_identifier: DatasetStorageIdentifier,
+        video_id: ID,
+    ) -> Path | str:
+        """
+        Tries to get the path to the thumbnail video without using the database. If the
+        path does not exist it is assumed the thumbnail is missing and one is generated.
+        None is returned when thumbnail video is missing. A kafka event will be produced
+        to generate the thumbnail video.
+
+        :param dataset_storage_identifier: Identifier of the dataset storage containing the video
+        :param video_id: ID of the video
+        :return: Path or presigned S3 URL pointing to the thumbnail in the storage if it exists, else None
+        :raises: VideoThumbnailNotFoundException if the video thumbnail does not exist
+        """
+        thumbnail_binary_filename = Video.thumbnail_video_filename_by_video_id(str(video_id))
+        thumbnail_repo = VideoRepo(dataset_storage_identifier).thumbnail_binary_repo
+
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING):
+            video = VideoRepo(dataset_storage_identifier).get_by_id(video_id)
+            if not video.preprocessing.status.is_finished():
+                raise MediaNotPreprocessedException(media_id=video_id)
+            return thumbnail_repo.get_path_or_presigned_url(filename=thumbnail_binary_filename)
+
+        if thumbnail_repo.exists(filename=thumbnail_binary_filename):
+            return thumbnail_repo.get_path_or_presigned_url(filename=thumbnail_binary_filename)
+
+        # Check if a temporary file has already been created
+        thumbnail_temp_path = thumbnail_repo.create_path_for_temporary_file(
+            filename=thumbnail_binary_filename, make_unique=False
+        )
+        if not os.path.exists(thumbnail_temp_path):
+            video = MediaManager.get_video_by_id(
+                dataset_storage_identifier=dataset_storage_identifier,
+                video_id=video_id,
+            )
+            publish_event(
+                topic="thumbnail_video_missing",
+                body={
+                    "video_id": video.id_,
+                    "workspace_id": dataset_storage_identifier.workspace_id,
+                    "project_id": dataset_storage_identifier.project_id,
+                    "dataset_storage_id": dataset_storage_identifier.dataset_storage_id,
+                },
+                key=str(video.id_).encode(),
+                headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
+            )
+        raise VideoThumbnailNotFoundException(video_id=video_id)
 
     @staticmethod
     def get_video_by_id(dataset_storage_identifier: DatasetStorageIdentifier, video_id: ID) -> Video:
@@ -311,9 +385,16 @@ class MediaManager:
         :return: ndarray representation of video frame.
         """
         video = VideoRepo(dataset_storage_identifier).get_by_id(video_id)
-        video_binary_repo = VideoBinaryRepo(dataset_storage_identifier)
         if frame_index is None:
             frame_index = video.total_frames // 2
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING):
+            if not video.preprocessing.status.is_finished():
+                raise MediaNotPreprocessedException(media_id=video_id)
+            return MediaManager.get_single_thumbnail_frame_numpy(
+                video=video, dataset_storage_identifier=dataset_storage_identifier, frame_index=frame_index
+            )
+
+        video_binary_repo = VideoBinaryRepo(dataset_storage_identifier)
         try:
             frame_numpy = MediaManager.get_single_thumbnail_frame_numpy(
                 video=video,
@@ -491,7 +572,9 @@ class MediaManager:
                 width=bgr_image.shape[1],
                 height=bgr_image.shape[0],
                 size=size,
-                preprocessing=MediaPreprocessing(
+                preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus.SCHEDULED)
+                if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING)
+                else MediaPreprocessing(
                     status=MediaPreprocessingStatus.IN_PROGRESS,
                     start_timestamp=datetime.datetime.now(),
                 ),
@@ -508,19 +591,34 @@ class MediaManager:
                 image_binary_repo.delete_by_filename(binary_filename)
             raise
 
-        try:
-            # Create a thumbnail for the image
-            Media2DFactory.create_and_save_media_thumbnail(
-                dataset_storage_identifier=dataset_storage_identifier,
-                media_numpy=cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB),
-                thumbnail_binary_filename=image.thumbnail_filename,
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING):
+            publish_event(
+                topic="media_preprocessing",
+                body={
+                    "project_id": str(dataset_storage_identifier.project_id),
+                    "dataset_storage_id": str(dataset_storage_identifier.dataset_storage_id),
+                    "media_id": str(image_id),
+                    "data_binary_filename": image.data_binary_filename,
+                    "media_type": "IMAGE",
+                    "event": "MEDIA_UPLOADED",
+                },
+                key=str(image.id_).encode(),
+                headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
             )
-            image.preprocessing.finished()
-        except Exception:
-            image.preprocessing.failed("Failed to preprocess image file")
-            raise
-        finally:
-            image_repo.save(image)
+        else:
+            try:
+                # Create a thumbnail for the image
+                Media2DFactory.create_and_save_media_thumbnail(
+                    dataset_storage_identifier=dataset_storage_identifier,
+                    media_numpy=cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB),
+                    thumbnail_binary_filename=image.thumbnail_filename,
+                )
+                image.preprocessing.finished()
+            except Exception:
+                image.preprocessing.failed("Failed to preprocess image file")
+                raise
+            finally:
+                image_repo.save(image)
 
         if update_metrics:
             MediaManager._update_image_metrics(image=image)
@@ -709,7 +807,9 @@ class MediaManager:
             height=info.height,
             total_frames=info.total_frames,
             size=video_binary_repo.get_object_size(binary_filename),
-            preprocessing=MediaPreprocessing(
+            preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus.SCHEDULED)
+            if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING)
+            else MediaPreprocessing(
                 status=MediaPreprocessingStatus.IN_PROGRESS,
                 start_timestamp=datetime.datetime.now(),
             ),
@@ -722,40 +822,55 @@ class MediaManager:
 
         video_repo.save(video)
 
-        try:
-            video_numpy = MediaManager.get_video_frame_thumbnail_numpy(
-                dataset_storage_identifier=dataset_storage_identifier,
-                video_id=video_id,
-                target_height=DEFAULT_THUMBNAIL_SIZE,
-                target_width=DEFAULT_THUMBNAIL_SIZE,
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING):
+            publish_event(
+                topic="media_preprocessing",
+                body={
+                    "project_id": str(dataset_storage_identifier.project_id),
+                    "dataset_storage_id": str(dataset_storage_identifier.dataset_storage_id),
+                    "media_id": str(video_id),
+                    "data_binary_filename": video.data_binary_filename,
+                    "media_type": "VIDEO",
+                    "event": "MEDIA_UPLOADED",
+                },
+                key=str(video_id).encode(),
+                headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
             )
-            Media2DFactory.create_and_save_media_thumbnail(
-                dataset_storage_identifier=dataset_storage_identifier,
-                media_numpy=video_numpy,
-                thumbnail_binary_filename=video.thumbnail_filename,
-            )
-            logger.debug(
-                f"Created thumbnail for video `{orig_filename}` (ID `{video_id}`) "
-                f"in dataset storage `{dataset_storage_identifier}`",
-            )
-            video.preprocessing.finished()
-        except Exception:
-            video.preprocessing.failed("Failed to preprocess video file")
-            raise
-        finally:
-            video_repo.save(video)
+        else:
+            try:
+                video_numpy = MediaManager.get_video_frame_thumbnail_numpy(
+                    dataset_storage_identifier=dataset_storage_identifier,
+                    video_id=video_id,
+                    target_height=DEFAULT_THUMBNAIL_SIZE,
+                    target_width=DEFAULT_THUMBNAIL_SIZE,
+                )
+                Media2DFactory.create_and_save_media_thumbnail(
+                    dataset_storage_identifier=dataset_storage_identifier,
+                    media_numpy=video_numpy,
+                    thumbnail_binary_filename=video.thumbnail_filename,
+                )
+                logger.debug(
+                    f"Created thumbnail for video `{orig_filename}` (ID `{video_id}`) "
+                    f"in dataset storage `{dataset_storage_identifier}`",
+                )
+                video.preprocessing.finished()
+            except Exception:
+                video.preprocessing.failed("Failed to preprocess video file")
+                raise
+            finally:
+                video_repo.save(video)
 
-        publish_event(
-            topic="thumbnail_video_missing",
-            body={
-                "video_id": video.id_,
-                "workspace_id": dataset_storage_identifier.workspace_id,
-                "project_id": dataset_storage_identifier.project_id,
-                "dataset_storage_id": dataset_storage_identifier.dataset_storage_id,
-            },
-            key=str(video.id_).encode(),
-            headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
-        )
+            publish_event(
+                topic="thumbnail_video_missing",
+                body={
+                    "video_id": video.id_,
+                    "workspace_id": dataset_storage_identifier.workspace_id,
+                    "project_id": dataset_storage_identifier.project_id,
+                    "dataset_storage_id": dataset_storage_identifier.dataset_storage_id,
+                },
+                key=str(video.id_).encode(),
+                headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
+            )
 
         if update_metrics:
             MediaManager._update_video_metrics(video=video)
@@ -847,17 +962,22 @@ class MediaManager:
     @staticmethod
     def get_first_media(
         dataset_storage_identifier: DatasetStorageIdentifier,
+        only_preprocessed: bool = False,
     ) -> Video | Image | None:
         """
         Gets the first image in the project, or the first video if there is no image. Return None if neither exists.
 
         :param dataset_storage_identifier: Identifier of the dataset
+        :param only_preprocessed: Return only preprocessed media
         :return: first Image or Video, if media exists in project, else None
         """
-        first_image = ImageRepo(dataset_storage_identifier).get_one(earliest=True)
+        extra_filter = None
+        if only_preprocessed:
+            extra_filter = {"preprocessed": {"status": str(MediaPreprocessingStatus.FINISHED.value)}}
+        first_image = ImageRepo(dataset_storage_identifier).get_one(earliest=True, extra_filter=extra_filter)
         if not isinstance(first_image, NullImage):
             return first_image
-        first_video = VideoRepo(dataset_storage_identifier).get_one(earliest=True)
+        first_video = VideoRepo(dataset_storage_identifier).get_one(earliest=True, extra_filter=extra_filter)
         if not isinstance(first_video, NullVideo):
             return first_video
         return None

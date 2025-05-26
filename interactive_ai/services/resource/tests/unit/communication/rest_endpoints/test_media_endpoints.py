@@ -92,10 +92,12 @@ def fxt_random_video_file():
 
 
 class TestMediaRESTEndpoint:
+    @pytest.mark.parametrize("asynchronous_media_preprocessing", [True, False])
     def test_media_image_endpoint_post(
         self,
         fxt_resource_rest,
         fxt_random_image_file,
+        asynchronous_media_preprocessing,
     ) -> None:
         # Arrange
         endpoint = f"{API_IMAGE_PATTERN}"
@@ -107,12 +109,17 @@ class TestMediaRESTEndpoint:
                 "upload_media",
                 return_value=DUMMY_DATA,
             ) as mock_upload_media,
+            patch.dict(
+                os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": str(asynchronous_media_preprocessing)}
+            ),
             open(fxt_random_image_file, "rb") as f,
         ):
             result = fxt_resource_rest.post(endpoint, files={"file": ("crate.png", f, "image/png")})
 
         # Assert
-        assert result.status_code == HTTPStatus.OK
+        assert (
+            result.status_code == status.HTTP_202_ACCEPTED if asynchronous_media_preprocessing else status.HTTP_200_OK
+        )
         mock_upload_media.assert_called_once_with(
             user_id=DUMMY_USER,
             dataset_storage_identifier=DUMMY_DATASET_STORAGE_IDENTIFIER,
@@ -122,10 +129,12 @@ class TestMediaRESTEndpoint:
         )
         compare(result.json(), DUMMY_DATA, ignore_eq=True)
 
+    @pytest.mark.parametrize("asynchronous_media_preprocessing", [True, False])
     def test_media_image_endpoint_post_with_label(
         self,
         fxt_resource_rest,
         fxt_random_image_file,
+        asynchronous_media_preprocessing,
     ) -> None:
         # Arrange
         endpoint = f"{API_IMAGE_PATTERN}"
@@ -139,6 +148,9 @@ class TestMediaRESTEndpoint:
                 "upload_media",
                 return_value=DUMMY_DATA,
             ) as mock_upload_media,
+            patch.dict(
+                os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": str(asynchronous_media_preprocessing)}
+            ),
             open(fxt_random_image_file, "rb") as f,
         ):
             result = fxt_resource_rest.post(
@@ -148,7 +160,9 @@ class TestMediaRESTEndpoint:
             )
 
         # Assert
-        assert result.status_code == HTTPStatus.OK
+        assert (
+            result.status_code == status.HTTP_202_ACCEPTED if asynchronous_media_preprocessing else status.HTTP_200_OK
+        )
         mock_upload_media.assert_called_once_with(
             user_id=DUMMY_USER,
             dataset_storage_identifier=DUMMY_DATASET_STORAGE_IDENTIFIER,
@@ -184,10 +198,12 @@ class TestMediaRESTEndpoint:
         mock_get_free_space.assert_called_once()
         assert result.status_code == status.HTTP_507_INSUFFICIENT_STORAGE
 
+    @pytest.mark.parametrize("asynchronous_media_preprocessing", [True, False])
     def test_media_video_endpoint_post(
         self,
         fxt_resource_rest,
         fxt_video_file,
+        asynchronous_media_preprocessing,
     ) -> None:
         # Arrange
         endpoint = f"{API_VIDEO_PATTERN}"
@@ -199,12 +215,17 @@ class TestMediaRESTEndpoint:
                 "upload_media",
                 return_value=DUMMY_DATA,
             ) as mock_upload_media,
+            patch.dict(
+                os.environ, {"FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": str(asynchronous_media_preprocessing)}
+            ),
             open(fxt_video_file, "rb") as f,
         ):
             result = fxt_resource_rest.post(endpoint, files={"file": ("test_mp4.mp4", f, "video/mp4")})
 
         # Assert
-        assert result.status_code == HTTPStatus.OK
+        assert (
+            result.status_code == status.HTTP_202_ACCEPTED if asynchronous_media_preprocessing else status.HTTP_200_OK
+        )
         mock_upload_media.assert_called_once_with(
             user_id=DUMMY_USER,
             dataset_storage_identifier=DUMMY_DATASET_STORAGE_IDENTIFIER,
