@@ -6,11 +6,11 @@ package service
 import (
 	"context"
 
-	"inference_gateway/app/entities"
-
 	"geti.com/iai_core/logger"
 	"github.com/caarlos0/env/v11"
 	"github.com/go-resty/resty/v2"
+
+	"inference_gateway/app/entities"
 )
 
 type CacheService interface {

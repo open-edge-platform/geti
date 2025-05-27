@@ -13,12 +13,12 @@ import (
 	"mime/multipart"
 	"strconv"
 
-	"inference_gateway/app/entities"
-	"inference_gateway/app/service"
-
 	sdkentities "geti.com/iai_core/entities"
 	"geti.com/iai_core/logger"
 	"github.com/gin-gonic/gin"
+
+	"inference_gateway/app/entities"
+	"inference_gateway/app/service"
 )
 
 type MediaInfoJSON struct {

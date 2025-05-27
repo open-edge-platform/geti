@@ -8,15 +8,13 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"inference_gateway/app/entities"
-
+	sdkendities "geti.com/iai_core/entities"
 	"github.com/go-resty/resty/v2"
 	"github.com/jarcoal/httpmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	sdk_endities "geti.com/iai_core/entities"
+	"inference_gateway/app/entities"
 )
 
 func TestPredictionCacheService(t *testing.T) {
@@ -24,7 +22,7 @@ func TestPredictionCacheService(t *testing.T) {
 	client := resty.New()
 	httpmock.ActivateNonDefault(client.GetClient())
 	defer httpmock.DeactivateAndReset()
-	testID := sdk_endities.GetFullTestID(t)
+	testID := sdkendities.GetFullTestID(t)
 	req := &entities.PredictionRequestData{
 		UseCache:       entities.Auto,
 		OrganizationID: testID.OrganizationID,

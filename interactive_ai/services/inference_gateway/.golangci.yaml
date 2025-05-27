@@ -27,7 +27,7 @@ formatters:
       # with the given prefixes are grouped after 3rd-party packages.
       # Default: []
       local-prefixes:
-        - inference-gateway
+        - inference_gateway
 
     golines:
       # Target maximum line length.
