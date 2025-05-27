@@ -3,7 +3,11 @@
 
 import { useNavigate } from 'react-router-dom';
 
-import { SearchRuleField, SearchRuleOperator } from '../../../../../../core/media/media-filter.interface';
+import {
+    AdvancedFilterOptions,
+    SearchRuleField,
+    SearchRuleOperator,
+} from '../../../../../../core/media/media-filter.interface';
 import { paths } from '../../../../../../core/services/routes';
 import { encodeFilterSearchParam } from '../../../../../../hooks/use-filter-search-param/use-filter-search-param.hook';
 import { BarHorizontalChart } from '../../../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
@@ -40,12 +44,12 @@ export const AnnotationObjectsBarHorizontalChart = ({
             return;
         }
 
-        const search = {
+        const search: AdvancedFilterOptions = {
             condition: 'and',
             rules: [
                 {
                     field: SearchRuleField.LabelId,
-                    id: datasetIdentifier,
+                    id: `${datasetIdentifier.datasetId}-${labelId}`,
                     operator: SearchRuleOperator.In,
                     value: [labelId],
                 },
