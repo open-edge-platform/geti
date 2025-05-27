@@ -1,10 +1,10 @@
-include ../../../Makefile.shared-workflows
+include ../../../../Makefile.shared-workflows
 
 .PHONY: build-image
 
 IMAGE_NAME := otx2-intel
 
-DOCKER_BUILD_CONTEXT := --build-context libs=../../../../../libs
+DOCKER_BUILD_CONTEXT := --build-context libs=../../../../../../libs
 
 build-image: install_common_libs
 	@echo "Building docker image for component: ${IMAGE_NAME}"
@@ -20,7 +20,7 @@ push-image:
 
 # TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
 test-unit: venv
-	-uv run pytest --disable-warnings -v
+	-PYTHONPATH=../scripts uv run pytest ../tests --disable-warnings -v
 	true
 
 test-component: venv
