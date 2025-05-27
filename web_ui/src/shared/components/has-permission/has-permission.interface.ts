@@ -7,13 +7,31 @@ import { Resource, RESOURCE_TYPE, Role } from '../../../core/users/users.interfa
 
 export interface HasPermissionProps {
     children: ReactNode;
-    operations: OPERATION[];
+    operations: (OPERATION_NEW | OPERATION_OLD)[];
     Fallback?: ReactNode;
     resources?: Resource[];
     specialCondition?: boolean;
 }
 
-export enum OPERATION {
+export enum OPERATION_NEW {
+    ADD_USER_TO_WORKSPACE,
+    ADD_USER_TO_PROJECT,
+    ADD_WORKSPACE,
+    ANALYTICS_TAB,
+    CAN_SEE_PROJECT,
+    CAN_SEE_WORKSPACE,
+    CAN_VIEW_CREDITS_USAGE,
+    INVITE_USER,
+    IMPORT_PROJECT,
+    MANAGE_USER,
+    PROJECT_CREATION,
+    PROJECT_DELETION,
+    PROJECT_NAME_EDITION,
+    USAGE_TAB,
+    WORKSPACE_MANAGEMENT,
+}
+
+export enum OPERATION_OLD {
     INVITE_USER,
     MANAGE_USER,
     WORKSPACE_MANAGEMENT,
@@ -29,8 +47,12 @@ export enum OPERATION {
 
 type PermissionEntity = Omit<Role, 'resourceId'>;
 
-export type OperationPermission = Record<OPERATION, PermissionEntity[]>;
+export type OperationPermissionOld = Record<OPERATION_OLD, PermissionEntity[]>;
+export type OperationPermissionNew = Record<OPERATION_NEW, PermissionEntity[]>;
 
 export type UsePermissionType = {
-    verifyPermission: (operation: OPERATION, resources: Record<RESOURCE_TYPE, string | undefined>) => boolean;
+    verifyPermission: (
+        operation: OPERATION_NEW | OPERATION_OLD,
+        resources: Record<RESOURCE_TYPE, string | undefined>
+    ) => boolean;
 };

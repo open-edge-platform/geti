@@ -7,6 +7,7 @@ import { DialogContainer } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useOverlayTriggerState } from 'react-stately';
 
+import { useFeatureFlags } from '../../../../../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { ProjectIdentifier } from '../../../../../../../../../core/projects/core.interface';
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';
 import { RESOURCE_TYPE } from '../../../../../../../../../core/users/users.interface';
@@ -14,7 +15,10 @@ import { useWorkspaceIdentifier } from '../../../../../../../../../providers/wor
 import { ActionMenu } from '../../../../../../../../../shared/components/action-menu/action-menu.component';
 import { MenuAction } from '../../../../../../../../../shared/components/action-menu/menu-action.interface';
 import { useCheckPermission } from '../../../../../../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../../../../../../shared/components/has-permission/has-permission.interface';
+import {
+    OPERATION_NEW,
+    OPERATION_OLD,
+} from '../../../../../../../../../shared/components/has-permission/has-permission.interface';
 import { DeleteProjectDialog } from './delete-project-dialog.component';
 import { EditProjectNameDialog } from './edit-project-name-dialog.component';
 
@@ -44,6 +48,8 @@ export const ProjectActionMenu = ({
     isExporting,
 }: ActionMenuProps): JSX.Element => {
     const { workspaceId, organizationId } = useWorkspaceIdentifier();
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
+    const OPERATION = FEATURE_FLAG_WORKSPACE_ACTIONS ? OPERATION_NEW : OPERATION_OLD;
     const canEditProject = useCheckPermission(
         [OPERATION.PROJECT_NAME_EDITION],
         [{ type: RESOURCE_TYPE.PROJECT, id: project.id }]

@@ -6,10 +6,11 @@ import { Dispatch, SetStateAction, useState } from 'react';
 import { Flex, SearchField } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
+import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { ProjectSortingOptions, ProjectsQueryOptions } from '../../../core/projects/services/project-service.interface';
 import { useDebouncedCallback } from '../../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';
 import { NewProjectDialog } from '../../create-project/new-project-dialog.component';
 import { ProjectSorting } from './components/project-sorting/project-sorting.component';
 
@@ -34,6 +35,7 @@ export const ProjectsActions = ({
     datasetImportDialogTrigger,
 }: ProjectActionsProps): JSX.Element => {
     const [filterText, setFilterText] = useState<string>('');
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     const handleQueryOptions = useDebouncedCallback((projectName: string) => {
         setQueryOptions((prevQueryOptions) => {
@@ -78,7 +80,13 @@ export const ProjectsActions = ({
                         />
                     </>
                 )}
-                <HasPermission operations={[OPERATION.PROJECT_CREATION]}>
+                <HasPermission
+                    operations={
+                        FEATURE_FLAG_WORKSPACE_ACTIONS
+                            ? [OPERATION_NEW.PROJECT_CREATION]
+                            : [OPERATION_OLD.PROJECT_CREATION]
+                    }
+                >
                     <NewProjectDialog
                         buttonText={'Create new project'}
                         openImportDatasetDialog={datasetImportDialogTrigger}

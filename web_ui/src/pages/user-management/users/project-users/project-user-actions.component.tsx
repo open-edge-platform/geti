@@ -6,9 +6,10 @@ import { useState } from 'react';
 import { DialogContainer } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
+import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../../shared/components/has-permission/has-permission.interface';
 import { MenuTriggerButton } from '../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { EditUserRoleDialog } from './edit-user-role-dialog.component';
@@ -20,10 +21,11 @@ enum USER_ACTIONS_OPTIONS {
 }
 
 const useActions = (projectId: string, user: User, activeUser: User | undefined): USER_ACTIONS_OPTIONS[] => {
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
     const isOwnAccount = user.id === activeUser?.id;
 
     const canChangePermissions = useCheckPermission(
-        [OPERATION.ADD_USER_TO_PROJECT],
+        FEATURE_FLAG_WORKSPACE_ACTIONS ? [OPERATION_NEW.ADD_USER_TO_PROJECT] : [OPERATION_OLD.ADD_USER_TO_PROJECT],
         [
             {
                 type: RESOURCE_TYPE.PROJECT,

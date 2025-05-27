@@ -17,7 +17,7 @@ import { useOrganizationIdentifier } from '../../hooks/use-organization-identifi
 import { useMediaUpload } from '../../providers/media-upload-provider/media-upload-provider.component';
 import { useFirstWorkspaceIdentifier } from '../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { useCheckPermission } from '../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../shared/components/has-permission/has-permission.interface';
 import { PageLayoutWithTabs } from '../../shared/components/page-layout/page-layout-with-tabs.component';
 import { ShowForOnPrem } from '../../shared/components/show-for-onprem/show-for-onprem.component';
 import { TabItem } from '../../shared/components/tabs/tabs.interface';
@@ -54,7 +54,7 @@ const USER_MANAGEMENT_TABS_TO_PATH = {
     [UserManagementTabs.USAGE]: paths.account.usage,
 };
 
-const useDecorateCheckPermission = (operations: OPERATION[]) => {
+const useDecorateCheckPermission = (operations: (OPERATION_NEW | OPERATION_OLD)[]) => {
     const { organizationId, workspaceId } = useFirstWorkspaceIdentifier();
     const { useActiveUser } = useUsers();
 
@@ -90,8 +90,14 @@ export const UserManagement = (): JSX.Element => {
     const navigate = useNavigate();
     const { FEATURE_FLAG_WORKSPACE_ACTIONS, FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
     const isSaasEnvironment = useIsSaasEnv();
-    const shouldShowUsageTab = useDecorateCheckPermission([OPERATION.USAGE_TAB]) && FEATURE_FLAG_CREDIT_SYSTEM;
-    const shouldShowAnalyticsTab = useDecorateCheckPermission([OPERATION.ANALYTICS_TAB]) && !isSaasEnvironment;
+    const shouldShowUsageTab =
+        useDecorateCheckPermission([
+            FEATURE_FLAG_WORKSPACE_ACTIONS ? OPERATION_NEW.USAGE_TAB : OPERATION_OLD.USAGE_TAB,
+        ]) && FEATURE_FLAG_CREDIT_SYSTEM;
+    const shouldShowAnalyticsTab =
+        useDecorateCheckPermission([
+            FEATURE_FLAG_WORKSPACE_ACTIONS ? OPERATION_NEW.ANALYTICS_TAB : OPERATION_OLD.ANALYTICS_TAB,
+        ]) && !isSaasEnvironment;
 
     const activeTab = useActiveTab(UserManagementTabs.PROFILE);
 

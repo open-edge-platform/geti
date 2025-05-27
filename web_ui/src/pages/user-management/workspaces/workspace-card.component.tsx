@@ -4,6 +4,7 @@
 import { Button, Divider, Flex, Heading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
+import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { WorkspaceEntity } from '../../../core/workspaces/services/workspaces.interface';
@@ -11,7 +12,7 @@ import { ActionMenu } from '../../../shared/components/action-menu/action-menu.c
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';
 import { useWorkspaceActions } from '../../landing-page/workspaces-tabs/use-workspace-actions.hook';
 import { WorkspaceMenuActions } from '../../landing-page/workspaces-tabs/utils';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from './utils';
@@ -24,6 +25,7 @@ interface WorkspaceCardProps {
 export const WorkspaceCard = ({ workspace, workspaces }: WorkspaceCardProps): JSX.Element => {
     const navigate = useNavigate();
     const { items, handleMenuAction, deleteDialog, editDialog } = useWorkspaceActions(workspaces.length);
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     const workspaceActions = items.map((item) => ({ name: item, id: item }));
     const handleSeeMore = (): void => {
@@ -65,7 +67,11 @@ export const WorkspaceCard = ({ workspace, workspaces }: WorkspaceCardProps): JS
                     See more
                 </Button>
                 <HasPermission
-                    operations={[OPERATION.WORKSPACE_MANAGEMENT]}
+                    operations={
+                        FEATURE_FLAG_WORKSPACE_ACTIONS
+                            ? [OPERATION_NEW.WORKSPACE_MANAGEMENT]
+                            : [OPERATION_OLD.WORKSPACE_MANAGEMENT]
+                    }
                     resources={[{ type: RESOURCE_TYPE.WORKSPACE, id: workspace.id }]}
                 >
                     <ActionMenu<WorkspaceMenuActions>
@@ -77,7 +83,11 @@ export const WorkspaceCard = ({ workspace, workspaces }: WorkspaceCardProps): JS
             </Flex>
 
             <HasPermission
-                operations={[OPERATION.WORKSPACE_MANAGEMENT]}
+                operations={
+                    FEATURE_FLAG_WORKSPACE_ACTIONS
+                        ? [OPERATION_NEW.WORKSPACE_MANAGEMENT]
+                        : [OPERATION_OLD.WORKSPACE_MANAGEMENT]
+                }
                 resources={[{ type: RESOURCE_TYPE.WORKSPACE, id: workspace.id }]}
             >
                 <DeleteDialog

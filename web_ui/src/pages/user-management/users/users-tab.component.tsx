@@ -7,11 +7,12 @@ import { Flex } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
+import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { paths } from '../../../core/services/routes';
 import { User } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';
 import { PageLayoutWithTabs } from '../../../shared/components/page-layout/page-layout-with-tabs.component';
 import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { Header } from './header.component';
@@ -33,6 +34,7 @@ interface UsersTabProps {
 export const UsersTab = ({ activeUser }: UsersTabProps): JSX.Element => {
     const { organizationId } = useOrganizationIdentifier();
     const [selectedWorkspace, setSelectedWorkspace] = useState<string>();
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     const activeTab = UsersTabs.DETAILS;
     const navigate = useNavigate();
@@ -70,7 +72,13 @@ export const UsersTab = ({ activeUser }: UsersTabProps): JSX.Element => {
                     selectedWorkspace={selectedWorkspace}
                     setSelectedWorkspace={setSelectedWorkspace}
                 />
-                <HasPermission operations={[OPERATION.MANAGE_USER, OPERATION.INVITE_USER]}>
+                <HasPermission
+                    operations={
+                        FEATURE_FLAG_WORKSPACE_ACTIONS
+                            ? [OPERATION_NEW.MANAGE_USER, OPERATION_NEW.INVITE_USER]
+                            : [OPERATION_OLD.MANAGE_USER, OPERATION_OLD.INVITE_USER]
+                    }
+                >
                     <Header />
                 </HasPermission>
             </Flex>

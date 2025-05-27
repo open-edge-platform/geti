@@ -7,6 +7,7 @@ import { DialogContainer } from '@geti/ui';
 import { Delete, Edit } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
+import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { AccountStatus } from '../../../../../core/organizations/organizations.interface';
 import { isOrganizationAdmin, isWorkspaceContributor } from '../../../../../core/users/user-role-utils';
 import { User } from '../../../../../core/users/users.interface';
@@ -15,7 +16,7 @@ import { useFirstWorkspaceIdentifier } from '../../../../../providers/workspaces
 import { ActionMenu } from '../../../../../shared/components/action-menu/action-menu.component';
 import { MenuAction } from '../../../../../shared/components/action-menu/menu-action.interface';
 import { HasPermission } from '../../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../../../shared/components/has-permission/has-permission.interface';
 import { checkStatusFlowValidity } from '../../utils';
 import { EditUserDialog } from './edit-user-dialog.component';
 import { RemoveUserDialog } from './remove-user-dialog.component';
@@ -34,6 +35,7 @@ interface UserActionsProps {
 export const WorkspaceUserActions = ({ activeUser, user, users }: UserActionsProps): JSX.Element => {
     const { organizationId, workspaceId } = useFirstWorkspaceIdentifier();
     const isSaasEnvironment = useIsSaasEnv();
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     const [action, setAction] = useState<USER_ACTIONS_OPTIONS | undefined>(undefined);
 
@@ -77,7 +79,10 @@ export const WorkspaceUserActions = ({ activeUser, user, users }: UserActionsPro
 
     //Note: specialCondition is used to allow user edit/delete him/herself
     return (
-        <HasPermission operations={[OPERATION.MANAGE_USER]} specialCondition={isOwnAccount}>
+        <HasPermission
+            operations={FEATURE_FLAG_WORKSPACE_ACTIONS ? [OPERATION_NEW.MANAGE_USER] : [OPERATION_OLD.MANAGE_USER]}
+            specialCondition={isOwnAccount}
+        >
             <ActionMenu
                 items={items}
                 id={`${user.id}-user-action-menu`}

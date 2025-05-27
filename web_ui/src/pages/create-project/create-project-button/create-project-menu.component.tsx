@@ -27,7 +27,7 @@ import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-f
 import { useStatus } from '../../../core/status/hooks/use-status.hook';
 import { isBelowTooLowFreeDiskSpace } from '../../../core/status/hooks/utils';
 import { useCheckPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION } from '../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';
 import { ProjectImportPanel } from '../import-project-panel.component';
 
 import classes from './create-project-button.module.scss';
@@ -42,7 +42,10 @@ interface CreateProjectMenuProps {
 }
 
 const useMenuItems = () => {
-    const canImportProjects = useCheckPermission([OPERATION.IMPORT_PROJECT]);
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
+    const canImportProjects = useCheckPermission([
+        FEATURE_FLAG_WORKSPACE_ACTIONS ? OPERATION_NEW.IMPORT_PROJECT : OPERATION_OLD.IMPORT_PROJECT,
+    ]);
     const items = [{ name: CreateProjectMenuActions.IMPORT_DATASET, id: CreateProjectMenuActions.IMPORT_DATASET }];
 
     if (canImportProjects) {

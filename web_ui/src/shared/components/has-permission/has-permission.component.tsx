@@ -3,11 +3,12 @@
 
 import { useParams } from 'react-router-dom';
 
+import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { Resource, RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { HasPermissionProps, OPERATION, UsePermissionType } from './has-permission.interface';
-import { OPERATION_PERMISSION } from './utils';
+import { HasPermissionProps, OPERATION_NEW, OPERATION_OLD, UsePermissionType } from './has-permission.interface';
+import { OPERATION_PERMISSION_NEW, OPERATION_PERMISSION_OLD } from './utils';
 
 const useResource = (selectedResources?: Resource[]): Record<RESOURCE_TYPE, string | undefined> => {
     const params = useParams<{ organizationId?: string; workspaceId?: string; projectId?: string }>();
@@ -23,12 +24,18 @@ const useResource = (selectedResources?: Resource[]): Record<RESOURCE_TYPE, stri
 };
 
 const usePermission = (): UsePermissionType => {
+    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
     const { useActiveUser } = useUsers();
     const { organizationId } = useOrganizationIdentifier();
     const { data: activeUser } = useActiveUser(organizationId);
 
-    const verifyPermission = (operation: OPERATION, resources: Record<RESOURCE_TYPE, string | undefined>): boolean => {
-        const requiredPermissions = OPERATION_PERMISSION[operation];
+    const verifyPermission = (
+        operation: OPERATION_NEW | OPERATION_OLD,
+        resources: Record<RESOURCE_TYPE, string | undefined>
+    ): boolean => {
+        const requiredPermissions = FEATURE_FLAG_WORKSPACE_ACTIONS
+            ? OPERATION_PERMISSION_NEW[operation as OPERATION_NEW]
+            : OPERATION_PERMISSION_OLD[operation as OPERATION_OLD];
 
         return (
             activeUser?.roles.some((userRole) =>
@@ -52,7 +59,7 @@ const usePermission = (): UsePermissionType => {
 };
 
 export const useCheckPermission = (
-    operations: OPERATION[],
+    operations: (OPERATION_NEW | OPERATION_OLD)[],
     selectedResources?: Resource[],
     specialCondition = false
 ) => {
@@ -69,6 +76,7 @@ export const HasPermission = ({
     Fallback = <></>,
     specialCondition = false,
 }: HasPermissionProps): JSX.Element => {
+    //debugger;
     const isPermitted = useCheckPermission(operations, resources, specialCondition);
 
     if (isPermitted) {
