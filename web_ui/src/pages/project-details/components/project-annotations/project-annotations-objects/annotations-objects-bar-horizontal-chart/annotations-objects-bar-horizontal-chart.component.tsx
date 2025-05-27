@@ -12,6 +12,7 @@ import { useDatasetIdentifier } from '../../../../../annotator/hooks/use-dataset
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 
 interface AnnotationObjectsBarHorizontalChartProps extends ChartProps {
+    title: string;
     barSize?: number;
     yPadding?: {
         top?: number;
@@ -21,6 +22,7 @@ interface AnnotationObjectsBarHorizontalChartProps extends ChartProps {
 }
 
 export const AnnotationObjectsBarHorizontalChart = ({
+    title,
     data,
     barSize = 20,
     yPadding,
@@ -29,9 +31,8 @@ export const AnnotationObjectsBarHorizontalChart = ({
     const navigate = useNavigate();
     const datasetIdentifier = useDatasetIdentifier();
     const { project } = useProject();
-    const title = 'Number of objects per label';
 
-    const handleLabelClick = (labelName: string) => {
+    const handleCellClick = (labelName: string) => {
         const labelId = project.labels.find((label) => label.name === labelName)?.id;
 
         if (!labelId) {
@@ -65,7 +66,7 @@ export const AnnotationObjectsBarHorizontalChart = ({
             yPadding={yPadding}
             colors={colors}
             allowDecimals={false}
-            handleLabelClick={handleLabelClick}
+            onCellClick={handleCellClick}
         />
     );
 };
