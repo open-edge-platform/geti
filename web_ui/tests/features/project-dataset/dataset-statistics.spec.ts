@@ -121,22 +121,6 @@ const expectNumberOfObjectsPerLabelToBeEqualCSV = (expected: Statistics['objects
     expectCSVToBeEqual(expectedObjectsPerLabelCSV, actual);
 };
 
-const expectClickingBarOnHorizontalBarChartToRedirectToFilteredDatasetPage = async (
-    datasetStatisticsPage: DatasetStatisticsPage,
-    page: Page
-) => {
-    const barChart = datasetStatisticsPage.getBarChart('Number of objects per label');
-
-    const candyCell = barChart.getColumn('Candy');
-    await expect(candyCell).toBeVisible();
-    await expect(candyCell).toHaveAttribute('aria-valuenow', '24');
-    await candyCell.click();
-
-    await expect(page).not.toHaveURL(/statistics/);
-    await expect(page).toHaveURL(/media/);
-    await expect(page.getByText('With label(s) Candy')).toBeVisible();
-};
-
 test.describe('Dataset statistics', () => {
     test.beforeEach(({ registerApiResponse }) => {
         registerApiResponse('GetProjectInfo', (_, res, ctx) => res(ctx.json(taskChainDetectionSegmentationProject)));
@@ -248,12 +232,22 @@ test.describe('Dataset statistics', () => {
         await expect(datasetPage.getStatisticsTab()).toHaveAttribute('aria-selected', 'false');
     });
 
-    test('Redirects to filtered media page when clicking Label on AnnotationObjectsBarHorizontalChart', async ({
+    test(`Redirects to filtered media page when clicking label's bar on the chart`, async ({
         datasetStatisticsPage,
         page,
     }) => {
         await datasetStatisticsPage.openByURL();
 
-        await expectClickingBarOnHorizontalBarChartToRedirectToFilteredDatasetPage(datasetStatisticsPage, page);
+        const barChart = datasetStatisticsPage.getBarChart('Number of objects per label');
+        const candyCell = barChart.getColumn('Candy');
+
+        await expect(candyCell).toBeVisible();
+        await expect(candyCell).toHaveAttribute('aria-valuenow', '24');
+
+        await candyCell.click();
+
+        await expect(page).not.toHaveURL(/statistics/);
+        await expect(page).toHaveURL(/media/);
+        await expect(page.getByText('With label(s) Candy')).toBeVisible();
     });
 });
