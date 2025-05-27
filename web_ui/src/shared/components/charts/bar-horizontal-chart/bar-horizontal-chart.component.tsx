@@ -34,7 +34,7 @@ export interface BarHorizontalChartProps extends ChartProps {
     formatTooltipMessage?: FormatTooltipMessage;
     xTickFormatter?: XTickFormatter;
     ariaLabel?: string;
-    handleLabelClick?: (labelName: string) => void;
+    onCellClick?: (labelName: string) => void;
 }
 
 const LEFT_MARGIN = -70;
@@ -63,7 +63,7 @@ export const BarHorizontalChart = ({
     ariaLabel,
     allowDecimals = true,
     formatTooltipMessage = displayMessage,
-    handleLabelClick,
+    onCellClick,
 }: BarHorizontalChartProps): JSX.Element => {
     const [labelColors, setLabelColors] = useState<Colors[]>(colors || []);
     const [margin, setMargin] = useState<number>(0);
@@ -155,7 +155,7 @@ export const BarHorizontalChart = ({
                                     id={`${name}-id`}
                                     aria-label={name}
                                     aria-valuenow={value}
-                                    onClick={isFunction(handleLabelClick) ? () => handleLabelClick(name) : undefined}
+                                    onClick={isFunction(onCellClick) ? () => onCellClick(name) : undefined}
                                 />
                             ))
                         ) : (
