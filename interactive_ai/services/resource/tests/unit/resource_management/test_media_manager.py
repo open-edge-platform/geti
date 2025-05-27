@@ -56,7 +56,7 @@ class TestMediaManager:
             found_media = MediaManager.get_first_media(ds_identifier, only_preprocessed)
 
         mock_get_one_image.assert_called_once_with(
-            earliest=True, extra_filter=None if not only_preprocessed else {"preprocessed": {"status": "FINISHED"}}
+            earliest=True, extra_filter=None if not only_preprocessed else {"preprocessing": {"status": "FINISHED"}}
         )
         mock_get_one_video.assert_not_called()
         assert found_media == image
@@ -64,7 +64,7 @@ class TestMediaManager:
     @pytest.mark.parametrize("only_preprocessed", [True, False])
     def test_get_first_media_video(self, request, fxt_video_entity, fxt_dataset_storage, only_preprocessed) -> None:
         ds_identifier = fxt_dataset_storage.identifier
-        extra_filter = None if not only_preprocessed else {"preprocessed": {"status": "FINISHED"}}
+        extra_filter = None if not only_preprocessed else {"preprocessing": {"status": "FINISHED"}}
         with (
             patch.object(ImageRepo, "get_one", return_value=NullImage()) as mock_get_one_image,
             patch.object(VideoRepo, "get_one", return_value=fxt_video_entity) as mock_get_one_video,
@@ -78,7 +78,7 @@ class TestMediaManager:
     @pytest.mark.parametrize("only_preprocessed", [True, False])
     def test_get_first_media_none(self, request, fxt_dataset_storage, only_preprocessed) -> None:
         ds_identifier = fxt_dataset_storage.identifier
-        extra_filter = None if not only_preprocessed else {"preprocessed": {"status": "FINISHED"}}
+        extra_filter = None if not only_preprocessed else {"preprocessing": {"status": "FINISHED"}}
         with (
             patch.object(ImageRepo, "get_one", return_value=NullImage()) as mock_get_one_image,
             patch.object(VideoRepo, "get_one", return_value=NullVideo()) as mock_get_one_video,
