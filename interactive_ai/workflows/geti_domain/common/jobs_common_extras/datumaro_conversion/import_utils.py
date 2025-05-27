@@ -652,11 +652,6 @@ class ImportUtils:
         :param task_type: OTX task type identifier
         :return: task name for REST API
         """
-        if (
-            FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            and task_type == TaskType.ANOMALY_CLASSIFICATION
-        ):
-            return "anomaly"
         return task_type.name.lower() if task_type != TaskType.ROTATED_DETECTION else STR_DETECTION_ORIENTED
 
     @staticmethod
@@ -673,8 +668,6 @@ class ImportUtils:
             GetiProjectType.CHAINED_DETECTION_SEGMENTATION: "detection_segmentation",
             GetiProjectType.ROTATED_DETECTION: STR_DETECTION_ORIENTED,
         }
-        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION):
-            exceptions[GetiProjectType.ANOMALY_CLASSIFICATION] = "anomaly"
         return exceptions.get(geti_project_type, geti_project_type.name.lower())
 
     @staticmethod

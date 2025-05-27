@@ -744,13 +744,6 @@ def fxt_expected_pipeline_by_project_parser():
 
 
 @pytest.fixture(scope="function", params=[True, False])
-def fxt_anomaly_reduction(request: pytest.FixtureRequest) -> bool:
-    """Parameterize FEATURE_FLAG_ANOMALY_REDUCTION"""
-    TestFeatureFlagProvider.set_flag(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION, request.param)
-    return request.param
-
-
-@pytest.fixture(scope="function", params=[True, False])
 def fxt_keypoint_detection(request: pytest.FixtureRequest) -> bool:
     """Parameterize FEATURE_FLAG_KEYPOINT_DETECTION"""
     TestFeatureFlagProvider.set_flag(FeatureFlag.FEATURE_FLAG_KEYPOINT_DETECTION, request.param)

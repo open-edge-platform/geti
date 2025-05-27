@@ -59,10 +59,7 @@ class DatumaroProjectParser(ProjectParser):
             self._task_name_to_task_type,
         ) = self._process_task_types(project_type=project_type)
 
-        if (
-            FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            and project_type == GetiProjectType.ANOMALY_CLASSIFICATION
-        ):
+        if project_type in [GetiProjectType.ANOMALY, GetiProjectType.ANOMALY_CLASSIFICATION]:
             label_cat: dm.LabelCategories = dm_categories[dm.AnnotationType.label]
             if label_cat.label_groups:
                 label_cat.label_groups = []  # ignore label_groups to generate correct group name for new task
@@ -540,14 +537,7 @@ class DatumaroProjectParser(ProjectParser):
 
                 labels.append(label_item)
 
-            if (
-                FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-                and task_type == TaskType.ANOMALY_CLASSIFICATION
-            ):
-                task_type_name = "anomaly"
-            else:
-                task_type_name = task_type.name.lower()  # OTX TaskType name
-                # != ImportUtils.task_type_to_rest_api_string(...)
+            task_type_name = task_type.name.lower()  # OTX TaskType name != ImportUtils.task_type_to_rest_api_string()
             task: dict[str, Any] = {
                 "title": task_name,  # generated from ImportUtils.task_type_to_rest_api_string(...)
                 "task_type": task_type_name,  # OTX TaskType name
