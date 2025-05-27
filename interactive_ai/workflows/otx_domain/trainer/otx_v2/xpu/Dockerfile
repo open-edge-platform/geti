@@ -37,9 +37,9 @@ COPY --link --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8e
 
 WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2
 
-COPY --link scripts/ scripts
-COPY --link run run
-COPY --link download_pretrained_weights.py download_pretrained_weights.py
+COPY --link ../scripts/ scripts
+COPY --link ../run run
+COPY --link ../download_pretrained_weights.py download_pretrained_weights.py
 
 # For OTX to install torch with ipex support, else defaults to cpu version
 ENV PIP_EXTRA_INDEX_URL=https://download.pytorch.org/whl/xpu

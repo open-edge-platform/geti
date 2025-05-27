@@ -47,9 +47,9 @@ WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2
 
 COPY --link --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8ea41eb4553a794195ef5803aa7ca6258653100d /uv /bin/uv
 
-COPY --link scripts/ scripts
-COPY --link run run
-COPY --link download_pretrained_weights.py download_pretrained_weights.py
+COPY --link ../scripts/ scripts
+COPY --link ../run run
+COPY --link ../download_pretrained_weights.py download_pretrained_weights.py
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
