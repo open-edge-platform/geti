@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Divider, Flex, Heading, Text, View } from '@geti/ui';
-import { Image } from '@geti/ui/icons';
-import Alert from '@spectrum-icons/workflow/Alert';
+import { Alert, Image } from '@geti/ui/icons';
 import { capitalize } from 'lodash-es';
 
 import { DATASET_IMPORT_WARNING_TYPE } from '../../../core/datasets/dataset.enum';
@@ -29,10 +28,8 @@ const DatasetImportWarningItem = ({ warning }: DatasetImportWarningItemProps): J
                     <Flex alignItems='start' justifyContent='space-between'>
                         <Flex flex={3} alignItems='center' gap='size-200'>
                             <Alert
-                                size='S'
-                                marginStart='size-50'
                                 data-testid='alert-icon'
-                                UNSAFE_className={
+                                className={
                                     type === DATASET_IMPORT_WARNING_TYPE.ERROR ? classes.negative : classes.warning
                                 }
                             />

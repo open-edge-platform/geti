@@ -38,6 +38,10 @@ export default [
                             group: ['@react-types/*'],
                             message: 'Use type from the @geti/ui folder instead.',
                         },
+                        {
+                            group: ['@spectrum-icons'],
+                            message: 'Use icons from the @geti/ui/icons folder instead.',
+                        },
                     ],
                 },
             ],

@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Button, Content, Heading } from '@geti/ui';
-import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
+import { CloudErrorIcon } from '@geti/ui/icons';
 import { useAuth } from 'react-oidc-context';
 
 import { ErrorLayout } from '../error-layout/error-layout.component';

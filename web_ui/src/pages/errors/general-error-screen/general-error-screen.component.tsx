@@ -3,7 +3,7 @@
 
 import { paths } from '@geti/core';
 import { Heading, Link } from '@geti/ui';
-import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
+import { CloudErrorIcon } from '@geti/ui/icons';
 
 import { redirectTo } from '../../../shared/utils';
 

@@ -144,3 +144,17 @@ export { ReactComponent as RightClick } from './right-click.svg';
 export { ReactComponent as JointConnection } from './joint-connection.svg';
 export { ReactComponent as LineMappingLight } from './line-mapping-light.svg';
 export { ReactComponent as AlertOutlined } from './alert-outlined.svg';
+
+export { default as Checkmark } from '@spectrum-icons/workflow/Checkmark';
+export { default as Calendar } from '@spectrum-icons/workflow/Calendar';
+export { default as NotFound } from '@spectrum-icons/illustrations/NotFound';
+export { default as ChevronDoubleLeft } from '@spectrum-icons/workflow/ChevronDoubleLeft';
+export { default as ChevronDoubleRight } from '@spectrum-icons/workflow/ChevronDoubleRight';
+export { default as CheckmarkCircleOutline } from '@spectrum-icons/workflow/CheckmarkCircleOutline';
+export { default as DeleteOutline } from '@spectrum-icons/workflow/DeleteOutline';
+export { default as RemoveCircle } from '@spectrum-icons/workflow/RemoveCircle';
+export { default as AlertCircle } from '@spectrum-icons/workflow/AlertCircle';
+export { default as CloudErrorIcon } from '@spectrum-icons/workflow/CloudError';
+export { default as LinkOut } from '@spectrum-icons/workflow/LinkOut';
+export { default as Import } from '@spectrum-icons/workflow/Import';
+export { default as Cross } from '@spectrum-icons/ui/CrossMedium';

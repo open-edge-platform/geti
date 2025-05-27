@@ -5,9 +5,7 @@ import { FormEvent, useEffect, useState } from 'react';
 
 import { paths } from '@geti/core';
 import { ActionGroup, Button, ButtonGroup, Divider, Flex, Form, Item, Key, Text, TextField, View } from '@geti/ui';
-import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
-import DeleteOutline from '@spectrum-icons/workflow/DeleteOutline';
-import RemoveCircle from '@spectrum-icons/workflow/RemoveCircle';
+import { CheckmarkCircleOutline, DeleteOutline, RemoveCircle } from '@geti/ui/icons';
 import dayjs from 'dayjs';
 import { isEmpty } from 'lodash-es';
 import { Navigate } from 'react-router-dom';

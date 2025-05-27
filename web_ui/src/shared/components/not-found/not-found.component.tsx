@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Content, Heading, IllustratedMessage } from '@geti/ui';
-import NotFoundSpectrum from '@spectrum-icons/illustrations/NotFound';
+import { NotFound as NotFoundSpectrum } from '@geti/ui/icons';
 
 interface NotFoundProps {
     heading?: string;

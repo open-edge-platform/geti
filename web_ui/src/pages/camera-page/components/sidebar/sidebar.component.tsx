@@ -4,8 +4,7 @@
 import { useState } from 'react';
 
 import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
-import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
-import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
+import { ChevronDoubleLeft, ChevronDoubleRight } from '@geti/ui/icons';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { useCameraParams } from '../../hooks/camera-params.hook';

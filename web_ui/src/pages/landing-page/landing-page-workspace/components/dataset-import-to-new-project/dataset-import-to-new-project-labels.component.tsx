@@ -4,8 +4,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { ActionButton, Checkbox, Divider, Flex, Heading, IllustratedMessage, Text, View } from '@geti/ui';
-import { ChevronRightSmallLight, LabelGroup } from '@geti/ui/icons';
-import NotFound from '@spectrum-icons/illustrations/NotFound';
+import { ChevronRightSmallLight, LabelGroup, NotFound } from '@geti/ui/icons';
 import { differenceBy, intersectionBy, isEmpty, uniqBy } from 'lodash-es';
 
 import { DATASET_IMPORT_TASK_TYPE } from '../../../../../core/datasets/dataset.enum';
