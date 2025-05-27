@@ -31,5 +31,10 @@
     "type-check": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",
     "lint:fix": "eslint --fix \"./src/**/*.ts*\""
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./icons": "./icons/index.ts",
+    "./theme": "./theme/index.tsx"
   }
 }
