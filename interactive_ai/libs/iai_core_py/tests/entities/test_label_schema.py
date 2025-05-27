@@ -19,7 +19,6 @@ from iai_core.entities.label_schema import (
     LabelSchemaView,
     LabelTree,
     NullLabelSchema,
-    natural_sort_label_id,
 )
 from iai_core.entities.scored_label import ScoredLabel
 from iai_core.repos import LabelSchemaRepo
@@ -33,17 +32,6 @@ def get_label_entity(id_val: str):
 
 def get_scored_label(id_val: str):
     return ScoredLabel(label_id=get_label_entity(id_val).id_, is_empty=get_label_entity(id_val).is_empty)
-
-
-@pytest.mark.parametrize("id_val", ["3", "fake1name2"])
-@pytest.mark.parametrize("target_class", [ID, get_label_entity, get_scored_label])
-def test_natural_sort_label_id(id_val: str, target_class):
-    target = target_class(id_val)
-
-    if id_val.isdecimal():
-        assert natural_sort_label_id(target) == ["", int(id_val)]
-    else:
-        assert natural_sort_label_id(target) == [id_val]
 
 
 class TestLabelSchemaEntity:
@@ -163,15 +151,14 @@ class TestLabelGroup:
             id=ID("1"),
         )
         assert no_group_type_label_group.id_ == "1"
-        # Expected ascending sorting of labels
+        # Expected labels to respect the original order
         assert no_group_type_label_group.labels == [
-            labels.label_0,
             labels.label_0_1,
+            labels.label_0,
         ]
         assert no_group_type_label_group.name == "Type non-specified specified label group"
         assert no_group_type_label_group.group_type == LabelGroupType.EXCLUSIVE
-        assert isinstance(no_group_type_label_group.minimum_label_id, ID)
-        assert no_group_type_label_group.minimum_label_id == ID(0)
+        assert no_group_type_label_group.labels[0].id_ == ID("0_1")
         # Checking attributes of LabelGroup object with specified group_type and not specified id parameters
         no_id_label_group = LabelGroup(
             name="ID non-specified Label Group",
@@ -181,12 +168,10 @@ class TestLabelGroup:
         # Expected randomly generated ID object with 24 characters as "id" attribute
         assert isinstance(no_id_label_group.id_, ID)
         assert len(no_id_label_group.id_) == 24
-        # Expected ascending sorting of labels
-        assert no_id_label_group.labels == [labels.label_0, labels.label_0_1]
+        assert no_id_label_group.labels == [labels.label_0_1, labels.label_0]
         assert no_id_label_group.name == "ID non-specified Label Group"
         assert no_id_label_group.group_type == LabelGroupType.EMPTY_LABEL
-        assert isinstance(no_id_label_group.minimum_label_id, ID)
-        assert no_id_label_group.minimum_label_id == "0"
+        assert no_id_label_group.labels[0].id_ == "0_1"
 
     def test_label_group_remove_label(self):
         """
@@ -197,21 +182,20 @@ class TestLabelGroup:
         LabelGroup objects with specified name, labels, group type and id_parameters parameters
 
         <b>Expected results:</b>
-        Test passes if after using remove_label method values of "labels" property, "minimum_label_id" and
+        Test passes if after using remove_label method values of "labels" property, and
         "is_single_label" methods are equal to expected
         """
         label_group = LabelGroup(name="Test Label Group", labels=[labels.label_0, labels.label_0_1])
         assert not label_group.is_single_label()
-        # Removing first label in "labels" property and checking values of "labels", "minimum_label_id" and
-        # "is_single_label"
+        # Removing first label in "labels" property and checking values of "labels", and "is_single_label"
         label_group.remove_label(labels.label_0)
         assert label_group.labels == [labels.label_0_1]
-        assert label_group.minimum_label_id == "0_1"
+        assert label_group.labels[0].id_ == "0_1"
         assert label_group.is_single_label()
         # Removing label that not included to LabelGroup object and repeat checks
         label_group.remove_label(labels.non_included_label)
         assert label_group.labels == [labels.label_0_1]
-        assert label_group.minimum_label_id == "0_1"
+        assert label_group.labels[0].id_ == "0_1"
         assert label_group.is_single_label()
 
 
@@ -254,7 +238,6 @@ class TestLabelTree:
     @staticmethod
     def label_tree() -> LabelTree:
         label_tree = LabelTree()
-        label_tree.get_labels_in_topological_order()
         # Forming Label Tree with children
         for parent, child in [
             edges.edge_0_to_0_1,
@@ -385,7 +368,6 @@ class TestLabelTree:
         """
         label_tree = self.label_tree_no_children()
         # Adding edges, one of which already in LabelTree
-        label_tree.topological_sort()
         label_tree.add_edges([edges.edge_0_to_0_1, edges.edge_0_1_to_0_1_3])
         CommonGraphMethods().check_graph_non_list_attributes(
             [
@@ -417,9 +399,7 @@ class TestLabelTree:
                 },
             ]
         )
-        assert not label_tree._LabelTree__topological_order_cache
         # Adding one existing and one non-existing edge
-        label_tree.topological_sort()
         label_tree.add_edges([edges.edge_0_to_0_2, edges.edge_0_2_to_0_2_4])
         CommonGraphMethods().check_graph_non_list_attributes(
             [
@@ -454,7 +434,6 @@ class TestLabelTree:
                 },
             ]
         )
-        assert not label_tree._LabelTree__topological_order_cache
 
     def test_label_tree_add_node(self):
         """
@@ -469,7 +448,6 @@ class TestLabelTree:
         """
         label_tree = self.label_tree_no_children()
         # Adding new node
-        label_tree.get_labels_in_topological_order()
         label_tree.add_node(labels.label_0_1_3)
         CommonGraphMethods().check_graph_non_list_attributes(
             [
@@ -501,9 +479,6 @@ class TestLabelTree:
                 },
             ]
         )
-        assert not label_tree._LabelTree__topological_order_cache
-        # Adding existing node, only topological_order_cache should be empty
-        label_tree.get_labels_in_topological_order()
         label_tree.add_node(labels.label_0)
         CommonGraphMethods().check_graph_non_list_attributes(
             [
@@ -525,29 +500,6 @@ class TestLabelTree:
                 },
             ]
         )
-        assert not label_tree._LabelTree__topological_order_cache
-
-    def test_label_tree_clear_topological_cache(self):
-        """
-        <b>Description:</b>
-        Check LabelTree class clear_topological_cache method
-
-        <b>Input data:</b>
-        LabelTree object with specified directed parameter and added edges
-
-        <b>Expected results:</b>
-        Test passes if "__topological_order_cache" attribute of LabelTree is equal "None" after clear_topological_cache
-        """
-        # Check for empty LabelTree
-        label_tree = LabelTree()
-        label_tree.get_labels_in_topological_order()
-        label_tree.clear_topological_cache()
-        assert not label_tree._LabelTree__topological_order_cache
-        # Check for LabelTree with specified nodes and edges
-        label_tree = self.label_tree_no_children()
-        label_tree.get_labels_in_topological_order()
-        label_tree.clear_topological_cache()
-        assert not label_tree._LabelTree__topological_order_cache
 
     def test_label_tree_relations(self):
         """
@@ -569,7 +521,6 @@ class TestLabelTree:
         5. Check "get_ancestors" method
         """
         label_tree = self.label_tree()
-        assert not label_tree._LabelTree__topological_order_cache
         # Checking new nodes and edges added after add_children method
         CommonGraphMethods().check_graph_non_list_attributes(
             [
@@ -631,51 +582,6 @@ class TestLabelTree:
         # Checking "get_ancestors" method
         self.check_get_ancestors_method(label_tree)
 
-    def test_label_tree_get_labels_in_topological_order(self):
-        """
-        <b>Description:</b>
-        Check LabelTree class get_labels_in_topological_order method
-
-        <b>Input data:</b>
-        LabelTree object with specified directed parameter, added edges and children
-
-        <b>Expected results:</b>
-        Test passes if get_labels_in_topological_order method of LabelTree returns expected value
-
-        <b>Steps</b>
-        1. Check value returned by get_labels_in_topological_order method for Tree with multiple children branches
-        2. Remove node with children from tree and check value returned by get_labels_in_topological_order method
-        """
-        label_tree = self.label_tree()
-        # Checking value returned by get_labels_in_topological_order method for tree with multiple branches
-        labels_topological_order = label_tree.get_labels_in_topological_order()
-
-        def previous_vertexes(vert_id):
-            vertexes = vert_id.split("_")
-            return vertexes[:-1], vertexes[-1]
-
-        returned_vertexes = set()
-        for label in labels_topological_order:
-            previous, curent = previous_vertexes(label.id_)
-            for vertex in previous:
-                assert vertex in returned_vertexes
-            returned_vertexes.add(curent)
-        assert {"0", "1", "2", "3", "4", "5"} == returned_vertexes
-
-        assert label_tree._LabelTree__topological_order_cache == labels_topological_order
-        # Removing node with children and checking value returned by get_labels_in_topological_order method
-        label_tree.remove_node(labels.label_0_1)
-        labels_topological_order = label_tree.get_labels_in_topological_order()
-        returned_vertexes = set()
-        for label in labels_topological_order:
-            previous, curent = previous_vertexes(label.id_)
-            for vertex in previous:
-                if curent != "3":  # the '1' has been removed, so that '3' is separated from the rest graph.
-                    assert vertex in returned_vertexes
-            returned_vertexes.add(curent)
-        assert {"0", "2", "3", "4", "5"} == returned_vertexes
-        assert label_tree._LabelTree__topological_order_cache == labels_topological_order
-
     def test_label_tree_remove_node(self):
         """
         <b>Description:</b>
@@ -699,7 +605,6 @@ class TestLabelTree:
         label_tree.remove_node(labels.label_0_1_3)
         assert label_tree.num_nodes() == 5
         assert label_tree.num_labels == 5
-        assert not label_tree._LabelTree__topological_order_cache
         CommonGraphMethods().check_graph_list_attributes(
             [
                 {
@@ -725,12 +630,9 @@ class TestLabelTree:
                 },
             ]
         )
-        # Removing node with children and checking value returned by get_labels_in_topological_order method
-        label_tree.get_labels_in_topological_order()
         label_tree.remove_node(labels.label_0_2)
         assert label_tree.num_nodes() == 4
         assert label_tree.num_labels == 4
-        assert not label_tree._LabelTree__topological_order_cache
         expected_edges = [(labels.label_0_1, labels.label_0, 0, {"value": None})]
         CommonGraphMethods().check_graph_list_attributes(
             [
