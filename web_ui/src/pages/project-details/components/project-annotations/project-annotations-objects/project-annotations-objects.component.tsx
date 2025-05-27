@@ -6,10 +6,10 @@ import { ResponsiveContainer } from 'recharts';
 
 import { ObjectsPerLabelInterface } from '../../../../../core/statistics/dtos/dataset-statistics.interface';
 import { CardContent } from '../../../../../shared/components/card-content/card-content.component';
-import { BarHorizontalChart } from '../../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
 import { Colors } from '../../../../../shared/components/charts/chart.interface';
 import { FullscreenAction } from '../../../../../shared/components/fullscreen-action/fullscreen-action.component';
 import { ProjectGridArea } from '../project-grid-area.interface';
+import { AnnotationObjectsBarHorizontalChart } from './annotations-objects-bar-horizontal-chart/annotations-objects-bar-horizontal-chart.component';
 import { formatToChartData, getColors, reorderObjectsLabels } from './utils';
 
 interface ProjectAnnotationsObjectsProps extends ProjectGridArea {
@@ -38,29 +38,23 @@ export const ProjectAnnotationsObjects = ({
                         title='Number of objects per label'
                         downloadableData={{ type: 'barChart', data }}
                     >
-                        <BarHorizontalChart
-                            title='Number of objects per label'
-                            data={data}
-                            colors={colors}
-                            allowDecimals={false}
-                            barSize={50}
-                        />
+                        <AnnotationObjectsBarHorizontalChart data={data} colors={colors} barSize={50} title={title} />
                     </FullscreenAction>
                 }
                 height={'100%'}
             >
                 <Flex height={'100%'} justifyContent={'center'} alignItems={'center'}>
                     <ResponsiveContainer id='objects-bar-horizontal-chart-id' width={'98%'} height={'98%'}>
-                        <BarHorizontalChart
-                            title='Number of objects per label'
+                        <AnnotationObjectsBarHorizontalChart
                             data={data}
                             colors={colors}
-                            allowDecimals={false}
                             yPadding={{ bottom: 10 }}
                             barSize={30}
+                            title={title}
                         />
                     </ResponsiveContainer>
                 </Flex>
+                x
             </CardContent>
         </div>
     );

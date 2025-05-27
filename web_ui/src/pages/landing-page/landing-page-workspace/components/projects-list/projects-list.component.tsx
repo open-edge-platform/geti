@@ -3,9 +3,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { VirtualizedListLayout } from '@geti/ui';
+import { VirtualizedListLayout, type Selection } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
-import { Selection } from 'react-aria-components';
 
 import { ProjectsQueryResult } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';

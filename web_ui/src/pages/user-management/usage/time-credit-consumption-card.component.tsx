@@ -16,7 +16,7 @@ import {
     View,
     type StyleProps,
 } from '@geti/ui';
-import Close from '@spectrum-icons/workflow/Close';
+import { Close } from '@geti/ui/icons';
 import dayjs from 'dayjs';
 import { isEmpty, isNumber, orderBy } from 'lodash-es';
 import { Bar, BarChart, Rectangle, ResponsiveContainer, Tooltip, TooltipProps, XAxis, YAxis } from 'recharts';

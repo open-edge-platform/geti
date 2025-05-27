@@ -24,7 +24,7 @@ func ZapRequestLogger(logger *otelzap.Logger) gin.HandlerFunc {
 		c.Next()
 
 		latency := time.Since(start)
-		latencyFormatted := fmt.Sprintf("%.4fms", float64(latency.Nanoseconds())/1e6)
+		latencyFormatted := fmt.Sprintf("%.4fms", float64(latency.Nanoseconds())/float64(time.Millisecond))
 		status := c.Writer.Status()
 		sizeOut := c.Writer.Size()
 		sizeIn := c.Request.ContentLength

@@ -6,13 +6,13 @@ import { useEffect, useRef } from 'react';
 import { isNil } from 'lodash-es';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { paths } from '../../../../packages/core/src/services/routes';
+import { getErrorMessage } from '../../../../packages/core/src/services/utils';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { isActiveOrganization, isUserActivatedInOrg, isUserInvitedInOrg } from '../../../routes/organizations/util';
 import { hasEqualId } from '../../../shared/utils';
-import { paths } from '../../services/routes';
-import { getErrorMessage } from '../../services/utils';
 import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../user-settings/utils';

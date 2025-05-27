@@ -3,7 +3,7 @@
 
 import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { UserCircleFilled as AdminIcon } from '@geti/ui/icons';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 
 import { USER_ROLE } from '../../../../../core/users/users.interface';
 import { UserPhotoPresentation } from '../../../profile-page/user-photo-container/user-photo-presentation.component';

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Heading, Link } from '@geti/ui';
-import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
+import { CloudErrorIcon } from '@geti/ui/icons';
 
-import { paths } from '../../../core/services/routes';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';

@@ -3,10 +3,10 @@
 
 import { Dispatch, useCallback, useMemo } from 'react';
 
+import { paths } from '@geti/core';
 import { Flex } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../../core/services/routes';
 import { DatasetMediaUploadActions } from '../../../../providers/media-upload-provider/media-upload-reducer-actions';
 import {
     MEDIA_CONTENT_BUCKET,

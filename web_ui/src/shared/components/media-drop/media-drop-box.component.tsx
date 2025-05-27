@@ -3,10 +3,9 @@
 
 import { FC, ReactNode, SVGProps } from 'react';
 
-import { Flex, Text, View, type DimensionValue, type Responsive } from '@geti/ui';
+import { AriaDropZone as DropZone, Flex, Text, View, type DimensionValue, type Responsive } from '@geti/ui';
 import { isFirefox } from '@react-aria/utils';
 import { isEmpty, isNil } from 'lodash-es';
-import { DropZone } from 'react-aria-components';
 
 import { MediaUpload } from '../../../assets/images';
 import { useStatus } from '../../../core/status/hooks/use-status.hook';

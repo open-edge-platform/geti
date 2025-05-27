@@ -1,14 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
-import { Pressable } from 'react-aria-components';
+import { paths } from '@geti/core';
+import { Flex, Pressable, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../core/projects/hooks/use-project-status.hook';
 import { Performance, PerformanceType } from '../../../../core/projects/task.interface';
-import { paths } from '../../../../core/services/routes';
 import { AccuracyHalfDonutChart } from '../../../project-details/components/project-models/models-container/model-card/accuracy-container/accuracy-half-donut-chart';
 import { AnomalyProjectPerformance } from './anomaly-project-performance.component';
 import { ProjectPerformanceTooltip } from './project-performance-tooltip.component';

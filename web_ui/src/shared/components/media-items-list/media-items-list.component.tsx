@@ -3,16 +3,18 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { View, type DimensionValue, type Responsive } from '@geti/ui';
-import { useLoadMore } from '@react-aria/utils';
 import {
-    ListBox as AriaComponentsListBox,
+    AriaComponentsListBox,
     GridLayout,
     ListBoxItem,
     ListLayout,
     Size,
+    View,
     Virtualizer,
-} from 'react-aria-components';
+    type DimensionValue,
+    type Responsive,
+} from '@geti/ui';
+import { useLoadMore } from '@react-aria/utils';
 
 import { VIEW_MODE_SETTINGS, ViewModes } from '../media-view-modes/utils';
 import { useGetTargetPosition } from './use-get-target-position.hook';

@@ -3,12 +3,12 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { isEmpty, isEqual } from 'lodash-es';
 import { DetailedError, Upload } from 'tus-js-client';
 
 import { useImportProject } from '../../core/projects/hooks/use-import-project.hook';
 import { ImportOptions } from '../../core/projects/services/project-service.interface';
-import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 import { MissingProviderError } from '../../shared/missing-provider-error';

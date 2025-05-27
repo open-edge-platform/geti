@@ -440,10 +440,7 @@ class QueryBuilder:
             size=media_doc["size"],
             creation_date=DatetimeToMongo.backward(media_doc["upload_date"]),
             extension=extension,
-            preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus[media_doc["preprocessing"]])
-            # TODO: remove in scope of CVS-163688
-            if "preprocessing" in media_doc and media_doc["preprocessing"] is not None
-            else MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED),
+            preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus[media_doc["preprocessing"]]),
         )
 
     @staticmethod
@@ -463,10 +460,7 @@ class QueryBuilder:
             stride=media_doc["frame_stride"] if media_doc["frame_stride"] else 0,
             creation_date=DatetimeToMongo.backward(media_doc["upload_date"]),
             extension=extension,
-            preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus[media_doc["preprocessing"]])
-            # TODO: remove in scope of CVS-163688
-            if "preprocessing" in media_doc and media_doc["preprocessing"] is not None
-            else MediaPreprocessing(status=MediaPreprocessingStatus.FINISHED),
+            preprocessing=MediaPreprocessing(status=MediaPreprocessingStatus[media_doc["preprocessing"]]),
         )
 
     @staticmethod

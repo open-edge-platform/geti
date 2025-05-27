@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { StatusCodes } from 'http-status-codes';
@@ -9,7 +10,6 @@ import { useAuth } from 'react-oidc-context';
 import { useParams } from 'react-router-dom';
 
 import { AccountStatus } from '../../core/organizations/organizations.interface';
-import { paths } from '../../core/services/routes';
 import { createInMemoryOnboardingService } from '../../core/users/services/inmemory-onboarding-service';
 import { getMockedOrganizationMetadata } from '../../test-utils/mocked-items-factory/mocked-organization';
 import { providersRender as render } from '../../test-utils/required-providers-render';

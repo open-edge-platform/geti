@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Divider, Flex, Link as SpectrumLink, useMediaQuery, View } from '@geti/ui';
 import { InfoOutline, Policy, ProjectsIcon, UserIcon } from '@geti/ui/icons';
 import { isLargeSizeQuery } from '@geti/ui/theme';
 import { Link } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '../../../core/services/routes';
 import { useFirstWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { MenuItemImage } from '../../../shared/components/menu-item-image/menu-item-image.component';
 import { MenuOption } from '../../../shared/components/menu-option.interface';

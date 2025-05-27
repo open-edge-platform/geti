@@ -5,14 +5,12 @@ package entities
 
 import "gopkg.in/validator.v2"
 
-var emptyID = ID{""}
-
-// ID struct
+// ID struct.
 type ID struct {
 	ID string `validate:"min=24,max=36,regexp=^[A-Fa-f0-9-]+$"`
 }
 
-// ContextID struct
+// ContextID struct.
 type ContextID struct {
 	OrganizationID ID
 	WorkspaceID    ID
@@ -25,12 +23,12 @@ func (s ID) String() string {
 	return s.ID
 }
 
-// IsValid checks if the ID is a valid ObjectId or UUID
+// IsValid checks if the ID is a valid ObjectId or UUID.
 func (s ID) IsValid() error {
 	return validator.Validate(s)
 }
 
-// IsEmptyID checks if the ID is empty
-func (s ID) IsEmptyID() bool {
-	return s == emptyID
+// IsEmpty checks if the ID is empty.
+func (s ID) IsEmpty() bool {
+	return s.ID == ""
 }

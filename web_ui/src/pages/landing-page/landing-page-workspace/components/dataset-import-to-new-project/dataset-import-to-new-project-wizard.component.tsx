@@ -4,7 +4,7 @@
 import { useCallback } from 'react';
 
 import { Flex, Text, View } from '@geti/ui';
-import Checkmark from '@spectrum-icons/workflow/Checkmark';
+import { Checkmark } from '@geti/ui/icons';
 import { capitalize, isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../../../../core/datasets/dataset.enum';

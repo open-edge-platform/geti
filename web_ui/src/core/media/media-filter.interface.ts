@@ -10,7 +10,7 @@ export enum SortMenuActionKey {
 
 export interface AdvancedFilterSortingOptions {
     sortBy?: string;
-    sortDir?: string;
+    sortDir?: 'asc' | 'dsc';
 }
 
 // Note: condition = undefined is only when we add an empty filter rule
