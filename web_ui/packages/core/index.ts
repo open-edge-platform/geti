@@ -2,3 +2,6 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 export { apiClient } from './src/client/axios-instance';
+export { paths } from './src/services/routes';
+export { API_URLS } from './src/services/urls';
+export { addHostToApiUrls } from './src/services/use-api-router.hook';

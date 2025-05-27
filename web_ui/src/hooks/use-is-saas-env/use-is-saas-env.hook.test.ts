@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
 import { renderHook } from '@testing-library/react';
 
-import { useDeploymentConfigQuery } from '../../core/services/use-deployment-config-query.hook';
 import { useIsSaasEnv } from './use-is-saas-env.hook';
 
 const mockConfig = {
@@ -17,8 +17,8 @@ const mockConfig = {
     dataPlaneUrl: null,
     docsUrl: 'https://docs.geti.intel.com/on-prem/2.6/',
 };
-jest.mock('../../core/services/use-deployment-config-query.hook', () => ({
-    ...jest.requireActual('../../core/services/use-deployment-config-query.hook'),
+jest.mock('@geti/core/src/services/use-deployment-config-query.hook', () => ({
+    ...jest.requireActual('@geti/core/src/services/use-deployment-config-query.hook'),
     useDeploymentConfigQuery: jest.fn(() => ({
         data: mockConfig,
     })),

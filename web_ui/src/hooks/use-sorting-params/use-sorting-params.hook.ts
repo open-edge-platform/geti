@@ -16,7 +16,7 @@ export const useSortingParams = () => {
 
     const sortingOptions: AdvancedFilterSortingOptions = {
         sortBy: searchParams.get('sortBy') ?? SortMenuActionKey.DATE,
-        sortDir: searchParams.get('sortDirection') ?? 'dsc',
+        sortDir: searchParams.get('sortDirection') === 'asc' ? 'asc' : 'dsc',
     };
 
     return {

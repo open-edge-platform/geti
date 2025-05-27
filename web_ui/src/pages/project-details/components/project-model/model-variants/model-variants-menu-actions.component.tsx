@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { MenuTriggerList } from '../../../../../shared/components/menu-trigger-list/menu-trigger-list.component';

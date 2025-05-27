@@ -1,11 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getMockedProjectIdentifier } from '../../test-utils/mocked-items-factory/mocked-identifiers';
-import { PredictionCache, PredictionMode } from '../annotations/services/prediction-service.interface';
-import { MEDIA_TYPE } from '../media/base-media.interface';
-import { MediaIdentifier } from '../media/media.interface';
-import { SortDirection } from '../shared/query-parameters';
+import {
+    PredictionCache,
+    PredictionMode,
+} from '../../../../src/core/annotations/services/prediction-service.interface';
+import { MEDIA_TYPE } from '../../../../src/core/media/base-media.interface';
+import { MediaIdentifier } from '../../../../src/core/media/media.interface';
+import { SortDirection } from '../../../../src/core/shared/query-parameters';
+import { getMockedProjectIdentifier } from '../../../../src/test-utils/mocked-items-factory/mocked-identifiers';
 import { API_URLS, MEDIA_ITEM } from './urls';
 
 describe('urls', () => {

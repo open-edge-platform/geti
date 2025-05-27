@@ -4,7 +4,7 @@
 import { WebStorageStateStore } from 'oidc-client-ts';
 import { AuthProviderProps } from 'react-oidc-context';
 
-import { paths } from '../services/routes';
+import { paths } from '../../../packages/core/src/services/routes';
 
 /*
     # OpenID Connect (OIDC) and OAuth2 protocol support for browser-based JavaScript applications

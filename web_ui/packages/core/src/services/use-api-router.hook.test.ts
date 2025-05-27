@@ -3,7 +3,7 @@
 
 import { renderHook } from '@testing-library/react';
 
-import { MEDIA_TYPE } from '../media/base-media.interface';
+import { MEDIA_TYPE } from '../../../../src/core/media/base-media.interface';
 import { useApiRouter } from './use-api-router.hook';
 import { useDeploymentConfigQuery } from './use-deployment-config-query.hook';
 

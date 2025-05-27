@@ -4,9 +4,9 @@
 import { apiClient } from '@geti/core';
 import { AxiosProgressEvent, AxiosResponse } from 'axios';
 
+import { CreateApiService } from '../../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../../packages/core/src/services/urls';
 import { DatasetIdentifier } from '../../../projects/dataset.interface';
-import { CreateApiService } from '../../../services/create-api-service.interface';
-import { API_URLS } from '../../../services/urls';
 import { MEDIA_GROUP, MEDIA_TYPE } from '../../base-media.interface';
 import {
     ActiveMediaDTO,

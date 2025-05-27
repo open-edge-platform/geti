@@ -3,6 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
+import { API_URLS } from '@geti/core';
 import { QueryClient, QueryKey } from '@tanstack/react-query';
 import { isArray, isEqual, isNumber } from 'lodash-es';
 import { useParams } from 'react-router-dom';
@@ -15,7 +16,6 @@ import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { MediaIdentifier, MediaItem } from '../../../../core/media/media.interface';
 import { isVideo, VideoFrame } from '../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import { API_URLS } from '../../../../core/services/urls';
 import { SelectedMediaItem } from './selected-media-item.interface';
 import { useMediaItemQuery } from './use-media-item-query.hook';
 

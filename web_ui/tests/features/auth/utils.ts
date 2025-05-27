@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Page } from '@playwright/test';
 import { User } from 'oidc-client-ts';
 
-import { paths } from '../../../src/core/services/routes';
 import { generateToken as generateJWT } from '../../utils/generate-token';
 
 export const routeLoginRequest = async (page: Page) => {

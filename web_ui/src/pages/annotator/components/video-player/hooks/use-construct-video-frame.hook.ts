@@ -3,11 +3,12 @@
 
 import { useCallback } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
 import { MEDIA_ANNOTATION_STATUS } from '../../../../../core/media/base.interface';
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideo, isVideoFrame, VideoFrame } from '../../../../../core/media/video.interface';
-import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';
 
 export const useConstructVideoFrame = (videoFrame: MediaItem | undefined) => {

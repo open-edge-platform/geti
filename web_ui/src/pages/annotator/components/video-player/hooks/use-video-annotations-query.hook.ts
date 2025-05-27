@@ -3,14 +3,14 @@
 
 import { useEffect, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery } from '@tanstack/react-query';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
 import { VideoPaginationOptions } from '../../../../../core/annotations/services/video-pagination-options.interface';
 import { Video } from '../../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
 
 export const useVideoAnnotationsQueryOptions = (datasetIdentifier: DatasetIdentifier) => {

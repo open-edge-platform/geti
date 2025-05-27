@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, screen } from '@testing-library/react';
 
 import { ModelsGroups } from '../../../../core/models/models.interface';
 import { mockedArchitectureModels } from '../../../../core/models/services/test-utils';
-import { ApplicationServicesContextProps } from '../../../../core/services/application-services-provider.component';
 import { PerformanceCategory } from '../../../../core/supported-algorithms/dtos/supported-algorithms.interface';
 import { useSupportedAlgorithms } from '../../../../core/supported-algorithms/hooks/use-supported-algorithms.hook';
 import { getMockedSupportedAlgorithm } from '../../../../core/supported-algorithms/services/test-utils';

@@ -19,11 +19,11 @@ describe('useDebouncedCallback', () => {
             debouncedCallback();
         });
 
-        expect(mockCallback).toBeCalledTimes(0);
+        expect(mockCallback).toHaveBeenCalledTimes(0);
 
         jest.advanceTimersByTime(delay);
 
-        expect(mockCallback).toBeCalledTimes(1);
+        expect(mockCallback).toHaveBeenCalledTimes(1);
 
         jest.clearAllTimers();
     });

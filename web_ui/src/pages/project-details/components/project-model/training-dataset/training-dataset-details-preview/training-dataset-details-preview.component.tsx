@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { Flex } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 
@@ -20,7 +21,6 @@ import {
 } from '../../../../../../core/media/media.interface';
 import { isVideoFrame, Video, VideoFrame } from '../../../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../../../core/projects/dataset.interface';
-import { useApplicationServices } from '../../../../../../core/services/application-services-provider.component';
 import { EditAnnotationsButton } from '../../../../../../shared/components/media-item-annotations-preview/edit-annotations-button/edit-annotations-button.component';
 import { ImagePreviewNavigationControls } from '../../../../../../shared/components/media-item-annotations-preview/media-item-annotations-preview-dialog/image-preview-navigation-controls/image-preview-navigation-controls.component';
 import { MediaItemAnnotationsPreviewDialog } from '../../../../../../shared/components/media-item-annotations-preview/media-item-annotations-preview-dialog/media-item-annotations-preview-dialog.component';

@@ -3,9 +3,8 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
-import { apiClient } from '@geti/core';
-
-import { MissingProviderError } from '../../shared/missing-provider-error';
+import { MissingProviderError } from '../../../../src/shared/missing-provider-error';
+import { apiClient } from '../client/axios-instance';
 import { ApplicationServices } from './application-services.interface';
 import { getApiServices } from './get-api-services';
 import { getInMemoryServices } from './get-in-memory-services';
