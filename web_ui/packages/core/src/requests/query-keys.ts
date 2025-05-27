@@ -1,26 +1,29 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { PredictionCache, PredictionMode } from '../annotations/services/prediction-service.interface';
-import { VideoPaginationOptions } from '../annotations/services/video-pagination-options.interface';
-import { TrainingConfigurationQueryParameters } from '../configurable-parameters/services/api-model-config-parameters-service';
-import { CreditAccountIdentifier } from '../credits/credits.interface';
+import {
+    PredictionCache,
+    PredictionMode,
+} from '../../../../src/core/annotations/services/prediction-service.interface';
+import { VideoPaginationOptions } from '../../../../src/core/annotations/services/video-pagination-options.interface';
+import { TrainingConfigurationQueryParameters } from '../../../../src/core/configurable-parameters/services/api-model-config-parameters-service';
+import { CreditAccountIdentifier } from '../../../../src/core/credits/credits.interface';
 import {
     GetTransactionsAggregatesQueryOptions,
     GetTransactionsQueryOptions,
-} from '../credits/transactions/services/transactions-service.interface';
-import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../media/media-filter.interface';
-import { MediaIdentifier } from '../media/media.interface';
-import { VideoIdentifier } from '../media/video.interface';
-import { ModelGroupIdentifier, ModelIdentifier } from '../models/models.interface';
-import { OrganizationIdentifier } from '../organizations/organizations.interface';
-import { GetOrganizationsQueryOptions } from '../organizations/services/organizations-service.interface';
-import { DOMAIN, ProjectIdentifier } from '../projects/core.interface';
-import { DatasetIdentifier } from '../projects/dataset.interface';
-import { ProjectsQueryOptions } from '../projects/services/project-service.interface';
-import { Task } from '../projects/task.interface';
-import { RESOURCE_TYPE, UsersQueryParams } from '../users/users.interface';
-import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
+} from '../../../../src/core/credits/transactions/services/transactions-service.interface';
+import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../../../src/core/media/media-filter.interface';
+import { MediaIdentifier } from '../../../../src/core/media/media.interface';
+import { VideoIdentifier } from '../../../../src/core/media/video.interface';
+import { ModelGroupIdentifier, ModelIdentifier } from '../../../../src/core/models/models.interface';
+import { OrganizationIdentifier } from '../../../../src/core/organizations/organizations.interface';
+import { GetOrganizationsQueryOptions } from '../../../../src/core/organizations/services/organizations-service.interface';
+import { DOMAIN, ProjectIdentifier } from '../../../../src/core/projects/core.interface';
+import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interface';
+import { ProjectsQueryOptions } from '../../../../src/core/projects/services/project-service.interface';
+import { Task } from '../../../../src/core/projects/task.interface';
+import { RESOURCE_TYPE, UsersQueryParams } from '../../../../src/core/users/users.interface';
+import { WorkspaceIdentifier } from '../../../../src/core/workspaces/services/workspaces.interface';
 
 const WORKSPACES = (organizationId: string) => [organizationId, 'workspaces'];
 

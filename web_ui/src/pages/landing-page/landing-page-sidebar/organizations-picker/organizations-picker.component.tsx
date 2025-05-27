@@ -3,12 +3,12 @@
 
 import { useRef } from 'react';
 
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import { CustomPopover, dimensionValue, Flex, Item, ListBox, Picker, View } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isNil } from 'lodash-es';
 
 import { useSelectedOrganization } from '../../../../core/organizations/hook/use-selected-organization.hook';
-import { getErrorMessage } from '../../../../core/services/utils';
 import { useOnboardUserMutation } from '../../../../core/users/hook/use-onboard-user-mutation.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';

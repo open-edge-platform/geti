@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
@@ -11,7 +12,6 @@ import { LABEL_BEHAVIOUR } from '../../../../../core/labels/label.interface';
 import { createInMemoryMediaService } from '../../../../../core/media/services/in-memory-media-service/in-memory-media-service';
 import { MediaService } from '../../../../../core/media/services/media-service.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
 import { useDataset } from '../../../../../providers/dataset-provider/dataset-provider.component';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedPerformance, getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';

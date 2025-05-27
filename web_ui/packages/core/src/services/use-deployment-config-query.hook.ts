@@ -5,7 +5,7 @@ import { useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query
 import axios from 'axios';
 import { object, string } from 'yup';
 
-import { oidcConfigCidaas, oidcConfigIntelSSO } from './../../core/auth/configuration';
+import { oidcConfigCidaas, oidcConfigIntelSSO } from '../../../../src/core/auth/configuration';
 import { isAdminLocation } from './utils';
 
 export interface DeploymentConfiguration {

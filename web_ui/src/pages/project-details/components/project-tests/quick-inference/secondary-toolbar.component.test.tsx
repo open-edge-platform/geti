@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesProvider } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { createInMemoryInferenceService } from '../../../../../core/annotations/services/in-memory-inference-service';
 import { Label } from '../../../../../core/labels/label.interface';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
-import { ApplicationServicesProvider } from '../../../../../core/services/application-services-provider.component';
 import { initialConfig } from '../../../../../core/user-settings/utils';
 import { getMockedAnnotation } from '../../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';

@@ -3,6 +3,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 
+import { paths } from '@geti/core';
 import { ActionGroup, Button, ButtonGroup, Divider, Flex, Form, Item, Key, Text, TextField, View } from '@geti/ui';
 import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
 import DeleteOutline from '@spectrum-icons/workflow/DeleteOutline';
@@ -14,7 +15,6 @@ import { useOverlayTriggerState } from 'react-stately';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { AccountStatus, Organization } from '../../../core/organizations/organizations.interface';
-import { paths } from '../../../core/services/routes';
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { PhotoPlaceholder } from '../../../shared/components/photo-placeholder/photo-placeholder.component';
 import { Header } from '../../shared/components/header/header.component';
