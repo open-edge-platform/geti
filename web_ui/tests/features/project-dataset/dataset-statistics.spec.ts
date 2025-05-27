@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { expect, Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { test } from '../../fixtures/base-test';
 
