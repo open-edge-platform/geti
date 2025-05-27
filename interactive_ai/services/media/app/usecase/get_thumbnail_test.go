@@ -160,6 +160,21 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 				assert.Nil(t, metadata)
 			},
 		},
+		{
+			name: "ShouldNotGenerateThumbnail",
+			setupMocks: func() {
+				t.Setenv("FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING", "true")
+				mockRepo.EXPECT().
+					LoadThumbnailByID(ctx, fullImageID).
+					Return(io.NopCloser(nil), nil, errors.New("not_found")).
+					Once()
+			},
+			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
+				assert.ErrorContains(t, err, "Thumbnail not found")
+				assert.Nil(t, reader)
+				assert.Nil(t, metadata)
+			},
+		},
 	}
 
 	for _, tt := range tests {

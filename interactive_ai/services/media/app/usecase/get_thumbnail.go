@@ -43,8 +43,7 @@ type GetOrCreateThumbnail struct {
 func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper service.Cropper) (*GetOrCreateThumbnail, error) {
 	cfg := EnvsConfig{}
 	if err := env.Parse(&cfg); err != nil {
-		logger.Log().Errorf("Failed to parse environment variables: %s", err)
-		return nil, err
+		return nil, fmt.Errorf("NewGetOrCreateImageThumbnail error: %w", err)
 	}
 	return &GetOrCreateThumbnail{
 		imageRepo: imageRepo,
