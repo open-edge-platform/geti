@@ -13,9 +13,9 @@ export const ModelInfoFields = ({
     complexity,
     isModelTraining,
 }: {
-    modelSize?: string | undefined;
-    totalDiskSize?: string | undefined;
-    complexity?: number | undefined;
+    modelSize?: string;
+    totalDiskSize?: string;
+    complexity?: number;
     isModelTraining: boolean;
 }) => {
     return (

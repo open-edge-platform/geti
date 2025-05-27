@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Heading, Text, View } from '@geti/ui';
+import { dimensionValue, Divider, Heading, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
@@ -41,7 +41,7 @@ export const TrainingProgress = ({ taskId }: TrainingProgressProps): JSX.Element
                                 <Heading
                                     id={`model-group-name-${job.id}-id`}
                                     margin={0}
-                                    UNSAFE_style={{ padding: '16px' }}
+                                    UNSAFE_style={{ padding: dimensionValue('size-200') }}
                                 >
                                     {job.metadata.task.modelArchitecture}
                                 </Heading>
