@@ -5,7 +5,7 @@ import { FC, PropsWithChildren } from 'react';
 
 import { dimensionValue } from '@geti/ui';
 import { AcceptSmall, Add, CloseSmall } from '@geti/ui/icons';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 
 const Wrapper: FC<PropsWithChildren & { ariaLabel?: string }> = ({ children, ariaLabel }) => {
     return (

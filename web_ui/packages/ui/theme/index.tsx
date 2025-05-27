@@ -29,3 +29,5 @@ export {
     isExtraLargeSizeQuery,
     smallerThanQuery,
 } from './queries';
+
+export { COLOR_MODE } from './color-mode.enum';

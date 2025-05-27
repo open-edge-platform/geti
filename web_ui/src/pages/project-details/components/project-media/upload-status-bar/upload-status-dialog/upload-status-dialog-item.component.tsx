@@ -16,7 +16,7 @@ import {
     type IconColorValue,
 } from '@geti/ui';
 import { AcceptCircle, Alert, AlertCircle, Image, Play, Refresh } from '@geti/ui/icons';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 
 import { MEDIA_TYPE } from '../../../../../../core/media/base-media.interface';
 import {
