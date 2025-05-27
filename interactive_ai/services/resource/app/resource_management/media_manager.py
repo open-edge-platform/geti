@@ -1,4 +1,5 @@
 # Copyright (C) 2022-2025 Intel Corporation
+# Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 """This module contains the media manager"""
@@ -973,7 +974,7 @@ class MediaManager:
         """
         extra_filter = None
         if only_preprocessed:
-            extra_filter = {"preprocessing": {"status": str(MediaPreprocessingStatus.FINISHED.value)}}
+            extra_filter = {"preprocessing.status": str(MediaPreprocessingStatus.FINISHED.value)}
         first_image = ImageRepo(dataset_storage_identifier).get_one(earliest=True, extra_filter=extra_filter)
         if not isinstance(first_image, NullImage):
             return first_image
