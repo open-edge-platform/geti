@@ -129,7 +129,9 @@ export const DatasetImportPanels = ({
             {!isEmpty(datasetImports) ? (
                 <View position={'relative'} UNSAFE_className={classes.datasetImportPanels}>
                     {!areProjectsLoading &&
-                        datasetImports.map((datasetImportItem: DatasetImportItem) => (
+                        datasetImports
+                            .sort((a, b) => b.startAt - a.startAt)
+                            .map((datasetImportItem: DatasetImportItem) => (
                             <Fragment key={datasetImportItem.id}>
                                 <DatasetImportJobStatus
                                     workspaceId={workspaceId}

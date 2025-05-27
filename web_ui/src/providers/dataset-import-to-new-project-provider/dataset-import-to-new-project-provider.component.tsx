@@ -14,7 +14,7 @@ import {
 } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { isEmpty, noop } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
@@ -191,7 +191,12 @@ export const DatasetImportToNewProjectProvider = ({ children }: DatasetImportToN
             { ...workspaceIdentifier, fileId: String(datasetImport.uploadId) },
             {
                 onSuccess: () => deleteLsDatasetImport(datasetImport.id),
-                onError: (error) => addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR }),
+                onError: (error) => {
+                    if (error.response?.status === HttpStatusCode.NotFound) {
+                        deleteLsDatasetImport(datasetImport.id);
+                    }
+                    addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+                },
             }
         );
     };

@@ -30,6 +30,7 @@ import { useTusUpload } from '../tus-upload-provider/tus-upload-provider.compone
 import { getUploadId, onErrorMessage, throttleProgress } from '../tus-upload-provider/util';
 import { useWorkspaceIdentifier } from '../workspaces-provider/use-workspace-identifier.hook';
 import { getDatasetImportInitialState, getLabelsMap, matchStatus } from './utils';
+import { HttpStatusCode } from 'axios';
 
 interface DatasetImportToExistingProjectContextProps {
     isReady: (id: string | undefined) => boolean;
@@ -134,6 +135,12 @@ export const DatasetImportToExistingProjectProvider = ({ children }: DatasetImpo
             { workspaceId, organizationId, fileId: String(activeDatasetImport.uploadId) },
             {
                 onSuccess: () => deleteLsDatasetImport(activeDatasetImport.id),
+                onError: (error) => {
+                    if (error.response?.status === HttpStatusCode.NotFound) {
+                        deleteLsDatasetImport(activeDatasetImport.id);
+                    }
+                    addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+                },
             }
         );
     };
