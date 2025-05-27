@@ -13,11 +13,6 @@ body:
       options:
         - Bug 🐞
         - Feature Request ✨
-        - Enhancement 🛠️
-        - Documentation 📚
-        options:
-        - Bug 🐞
-        - Feature Request ✨
         - Documentation 📚
         - Other❓
     validations:
