@@ -1,8 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ResourceTypeDTO, RoleResourceDTO, UserDTO, UserRoleDTO } from '@geti/core/src/users/users.interface';
-
+import {
+    ResourceTypeDTO,
+    RoleResourceDTO,
+    UserDTO,
+    UserRoleDTO,
+} from '../../../packages/core/src/users/users.interface';
 import { OpenApiRequest } from '../../../src/core/server/types';
 import { OpenApiFixtures } from '../../fixtures/open-api';
 import { notFoundHandler } from '../../fixtures/open-api/setup-open-api-handlers';
