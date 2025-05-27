@@ -29,7 +29,18 @@ export const useLocalStorageDatasetImport = <T extends DatasetImport>(
     };
 
     const putLsDatasetImport = (item: T): void => {
-        setLsDatasetImports([...(getParsedLocalStorage(storageKey) as T[]).filter(hasDifferentId(item.id)), item]);
+        const currentItems = getParsedLocalStorage(storageKey) as T[] || [];
+        const existingItemIndex = currentItems.findIndex(hasEqualId(item.id));
+
+        if (existingItemIndex >= 0) {
+            // Update existing item in place to preserve order
+            const updatedItems = [...currentItems];
+            updatedItems[existingItemIndex] = item;
+            setLsDatasetImports(updatedItems);
+        } else {
+            // Add new item at the end
+            setLsDatasetImports([...currentItems, item]);
+        }
     };
 
     const patchLsDatasetImport = (partialItem: Partial<T>): void => {
