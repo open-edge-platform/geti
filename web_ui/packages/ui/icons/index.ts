@@ -1,17 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import Cross from '@spectrum-icons/ui/CrossMedium';
-import CheckmarkCircleOutline from '@spectrum-icons/workflow/CheckmarkCircleOutline';
-import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
-import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
-import CloudErrorIcon from '@spectrum-icons/workflow/CloudError';
-import DeleteOutline from '@spectrum-icons/workflow/DeleteOutline';
-import RemoveCircle from '@spectrum-icons/workflow/RemoveCircle';
-
-// Copyright (C) 2022-2025 Intel Corporation
-// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-
 export { ReactComponent as Adjustments } from './adjustments.svg';
 export { ReactComponent as AiIcon } from './ai.svg';
 export { ReactComponent as AICPUIcon } from './ai-cpu.svg';
