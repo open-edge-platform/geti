@@ -1,4 +1,6 @@
 exclude_dirs: ["*/tests/*"]
+# Based on security team recommendations,
+# considering that CodeQL SAST is also enabled
 tests:
   [
     "B301",
