@@ -57,7 +57,7 @@ func TestErrorHandler(t *testing.T) {
 			router.GET(tt.path, func(c *gin.Context) {
 				_ = c.Error(tt.giveErr)
 			})
-			req, _ := http.NewRequest("GET", tt.path, nil)
+			req, _ := http.NewRequest(http.MethodGet, tt.path, nil)
 			resp := httptest.NewRecorder()
 			router.ServeHTTP(resp, req)
 			assert.Equal(t, tt.wantCode, resp.Code)

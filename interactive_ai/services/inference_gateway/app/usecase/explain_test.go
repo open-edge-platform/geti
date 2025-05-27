@@ -9,18 +9,18 @@ import (
 	"testing"
 
 	sdkentities "geti.com/iai_core/entities"
-	mockframes "geti.com/iai_core/mock/frames"
-	mockstorage "geti.com/iai_core/mock/storage"
+	"geti.com/iai_core/frames"
+	"geti.com/iai_core/storage"
 	pb "geti.com/predict"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"inference_gateway/app/entities"
-	mockservice "inference_gateway/app/mock/service"
+	"inference_gateway/app/service"
 )
 
 func TestExplainBatch(t *testing.T) {
-
 	ctx := context.Background()
 	fullVideoID := sdkentities.GetFullVideoID(t)
 	start, end, skip := 0, 199, 10
@@ -44,9 +44,9 @@ func TestExplainBatch(t *testing.T) {
 		HyperParameters: &hyperParamaters,
 	}
 
-	mockModelAccess := mockservice.NewMockModelAccessService(t)
-	mockVideoRepo := mockstorage.NewMockVideoRepository(t)
-	mockFrameExtractor := mockframes.NewMockCLIFrameExtractor(t)
+	mockModelAccess := service.NewMockModelAccessService(t)
+	mockVideoRepo := storage.NewMockVideoRepository(t)
+	mockFrameExtractor := frames.NewMockCLIFrameExtractor(t)
 
 	mockVideoRepo.EXPECT().
 		LoadVideoByID(ctx, fullVideoID).
@@ -69,7 +69,7 @@ func TestExplainBatch(t *testing.T) {
 
 	infer := NewExplain(mockModelAccess, mockVideoRepo, mockFrameExtractor)
 	result, err := infer.Batch(ctx, &batchRequest)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Len(t, result.BatchExplain, total)
 	for i, item := range result.BatchExplain {

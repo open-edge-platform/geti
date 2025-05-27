@@ -19,9 +19,10 @@ import (
 	sdkentities "geti.com/iai_core/entities"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"inference_gateway/app/entities"
-	mockservice "inference_gateway/app/mock/service"
+	"inference_gateway/app/service"
 	testhelpers "inference_gateway/app/test_helpers"
 )
 
@@ -39,16 +40,16 @@ func TestRequestHandler_NewPredictionRequest_File(t *testing.T) {
 	testImage := testhelpers.GetUniformTestImage(500, 250, uint8(111))
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, testImage, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	buffer := new(bytes.Buffer)
 	writer := multipart.NewWriter(buffer)
 	part, err := writer.CreateFormFile("file", "file.jpg")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	_, err = io.Copy(part, buf)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	err = writer.Close()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	roiString := "1,2,3,4"
 	roi := entities.Roi{X: 1, Y: 2, Width: 3, Height: 4}
@@ -56,20 +57,20 @@ func TestRequestHandler_NewPredictionRequest_File(t *testing.T) {
 
 	// Set query parameters for the request
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
-	c.Request, _ = http.NewRequest("GET", queryStr, buffer)
+	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, buffer)
 	c.Request.Header.Set("Content-Type", writer.FormDataContentType())
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	rh := NewRequestHandlerImpl(mediaMock)
 	predictionRequestData, err := rh.NewPredictionRequest(c, req, testID.TestID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	decodedImage, err := predictionRequestData.DecodeMedia()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, roi, predictionRequestData.Roi)
 	assert.Equal(t, cacheMode, predictionRequestData.UseCache)
-	//assert.Equal(t, buffer, predictionRequestData.Media)
-	//assert.Equal(t, testMediaInfo, predictionRequestData.MediaInfo)
+	// assert.Equal(t, buffer, predictionRequestData.Media)
+	// assert.Equal(t, testMediaInfo, predictionRequestData.MediaInfo)
 	assert.Equal(t, testID.WorkspaceID, predictionRequestData.WorkspaceID)
 	assert.Equal(t, testID.OrganizationID, predictionRequestData.OrganizationID)
 	assert.Equal(t, testID.ProjectID, predictionRequestData.ProjectID)
@@ -96,14 +97,14 @@ func TestRequestHandler_NewPredictionRequest_Image(t *testing.T) {
 	testImage := testhelpers.GetUniformTestImage(500, 250, uint8(111))
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, testImage, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	requestInfo := &MediaInfoJSON{
 		ImageID:   fullImageID.ImageID.String(),
 		DatasetID: fullImageID.DatasetID.String(),
 	}
 
 	body, err := json.Marshal(requestInfo)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	roiString := "1,2,3,4"
 	roi := entities.Roi{X: 1, Y: 2, Width: 3, Height: 4}
@@ -111,17 +112,17 @@ func TestRequestHandler_NewPredictionRequest_Image(t *testing.T) {
 
 	// Set query parameters for the request
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
-	c.Request, _ = http.NewRequest("GET", queryStr, bytes.NewBuffer(body))
+	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, bytes.NewBuffer(body))
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	mediaMock.EXPECT().GetImage(c.Request.Context(), fullImageID).Return(buf, nil).Once()
 	rh := NewRequestHandlerImpl(mediaMock)
 	modelID := fullImageID.ImageID
 	predictionRequestData, err := rh.NewPredictionRequest(c, req, modelID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	decodedImage, err := predictionRequestData.DecodeMedia()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, roi, predictionRequestData.Roi)
 	assert.Equal(t, cacheMode, predictionRequestData.UseCache)
 	assert.Equal(t, buf, predictionRequestData.Media)
@@ -155,7 +156,7 @@ func TestRequestHandler_NewPredictionRequest_Video(t *testing.T) {
 	testImage := testhelpers.GetUniformTestImage(500, 250, uint8(111))
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, testImage, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	requestInfo := &MediaInfoJSON{
 		VideoID:    fullVideoID.VideoID.String(),
 		DatasetID:  fullVideoID.DatasetID.String(),
@@ -163,7 +164,7 @@ func TestRequestHandler_NewPredictionRequest_Video(t *testing.T) {
 	}
 
 	body, err := json.Marshal(requestInfo)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	roiString := "1,2,3,4"
 	roi := entities.Roi{X: 1, Y: 2, Width: 3, Height: 4}
@@ -171,17 +172,17 @@ func TestRequestHandler_NewPredictionRequest_Video(t *testing.T) {
 
 	// Set query parameters for the request
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
-	c.Request, _ = http.NewRequest("GET", queryStr, bytes.NewBuffer(body))
+	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, bytes.NewBuffer(body))
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	mediaMock.EXPECT().GetFrame(c.Request.Context(), fullVideoID, 1).Return(buf, nil).Once()
 	rh := NewRequestHandlerImpl(mediaMock)
 	modelID := fullVideoID.VideoID
 	predictionRequestData, err := rh.NewPredictionRequest(c, req, modelID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	decodedImage, err := predictionRequestData.DecodeMedia()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, roi, predictionRequestData.Roi)
 	assert.Equal(t, cacheMode, predictionRequestData.UseCache)
 	assert.Equal(t, buf, predictionRequestData.Media)
@@ -216,7 +217,7 @@ func TestRequestHandler_NewBatchPredictionRequest_Video(t *testing.T) {
 	testImage := testhelpers.GetUniformTestImage(500, 250, uint8(111))
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, testImage, nil)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	requestInfo := &MediaInfoBatchJSON{
 		MediaInfoJSON: &MediaInfoJSON{
 			VideoID:    fullVideoID.VideoID.String(),
@@ -229,7 +230,7 @@ func TestRequestHandler_NewBatchPredictionRequest_Video(t *testing.T) {
 	}
 
 	body, err := json.Marshal(requestInfo)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	roiString := "1,2,3,4"
 	roi := entities.Roi{X: 1, Y: 2, Width: 3, Height: 4}
@@ -237,13 +238,13 @@ func TestRequestHandler_NewBatchPredictionRequest_Video(t *testing.T) {
 
 	// Set query parameters for the request
 	queryStr := fmt.Sprintf("?roi=%s&use_cache=%s", roiString, cacheMode)
-	c.Request, _ = http.NewRequest("GET", queryStr, bytes.NewBuffer(body))
+	c.Request, _ = http.NewRequest(http.MethodGet, queryStr, bytes.NewBuffer(body))
 
-	mediaMock := mockservice.NewMockMediaService(t)
+	mediaMock := service.NewMockMediaService(t)
 	rh := NewRequestHandlerImpl(mediaMock)
 	modelID := fullVideoID.VideoID
 	batchRequest, err := rh.NewBatchPredictionRequest(c, req, modelID)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	assert.Equal(t, roi, batchRequest.Roi)
 	testMediaInfo := &entities.MediaInfo{

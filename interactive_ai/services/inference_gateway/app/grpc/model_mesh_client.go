@@ -21,8 +21,8 @@ import (
 const ModelStatusTimeoutSeconds = 20
 
 type modelMeshConfig struct {
-	Service string `env:"MODELMESH_SERVICE" envDefault:"modelmesh-serving.impt"`
-	Port    int    `env:"MODELMESH_PORT" envDefault:"8033"`
+	Service string `env:"MODELMESH_SERVICE"        envDefault:"modelmesh-serving.impt"`
+	Port    int    `env:"MODELMESH_PORT"           envDefault:"8033"`
 	Address string `env:"MODELMESH_ADDRESS,expand" envDefault:"passthrough:///$MODELMESH_SERVICE:${MODELMESH_PORT}"`
 }
 
