@@ -19,7 +19,7 @@ type FormatTooltipMessage = ComponentProps<typeof CustomTooltipChart>['displayMe
 
 type XTickFormatter = ComponentProps<typeof XAxis>['tickFormatter'];
 
-export interface BarHorizontalChartProps extends ChartProps {
+interface BarHorizontalChartProps extends ChartProps {
     barSize?: number;
     xPadding?: {
         right?: number;
@@ -34,7 +34,7 @@ export interface BarHorizontalChartProps extends ChartProps {
     formatTooltipMessage?: FormatTooltipMessage;
     xTickFormatter?: XTickFormatter;
     ariaLabel?: string;
-    onCellClick?: (labelName: string) => void;
+    onCellClick?: (labelId: string | undefined) => void;
 }
 
 const LEFT_MARGIN = -70;

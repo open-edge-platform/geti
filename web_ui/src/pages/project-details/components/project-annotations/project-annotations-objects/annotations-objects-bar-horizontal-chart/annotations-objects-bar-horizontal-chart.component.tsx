@@ -34,7 +34,7 @@ export const AnnotationObjectsBarHorizontalChart = ({
     const navigate = useNavigate();
     const datasetIdentifier = useDatasetIdentifier();
 
-    const handleCellClick = (labelId: string) => {
+    const handleCellClick = (labelId: string | undefined) => {
         if (!labelId) {
             // if there's no labelId, we don't navigate to the dataset
             return;
