@@ -167,8 +167,8 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 					Return(io.NopCloser(nil), nil, errors.New("not_found")).
 					Once()
 			},
-			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
-				assert.ErrorContains(t, err, "Thumbnail not found")
+			wantAsserts: func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error) {
+				require.ErrorContains(t, err, "Thumbnail not found")
 				assert.Nil(t, reader)
 				assert.Nil(t, metadata)
 			},
