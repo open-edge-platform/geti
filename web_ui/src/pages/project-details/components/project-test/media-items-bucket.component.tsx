@@ -52,7 +52,7 @@ export const MediaItemsBucket = ({
     const { useMediaItemsOfTestQuery } = useTests();
     const testMediaItemsQuery = useMediaItemsOfTestQuery(projectIdentifier, testId ?? '', mediaFilterOptions, {
         sortBy: SearchRuleField.Score,
-        sortDir: sortDirection,
+        sortDir: sortDirection === SortDirection.ASC ? 'asc' : 'dsc',
     });
     const { isFetchingNextPage, hasNextPage, fetchNextPage, data: mediaData } = testMediaItemsQuery;
 

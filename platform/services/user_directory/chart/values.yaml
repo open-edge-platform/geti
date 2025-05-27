@@ -25,7 +25,7 @@ resources:
     cpu: 200m
     memory: 200Mi
   limits:
-    memory: 200Mi
+    memory: 300Mi
 
 securityContext:
   readOnlyRootFilesystem: true
