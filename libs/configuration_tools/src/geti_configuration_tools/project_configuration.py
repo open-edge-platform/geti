@@ -134,6 +134,7 @@ class PartialProjectConfiguration(BaseModel):
     This class is useful for update operations or PATCH endpoints, allowing clients
     to provide only the fields they wish to modify, while leaving others unset.
     """
+
     task_configs: list[PartialTaskConfig] = Field(
         title="Task configurations", description="List of configurations for all tasks in this project"
     )

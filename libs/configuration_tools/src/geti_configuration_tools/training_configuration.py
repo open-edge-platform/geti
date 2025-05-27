@@ -114,18 +114,15 @@ class GlobalParameters(BaseModel):
 class TrainingConfiguration(BaseModel, PersistentEntity):
     """Configuration for model training"""
 
-    def __init__(self, id_: ID, task_id: ID, ephemeral: bool = True, **data):
+    def __init__(self, id_: ID, ephemeral: bool = True, **data):
         # first initialize the Pydantic BaseModel with all arguments
         BaseModel.__init__(self, **data)
 
         # then initialize PersistentEntity with id and ephemeral parameters
         PersistentEntity.__init__(self, id_=id_, ephemeral=ephemeral)
-        self.task_id = task_id
 
-    model_config = ConfigDict(  # allows the class to have "extra" field such as task_id
-        extra="allow", protected_namespaces=()
-    )
-
+    task_id: str = Field(title="Task ID", description="Unique identifier for the task")
+    model_config = ConfigDict(protected_namespaces=())  # avoid conflict with "model_" namespace
     model_manifest_id: str | None = Field(
         default=None,
         title="Model manifest ID",

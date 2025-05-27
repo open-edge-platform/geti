@@ -6,10 +6,11 @@ from geti_types import ID
 
 from geti_configuration_tools.project_configuration import (
     AutoTrainingParameters,
+    PartialTaskConfig,
     ProjectConfiguration,
     TaskConfig,
     TrainConstraints,
-    TrainingParameters, PartialTaskConfig, PartialProjectConfiguration
+    TrainingParameters,
 )
 
 
@@ -97,7 +98,7 @@ class TestProjectConfiguration:
             ),
         ],
     )
-    def test_project_configuration(self, project_config_dict, expected_config):
+    def test_project_configuration(self, project_config_dict, expected_config) -> None:
         # Create configuration from dict
         config = ProjectConfiguration(**project_config_dict)
 
@@ -122,7 +123,7 @@ class TestProjectConfiguration:
                 expected_task_config.auto_training.min_images_per_label
             )
 
-    def test_partial_task_config(self):
+    def test_partial_task_config(self) -> None:
         # Test partial model creation
         partial_task_config = PartialTaskConfig.model_validate(
             {

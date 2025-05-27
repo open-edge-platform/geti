@@ -575,7 +575,7 @@ class ProjectConfigurationNotFoundException(GetiBaseException):
             else ""
         )
         super().__init__(
-            http_status=status.HTTP_404_NOT_FOUND,
+            http_status=http.HTTPStatus.NOT_FOUND,
             error_code="project_configuration_not_found",
             message=message,
         )

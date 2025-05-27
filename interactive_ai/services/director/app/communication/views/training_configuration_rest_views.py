@@ -49,7 +49,7 @@ class TrainingConfigurationRESTViews(ConfigurableParametersRESTViews):
             return {}
 
         rest_view = {
-            "task_id": str(training_configuration.model_extra["task_id"]),
+            "task_id": training_configuration.task_id,
             DATASET_PREPARATION: cls._dataset_preparation_to_rest(
                 global_parameters=training_configuration.global_parameters,
                 hyperparameters=training_configuration.hyperparameters,

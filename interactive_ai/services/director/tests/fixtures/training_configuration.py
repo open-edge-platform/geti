@@ -65,7 +65,7 @@ def fxt_global_parameters():
 def fxt_training_configuration_task_level(fxt_mongo_id, fxt_global_parameters, ftx_hyperparameters):
     yield TrainingConfiguration(
         id_=fxt_mongo_id(11),
-        task_id=fxt_mongo_id(22),
+        task_id=str(fxt_mongo_id(22)),
         global_parameters=fxt_global_parameters,
         hyperparameters=ftx_hyperparameters,
     )
@@ -74,7 +74,7 @@ def fxt_training_configuration_task_level(fxt_mongo_id, fxt_global_parameters, f
 @pytest.fixture
 def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_task_level):
     yield {
-        "task_id": str(fxt_training_configuration_task_level.model_extra["task_id"]),
+        "task_id": str(fxt_training_configuration_task_level.task_id),
         "dataset_preparation": {
             "augmentation": {
                 "center_crop": [
@@ -325,7 +325,7 @@ def fxt_training_configuration_full_rest_view(
 ):
     # Full configuration combines task level and manifest level configurations
     yield {
-        "task_id": str(fxt_partial_training_configuration_manifest_level.model_extra["task_id"]),
+        "task_id": str(fxt_partial_training_configuration_manifest_level.task_id),
         "model_manifest_id": fxt_partial_training_configuration_manifest_level.model_manifest_id,
         "dataset_preparation": {
             "augmentation": {

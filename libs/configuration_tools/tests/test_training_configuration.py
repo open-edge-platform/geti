@@ -67,7 +67,7 @@ def fxt_global_parameters():
 
 
 class TestTrainingConfiguration:
-    def test_valid_training_configuration(self, fxt_global_parameters, ftx_hyperparameters):
+    def test_valid_training_configuration(self, fxt_global_parameters, ftx_hyperparameters) -> None:
         # Create a valid TrainingConfiguration
         training_config = TrainingConfiguration(
             id_=ID("test_training_config"),
@@ -84,7 +84,7 @@ class TestTrainingConfiguration:
         assert training_config.hyperparameters.training.early_stopping.enable
         assert training_config.hyperparameters.training.early_stopping.patience == 10
 
-    def test_invalid_subset_split(self, ftx_hyperparameters):
+    def test_invalid_subset_split(self, ftx_hyperparameters) -> None:
         # Test that validation fails when subset percentages don't add up to 100
         with pytest.raises(ValidationError) as excinfo:
             TrainingConfiguration(
@@ -99,7 +99,11 @@ class TestTrainingConfiguration:
                             auto_selection=True,
                             remixing=False,
                         ),
-                        filtering=Filtering(),
+                        filtering=Filtering(
+                            min_annotation_pixels=MinAnnotationPixels(),
+                            max_annotation_pixels=MaxAnnotationPixels(),
+                            max_annotation_objects=MaxAnnotationObjects(),
+                        ),
                     )
                 ),
                 hyperparameters=ftx_hyperparameters,
@@ -107,7 +111,7 @@ class TestTrainingConfiguration:
 
         assert "Sum of subsets should be equal to 100" in str(excinfo.value)
 
-    def test_invalid_annotation_pixels(self, ftx_hyperparameters):
+    def test_invalid_annotation_pixels(self, ftx_hyperparameters) -> None:
         # Test validation for annotation pixels
         with pytest.raises(ValidationError):
             TrainingConfiguration(
@@ -121,17 +125,19 @@ class TestTrainingConfiguration:
                                 enable=True,
                                 min_annotation_pixels=0,  # Invalid: must be > 0
                             ),
+                            max_annotation_pixels=MaxAnnotationPixels(),
+                            max_annotation_objects=MaxAnnotationObjects(),
                         ),
                     )
                 ),
                 hyperparameters=ftx_hyperparameters,
             )
 
-    def test_null_training_configuration(self):
+    def test_null_training_configuration(self) -> None:
         null_training_config = NullTrainingConfiguration()
         assert null_training_config.model_dump() == {}
 
-    def test_partial_training_configuration(self, fxt_global_parameters, ftx_hyperparameters):
+    def test_partial_training_configuration(self, fxt_global_parameters, ftx_hyperparameters) -> None:
         """Test that PartialTrainingConfiguration works correctly with both partial and complete configurations."""
         partial_training_config_incomplete = PartialTrainingConfiguration.model_validate(
             {
@@ -170,7 +176,7 @@ class TestTrainingConfiguration:
 
         assert partial_training_config_full.model_dump() == training_config.model_dump()
 
-    def test_partial_global_parameters(self, fxt_global_parameters):
+    def test_partial_global_parameters(self, fxt_global_parameters) -> None:
         """Test that PartialGlobalParameters works correctly with both partial and complete configurations."""
         # Test with a partial configuration
         partial_global_params = PartialGlobalParameters.model_validate(

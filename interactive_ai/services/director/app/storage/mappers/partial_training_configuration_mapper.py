@@ -3,6 +3,7 @@
 
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 
+from geti_types import ID
 from iai_core.repos.mappers.mongodb_mapper_interface import IMapperSimple
 from iai_core.repos.mappers.mongodb_mappers.id_mapper import IDToMongo
 
@@ -14,7 +15,7 @@ class PartialTrainingConfigurationToMongo(IMapperSimple[PartialTrainingConfigura
     def forward(instance: PartialTrainingConfiguration) -> dict:
         doc = {
             "_id": IDToMongo.forward(instance.id_),
-            "task_id": IDToMongo.forward(instance.task_id),
+            "task_id": IDToMongo.forward(ID(instance.task_id)),
             "global_parameters": instance.global_parameters.model_dump(),
             "hyperparameters": instance.hyperparameters.model_dump(),
         }

@@ -18,7 +18,7 @@ class TestTrainingConfigurationController:
         fxt_training_configuration_task_level_rest_view,
         fxt_partial_training_configuration_manifest_level,
         fxt_training_configuration_full_rest_view,
-    ):
+    ) -> None:
         # Arrange
         repo = PartialTrainingConfigurationRepo(fxt_project_identifier)
         request.addfinalizer(lambda: repo.delete_all())

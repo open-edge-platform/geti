@@ -55,7 +55,7 @@ class TestProjectConfigurationEndpoints:
 
         result = fxt_director_app.patch(
             f"{API_PROJECT_PATTERN}/project_configuration",
-            json={"some": "configuration"},
+            json={},
         )
 
         assert result.status_code == HTTPStatus.FORBIDDEN
@@ -85,7 +85,7 @@ class TestProjectConfigurationEndpoints:
         # Assert
         mock_update_project_config.assert_called_once_with(
             project_identifier=project_identifier,
-            project_configuration=mock_update_project_config.call_args[1]["project_configuration"],
+            update_configuration=mock_update_project_config.call_args[1]["update_configuration"],
         )
         assert result.status_code == HTTPStatus.NO_CONTENT
         assert not result.content  # 204 responses must not include a response body

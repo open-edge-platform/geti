@@ -152,7 +152,7 @@ class TestHyperparameters:
                 evaluation=EvaluationParameters(),
             )
 
-    def test_partial_hyperparameters(self):
+    def test_partial_hyperparameters(self) -> None:
         """Test that PartialHyperparameters works correctly with both partial and complete configurations."""
         # Test with a partial configuration
         partial_hyperparams = PartialHyperparameters.model_validate(

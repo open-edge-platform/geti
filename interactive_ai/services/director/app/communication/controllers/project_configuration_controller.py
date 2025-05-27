@@ -38,23 +38,23 @@ class ProjectConfigurationRESTController:
     @unified_tracing
     def update_configuration(
         project_identifier: ProjectIdentifier,
-        project_configuration: PartialProjectConfiguration,
+        update_configuration: PartialProjectConfiguration,
     ) -> None:
         """
         Updates the configuration for a specific project.
 
         :param project_identifier: Identifier for the project (containing organization_id, workspace_id, and project_id)
-        :param project_configuration: Dictionary representation of the new project configuration
+        :param update_configuration: Dictionary representation of the new project configuration
         :return: Updated dictionary representation of the project configuration
         """
-        if not project_configuration.task_configs:
+        if not update_configuration.task_configs:
             return
 
         repo = ProjectConfigurationRepo(project_identifier)
         current_config = repo.get_project_configuration()
         current_task_config_map = {task_config.task_id: task_config for task_config in current_config.task_configs}
 
-        for task_config in project_configuration.task_configs:
+        for task_config in update_configuration.task_configs:
             if task_config.task_id not in current_task_config_map:
                 raise ProjectConfigurationNotFoundException(
                     project_id=project_identifier.project_id,

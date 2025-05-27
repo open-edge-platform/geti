@@ -44,7 +44,7 @@ def get_project_configuration(
 @project_configuration_router.patch("/project_configuration", status_code=HTTPStatus.NO_CONTENT)
 def update_project_configuration(
     project_identifier: Annotated[ProjectIdentifier, Depends(get_project_identifier)],
-    project_configuration: PartialProjectConfiguration,
+    update_configuration: PartialProjectConfiguration,
 ) -> None:
     """Update the configuration for a specific project."""
     if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
@@ -53,7 +53,7 @@ def update_project_configuration(
             error_code="feature_not_available",
             http_status=HTTPStatus.FORBIDDEN,
         )
-    ProjectConfigurationRESTController().update_configuration(
+    ProjectConfigurationRESTController.update_configuration(
         project_identifier=project_identifier,
-        project_configuration=project_configuration,
+        update_configuration=update_configuration,
     )
