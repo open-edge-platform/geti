@@ -4,9 +4,12 @@
 import { parseDateTime } from '@internationalized/date';
 import dayjs from 'dayjs';
 
+import { JobState, JobStepState } from '../core/jobs/jobs.const';
+import { JobDataset } from '../core/jobs/jobs.interface';
 import { DOMAIN } from '../core/projects/core.interface';
 import { getMockedTest } from '../core/tests/services/tests-utils';
 import { Test } from '../core/tests/tests.interface';
+import { getMockedJobStep } from '../test-utils/mocked-items-factory/mocked-jobs';
 import { getMockedTask } from '../test-utils/mocked-items-factory/mocked-tasks';
 import {
     DATE_TIME_IN_ISO_AND_UTC_OFFSETFORMAT,
@@ -16,6 +19,7 @@ import {
     getFileSize,
     getId,
     getIds,
+    getIntervalJobHandlers,
     getProgressScoreColor,
     getUniqueNameFromArray,
     hasDifferentId,
@@ -319,4 +323,60 @@ it('getDownloadNotificationMessage', () => {
     expect(getDownloadNotificationMessage('test-name')).toEqual(
         'Your test-name file is being prepared and will start downloading shortly.'
     );
+});
+
+describe('getIntervalJobHandlers', () => {
+    const getMockedDatasetJob = (state: JobState) =>
+        ({
+            state,
+            steps: [getMockedJobStep({ state: JobStepState.FAILED, message: null })],
+        }) as JobDataset;
+
+    const defaultErrorResponse = {
+        message: 'Something went wrong. Please try again',
+        response: { status: 501 },
+    };
+    const mockedHandlers = {
+        onError: jest.fn(),
+        onSuccess: jest.fn(),
+        onSettled: jest.fn(),
+        onCancelOrFailed: jest.fn(),
+        onCancel: jest.fn(),
+    };
+
+    const intervalHandler = getIntervalJobHandlers(mockedHandlers);
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
+
+    it('finished', () => {
+        const job = getMockedDatasetJob(JobState.FINISHED);
+        intervalHandler(job);
+
+        expect(mockedHandlers.onSuccess).toHaveBeenCalledWith(job);
+        expect(mockedHandlers.onSettled).toHaveBeenCalled();
+        expect(mockedHandlers.onCancelOrFailed).not.toHaveBeenCalled();
+        expect(mockedHandlers.onError).not.toHaveBeenCalled();
+    });
+
+    it('cancelled', () => {
+        const job = getMockedDatasetJob(JobState.CANCELLED);
+        intervalHandler(job);
+
+        expect(mockedHandlers.onCancelOrFailed).toHaveBeenCalled();
+        expect(mockedHandlers.onCancel).toHaveBeenCalled();
+        expect(mockedHandlers.onSettled).toHaveBeenCalled();
+        expect(mockedHandlers.onSuccess).not.toHaveBeenCalled();
+    });
+
+    it('failed', () => {
+        const job = getMockedDatasetJob(JobState.FAILED);
+        intervalHandler(job);
+
+        expect(mockedHandlers.onCancelOrFailed).toHaveBeenCalled();
+        expect(mockedHandlers.onSettled).toHaveBeenCalled();
+        expect(mockedHandlers.onError).toHaveBeenCalledWith(defaultErrorResponse);
+        expect(mockedHandlers.onSuccess).not.toHaveBeenCalled();
+    });
 });

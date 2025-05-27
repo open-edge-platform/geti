@@ -8,6 +8,7 @@ import { Delete } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { isVideo } from '../../../../core/media/video.interface';
+import { ExportImportDatasetButtons } from '../../../../features/dataset-export/components/export-import-dataset-buttons.component';
 import { useSortingParams } from '../../../../hooks/use-sorting-params/use-sorting-params.hook';
 import { MediaViewModes } from '../../../../shared/components/media-view-modes/media-view-modes.component';
 import { ViewModes } from '../../../../shared/components/media-view-modes/utils';
@@ -17,7 +18,6 @@ import { MediaSearch } from '../../../media/media-actions/media-search.component
 import { MediaSorting } from '../../../media/media-actions/media-sorting.component';
 import { MediaFilter } from '../../../media/media-filter.component';
 import { useMedia } from '../../../media/providers/media-provider.component';
-import { ExportImportDatasetButtons } from '../project-dataset/export-dataset/export-import-dataset-buttons.component';
 import { MediaCount } from './media-count.component';
 import { DELETE_ANOMALY_VIDEO_WARNING } from './media-item-tooltip-message/utils';
 import { DELETE_SELECTED_MEDIA_LABEL, SELECT_ALL_LABEL, UPLOAD_MEDIA_LABEL } from './utils';
