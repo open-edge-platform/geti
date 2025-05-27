@@ -11,7 +11,6 @@ from typing import Any
 
 from communication.views.media_identifier_rest_views import MediaIdentifierRESTViews
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
@@ -623,8 +622,5 @@ class AnnotationRESTViews:
             )
             for annotation in annotation_scene.annotations
         ]
-
-        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION):
-            result[ANNOTATIONS] = [annotation for annotation in result[ANNOTATIONS] if annotation != {}]
 
         return result

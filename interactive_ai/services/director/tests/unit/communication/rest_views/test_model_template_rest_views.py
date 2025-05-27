@@ -5,7 +5,6 @@
 from testfixtures import compare
 
 from communication.views.model_template_rest_views import ModelTemplateRESTViews
-from features.feature_flag_provider import FeatureFlag
 
 
 class TestSCModelTemplateRESTViews:
@@ -24,28 +23,5 @@ class TestSCModelTemplateRESTViews:
         }
 
         result = ModelTemplateRESTViews.model_template_to_rest(model_template=fxt_model_template_classification)
-
-        compare(result, expected_result, ignore_eq=True)
-
-    def test_model_template_to_rest_with_reduced_anomaly(
-        self,
-        fxt_model_template_anomaly_detection,
-        fxt_enable_feature_flag_name,
-    ) -> None:
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
-        expected_result = {
-            "name": fxt_model_template_anomaly_detection.name,
-            "task_type": "anomaly",
-            "model_size": fxt_model_template_anomaly_detection.size,
-            "model_template_id": fxt_model_template_anomaly_detection.model_template_id,
-            "gigaflops": fxt_model_template_anomaly_detection.gigaflops,
-            "summary": fxt_model_template_anomaly_detection.summary,
-            "supports_auto_hpo": False,
-            "default_algorithm": False,
-            "performance_category": fxt_model_template_anomaly_detection.model_category.name.lower(),
-            "lifecycle_stage": fxt_model_template_anomaly_detection.model_status.name.lower(),
-        }
-
-        result = ModelTemplateRESTViews.model_template_to_rest(model_template=fxt_model_template_anomaly_detection)
 
         compare(result, expected_result, ignore_eq=True)

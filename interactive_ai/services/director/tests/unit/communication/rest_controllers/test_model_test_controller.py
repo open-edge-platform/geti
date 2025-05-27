@@ -15,7 +15,6 @@ from communication.exceptions import (
 from communication.views.job_rest_views import JobRestViews
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.prediction_rest_views import PredictionRESTViews
-from features.feature_flag_provider import FeatureFlag
 from service.job_submission import ModelTestingJobSubmitter
 from service.label_schema_service import LabelSchemaService
 
@@ -89,63 +88,6 @@ class TestModelTestRESTController:
         )
         compare(result, fxt_model_test_results_rest, ignore_eq=True)
 
-    def test_get_all_model_test_results_anomaly_reduced(
-        self,
-        fxt_project_with_anomaly_detection_task,
-        fxt_model_test_result,
-        fxt_model_test_result_with_accuracy_metric,
-        fxt_model_test_result_with_accuracy_metric_rest,
-        fxt_enable_feature_flag_name,
-    ) -> None:
-        # Arrange
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
-        workspace_id = fxt_project_with_anomaly_detection_task.workspace_id
-        project_id = fxt_project_with_anomaly_detection_task.id_
-        model_test_results = [
-            fxt_model_test_result,
-            fxt_model_test_result_with_accuracy_metric,
-        ]
-        dummy_dataset_counts = {
-            "n_images": 1,
-            "n_frames": 2,
-            "n_samples": 3,
-        }
-        dataset_storages = fxt_model_test_result.get_dataset_storages()
-        datasets_counts = {dataset_storage.id_: dummy_dataset_counts for dataset_storage in dataset_storages}
-        datasets_counts_per_model_test = {fxt_model_test_result.id_: datasets_counts}
-
-        # Act
-        with (
-            patch.object(
-                ProjectRepo,
-                "get_by_id",
-                return_value=fxt_project_with_anomaly_detection_task,
-            ),
-            patch.object(
-                ModelTestResultRepo,
-                "get_all",
-                return_value=model_test_results,
-            ) as mock_get_model_test_results,
-            patch.object(
-                ModelTestResultRestViews,
-                "model_test_results_to_rest",
-                return_value=fxt_model_test_result_with_accuracy_metric_rest,
-            ) as mock_model_results_rest_view,
-            patch.object(
-                DatasetRepo, "count_per_media_type", return_value=dummy_dataset_counts
-            ) as mock_get_counts_in_dataset,
-        ):
-            result = ModelTestController.get_all_model_test_results(workspace_id=workspace_id, project_id=project_id)
-
-        # Assert
-        mock_get_counts_in_dataset.assert_called()
-        mock_get_model_test_results.assert_called_once_with()
-        mock_model_results_rest_view.assert_called_once_with(
-            model_test_results=[fxt_model_test_result_with_accuracy_metric],
-            datasets_counts_per_model_test=datasets_counts_per_model_test,
-        )
-        compare(result, fxt_model_test_result_with_accuracy_metric_rest, ignore_eq=True)
-
     def test_get_model_test_result(
         self,
         fxt_project,
@@ -207,10 +149,8 @@ class TestModelTestRESTController:
         fxt_project_with_anomaly_classification_task,
         fxt_model_test_result_with_accuracy_metric,
         fxt_model_test_result_with_accuracy_metric_rest,
-        fxt_enable_feature_flag_name,
     ) -> None:
         # Arrange
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         project = fxt_project_with_anomaly_classification_task
         workspace_id = project.workspace_id
         project_id = project.id_
@@ -264,10 +204,8 @@ class TestModelTestRESTController:
         self,
         fxt_project_with_anomaly_detection_task,
         fxt_model_test_result,
-        fxt_enable_feature_flag_name,
     ) -> None:
         # Arrange
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         project = fxt_project_with_anomaly_detection_task
         workspace_id = project.workspace_id
         project_id = project.id_
