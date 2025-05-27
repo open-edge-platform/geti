@@ -52,19 +52,19 @@ class ProjectConfigurationRESTController:
 
         repo = ProjectConfigurationRepo(project_identifier)
         current_config = repo.get_project_configuration()
-        currect_task_configs = {task_config.task_id: task_config for task_config in current_config.task_configs}
+        current_task_config_map = {task_config.task_id: task_config for task_config in current_config.task_configs}
 
         for task_config in project_configuration.task_configs:
-            if task_config.task_id not in currect_task_configs:
+            if task_config.task_id not in current_task_config_map:
                 raise ProjectConfigurationNotFoundException(
                     project_id=project_identifier.project_id,
                     task_id=ID(task_config.task_id),
                 )
             # Update existing task config
-            current_task_config = currect_task_configs[task_config.task_id]
+            current_task_config = current_task_config_map[task_config.task_id]
             updated_task_config_dict = delete_none_from_dict(task_config.model_dump())
             merged_task_config_dict = merge_deep_dict(current_task_config.model_dump(), updated_task_config_dict)
-            currect_task_configs[task_config.task_id] = TaskConfig.model_validate(merged_task_config_dict)
+            current_task_config_map[task_config.task_id] = TaskConfig.model_validate(merged_task_config_dict)
 
-        for _, task_config in currect_task_configs.items():
+        for _, task_config in current_task_config_map.items():
             repo.update_task_config(task_config)
