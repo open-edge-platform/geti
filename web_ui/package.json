@@ -8,10 +8,9 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@adobe/react-spectrum": "^3.41.0",
     "@doodle3d/clipper-js": "^1.0.11",
-    "@geti/ui": "*",
     "@geti/core": "*",
+    "@geti/ui": "*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^1.26.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.53.0",
