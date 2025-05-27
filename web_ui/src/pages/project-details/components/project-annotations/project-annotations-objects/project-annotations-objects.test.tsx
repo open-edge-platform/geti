@@ -3,8 +3,7 @@
 
 import { screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { providersRender } from '../../../../../test-utils/required-providers-render';
-import { ProjectProvider } from '../../../providers/project-provider/project-provider.component';
+import { projectRender } from '../../../../../test-utils/project-provider-render';
 import { ProjectAnnotationsObjects } from './project-annotations-objects.component';
 import { reorderObjectsLabels } from './utils';
 
@@ -16,25 +15,13 @@ const mockObjectsPerLabel = (id = '1234', name = 'test-name', color = '#000', va
 });
 
 describe('Project annotations objects', () => {
-    const renderApp = async () => {
-        providersRender(
-            <ProjectProvider
-                projectIdentifier={{
-                    projectId: 'project-id',
-                    workspaceId: 'workspace-id',
-                    organizationId: 'organization-id',
-                }}
-            >
-                <ProjectAnnotationsObjects objectsPerLabel={[]} gridArea='objects' />
-            </ProjectProvider>
-        );
+    it('should render correctly', async () => {
+        projectRender(<ProjectAnnotationsObjects objectsPerLabel={[]} gridArea='objects' />);
 
         await waitForElementToBeRemoved(screen.getByRole('progressbar'));
-    };
 
-    it('should render correctly', async () => {
-        await renderApp();
         const objectsTitle = screen.getByText('Number of objects per label');
+
         expect(objectsTitle).toBeInTheDocument();
     });
 
