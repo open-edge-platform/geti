@@ -3,10 +3,10 @@
 
 import { useEffect } from 'react';
 
+import { paths } from '@geti/core';
 import { Button, Heading, Text } from '@geti/ui';
 
 import { Unauthorized } from '../../../assets/images';
-import { paths } from '../../../core/services/routes';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';

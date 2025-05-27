@@ -3,12 +3,12 @@
 
 import { Key } from 'react';
 
+import { paths } from '@geti/core';
 import { Button, Loading } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '../../core/services/routes';
 import { useUsers } from '../../core/users/hook/use-users.hook';
 import { RESOURCE_TYPE, User, USER_ROLE } from '../../core/users/users.interface';
 import { useHandleSignOut } from '../../hooks/use-handle-sign-out/use-handle-sign-out.hook';

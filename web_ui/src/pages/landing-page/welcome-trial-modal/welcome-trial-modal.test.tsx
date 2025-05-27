@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { useProducts } from '../../../core/credits/products/hooks/use-products.hook';
-import { ApplicationServicesContextProps } from '../../../core/services/application-services-provider.component';
 import { GLOBAL_MODALS_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
 import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';

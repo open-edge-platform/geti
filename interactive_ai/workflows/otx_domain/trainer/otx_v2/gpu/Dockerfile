@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bookworm@sha256:727bcea1bca58820e83b67b048f0eafe936fa215a69847e1466bc6312251fe2c AS base
+FROM python:3.10-slim-bookworm@sha256:49454d2bf78a48f217eb25ecbcb4b5face313fea6a6e82706465a6990303ada2 AS base
 
 # step 1: get cuda dependencies
 FROM base AS cuda

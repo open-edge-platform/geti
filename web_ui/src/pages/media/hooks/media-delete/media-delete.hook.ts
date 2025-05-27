@@ -1,13 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import { InfiniteData, QueryKey, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import { chunk } from 'lodash-es';
 
 import { MediaAdvancedFilterResponse, MediaItem } from '../../../../core/media/media.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
-import { getErrorMessage } from '../../../../core/services/utils';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
@@ -16,6 +17,9 @@ import { filterPageMedias } from '../../utils';
 interface UseDeleteMediaMutation {
     deleteMedia: UseMutationResult<unknown, AxiosError, MediaItem[]>;
 }
+
+// Empirically determined batch size that not causes browser to throw an net::ERR_INSUFFICIENT_RESOURCES
+const BATCH_SIZE = 300;
 
 const getQueriesAndPreviousItems = (
     previousItems: [QueryKey, InfiniteData<MediaAdvancedFilterResponse> | undefined][]
@@ -47,10 +51,19 @@ export const useDeleteMediaMutation = (): UseDeleteMediaMutation => {
         MediaItem[],
         [QueryKey, InfiniteData<MediaAdvancedFilterResponse> | undefined][]
     >({
-        mutationFn: (mediaItems) => {
-            return Promise.all(mediaItems.map((mediaItem) => mediaService.deleteMedia(datasetIdentifier, mediaItem)));
+        mutationFn: async (mediaItems) => {
+            // Batching the delete requests to avoid browser simultaneous requests limit
+            const batches = chunk(mediaItems, BATCH_SIZE);
+            const promises = [];
+            for (const batch of batches) {
+                const batchPromises = batch.map((mediaItem) => {
+                    return mediaService.deleteMedia(datasetIdentifier, mediaItem);
+                });
+                await Promise.all(batchPromises);
+                promises.push(...batchPromises);
+            }
+            return Promise.all(promises);
         },
-
         onError: (error, _variables, previousItems) => {
             if (previousItems !== undefined) {
                 const { queryKeys, data } = getQueriesAndPreviousItems(previousItems);
@@ -62,7 +75,6 @@ export const useDeleteMediaMutation = (): UseDeleteMediaMutation => {
                 type: NOTIFICATION_TYPE.ERROR,
             });
         },
-
         onMutate: (itemsDeleted) => {
             const previousItems = queryClient.getQueriesData<InfiniteData<MediaAdvancedFilterResponse>>({
                 queryKey: mediaQueryKeyPrefix,

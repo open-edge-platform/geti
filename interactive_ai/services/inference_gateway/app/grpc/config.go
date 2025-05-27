@@ -16,28 +16,29 @@ import (
 const (
 	retryBackoffDurationMs = 200
 	maxRetryAttempts       = 5
+	keepAliveTimeSec       = 10
 )
 
-var keepAlive = keepalive.ClientParameters{
-	Time:                10 * time.Second,
-	Timeout:             time.Second,
-	PermitWithoutStream: true,
-}
-
-var retryOpts = []retry.CallOption{
-	retry.WithMax(maxRetryAttempts),
-	retry.WithBackoff(retry.BackoffExponential(retryBackoffDurationMs * time.Millisecond)),
-	retry.WithCodes(codes.Unavailable, codes.DeadlineExceeded),
-}
-
-var serviceCfg = `{
-	"methodConfig": [{
-		"name": [{}],
-		"timeout": "3s"
-	}]
-}`
-
 func NewGRPCClient(address string) (*grpc.ClientConn, error) {
+	keepAlive := keepalive.ClientParameters{
+		Time:                keepAliveTimeSec * time.Second,
+		Timeout:             time.Second,
+		PermitWithoutStream: true,
+	}
+
+	retryOpts := []retry.CallOption{
+		retry.WithMax(maxRetryAttempts),
+		retry.WithBackoff(retry.BackoffExponential(retryBackoffDurationMs * time.Millisecond)),
+		retry.WithCodes(codes.Unavailable, codes.DeadlineExceeded),
+	}
+
+	serviceCfg := `{
+		"methodConfig": [{
+			"name": [{}],
+			"timeout": "3s"
+		}]
+	}`
+
 	return grpc.NewClient(
 		address,
 		grpc.WithUnaryInterceptor(retry.UnaryClientInterceptor(retryOpts...)),

@@ -3,10 +3,10 @@
 
 import { sortBy } from 'lodash-es';
 
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { ImageIdDTO, VideoFrameIdDTO, VideoIdDTO } from '../../annotations/dtos/annotation.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import { DatasetIdentifier } from '../../projects/dataset.interface';
-import { API_URLS } from '../../services/urls';
 import { MEDIA_TYPE } from '../base-media.interface';
 import { AnnotationStatePerTask } from '../base.interface';
 import { AnnotationStatePerTaskDTO } from '../dtos/base.interface';

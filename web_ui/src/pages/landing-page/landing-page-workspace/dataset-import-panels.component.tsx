@@ -3,6 +3,7 @@
 
 import { Fragment } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { View } from '@geti/ui';
 import { OverlayTriggerState, useOverlayTriggerState } from '@react-stately/overlays';
 import { useQueryClient } from '@tanstack/react-query';
@@ -14,7 +15,6 @@ import { DatasetImportItem, DatasetImportToNewProjectItem } from '../../../core/
 import { useDatasetImportQueries } from '../../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { getCurrentJob, isImportingNewProjectJob, isPreparingJob } from '../../../core/datasets/utils';
 import { useJobs } from '../../../core/jobs/hooks/use-jobs.hook';
-import QUERY_KEYS from '../../../core/requests/query-keys';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { useDatasetImportToNewProject } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';

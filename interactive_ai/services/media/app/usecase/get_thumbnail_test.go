@@ -11,28 +11,26 @@ import (
 	"os"
 	"testing"
 
-	sdk_endities "geti.com/iai_core/entities"
-
+	sdkendities "geti.com/iai_core/entities"
+	"geti.com/iai_core/storage"
 	"geti.com/iai_core/testhelper"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	mock_service "media/app/mock/service"
-
-	mock_storage "geti.com/iai_core/mock/storage"
+	"media/app/service"
 )
 
 func readImage(t *testing.T) (*os.File, int64) {
 	file, err := os.Open("../test_data/test_jpeg.jpeg")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	stat, err := file.Stat()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	return file, stat.Size()
 }
 
 func TestGetOrCreateThumbnail(t *testing.T) {
-	mockRepo := mock_storage.NewMockImageRepository(t)
-	mockCropper := mock_service.NewMockCropper(t)
+	mockRepo := storage.NewMockImageRepository(t)
+	mockCropper := service.NewMockCropper(t)
 
 	ctx := context.Background()
 	fullImageID := testhelper.GetFullImageID(t)
@@ -48,18 +46,18 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 	tests := []struct {
 		name        string
 		setupMocks  func()
-		wantAsserts func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error)
+		wantAsserts func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error)
 	}{
 		{
 			name: "ThumbnailExists",
 			setupMocks: func() {
 				mockRepo.EXPECT().
 					LoadThumbnailByID(ctx, fullImageID).
-					Return(file, sdk_endities.NewObjectMetadata(size, "image/jpeg"), nil).
+					Return(file, sdkendities.NewObjectMetadata(size, "image/jpeg"), nil).
 					Once()
 			},
-			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
-				assert.NoError(t, err)
+			wantAsserts: func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error) {
+				require.NoError(t, err)
 				assert.NotNil(t, reader)
 				assert.NotNil(t, metadata)
 			},
@@ -73,7 +71,7 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 					Once()
 				mockRepo.EXPECT().
 					LoadImageByID(ctx, fullImageID).
-					Return(file, sdk_endities.NewObjectMetadata(size, "image/jpeg"), nil).
+					Return(file, sdkendities.NewObjectMetadata(size, "image/jpeg"), nil).
 					Once()
 				mockRepo.EXPECT().
 					SaveThumbnail(ctx, fullImageID, img).
@@ -81,15 +79,15 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 					Once()
 				mockRepo.EXPECT().
 					LoadThumbnailByID(ctx, fullImageID).
-					Return(file, sdk_endities.NewObjectMetadata(size, "image/jpeg"), nil).
+					Return(file, sdkendities.NewObjectMetadata(size, "image/jpeg"), nil).
 					Once()
 				mockCropper.EXPECT().
-					CropImage(file, uint(defaultThumbSize), uint(defaultThumbSize)).
+					CropImage(file, defaultThumbSize, defaultThumbSize).
 					Return(img, nil).
 					Once()
 			},
-			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
-				assert.NoError(t, err)
+			wantAsserts: func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error) {
+				require.NoError(t, err)
 				assert.NotNil(t, reader)
 				assert.NotNil(t, metadata)
 			},
@@ -106,8 +104,8 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 					Return(io.NopCloser(nil), nil, errors.New("not_found")).
 					Once()
 			},
-			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
-				assert.ErrorContains(t, err, "Image not found")
+			wantAsserts: func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error) {
+				require.ErrorContains(t, err, "Image not found")
 				assert.Nil(t, reader)
 				assert.Nil(t, metadata)
 			},
@@ -121,15 +119,15 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 					Once()
 				mockRepo.EXPECT().
 					LoadImageByID(ctx, fullImageID).
-					Return(file, sdk_endities.NewObjectMetadata(size, "image/jpeg"), nil).
+					Return(file, sdkendities.NewObjectMetadata(size, "image/jpeg"), nil).
 					Once()
 				mockCropper.EXPECT().
-					CropImage(file, uint(defaultThumbSize), uint(defaultThumbSize)).
+					CropImage(file, defaultThumbSize, defaultThumbSize).
 					Return(img, errors.New("crop_failed")).
 					Once()
 			},
-			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
-				assert.Error(t, err)
+			wantAsserts: func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error) {
+				require.Error(t, err)
 				assert.Nil(t, reader)
 				assert.Nil(t, metadata)
 			},
@@ -143,19 +141,19 @@ func TestGetOrCreateThumbnail(t *testing.T) {
 					Once()
 				mockRepo.EXPECT().
 					LoadImageByID(ctx, fullImageID).
-					Return(file, sdk_endities.NewObjectMetadata(size, "image/jpeg"), nil).
+					Return(file, sdkendities.NewObjectMetadata(size, "image/jpeg"), nil).
 					Once()
 				mockRepo.EXPECT().
 					SaveThumbnail(ctx, fullImageID, img).
 					Return(errors.New("save_failed")).
 					Once()
 				mockCropper.EXPECT().
-					CropImage(file, uint(defaultThumbSize), uint(defaultThumbSize)).
+					CropImage(file, defaultThumbSize, defaultThumbSize).
 					Return(img, nil).
 					Once()
 			},
-			wantAsserts: func(reader io.ReadCloser, metadata *sdk_endities.ObjectMetadata, err error) {
-				assert.ErrorContains(t, err, "cannot save thumbnail")
+			wantAsserts: func(reader io.ReadCloser, metadata *sdkendities.ObjectMetadata, err error) {
+				require.ErrorContains(t, err, "cannot save thumbnail")
 				assert.Nil(t, reader)
 				assert.Nil(t, metadata)
 			},

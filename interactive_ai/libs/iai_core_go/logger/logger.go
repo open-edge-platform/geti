@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+//nolint:gochecknoglobals // consider refactoring global variables
 package logger
 
 import (
@@ -19,13 +20,12 @@ import (
 )
 
 var (
-	logger          = otelzap.New(zap.NewNop())
-	sugarLogger     = logger.Sugar()
-	otelServiceName = env.GetEnv("OTEL_SERVICE_NAME", "")
-	once            sync.Once
+	logger      = otelzap.New(zap.NewNop())
+	sugarLogger = logger.Sugar()
+	once        sync.Once
 )
 
-// Initialize initializes the logger with custom encoders if it's not initialized
+// Initialize initializes the logger with custom encoders if it's not initialized.
 func Initialize() {
 	once.Do(func() {
 		config := zap.NewProductionEncoderConfig()
@@ -54,6 +54,7 @@ func Log() *otelzap.SugaredLogger {
 
 // TracingLog returns sugared logger with tracing information.
 func TracingLog(ctx context.Context) *otelzap.SugaredLogger {
+	otelServiceName := env.GetEnv("OTEL_SERVICE_NAME", "")
 	// TODO: consider updating this code when otelzap will support tracing context propagation
 	// https://github.com/uptrace/opentelemetry-go-extra/pull/126
 	if span := trace.SpanFromContext(ctx); span != nil && span.IsRecording() {

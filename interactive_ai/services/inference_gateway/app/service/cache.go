@@ -6,11 +6,11 @@ package service
 import (
 	"context"
 
-	"inference_gateway/app/entities"
-
 	"geti.com/iai_core/logger"
 	"github.com/caarlos0/env/v11"
 	"github.com/go-resty/resty/v2"
+
+	"inference_gateway/app/entities"
 )
 
 type CacheService interface {
@@ -18,8 +18,8 @@ type CacheService interface {
 }
 
 type directorConfig struct {
-	Service string `env:"DIRECTOR_MS_SERVICE" envDefault:"impt-director"`
-	Port    int    `env:"DIRECTOR_MS_PORT" envDefault:"4999"`
+	Service string `env:"DIRECTOR_MS_SERVICE"        envDefault:"impt-director"`
+	Port    int    `env:"DIRECTOR_MS_PORT"           envDefault:"4999"`
 	Address string `env:"DIRECTOR_MS_ADDRESS,expand" envDefault:"http://$DIRECTOR_MS_SERVICE.impt:${DIRECTOR_MS_PORT}"`
 }
 

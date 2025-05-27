@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, renderHook, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { partial } from 'lodash-es';
 
 import { createInMemoryInferenceService } from '../../../../../core/annotations/services/in-memory-inference-service';
 import { createInMemoryModelsService } from '../../../../../core/models/services/in-memory-models-service';
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
-import { ApplicationServicesContextProps } from '../../../../../core/services/application-services-provider.component';
 import { ANNOTATOR_MODE } from '../../../core/annotation-tool-context.interface';
 import { useAnnotatorMode } from '../../../hooks/use-annotator-mode';
 import { annotatorRender as render } from '../../../test-utils/annotator-render';

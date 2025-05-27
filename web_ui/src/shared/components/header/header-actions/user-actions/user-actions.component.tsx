@@ -3,11 +3,11 @@
 
 import { Key, useRef } from 'react';
 
+import { paths } from '@geti/core';
 import { Button, Flex, Grid, Text, useUnwrapDOMRef, type FocusableRefValue } from '@geti/ui';
-import Import from '@spectrum-icons/workflow/Import';
+import { Import } from '@geti/ui/icons';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../../../core/services/routes';
 import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { User } from '../../../../../core/users/users.interface';
 import { useHandleSignOut } from '../../../../../hooks/use-handle-sign-out/use-handle-sign-out.hook';

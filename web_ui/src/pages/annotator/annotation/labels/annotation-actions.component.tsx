@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton } from '@geti/ui';
-import { Edit } from '@geti/ui/icons';
-import Cross from '@spectrum-icons/ui/CrossMedium';
+import { Cross, Edit } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';

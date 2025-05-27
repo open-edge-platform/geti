@@ -3,15 +3,16 @@
 
 import { useMemo } from 'react';
 
-import { Content, Loading } from '@geti/ui';
 import {
-    ListBox as AriaComponentsListBox,
+    AriaComponentsListBox,
+    Content,
     DropIndicator,
     ListBoxItem,
     ListLayout,
+    Loading,
     useDragAndDrop,
     Virtualizer,
-} from 'react-aria-components';
+} from '@geti/ui';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { hasEqualId } from '../../../../shared/utils';

@@ -3,9 +3,8 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Loading, Text, View, VirtualizedListLayout } from '@geti/ui';
+import { Loading, Text, View, VirtualizedListLayout, type Selection } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
-import { Selection } from 'react-aria-components';
 
 import { JobState } from '../../../../core/jobs/jobs.const';
 import { Job } from '../../../../core/jobs/jobs.interface';
