@@ -40,7 +40,10 @@ type GetOrCreateThumbnail struct {
 	cfg       EnvsConfig
 }
 
-func NewGetOrCreateImageThumbnail(imageRepo storage.ImageRepository, cropper service.Cropper) (*GetOrCreateThumbnail, error) {
+func NewGetOrCreateImageThumbnail(
+	imageRepo storage.ImageRepository,
+	cropper service.Cropper,
+) (*GetOrCreateThumbnail, error) {
 	cfg := EnvsConfig{}
 	if err := env.Parse(&cfg); err != nil {
 		return nil, fmt.Errorf("NewGetOrCreateImageThumbnail error: %w", err)
