@@ -45,7 +45,7 @@ DOCKER_EXTRA_ARGS                 := \
     $(if $(HTTPS_PROXY),--build-arg HTTPS_PROXY=$(HTTPS_PROXY)) \
     $(if $(NO_PROXY),--build-arg NO_PROXY=$(NO_PROXY))
 
-DOCKER_IMAGE_DESCRIPTION          ?= "Geti component: $(COMPONENT_NAME)"
+DOCKER_IMAGE_DESCRIPTION          ?= Geti component: $(COMPONENT_NAME)
 
 ###
 # docker builder extra arguments

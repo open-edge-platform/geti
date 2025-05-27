@@ -10,4 +10,5 @@ build-image:
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		-t ${BUILDER_IMAGE_NAME}:${BUILDER_TAG} \
+		--label "org.opencontainers.image.description=${DOCKER_IMAGE_DESCRIPTION}" \
 		-f ./Dockerfile .

@@ -4,6 +4,7 @@ include ../../Makefile.shared
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 COMPONENT_NAME := dex-templates-init-copy
+DOCKER_IMAGE_DESCRIPTION := Dex templates for Geti
 
 lint-chart:
 	@echo "Running chart linter for component: ${COMPONENT_NAME} NOT IMPLEMENTED"
