@@ -66,8 +66,8 @@ build-image-default:
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
-		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
 		--label "org.opencontainers.image.description=${DOCKER_IMAGE_DESCRIPTION}" \
+		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
 		-f ./Dockerfile .
 
 
