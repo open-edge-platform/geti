@@ -1,6 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from communication.rest_views.keypoint_structure_rest_views import KeypointStructureRESTViews
 from communication.rest_views.label_rest_views import LabelRESTViews
@@ -58,7 +58,7 @@ class PipelineRESTViews:
         :return: dict of rest representation of task node
         """
 
-        output = {
+        output: dict[str, Any] = {
             ID_: str(node.id_),
             TITLE: node.title,
             TASK_TYPE: str(node.task_properties.task_type).lower(),
