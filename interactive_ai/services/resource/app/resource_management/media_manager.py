@@ -1,5 +1,4 @@
 # Copyright (C) 2022-2025 Intel Corporation
-# Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 """This module contains the media manager"""
