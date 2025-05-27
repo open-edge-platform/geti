@@ -146,7 +146,7 @@ export const BarHorizontalChart = ({
 
                     <Bar dataKey='value' radius={[0, 2, 2, 0]}>
                         {data.length ? (
-                            data.map(({ name, value }, index) => (
+                            data.map(({ id, name, value }, index) => (
                                 <Cell
                                     key={name}
                                     fill={
@@ -155,7 +155,7 @@ export const BarHorizontalChart = ({
                                     id={`${name}-id`}
                                     aria-label={name}
                                     aria-valuenow={value}
-                                    onClick={isFunction(onCellClick) ? () => onCellClick(name) : undefined}
+                                    onClick={isFunction(onCellClick) ? () => onCellClick(id) : undefined}
                                 />
                             ))
                         ) : (
