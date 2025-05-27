@@ -7,6 +7,7 @@ export interface Colors {
 }
 
 export interface ChartData {
+    id: string;
     value: number;
     name: string;
 }

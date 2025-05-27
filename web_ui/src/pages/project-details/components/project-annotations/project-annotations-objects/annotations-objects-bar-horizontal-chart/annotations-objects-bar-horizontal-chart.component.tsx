@@ -13,7 +13,6 @@ import { encodeFilterSearchParam } from '../../../../../../hooks/use-filter-sear
 import { BarHorizontalChart } from '../../../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
 import { ChartProps, Colors } from '../../../../../../shared/components/charts/chart.interface';
 import { useDatasetIdentifier } from '../../../../../annotator/hooks/use-dataset-identifier.hook';
-import { useProject } from '../../../../providers/project-provider/project-provider.component';
 
 interface AnnotationObjectsBarHorizontalChartProps extends ChartProps {
     title: string;
@@ -34,11 +33,8 @@ export const AnnotationObjectsBarHorizontalChart = ({
 }: AnnotationObjectsBarHorizontalChartProps): JSX.Element => {
     const navigate = useNavigate();
     const datasetIdentifier = useDatasetIdentifier();
-    const { project } = useProject();
 
-    const handleCellClick = (labelName: string) => {
-        const labelId = project.labels.find((label) => label.name === labelName)?.id;
-
+    const handleCellClick = (labelId: string) => {
         if (!labelId) {
             // if there's no labelId, we don't navigate to the dataset
             return;
