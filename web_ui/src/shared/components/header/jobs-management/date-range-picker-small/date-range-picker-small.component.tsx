@@ -15,14 +15,14 @@ import {
     Tooltip,
     TooltipTrigger,
     useDateFormatter,
+    type SpectrumRangeCalendarProps,
 } from '@geti/ui';
 import { Calendar } from '@geti/ui/icons';
 import { DateValue, getLocalTimeZone } from '@internationalized/date';
 import { isFunction } from 'lodash-es';
 import isEmpty from 'lodash/isEmpty';
-import { RangeCalendarProps } from 'react-aria-components';
 
-interface DateRangePickerSmall extends Omit<RangeCalendarProps<DateValue>, 'focusedValue' | 'onFocusChange'> {
+interface DateRangePickerSmall extends Omit<SpectrumRangeCalendarProps<DateValue>, 'focusedValue' | 'onFocusChange'> {
     hasManualEdition?: boolean;
     headerContent?: ReactNode;
 }
