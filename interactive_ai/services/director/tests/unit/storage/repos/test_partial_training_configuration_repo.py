@@ -20,7 +20,6 @@ class TestTrainingConfigurationRepo:
         # Act
         retrieved_config = repo.get_task_only_configuration(fxt_training_configuration_task_level.task_id)
 
-
         # Assert
         assert retrieved_config.id_ == fxt_training_configuration_task_level.id_
         assert retrieved_config.task_id == fxt_training_configuration_task_level.task_id

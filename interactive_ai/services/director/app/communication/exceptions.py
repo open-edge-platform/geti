@@ -568,11 +568,16 @@ class NotEnoughSpaceHTTPException(HTTPException):
 class ProjectConfigurationNotFoundException(GetiBaseException):
     """Exception raised when the project configuration could not be found in the database"""
 
-    def __init__(self, project_id: ID) -> None:
+    def __init__(self, project_id: ID, task_id: ID | None = None) -> None:
+        message = (
+            f"The requested project configuration could not be found. Project ID: `{project_id}`, task ID: `{task_id}`"
+            if task_id
+            else ""
+        )
         super().__init__(
             http_status=status.HTTP_404_NOT_FOUND,
             error_code="project_configuration_not_found",
-            message=f"Project configuration not found for project ID: {project_id}",
+            message=message,
         )
 
 

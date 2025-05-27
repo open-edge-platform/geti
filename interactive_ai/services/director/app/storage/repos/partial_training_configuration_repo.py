@@ -8,11 +8,12 @@ from pymongo import DESCENDING, IndexModel
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
+from storage.mappers.partial_training_configuration_mapper import PartialTrainingConfigurationToMongo
+
 from geti_types import ID, ProjectIdentifier, Session
 from iai_core.repos.base import ProjectBasedSessionRepo
 from iai_core.repos.mappers import IDToMongo
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
-from storage.mappers.partial_training_configuration_mapper import PartialTrainingConfigurationToMongo
 
 
 class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingConfiguration]):
@@ -57,7 +58,7 @@ class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingCo
             cursor=mongo_cursor, mapper=PartialTrainingConfigurationToMongo, parameter=None
         )
 
-    def get_task_only_configuration(self, task_id: ID) -> PartialTrainingConfiguration | NullTrainingConfiguration:
+    def get_task_only_configuration(self, task_id: ID) -> PartialTrainingConfiguration:
         """
         Get a partial training configuration that is only applied to the specified task ID.
         This returns task-level configuration that does not have an associated model manifest ID.
@@ -68,7 +69,7 @@ class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingCo
         task_filter = {"task_id": IDToMongo.forward(instance=task_id), "model_manifest_id": {"$exists": False}}
         return self.get_one(extra_filter=task_filter)
 
-    def get_by_model_manifest_id(self, model_manifest_id: str) -> PartialTrainingConfiguration | NullTrainingConfiguration:
+    def get_by_model_manifest_id(self, model_manifest_id: str) -> PartialTrainingConfiguration:
         """
         Get a TrainingConfiguration by model manifest ID.
 
