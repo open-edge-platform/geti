@@ -1,10 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-<<<<<<< HEAD
 import { paths } from '@geti/core';
-=======
->>>>>>> a9c1d274e7f310123cdd1a472dab2f82adc5985b
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -12,10 +9,6 @@ import {
     SearchRuleField,
     SearchRuleOperator,
 } from '../../../../../../core/media/media-filter.interface';
-<<<<<<< HEAD
-=======
-import { paths } from '../../../../../../core/services/routes';
->>>>>>> a9c1d274e7f310123cdd1a472dab2f82adc5985b
 import { encodeFilterSearchParam } from '../../../../../../hooks/use-filter-search-param/use-filter-search-param.hook';
 import { BarHorizontalChart } from '../../../../../../shared/components/charts/bar-horizontal-chart/bar-horizontal-chart.component';
 import { ChartProps, Colors } from '../../../../../../shared/components/charts/chart.interface';
