@@ -15,14 +15,23 @@ func TestNewVideo(t *testing.T) {
 	path := "../test_data/test_mp4.mp4"
 	video := NewVideo(context.Background(), path)
 	assert.Equal(t, path, video.FilePath)
-	assert.Equal(t, float64(30), video.FPS)
+	assert.InEpsilon(t, float64(30), video.FPS, 0.0001)
 }
 
 func TestFullVideoID(t *testing.T) {
 	fullVideoID := GetFullVideoID(t)
 
-	videoPath := filepath.Join("organizations", fullVideoID.OrganizationID.String(), "workspaces", fullVideoID.WorkspaceID.String(), "projects",
-		fullVideoID.ProjectID.String(), "dataset_storages", fullVideoID.DatasetID.String(), fullVideoID.VideoID.String())
+	videoPath := filepath.Join(
+		"organizations",
+		fullVideoID.OrganizationID.String(),
+		"workspaces",
+		fullVideoID.WorkspaceID.String(),
+		"projects",
+		fullVideoID.ProjectID.String(),
+		"dataset_storages",
+		fullVideoID.DatasetID.String(),
+		fullVideoID.VideoID.String(),
+	)
 
 	assert.Equal(t, videoPath, fullVideoID.GetPath())
 }
@@ -48,7 +57,7 @@ func TestParseFpsFraction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.given, func(t *testing.T) {
-			assert.Equal(t, tt.want, parseFPSFraction(tt.given))
+			assert.InEpsilon(t, tt.want, parseFPSFraction(tt.given), 0.0001)
 		})
 	}
 }

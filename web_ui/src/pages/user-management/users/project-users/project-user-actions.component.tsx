@@ -3,10 +3,10 @@
 
 import { useState } from 'react';
 
+import { RESOURCE_TYPE, User } from '@geti/core/src/users/users.interface';
 import { DialogContainer } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
-import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';
 import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
 import { MenuTriggerButton } from '../../../../shared/components/menu-trigger/menu-trigger-button/menu-trigger-button.component';

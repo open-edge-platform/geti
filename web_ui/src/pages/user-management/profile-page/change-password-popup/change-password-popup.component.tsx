@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import { useChangePassword } from '@geti/core/src/users/hook/use-users.hook';
 import {
     ActionButton,
     Button,
@@ -17,7 +18,6 @@ import {
 } from '@geti/ui';
 import { ValidationError } from 'yup';
 
-import { useChangePassword } from '../../../../core/users/hook/use-users.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { CONFIRM_PASSWORD_ERROR_MESSAGE, encodeToBase64 } from '../../../../shared/utils';

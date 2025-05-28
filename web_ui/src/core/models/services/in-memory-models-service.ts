@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { getMockedLabel } from '../../../test-utils/mocked-items-factory/mocked-labels';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { TrainingBodyDTO } from '../dtos/train-model.interface';
 import { ModelGroupIdentifier, ModelIdentifier, ModelsGroups } from '../models.interface';
 import { ModelDetails } from '../optimized-models.interface';

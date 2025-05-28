@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { OrganizationMetadata } from '@geti/core/src/users/services/onboarding-service.interface';
+
 import { AccountStatus } from '../../core/organizations/organizations.interface';
-import { OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';
 
 export const isActiveOrganization = (organization: OrganizationMetadata) =>
     organization.status === AccountStatus.ACTIVATED;

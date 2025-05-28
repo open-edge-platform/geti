@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { paths } from '../../../src/core/services/routes';
+import { paths } from '@geti/core';
+
 import {
     FUX_NOTIFICATION_KEYS,
     FUX_SETTINGS_KEYS,

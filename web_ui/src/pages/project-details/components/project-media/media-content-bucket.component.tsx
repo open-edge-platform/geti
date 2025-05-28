@@ -4,8 +4,8 @@
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
 import { Divider, Flex, IllustratedMessage, useMediaQuery, View, type DimensionValue, type Responsive } from '@geti/ui';
+import { NotFound } from '@geti/ui/icons';
 import { isLargeSizeQuery } from '@geti/ui/theme';
-import NotFound from '@spectrum-icons/illustrations/NotFound';
 import { isEmpty } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryOnboardingService } from '@geti/core/src/users/services/inmemory-onboarding-service';
 import { getLocalTimeZone, today } from '@internationalized/date';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { createInMemoryOnboardingService } from '../../../../core/users/services/inmemory-onboarding-service';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { GenerateOnboardingTokenDialogContainer } from './generate-onboarding-invitation-link-dialog.component';
 

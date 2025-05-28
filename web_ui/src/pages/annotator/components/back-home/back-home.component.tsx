@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Flex, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { AdvancedFilterOptions, SearchRuleField } from '../../../../core/media/media-filter.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
-import { paths } from '../../../../core/services/routes';
 import {
     encodeFilterSearchParam,
     getFilterParam,

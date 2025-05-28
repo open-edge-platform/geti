@@ -21,7 +21,10 @@ type ObjectStorageHandlerImpl struct{}
 // It returns an io.Reader, the size of the object, and an error if any.
 // The function will make a minio index lookup with minio.ListObjects API with object name without extension passed as a prefix and limit 1.
 // If object exists, the reader will be instantiated with minio.GetObject and will be ready for the further retrieval operations.
-func (h *ObjectStorageHandlerImpl) GetObjectByType(ctx context.Context, objectType, objectName string) (io.ReadCloser, *entities.ObjectMetadata, error) {
+func (h *ObjectStorageHandlerImpl) GetObjectByType(
+	ctx context.Context,
+	objectType, objectName string,
+) (io.ReadCloser, *entities.ObjectMetadata, error) {
 	bucketName, err := storage.GetBucketName(objectType)
 	if err != nil {
 		return nil, nil, err
@@ -58,7 +61,12 @@ func (h *ObjectStorageHandlerImpl) GetObjectByType(ctx context.Context, objectTy
 
 // CreateObject uploads a new object to a bucket in MinIO storage.
 // It returns an error if the bucket for specified type doesn't exist or object creation fails, otherwise nil.
-func (h *ObjectStorageHandlerImpl) CreateObject(ctx context.Context, objectType, objectName string, reader io.Reader, objectSize int64) error {
+func (h *ObjectStorageHandlerImpl) CreateObject(
+	ctx context.Context,
+	objectType, objectName string,
+	reader io.Reader,
+	objectSize int64,
+) error {
 	bucketName, err := storage.GetBucketName(objectType)
 	if err != nil {
 		return err
@@ -67,7 +75,7 @@ func (h *ObjectStorageHandlerImpl) CreateObject(ctx context.Context, objectType,
 	if minioErr != nil {
 		return minioErr
 	}
-	if _, err := minioClient.PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{}); err != nil {
+	if _, err = minioClient.PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{}); err != nil {
 		return err
 	}
 	return nil

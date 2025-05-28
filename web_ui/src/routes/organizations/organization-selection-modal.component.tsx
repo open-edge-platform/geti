@@ -1,14 +1,14 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getErrorMessage } from '@geti/core/src/services/utils';
+import { useOnboardUserMutation } from '@geti/core/src/users/hook/use-onboard-user-mutation.hook';
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
+import { OrganizationMetadata } from '@geti/core/src/users/services/onboarding-service.interface';
 import { Button, Content, Dialog, DialogContainer, dimensionValue, Divider, Flex, Heading, Text } from '@geti/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { noop } from 'lodash-es';
 
-import { getErrorMessage } from '../../core/services/utils';
-import { useOnboardUserMutation } from '../../core/users/hook/use-onboard-user-mutation.hook';
-import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
-import { OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 import { formatUtcToLocal } from '../../shared/utils';

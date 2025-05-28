@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { USER_ROLE } from '@geti/core/src/users/users.interface';
 import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { UserCircleFilled as AdminIcon } from '@geti/ui/icons';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 
-import { USER_ROLE } from '../../../../../core/users/users.interface';
 import { UserPhotoPresentation } from '../../../profile-page/user-photo-container/user-photo-presentation.component';
 
 import classes from './user-name-cell.module.scss';

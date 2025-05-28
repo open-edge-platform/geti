@@ -3,6 +3,8 @@
 
 import { useEffect, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
@@ -10,8 +12,6 @@ import { LabeledVideoRange } from '../../../../core/annotations/labeled-video-ra
 import { Label } from '../../../../core/labels/label.interface';
 import { Video } from '../../../../core/media/video.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 
 export const useLabeledVideoRangesQuery = (
     datasetIdentifier: DatasetIdentifier,

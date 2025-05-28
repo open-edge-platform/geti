@@ -3,11 +3,11 @@
 
 import { useState } from 'react';
 
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Flex, Heading, Text } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 
-import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';
-import { useUsers } from '../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 
 import classes from './license-modal.module.scss';

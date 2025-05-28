@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ActionButton, Flex, Text, type ActionButtonProps } from '@geti/ui';
-import Checkmark from '@spectrum-icons/workflow/Checkmark';
+import { Checkmark } from '@geti/ui/icons';
 
 import classes from './select-domain-button.module.scss';
 

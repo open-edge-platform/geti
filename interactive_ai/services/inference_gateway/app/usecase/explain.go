@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+//nolint:dupl // Will be refactored in the future
 package usecase
 
 import (
@@ -29,7 +30,11 @@ type Explain struct {
 	semaCh         chan struct{}
 }
 
-func NewExplain(modelAccess service.ModelAccessService, videoRepo storage.VideoRepository, frameExtractor frames.CLIFrameExtractor) *Explain {
+func NewExplain(
+	modelAccess service.ModelAccessService,
+	videoRepo storage.VideoRepository,
+	frameExtractor frames.CLIFrameExtractor,
+) *Explain {
 	return &Explain{
 		modelAccess:    modelAccess,
 		videoRepo:      videoRepo,
@@ -45,7 +50,14 @@ type BatchExplainJSON struct {
 func (uc *Explain) One(ctx context.Context, request *entities.PredictionRequestData) (string, error) {
 	modelName := request.ProjectID.String() + "-" + request.ModelID.String()
 
-	inferParams := service.NewInferParameters(request.Media, modelName, true, request.Roi, request.LabelOnly, request.HyperParameters)
+	inferParams := service.NewInferParameters(
+		request.Media,
+		modelName,
+		true,
+		request.Roi,
+		request.LabelOnly,
+		request.HyperParameters,
+	)
 	response, err := uc.modelAccess.InferImageBytes(ctx, *inferParams)
 	if errors.Is(err, service.ErrModelNotFound) {
 		logger.TracingLog(ctx).Infof("`Model not found` error encountered, attempting to recover model `%s`", modelName)
@@ -93,9 +105,9 @@ func (uc *Explain) Batch(ctx context.Context, request *entities.BatchPredictionR
 				return inferErr
 			}
 
-			jsonData, err := req.ToExplainBytes(result)
-			if err != nil {
-				return fmt.Errorf("failed to construct JSON response from prediction string: %w", err)
+			jsonData, reqErr := req.ToExplainBytes(result)
+			if reqErr != nil {
+				return fmt.Errorf("failed to construct JSON response from prediction string: %w", reqErr)
 			}
 			inferResults[frame.Index] = jsonData
 			return nil
@@ -105,11 +117,11 @@ func (uc *Explain) Batch(ctx context.Context, request *entities.BatchPredictionR
 	err = <-doneCh
 	if err != nil {
 		telemetry.RecordError(span, err)
-		return nil, fmt.Errorf("error during frame extraction process: %s", err)
+		return nil, fmt.Errorf("error during frame extraction process: %w", err)
 	}
-	if err := g.Wait(); err != nil {
+	if err = g.Wait(); err != nil {
 		telemetry.RecordError(span, err)
-		return nil, fmt.Errorf("error during one of the inference requests: %s", err)
+		return nil, fmt.Errorf("error during one of the inference requests: %w", err)
 	}
 
 	var batchExplainJSON BatchExplainJSON

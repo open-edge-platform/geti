@@ -3,9 +3,9 @@
 
 import { Key, useMemo, useState } from 'react';
 
+import { User } from '@geti/core/src/users/users.interface';
 import { ComboBox, Item, useFilter } from '@geti/ui';
 
-import { User } from '../../../../core/users/users.interface';
 import { hasEqualId } from '../../../../shared/utils';
 import { getFullNameFromUser } from '../users-table/utils';
 

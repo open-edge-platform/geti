@@ -3,7 +3,7 @@
 
 import { v4 as uuid } from 'uuid';
 
-import { USER_ROLE, WorkspaceRole } from '../../../src/core/users/users.interface';
+import { USER_ROLE, WorkspaceRole } from '../../../packages/core/src/users/users.interface';
 import { expect } from '../../fixtures/base-test';
 import { MembersPage } from '../../fixtures/page-objects/members-page';
 import { test } from '../fixtures';

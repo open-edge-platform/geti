@@ -4,9 +4,8 @@
 import { useRef } from 'react';
 
 import { Flex, PressableElement, Tooltip, TooltipTrigger, View, type ToggleProps } from '@geti/ui';
+import { ChevronDoubleLeft, ChevronDoubleRight } from '@geti/ui/icons';
 import { useToggleState } from '@react-stately/toggle';
-import ChevronDoubleLeft from '@spectrum-icons/workflow/ChevronDoubleLeft';
-import ChevronDoubleRight from '@spectrum-icons/workflow/ChevronDoubleRight';
 import { useToggleButton } from 'react-aria';
 
 import classes from './toggle-sidebar.module.scss';

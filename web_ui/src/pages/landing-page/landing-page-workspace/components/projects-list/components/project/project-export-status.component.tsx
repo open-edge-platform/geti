@@ -3,6 +3,8 @@
 
 import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Button, ButtonGroup, Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -14,8 +16,6 @@ import { useExportProjectStatusQuery } from '../../../../../../../core/projects/
 import { useLocalStorageProject } from '../../../../../../../core/projects/hooks/use-local-storage-project.hook';
 import { ProjectExport, ProjectExportIdentifier } from '../../../../../../../core/projects/project.interface';
 import { JobStateToExportStatus } from '../../../../../../../core/projects/services/api-project-service';
-import { useApplicationServices } from '../../../../../../../core/services/application-services-provider.component';
-import { WorkspaceIdentifier } from '../../../../../../../core/workspaces/services/workspaces.interface';
 import { NOTIFICATION_TYPE } from '../../../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../../../notification/notification.component';
 import { ANIMATION_PARAMETERS } from '../../../../../../../shared/animation-parameters/animation-parameters';

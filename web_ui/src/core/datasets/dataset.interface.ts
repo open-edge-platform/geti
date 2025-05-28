@@ -3,7 +3,7 @@
 
 import { type ButtonProps } from '@geti/ui';
 
-import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
+import { WorkspaceIdentifier } from '../../../packages/core/src/workspaces/services/workspaces.interface';
 import {
     DATASET_IMPORT_DIALOG_BUTTONS,
     DATASET_IMPORT_TASK_TYPE,

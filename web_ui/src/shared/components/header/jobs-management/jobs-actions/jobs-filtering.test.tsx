@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { User } from '@geti/core/src/users/users.interface';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { JobType } from '../../../../../core/jobs/jobs.const';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
-import { User } from '../../../../../core/users/users.interface';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedUser } from '../../../../../test-utils/mocked-items-factory/mocked-users';
 import { projectRender as render } from '../../../../../test-utils/project-provider-render';
@@ -15,8 +15,8 @@ import { JobsFiltering } from './jobs-filtering.component';
 
 const mockedProject = getMockedProject({});
 
-jest.mock('../../../../../core/users/hook/use-users.hook', () => ({
-    ...jest.requireActual('../../../../../core/users/hook/use-users.hook'),
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
+    ...jest.requireActual('@geti/core/src/users/hook/use-users.hook'),
     useUsers: jest.fn(() => ({
         useGetUsersQuery: () => {
             return {

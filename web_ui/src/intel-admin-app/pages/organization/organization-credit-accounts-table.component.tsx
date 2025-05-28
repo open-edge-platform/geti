@@ -14,7 +14,7 @@ import {
     Text,
     View,
 } from '@geti/ui';
-import NotFound from '@spectrum-icons/illustrations/NotFound';
+import { NotFound } from '@geti/ui/icons';
 import dayjs from 'dayjs';
 import { get } from 'lodash-es';
 

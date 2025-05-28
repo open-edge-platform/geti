@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
-import { useUsers } from '../../../../../../../../../core/users/hook/use-users.hook';
 import { getMockedProject } from '../../../../../../../../../test-utils/mocked-items-factory/mocked-project';
 import {
     getMockedOrganizationAdminUser,
@@ -24,8 +24,8 @@ jest.mock('react-router-dom', () => ({
     }),
 }));
 
-jest.mock('../../../../../../../../../core/users/hook/use-users.hook', () => ({
-    ...jest.requireActual('../../../../../../../../../core/users/hook/use-users.hook'),
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
+    ...jest.requireActual('@geti/core/src/users/hook/use-users.hook'),
     useUsers: jest.fn(() => ({
         useActiveUser: jest.fn(() => ({ data: mockedOrganizationAndWorkspaceAdmin })),
     })),

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Navigate, Outlet, useParams } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from './../../core/services/routes';
 
 export const RedirectToTheOrganizations = (): JSX.Element => {
     return <Navigate to={paths.intelAdmin.organizations({})} replace />;

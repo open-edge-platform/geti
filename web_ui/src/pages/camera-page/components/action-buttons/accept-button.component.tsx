@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Button } from '@geti/ui';
 import { groupBy, isEmpty } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import { paths } from '../../../../core/services/routes';
 import { getIds } from '../../../../shared/utils';
 import { useDatasetMediaUpload } from '../../../project-details/components/project-dataset/hooks/dataset-media-upload';
 import { useCameraParams } from '../../hooks/camera-params.hook';
