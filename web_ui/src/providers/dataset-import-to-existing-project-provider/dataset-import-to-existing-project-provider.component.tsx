@@ -6,6 +6,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQueryClient } from '@tanstack/react-query';
+import { HttpStatusCode } from 'axios';
 import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
@@ -30,7 +31,6 @@ import { useTusUpload } from '../tus-upload-provider/tus-upload-provider.compone
 import { getUploadId, onErrorMessage, throttleProgress } from '../tus-upload-provider/util';
 import { useWorkspaceIdentifier } from '../workspaces-provider/use-workspace-identifier.hook';
 import { getDatasetImportInitialState, getLabelsMap, matchStatus } from './utils';
-import { HttpStatusCode } from 'axios';
 
 interface DatasetImportToExistingProjectContextProps {
     isReady: (id: string | undefined) => boolean;
