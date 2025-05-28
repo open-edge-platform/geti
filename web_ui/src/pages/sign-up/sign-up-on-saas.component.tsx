@@ -4,6 +4,8 @@
 import { FormEvent, useState } from 'react';
 
 import { paths } from '@geti/core';
+import { useOnboardUserMutation } from '@geti/core/src/users/hook/use-onboard-user-mutation.hook';
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
 import { Item, Picker, TextField } from '@geti/ui';
 import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
@@ -15,8 +17,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useSelectedOrganization } from '../../core/organizations/hook/use-selected-organization.hook';
-import { useOnboardUserMutation } from '../../core/users/hook/use-onboard-user-mutation.hook';
-import { useProfileQuery } from '../../core/users/hook/use-profile.hook';
 import { isOrgVisibleAndUserInvitedInOrg } from '../../routes/organizations/util';
 import { isNonEmptyString } from '../../shared/utils';
 import { InvalidOrganizationsScreen } from '../errors/invalid-organization/invalid-organization-screen.component';

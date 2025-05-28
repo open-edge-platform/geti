@@ -22,7 +22,8 @@ const App = () => {
         </>
     );
 };
-jest.mock('../../../../core/users/hook/use-users.hook', () => ({
+
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
     useUsers: jest.fn(() => ({
         useActiveUser: () => ({
             data: {},

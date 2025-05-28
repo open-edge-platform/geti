@@ -2,9 +2,8 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
+import { USER_ROLE } from '@geti/core/src/users/users.interface';
 import { expect, Locator, Page } from '@playwright/test';
-
-import { USER_ROLE } from '../../../src/core/users/users.interface';
 
 export class MembersPage {
     constructor(private page: Page) {}

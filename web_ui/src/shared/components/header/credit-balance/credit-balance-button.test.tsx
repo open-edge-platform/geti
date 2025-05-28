@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
+import { User } from '@geti/core/src/users/users.interface';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useParams } from 'react-router-dom';
 
@@ -11,8 +13,6 @@ import {
     FuxSettingsConfig,
 } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { createInMemoryUserSettingsService } from '../../../../core/user-settings/services/in-memory-user-settings-service';
-import { createInMemoryUsersService } from '../../../../core/users/services/in-memory-users-service';
-import { User } from '../../../../core/users/users.interface';
 import { getMockedUserGlobalSettings } from '../../../../test-utils/mocked-items-factory/mocked-settings';
 import { getMockedUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';

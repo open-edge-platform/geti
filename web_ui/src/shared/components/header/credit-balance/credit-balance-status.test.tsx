@@ -2,10 +2,10 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { fireEvent, screen } from '@testing-library/react';
 
 import { createInMemoryCreditsService } from '../../../../core/credits/services/in-memory-credits-service';
-import { createInMemoryUsersService } from '../../../../core/users/services/in-memory-users-service';
 import {
     getMockedOrganizationAdminUser,
     getMockedUser,

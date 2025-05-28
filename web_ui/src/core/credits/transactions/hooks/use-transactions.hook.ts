@@ -15,9 +15,9 @@ import {
 import { AxiosError } from 'axios';
 
 import QUERY_KEYS from '../../../../../packages/core/src/requests/query-keys';
+import { WorkspaceIdentifier } from '../../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { useProjectActions } from '../../../projects/hooks/use-project-actions.hook';
 import { NextPage } from '../../../shared/infinite-query.interface';
-import { WorkspaceIdentifier } from '../../../workspaces/services/workspaces.interface';
 import {
     GetTransactionsAggregatesQueryOptions,
     GetTransactionsQueryOptions,

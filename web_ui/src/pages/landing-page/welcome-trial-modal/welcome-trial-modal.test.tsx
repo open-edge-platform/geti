@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
+import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { useProducts } from '../../../core/credits/products/hooks/use-products.hook';
 import { GLOBAL_MODALS_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
-import { RESOURCE_TYPE, USER_ROLE } from '../../../core/users/users.interface';
 import { getMockedPolicy } from '../../../test-utils/mocked-items-factory/mocked-product';
 import { getMockedUser } from '../../../test-utils/mocked-items-factory/mocked-users';
 import { providersRender as render } from '../../../test-utils/required-providers-render';

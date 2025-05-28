@@ -7,17 +7,19 @@ import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
-import { useGetRunningJobs } from '../../../../../../core/jobs/hooks/use-jobs.hook';
+import { useGetRunningJobs, useGetScheduledJobs } from '../../../../../../core/jobs/hooks/use-jobs.hook';
 import { JobState } from '../../../../../../core/jobs/jobs.const';
 import { RunningTrainingJob } from '../../../../../../core/jobs/jobs.interface';
 import { JobsResponse } from '../../../../../../core/jobs/services/jobs-service.interface';
 import { useProjectIdentifier } from '../../../../../../hooks/use-project-identifier/use-project-identifier';
-import { getAllJobs, isRunningTrainingJob } from '../../../../../../shared/components/header/jobs-management/utils';
-import { useIsTraining } from '../../hooks/use-is-training.hook';
+import {
+    getAllJobs,
+    isRunningOrScheduledTrainingJob,
+} from '../../../../../../shared/components/header/jobs-management/utils';
 
 interface UseTrainingProgressDetails {
     showTrainingProgress: true;
-    trainingDetails: RunningTrainingJob;
+    trainingDetails: RunningTrainingJob[];
 }
 
 interface UseTrainingProgressNoDetails {
@@ -26,12 +28,10 @@ interface UseTrainingProgressNoDetails {
 
 type UseTrainingProgress = UseTrainingProgressDetails | UseTrainingProgressNoDetails;
 
-const useTrainingProgressJobs = (isTraining: boolean) => {
+const useTrainingProgressJobs = () => {
     const queryClient = useQueryClient();
     const projectIdentifier = useProjectIdentifier();
-
     const prevJobsSize = useRef<number>();
-
     const areTrainingDetails = true;
 
     const handleSuccess = useCallback(
@@ -47,42 +47,52 @@ const useTrainingProgressJobs = (isTraining: boolean) => {
         [queryClient, projectIdentifier]
     );
 
-    const { data, isSuccess } = useGetRunningJobs({
+    const { data: runningJobsData, isSuccess: runningJobsIsSuccess } = useGetRunningJobs({
         projectId: projectIdentifier.projectId,
         queryOptions: {
-            enabled: isTraining,
             refetchIntervalInBackground: true,
             queryKey: QUERY_KEYS.JOBS_KEY(projectIdentifier, JobState.RUNNING, areTrainingDetails),
         },
     });
 
+    const { data: scheduledJobsData, isSuccess: scheduledJobsIsSuccess } = useGetScheduledJobs({
+        projectId: projectIdentifier.projectId,
+        queryOptions: {
+            refetchIntervalInBackground: true,
+            queryKey: QUERY_KEYS.JOBS_KEY(projectIdentifier, JobState.SCHEDULED, areTrainingDetails),
+        },
+    });
+
     useEffect(() => {
-        if (!isSuccess) {
+        if (!runningJobsIsSuccess && !scheduledJobsIsSuccess) {
             return;
         }
 
-        handleSuccess(data);
-    }, [data, isSuccess, handleSuccess]);
+        handleSuccess({
+            pages: [...(runningJobsData?.pages ?? []), ...(scheduledJobsData?.pages ?? [])],
+            pageParams: [...(runningJobsData?.pageParams ?? []), ...(scheduledJobsData?.pageParams ?? [])],
+        });
+    }, [runningJobsData, runningJobsIsSuccess, handleSuccess, scheduledJobsData, scheduledJobsIsSuccess]);
 
-    return data;
+    const runningJobs = runningJobsData?.pages?.flatMap((jobsResponse) => jobsResponse.jobs) ?? [];
+    const scheduledJobs = scheduledJobsData?.pages?.flatMap((jobsResponse) => jobsResponse.jobs) ?? [];
+
+    return [...runningJobs, ...scheduledJobs];
 };
 
 export const useTrainingProgress = (taskId: string): UseTrainingProgress => {
-    const isTraining = useIsTraining();
-    const data = useTrainingProgressJobs(isTraining);
+    const data = useTrainingProgressJobs();
 
-    const getTrainingDetails = (): RunningTrainingJob | undefined => {
-        const jobs = getAllJobs(data);
-        const jobsPerTask = jobs.filter(
-            (job) => isRunningTrainingJob(job) && taskId === job.metadata.task.taskId
+    const getTrainingDetails = (): RunningTrainingJob[] => {
+        const jobsPerTask = data.filter(
+            (job) => isRunningOrScheduledTrainingJob(job) && taskId === job.metadata.task.taskId
         ) as RunningTrainingJob[];
-
-        return !isEmpty(jobsPerTask) ? jobsPerTask[0] : undefined;
+        return jobsPerTask;
     };
 
     const trainingDetails = getTrainingDetails();
 
-    if (isTraining && trainingDetails) {
+    if (!isEmpty(trainingDetails)) {
         return {
             showTrainingProgress: true,
             trainingDetails,

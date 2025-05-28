@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '../../../packages/core/src/workspaces/services/workspaces.interface';
 import { EmptyObject } from '../../types-utils/types';
 import { ExportStatusStateDTO } from '../configurable-parameters/dtos/configurable-parameters.interface';
 import { Label } from '../labels/label.interface';
-import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
 import { DOMAIN, ProjectIdentifier } from './core.interface';
 import { Dataset } from './dataset.interface';
 import { ConnectionDTO, ProjectCommon } from './dtos/project.interface';

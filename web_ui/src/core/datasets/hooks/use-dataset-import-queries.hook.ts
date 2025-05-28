@@ -9,6 +9,7 @@ import { AxiosError } from 'axios';
 
 import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { getErrorMessage } from '../../../../packages/core/src/services/utils';
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import {
@@ -19,7 +20,6 @@ import {
     JobStatusIdentifier,
 } from '../../jobs/jobs.interface';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import {
     DatasetImportIdentifier,
     DatasetImportPrepareForNewProjectResponse,

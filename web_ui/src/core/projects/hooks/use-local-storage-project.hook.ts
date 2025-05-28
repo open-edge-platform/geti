@@ -3,10 +3,10 @@
 
 import { useLocalStorage } from 'usehooks-ts';
 
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { LOCAL_STORAGE_KEYS } from '../../../shared/local-storage-keys';
 import { getParsedLocalStorage } from '../../../shared/utils';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { ProjectExportIdentifier } from '../project.interface';
 
 const getExportProjectKey = ({ organizationId, workspaceId }: WorkspaceIdentifier): string => {

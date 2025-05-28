@@ -3,10 +3,9 @@
 
 import { ComponentProps, Key } from 'react';
 
+import { USER_ROLE } from '@geti/core/src/users/users.interface';
 import { Item, Picker } from '@geti/ui';
 import { capitalize, isEmpty } from 'lodash-es';
-
-import { USER_ROLE } from '../../../../core/users/users.interface';
 
 interface RolePickerProps<T> extends Omit<ComponentProps<typeof Picker>, 'children'> {
     roles: T[];

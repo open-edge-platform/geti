@@ -22,8 +22,8 @@ import { DOMAIN, ProjectIdentifier } from '../../../../src/core/projects/core.in
 import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interface';
 import { ProjectsQueryOptions } from '../../../../src/core/projects/services/project-service.interface';
 import { Task } from '../../../../src/core/projects/task.interface';
-import { RESOURCE_TYPE, UsersQueryParams } from '../../../../src/core/users/users.interface';
-import { WorkspaceIdentifier } from '../../../../src/core/workspaces/services/workspaces.interface';
+import { RESOURCE_TYPE, UsersQueryParams } from '../users/users.interface';
+import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
 
 const WORKSPACES = (organizationId: string) => [organizationId, 'workspaces'];
 

@@ -1,11 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
+
 import { DatasetImportIdentifier } from '../../core/datasets/dataset.interface';
 import { ProjectIdentifier } from '../../core/projects/core.interface';
 import { DatasetIdentifier, ExportDatasetStatusIdentifier } from '../../core/projects/dataset.interface';
 import { ProjectExportIdentifier, ProjectImportIdentifier } from '../../core/projects/project.interface';
-import { WorkspaceIdentifier } from '../../core/workspaces/services/workspaces.interface';
 
 export const getMockedWorkspaceIdentifier = (
     workspaceIdentifier: Partial<WorkspaceIdentifier> = {}

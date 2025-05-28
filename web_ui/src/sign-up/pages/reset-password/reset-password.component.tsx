@@ -3,10 +3,10 @@
 
 import { FormEvent, useState } from 'react';
 
+import { useResetPassword } from '@geti/core/src/users/hook/use-users.hook';
 import { Button, Form, Heading, PasswordField, Text } from '@geti/ui';
 import { ValidationError } from 'yup';
 
-import { useResetPassword } from '../../../core/users/hook/use-users.hook';
 import { isYupValidationError } from '../../../pages/user-management/profile-page/utils';
 import { PasswordState } from '../../../pages/user-management/users/add-member-popup/add-member-popup.interface';
 import {
