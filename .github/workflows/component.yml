@@ -70,9 +70,9 @@ jobs:
       - name: Check if Python/Go project
         id: check-python-go
         run: |
-          if [ -f "${COMPONENT_DIR}/setup.py" ] || [ -f "${COMPONENT_DIR}/pyproject.toml" ]; then
+          if [ -f "${COMPONENT_DIR}/setup.py" ] || [ -f "${COMPONENT_DIR}/pyproject.toml" ] || [ -f "${COMPONENT_DIR}/.python" ]; then
             echo "BUILDER_IMAGE=${REGISTRY}/${PYTHON_BUILDER_IMAGE}" >> $GITHUB_ENV
-          elif [ -f "${COMPONENT_DIR}/go.mod" ]; then
+          elif [ -f "${COMPONENT_DIR}/go.mod" ] || [ -f "${COMPONENT_DIR}/.go" ]; then
             echo "BUILDER_IMAGE=${REGISTRY}/${GO_BUILDER_IMAGE}" >> $GITHUB_ENV
           else
             echo "BUILDER_IMAGE=builder_image_not_set" >> $GITHUB_ENV
