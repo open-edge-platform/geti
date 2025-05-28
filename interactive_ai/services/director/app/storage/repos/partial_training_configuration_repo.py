@@ -3,12 +3,12 @@
 
 from collections.abc import Callable
 
-from geti_configuration_tools.training_configuration import NullTrainingConfiguration, TrainingConfiguration
+from geti_configuration_tools.training_configuration import NullTrainingConfiguration, PartialTrainingConfiguration
 from pymongo import DESCENDING, IndexModel
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
-from storage.mappers.training_configuration_mapper import TrainingConfigurationToMongo
+from storage.mappers.partial_training_configuration_mapper import PartialTrainingConfigurationToMongo
 
 from geti_types import ID, ProjectIdentifier, Session
 from iai_core.repos.base import ProjectBasedSessionRepo
@@ -16,7 +16,7 @@ from iai_core.repos.mappers import IDToMongo
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
 
 
-class TrainingConfigurationRepo(ProjectBasedSessionRepo[TrainingConfiguration]):
+class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingConfiguration]):
     """
     Repository to persist TrainingConfiguration entities in the database.
 
@@ -41,12 +41,12 @@ class TrainingConfigurationRepo(ProjectBasedSessionRepo[TrainingConfiguration]):
         return super_indexes + new_indexes
 
     @property
-    def forward_map(self) -> Callable[[TrainingConfiguration], dict]:
-        return TrainingConfigurationToMongo.forward
+    def forward_map(self) -> Callable[[PartialTrainingConfiguration], dict]:
+        return PartialTrainingConfigurationToMongo.forward
 
     @property
-    def backward_map(self) -> Callable[[dict], TrainingConfiguration]:
-        return TrainingConfigurationToMongo.backward
+    def backward_map(self) -> Callable[[dict], PartialTrainingConfiguration]:
+        return PartialTrainingConfigurationToMongo.backward
 
     @property
     def null_object(self) -> NullTrainingConfiguration:
@@ -55,20 +55,21 @@ class TrainingConfigurationRepo(ProjectBasedSessionRepo[TrainingConfiguration]):
     @property
     def cursor_wrapper(self) -> Callable[[Cursor | CommandCursor], CursorIterator]:
         return lambda mongo_cursor: CursorIterator(
-            cursor=mongo_cursor, mapper=TrainingConfigurationToMongo, parameter=None
+            cursor=mongo_cursor, mapper=PartialTrainingConfigurationToMongo, parameter=None
         )
 
-    def get_by_task_id(self, task_id: ID) -> TrainingConfiguration:
+    def get_task_only_configuration(self, task_id: ID) -> PartialTrainingConfiguration:
         """
-        Get a TrainingConfiguration by task ID.
+        Get a partial training configuration that is only applied to the specified task ID.
+        This returns task-level configuration that does not have an associated model manifest ID.
 
         :param task_id: The task ID to search for.
-        :return: The TrainingConfiguration object if found, otherwise NullTrainingConfiguration.
+        :return: A partial training configuration object if found, otherwise NullTrainingConfiguration.
         """
-        task_filter = {"task_id": IDToMongo.forward(instance=task_id)}
+        task_filter = {"task_id": IDToMongo.forward(instance=task_id), "model_manifest_id": {"$exists": False}}
         return self.get_one(extra_filter=task_filter)
 
-    def get_by_model_manifest_id(self, model_manifest_id: ID) -> TrainingConfiguration:
+    def get_by_model_manifest_id(self, model_manifest_id: str) -> PartialTrainingConfiguration:
         """
         Get a TrainingConfiguration by model manifest ID.
 
