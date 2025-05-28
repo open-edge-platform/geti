@@ -2,21 +2,28 @@ include ../../../../Makefile.shared-workflows
 
 .PHONY: build-image
 
-IMAGE_NAME := otx2-intel
+COMPONENT_NAME := otx2-intel
 
 DOCKER_BUILD_CONTEXT := --build-context libs=../../../../../../libs
 
 build-image: install_common_libs
-	@echo "Building docker image for component: ${IMAGE_NAME}"
+	@echo "Building docker image for component: ${COMPONENT_NAME}"
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
-		-t ${IMAGES_REGISTRY}/${IMAGE_NAME}:${TAG} \
-		-f ./Dockerfile .
+		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
+		-f ./Dockerfile ..
 
-push-image:
-	@echo "Pushing docker image for component: ${IMAGE_NAME}"
-	@docker push ${IMAGES_REGISTRY}/${IMAGE_NAME}:${TAG}
+ruff: venv
+	uv run ruff check .. --config ../pyproject.toml
+	uv run ruff format --check .. --config ../pyproject.toml
+
+mypy: venv
+	uv run mypy .. --config-file=../pyproject.toml
+
+style-fix: venv
+	uv run ruff check .. --config ../pyproject.toml --fix
+	uv run ruff format .. --config ../pyproject.toml
 
 # TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
 test-unit: venv
