@@ -10,7 +10,7 @@ require (
 	geti.com/account_service_grpc v1.0.0
 	github.com/coocood/freecache v1.2.4
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/zap v1.27.0
 	golang.org/x/exp v0.0.0-20240904232852-e7e105dedf7e
