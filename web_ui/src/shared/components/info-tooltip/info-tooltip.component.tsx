@@ -6,7 +6,7 @@ import { CSSProperties, ReactNode } from 'react';
 import { Content, ContextualHelp, Text } from '@geti/ui';
 
 interface InfoTooltipProps {
-    id: string;
+    id?: string;
     tooltipText: ReactNode;
     iconColor?: string | undefined;
     className?: string;

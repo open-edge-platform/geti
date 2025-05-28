@@ -8,6 +8,7 @@ import { ObjectsPerLabelInterface } from '../../../../../core/statistics/dtos/da
 import { CardContent } from '../../../../../shared/components/card-content/card-content.component';
 import { Colors } from '../../../../../shared/components/charts/chart.interface';
 import { FullscreenAction } from '../../../../../shared/components/fullscreen-action/fullscreen-action.component';
+import { InfoTooltip } from '../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { ProjectGridArea } from '../project-grid-area.interface';
 import { AnnotationObjectsBarHorizontalChart } from './annotations-objects-bar-horizontal-chart/annotations-objects-bar-horizontal-chart.component';
 import { formatToChartData, getColors, reorderObjectsLabels } from './utils';
@@ -15,6 +16,17 @@ import { formatToChartData, getColors, reorderObjectsLabels } from './utils';
 interface ProjectAnnotationsObjectsProps extends ProjectGridArea {
     objectsPerLabel: ObjectsPerLabelInterface[];
 }
+
+const ActionTooltip = () => {
+    return (
+        <InfoTooltip
+            tooltipText={
+                "Click on a bar to view datasets filtered by this label. You'll be redirected to a page showing only " +
+                'media items tagged with the selected label.'
+            }
+        />
+    );
+};
 
 export const ProjectAnnotationsObjects = ({
     objectsPerLabel,
@@ -32,6 +44,7 @@ export const ProjectAnnotationsObjects = ({
                 isDownloadable
                 downloadableData={{ type: 'barChart', data }}
                 title={title}
+                titleActions={<ActionTooltip />}
                 actions={
                     <FullscreenAction
                         isDownloadable
@@ -54,7 +67,6 @@ export const ProjectAnnotationsObjects = ({
                         />
                     </ResponsiveContainer>
                 </Flex>
-                x
             </CardContent>
         </div>
     );
