@@ -1,0 +1,91 @@
+name: 📝 General Issue
+description: Report a bug, request a feature, or suggest an enhancement
+title: "[<type>] <short description>"
+labels: []
+assignees: []
+
+body:
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: 🧩 Issue type
+      description: What type of issue is this?
+      options:
+        - Bug 🐞
+        - Feature Request ✨
+        - Documentation 📚
+        - Other❓
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 📄 Description
+      description: Provide a clear and concise description of the issue.
+      placeholder: "Describe the bug, feature, or question..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: 📋 Steps to reproduce (if applicable)
+      description: For bugs, explain how to reproduce the issue step-by-step.
+      placeholder: |
+        1. Go to '...'
+        2. Run '...'
+        3. Observe '...'
+  
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: 💻 Expected behavior
+      description: What did you expect to happen instead?
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 🖼️ Screenshots, video recordings or logs
+      description: Upload screenshots, logs, or recordings that help explaining the issue.
+      placeholder: "Drag and drop files, or paste logs here..."
+
+  - type: input
+    id: version
+    attributes:
+      label: 📦 Geti version
+      description: Version of the application (e.g. `2.10.0`, commit hash, or branch name)
+      placeholder: "2.10.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: 🖥️ Operating System
+      placeholder: "e.g. Windows 11, Ubuntu 22.04"
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser (if applicable)
+      placeholder: "e.g. Chrome, version 136.0.7103.114"
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version (if relevant)
+      placeholder: "e.g. 3.10"
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware
+      placeholder: "e.g. Intel CPU, GPU, RAM"
+
+  - type: textarea
+    id: context
+    attributes:
+      label: ➕ Additional context
+      description: Add any other relevant information or workarounds.
+      placeholder: "Any extra notes, configs, links..."
