@@ -78,7 +78,7 @@ scheduler:
     limits:
       memory: 100Mi
 
-  standardeResources:
+  standardResources:
     requests:
       cpu: 300m
       memory: 500Mi
