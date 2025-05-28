@@ -11,6 +11,7 @@ build-image: install_common_libs
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
+		--label "org.opencontainers.image.description=GPU trainer for Geti" \
 		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
 		-f ./Dockerfile ..
 
