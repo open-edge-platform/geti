@@ -1,0 +1,150 @@
+# Copyright 2021 IBM Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-modelmesh-controller
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    secret.reloader.stakater.com/reload: "{{ .Values.certificate.secret_name }},model-serving-etcd"
+  labels:
+    {{- include "modelmesh-serving.labels" . | nindent 4 }}
+    control-plane: modelmesh-controller
+spec:
+  selector:
+    matchLabels:
+      control-plane: modelmesh-controller
+  replicas: {{ .Values.replicaCount }} # This can be increased safely to enable HA. A good value to set is 3.
+  template:
+    metadata:
+      labels:
+        control-plane: modelmesh-controller
+      annotations:
+        # Exclude because Kubernetes API server does not support Istio mTLS for webhooks
+        traffic.sidecar.istio.io/excludeInboundPorts: "9443"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: control-plane
+                      operator: In
+                      values:
+                        - modelmesh-controller
+                topologyKey: topology.kubernetes.io/zone
+      initContainers:
+        - name: update-etcd-secret
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: ETCD_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-etcd
+                  key: etcd-root-password
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              echo -n "\
+                {\
+                  \"endpoints\": \"${POD_NAMESPACE}-etcd.${POD_NAMESPACE}.svc.cluster.local:2379\",\
+                  \"userid\": \"root\",\
+                  \"password\": \"${ETCD_ROOT_PASSWORD}\",\
+                  \"root_prefix\": \"modelmesh-etcd\"\
+                }\
+              " |
+              base64 --wrap=0 - |
+              { read output; kubectl -n ${POD_NAMESPACE} patch secret model-serving-etcd -p="{\"data\":{\"etcd_connection\": \"$output\"}}"; }
+        - name: wait-for-etcd
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          command: ['sh', '-c', 'until nc -w 5 -z {{ .Release.Namespace }}-etcd 2379; do echo wait...; sleep 2; done;']
+          resources:
+              requests:
+                cpu: 50m
+                memory: 100Mi
+              limits:
+                memory: 100Mi
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      containers:
+        - command:
+            - /manager
+          # args:
+          #   - --enable-leader-election
+          image: "{{ .Values.controller.image.registry }}/{{ if .Values.controller.image.repository }}{{ .Values.controller.image.repository }}/{{ end }}{{ .Values.controller.image.name }}"
+          name: manager
+          ports:
+            - containerPort: 9443
+              name: webhook
+              protocol: TCP
+          env:
+            - name: NAMESPACE_SCOPE
+              value: "true"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: ETCD_SECRET_NAME
+              value: "model-serving-etcd"
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          resources:
+{{ toYaml .Values.controllerResources | indent 13 }}
+          volumeMounts:
+            - mountPath: /etc/model-serving/config/default
+              name: config-defaults
+              readOnly: true
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: {{ .Values.certificate.secret_name }}
+              readOnly: true
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      terminationGracePeriodSeconds: 10
+      serviceAccountName: modelmesh-controller
+      volumes:
+        - name: config-defaults
+          configMap:
+            defaultMode: 420
+            name: model-serving-config-defaults
+        - name: {{ .Values.certificate.secret_name }}
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.certificate.secret_name }}

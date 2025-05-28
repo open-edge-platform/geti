@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-logging-config
+  namespace: {{ include "flyteworkflow.namespace" . }}
+data:
+  # The general telemetry retention period, expressed in days.
+  retention: "{{ .Values.global.telemetry_retention_geti }}"
+  # The k8s telemetry retention period, expressed in days.
+  # Takes precedence over the general telemetry period, with respect to k8s telemetry data.
+  retention_k8s: "{{ .Values.global.telemetry_retention_k8s }}"
+  # Telemetry backup forced cleanup threshold extra size, added on top of min_free_disk_space_gib, expressed in GiB.
+  # Total forced cleanup threshold is the sum of min_free_disk_space_gib and this value.
+  telemetry_cleanup_threshold_extra_gib: "10"
+  # Telemetry backup forced cleanup limit, expressed as number of total hours.
+  # Unconditionally protects the last x hours from deletion on forced cleanup.
+  telemetry_cleanup_limit_hours: "24"
+  LOG_LEVEL: {{ .Values.log_level }}
+  logging_config.json: |
+    {"LOG_LEVEL" : "{{ .Values.log_level }}"}

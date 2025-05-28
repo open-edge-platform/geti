@@ -1,0 +1,100 @@
+feature_flags_data:
+  FEATURE_FLAG_ALLOW_EXTERNAL_KEY_PROJECT_IMPORT: "true"
+  FEATURE_FLAG_AMBIENT_MESH: "false"
+  FEATURE_FLAG_ANALYTICS_WORKFLOW_ID: "true"
+  FEATURE_FLAG_ANOMALY_REDUCTION: "true"
+  FEATURE_FLAG_CAMERA_VIDEO_UPLOAD: "false"
+  FEATURE_FLAG_CLASSIFICATION_RANGES: "true"
+  FEATURE_FLAG_CREDIT_SYSTEM: "false"
+  FEATURE_FLAG_DECORD_VIDEO_DECODER: "false"
+  FEATURE_FLAG_KEYPOINT_DETECTION: "false"
+  FEATURE_FLAG_KEYPOINT_DETECTION_DATASET_IE: "false"
+  FEATURE_FLAG_MAINTENANCE_BANNER: "false"
+  FEATURE_FLAG_OBJECT_STORAGE_OP: "true"
+  FEATURE_FLAG_OFFLINE_INSTALLATION: "true"
+  FEATURE_FLAG_OIDC_CIDAAS: "false"
+  FEATURE_FLAG_ORG_QUOTAS: "false"
+  FEATURE_FLAG_OTX_VERSION_SELECTION: "true"
+  FEATURE_FLAG_OVMS_DEPLOYMENT_PACKAGE: "true"
+  FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK: "true"
+  FEATURE_FLAG_MANAGE_USERS: "false"
+  FEATURE_FLAG_MANAGE_USERS_ROLES: "true"
+  FEATURE_FLAG_ACC_SVC_MOD: "false"
+  FEATURE_FLAG_STORAGE_SIZE_COMPUTATION: "true"
+  FEATURE_FLAG_SUPPORT_CORS: "false"
+  FEATURE_FLAG_UPLOAD_OTE_WEIGHTS: "true"
+  FEATURE_FLAG_USER_ONBOARDING: "false"
+  FEATURE_FLAG_VISUAL_PROMPT_SERVICE: "true"
+  FEATURE_FLAG_WORKSPACE_ACTIONS: "false"
+  FEATURE_FLAG_REQ_ACCESS: "false"
+  FEATURE_FLAG_RETAIN_TRAINING_ARTIFACTS: "false"
+  FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING: "false"
+
+main_namespace: impt
+flyte_workflows:
+  name: "jobs"
+  domain: "production"
+
+log_level: INFO
+
+cert:
+  name: signing-ie-certificate
+  secretName: signing-ie-certificate
+  algorithm: ECDSA
+  size: 384
+  duration: 4380h0m0s
+  renewBefore: 24h0m0s
+  ca_name: ca-issuer
+
+global:
+  telemetry_retention_geti: 30
+  telemetry_retention_k8s: 10
+  min_image_size: 32
+  max_image_size: 20000
+  min_video_size: 32
+  max_video_width: 7680
+  max_video_height: 4320
+  max_video_length: 10800
+  project_ie_key_source: "cert-manager"
+  overwrite_resources_cpu_limits: "100"
+  num_models_to_keep_in_storage: "-1"
+  proxy_enabled: false
+  http_proxy: ""
+  https_proxy: ""
+  no_proxy: ""
+
+spicedb:
+  fullname: impt-spice-db
+  # To meet Intel crypto compliance,
+  # use ECDSA P-521 for the CA and P-384 for the leafs.
+  # use 5y for the CA and 1y for the leafs.
+  tls:
+    algorithm: ECDSA
+    ca:
+      name: ca-issuer
+    leaf:
+      size: 384
+      duration: 4380h0m0s
+      renewBefore: 24h0m0s
+
+training:
+  default_trainer_image_name: "impp/otx2-training"
+  default_trainer_version: "2.2.0"
+  mlflow_sidecar_image_name: "impp/mlflow-geti-store"
+
+bucket_name_compileddatasetshards: compileddatasetshards
+bucket_name_images: images
+bucket_name_models: models
+bucket_name_resultmedia: resultmedia
+bucket_name_tensors: tensors
+bucket_name_thumbnails: thumbnails
+bucket_name_videos: videos
+bucket_name_codedeployments: codedeployments
+bucket_name_temporaryfiles: temporaryfiles
+bucket_name_modelmesh: modelmesh
+bucket_name_mlflowexperiments: mlflowexperiments
+bucket_name_pretrainedweights: pretrainedweights
+
+flyteNamespaceTemplate:
+  # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
+  enabled: true
