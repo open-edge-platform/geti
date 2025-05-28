@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { AuthProvider, useAuth } from 'react-oidc-context';
 import { MemoryRouter as Router } from 'react-router-dom';
@@ -60,9 +61,9 @@ describe('Error screens', () => {
         it('goes back to home screen route correctly', () => {
             render(<ErrorScreen resetErrorBoundary={jest.fn()} errorMessage={'Something went wrong...'} />);
 
-            const goBackHomeButton = screen.getByRole('link', { name: 'Go back to home' });
+            const goBackHomeLink = screen.getByRole('link', { name: 'Go back to home' });
 
-            fireEvent.click(goBackHomeButton);
+            fireEvent.click(goBackHomeLink);
 
             expect(mockRedirectTo).toHaveBeenCalledWith('/');
         });
@@ -79,11 +80,11 @@ describe('Error screens', () => {
             const handleReset = jest.fn();
             render(<ResourceNotFound onReset={handleReset} />);
 
-            const refreshButton = screen.getByRole('button', { name: 'Refresh' });
+            const goBackHomeButton = screen.getByRole('button', { name: /Go back to home/ });
 
-            fireEvent.click(refreshButton);
+            fireEvent.click(goBackHomeButton);
 
-            expect(mockRedirectTo).toHaveBeenCalledWith(window.location.href);
+            expect(mockRedirectTo).toHaveBeenCalledWith(paths.root({}));
             expect(handleReset).toHaveBeenCalled();
         });
     });
