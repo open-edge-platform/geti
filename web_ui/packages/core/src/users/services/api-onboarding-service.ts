@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { apiClient } from '@geti/core';
 import { isAxiosError } from 'axios';
 
-import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
-import { API_URLS } from '../../../../packages/core/src/services/urls';
-import { is404Error } from '../../../../packages/core/src/services/utils';
-import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
+import { AccountStatusDTO } from '../../../../../src/core/organizations/dtos/organizations.interface';
+import { apiClient } from '../../client/axios-instance';
+import { CreateApiService } from '../../services/create-api-service.interface';
+import { API_URLS } from '../../services/urls';
+import { is404Error } from '../../services/utils';
 import { GenerateTokenDTO } from '../dtos/onboarding.interface';
 import { OnboardingService } from './onboarding-service.interface';
 import { USER_STATUS_MAPPING } from './utils';

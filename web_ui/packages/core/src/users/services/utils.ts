@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AccountStatusDTO } from '../../organizations/dtos/organizations.interface';
-import { AccountStatus } from '../../organizations/organizations.interface';
+import { AccountStatusDTO } from '../../../../../src/core/organizations/dtos/organizations.interface';
+import { AccountStatus } from '../../../../../src/core/organizations/organizations.interface';
 import {
     getApplicationAdminRole,
     ORGANIZATION_STATUS_MAPPER,
     ORGANIZATION_STATUS_MAPPER_DTO,
-} from '../../organizations/services/utils';
+} from '../../../../../src/core/organizations/services/utils';
 import {
     MemberRole,
     RESOURCE_TYPE,

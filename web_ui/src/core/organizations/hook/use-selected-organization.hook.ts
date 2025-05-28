@@ -3,6 +3,8 @@
 
 import { useEffect, useRef } from 'react';
 
+import { useOnboardUserMutation } from '@geti/core/src/users/hook/use-onboard-user-mutation.hook';
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
 import { isNil } from 'lodash-es';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -16,8 +18,6 @@ import { hasEqualId } from '../../../shared/utils';
 import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../user-settings/utils';
-import { useOnboardUserMutation } from '../../users/hook/use-onboard-user-mutation.hook';
-import { useProfileQuery } from '../../users/hook/use-profile.hook';
 
 const removeLastForwardSlash = (text: string) => text.replace(/\/$/, '');
 

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { getMockedLabel, labels as mockedLabels } from '../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedProject } from '../../../test-utils/mocked-items-factory/mocked-project';
 import {
@@ -9,7 +10,6 @@ import {
 } from '../../configurable-parameters/dtos/configurable-parameters.interface';
 import { JobState, JobStepState, JobType } from '../../jobs/jobs.const';
 import { JobExportStatus, JobStatusIdentifier } from '../../jobs/jobs.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { DOMAIN, ProjectIdentifier } from '../core.interface';
 import {
     CreateDatasetBody,

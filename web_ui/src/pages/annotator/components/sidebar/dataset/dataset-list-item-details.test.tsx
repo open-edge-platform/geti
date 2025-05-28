@@ -17,7 +17,7 @@ import { formatUploadTime } from './utils';
 
 const MOCKED_USER = getMockedUser();
 
-jest.mock('../../../../../core/users/hook/use-users.hook', () => ({
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
     useUsers: jest.fn(() => ({
         useGetUserQuery: () => ({
             data: MOCKED_USER,

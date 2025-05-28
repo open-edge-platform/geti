@@ -30,9 +30,9 @@ import { StatusService } from '../../../../src/core/status/services/status-servi
 import { SupportedAlgorithmsService } from '../../../../src/core/supported-algorithms/services/supported-algorithms.interface';
 import { TestsService } from '../../../../src/core/tests/services/tests-service.interface';
 import { UserSettingsService } from '../../../../src/core/user-settings/services/user-settings.interface';
-import { OnboardingService } from '../../../../src/core/users/services/onboarding-service.interface';
-import { UsersService } from '../../../../src/core/users/services/users-service.interface';
-import { WorkspacesService } from '../../../../src/core/workspaces/services/workspaces-service.interface';
+import { OnboardingService } from '../users/services/onboarding-service.interface';
+import { UsersService } from '../users/services/users-service.interface';
+import { WorkspacesService } from '../workspaces/services/workspaces-service.interface';
 import { API_URLS } from './urls';
 
 export interface ApplicationServices {

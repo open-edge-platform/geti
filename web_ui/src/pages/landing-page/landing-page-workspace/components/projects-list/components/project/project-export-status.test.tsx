@@ -3,13 +3,13 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import { JobState, JobStepState } from '../../../../../../../core/jobs/jobs.const';
 import { JobProjectExportStatus } from '../../../../../../../core/jobs/jobs.interface';
 import { createInMemoryJobsService } from '../../../../../../../core/jobs/services/in-memory-jobs-service';
 import { createInMemoryProjectService } from '../../../../../../../core/projects/services/in-memory-project-service';
-import { WorkspaceIdentifier } from '../../../../../../../core/workspaces/services/workspaces.interface';
 import * as sharedUtils from '../../../../../../../shared/utils';
 import { getDownloadNotificationMessage } from '../../../../../../../shared/utils';
 import { getMockedProjectExportJob } from '../../../../../../../test-utils/mocked-items-factory/mocked-jobs';

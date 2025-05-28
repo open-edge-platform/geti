@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AccountStatus } from '../../organizations/organizations.interface';
+import { AccountStatus } from '../../../../../src/core/organizations/organizations.interface';
 
 export interface OrganizationMetadata {
     id: string;

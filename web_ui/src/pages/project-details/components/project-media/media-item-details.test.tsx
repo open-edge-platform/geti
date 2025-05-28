@@ -5,9 +5,9 @@ import '@wessberg/pointer-events';
 
 import { ReactElement } from 'react';
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { screen } from '@testing-library/react';
 
-import { createInMemoryUsersService } from '../../../../core/users/services/in-memory-users-service';
 import { getMockedVideoMediaItem } from '../../../../test-utils/mocked-items-factory/mocked-media';
 import { getMockedUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
 import { projectRender } from '../../../../test-utils/project-provider-render';

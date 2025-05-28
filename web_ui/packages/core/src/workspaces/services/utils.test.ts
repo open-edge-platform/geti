@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getMockedWorkspace } from '../../../test-utils/mocked-items-factory/mocked-workspace';
+import { getMockedWorkspace } from '../../../../../src/test-utils/mocked-items-factory/mocked-workspace';
 import { WorkspacesResponseDTO } from '../dtos/workspace.interface';
 import { getWorkspaceEntity, getWorkspaceEntityDTO, getWorkspacesEntity } from './utils';
 

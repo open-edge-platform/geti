@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { ExportDatasetStatusDTO } from '../../configurable-parameters/dtos/configurable-parameters.interface';
 import { JobExportStatus, JobProjectExportStatus, JobStatusIdentifier } from '../../jobs/jobs.interface';
 import { NextPageURL } from '../../shared/infinite-query.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { DOMAIN, ProjectIdentifier } from '../core.interface';
 import {
     CreateDatasetBody,

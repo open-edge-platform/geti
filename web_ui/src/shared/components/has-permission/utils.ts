@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RESOURCE_TYPE, USER_ROLE } from '../../../core/users/users.interface';
+import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
+
 import { OPERATION, OperationPermission } from './has-permission.interface';
 
 const ORGANIZATION_ADMIN_PERMISSION = {

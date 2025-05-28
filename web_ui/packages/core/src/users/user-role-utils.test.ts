@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getMockedWorkspaceIdentifier } from '../../test-utils/mocked-items-factory/mocked-identifiers';
+import { getMockedWorkspaceIdentifier } from '../../../../src/test-utils/mocked-items-factory/mocked-identifiers';
 import {
     getMockedAdminUser,
     getMockedOrganizationAdminUser,
     getMockedUser,
-} from '../../test-utils/mocked-items-factory/mocked-users';
+} from '../../../../src/test-utils/mocked-items-factory/mocked-users';
 import { isOrganizationAdmin, isWorkspaceAdmin, isWorkspaceContributor } from './user-role-utils';
 import { RESOURCE_TYPE, USER_ROLE } from './users.interface';
 

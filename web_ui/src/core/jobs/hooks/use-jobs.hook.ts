@@ -16,12 +16,12 @@ import { AxiosError } from 'axios';
 
 import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { getErrorMessage } from '../../../../packages/core/src/services/utils';
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { Task } from '../../projects/task.interface';
 import { NextPageURL } from '../../shared/infinite-query.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { JobState, JobType } from '../jobs.const';
 import { JobsQueryParams, JobsResponse, JobsService } from '../services/jobs-service.interface';
 import { hasJobForCurrentTask, NORMAL_INTERVAL, useInvalidateBalanceOnNewJob } from './utils';

@@ -3,6 +3,8 @@
 
 import { Key, useCallback, useMemo } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { RESOURCE_TYPE, User } from '@geti/core/src/users/users.interface';
 import { InfiniteQueryObserverResult } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
@@ -10,8 +12,6 @@ import { JobType } from '../../../../../core/jobs/jobs.const';
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
 import { ProjectSortingOptions } from '../../../../../core/projects/services/project-service.interface';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
-import { RESOURCE_TYPE, User } from '../../../../../core/users/users.interface';
 import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { isNonEmptyArray } from '../../../../utils';
 import { JobsFilterField } from '../jobs-filter-field.component';

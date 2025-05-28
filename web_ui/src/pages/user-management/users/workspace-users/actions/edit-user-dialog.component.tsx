@@ -3,12 +3,8 @@
 
 import { FC, FormEvent, useState } from 'react';
 
-import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@geti/ui';
-import { isEmpty, isEqual } from 'lodash-es';
-
-import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
-import { getRoleCreationPayload, getRoleDeletionPayload } from '../../../../../core/users/services/utils';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { getRoleCreationPayload, getRoleDeletionPayload } from '@geti/core/src/users/services/utils';
 import {
     RESOURCE_TYPE,
     RoleResource,
@@ -16,8 +12,12 @@ import {
     User,
     USER_ROLE,
     WorkspaceRole,
-} from '../../../../../core/users/users.interface';
-import { WorkspaceEntity, WorkspaceIdentifier } from '../../../../../core/workspaces/services/workspaces.interface';
+} from '@geti/core/src/users/users.interface';
+import { WorkspaceEntity, WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Form, Heading, TextField } from '@geti/ui';
+import { isEmpty, isEqual } from 'lodash-es';
+
+import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useWorkspaces } from '../../../../../providers/workspaces-provider/workspaces-provider.component';
 import { RolePicker } from '../../old-project-users/role-picker.component';
 import { getAvailableRoles } from './roles-validation';

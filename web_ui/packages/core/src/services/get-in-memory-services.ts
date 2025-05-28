@@ -28,9 +28,9 @@ import { createInMemoryStatusService } from '../../../../src/core/status/service
 import { createInMemorySupportedAlgorithmsService } from '../../../../src/core/supported-algorithms/services/in-memory-supported-algorithms-service';
 import { createInMemoryTestsService } from '../../../../src/core/tests/services/in-memory-tests-service';
 import { createInMemoryUserSettingsService } from '../../../../src/core/user-settings/services/in-memory-user-settings-service';
-import { createInMemoryUsersService } from '../../../../src/core/users/services/in-memory-users-service';
-import { createInMemoryOnboardingService } from '../../../../src/core/users/services/inmemory-onboarding-service';
-import { createInMemoryApiWorkspacesService } from '../../../../src/core/workspaces/services/in-memory-api-workspaces-service';
+import { createInMemoryUsersService } from '../users/services/in-memory-users-service';
+import { createInMemoryOnboardingService } from '../users/services/inmemory-onboarding-service';
+import { createInMemoryApiWorkspacesService } from '../workspaces/services/in-memory-api-workspaces-service';
 import { ApplicationServices, ServiceConfiguration } from './application-services.interface';
 
 export const getInMemoryServices = (serviceConfiguration: ServiceConfiguration): ApplicationServices => {

@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { screen } from '@testing-library/react';
 
 import { createInMemoryPlatformUtilsService } from '../../../core/platform-utils/services/create-in-memory-platform-utils-service';
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { applicationRender as render } from '../../../test-utils/application-provider-render';
 import { getMockedProductInfo } from '../../../test-utils/mocked-items-factory/mocked-product-info';

@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { USER_ROLE } from '@geti/core/src/users/users.interface';
+
 import { AccountStatus } from '../../../core/organizations/organizations.interface';
-import { USER_ROLE } from '../../../core/users/users.interface';
 
 export interface Membership {
     id: string;

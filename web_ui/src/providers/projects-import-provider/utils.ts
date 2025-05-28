@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { WorkspaceIdentifier } from '../../core/workspaces/services/workspaces.interface';
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
+
 import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
 import { getParsedLocalStorage, isNonEmptyString, setParsedLocalStorage } from '../../shared/utils';
 import {
