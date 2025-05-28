@@ -21,6 +21,7 @@ describe('Project service utils', () => {
                 parent_id: 'parentId-test',
                 is_empty: false,
                 is_anomalous: false,
+                is_background: false,
             });
             expect(newLabel.behaviour).toBe(LABEL_BEHAVIOUR.LOCAL);
         });
@@ -36,6 +37,7 @@ describe('Project service utils', () => {
                     group: 'group 1',
                     is_anomalous: false,
                     is_empty: false,
+                    is_background: false,
                     parent_id: 'label-1',
                 },
                 {
@@ -45,6 +47,7 @@ describe('Project service utils', () => {
                     group: 'group 1',
                     is_anomalous: false,
                     is_empty: false,
+                    is_background: false,
                     parent_id: null,
                 },
                 {
@@ -54,6 +57,7 @@ describe('Project service utils', () => {
                     group: 'group 1',
                     is_anomalous: false,
                     is_empty: false,
+                    is_background: false,
                     parent_id: 'label-3',
                 },
                 {
@@ -63,6 +67,7 @@ describe('Project service utils', () => {
                     group: 'group 1',
                     is_anomalous: false,
                     is_empty: false,
+                    is_background: false,
                     parent_id: 'label-1',
                 },
             ]);
@@ -116,6 +121,7 @@ describe('Project service utils', () => {
                 group: 'group 1',
                 is_anomalous: false,
                 is_empty: false,
+                is_background: false,
                 parent_id: 'label-1',
             };
 

@@ -38,6 +38,7 @@ const GROUP_A_PARENT_A: Label = {
     hotkey: '',
     behaviour: 4,
     isEmpty: false,
+    isBackground: false,
 };
 const GROUP_A_A_CHILD_A: Label = {
     id: '66f401707118b7a8abd3be5a',
@@ -48,6 +49,7 @@ const GROUP_A_A_CHILD_A: Label = {
     hotkey: '',
     behaviour: 4,
     isEmpty: false,
+    isBackground: false,
 };
 
 const GROUP_A_PARENT_B: Label = {
@@ -59,6 +61,7 @@ const GROUP_A_PARENT_B: Label = {
     hotkey: '',
     behaviour: 4,
     isEmpty: false,
+    isBackground: false,
 };
 const GROUP_A_B_CHILD_A: Label = {
     id: '66f401707118b7a8abd3be5d',
@@ -69,6 +72,7 @@ const GROUP_A_B_CHILD_A: Label = {
     hotkey: '',
     behaviour: 4,
     isEmpty: false,
+    isBackground: false,
 };
 
 const GROUP_B: Label = {
@@ -80,6 +84,7 @@ const GROUP_B: Label = {
     hotkey: '',
     behaviour: 4,
     isEmpty: false,
+    isBackground: false,
 };
 
 const HIERARCHICAL_LABELS: Label[] = [GROUP_A_PARENT_A, GROUP_A_A_CHILD_A, GROUP_A_PARENT_B, GROUP_B];

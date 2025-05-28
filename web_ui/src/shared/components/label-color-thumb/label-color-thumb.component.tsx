@@ -4,14 +4,14 @@
 import { ColorThumb, type ColorThumbProps } from '@geti/ui';
 
 import { Label } from '../../../core/labels/label.interface';
-import { isEmptyLabel } from '../../../core/labels/utils';
+import { isEmptyOrBackgroundLabel } from '../../../core/labels/utils';
 
 interface LabelColorThumbProps extends Omit<ColorThumbProps, 'color'> {
     label: Label;
 }
 
 export const LabelColorThumb = ({ label, ...rest }: LabelColorThumbProps): JSX.Element => {
-    if (isEmptyLabel(label)) {
+    if (isEmptyOrBackgroundLabel(label)) {
         return <></>;
     }
 
