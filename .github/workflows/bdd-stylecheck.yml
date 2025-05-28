@@ -26,7 +26,7 @@ jobs:
           persist-credentials: false
 
       - name: Install uv
-        uses: astral-sh/setup-uv@f3121ef80ee2c4902cefcba4d30c2d17aa8baea7
+        uses: astral-sh/setup-uv@c19c1b1ffd920a6c8a8a88ebbe7bf2e5f509eb0c
 
       - name: Setup Java
         uses: actions/setup-java@v4
