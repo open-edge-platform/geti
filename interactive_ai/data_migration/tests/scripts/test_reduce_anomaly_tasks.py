@@ -19,7 +19,7 @@ PROJECT_ID = ObjectId("66a0faf070cdf6d0b2ec5f93")
 
 @pytest.fixture
 def fxt_project() -> dict:
-    yield {
+    return {
         "organization_id": ORGANIZATION_ID,
         "workspace_id": WORKSPACE_ID,
         "_id": PROJECT_ID,
@@ -43,7 +43,7 @@ def fxt_anomaly_classification_project(fxt_project) -> dict:
     anomaly_classification_project = deepcopy(fxt_project)
     anomaly_classification_project["project_type"] = "ANOMALY_CLASSIFICATION"
     anomaly_classification_project["task_graph"]["pipeline_representation"] = "Dataset → Anomaly classification"
-    yield anomaly_classification_project
+    return anomaly_classification_project
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ def fxt_anomaly_detection_project(fxt_project) -> dict:
     anomaly_detection_project = deepcopy(fxt_project)
     anomaly_detection_project["project_type"] = "ANOMALY_DETECTION"
     anomaly_detection_project["task_graph"]["pipeline_representation"] = "Dataset → Anomaly detection"
-    yield anomaly_detection_project
+    return anomaly_detection_project
 
 
 @pytest.fixture
@@ -59,12 +59,12 @@ def fxt_anomaly_segmentation_project(fxt_project) -> dict:
     anomaly_segmentation_project = deepcopy(fxt_project)
     anomaly_segmentation_project["project_type"] = "ANOMALY_SEGMENTATION"
     anomaly_segmentation_project["task_graph"]["pipeline_representation"] = "Dataset → Anomaly segmentation"
-    yield anomaly_segmentation_project
+    return anomaly_segmentation_project
 
 
 @pytest.fixture
 def fxt_label() -> dict:
-    yield {
+    return {
         "domain": "UNDEFINED",
         "is_anomalous": True,
         "organization_id": ORGANIZATION_ID,
@@ -77,26 +77,26 @@ def fxt_label() -> dict:
 def fxt_anomaly_classification_label(fxt_label) -> dict:
     anomaly_classification_label = deepcopy(fxt_label)
     anomaly_classification_label["domain"] = "ANOMALY_CLASSIFICATION"
-    yield anomaly_classification_label
+    return anomaly_classification_label
 
 
 @pytest.fixture
 def fxt_anomaly_detection_label(fxt_label) -> dict:
     anomaly_detection_label = deepcopy(fxt_label)
     anomaly_detection_label["domain"] = "ANOMALY_DETECTION"
-    yield anomaly_detection_label
+    return anomaly_detection_label
 
 
 @pytest.fixture
 def fxt_anomaly_segmentation_label(fxt_label) -> dict:
     anomaly_segmentation_label = deepcopy(fxt_label)
     anomaly_segmentation_label["domain"] = "ANOMALY_SEGMENTATION"
-    yield anomaly_segmentation_label
+    return anomaly_segmentation_label
 
 
 @pytest.fixture
 def fxt_task_node() -> dict:
-    yield {
+    return {
         "workspace_id": WORKSPACE_ID,
         "organization_id": ORGANIZATION_ID,
         "project_id": PROJECT_ID,
@@ -110,7 +110,7 @@ def fxt_anomaly_classification_task_node(fxt_task_node) -> dict:
     anomaly_classification_task_node = deepcopy(fxt_task_node)
     anomaly_classification_task_node["task_type"] = "ANOMALY_CLASSIFICATION"
     anomaly_classification_task_node["task_title"] = "Anomaly classification"
-    yield anomaly_classification_task_node
+    return anomaly_classification_task_node
 
 
 @pytest.fixture
@@ -118,7 +118,7 @@ def fxt_anomaly_detection_task_node(fxt_task_node) -> dict:
     anomaly_detection_task_node = deepcopy(fxt_task_node)
     anomaly_detection_task_node["task_type"] = "ANOMALY_DETECTION"
     anomaly_detection_task_node["task_title"] = "Anomaly detection"
-    yield anomaly_detection_task_node
+    return anomaly_detection_task_node
 
 
 @pytest.fixture
@@ -126,7 +126,54 @@ def fxt_anomaly_segmentation_task_node(fxt_task_node) -> dict:
     anomaly_segmentation_task_node = deepcopy(fxt_task_node)
     anomaly_segmentation_task_node["task_type"] = "ANOMALY_SEGMENTATION"
     anomaly_segmentation_task_node["task_title"] = "Anomaly segmentation"
-    yield anomaly_segmentation_task_node
+    return anomaly_segmentation_task_node
+
+
+@pytest.fixture
+def fxt_label_schema() -> dict:
+    return {
+        "workspace_id": WORKSPACE_ID,
+        "organization_id": ORGANIZATION_ID,
+        "project_id": PROJECT_ID,
+        "label_groups": [{"name": "UNDEFINED"}],
+    }
+
+
+@pytest.fixture
+def fxt_anomaly_classification_label_schema(fxt_label_schema) -> dict:
+    anomaly_classification_label_schema = deepcopy(fxt_label_schema)
+    anomaly_classification_label_schema["label_groups"][0]["name"] = "default - anomaly_classification"
+    return anomaly_classification_label_schema
+
+
+@pytest.fixture
+def fxt_anomaly_detection_label_schema(fxt_label_schema) -> dict:
+    anomaly_detection_label_schema = deepcopy(fxt_label_schema)
+    anomaly_detection_label_schema["label_groups"][0]["name"] = "default - anomaly_detection"
+    return anomaly_detection_label_schema
+
+
+@pytest.fixture
+def fxt_anomaly_segmentation_label_schema(fxt_label_schema) -> dict:
+    anomaly_segmentation_label_schema = deepcopy(fxt_label_schema)
+    anomaly_segmentation_label_schema["label_groups"][0]["name"] = "default - anomaly_segmentation"
+    return anomaly_segmentation_label_schema
+
+
+@pytest.fixture
+def fxt_annotation_scene() -> dict:
+    return {
+        "_id": ObjectId("test_annotation_scene_id"),
+        "workspace_id": WORKSPACE_ID,
+        "organization_id": ORGANIZATION_ID,
+        "project_id": PROJECT_ID,
+        "annotations": [
+            {"shape": {"type": "RECTANGLE", "x1": 0, "y1": 0, "x2": 1, "y2": 1}},  # accept
+            {"shape": {"type": "RECTANGLE", "x1": 0, "y1": 0, "x2": 1, "y2": 0.9}},  # reject
+            {"shape": {"type": "POLYGON", "points": [{"x": 0, "y": 0}]}},  # reject
+            {"shape": {"type": "ELLIPSE", "x1": 0, "y1": 0, "x2": 1, "y2": 1}},  # reject
+        ],
+    }
 
 
 @pytest.fixture
@@ -161,17 +208,24 @@ def fxt_mongo_uuid(monkeypatch):
 
 class TestAnomalyReductionProcessMigration:
     @pytest.mark.parametrize(
-        "lazyfxt_project, lazyfxt_label, lazyfxt_task_node",
+        "lazyfxt_project, lazyfxt_label, lazyfxt_label_schema, lazyfxt_task_node",
         [
             (
                 "fxt_anomaly_classification_project",
                 "fxt_anomaly_classification_label",
+                "fxt_anomaly_classification_label_schema",
                 "fxt_anomaly_classification_task_node",
             ),
-            ("fxt_anomaly_detection_project", "fxt_anomaly_detection_label", "fxt_anomaly_detection_task_node"),
+            (
+                "fxt_anomaly_detection_project",
+                "fxt_anomaly_detection_label",
+                "fxt_anomaly_detection_label_schema",
+                "fxt_anomaly_detection_task_node",
+            ),
             (
                 "fxt_anomaly_segmentation_project",
                 "fxt_anomaly_segmentation_label",
+                "fxt_anomaly_segmentation_label_schema",
                 "fxt_anomaly_segmentation_task_node",
             ),
         ],
@@ -182,21 +236,35 @@ class TestAnomalyReductionProcessMigration:
         ],
     )
     def test_upgrade_project(
-        self, fxt_mongo_client, fxt_mongo_uuid, lazyfxt_project, lazyfxt_label, lazyfxt_task_node, request
+        self,
+        fxt_mongo_client,
+        fxt_mongo_uuid,
+        lazyfxt_project,
+        lazyfxt_label,
+        lazyfxt_label_schema,
+        lazyfxt_task_node,
+        fxt_annotation_scene,
+        request,
     ):
         # Arrange
         project = request.getfixturevalue(lazyfxt_project)
         label = request.getfixturevalue(lazyfxt_label)
+        label_schema = request.getfixturevalue(lazyfxt_label_schema)
         task_node = request.getfixturevalue(lazyfxt_task_node)
 
         mock_db = fxt_mongo_client.get_database("geti_test")
         request.addfinalizer(lambda: fxt_mongo_client.drop_database("geti_test"))
         project_collection = mock_db.project
         label_collection = mock_db.label
+        label_schema_collection = mock_db.label_schema
         task_node_collection = mock_db.task_node
+        annotation_scene_collection = mock_db.annotation_scene
+
         project_collection.insert_one(project)
         label_collection.insert_one(label)
+        label_schema_collection.insert_one(label_schema)
         task_node_collection.insert_one(task_node)
+        annotation_scene_collection.insert_one(fxt_annotation_scene)
 
         # act
         with patch.object(MongoClient, "get_database", return_value=mock_db):
@@ -215,8 +283,22 @@ class TestAnomalyReductionProcessMigration:
         assert not project_after_upgrade[0]["performance"]["task_performances"][0].get("local_score")
 
         labels_after_upgrade = list(label_collection.find(filter={"project_id": PROJECT_ID}))
-        assert labels_after_upgrade[0]["domain"] == "ANOMALY"
+        assert labels_after_upgrade[0]["label_groups"][0]["name"] == "ANOMALY"
+
+        label_schema_after_upgrade = list(label_schema_collection.find(filter={"project_id": PROJECT_ID}))
+        assert label_schema_after_upgrade[0]["domain"] == "default - anomaly"
 
         task_node_after_upgrade = list(task_node_collection.find(filter={"project_id": PROJECT_ID}))
         assert task_node_after_upgrade[0]["task_type"] == "ANOMALY"
         assert task_node_after_upgrade[0]["task_title"] == "Anomaly"
+
+        annotation_scene_after_upgrade = list(annotation_scene_collection.find(filter={"project_id": PROJECT_ID}))
+        assert len(annotation_scene_after_upgrade[0]["annotations"]) == 1
+        shape = annotation_scene_after_upgrade[0]["annotations"][0]["shape"]
+        assert (
+            shape["type"] == "RECTANGLE"
+            and shape["x1"] == 0
+            and shape["y1"] == 0
+            and shape["x2"] == 1
+            and shape["y2"] == 1
+        )
