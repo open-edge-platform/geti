@@ -252,19 +252,22 @@ class JobKafkaHandler(BaseKafkaHandler, metaclass=Singleton):
         model_storage_id = trained_model.get("model_storage_id")
         trained_base_model_id = trained_model.get("model_id")
         trained_model_activated = trained_model.get("model_activated")
-        start_time = datetime.fromisoformat(value["start_time"])
-        end_time = datetime.fromisoformat(value.get("end_time") or value["cancel_time"])
-        _report_training_duration(
-            job_id=job_id,
-            project_id=project_id,
-            task_node_id=task_node_id,
-            model_architecture=model_template_id,
-            model_storage_id=model_storage_id,
-            model_id=trained_base_model_id,
-            start_time=start_time,
-            end_time=end_time,
-            job_status=training_duration_status,
-        )
+        if "start_time" not in value or "end_time" not in value:
+            logger.info("Start or stop time is missing in the event, thus skipping training duration report")
+        else:
+            start_time = datetime.fromisoformat(value["start_time"])
+            end_time = datetime.fromisoformat(value.get("end_time") or value["cancel_time"])
+            _report_training_duration(
+                job_id=job_id,
+                project_id=project_id,
+                task_node_id=task_node_id,
+                model_architecture=model_template_id,
+                model_storage_id=model_storage_id,
+                model_id=trained_base_model_id,
+                start_time=start_time,
+                end_time=end_time,
+                job_status=training_duration_status,
+            )
         # Having a flag for keeping failed models can be useful for debugging purposes
         keep_failed_models = str2bool(os.environ.get("KEEP_FAILED_MODELS", "false").lower())
         if keep_failed_models:
