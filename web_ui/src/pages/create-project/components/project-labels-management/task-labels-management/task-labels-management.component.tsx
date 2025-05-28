@@ -67,7 +67,7 @@ export const TaskLabelsManagement = ({
 
     const addLabel = (label: LabelTreeItem, shouldGoNext = false) => {
         const newLabel = { ...label, state: LabelItemEditionState.NEW };
-        const newLabels: LabelTreeItem[] = type === LABEL_TREE_TYPE.SINGLE ? [newLabel] : [...labels, newLabel];
+        const newLabels: LabelTreeItem[] = type === LABEL_TREE_TYPE.SINGLE ? [newLabel] : [newLabel, ...labels];
 
         setLabels(newLabels);
 

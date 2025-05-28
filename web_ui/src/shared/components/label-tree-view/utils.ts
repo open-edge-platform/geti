@@ -296,8 +296,8 @@ export const getLabelsWithAddedChild = (
                 ...item,
                 open: true,
                 children: [
-                    ...item.children,
                     getNewChildItem(type, item, groupName, getFlattenedItems(labelTree), true),
+                    ...item.children,
                 ],
             };
         } else

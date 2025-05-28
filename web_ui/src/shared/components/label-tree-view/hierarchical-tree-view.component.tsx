@@ -3,7 +3,6 @@
 
 import { isEmpty } from 'lodash-es';
 
-import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { HierarchicalLabelTreeViewProps, LabelTreeItem } from '../../../core/labels/label-tree-view.interface';
 import { LabelTreeViewItem, LabelTreeViewItemProps } from './label-tree-view-item/label-tree-view-item.component';
 
@@ -20,9 +19,6 @@ export const HierarchicalTreeView = ({
     treeValidationErrors,
     setValidationError,
 }: HierarchicalLabelTreeViewProps): JSX.Element => {
-    const { FEATURE_FLAG_LABELS_REORDERING } = useFeatureFlags();
-    const reversedLabelList = FEATURE_FLAG_LABELS_REORDERING ? labels : [...labels].reverse();
-
     return (
         <ul
             className={`spectrum-TreeView ${isEditable ? 'spectrum-TreeView--thumbnail' : ''} ${classes.item}`}
@@ -31,7 +27,7 @@ export const HierarchicalTreeView = ({
                 paddingLeft: level && 'var(--spectrum-global-dimension-size-500)',
             }}
         >
-            {reversedLabelList.map((item: LabelTreeItem) => {
+            {labels.map((item: LabelTreeItem) => {
                 const labelTreeViewItemProps: LabelTreeViewItemProps = {
                     actions,
                     setValidationError,

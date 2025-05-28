@@ -62,7 +62,7 @@ export const ProjectLabelsManagement = ({
     };
 
     const addItemHandler = (item?: LabelTreeItem) => {
-        item && setTaskLabelsHandler([...labelsTree, { ...item, state: LabelItemEditionState.NEW }]);
+        item && setTaskLabelsHandler([{ ...item, state: LabelItemEditionState.NEW }, ...labelsTree]);
     };
 
     const addChild = (parentId: string | null, groupName: string, type: LabelItemType) => {
