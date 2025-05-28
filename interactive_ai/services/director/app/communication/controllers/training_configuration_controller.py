@@ -75,7 +75,7 @@ class TrainingConfigurationRESTController:
             raise TaskNodeNotFoundException(task_node_id=task_id)
 
         if model_id is not None:
-            # TODO: if model_id is provided, load configuration from the model entity
+            # TODO ITEP-68215: if model_id is provided, load configuration from the model entity
             pass
 
         training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)
@@ -88,7 +88,7 @@ class TrainingConfigurationRESTController:
             )
 
         # If model_manifest_id is available, the full configuration can be built
-        # TODO: Load model manifest hyperparameters when model manifests are added
+        # TODO after ITEP-32190: Load model manifest hyperparameters when model manifests are added
         algo_level_config = (
             training_configuration_repo.get_by_model_manifest_id(model_manifest_id) if model_manifest_id else None
         )
