@@ -41,7 +41,7 @@ export const getErrorMessageByStatusCode = (error: AxiosError): string => {
     const message = (get(error, 'response.data.message') || get(error, 'response.data')) as string | undefined;
 
     if (message && typeof message === 'string') {
-        return `Error: ${message}`;
+        return message;
     }
 
     switch (statusCode) {

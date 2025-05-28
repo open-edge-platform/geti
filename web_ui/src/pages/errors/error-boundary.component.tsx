@@ -58,7 +58,7 @@ export const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
                 component = <BadRequest onReset={resetErrorBoundary} />;
                 break;
             case StatusCodes.NOT_FOUND: // 404
-                component = <ResourceNotFound onReset={resetErrorBoundary} />;
+                component = <ResourceNotFound onReset={resetErrorBoundary} errorMessage={errorMessage} />;
                 break;
             case StatusCodes.INTERNAL_SERVER_ERROR: // 500
                 component = <InternalServerError onReset={resetErrorBoundary} />;
