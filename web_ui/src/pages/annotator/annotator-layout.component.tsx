@@ -9,7 +9,6 @@ import { FocusScope } from 'react-aria';
 import { hasMaxAllowedAnnotations } from '../../core/annotations/utils';
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
 import { Label } from '../../core/labels/label.interface';
-import { isExclusive } from '../../core/labels/utils';
 import { isVideo, isVideoFrame } from '../../core/media/video.interface';
 import { isKeypointTask } from '../../core/projects/utils';
 import {
@@ -22,7 +21,6 @@ import { SuccessfullyAutotrainedNotification } from '../../shared/components/coa
 import { TutorialCardBuilder } from '../../shared/components/tutorial-card/tutorial-card-builder.component';
 import { getFuxSetting } from '../../shared/components/tutorials/utils';
 import { useTutorialEnablement } from '../../shared/hooks/use-tutorial-enablement.hook';
-import { hasEqualId } from '../../shared/utils';
 import { ErrorBoundary } from '../errors/error-boundary.component';
 import { useProject } from '../project-details/providers/project-provider/project-provider.component';
 import { EmptyAnnotationsNotification } from './annotation/annotation-list/annotation-list-thumbnail-grid/empty-annotations-notification.component';
@@ -36,6 +34,7 @@ import { Sidebar } from './components/sidebar/sidebar.component';
 import { VideoPlayer } from './components/video-player/video-player.component';
 import { AnnotationScene } from './core/annotation-scene.interface';
 import { useCopyPasteAnnotation } from './hooks/use-copy-paste-annotation/use-copy-paste-annotation.hook';
+import { useLabelShortcuts } from './hooks/use-label-shortcuts.hook';
 import { useSelectedAnnotations } from './hooks/use-selected-annotations.hook';
 import { useVisibleAnnotations } from './hooks/use-visible-annotations.hook';
 import { AutoTrainingCreditsModalFactory } from './notification/auto-training-credits-modal/auto-training-credits-modal.component';
@@ -48,7 +47,6 @@ import { useAnnotator } from './providers/annotator-provider/annotator-provider.
 import { useROI } from './providers/region-of-interest-provider/region-of-interest-provider.component';
 import { useSelectedMediaItem } from './providers/selected-media-item-provider/selected-media-item-provider.component';
 import { SelectedMediaItem } from './providers/selected-media-item-provider/selected-media-item.interface';
-import { useTask } from './providers/task-provider/task-provider.component';
 
 const GRID_AREAS = [
     'backHome  navigationToolbar  navigationToolbar',
@@ -71,28 +69,6 @@ const ErrorFallback = ({ error }: { error: { message: string } }) => {
             </Flex>
         </View>
     );
-};
-
-// For now we'll remove any empty labels from a sub task if we're in the "All tasks" view
-const useLabelShortcuts = (): Label[] => {
-    const { labels: taskLabels, tasks, selectedTask } = useTask();
-
-    if (tasks.length < 2 || selectedTask !== null) {
-        return taskLabels.filter((label) => tasks.some((task) => task.labels.some(hasEqualId(label.id))));
-    }
-
-    const secondTask = tasks[1];
-
-    return taskLabels.filter((label) => {
-        if (!isExclusive(label)) {
-            return true;
-        }
-
-        return (
-            !secondTask.labels.some(hasEqualId(label.id)) &&
-            tasks.some((task) => task.labels.some(hasEqualId(label.id)))
-        );
-    });
 };
 
 interface CopyPasteProps {

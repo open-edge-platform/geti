@@ -181,7 +181,7 @@ export const getAnnotation = (annotation: AnnotationDTO, projectLabels: Label[],
                 probability,
                 source: { user_id, model_id, model_storage_id },
             } = label;
-            const { name, color, hotkey, group, parentLabelId, behaviour, isEmpty } = projectLabel;
+            const { name, color, hotkey, group, parentLabelId, behaviour, isEmpty, isBackground } = projectLabel;
 
             return {
                 id,
@@ -198,6 +198,7 @@ export const getAnnotation = (annotation: AnnotationDTO, projectLabels: Label[],
                 hotkey,
                 behaviour,
                 isEmpty,
+                isBackground,
             };
         })
         .filter((label): label is AnnotationLabel => label !== undefined);
