@@ -5,6 +5,7 @@ import { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Flex } from '@geti/ui';
 
+import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { getFullGroupName } from '../../../../core/labels/annotator-utils/group-utils';
 import {
     LabelItemEditionState,
@@ -12,6 +13,7 @@ import {
     LabelTreeGroupProps,
     LabelTreeItem,
     LabelTreeLabelProps,
+    TreeItemActions,
 } from '../../../../core/labels/label-tree-view.interface';
 import { filterGroups, filterLabels, getFlattenedItems } from '../../../../core/labels/utils';
 import { DOMAIN } from '../../../../core/projects/core.interface';
@@ -33,9 +35,7 @@ const attrs = {
 export interface LabelTreeViewItemProps {
     item: LabelTreeItem;
     children?: ReactNode;
-    save: (editedItem?: LabelTreeItem, oldId?: string) => void;
-    addChild: (parentId: string | null, groupName: string, type: LabelItemType) => void;
-    deleteItem: (deletedItem: LabelTreeItem) => void;
+    actions: TreeItemActions;
     projectLabels: LabelTreeItem[];
     isCreationInNewProject?: boolean;
     domains: DOMAIN[];
@@ -48,9 +48,7 @@ export interface LabelTreeViewItemProps {
 export const LabelTreeViewItem = ({
     item,
     children,
-    save,
-    addChild,
-    deleteItem,
+    actions: { addChild, deleteItem, reorder, save },
     projectLabels,
     isCreationInNewProject = false,
     domains,
@@ -59,6 +57,8 @@ export const LabelTreeViewItem = ({
     validationErrors,
     setValidationError,
 }: LabelTreeViewItemProps): JSX.Element => {
+    const { FEATURE_FLAG_LABELS_REORDERING } = useFeatureFlags();
+
     const [isOpen, setIsOpen] = useState<boolean>(item.open);
     const [inEditMode, setInEditMode] = useState<boolean>(item.inEditMode);
 
@@ -129,10 +129,28 @@ export const LabelTreeViewItem = ({
         finishEdition();
     };
 
+    const reorderUpHandler = () => {
+        reorder(item, 'up');
+    };
+    const reorderDownHandler = () => {
+        reorder(item, 'down');
+    };
+
     const isFlatStructure = !isMixedRelation;
 
     const isEditionModeOn = inEditMode || isEditable;
     const canEditItem = isCreationInNewProject || !(item.type === LabelItemType.GROUP && !isNew(item));
+
+    const canReorderUp =
+        FEATURE_FLAG_LABELS_REORDERING &&
+        (item.type === LabelItemType.LABEL ? flatProjectLabels[0] : flatProjectGroups[0]).id !== item.id;
+
+    const canReorderDown =
+        FEATURE_FLAG_LABELS_REORDERING &&
+        (item.type === LabelItemType.LABEL
+            ? flatProjectLabels[flatProjectLabels.length - 1]
+            : flatProjectGroups[flatProjectGroups.length - 1]
+        ).id !== item.id;
 
     const canAddGroup =
         !isAnomalyProject &&
@@ -192,6 +210,14 @@ export const LabelTreeViewItem = ({
                         }`}
                         isAvailable={isEditable}
                         actions={{
+                            [Actions.REORDER_UP]: {
+                                isEnabled: canReorderUp,
+                                onAction: reorderUpHandler,
+                            },
+                            [Actions.REORDER_DOWN]: {
+                                isEnabled: canReorderDown,
+                                onAction: reorderDownHandler,
+                            },
                             [Actions.ADD_LABEL]: {
                                 isEnabled: canAddLabel,
                                 onAction: addChildHandler,

@@ -3,6 +3,7 @@
 
 import { isEmpty } from 'lodash-es';
 
+import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { HierarchicalLabelTreeViewProps, LabelTreeItem } from '../../../core/labels/label-tree-view.interface';
 import { LabelTreeViewItem, LabelTreeViewItemProps } from './label-tree-view-item/label-tree-view-item.component';
 
@@ -11,9 +12,7 @@ import classes from './hierarchical-tree-view.module.scss';
 export const HierarchicalTreeView = ({
     labels,
     isEditable,
-    save,
-    addChild,
-    deleteItem,
+    actions,
     projectLabels,
     level = 0,
     options,
@@ -21,7 +20,8 @@ export const HierarchicalTreeView = ({
     treeValidationErrors,
     setValidationError,
 }: HierarchicalLabelTreeViewProps): JSX.Element => {
-    const reversedLabelList = [...labels].reverse();
+    const { FEATURE_FLAG_LABELS_REORDERING } = useFeatureFlags();
+    const reversedLabelList = FEATURE_FLAG_LABELS_REORDERING ? labels : [...labels].reverse();
 
     return (
         <ul
@@ -33,9 +33,7 @@ export const HierarchicalTreeView = ({
         >
             {reversedLabelList.map((item: LabelTreeItem) => {
                 const labelTreeViewItemProps: LabelTreeViewItemProps = {
-                    save,
-                    addChild,
-                    deleteItem,
+                    actions,
                     setValidationError,
                     item,
                     domains,
@@ -56,9 +54,7 @@ export const HierarchicalTreeView = ({
                             labels={item.children}
                             isEditable={isEditable}
                             options={options}
-                            save={save}
-                            addChild={addChild}
-                            deleteItem={deleteItem}
+                            actions={actions}
                             projectLabels={projectLabels}
                             level={++level}
                             domains={domains}

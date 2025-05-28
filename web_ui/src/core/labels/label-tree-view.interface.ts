@@ -62,14 +62,19 @@ interface SetLabelsValidation {
 
 export type SetValidationProps = SetTreeValidation | SetLabelsValidation;
 
+export interface TreeItemActions {
+    save: (editedLabel?: LabelTreeItem, oldId?: string) => void;
+    deleteItem: (deletedLabel: LabelTreeItem) => void;
+    addChild: (parentId: string | null, groupName: string, type: LabelItemType) => void;
+    reorder: (item: LabelTreeItem, type: 'up' | 'down') => void;
+}
+
 export interface EditableTreeViewProps {
     labelsTree: LabelTreeItem[];
     projectLabels?: LabelTreeItem[];
     isHierarchicalMode: boolean;
     isInEditMode: boolean;
-    save: (editedLabel?: LabelTreeItem, oldId?: string) => void;
-    deleteItem: (deletedLabel: LabelTreeItem) => void;
-    addChild: (parentId: string, groupName: string, type: LabelItemType) => void;
+    actions: TreeItemActions;
     domains: DOMAIN[];
     type: Readonly.NO;
     options?: LabelTreeViewOptions;
@@ -80,9 +85,7 @@ interface ReadonlyTreeView {
     labelsTree: LabelTreeItem[];
     projectLabels?: LabelTreeItem[];
     isHierarchicalMode: boolean;
-    save?: never;
-    deleteItem?: never;
-    addChild?: never;
+    actions: never;
     domains?: never;
     type: Readonly.YES;
     options?: LabelTreeViewOptions;
@@ -93,9 +96,7 @@ export type LabelsTreeViewProps = EditableTreeViewProps | ReadonlyTreeView;
 export interface CommonTreeViewProps {
     labels: LabelTreeItem[];
     isEditable: boolean;
-    save: (editedLabel?: LabelTreeItem, oldId?: string) => void;
-    addChild: (parentId: string | null, groupName: string, type: LabelItemType) => void;
-    deleteItem: (deletedItem: LabelTreeItem) => void;
+    actions: TreeItemActions;
     projectLabels: LabelTreeItem[];
     domains: DOMAIN[];
     treeValidationErrors: Record<string, Record<string, string>>;

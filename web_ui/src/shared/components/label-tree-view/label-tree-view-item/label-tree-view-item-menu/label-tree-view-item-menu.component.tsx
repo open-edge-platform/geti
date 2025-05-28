@@ -7,8 +7,11 @@ import { ICONS_SIZE_IN_REM, LABEL_ITEM_MENU_PLACEHOLDER_WIDTH } from '../../util
 import { AddGroupMenuButton } from './add-group-menu-button.component';
 import { AddLabelMenuButton } from './add-label-menu-button.component';
 import { DeleteMenuButton } from './delete-menu-button.component';
+import { ReorderMenuButton } from './reorder-menu-button.component';
 
 export enum Actions {
+    REORDER_UP,
+    REORDER_DOWN,
     ADD_LABEL,
     ADD_GROUP,
     DELETE,
@@ -30,6 +33,18 @@ export const LabelTreeViewItemMenu = ({ isAvailable, actions, itemId }: LabelTre
             isHidden={!isAvailable}
         >
             <>
+                <ReorderMenuButton
+                    action={actions[Actions.REORDER_UP].onAction}
+                    id={itemId}
+                    type={'up'}
+                    isEnabled={actions[Actions.REORDER_UP].isEnabled}
+                />
+                <ReorderMenuButton
+                    action={actions[Actions.REORDER_DOWN].onAction}
+                    id={itemId}
+                    type={'down'}
+                    isEnabled={actions[Actions.REORDER_DOWN].isEnabled}
+                />
                 {actions[Actions.ADD_LABEL].isEnabled && (
                     <AddLabelMenuButton action={actions[Actions.ADD_LABEL].onAction} id={itemId} />
                 )}

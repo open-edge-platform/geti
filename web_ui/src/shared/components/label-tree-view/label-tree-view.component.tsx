@@ -21,9 +21,7 @@ export const LabelTreeView = (props: LabelsTreeViewProps): JSX.Element => {
     const {
         type,
         labelsTree,
-        save = noop,
-        addChild = noop,
-        deleteItem = noop,
+        actions = { save: noop, deleteItem: noop, reorder: noop, addChild: noop },
         domains = [],
         projectLabels = labelsTree,
         options,
@@ -71,21 +69,23 @@ export const LabelTreeView = (props: LabelsTreeViewProps): JSX.Element => {
     };
 
     const saveHandler = (editedLabel?: LabelTreeItem, oldId?: string) => {
-        save(editedLabel, oldId);
+        actions.save(editedLabel, oldId);
     };
 
     const deleteItemHandler = (deletedItem: LabelTreeItem) => {
         // Clear validation errors from deleted item
         setLabelValidationError(deletedItem.id, {});
-        deleteItem(deletedItem);
+        actions.deleteItem(deletedItem);
     };
 
     const parameters: CommonTreeViewProps = {
         labels: labelsTree,
         isEditable,
-        save: saveHandler,
-        deleteItem: deleteItemHandler,
-        addChild,
+        actions: {
+            ...actions,
+            save: saveHandler,
+            deleteItem: deleteItemHandler,
+        },
         projectLabels,
         domains,
         treeValidationErrors: treeItemsValidationErrors,

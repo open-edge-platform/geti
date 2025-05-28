@@ -283,7 +283,7 @@ export const getNewGroup = (
 export const getLabelsWithAddedChild = (
     labelTree: LabelTreeItem[],
     currentLabel: LabelTreeItem[],
-    parentId: string,
+    parentId: string | null,
     groupName: string,
     type: LabelItemType
 ): LabelTreeItem[] => {
@@ -315,6 +315,25 @@ export const getLabelWithoutDeleted = (labelTree: LabelTreeItem[], deletedItem: 
         return labelTree.map((item) => ({
             ...item,
             children: getLabelWithoutDeleted(item.children, deletedItem),
+        }));
+    }
+};
+
+export const getReorderedTree = (
+    levelItems: LabelTreeItem[],
+    itemToMove: LabelTreeItem,
+    mode: 'up' | 'down'
+): LabelTreeItem[] => {
+    const index = levelItems.findIndex(hasEqualId(itemToMove.id));
+
+    if (index >= 0) {
+        return mode === 'down'
+            ? levelItems.toSpliced(index, 2, levelItems[index + 1], levelItems[index])
+            : levelItems.toSpliced(index - 1, 2, levelItems[index], levelItems[index - 1]);
+    } else {
+        return levelItems.map((item) => ({
+            ...item,
+            children: getReorderedTree(item.children, itemToMove, mode),
         }));
     }
 };
