@@ -21,6 +21,7 @@ def get_product_info_endpoint() -> dict[str, str | bool]:
     platform_version = str(os.getenv("PLATFORM_VERSION"))
     build_version = str(os.getenv("BUILD_VERSION"))
     intel_email = str(os.getenv("INTEL_EMAIL"))
+    installation_profile = str(os.getenv("INSTALLATION_PROFILE", "standard"))
 
     smtp_defined = "False"
     try:
@@ -39,4 +40,5 @@ def get_product_info_endpoint() -> dict[str, str | bool]:
         "grafana_enabled": is_grafana_enabled(),
         "environment": get_environment(),
         "gpu-provider": get_gpu_provider(),
+        "installation-profile": installation_profile,
     }
