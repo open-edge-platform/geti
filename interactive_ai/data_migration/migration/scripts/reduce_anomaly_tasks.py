@@ -14,9 +14,18 @@ ANOM_STRINGS_MAPPING = {
     "ANOMALY_CLASSIFICATION": "ANOMALY",
     "ANOMALY_DETECTION": "ANOMALY",
     "ANOMALY_SEGMENTATION": "ANOMALY",
+    "anomaly_classification": "anomaly",
+    "anomaly_detection": "anomaly",
+    "anomaly_segmentation": "anomaly",
     "Anomaly classification": "Anomaly",
     "Anomaly detection": "Anomaly",
     "Anomaly segmentation": "Anomaly",
+    "Anomaly Classification": "Anomaly",
+    "Anomaly Detection": "Anomaly",
+    "Anomaly Segmentation": "Anomaly",
+    "anomaly classification": "anomaly",
+    "anomaly detection": "anomaly",
+    "anomaly segmentation": "anomaly",
 }
 
 
