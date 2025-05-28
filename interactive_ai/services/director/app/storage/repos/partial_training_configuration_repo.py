@@ -1,9 +1,19 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
-from geti_configuration_tools.training_configuration import NullTrainingConfiguration, PartialTrainingConfiguration
+from geti_configuration_tools.training_configuration import (
+    Filtering,
+    GlobalDatasetPreparationParameters,
+    GlobalParameters,
+    MaxAnnotationObjects,
+    MaxAnnotationPixels,
+    MinAnnotationPixels,
+    NullTrainingConfiguration,
+    PartialTrainingConfiguration,
+    SubsetSplit,
+)
 from pymongo import DESCENDING, IndexModel
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
@@ -78,3 +88,30 @@ class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingCo
         """
         manifest_filter = {"model_manifest_id": model_manifest_id}
         return self.get_one(extra_filter=manifest_filter)
+
+    def create_default_task_only_configuration(self, task_id: ID) -> None:
+        # If a configuration already exists for this task, do not create a new one
+        exists = not isinstance(self.get_task_only_configuration(task_id=task_id), NullTrainingConfiguration)
+        if exists:
+            return
+        default_global_parameters = GlobalParameters(
+            dataset_preparation=GlobalDatasetPreparationParameters(
+                subset_split=SubsetSplit(),
+                filtering=Filtering(
+                    min_annotation_pixels=MinAnnotationPixels(),
+                    max_annotation_pixels=MaxAnnotationPixels(),
+                    max_annotation_objects=MaxAnnotationObjects(),
+                ),
+            )
+        )
+        default_configuration_dict = {
+            "id_": self.generate_id(),
+            "task_id": str(task_id),
+            "global_parameters": default_global_parameters.model_dump(),
+        }
+        default_configuration = PartialTrainingConfiguration.model_validate(default_configuration_dict)
+        self.save(default_configuration)
+
+    def create_default_configuration(self, task_ids: Sequence[ID]) -> None:
+        for task_id in task_ids:
+            self.create_default_task_only_configuration(task_id=task_id)

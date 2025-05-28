@@ -28,6 +28,8 @@ def partial_model(model: type[BaseModel]) -> type[BaseModel]:
 
     @cache
     def make_field_optional(field: FieldInfo) -> tuple[Any, FieldInfo]:
+        # use json_schema_extra to store the default value, since default has to be None
+        field.json_schema_extra = {"default_value": field.default}
         field.default = None
         field.default_factory = None
         field.annotation = Optional[field.annotation]  # type: ignore[assignment] # noqa: UP007
