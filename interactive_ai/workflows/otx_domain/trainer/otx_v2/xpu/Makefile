@@ -26,10 +26,8 @@ style-fix: venv
 	uv run ruff check .. --config ../pyproject.toml --fix
 	uv run ruff format .. --config ../pyproject.toml
 
-# TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
 test-unit: venv
-	-PYTHONPATH=../scripts uv run pytest ../tests --disable-warnings -v
-	true
+	PYTHONPATH=../scripts uv run pytest ../tests --disable-warnings -v
 
 test-component: venv
 	@echo "test-component not available"
