@@ -73,7 +73,7 @@ class TestTrainingConfigurationController:
                         "test": 10,
                     }
                 }
-            }
+            },
         }
         update_config = PartialTrainingConfiguration.model_validate(update_config_dict)
 
@@ -96,53 +96,40 @@ class TestTrainingConfigurationController:
     def test_overlay_configurations(self, fxt_training_configuration_task_level) -> None:
         # Arrange
         # Create base configuration
-        base_partial_config = PartialTrainingConfiguration(task_id="task_123", global_parameters={
+        base_partial_config = PartialTrainingConfiguration(
+            task_id="task_123",
+            global_parameters={
                 "dataset_preparation": {
-                    "subset_split": {
-                        "training": 70,
-                        "validation": 20,
-                        "test": 10,
-                        "auto_selection": True
-                    },
-                    "filtering": {
-                        "min_annotation_pixels": {
-                            "enable": False,
-                            "min_annotation_pixels": 1
-                        }
-                    }
+                    "subset_split": {"training": 70, "validation": 20, "test": 10, "auto_selection": True},
+                    "filtering": {"min_annotation_pixels": {"enable": False, "min_annotation_pixels": 1}},
                 }
-            })
+            },
+        )
 
         # Create overlay configuration with some changes
-        overlay_config_1 = PartialTrainingConfiguration(task_id="task_123", global_parameters={
+        overlay_config_1 = PartialTrainingConfiguration(
+            task_id="task_123",
+            global_parameters={
                 "dataset_preparation": {
-                    "subset_split": {
-                        "training": 60,
-                        "validation": 30,
-                        "test": 10,
-                        "remixing": True
-                    },
-                    "filtering": {
-                        "max_annotation_pixels": {
-                            "enable": True,
-                            "max_annotation_pixels": 5000
-                        }
-                    }
+                    "subset_split": {"training": 60, "validation": 30, "test": 10, "remixing": True},
+                    "filtering": {"max_annotation_pixels": {"enable": True, "max_annotation_pixels": 5000}},
                 }
-            }, hyperparameters={
+            },
+            hyperparameters={
                 "training": {
                     "max_epochs": 32,
                     "learning_rate": 0.01,
                 }
-            })
+            },
+        )
 
-        overlay_config_2 = PartialTrainingConfiguration(task_id="task_123", hyperparameters={
-                "training": {
-                    "learning_rate": 0.05
-                }
-            })
+        overlay_config_2 = PartialTrainingConfiguration(
+            task_id="task_123", hyperparameters={"training": {"learning_rate": 0.05}}
+        )
 
-        expected_partial_overlay_config = PartialTrainingConfiguration(task_id="task_123", global_parameters={
+        expected_partial_overlay_config = PartialTrainingConfiguration(
+            task_id="task_123",
+            global_parameters={
                 "dataset_preparation": {
                     "subset_split": {
                         "training": 60,
@@ -152,22 +139,18 @@ class TestTrainingConfigurationController:
                         "auto_selection": True,
                     },
                     "filtering": {
-                        "min_annotation_pixels": {
-                            "enable": False,
-                            "min_annotation_pixels": 1
-                        },
-                        "max_annotation_pixels": {
-                            "enable": True,
-                            "max_annotation_pixels": 5000
-                        }
-                    }
+                        "min_annotation_pixels": {"enable": False, "min_annotation_pixels": 1},
+                        "max_annotation_pixels": {"enable": True, "max_annotation_pixels": 5000},
+                    },
                 }
-            }, hyperparameters={
+            },
+            hyperparameters={
                 "training": {
                     "max_epochs": 32,
                     "learning_rate": 0.05,  # This should be the last value applied
                 }
-            })
+            },
+        )
 
         # Act
         full_config_overlay = TrainingConfigurationRESTController._overlay_configurations(

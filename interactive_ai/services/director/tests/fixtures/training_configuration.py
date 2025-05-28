@@ -376,7 +376,7 @@ def fxt_training_configuration_full_rest_view(
                         "min_value": None,
                         "name": "Horizontal translation",
                         "type": "float",
-                        "value": 0.0
+                        "value": 0.0,
                     },
                     {
                         "default_value": 0.0,
@@ -386,7 +386,7 @@ def fxt_training_configuration_full_rest_view(
                         "min_value": None,
                         "name": "Vertical translation",
                         "type": "float",
-                        "value": 0.0
+                        "value": 0.0,
                     },
                     {
                         "default_value": 1.0,
@@ -396,8 +396,8 @@ def fxt_training_configuration_full_rest_view(
                         "min_value": None,
                         "name": "Scale factor",
                         "type": "float",
-                        "value": 1.0
-                    }
+                        "value": 1.0,
+                    },
                 ],
                 "tiling": [
                     {

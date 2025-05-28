@@ -90,7 +90,14 @@ class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingCo
         return self.get_one(extra_filter=manifest_filter)
 
     def create_default_task_only_configuration(self, task_id: ID) -> None:
-        # If a configuration already exists for this task, do not create a new one
+        """
+        Create a default training configuration for a specific task if one doesn't already exist.
+
+        This method checks if a task-specific configuration already exists and creates
+        a new configuration with default parameters only if no configuration is found.
+
+        :param task_id: The ID of the task for which to create a configuration
+        """
         exists = not isinstance(self.get_task_only_configuration(task_id=task_id), NullTrainingConfiguration)
         if exists:
             return
@@ -113,5 +120,13 @@ class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingCo
         self.save(default_configuration)
 
     def create_default_configuration(self, task_ids: Sequence[ID]) -> None:
+        """
+        Create default training configurations for multiple tasks.
+
+        This method iterates through the provided task IDs and creates a default
+        configuration for each task by calling create_default_task_only_configuration.
+
+        :param task_ids: Sequence of task IDs for which to create default configurations
+        """
         for task_id in task_ids:
             self.create_default_task_only_configuration(task_id=task_id)

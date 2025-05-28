@@ -88,14 +88,13 @@ class TrainingConfigurationRESTController:
             )
 
         # If model_manifest_id is available, the full configuration can be built
-        model_manifest_hyperparameters = None # TODO: Load model manifest hyperparameters
+        # TODO: Load model manifest hyperparameters when model manifests are added
         algo_level_config = (
             training_configuration_repo.get_by_model_manifest_id(model_manifest_id) if model_manifest_id else None
         )
         full_config = cls._overlay_configurations(task_level_config, algo_level_config)
 
         return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=full_config)
-
 
     @classmethod
     @unified_tracing

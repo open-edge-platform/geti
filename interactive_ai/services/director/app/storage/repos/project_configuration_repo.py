@@ -84,7 +84,16 @@ class ProjectConfigurationRepo(ProjectBasedSessionRepo[ProjectConfiguration]):
         raise ValueError(f"Task configuration with ID {task_config.task_id} not found.")
 
     def create_default_configuration(self, task_ids: Sequence[ID]) -> None:
-        # If a configuration already exists, do nothing
+        """
+        Create a default project configuration if one doesn't already exist.
+
+        This method checks if a project configuration already exists and creates
+        a new configuration with default parameters for the provided task IDs
+        only if no configuration is found.
+
+        :param task_ids: Sequence of task IDs to include in the default configuration
+        :return: None
+        """
         exists = not isinstance(self.get_project_configuration(), NullProjectConfiguration)
         if exists:
             return
@@ -108,4 +117,3 @@ class ProjectConfigurationRepo(ProjectBasedSessionRepo[ProjectConfiguration]):
             task_configs=default_task_configs,
         )
         self.save(default_config)
-

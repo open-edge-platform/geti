@@ -89,8 +89,7 @@ class TestTrainingConfigurationEndpoints:
         task_id = fxt_training_configuration_task_level.task_id
         model_manifest_id = fxt_training_configuration_task_level.model_manifest_id
         endpoint_url = (
-            f"{API_PROJECT_PATTERN}/training_configuration?"
-            f"task_id={str(task_id)}&model_manifest_id={model_manifest_id}"
+            f"{API_PROJECT_PATTERN}/training_configuration?task_id={str(task_id)}&model_manifest_id={model_manifest_id}"
         )
 
         # Act
