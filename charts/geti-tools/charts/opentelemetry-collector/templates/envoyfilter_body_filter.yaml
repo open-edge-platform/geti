@@ -1,0 +1,38 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svc_name := printf "%s-%s" .Release.Namespace .Chart.Name -}}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: {{ $svc_name }}-body-filter
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  workloadSelector:
+    labels:
+      app: {{ .Chart.Name }}
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: INSERT_FIRST
+      value:
+        name: envoy.filters.http.lua
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          defaultSourceCode:
+            inlineString: |
+              function envoy_on_response(response_handle)
+                  local status_code = response_handle:headers():get(":status")
+                  if status_code:find("^2") == nil and status_code:find("^3") == nil then
+                    response_handle:body():setBytes("")
+                  end
+              end
+{{- end }}

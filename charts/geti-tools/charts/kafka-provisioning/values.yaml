@@ -1,0 +1,589 @@
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+
+## @param global.imageRegistry Global Docker image registry
+## @param global.imagePullSecrets Global Docker registry secret names as an array
+## @param global.storageClass Global StorageClass for Persistent Volume(s)
+##
+global:
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+  storageClass: ""
+  kafka_topic_prefix: ""
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+
+## @section Common parameters
+
+## @param kubeVersion Override Kubernetes version
+##
+kubeVersion: ""
+## @param nameOverride String to partially override common.names.fullname
+##
+nameOverride: ""
+## @param fullnameOverride String to fully override common.names.fullname
+##
+fullnameOverride: ""
+## @param clusterDomain Default Kubernetes cluster domain
+##
+clusterDomain: cluster.local
+## @param commonLabels Labels to add to all deployed objects
+##
+commonLabels: {}
+## @param commonAnnotations Annotations to add to all deployed objects
+##
+commonAnnotations: {}
+## @param extraDeploy Array of extra objects to deploy with the release
+##
+extraDeploy: []
+## Enable diagnostic mode in the statefulset
+##
+diagnosticMode:
+  ## @param diagnosticMode.enabled Enable diagnostic mode (all probes will be disabled and the command will be overridden)
+  ##
+  enabled: false
+  ## @param diagnosticMode.command Command to override all containers in the statefulset
+  ##
+  command:
+    - sleep
+  ## @param diagnosticMode.args Args to override all containers in the statefulset
+  ##
+  args:
+    - infinity
+
+
+## @section Kafka parameters
+
+## Bitnami Kafka image version
+## ref: https://hub.docker.com/r/bitnami/kafka/tags/
+## @param image.registry Kafka image registry
+## @param image.repository Kafka image repository
+## @param image.tag Kafka image tag (immutable tags are recommended)
+## @param image.pullPolicy Kafka image pull policy
+## @param image.pullSecrets Specify docker-registry secret names as an array
+## @param image.debug Specify if debug values should be set
+##
+image:
+  registry: docker.io
+  repository: bitnami
+  name: kafka:3.7.0-debian-12-r2
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: https://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+  ## Set to true if you would like to see extra information on logs
+  ##
+  debug: false
+## @param configDir directory with configuration files in case of readonly filesystem
+##
+configDir: /opt/bitnami/kafka/config/
+## Authentication parameters
+## https://github.com/bitnami/bitnami-docker-kafka#security
+##
+auth:
+  ## Authentication protocol for client and inter-broker communications
+  ## This table shows the security provided on each protocol:
+  ## | Method    | Authentication                | Encryption via TLS |
+  ## | plaintext | None                          | No                 |
+  ## | tls       | None                          | Yes                |
+  ## | mtls      | Yes (two-way authentication)  | Yes                |
+  ## | sasl      | Yes (via SASL)                | No                 |
+  ## | sasl_tls  | Yes (via SASL)                | Yes                |
+  ## @param auth.clientProtocol Authentication protocol for communications with clients. Allowed protocols: `plaintext`, `tls`, `mtls`, `sasl` and `sasl_tls`
+  ## @param auth.externalClientProtocol Authentication protocol for communications with external clients. Defaults to value of `auth.clientProtocol`. Allowed protocols: `plaintext`, `tls`, `mtls`, `sasl` and `sasl_tls`
+  ##
+  # Note: empty by default for backwards compatibility reasons, find more information at
+  # https://github.com/bitnami/charts/pull/8902/
+  ## SASL configuration
+  ##
+  clientProtocol: sasl
+
+  ## TLS configuration
+  ##
+  tls:
+    ## @param auth.tls.type Format to use for TLS certificates. Allowed types: `jks` and `pem`
+    ##
+    type: jks
+    ## @param auth.tls.existingSecrets Array existing secrets containing the TLS certificates for the Kafka brokers
+    ## When using 'jks' format for certificates, each secret should contain a truststore and a keystore.
+    ## Create these secrets following the steps below:
+    ## 1) Generate your truststore and keystore files. Helpful script: https://raw.githubusercontent.com/confluentinc/confluent-platform-security-tools/master/kafka-generate-ssl.sh
+    ## 2) Rename your truststore to `kafka.truststore.jks`.
+    ## 3) Rename your keystores to `kafka-X.keystore.jks` where X is the ID of each Kafka broker.
+    ## 4) Run the command below one time per broker to create its associated secret (SECRET_NAME_X is the name of the secret you want to create):
+    ##       kubectl create secret generic SECRET_NAME_0 --from-file=kafka.truststore.jks=./kafka.truststore.jks --from-file=kafka.keystore.jks=./kafka-0.keystore.jks
+    ##       kubectl create secret generic SECRET_NAME_1 --from-file=kafka.truststore.jks=./kafka.truststore.jks --from-file=kafka.keystore.jks=./kafka-1.keystore.jks
+    ##       ...
+    ##
+    ## When using 'pem' format for certificates, each secret should contain a public CA certificate, a public certificate and one private key.
+    ## Create these secrets following the steps below:
+    ## 1) Create a certificate key and signing request per Kafka broker, and sign the signing request with your CA
+    ## 2) Rename your CA file to `kafka.ca.crt`.
+    ## 3) Rename your certificates to `kafka-X.tls.crt` where X is the ID of each Kafka broker.
+    ## 3) Rename your keys to `kafka-X.tls.key` where X is the ID of each Kafka broker.
+    ## 4) Run the command below one time per broker to create its associated secret (SECRET_NAME_X is the name of the secret you want to create):
+    ##       kubectl create secret generic SECRET_NAME_0 --from-file=ca.crt=./kafka.ca.crt --from-file=tls.crt=./kafka-0.tls.crt --from-file=tls.key=./kafka-0.tls.key
+    ##       kubectl create secret generic SECRET_NAME_1 --from-file=ca.crt=./kafka.ca.crt --from-file=tls.crt=./kafka-1.tls.crt --from-file=tls.key=./kafka-1.tls.key
+    ##       ...
+    ##
+    existingSecrets: []
+    ## @param auth.tls.autoGenerated Generate automatically self-signed TLS certificates for Kafka brokers. Currently only supported if `auth.tls.type` is `pem`
+    ## Note: ignored when using 'jks' format or `auth.tls.existingSecrets` is not empty
+    ##
+    autoGenerated: false
+    ## @param auth.tls.password Password to access the JKS files or PEM key when they are password-protected.
+    ## Note: ignored when using 'existingSecret'.
+    ##
+    password: ""
+    ## @param auth.tls.existingSecret Name of the secret containing the password to access the JKS files or PEM key when they are password-protected. (`key`: `password`)
+    ##
+    existingSecret: ""
+    ## @param auth.tls.jksTruststoreSecret Name of the existing secret containing your truststore if truststore not existing or different from the ones in the `auth.tls.existingSecrets`
+    ## Note: ignored when using 'pem' format for certificates.
+    ##
+    jksTruststoreSecret: ""
+    ## @param auth.tls.jksKeystoreSAN The secret key from the `auth.tls.existingSecrets` containing the keystore with a SAN certificate
+    ## The SAN certificate in it should be issued with Subject Alternative Names for all headless services:
+    ##  - kafka-0.kafka-headless.kafka.svc.cluster.local
+    ##  - kafka-1.kafka-headless.kafka.svc.cluster.local
+    ##  - kafka-2.kafka-headless.kafka.svc.cluster.local
+    ## Note: ignored when using 'pem' format for certificates.
+    ##
+    jksKeystoreSAN: ""
+    ## @param auth.tls.jksTruststore The secret key from the `auth.tls.existingSecrets` or `auth.tls.jksTruststoreSecret` containing the truststore
+    ## Note: ignored when using 'pem' format for certificates.
+    ##
+    jksTruststore: ""
+    ## @param auth.tls.endpointIdentificationAlgorithm The endpoint identification algorithm to validate server hostname using server certificate
+    ## Disable server host name verification by setting it to an empty string.
+    ## ref: https://docs.confluent.io/current/kafka/authentication_ssl.html#optional-settings
+    ##
+    endpointIdentificationAlgorithm: https
+
+## @section Statefulset parameters
+
+## @param replicaCount Number of Kafka nodes
+##
+replicaCount: 1
+
+## @section Traffic Exposure parameters
+
+## Service parameters
+##
+service:
+  ## @param service.ports.client Kafka svc port for client connections
+  ##
+  ports:
+    client: 9092
+
+
+## @section Kafka provisioning parameters
+
+## Kafka provisioning
+##
+provisioning:
+
+  waitForKafka: true
+  kafkaHost: impt-kafka
+
+  ## @param provisioning.numPartitions Default number of partitions for topics when unspecified
+  ##
+  numPartitions: 1
+  ## @param provisioning.replicationFactor Default replication factor for topics when unspecified
+  ##
+  replicationFactor: 1
+  ## @param provisioning.topics Kafka provisioning topics
+  ## - name: topic-name
+  ##   partitions: 1
+  ##   replicationFactor: 1
+  ##   ## https://kafka.apache.org/documentation/#topicconfigs
+  ##   config:
+  ##     max.message.bytes: 64000
+  ##     flush.messages: 1
+  ##
+  topics:
+    - name: annotation_scenes_to_revisit
+      config: []
+    - name: configuration_changes
+      config: []
+    - name: dataset_counters_updated
+      config: []
+    - name: dataset_updated
+      config: []
+    - name: training_successful
+      config: []
+    - name: media_deletions
+      config: []
+    - name: media_uploads
+      config: []
+    - name: new_annotation_scene
+      config: []
+    - name: predictions_and_metadata_created
+      config: []
+    - name: project_creations
+      config: []
+    - name: project_deletions
+      config: []
+    - name: project_updates
+      config: []
+    - name: thumbnail_video_missing
+      config: []
+    - name: model_activated
+      config: []
+    - name: model_reverted
+      config: []
+    - name: flyte_event
+      config: []
+    - name: job_step_details
+      config: []
+    - name: job_update
+      config: []
+    - name: on_job_cancelled
+      config: []
+    - name: on_job_failed
+      config: []
+    - name: on_job_finished
+      config: []
+    - name: project_notifications
+      config: []
+    - name: credits_lease
+      config: []
+
+  ## @param provisioning.acls Provision Kafka ACL rules
+  ##
+  acls:
+    # Jobs which run in Flyte use Flyte kafka credentials, therefore user in this case is "flyte"
+
+    # annotation_scenes_to_revisit
+    - user: director
+      topic: annotation_scenes_to_revisit
+      operations: ["Read"]
+    - user: resource
+      topic: annotation_scenes_to_revisit
+      operations: ["Write"]
+
+    # configuration_changes
+    - user: director
+      topic: configuration_changes
+      operations: ["Read", "Write"]
+
+    # dataset_counters_updated
+    - user: director
+      topic: dataset_counters_updated
+      operations: ["Read", "Write"]
+
+    # dataset_updated
+    - user: director
+      topic: dataset_updated
+      operations: ["Read", "Write"]
+    - user: flyte
+      topic: dataset_updated
+      operations: ["Write"]
+
+    # training_successful
+    - user: director
+      topic: training_successful
+      operations: ["Read", "Write"]
+    - user: flyte
+      topic: training_successful
+      operations: ["Write"]
+
+    # media_deletions
+    - user: director
+      topic: media_deletions
+      operations: ["Read"]
+    - user: resource
+      topic: media_deletions
+      operations: ["Write"]
+
+    # media_uploads
+    - user: director
+      topic: media_uploads
+      operations: ["Read"]
+    - user: resource
+      topic: media_uploads
+      operations: ["Read"]
+    - user: dataset-ie
+      topic: media_uploads
+      operations: ["Write"]
+    - user: flyte
+      topic: media_uploads
+      operations: [ "Write" ]
+    - user: resource
+      topic: media_uploads
+      operations: ["Write"]
+
+    # new_annotation_scene
+    - user: director
+      topic: new_annotation_scene
+      operations: ["Read"]
+    - user: dataset-ie
+      topic: new_annotation_scene
+      operations: ["Write"]
+    - user: flyte
+      topic: new_annotation_scene
+      operations: ["Write"]
+    - user: resource
+      topic: new_annotation_scene
+      operations: ["Read", "Write"]
+
+    # predictions_and_metadata_created
+    - user: director
+      topic: predictions_and_metadata_created
+      operations: ["Read", "Write"]
+    - user: flyte
+      topic: predictions_and_metadata_created
+      operations: ["Write"]
+
+    # project_creations
+    - user: director
+      topic: project_creations
+      operations: ["Read"]
+    - user: dataset-ie
+      topic: project_creations
+      operations: ["Write"]
+    - user: flyte
+      topic: project_creations
+      operations: [ "Write" ]
+    - user: resource
+      topic: project_creations
+      operations: ["Write"]
+
+    # project_deletions
+    - user: director
+      topic: project_deletions
+      operations: ["Read"]
+    - user: resource
+      topic: project_deletions
+      operations: ["Read", "Write"]
+    - user: jobs-scheduler
+      topic: project_deletions
+      operations: ["Read"]
+    - user: visual-prompt
+      topic: project_deletions
+
+    # project_updates
+    - user: director
+      topic: project_updates
+      operations: ["Read"]
+    - user: visual-prompt
+      topic: project_updates
+      operations: [ "Read" ]
+    - user: resource
+      topic: project_updates
+      operations: ["Write"]
+
+    # thumbnail_video_missing
+    - user: resource
+      topic: thumbnail_video_missing
+      operations: ["Read", "Write"]
+
+    # model_activated
+    - user: director
+      topic: model_activated
+      operations: ["Read", "Write"]
+    - user: resource
+      topic: model_activated
+      operations: ["Read", "Write"]
+    - user: flyte
+      topic: model_activated
+      operations: ["Write"]
+
+    # model_reverted
+    - user: director
+      topic: model_reverted
+      operations: ["Read", "Write"]
+    - user: resource
+      topic: model_reverted
+      operations: ["Write"]
+    - user: flyte
+      topic: model_reverted
+      operations: ["Write"]
+
+    # flyte_event
+    - user: flyte
+      topic: flyte_event
+      operations: ["Read", "Write"]
+    - user: jobs-scheduler
+      topic: flyte_event
+      operations: ["Read"]
+
+    # job_step_details
+    - user: flyte
+      topic: job_step_details
+      operations: ["Write"]
+    - user: jobs-scheduler
+      topic: job_step_details
+      operations: ["Read"]
+
+    # job_update
+    - user: flyte
+      topic: job_update
+      operations: ["Write"]
+    - user: jobs-scheduler
+      topic: job_update
+      operations: ["Read"]
+
+    # on_job_cancelled
+    - user: jobs-scheduler
+      topic: on_job_cancelled
+      operations: ["Read", "Write"]
+    - user: director
+      topic: on_job_cancelled
+      operations: ["Read"]
+    - user: dataset-ie
+      topic: on_job_cancelled
+      operations: ["Read"]
+
+    # on_job_failed
+    - user: jobs-scheduler
+      topic: on_job_failed
+      operations: ["Read", "Write"]
+    - user: director
+      topic: on_job_failed
+      operations: ["Read"]
+
+    # on_job_finished
+    - user: jobs-scheduler
+      topic: on_job_finished
+      operations: ["Read", "Write"]
+    - user: director
+      topic: on_job_finished
+      operations: ["Read"]
+    - user: dataset-ie
+      topic: on_job_finished
+      operations: ["Read"]
+    - user: project-ie
+      topic: on_job_finished
+      operations: ["Read"]
+
+    # project_notifications
+    - user: account-service
+      topic: project_notifications
+      operations: ["Read", "Write"]
+    - user: notifier
+      topic: project_notifications
+      operations: ["Read"]
+    - user: gateway
+      topic: project_notifications
+      operations: [ "Read", "Write" ]
+    - user: user-directory
+      topic: project_notifications
+      operations: [ "Read", "Write" ]
+
+    # credits_lease
+    - user: jobs-scheduler
+      topic: credits_lease
+      operations: ["Write"]
+    - user: credit-system
+      topic: credits_lease
+      operations: ["Read"]
+
+  ## @param provisioning.command Override provisioning container command
+  ##
+  command: []
+  ## @param provisioning.args Override provisioning container arguments
+  ##
+  args: []
+  ## @param provisioning.podAnnotations Extra annotations for Kafka provisioning pods
+  ##
+  podAnnotations:
+  ## @param provisioning.podLabels Extra labels for Kafka provisioning pods
+  ## Ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+  ##
+  podLabels: {}
+  ## Kafka provisioning resource requests and limits
+  ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+  ## @param provisioning.resources.limits The resources limits for the Kafka provisioning container
+  ## @param provisioning.resources.requests The requested resources for the Kafka provisioning container
+  ##
+  resources:
+    limits: {}
+    requests: {}
+  ## Kafka provisioning pods' Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+  ## @param provisioning.podSecurityContext.enabled Enable security context for the pods
+  ## @param provisioning.podSecurityContext.fsGroup Set Kafka provisioning pod's Security Context fsGroup
+  ##
+  podSecurityContext:
+    enabled: true
+    fsGroup: 0
+  ## Kafka provisioning containers' Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+  ## @param provisioning.containerSecurityContext.enabled Enable Kafka provisioning containers' Security Context
+  ## @param provisioning.containerSecurityContext.runAsUser Set Kafka provisioning containers' Security Context runAsUser
+  ## @param provisioning.containerSecurityContext.runAsNonRoot Set Kafka provisioning containers' Security Context runAsNonRoot
+  ## e.g:
+  ##   containerSecurityContext:
+  ##     enabled: true
+  ##     capabilities:
+  ##       drop: ["NET_RAW"]
+  ##     readOnlyRootFilesystem: true
+  ##
+  containerSecurityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - all
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10001
+  ## @param provisioning.schedulerName Name of the k8s scheduler (other than default) for kafka provisioning
+  ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+  ##
+  schedulerName: ""
+  ## @param provisioning.extraVolumes Optionally specify extra list of additional volumes for the Kafka provisioning pod(s)
+  ## e.g:
+  ## extraVolumes:
+  ##   - name: kafka-jaas
+  ##     secret:
+  ##       secretName: kafka-jaas
+  ##
+  extraVolumes: []
+  ## @param provisioning.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Kafka provisioning container(s)
+  ## extraVolumeMounts:
+  ##   - name: kafka-jaas
+  ##     mountPath: /bitnami/kafka/config/kafka_jaas.conf
+  ##     subPath: kafka_jaas.conf
+  ##
+  extraVolumeMounts: []
+  ## @param provisioning.sidecars Add additional sidecar containers to the Kafka provisioning pod(s)
+  ## e.g:
+  ## sidecars:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  sidecars: []
+  ## @param provisioning.initContainers Add additional Add init containers to the Kafka provisioning pod(s)
+  ## e.g:
+  ## initContainers:
+  ##   - name: your-image-name
+  ##     image: your-image
+  ##     imagePullPolicy: Always
+  ##     ports:
+  ##       - name: portname
+  ##         containerPort: 1234
+  ##
+  initContainers: []

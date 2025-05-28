@@ -1,0 +1,174 @@
+image: 
+  registry: docker.io
+  repository: bitnami
+  name: openldap:2.6.3-debian-11-r63
+imagePullPolicy: IfNotPresent
+
+debug: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    memory: 300Mi
+
+global:
+  storage_volume_claim_name_openldap: data-storage-volume-claim
+  enable_master_node_selector: true
+  ldap_service_user_secret_name: ''
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 100Mi
+  limits:
+    memory: 300Mi
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+service:
+  type: ClusterIP
+  ports:
+    ldap:
+      port: 389
+      targetport: 1389
+
+serviceAccount:
+  create: true
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+ldapSecurityContext:
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - KILL
+      - NET_BIND_SERVICE
+
+config:
+  impt_ldif: |-
+    # dn: dc=example,dc=org
+    # objectClass: dcObject
+    # objectClass: organization
+    # o: Example Company
+    # dc: example
+
+    dn: ou=People,dc=example,dc=org
+    objectClass: organizationalUnit
+    ou: People
+
+    dn: cn=Jane Doe,ou=People,dc=example,dc=org
+    cn: Jane Doe
+    gidnumber: 500
+    givenname: Jane
+    homedirectory: /home/users/janedoe
+    mail: janedoe@example.org
+    loginshell: /bin/bash
+    objectclass: inetOrgPerson
+    objectclass: posixAccount
+    objectclass: top
+    sn: Doe
+    uid: janedoe
+    uidnumber: 1000
+    userpassword: foo
+
+    dn: cn=John Doe,ou=People,dc=example,dc=org
+    cn: John Doe
+    gidnumber: 500
+    givenname: John
+    homedirectory: /home/users/johndoe
+    mail: johndoe@example.org
+    loginshell: /bin/bash
+    objectclass: inetOrgPerson
+    objectclass: posixAccount
+    objectclass: top
+    sn: Doe
+    uid: johndoe
+    uidnumber: 1001
+    userpassword: bar
+
+    # Group definitions.
+    dn: ou=Groups,dc=example,dc=org
+    objectClass: organizationalUnit
+    ou: Groups
+
+    dn: cn=Admins,ou=Groups,dc=example,dc=org
+    cn: Admins
+    gidnumber: 500
+    memberuid: janedoe
+    objectclass: posixGroup
+    objectclass: top
+
+    dn: cn=Google Analytics,ou=Groups,dc=example,dc=org
+    cn: Google Analytics
+    gidnumber: 501
+    memberuid: johndoe
+    memberuid: janedoe
+    objectclass: posixGroup
+    objectclass: top
+  service_accounts_group_ldif: |-
+    dn: cn=ServiceAccounts,ou=Groups,dc=example,dc=org
+    cn: ServiceAccounts
+    gidnumber: 502
+    objectclass: posixGroup
+    objectclass: top
+  ppolicy_container_ldif: |-
+    dn: ou=pwpolicy,dc=example,dc=org
+    objectClass: organizationalUnit
+    objectClass: top
+    ou: pwpolicy
+  ppolicy_rules_ldif: |-
+    dn: cn=default,ou=pwpolicy,dc=example,dc=org
+    objectClass: person
+    objectClass: pwdPolicyChecker
+    objectClass: pwdPolicy
+    cn: pwpolicy
+    sn: pwpolicy
+    pwdAttribute: userPassword
+    pwdLockout: TRUE
+    pwdMaxFailure: 5
+    pwdLockoutDuration: 600
+  pbkdf2_ldif: |-
+    dn: cn=module{0},cn=config
+    objectClass: olcModuleList
+    cn: module{0}
+    olcModuleLoad: pw-pbkdf2
+  ppolicy_module_ldif: |-
+    dn: cn=module{1},cn=config
+    objectClass: olcModuleList
+    cn: module{1}
+    olcModuleLoad: ppolicy
+  ppolicy_overlay_ldif: |-
+    dn: olcOverlay=ppolicy, olcDatabase={2}mdb,cn=config
+    objectClass: olcOverlayConfig
+    objectClass: olcPPolicyConfig
+    olcOverlay: ppolicy
+    olcPPolicyDefault: cn=default,ou=pwpolicy,dc=example,dc=org
+    olcPPolicyHashCleartext: TRUE
+  db_max_size_ldif: |-
+    dn: olcDatabase={2}mdb,cn=config
+    changetype: modify
+    add: olcDbMaxSize
+    olcDbMaxSize: 52428800

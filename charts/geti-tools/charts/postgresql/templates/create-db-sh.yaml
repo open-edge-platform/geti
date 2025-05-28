@@ -1,0 +1,25 @@
+# same as src/platform_charts/impt/charts/flyte-core/templates/admin/create-db-sh.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: create-db-sh
+  namespace: {{ .Release.Namespace }}
+data:
+  create-db.sh: |
+    set -e
+    set -u
+    
+    password="'"$TARGET_POSTGRES_PASSWORD"'"
+    create_database_select="'""CREATE DATABASE \"$TARGET_POSTGRES_DB\"""'"
+    database_quoted="'"$TARGET_POSTGRES_DB"'"
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" "$POSTGRES_DB" <<-EOSQL
+    DO \$\$
+    BEGIN
+    CREATE USER $TARGET_POSTGRES_USER WITH PASSWORD $password;
+    EXCEPTION
+    WHEN duplicate_object THEN
+    ALTER USER $TARGET_POSTGRES_USER WITH PASSWORD $password;
+    END\$\$;
+    SELECT $create_database_select WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = $database_quoted)\gexec
+    GRANT ALL PRIVILEGES ON DATABASE "$TARGET_POSTGRES_DB" TO "$TARGET_POSTGRES_USER";
+    EOSQL

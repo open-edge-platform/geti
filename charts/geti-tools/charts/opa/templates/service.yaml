@@ -1,0 +1,17 @@
+############################################################
+# Service to expose OPA admission controller (required by Kubernetes.)
+############################################################
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace.opa }}
+  name: admission-controller
+  labels:
+    {{- include "opa.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: 443
+      targetPort: 8443
+      name: https
+  selector:
+    {{ include "opa.selectorLabels" . }}

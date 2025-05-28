@@ -1,0 +1,142 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "postgresql.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "postgresql.fullname" . }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "postgresql.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "postgresql.selectorLabels" . | nindent 8 }}
+    spec:
+      terminationGracePeriodSeconds: 120
+      serviceAccountName: {{ include "postgresql.fullname" . }}
+      initContainers:
+      - command:
+          - /bin/sh
+        args:
+          - -c
+          - |
+            find {{ .Values.data_path }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} + || true
+        image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        name: volume-permissions
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 256Mi
+        securityContext:
+          {{ toYaml .Values.volumeSecurityContext | nindent 10 }}
+        volumeMounts:
+          - mountPath: {{ .Values.data_path }}
+            readOnly: false
+            name: data-storage
+            subPath: postgresql-data
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          args:
+            - -c
+            - max_connections={{ .Values.config.max_connections }}
+            - -c
+            - shared_buffers={{ .Values.config.shared_buffers }}
+          securityContext:
+            {{ toYaml .Values.securityContext | nindent 12 }}
+          env:
+          {{- if .Values.auth.init_database }}
+            - name: POSTGRES_DB
+              value: {{ .Values.auth.init_database }}
+          {{- end }}
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.fullname" . }}
+                  key: postgresql-username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.fullname" . }}
+                  key: postgresql-password
+            {{- if .Values.flyte_db_enabled }}
+            - name: FLYTE_POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.fullname" . }}
+                  key: flyte-postgresql-username
+            - name: FLYTE_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "postgresql.fullname" . }}
+                  key: flyte-postgresql-password
+            - name: FLYTE_POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "postgresql.fullname" . }}
+                  key: flyte-postgresql-db
+            {{- end }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /var/run
+              name: postgresql-run
+            - mountPath: {{ .Values.data_path }}
+              readOnly: false
+              name: data-storage
+              subPath: postgresql-data
+            - mountPath: /tmp
+              name: tmp
+          ports:
+            - name: postgresql
+              containerPort: {{ .Values.service.ports.postgresql.port }}
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'pg_isready --dbname=$POSTGRES_DB --username=$POSTGRES_USER'
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'pg_isready --dbname=$POSTGRES_DB --username=$POSTGRES_USER'
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - pg_ctl
+                  - stop
+                  - -D
+                  - {{ .Values.data_path }}
+                  - -m
+                  - smart
+      volumes:
+        - name: tmp
+          emptyDir: {}
+        - name: postgresql-run
+          emptyDir: {}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_postgresql }}

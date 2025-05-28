@@ -1,0 +1,42 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: {{ include "dex.name" . }}-auth-delay
+  namespace: {{ .Release.Namespace }}
+spec:
+  workloadSelector:
+    labels:
+      app: dex
+  configPatches:
+  - applyTo: HTTP_FILTER
+    match:
+      context: SIDECAR_INBOUND
+      listener:
+        filterChain:
+          filter:
+            name: "envoy.filters.network.http_connection_manager"
+    patch:
+      operation: INSERT_FIRST
+      value:
+        name: envoy.filters.http.lua
+        typed_config:
+          '@type': type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+          defaultSourceCode:
+            inlineString: |
+              function sleep(time)
+                local t0 = os.clock()
+                while os.clock() - t0 < time do
+                end
+              end
+              
+              function envoy_on_request(handle)
+                if handle ~= nil then
+                  local path = handle:headers():get(":path")
+                  if (path ~= nil and string.find(path, "/dex/auth/regular_users/login?")) then
+                    local time_to_sleep = math.random(0, 5) * 0.1
+                    sleep(time_to_sleep)
+                  end
+                end
+              end
+{{- end }}
