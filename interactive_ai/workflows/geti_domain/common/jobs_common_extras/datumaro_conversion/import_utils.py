@@ -734,6 +734,7 @@ class ImportUtils:
             GetiProjectType.ANOMALY_CLASSIFICATION: [TaskType.ANOMALY_CLASSIFICATION],
             GetiProjectType.ANOMALY_DETECTION: [TaskType.ANOMALY_DETECTION],
             GetiProjectType.ANOMALY_SEGMENTATION: [TaskType.ANOMALY_SEGMENTATION],
+            GetiProjectType.ANOMALY: [TaskType.ANOMALY],
             GetiProjectType.INSTANCE_SEGMENTATION: [TaskType.INSTANCE_SEGMENTATION],
             GetiProjectType.ROTATED_DETECTION: [TaskType.ROTATED_DETECTION],
             GetiProjectType.CHAINED_DETECTION_CLASSIFICATION: [
@@ -820,7 +821,7 @@ class ImportUtils:
         """
         Validate project valid for dataset import and return the task type of the project
 
-        :param project_id: str project id
+        :param project: Geti project object
         :return: task type of the (only) trainable task in the project
         """
         supported_types = [
@@ -831,6 +832,7 @@ class ImportUtils:
             TaskType.ANOMALY_CLASSIFICATION,
             TaskType.ANOMALY_DETECTION,
             TaskType.ANOMALY_SEGMENTATION,
+            TaskType.ANOMALY,
             TaskType.ROTATED_DETECTION,
         ]
 

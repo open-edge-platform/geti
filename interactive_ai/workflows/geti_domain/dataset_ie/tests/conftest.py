@@ -50,6 +50,7 @@ DEFAULT_MODEL_TEMPLATES = {
     str(TaskType.CLASSIFICATION).lower(): "Custom_Image_Classification_EfficinetNet-B0",
     str(TaskType.DETECTION).lower(): "Custom_Object_Detection_Gen3_ATSS",
     str(TaskType.SEGMENTATION).lower(): "Custom_Semantic_Segmentation_Lite-HRNet-18-mod2_OCR",
+    str(TaskType.ANOMALY).lower(): "ote_anomaly_classification_padim",
     str(TaskType.ANOMALY_CLASSIFICATION).lower(): "ote_anomaly_classification_padim",
     str(TaskType.ANOMALY_DETECTION).lower(): "ote_anomaly_detection_padim",
     str(TaskType.ANOMALY_SEGMENTATION).lower(): "ote_anomaly_segmentation_padim",

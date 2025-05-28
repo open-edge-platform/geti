@@ -254,6 +254,7 @@ class DatumaroProjectParser(ProjectParser):
 
         # ProjectBuilder will generate Labels with pre-defined metadata for anomaly project
         if include_all_labels or last_task_type not in [
+            TaskType.ANOMALY,
             TaskType.ANOMALY_CLASSIFICATION,
             TaskType.ANOMALY_DETECTION,
             TaskType.ANOMALY_SEGMENTATION,

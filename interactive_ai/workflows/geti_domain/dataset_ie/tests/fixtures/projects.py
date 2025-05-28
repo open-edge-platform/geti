@@ -36,6 +36,7 @@ supported_task_types = [
     TaskType.SEGMENTATION,
     TaskType.CLASSIFICATION,
     TaskType.INSTANCE_SEGMENTATION,
+    TaskType.ANOMALY,
     TaskType.ANOMALY_CLASSIFICATION,
     TaskType.ANOMALY_DETECTION,
     TaskType.ANOMALY_SEGMENTATION,

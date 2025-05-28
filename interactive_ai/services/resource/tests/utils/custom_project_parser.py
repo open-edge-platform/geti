@@ -45,9 +45,6 @@ class CustomTestProjectParser(ProjectParser):
 
     def get_task_type_by_name(self, task_name: str) -> TaskType:
         task_dict = self._get_task_dict(task_name)
-        task_type = task_dict["task_type"].upper()
-        if task_type == "ANOMALY":
-            return TaskType.ANOMALY_CLASSIFICATION
         return TaskType[task_dict["task_type"].upper()]
 
     def get_custom_labels_names_by_task(self, task_name: str) -> tuple[str, ...]:
