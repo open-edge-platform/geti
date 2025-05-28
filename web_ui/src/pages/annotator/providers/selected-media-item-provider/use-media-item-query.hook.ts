@@ -3,13 +3,13 @@
 
 import { useEffect, useRef } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { isEqual } from 'lodash-es';
 
 import { MediaIdentifier, MediaItem } from '../../../../core/media/media.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 

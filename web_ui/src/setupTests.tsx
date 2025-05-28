@@ -7,10 +7,10 @@ import 'jest-canvas-mock';
 
 import { ReactNode } from 'react';
 
+import { API_URLS } from '@geti/core';
 import { isLargeSizeQuery as mockIsLargeSizeQuery } from '@geti/ui/theme';
 
 import { initializeMetrics } from './analytics/metrics';
-import { API_URLS } from './core/services/urls';
 import * as CanvasUtils from './shared/canvas-utils';
 
 window.ResizeObserver = class ResizeObserver {
@@ -136,8 +136,8 @@ const mockConfig = {
     docsUrl: 'https://docs.geti.intel.com/',
     configUrl: 'https://config.geti.example.com',
 };
-jest.mock('./core/services/use-deployment-config-query.hook', () => ({
-    ...jest.requireActual('./core/services/use-deployment-config-query.hook'),
+jest.mock('@geti/core/src/services/use-deployment-config-query.hook', () => ({
+    ...jest.requireActual('@geti/core/src/services/use-deployment-config-query.hook'),
     useDeploymentConfigQuery: jest.fn(() => ({
         data: mockConfig,
     })),

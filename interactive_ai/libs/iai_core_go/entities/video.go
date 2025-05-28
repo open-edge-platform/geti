@@ -18,14 +18,14 @@ import (
 	"geti.com/iai_core/telemetry"
 )
 
-// FullVideoID represents full path to the video
+// FullVideoID represents full path to the video.
 type FullVideoID struct {
 	ContextID
 
 	VideoID ID
 }
 
-// VideoInfo captures metadata from ffprobe result to identify fps of a video stream
+// VideoInfo captures metadata from ffprobe result to identify fps of a video stream.
 type VideoInfo struct {
 	Streams []struct {
 		CodecType  string `json:"codec_type"`
@@ -33,8 +33,14 @@ type VideoInfo struct {
 	} `json:"streams"`
 }
 
-// NewFullVideoID creates new full video id struct
-func NewFullVideoID(organizationID string, workspaceID string, projectID string, datasetID string, videoID string) *FullVideoID {
+// NewFullVideoID creates new full video id struct.
+func NewFullVideoID(
+	organizationID string,
+	workspaceID string,
+	projectID string,
+	datasetID string,
+	videoID string,
+) *FullVideoID {
 	return &FullVideoID{
 		ContextID: ContextID{
 			OrganizationID: ID{organizationID},
@@ -46,10 +52,19 @@ func NewFullVideoID(organizationID string, workspaceID string, projectID string,
 	}
 }
 
-// GetPath construct the path to the video based on IDs
+// GetPath construct the path to the video based on IDs.
 func (vid FullVideoID) GetPath() string {
-	return filepath.Join("organizations", vid.OrganizationID.String(), "workspaces", vid.WorkspaceID.String(), "projects",
-		vid.ProjectID.String(), "dataset_storages", vid.DatasetID.String(), vid.VideoID.String())
+	return filepath.Join(
+		"organizations",
+		vid.OrganizationID.String(),
+		"workspaces",
+		vid.WorkspaceID.String(),
+		"projects",
+		vid.ProjectID.String(),
+		"dataset_storages",
+		vid.DatasetID.String(),
+		vid.VideoID.String(),
+	)
 }
 
 // Video represents video metadata.
@@ -109,6 +124,7 @@ func parseFPSFraction(fpsFraction string) float64 {
 	if err != nil {
 		return 0
 	}
-	fps := math.Round(n/d*100) / 100
+	const decimalPrecisionFactor = 100
+	fps := math.Round(n/d*decimalPrecisionFactor) / decimalPrecisionFactor
 	return fps
 }

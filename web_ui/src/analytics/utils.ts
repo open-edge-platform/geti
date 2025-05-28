@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CSRF_HEADERS } from '@geti/core/src/services/security';
 import { OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base';
 
 import packageJson from '../../package.json';
-import { CSRF_HEADERS } from '../core/services/security';
 
 export interface ResourceInfo {
     serviceName: string;

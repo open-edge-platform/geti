@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import { AuthContextProps } from 'react-oidc-context';
 
-import { useApplicationServices } from '../../services/application-services-provider.component';
 import { AuthService } from '../services/auth-service.interface';
 
 const loginQueryOptions = (authService: AuthService, idToken: string | undefined) => {

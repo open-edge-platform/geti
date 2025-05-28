@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { getFileSize } from '../../../../shared/utils';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedAdminUser, getMockedContributorUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
@@ -23,8 +23,8 @@ jest.mock('../../../../hooks/use-clear-indexeddb-storage/use-clear-indexeddb-sto
     };
 });
 
-jest.mock('../../../../core/users/hook/use-users.hook', () => ({
-    ...jest.requireActual('../../../../core/users/hook/use-users.hook'),
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
+    ...jest.requireActual('@geti/core/src/users/hook/use-users.hook'),
     useUsers: jest.fn(() => ({
         useActiveUser: jest.fn(() => ({ data: mockedAdminUser })),
     })),

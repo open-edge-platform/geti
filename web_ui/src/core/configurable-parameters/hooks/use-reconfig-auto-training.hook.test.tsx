@@ -5,8 +5,8 @@ import { ReactNode } from 'react';
 
 import { renderHook, waitFor } from '@testing-library/react';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { RequiredProviders } from '../../../test-utils/required-providers-render';
-import QUERY_KEYS from '../../requests/query-keys';
 import {
     ConfigurableParametersParams,
     ConfigurableParametersTaskChain,

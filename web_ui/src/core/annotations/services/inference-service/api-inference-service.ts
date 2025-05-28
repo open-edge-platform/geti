@@ -5,6 +5,7 @@ import { apiClient } from '@geti/core';
 import { isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
+import { API_URLS } from '../../../../../packages/core/src/services/urls';
 import { getImageDataFromTiffFile } from '../../../../shared/canvas-utils';
 import { isTiffFormat, loadImageFromFile } from '../../../../shared/media-utils';
 import { Label } from '../../../labels/label.interface';
@@ -13,7 +14,6 @@ import { mediaIdentifierToDTO } from '../../../media/services/utils';
 import { isVideo, Video } from '../../../media/video.interface';
 import { ProjectIdentifier } from '../../../projects/core.interface';
 import { DatasetIdentifier } from '../../../projects/dataset.interface';
-import { API_URLS } from '../../../services/urls';
 import { Annotation, TaskChainInput } from '../../annotation.interface';
 import {
     AnnotationDTO,

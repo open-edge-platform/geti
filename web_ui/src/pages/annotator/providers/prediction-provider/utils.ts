@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, sortBy } from 'lodash-es';
 
@@ -9,7 +10,6 @@ import { Explanation } from '../../../../core/annotations/prediction.interface';
 import { PredictionMode } from '../../../../core/annotations/services/prediction-service.interface';
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
 import { isVideoFrame } from '../../../../core/media/video.interface';
-import QUERY_KEYS from '../../../../core/requests/query-keys';
 import { useDatasetIdentifier } from '../../hooks/use-dataset-identifier.hook';
 import { useSelectedMediaItem } from '../selected-media-item-provider/selected-media-item-provider.component';
 import { updateVideoTimelineQuery } from '../selected-media-item-provider/utils';

@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { Button, ButtonGroup, Flex, Heading, Text, View } from '@geti/ui';
 import { isEmpty, isString } from 'lodash-es';
 
 import { ExportDatasetLSData } from '../../../../../core/projects/dataset.interface';
-import { useApplicationServices } from '../../../../../core/services/application-services-provider.component';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { downloadFile, getDownloadNotificationMessage, getFileSize } from '../../../../../shared/utils';

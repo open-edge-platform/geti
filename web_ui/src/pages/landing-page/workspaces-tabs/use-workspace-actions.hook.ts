@@ -3,9 +3,9 @@
 
 import { Key } from 'react';
 
+import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { WorkspaceMenuActions } from './utils';
 

@@ -64,7 +64,10 @@ func createRouter() *gin.Engine {
 
 	imageRepo := minio.NewImageRepositoryImpl()
 	cropper := service.NewResizeCropper()
-	createThumbnailUseCase := usecase.NewGetOrCreateImageThumbnail(imageRepo, cropper)
+	createThumbnailUseCase, err := usecase.NewGetOrCreateImageThumbnail(imageRepo, cropper)
+	if err != nil {
+		logger.Log().Fatalf("Cannot initiate create thumbnail use case: %s", err)
+	}
 	imageController := controller.NewImageController(createThumbnailUseCase, imageRepo)
 
 	pprof.Register(router, "media/debug/pprof")

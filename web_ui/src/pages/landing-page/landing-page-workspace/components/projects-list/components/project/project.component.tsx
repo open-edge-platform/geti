@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { paths } from '@geti/core';
 import { Divider, Flex, Text, View } from '@geti/ui';
 import dayjs from 'dayjs';
 import { Link, useNavigate } from 'react-router-dom';
@@ -13,7 +14,6 @@ import { DOMAIN, ProjectIdentifier } from '../../../../../../../core/projects/co
 import { useExportProject } from '../../../../../../../core/projects/hooks/use-export-project.hook';
 import { useProjectActions } from '../../../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../../../core/projects/project.interface';
-import { paths } from '../../../../../../../core/services/routes';
 import { useWorkspaceIdentifier } from '../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { CustomWellClickable } from '../../../../../../../shared/components/custom-well/custom-well-clickable.component';
 import { DomainName } from '../../../../../../../shared/components/domain-name/domain-name.component';

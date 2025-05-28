@@ -5,9 +5,9 @@ import { AxiosInstance } from 'axios';
 import { isNil } from 'lodash-es';
 import { v4 as uuidv4 } from 'uuid';
 
+import { API_URLS } from '../../../../../packages/core/src/services/urls';
 import { Label } from '../../../labels/label.interface';
 import { MediaItem } from '../../../media/media.interface';
-import { API_URLS } from '../../../services/urls';
 import { Annotation, TaskChainInput } from '../../annotation.interface';
 import { AnnotationLabelDTO, ImageIdDTO, VideoFrameIdDTO } from '../../dtos/annotation.interface';
 import { NewPredictionsDTO } from '../../dtos/prediction.interface';

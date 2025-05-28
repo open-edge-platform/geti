@@ -3,9 +3,13 @@
 
 import { useEffect, useRef } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
+import { getErrorMessage } from '../../../../packages/core/src/services/utils';
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import {
@@ -16,10 +20,6 @@ import {
     JobStatusIdentifier,
 } from '../../jobs/jobs.interface';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
-import { getErrorMessage } from '../../services/utils';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import {
     DatasetImportIdentifier,
     DatasetImportPrepareForNewProjectResponse,

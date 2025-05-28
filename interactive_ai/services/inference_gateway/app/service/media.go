@@ -24,7 +24,11 @@ type MediaServiceImpl struct {
 	frameReader frames.FrameReader
 }
 
-func NewMediaServiceImpl(videoRepo storage.VideoRepository, imageRepo storage.ImageRepository, reader frames.FrameReader) *MediaServiceImpl {
+func NewMediaServiceImpl(
+	videoRepo storage.VideoRepository,
+	imageRepo storage.ImageRepository,
+	reader frames.FrameReader,
+) *MediaServiceImpl {
 	return &MediaServiceImpl{
 		videoRepo:   videoRepo,
 		imageRepo:   imageRepo,
@@ -32,8 +36,12 @@ func NewMediaServiceImpl(videoRepo storage.VideoRepository, imageRepo storage.Im
 	}
 }
 
-// GetFrame reads frame specified by index from a video
-func (s *MediaServiceImpl) GetFrame(ctx context.Context, fullVideoID *sdkentities.FullVideoID, frameIndex int) (*bytes.Buffer, error) {
+// GetFrame reads frame specified by index from a video.
+func (s *MediaServiceImpl) GetFrame(
+	ctx context.Context,
+	fullVideoID *sdkentities.FullVideoID,
+	frameIndex int,
+) (*bytes.Buffer, error) {
 	video, loadErr := s.videoRepo.LoadVideoByID(ctx, fullVideoID)
 	if loadErr != nil {
 		return nil, loadErr
@@ -48,7 +56,7 @@ func (s *MediaServiceImpl) GetImage(ctx context.Context, fullImageID *sdkentitie
 		return nil, err
 	}
 	defer func() {
-		if err := imageReader.Close(); err != nil {
+		if err = imageReader.Close(); err != nil {
 			logger.TracingLog(ctx).Errorf("Error closing imageReader: %s", err)
 		}
 	}()

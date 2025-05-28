@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { ApplicationServicesContextProps } from '@geti/core/src/services/application-services-provider.component';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useNavigate } from 'react-router-dom';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
-import { ApplicationServicesContextProps } from '../../../../core/services/application-services-provider.component';
 import { useHistoryBlock } from '../../../../hooks/use-history-block/use-history-block.hook';
 import { applicationRender as render } from '../../../../test-utils/application-provider-render';
 import { getMockedProjectIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';

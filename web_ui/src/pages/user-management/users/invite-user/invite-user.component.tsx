@@ -3,6 +3,9 @@
 
 import { FormEvent, useRef, useState } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import {
     Button,
     ButtonGroup,
@@ -19,9 +22,6 @@ import {
 } from '@geti/ui';
 import { Info } from '@geti/ui/icons';
 
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
-import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
-import { WorkspaceIdentifier } from '../../../../core/workspaces/services/workspaces.interface';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { isYupValidationError } from '../../profile-page/utils';
 import { ErrorMessage } from '../add-member-popup/error-message/error-message.component';

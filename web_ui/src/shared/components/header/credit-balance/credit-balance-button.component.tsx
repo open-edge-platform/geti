@@ -3,6 +3,8 @@
 
 import { forwardRef, useEffect, useRef } from 'react';
 
+import { paths } from '@geti/core';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { ActionButton, Tooltip, TooltipTrigger, type FocusableRef } from '@geti/ui';
 import { CreditCard } from '@geti/ui/icons';
 import { isNil } from 'lodash-es';
@@ -10,11 +12,9 @@ import { useParams } from 'react-router-dom';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
-import { paths } from '../../../../core/services/routes';
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../../../core/user-settings/utils';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { usePrevious } from '../../../../hooks/use-previous/use-previous.hook';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';

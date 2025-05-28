@@ -3,13 +3,13 @@
 
 import { Key, useMemo, useState } from 'react';
 
+import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { DialogContainer } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { useOverlayTriggerState } from 'react-stately';
 
 import { ProjectIdentifier } from '../../../../../../../../../core/projects/core.interface';
 import { ProjectProps } from '../../../../../../../../../core/projects/project.interface';
-import { RESOURCE_TYPE } from '../../../../../../../../../core/users/users.interface';
 import { useWorkspaceIdentifier } from '../../../../../../../../../providers/workspaces-provider/use-workspace-identifier.hook';
 import { ActionMenu } from '../../../../../../../../../shared/components/action-menu/action-menu.component';
 import { MenuAction } from '../../../../../../../../../shared/components/action-menu/menu-action.interface';

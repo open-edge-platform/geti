@@ -9,15 +9,17 @@ import (
 	"image"
 	"image/draw"
 	"image/jpeg"
+	"regexp"
 	"testing"
 
 	sdkentities "geti.com/iai_core/entities"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	testhelpers "inference_gateway/app/test_helpers"
 )
 
-// Instantiate dummy entities for test purposes
+// Instantiate dummy entities for test purposes.
 func CreateDummyPredictionEntities(t *testing.T) (image.Image, *MediaInfo, PredictionRequestData) {
 	t.Helper()
 
@@ -25,7 +27,7 @@ func CreateDummyPredictionEntities(t *testing.T) (image.Image, *MediaInfo, Predi
 
 	buf := new(bytes.Buffer)
 	err := jpeg.Encode(buf, img, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	m := MediaInfo{
 		ImageID:    testhelpers.NewDummyID(5),
@@ -53,7 +55,7 @@ func TestDecodeMedia(t *testing.T) {
 
 	decodedImage, err := predictionRequestData.DecodeMedia()
 
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	// Convert the decodedImage to RGBA to be able to compare with the original
 	b := decodedImage.Bounds()
@@ -73,9 +75,6 @@ func TestExceedsMaxPredictions(t *testing.T) {
 }
 
 func TestPredictionRequestData_ToPredictBytes(t *testing.T) {
-	GetCurrentTimeString = func() string {
-		return "current_time"
-	}
 	var (
 		predictionRequestData PredictionRequestData
 		mediaInfo             MediaInfo
@@ -84,16 +83,18 @@ func TestPredictionRequestData_ToPredictBytes(t *testing.T) {
 	predictionRequestData.MediaInfo = mediaInfo
 
 	predictionString := `{"predictions":{"key1":"value1","key2":2},"maps":{"key3":"value3","key4":4}}`
-	expected := []byte(fmt.Sprintf(`{"predictions":{"key1":"value1","key2":2},"created":"current_time","media_identifier":{"image_id":"%s","type":"image"}}`, mediaInfo.ImageID))
+	expectedPattern := regexp.MustCompile(
+		fmt.Sprintf(
+			`{"predictions":{"key1":"value1","key2":2},"created":"[^"]+","media_identifier":{"image_id":"%s","type":"image"}}`,
+			regexp.QuoteMeta(mediaInfo.ImageID.String()),
+		),
+	)
 	output, err := predictionRequestData.ToPredictBytes(predictionString)
-	assert.NoError(t, err)
-	assert.Equal(t, expected, output)
+	require.NoError(t, err)
+	assert.Regexp(t, expectedPattern, string(output))
 }
 
 func TestPredictionRequestData_ToExplainBytes(t *testing.T) {
-	GetCurrentTimeString = func() string {
-		return "current_time"
-	}
 	var (
 		predictionRequestData PredictionRequestData
 		mediaInfo             MediaInfo
@@ -102,8 +103,13 @@ func TestPredictionRequestData_ToExplainBytes(t *testing.T) {
 	predictionRequestData.MediaInfo = mediaInfo
 
 	predictionString := `{"predictions":{"key1":"value1","key2":2},"maps":{"key3":"value3","key4":4}}`
-	expected := []byte(fmt.Sprintf(`{"maps":{"key3":"value3","key4":4},"created":"current_time","media_identifier":{"image_id":"%s","type":"image"}}`, mediaInfo.ImageID))
+	expectedPattern := regexp.MustCompile(
+		fmt.Sprintf(
+			`{"maps":{"key3":"value3","key4":4},"created":"[^"]+","media_identifier":{"image_id":"%s","type":"image"}}`,
+			regexp.QuoteMeta(mediaInfo.ImageID.String()),
+		),
+	)
 	output, err := predictionRequestData.ToExplainBytes(predictionString)
-	assert.NoError(t, err)
-	assert.Equal(t, expected, output)
+	require.NoError(t, err)
+	assert.Regexp(t, expectedPattern, string(output))
 }

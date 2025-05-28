@@ -4,10 +4,10 @@
 package storage
 
 import (
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetBucketName(t *testing.T) {
@@ -21,13 +21,12 @@ func TestGetBucketName(t *testing.T) {
 		{
 			give:     "EnvVarExists",
 			giveType: "imgType",
-			setupEnv: func() { _ = os.Setenv(bucketEnvVarName, "test") },
+			setupEnv: func() { t.Setenv(bucketEnvVarName, "test") },
 			want:     "test",
 		},
 		{
 			give:     "NoEnvVarExists",
 			giveType: "imgType",
-			setupEnv: func() { _ = os.Unsetenv(bucketEnvVarName) },
 			want:     "test",
 		},
 	}
@@ -40,10 +39,14 @@ func TestGetBucketName(t *testing.T) {
 			bucketName, err := GetBucketName(tt.giveType)
 			if err != nil {
 				assert.Empty(t, bucketName, "Bucket name should be empty")
-				assert.ErrorContains(t, err, "environment variable BUCKET_NAME_IMGTYPE was not set, but this is needed for S3 to work")
+				require.ErrorContains(
+					t,
+					err,
+					"environment variable BUCKET_NAME_IMGTYPE was not set, but this is needed for S3 to work",
+				)
 				return
 			}
-			assert.Nil(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tt.want, bucketName, "Bucket name doesn't match the expected value")
 		})
 	}

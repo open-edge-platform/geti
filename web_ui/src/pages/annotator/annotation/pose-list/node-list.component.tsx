@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ListBox as AriaComponentsListBox, ListBoxItem, ListLayout, Virtualizer } from 'react-aria-components';
+import { AriaComponentsListBox, ListBoxItem, ListLayout, Virtualizer } from '@geti/ui';
 
 import { KeypointAnnotation } from '../../../../core/annotations/annotation.interface';
 import { KeypointNode } from '../../../../core/annotations/shapes.interface';

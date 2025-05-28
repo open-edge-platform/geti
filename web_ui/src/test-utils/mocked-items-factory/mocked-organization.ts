@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { OrganizationMetadata } from '@geti/core/src/users/services/onboarding-service.interface';
 import { v4 as uuid } from 'uuid';
 
 import {
@@ -9,7 +10,6 @@ import {
     OrganizationTypeDTO,
 } from '../../core/organizations/dtos/organizations.interface';
 import { AccountStatus, Organization, OrganizationType } from '../../core/organizations/organizations.interface';
-import { OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';
 import { getMockedAdminUser } from './mocked-users';
 
 export const getMockedOrganization = (organization: Partial<Organization> = {}): Organization => {

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { screen } from '@testing-library/react';
 
-import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
 import { getMockedUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
 import { getMockedWorkspace } from '../../../../test-utils/mocked-items-factory/mocked-workspace';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';

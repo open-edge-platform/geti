@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { fireEvent, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -9,7 +10,6 @@ import { DOMAIN } from '../../core/projects/core.interface';
 import { CreateProjectProps } from '../../core/projects/project.interface';
 import { createInMemoryProjectService } from '../../core/projects/services/in-memory-project-service';
 import { TaskMetadata } from '../../core/projects/task.interface';
-import { WorkspaceIdentifier } from '../../core/workspaces/services/workspaces.interface';
 import { providersRender as render } from '../../test-utils/required-providers-render';
 import { REQUIRED_PROJECT_NAME_VALIDATION_MESSAGE } from './components/utils';
 import { NewProjectDialogProvider } from './new-project-dialog-provider/new-project-dialog-provider.component';

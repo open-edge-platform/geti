@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { v4 as uuid } from 'uuid';
 
+import { ResourceTypeDTO, UserDTO, UserRoleDTO } from '../../../packages/core/src/users/users.interface';
 import { AccountStatusDTO } from '../../../src/core/organizations/dtos/organizations.interface';
-import { paths } from '../../../src/core/services/routes';
-import { ResourceTypeDTO, UserDTO, UserRoleDTO } from '../../../src/core/users/users.interface';
 
 export const ACCOUNT_URL = (organizationId: string, tab: string) => `${paths.account.index({ organizationId })}/${tab}`;
 

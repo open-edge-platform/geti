@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryOnboardingService } from '@geti/core/src/users/services/inmemory-onboarding-service';
+import { OnboardingService, OrganizationMetadata } from '@geti/core/src/users/services/onboarding-service.interface';
 import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
 
 import { AccountStatus } from '../../core/organizations/organizations.interface';
-import { createInMemoryOnboardingService } from '../../core/users/services/inmemory-onboarding-service';
-import { OnboardingService, OrganizationMetadata } from '../../core/users/services/onboarding-service.interface';
 import { providersRender as render } from '../../test-utils/required-providers-render';
 import { OrganizationSelectionModal } from './organization-selection-modal.component';
 

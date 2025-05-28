@@ -3,9 +3,8 @@
 
 import { Key } from 'react';
 
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Item, Picker, Text } from '@geti/ui';
-
-import { WorkspaceEntity } from '../../../../../../core/workspaces/services/workspaces.interface';
 
 interface WorkspacesPickerProps {
     selectedWorkspace: WorkspaceEntity;

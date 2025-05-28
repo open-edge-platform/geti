@@ -4,8 +4,8 @@
 import { useRef } from 'react';
 
 import { ActionButton, CustomPopover } from '@geti/ui';
+import { Calendar } from '@geti/ui/icons';
 import { CalendarProps } from '@react-aria/calendar';
-import Calendar from '@spectrum-icons/workflow/Calendar';
 import { DateValue } from 'react-aria';
 import { useOverlayTriggerState } from 'react-stately';
 

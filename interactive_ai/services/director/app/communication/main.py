@@ -27,6 +27,7 @@ from communication.endpoints.prediction_endpoints import prediction_router
 from communication.endpoints.project_configuration_endpoints import project_configuration_router
 from communication.endpoints.status_endpoints import status_router
 from communication.endpoints.supported_algorithms_endpoints import supported_algorithms_router
+from communication.endpoints.training_configuration_endpoints import training_configuration_router
 from communication.endpoints.training_endpoints import training_router
 from communication.jobs_client import JobsClient
 from communication.kafka_handler import JobKafkaHandler, ProjectKafkaHandler
@@ -99,6 +100,7 @@ app.include_router(status_router)
 app.include_router(training_router)
 app.include_router(supported_algorithms_router)
 app.include_router(project_configuration_router)
+app.include_router(training_configuration_router)
 
 base_dir = os.path.dirname(__file__) + "/../../../api/schemas/"
 mongo_id_schema = RestApiValidator().load_schema_file_as_dict(base_dir + "mongo_id.yaml")

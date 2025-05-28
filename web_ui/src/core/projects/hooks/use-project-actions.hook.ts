@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import {
     InfiniteData,
     QueryKey,
@@ -18,14 +19,13 @@ import {
 import { AxiosError } from 'axios';
 import { isEmpty, omit } from 'lodash-es';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
+import { getErrorMessage } from '../../../../packages/core/src/services/utils';
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { useFeatureFlags } from '../../feature-flags/hooks/use-feature-flags.hook';
-import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
-import { getErrorMessage } from '../../services/utils';
 import { NextPageURL } from '../../shared/infinite-query.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { DOMAIN, ProjectIdentifier } from '../core.interface';
 import { DatasetIdentifier } from '../dataset.interface';
 import { CreateProjectProps, EditProjectProps, ProjectName, ProjectProps } from '../project.interface';

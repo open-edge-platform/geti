@@ -3,6 +3,7 @@
 
 import { Key } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { ActionButton, Flex, Item, Menu, MenuTrigger, Text } from '@geti/ui';
 import { Delete, Edit, MoreMenu } from '@geti/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
@@ -10,7 +11,6 @@ import dayjs from 'dayjs';
 
 import { usePersonalAccessToken } from '../../../../core/personal-access-tokens/hooks/use-personal-access-token.hook';
 import { PartialPersonalAccessToken } from '../../../../core/personal-access-tokens/personal-access-tokens.interface';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { DeleteDialog } from '../../../../shared/components/delete-dialog/delete-dialog.component';
 import { getDateTimeInISOAndUTCOffsetFormat } from '../../../../shared/utils';

@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
 import {
     Button,
     ButtonGroup,
@@ -16,7 +17,6 @@ import {
     View,
 } from '@geti/ui';
 
-import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from './utils';

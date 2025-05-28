@@ -3,11 +3,11 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
+import { CSRF_HEADERS } from '@geti/core/src/services/security';
 import { StatusCodes } from 'http-status-codes';
 import { isEmpty } from 'lodash-es';
 import { PreviousUpload, Upload, UploadOptions } from 'tus-js-client';
 
-import { CSRF_HEADERS } from '../../core/services/security';
 import { MissingProviderError } from '../../shared/missing-provider-error';
 
 const FILE_CHUNK_SIZE = 1024 * 1024 * 10; // 10mb

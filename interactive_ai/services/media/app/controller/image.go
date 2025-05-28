@@ -4,6 +4,7 @@
 package controller
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -23,13 +24,16 @@ type ImageController struct {
 
 type imageRequest struct {
 	OrganizationID string `uri:"organization_id" binding:"required,uuid4"`
-	WorkspaceID    string `uri:"workspace_id" binding:"required,uuid4"`
-	ProjectID      string `uri:"project_id" binding:"required,len=24,hexadecimal"`
-	DatasetID      string `uri:"dataset_id" binding:"required,len=24,hexadecimal"`
-	ImageID        string `uri:"image_id" binding:"required,len=24,hexadecimal"` // mongodb
+	WorkspaceID    string `uri:"workspace_id"    binding:"required,uuid4"`
+	ProjectID      string `uri:"project_id"      binding:"required,len=24,hexadecimal"`
+	DatasetID      string `uri:"dataset_id"      binding:"required,len=24,hexadecimal"`
+	ImageID        string `uri:"image_id"        binding:"required,len=24,hexadecimal"` // mongodb
 }
 
-func NewImageController(getThumbUseCase usecase.IGetOrCreateThumbnail, imageRepo storage.ImageRepository) *ImageController {
+func NewImageController(
+	getThumbUseCase usecase.IGetOrCreateThumbnail,
+	imageRepo storage.ImageRepository,
+) *ImageController {
 	return &ImageController{
 		getThumbUseCase: getThumbUseCase,
 		imageRepo:       imageRepo,
@@ -49,7 +53,7 @@ func sendImage(c *gin.Context, object io.ReadCloser, metadata *sdkentities.Objec
 	c.DataFromReader(http.StatusOK, metadata.Size, metadata.ContentType, object, headers)
 }
 
-// GetImage implements the full image display handler
+// GetImage implements the full image display handler.
 func (ctrl *ImageController) GetImage(c *gin.Context) {
 	var params imageRequest
 
@@ -58,8 +62,13 @@ func (ctrl *ImageController) GetImage(c *gin.Context) {
 		return
 	}
 
-	fullImageID := sdkentities.NewFullImageID(params.OrganizationID, params.WorkspaceID, params.ProjectID, params.DatasetID,
-		params.ImageID)
+	fullImageID := sdkentities.NewFullImageID(
+		params.OrganizationID,
+		params.WorkspaceID,
+		params.ProjectID,
+		params.DatasetID,
+		params.ImageID,
+	)
 	ctx := c.Request.Context()
 
 	logger.TracingLog(ctx).Infof("GetImage called for imageID %s", fullImageID.ImageID)
@@ -82,19 +91,27 @@ func (ctrl *ImageController) GetThumbnail(c *gin.Context) {
 		return
 	}
 
-	fullImageID := sdkentities.NewFullImageID(params.OrganizationID, params.WorkspaceID, params.ProjectID, params.DatasetID,
-		params.ImageID)
+	fullImageID := sdkentities.NewFullImageID(
+		params.OrganizationID,
+		params.WorkspaceID,
+		params.ProjectID,
+		params.DatasetID,
+		params.ImageID,
+	)
 	ctx := c.Request.Context()
 
 	logger.TracingLog(ctx).Infof("GetThumbnail called for imageID %s", fullImageID.ImageID)
 
 	thumbnail, metadata, err := ctrl.getThumbUseCase.Execute(ctx, fullImageID)
 	if err != nil {
-		switch err := err.(type) {
-		case *usecase.NotFoundError:
-			_ = c.AbortWithError(http.StatusNotFound, httperrors.NewNotFoundError(err.Error()))
-		default:
-			_ = c.AbortWithError(http.StatusInternalServerError, httperrors.NewInternalServerError(err.Error()))
+		{
+			var notFoundErr *usecase.NotFoundError
+			switch {
+			case errors.As(err, &notFoundErr):
+				_ = c.AbortWithError(http.StatusNotFound, httperrors.NewNotFoundError(err.Error()))
+			default:
+				_ = c.AbortWithError(http.StatusInternalServerError, httperrors.NewInternalServerError(err.Error()))
+			}
 		}
 		return
 	}

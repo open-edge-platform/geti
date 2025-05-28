@@ -12,6 +12,7 @@ build-image-gpu: install_common_libs
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
+		--label "org.opencontainers.image.description=GPU trainer for Geti" \
 		-t ${IMAGES_REGISTRY}/${GPU_IMAGE_NAME}:${TAG} \
 		-f ./Dockerfile.gpu .
 
@@ -20,6 +21,7 @@ build-image-xpu: install_common_libs
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
+		--label "org.opencontainers.image.description=XPU trainer for Geti" \
 		-t ${IMAGES_REGISTRY}/${XPU_IMAGE_NAME}:${TAG} \
 		-f ./Dockerfile.xpu .
 

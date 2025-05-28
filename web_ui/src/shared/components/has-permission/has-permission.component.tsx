@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { Resource, RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { useParams } from 'react-router-dom';
 
-import { useUsers } from '../../../core/users/hook/use-users.hook';
-import { Resource, RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { HasPermissionProps, OPERATION, UsePermissionType } from './has-permission.interface';
 import { OPERATION_PERMISSION } from './utils';

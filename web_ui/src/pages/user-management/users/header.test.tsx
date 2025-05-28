@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Resource, RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { screen } from '@testing-library/react';
 
 import { Environment, GPUProvider } from '../../../core/platform-utils/dto/utils.interface';
 import { createInMemoryPlatformUtilsService } from '../../../core/platform-utils/services/create-in-memory-platform-utils-service';
-import { Resource, RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { getMockedWorkspaceIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
 import {
@@ -38,7 +38,7 @@ jest.mock('../../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({
     useIsSaasEnv: jest.fn(() => true),
 }));
 
-jest.mock('../../../core/users/hook/use-users.hook', () => ({
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
     useResource: jest.fn(() => mockedResourceIdentifier),
     useUsers: jest.fn(() => ({
         useGetUsersQuery: mockedGetUsersQuery,

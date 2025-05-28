@@ -1,18 +1,18 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult, useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import type { UseQueryOptions } from '@tanstack/react-query/src/types';
 import { AxiosError } from 'axios';
 import { isEmpty } from 'lodash-es';
 
+import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
+import { getErrorMessage } from '../../../../packages/core/src/services/utils';
 import { useProjectIdentifier } from '../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import QUERY_KEYS from '../../requests/query-keys';
-import { useApplicationServices } from '../../services/application-services-provider.component';
-import { getErrorMessage } from '../../services/utils';
 import { useTasksWithSupportedAlgorithms } from '../../supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { TrainingBodyDTO } from '../dtos/train-model.interface';
 import { ModelGroupIdentifier, ModelIdentifier, ModelsGroups } from '../models.interface';

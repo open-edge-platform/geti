@@ -1,9 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { User } from '@geti/core/src/users/users.interface';
 import { isEmpty } from 'lodash-es';
-
-import { User } from '../../../../core/users/users.interface';
 
 export const getUserFullName = (firstName: string, lastName: string) => {
     return isEmpty(firstName) || isEmpty(lastName) ? `${lastName}${firstName}` : `${lastName}, ${firstName}`;

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti/ui';
 import { AiIcon, ChevronRightSmallLight } from '@geti/ui/icons';
 import { isFunction } from 'lodash-es';
@@ -8,7 +9,6 @@ import { useNumberFormatter, usePress } from 'react-aria';
 
 import { AnnotationLabel } from '../../../../core/annotations/annotation.interface';
 import { isPrediction, showLabelScore } from '../../../../core/labels/utils';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { TruncatedText } from '../../../../shared/components/truncated-text/truncated-text.component';
 import { FullnameWithLoading } from '../../../../shared/components/users/fullname.component';
