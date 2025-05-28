@@ -68,6 +68,7 @@ class TrainingConfigurationRESTController:
         :param project_identifier: Identifier for the project (containing organization_id, workspace_id, and project_id)
         :param task_id: ID of the task to retrieve configuration for
         :param model_manifest_id: Optional ID of the model manifest to retrieve specific configurations
+        :param model_id: Optional ID of the model to retrieve specific configurations
         :return: Dictionary representation of the training configuration
         :raises TaskNotFoundException: If the task does not exist
         """
