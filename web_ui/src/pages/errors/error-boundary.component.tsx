@@ -20,6 +20,7 @@ import { StatusCodes } from 'http-status-codes';
 import { ErrorBoundary as Boundary, FallbackProps } from 'react-error-boundary';
 import { isRouteErrorResponse } from 'react-router-dom';
 
+import { AccessDenied } from './access-denied/access-denied.component';
 import { BadRequest } from './bad-request/bad-request.component';
 import { ErrorLayout } from './error-layout/error-layout.component';
 import { ErrorScreen } from './general-error-screen/general-error-screen.component';
@@ -45,20 +46,23 @@ export const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
 
     switch (errorType) {
         case StatusCodes.BAD_REQUEST: // 400
-            component = <BadRequest />;
+            component = <BadRequest onReset={resetErrorBoundary} />;
             break;
         case StatusCodes.NOT_FOUND: // 404
-            component = <ResourceNotFound />;
+            component = <ResourceNotFound onReset={resetErrorBoundary} />;
             break;
         case StatusCodes.INTERNAL_SERVER_ERROR: // 500
-            component = <InternalServerError />;
+            component = <InternalServerError onReset={resetErrorBoundary} />;
             break;
         case StatusCodes.SERVICE_UNAVAILABLE: // 503
         case StatusCodes.TOO_MANY_REQUESTS: // 429
             component = <ServiceUnavailable />;
             break;
         case StatusCodes.UNAUTHORIZED: // 401
-            component = <UnauthenticatedUser />;
+            component = <UnauthenticatedUser onReset={resetErrorBoundary} />;
+            break;
+        case StatusCodes.FORBIDDEN: // 403
+            component = <AccessDenied onReset={resetErrorBoundary} />;
             break;
         default:
             component = <ErrorScreen errorMessage={errorMessage} resetErrorBoundary={resetErrorBoundary} />;
