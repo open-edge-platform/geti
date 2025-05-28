@@ -128,30 +128,23 @@ def register_models(
 
     try:
         model_registration_client = ModelRegistrationClient(metadata_getter=lambda: CTX_SESSION_VAR.get().as_tuple())
+
+        model_name = f"{str(project_id)}-{str(model_id)}"
+        logger.info(f"Registering model by {model_name}.")
+        model_registration_client.register(name=f"{str(project_id)}-{str(model_id)}", project=project, models=[model])
+
         # Register individual model
         if REGISTER_BY_TASK_ID and len(trainable_task_ids) == 1:
             # Single task project, register 'active' model only -> no further action needed,
             # return immediately after registration
             model_registration_client.register(
-                name=f"{str(project_id)}-active",
-                project=project,
-                models=[model],
-                override=True,
+                name=f"{str(project_id)}-active", project=project, models=[model], override=True
             )
             return
         if REGISTER_BY_TASK_ID and len(trainable_task_ids) > 1:
             # Task chain, register individual model by task id
             model_registration_client.register(
-                name=f"{str(project_id)}-{str(task_id)}",
-                project=project,
-                models=[model],
-                override=True,
-            )
-        else:
-            model_registration_client.register(
-                name=f"{str(project_id)}-{str(model_id)}",
-                project=project,
-                models=[model],
+                name=f"{str(project_id)}-{str(task_id)}", project=project, models=[model], override=True
             )
 
         # Register new active pipeline
@@ -205,6 +198,13 @@ def register_models(
 
             model_registration_client.register(
                 name=f"{str(project_id)}-active",
+                project=project,
+                models=[existing_mapped_model, model],
+                override=True,
+            )
+
+            model_registration_client.register(
+                name=f"{str(project_id)}-{str(existing_mapped_model.id)}-{str(model_id)}",
                 project=project,
                 models=[existing_mapped_model, model],
                 override=True,
