@@ -174,6 +174,17 @@ ingress:
     - /api/v(.*)/organizations/{{ .Values.id_pattern }}/workspaces
     methods:
       - GET
+      - POST
+      - PUT
+      - DELETE
+  - matches:
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/workspaces/{{ .Values.id_pattern }}
+    - /api/v(.*)/organizations/{{ .Values.id_pattern }}/workspaces/{{ .Values.id_pattern }}/
+    methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
   - matches:
     - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users/
     - /api/v(.*)/organizations/{{ .Values.id_pattern }}/users
