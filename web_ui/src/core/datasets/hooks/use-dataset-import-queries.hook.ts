@@ -156,19 +156,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         }, [intervalHandlers]);
 
         useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlersRef.current.onError(query.error);
             }
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.isSuccess, query.data, query.isError, query.error]);
 
         return query;
     };
@@ -192,19 +186,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         }, [intervalHandlers]);
 
         useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlersRef.current.onError(query.error);
             }
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.data, query.isSuccess, query.isError, query.error]);
 
         return query;
     };
@@ -228,19 +216,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         }, [intervalHandlers]);
 
         useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlersRef.current.onError(query.error);
             }
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.isSuccess, query.data, query.isError, query.error]);
 
         return query;
     };
@@ -250,6 +232,7 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         enabled = true,
         ...intervalHandlers
     }) => {
+        console.log('useImportingExistingProjectStatusJob');
         const intervalHandlersRef = useRef(intervalHandlers);
 
         const query = useQuery<JobImportDatasetToExistingProjectStatus, AxiosError>({
@@ -264,20 +247,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         }, [intervalHandlers]);
 
         useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlersRef.current.onError(query.error);
             }
-
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.isSuccess, query.data, query.isError, query.error]);
 
         return query;
     };
