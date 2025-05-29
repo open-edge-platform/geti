@@ -12,10 +12,17 @@ ingress:
   endpoints:
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):prompt
 
-resources:
+standardResources:
   requests:
     cpu: 1
     memory: 2Gi
+  limits:
+    memory: 2Gi
+
+liteResources:
+  requests:
+    cpu: 300Mi
+    memory: 1Gi
   limits:
     memory: 2Gi
 

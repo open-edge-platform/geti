@@ -2,10 +2,17 @@ image: resource
 
 imagePullPolicy: IfNotPresent
 
-resources:
+standardResources:
   requests:
     cpu: '1'
     memory: 3Gi
+  limits:
+    memory: 3Gi # To be reduced after media upload revamp (CVS-152302)
+
+liteResources:
+  requests:
+    cpu: 300Mi
+    memory: 1Gi
   limits:
     memory: 3Gi # To be reduced after media upload revamp (CVS-152302)
 
