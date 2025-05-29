@@ -8,7 +8,6 @@ import { IntelBrandedLoading } from '@geti/ui';
 import { negate } from 'lodash-es';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';
 
-import { AnalyticsProvider } from '../analytics/analytics-provider.component';
 import { useFeatureFlags } from '../core/feature-flags/hooks/use-feature-flags.hook';
 import { isKeypointTask } from '../core/projects/utils';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
@@ -21,6 +20,7 @@ import { WelcomeTrialModal } from '../pages/landing-page/welcome-trial-modal/wel
 import { ProjectDataset } from '../pages/project-details/components/project-dataset/project-dataset.component';
 import { RequestAccessConfirmation } from '../pages/sign-up/request-access-confirmation.component';
 import { SignUp } from '../pages/sign-up/sign-up.component';
+import { InstallationModeProvider } from '../providers/installation-mode-provider.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';
 import { AccessDeniedDialog } from '../shared/components/access-denied-dialog/access-denied-dialog.component';
 import { LicenseModal } from '../shared/components/license-modal/license-modal.component';
@@ -104,7 +104,7 @@ const AppProviders = (): JSX.Element => {
 
     return (
         <Suspense fallback={<IntelBrandedLoading />}>
-            <AnalyticsProvider>
+            <InstallationModeProvider>
                 <RoutesCollector>
                     <OrganizationsContext>
                         <LastLoginNotification />
@@ -119,7 +119,7 @@ const AppProviders = (): JSX.Element => {
                         </TusUploadProvider>
                     </OrganizationsContext>
                 </RoutesCollector>
-            </AnalyticsProvider>
+            </InstallationModeProvider>
             <ErrorsHandler />
         </Suspense>
     );

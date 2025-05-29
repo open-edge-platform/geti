@@ -9,7 +9,6 @@ import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk
 
 import { usePlatformUtils } from '../core/platform-utils/hooks/use-platform-utils.hook';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
-import { MissingProviderError } from '../shared/missing-provider-error';
 import { createPeriodicMetricExporter, initializeMetrics } from './metrics';
 import { initializeTracing } from './traces';
 import { SERVICE_DEFAULT_INFO } from './utils';
@@ -88,8 +87,7 @@ const AnalyticsProvider = ({ children }: AnalyticsProviderProps): JSX.Element =>
             meter: meterProviderRef.current?.getMeter('default', SERVICE_DEFAULT_INFO.serviceVersion),
             getTrace: tracingRef.current?.getTrace,
         }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [meterProviderRef.current, tracingRef.current]
+        []
     );
 
     return <AnalyticsContext.Provider value={value}>{children}</AnalyticsContext.Provider>;
@@ -99,7 +97,10 @@ const useAnalytics = (): AnalyticsContextProps => {
     const context = useContext(AnalyticsContext);
 
     if (context === undefined) {
-        throw new MissingProviderError('useAnalytics', 'AnalyticsProvider');
+        return {
+            meter: undefined,
+            getTrace: undefined,
+        };
     }
 
     return context;
