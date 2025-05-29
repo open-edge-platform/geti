@@ -21,8 +21,8 @@ const ActionTooltip = () => {
     return (
         <InfoTooltip
             tooltipText={
-                "Click on a bar to view datasets filtered by this label. You'll be redirected to a page showing only " +
-                'media items tagged with the selected label.'
+                "Clicking a label's bar redirects you to the dataset page displaying media items filtered by " +
+                'selected label.'
             }
         />
     );
