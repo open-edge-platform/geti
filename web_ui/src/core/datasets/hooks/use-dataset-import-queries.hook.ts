@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
@@ -142,8 +142,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         enabled = true,
         ...intervalHandlers
     }) => {
-        const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobPrepareDatasetImportNewProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.PREPARE_DATASET_STATUS_JOB_KEY(data),
             queryFn: () => service.prepareDatasetImportNewProjectJob(data),
@@ -152,23 +150,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         });
 
         useEffect(() => {
-            intervalHandlersRef.current = intervalHandlers;
-        }, [intervalHandlers]);
-
-        useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlers)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlers.onError(query.error);
             }
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.data, query.isSuccess, query.isError, query.error, intervalHandlers]);
 
         return query;
     };
@@ -178,8 +166,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         enabled = true,
         ...intervalHandlers
     }) => {
-        const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobImportDatasetToNewProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.IMPORT_DATASET_NEW_PROJECT_STATUS_JOB_KEY(data),
             queryFn: () => service.importDatasetToNewProjectStatusJob(data),
@@ -188,23 +174,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         });
 
         useEffect(() => {
-            intervalHandlersRef.current = intervalHandlers;
-        }, [intervalHandlers]);
-
-        useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlers)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlers.onError(query.error);
             }
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.data, query.isSuccess, query.isError, query.error, intervalHandlers]);
 
         return query;
     };
@@ -214,8 +190,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         enabled = true,
         ...intervalHandlers
     }) => {
-        const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobPrepareDatasetToExistingProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.PREPARE_DATASET_STATUS_JOB_KEY(data),
             queryFn: () => service.prepareDatasetToExistingProjectStatusJob(data),
@@ -224,23 +198,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         });
 
         useEffect(() => {
-            intervalHandlersRef.current = intervalHandlers;
-        }, [intervalHandlers]);
-
-        useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlers)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlers.onError(query.error);
             }
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.data, query.isSuccess, query.isError, query.error, intervalHandlers]);
 
         return query;
     };
@@ -250,8 +214,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         enabled = true,
         ...intervalHandlers
     }) => {
-        const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobImportDatasetToExistingProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.IMPORT_DATASET_EXISTING_PROJECT_STATUS_JOB_KEY(data),
             queryFn: () => service.importDatasetToExistingProjectStatusJob(data),
@@ -260,24 +222,13 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         });
 
         useEffect(() => {
-            intervalHandlersRef.current = intervalHandlers;
-        }, [intervalHandlers]);
-
-        useEffect(() => {
-            if (!enabled || !query.isSuccess) {
-                return;
+            if (!enabled) return;
+            if (query.isSuccess) {
+                getIntervalJobHandlers(intervalHandlers)(query.data);
+            } else if (query.isError && query.error !== null) {
+                intervalHandlers.onError(query.error);
             }
-
-            getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
-        }, [enabled, query.isSuccess, query.data]);
-
-        useEffect(() => {
-            if (!query.isError || query.error === null) {
-                return;
-            }
-
-            intervalHandlersRef.current.onError(query.error);
-        }, [query.isError, query.error]);
+        }, [enabled, query.data, query.isSuccess, query.isError, query.error, intervalHandlers]);
 
         return query;
     };
