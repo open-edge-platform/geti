@@ -21,7 +21,7 @@ standardResources:
 
 liteResources:
   requests:
-    cpu: 300Mi
+    cpu: 300m
     memory: 1Gi
   limits:
     memory: 2Gi

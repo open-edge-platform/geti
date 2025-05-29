@@ -11,7 +11,7 @@ standardResources:
 
 liteResources:
   requests:
-    cpu: 300Mi
+    cpu: 300m
     memory: 1Gi
   limits:
     memory: 3Gi # To be reduced after media upload revamp (CVS-152302)
