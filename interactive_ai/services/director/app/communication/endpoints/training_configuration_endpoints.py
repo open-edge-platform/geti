@@ -6,6 +6,7 @@ from http import HTTPStatus
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
+from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
@@ -45,4 +46,23 @@ def get_training_configuration(
         task_id=ID(task_id) if task_id else None,
         model_manifest_id=model_manifest_id,
         model_id=ID(model_id) if model_id else None,
+    )
+
+
+@training_configuration_router.patch("/training_configuration", status_code=HTTPStatus.NO_CONTENT)
+def update_training_configuration(
+    project_identifier: Annotated[ProjectIdentifier, Depends(get_project_identifier)],
+    update_configuration: PartialTrainingConfiguration,
+) -> None:
+    """Update the configuration for a specific project."""
+    if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
+        raise GetiBaseException(
+            message="Feature not available",
+            error_code="feature_not_available",
+            http_status=HTTPStatus.FORBIDDEN,
+        )
+
+    TrainingConfigurationRESTController.update_configuration(
+        project_identifier=project_identifier,
+        update_configuration=update_configuration,
     )

@@ -16,8 +16,8 @@ class PartialTrainingConfigurationToMongo(IMapperSimple[PartialTrainingConfigura
         doc = {
             "_id": IDToMongo.forward(instance.id_),
             "task_id": IDToMongo.forward(ID(instance.task_id)),
-            "global_parameters": instance.global_parameters.model_dump(),
-            "hyperparameters": instance.hyperparameters.model_dump(),
+            "global_parameters": instance.global_parameters.model_dump() if instance.global_parameters else None,
+            "hyperparameters": instance.hyperparameters.model_dump() if instance.hyperparameters else None,
         }
         if instance.model_manifest_id:
             doc["model_manifest_id"] = instance.model_manifest_id

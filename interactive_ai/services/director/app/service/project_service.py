@@ -12,6 +12,8 @@ from communication.exceptions import DatasetStorageNotInProjectException
 from configuration import ComponentRegisterEntry, ConfigurableComponentRegister
 from storage.repos import DatasetItemCountRepo, DatasetItemLabelsRepo
 from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActivationRepo
+from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
+from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
 from geti_fastapi_tools.exceptions import ProjectNotFoundException
 from geti_types import ID, DatasetStorageIdentifier, ProjectIdentifier
@@ -71,6 +73,11 @@ class ProjectService:
                     task_id=None,
                 )
 
+        # init project and training configurations
+        task_ids = [task.id_ for task in project.get_trainable_task_nodes()]
+        ProjectConfigurationRepo(project.identifier).create_default_configuration(task_ids=task_ids)
+        PartialTrainingConfigurationRepo(project.identifier).create_default_configuration(task_ids=task_ids)
+
     @staticmethod
     def delete_entities(workspace_id: ID, project_id: ID, dataset_storage_id: ID) -> None:
         """
@@ -80,6 +87,8 @@ class ProjectService:
             - DatasetItemCount
             - DatasetItemLabels
             - AutoTrainActivation
+            - ProjectConfiguration
+            - PartialTrainingConfiguration
 
         Warning: deletion may change with: CVS-86033
 
@@ -97,6 +106,8 @@ class ProjectService:
         DatasetItemCountRepo(dataset_storage_identifier=dataset_storage_identifier).delete_all()
         DatasetItemLabelsRepo(dataset_storage_identifier=dataset_storage_identifier).delete_all()
         ProjectBasedAutoTrainActivationRepo(project_identifier=project_identifier).delete_all()
+        ProjectConfigurationRepo(project_identifier=project_identifier).delete_all()
+        PartialTrainingConfigurationRepo(project_identifier=project_identifier).delete_all()
 
     @staticmethod
     def unlock(job_type: str, project_id: ID) -> None:

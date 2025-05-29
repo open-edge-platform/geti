@@ -79,7 +79,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
             "augmentation": {
                 "center_crop": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply center cropping to the image",
                         "key": "enable",
                         "name": "Enable center crop",
@@ -87,7 +87,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 1.0,
                         "description": "Ratio of original dimensions to keep when cropping",
                         "key": "ratio",
                         "max_value": None,
@@ -101,7 +101,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
             "filtering": {
                 "max_annotation_objects": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply maximum annotation objects filtering",
                         "key": "enable",
                         "name": "Enable maximum annotation objects filtering",
@@ -109,7 +109,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 10000,
                         "description": "Maximum number of objects in an annotation",
                         "key": "max_annotation_objects",
                         "max_value": None,
@@ -121,7 +121,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                 ],
                 "max_annotation_pixels": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply maximum annotation pixels filtering",
                         "key": "enable",
                         "name": "Enable maximum annotation pixels filtering",
@@ -129,7 +129,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 10000,
                         "description": "Maximum number of pixels in an annotation",
                         "key": "max_annotation_pixels",
                         "max_value": None,
@@ -141,7 +141,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                 ],
                 "min_annotation_pixels": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply minimum annotation pixels filtering",
                         "key": "enable",
                         "name": "Enable minimum annotation pixels filtering",
@@ -149,7 +149,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 1,
                         "description": "Minimum number of pixels in an annotation",
                         "key": "min_annotation_pixels",
                         "max_value": None,
@@ -162,7 +162,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
             },
             "subset_split": [
                 {
-                    "default_value": None,
+                    "default_value": 70,
                     "description": "Percentage of data to use for training",
                     "key": "training",
                     "max_value": None,
@@ -172,7 +172,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "value": 70,
                 },
                 {
-                    "default_value": None,
+                    "default_value": 20,
                     "description": "Percentage of data to use for validation",
                     "key": "validation",
                     "max_value": None,
@@ -182,7 +182,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "value": 20,
                 },
                 {
-                    "default_value": None,
+                    "default_value": 10,
                     "description": "Percentage of data to use for testing",
                     "key": "test",
                     "max_value": None,
@@ -192,7 +192,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "value": 10,
                 },
                 {
-                    "default_value": None,
+                    "default_value": True,
                     "description": "Whether to automatically select data for each subset",
                     "key": "auto_selection",
                     "name": "Auto selection",
@@ -200,7 +200,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "value": True,
                 },
                 {
-                    "default_value": None,
+                    "default_value": False,
                     "description": "Whether to remix data between subsets",
                     "key": "remixing",
                     "name": "Remixing",
@@ -211,7 +211,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
         },
         "training": [
             {
-                "default_value": None,
+                "default_value": 1000,
                 "description": "Maximum number of training epochs to run",
                 "key": "max_epochs",
                 "max_value": None,
@@ -221,7 +221,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                 "value": 100,
             },
             {
-                "default_value": None,
+                "default_value": 0.001,
                 "description": "Base learning rate for the optimizer",
                 "key": "learning_rate",
                 "max_value": 1.0,
@@ -233,7 +233,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
             {
                 "early_stopping": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to stop training early when performance stops improving",
                         "key": "enable",
                         "name": "Enable early stopping",
@@ -241,7 +241,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 1,
                         "description": "Number of epochs with no improvement after which training will be stopped",
                         "key": "patience",
                         "max_value": None,
@@ -253,7 +253,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                 ],
                 "max_detection_per_image": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to limit the number of detections per image",
                         "key": "enable",
                         "name": "Enable maximum detection per image",
@@ -261,7 +261,7 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": False,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 10000,
                         "description": "Maximum number of objects that can be detected in a single image, "
                         "only applicable for instance segmentation models",
                         "key": "max_detection_per_image",
@@ -331,7 +331,7 @@ def fxt_training_configuration_full_rest_view(
             "augmentation": {
                 "center_crop": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply center cropping to the image",
                         "key": "enable",
                         "name": "Enable center crop",
@@ -339,7 +339,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 1.0,
                         "description": "Ratio of original dimensions to keep when cropping",
                         "key": "ratio",
                         "max_value": None,
@@ -351,7 +351,7 @@ def fxt_training_configuration_full_rest_view(
                 ],
                 "random_affine": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply random affine transformations to the image",
                         "key": "enable",
                         "name": "Enable random affine",
@@ -359,7 +359,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 0.0,
                         "description": "Maximum rotation angle in degrees",
                         "key": "degrees",
                         "max_value": None,
@@ -368,10 +368,40 @@ def fxt_training_configuration_full_rest_view(
                         "type": "float",
                         "value": 15.0,
                     },
+                    {
+                        "default_value": 0.0,
+                        "description": "Maximum horizontal translation as a fraction of image width",
+                        "key": "translate_x",
+                        "max_value": None,
+                        "min_value": None,
+                        "name": "Horizontal translation",
+                        "type": "float",
+                        "value": 0.0,
+                    },
+                    {
+                        "default_value": 0.0,
+                        "description": "Maximum vertical translation as a fraction of image height",
+                        "key": "translate_y",
+                        "max_value": None,
+                        "min_value": None,
+                        "name": "Vertical translation",
+                        "type": "float",
+                        "value": 0.0,
+                    },
+                    {
+                        "default_value": 1.0,
+                        "description": "Scaling factor for the image during affine transformation",
+                        "key": "scale",
+                        "max_value": None,
+                        "min_value": None,
+                        "name": "Scale factor",
+                        "type": "float",
+                        "value": 1.0,
+                    },
                 ],
                 "tiling": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply tiling to the image",
                         "key": "enable",
                         "name": "Enable tiling",
@@ -379,7 +409,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to use adaptive tiling based on image content",
                         "key": "adaptive_tiling",
                         "name": "Adaptive tiling",
@@ -387,7 +417,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": False,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 128,
                         "description": "Size of each tile in pixels",
                         "key": "tile_size",
                         "max_value": None,
@@ -397,7 +427,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": 256,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 64,
                         "description": "Overlap between adjacent tiles in pixels",
                         "key": "tile_overlap",
                         "max_value": None,
@@ -411,7 +441,7 @@ def fxt_training_configuration_full_rest_view(
             "filtering": {
                 "max_annotation_objects": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply maximum annotation objects filtering",
                         "key": "enable",
                         "name": "Enable maximum annotation objects filtering",
@@ -419,7 +449,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 10000,
                         "description": "Maximum number of objects in an annotation",
                         "key": "max_annotation_objects",
                         "max_value": None,
@@ -431,7 +461,7 @@ def fxt_training_configuration_full_rest_view(
                 ],
                 "max_annotation_pixels": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply maximum annotation pixels filtering",
                         "key": "enable",
                         "name": "Enable maximum annotation pixels filtering",
@@ -439,7 +469,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 10000,
                         "description": "Maximum number of pixels in an annotation",
                         "key": "max_annotation_pixels",
                         "max_value": None,
@@ -451,7 +481,7 @@ def fxt_training_configuration_full_rest_view(
                 ],
                 "min_annotation_pixels": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to apply minimum annotation pixels filtering",
                         "key": "enable",
                         "name": "Enable minimum annotation pixels filtering",
@@ -459,7 +489,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 1,
                         "description": "Minimum number of pixels in an annotation",
                         "key": "min_annotation_pixels",
                         "max_value": None,
@@ -472,7 +502,7 @@ def fxt_training_configuration_full_rest_view(
             },
             "subset_split": [
                 {
-                    "default_value": None,
+                    "default_value": 70,
                     "description": "Percentage of data to use for training",
                     "key": "training",
                     "max_value": None,
@@ -482,7 +512,7 @@ def fxt_training_configuration_full_rest_view(
                     "value": 80,
                 },
                 {
-                    "default_value": None,
+                    "default_value": 20,
                     "description": "Percentage of data to use for validation",
                     "key": "validation",
                     "max_value": None,
@@ -492,7 +522,7 @@ def fxt_training_configuration_full_rest_view(
                     "value": 10,
                 },
                 {
-                    "default_value": None,
+                    "default_value": 10,
                     "description": "Percentage of data to use for testing",
                     "key": "test",
                     "max_value": None,
@@ -502,7 +532,7 @@ def fxt_training_configuration_full_rest_view(
                     "value": 10,
                 },
                 {
-                    "default_value": None,
+                    "default_value": True,
                     "description": "Whether to automatically select data for each subset",
                     "key": "auto_selection",
                     "name": "Auto selection",
@@ -510,7 +540,7 @@ def fxt_training_configuration_full_rest_view(
                     "value": True,
                 },
                 {
-                    "default_value": None,
+                    "default_value": False,
                     "description": "Whether to remix data between subsets",
                     "key": "remixing",
                     "name": "Remixing",
@@ -521,7 +551,7 @@ def fxt_training_configuration_full_rest_view(
         },
         "training": [
             {
-                "default_value": None,
+                "default_value": 1000,
                 "description": "Maximum number of training epochs to run",
                 "key": "max_epochs",
                 "max_value": None,
@@ -531,7 +561,7 @@ def fxt_training_configuration_full_rest_view(
                 "value": 50,
             },
             {
-                "default_value": None,
+                "default_value": 0.001,
                 "description": "Base learning rate for the optimizer",
                 "key": "learning_rate",
                 "max_value": 1.0,
@@ -543,7 +573,7 @@ def fxt_training_configuration_full_rest_view(
             {
                 "early_stopping": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to stop training early when performance stops improving",
                         "key": "enable",
                         "name": "Enable early stopping",
@@ -551,7 +581,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": True,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 1,
                         "description": "Number of epochs with no improvement after which training will be stopped",
                         "key": "patience",
                         "max_value": None,
@@ -563,7 +593,7 @@ def fxt_training_configuration_full_rest_view(
                 ],
                 "max_detection_per_image": [
                     {
-                        "default_value": None,
+                        "default_value": False,
                         "description": "Whether to limit the number of detections per image",
                         "key": "enable",
                         "name": "Enable maximum detection per image",
@@ -571,7 +601,7 @@ def fxt_training_configuration_full_rest_view(
                         "value": False,
                     },
                     {
-                        "default_value": None,
+                        "default_value": 10000,
                         "description": "Maximum number of objects that can be detected in a single image, "
                         "only applicable for instance segmentation models",
                         "key": "max_detection_per_image",
