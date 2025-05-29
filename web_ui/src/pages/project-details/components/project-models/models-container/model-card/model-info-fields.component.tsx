@@ -28,9 +28,9 @@ const ModelInfoReady = ({
     totalDiskSize,
     complexity,
 }: {
-    modelSize?: string;
-    totalDiskSize?: string;
-    complexity?: number;
+    modelSize: string | undefined;
+    totalDiskSize: string | undefined;
+    complexity: number | undefined;
 }) => (
     <>
         {modelSize !== undefined && (
@@ -58,6 +58,9 @@ const ModelInfoReady = ({
 );
 
 export const ModelInfoFields = ({
+    modelSize,
+    totalDiskSize,
+    complexity,
     isModelTraining,
 }: {
     modelSize?: string;
@@ -65,5 +68,13 @@ export const ModelInfoFields = ({
     complexity?: number;
     isModelTraining: boolean;
 }) => {
-    return <>{isModelTraining ? <ModelInfoTraining /> : <ModelInfoReady />}</>;
+    return (
+        <>
+            {isModelTraining ? (
+                <ModelInfoTraining />
+            ) : (
+                <ModelInfoReady modelSize={modelSize} totalDiskSize={totalDiskSize} complexity={complexity} />
+            )}
+        </>
+    );
 };

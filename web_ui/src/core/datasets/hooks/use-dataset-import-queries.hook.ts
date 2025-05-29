@@ -232,7 +232,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         enabled = true,
         ...intervalHandlers
     }) => {
-        console.log('useImportingExistingProjectStatusJob');
         const intervalHandlersRef = useRef(intervalHandlers);
 
         const query = useQuery<JobImportDatasetToExistingProjectStatus, AxiosError>({
