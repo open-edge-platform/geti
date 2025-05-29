@@ -54,6 +54,30 @@ jest.mock('../../../../../../core/supported-algorithms/hooks/use-tasks-with-supp
     }),
 }));
 
+const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
+const mockedJob = getMockedJob({
+    state: JobState.RUNNING,
+    type: JobType.TRAIN,
+    creationTime: formattedCreationDate,
+    metadata: {
+        task: {
+            taskId: 'segmentation-id',
+            modelArchitecture: 'SSD',
+            name: 'Segmentation',
+            datasetStorageId: 'dataset-storage-id',
+            modelTemplateId: 'template-id',
+        },
+        project: {
+            id: '123',
+            name: 'example project',
+        },
+        trainedModel: {
+            modelId: 'model-id',
+        },
+    },
+}) as RunningTrainingJob;
+const mockedGenericId = `training-model-${mockedJob.metadata.trainedModel.modelId}`;
+
 describe('TrainingModelCard', () => {
     const render = async ({ job, modelGroup }: { job: RunningTrainingJob; modelGroup: ModelsGroups[] }) => {
         const modelsService = createInMemoryModelsService();
@@ -74,29 +98,6 @@ describe('TrainingModelCard', () => {
     };
 
     it('should display increased model version from the previously trained model, creation time, loading model info and inform that score is not available', async () => {
-        const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
-        const mockedJob = getMockedJob({
-            state: JobState.RUNNING,
-            type: JobType.TRAIN,
-            creationTime: formattedCreationDate,
-            metadata: {
-                task: {
-                    taskId: 'segmentation-id',
-                    modelArchitecture: 'SSD',
-                    name: 'Segmentation',
-                    datasetStorageId: 'dataset-storage-id',
-                    modelTemplateId: 'template-id',
-                },
-                project: {
-                    id: '123',
-                    name: 'example project',
-                },
-                trainedModel: {
-                    modelId: 'model-id',
-                },
-            },
-        }) as RunningTrainingJob;
-        const mockedGenericId = `training-model-${mockedJob.metadata.trainedModel.modelId}`;
         const mockedModelGroup = [getMockedModelGroups()];
         await render({ job: mockedJob, modelGroup: mockedModelGroup });
 
@@ -117,29 +118,6 @@ describe('TrainingModelCard', () => {
     });
 
     it('should display model version 1 if there were not previously trained model in that architecture, creation time, loading model info and inform that score is not available', async () => {
-        const formattedCreationDate = formatDate(dayjs().toString(), 'DD MMM YYYY, hh:mm A');
-        const mockedJob = getMockedJob({
-            state: JobState.RUNNING,
-            type: JobType.TRAIN,
-            creationTime: formattedCreationDate,
-            metadata: {
-                task: {
-                    taskId: 'segmentation-id',
-                    modelArchitecture: 'SSD',
-                    name: 'Segmentation',
-                    datasetStorageId: 'dataset-storage-id',
-                    modelTemplateId: 'template-id',
-                },
-                project: {
-                    id: '123',
-                    name: 'example project',
-                },
-                trainedModel: {
-                    modelId: 'model-id',
-                },
-            },
-        }) as RunningTrainingJob;
-        const mockedGenericId = `training-model-${mockedJob.metadata.trainedModel.modelId}`;
         await render({ job: mockedJob, modelGroup: [] });
 
         expect(screen.getByTestId(`version-${mockedGenericId}-id`)).toHaveTextContent(`Version 1`);
