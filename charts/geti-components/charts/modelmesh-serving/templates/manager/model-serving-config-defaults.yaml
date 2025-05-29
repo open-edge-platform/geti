@@ -1,0 +1,78 @@
+# Copyright 2021 IBM Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# These are the system defaults which users can override with a user config
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-serving-config-defaults
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "modelmesh-serving.labels" . | nindent 4 }}
+data:
+  config-defaults.yaml: |
+    podsPerRuntime: 1
+    scaleToZero:
+      enabled: false
+    # We use a regular (non-headless) Service so that Kubernetes can assign a ClusterIP.
+    # This simplifies service discovery and offloads load balancing from client applications
+    # to the service mesh. Note that Kubernetes' default load balancing does not handle
+    # gRPC traffic well due to HTTP/2 multiplexing. Instead, we rely on Istio’s L7 routing
+    # and load balancing to properly manage gRPC connections.
+    # https://jira.devtools.intel.com/browse/CVS-161173
+    headlessService: false
+    runtimePodAnnotations:
+      traffic.sidecar.istio.io/excludeInboundPorts: "8080"
+      traffic.sidecar.istio.io/excludeOutboundPorts: "8080"
+    modelMeshImage:
+      name: "{{ .Values.modelmesh.image.registry }}/{{ if .Values.modelmesh.image.repository }}{{ .Values.modelmesh.image.repository }}/{{ end }}{{ .Values.modelmesh.image.name }}"
+      tag: {{ .Values.modelmesh.image.tag }}
+    modelMeshResources:
+      requests:
+        cpu: "300m"
+        memory: "448Mi"
+      limits:
+        cpu: "100"
+        memory: "448Mi"
+    restProxy:
+      enabled: false
+      port: 8008
+      image:
+        name: {{ .Values.restProxyImage }}
+        tag: {{ .Values.restProxyImageTag }}
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "96Mi"
+        limits:
+          cpu: "100"
+          memory: "512Mi"
+    storageHelperImage:
+      name: "{{ .Values.runtimeadapter.image.registry }}/{{ if .Values.runtimeadapter.image.repository }}{{ .Values.runtimeadapter.image.repository }}/{{ end }}{{ .Values.runtimeadapter.image.name }}"
+      tag: {{ .Values.runtimeadapter.image.tag }}
+      command: ["/opt/app/puller"]
+    storageHelperResources:
+      requests:
+        cpu: "50m"
+        memory: "512Mi"
+      limits:
+        cpu: "2"
+        memory: "512Mi"
+    serviceAccountName: "{{ .Release.Namespace }}-modelmesh"
+    metrics:
+      enabled: true
+      scheme: http
+    builtInServerTypes:
+      - ovms
+    grpcMaxMessageSizeBytes: 67108864
