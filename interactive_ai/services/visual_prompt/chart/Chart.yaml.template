@@ -1,6 +1,6 @@
 ---
 name: visual-prompt
-version: 0.0.1
+version: '{{VERSION}}'
 apiVersion: v2
 description: visual prompt service
-appVersion: v0.0.1
+appVersion: '{{VERSION}}'

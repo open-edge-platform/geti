@@ -102,7 +102,7 @@ jobs:
 
       - name: Push image
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        run: make -C "${COMPONENT_DIR}" push-image
+        run: make -C "${COMPONENT_DIR}" publish-image
 
       - name: Lint chart
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'

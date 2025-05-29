@@ -1,6 +1,6 @@
 ---
 name: resource
-version: 0.0.12
+version: '{{VERSION}}'
 apiVersion: v2
 description: resource
-appVersion: v0.0.1
+appVersion: '{{VERSION}}'
