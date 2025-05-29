@@ -1,13 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Text, View } from '@geti/ui';
+import { dimensionValue, Divider, Heading, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
 import { JobsListItemStatus } from '../../../../../shared/components/header/jobs-management/jobs-list-item-status.component';
-import { formatJobsCreationTime } from '../../../../../shared/utils';
-import { TrainingProgressTask } from './training-progress-task/training-progress-task.component';
+import { TrainingModelCard } from '../models-container/training-model-card/training-model-card.component';
 import { useTrainingProgress } from './use-training-progress/use-training-progress.hook';
 
 interface TrainingProgressProps {
@@ -28,24 +27,29 @@ export const TrainingProgress = ({ taskId }: TrainingProgressProps): JSX.Element
                 >
                     <View marginTop={'size-100'} marginBottom={'size-200'}>
                         <Text id={`current-training-${taskId}-id`} data-testid={`current-training-${taskId}-id`}>
-                            Current job
+                            {trainingData.trainingDetails.length > 1 ? 'Current jobs' : 'Current job'}
                         </Text>
-                        <View
-                            borderTopStartRadius={'small'}
-                            borderTopEndRadius={'small'}
-                            backgroundColor={'gray-75'}
-                            marginTop={'size-100'}
-                        >
-                            <View paddingTop={'size-250'} paddingX={'size-200'}>
-                                <TrainingProgressTask
-                                    name={trainingData.trainingDetails.metadata.task.name?.split(' task')[0] ?? ''}
-                                    architecture={trainingData.trainingDetails.metadata.task.modelArchitecture ?? ''}
-                                    creationTime={formatJobsCreationTime(trainingData.trainingDetails.creationTime)}
-                                />
-                                <Divider size={'S'} marginY={'size-200'} />
+                        {trainingData.trainingDetails.map((job) => (
+                            <View
+                                borderTopStartRadius={'small'}
+                                borderTopEndRadius={'small'}
+                                backgroundColor={'gray-75'}
+                                marginTop={'size-100'}
+                                key={`training-${job.metadata.task.modelArchitecture}-job-${job.id}`}
+                                aria-label={`${job.metadata.task.modelArchitecture} training job`}
+                            >
+                                <Heading
+                                    id={`model-group-name-${job.id}-id`}
+                                    margin={0}
+                                    UNSAFE_style={{ padding: dimensionValue('size-200') }}
+                                >
+                                    {job.metadata.task.modelArchitecture}
+                                </Heading>
+                                <Divider size='S' />
+                                <TrainingModelCard job={job} />
+                                <JobsListItemStatus expanded={false} job={job} />
                             </View>
-                            <JobsListItemStatus expanded={false} job={trainingData.trainingDetails} />
-                        </View>
+                        ))}
                     </View>
                 </motion.div>
             )}

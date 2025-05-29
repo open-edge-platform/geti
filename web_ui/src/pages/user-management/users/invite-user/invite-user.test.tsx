@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { fireEvent, screen } from '@testing-library/react';
 
-import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
 import { getMockedWorkspaceIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedAdminUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
 import { getMockedWorkspace } from '../../../../test-utils/mocked-items-factory/mocked-workspace';
@@ -31,7 +31,7 @@ jest.mock('../../../../providers/workspaces-provider/workspaces-provider.compone
     })),
 }));
 
-jest.mock('../../../../core/users/hook/use-users.hook', () => ({
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
     useUsers: jest.fn(() => ({
         useGetUsersQuery: jest.fn(() => ({ data: [] })),
         useInviteUserMutation: jest.fn(() => ({ isPending: false, mutate: mockedInviteUserMutation })),

@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import { paths } from '@geti/core';
+import { useUserRegister } from '@geti/core/src/users/hook/use-users.hook';
 import {
     Button,
     ButtonGroup,
@@ -20,7 +21,6 @@ import {
 } from '@geti/ui';
 import { ValidationError } from 'yup';
 
-import { useUserRegister } from '../../../core/users/hook/use-users.hook';
 import { isYupValidationError } from '../../../pages/user-management/profile-page/utils';
 import { PasswordState } from '../../../pages/user-management/users/add-member-popup/add-member-popup.interface';
 import {

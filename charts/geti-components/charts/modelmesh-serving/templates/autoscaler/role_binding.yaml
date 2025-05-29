@@ -1,0 +1,16 @@
+---
+{{- if .Values.autoscalerEnabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: modelmesh-autoscaler-rolebinding
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: modelmesh-autoscaler-role
+subjects:
+  - kind: ServiceAccount
+    name: modelmesh-autoscaler
+    namespace: {{ .Release.Namespace }}
+{{- end }}

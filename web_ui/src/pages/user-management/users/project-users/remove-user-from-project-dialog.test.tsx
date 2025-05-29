@@ -2,12 +2,12 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
+import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { useNavigate } from 'react-router-dom';
 
-import { createInMemoryUsersService } from '../../../../core/users/services/in-memory-users-service';
-import { RESOURCE_TYPE, USER_ROLE } from '../../../../core/users/users.interface';
 import { getMockedUser } from '../../../../test-utils/mocked-items-factory/mocked-users';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
 import { RemoveUserFromProjectDialog } from './remove-user-from-project-dialog.component';

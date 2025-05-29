@@ -2,13 +2,13 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
+import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { Flex, Text } from '@geti/ui';
 import { Datasets, Deployments, Model, Shield, Tag, Users } from '@geti/ui/icons';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
-import { RESOURCE_TYPE } from '../../../../core/users/users.interface';
 import { Arrow } from '../../../../shared/components/arrow/arrow.component';
 import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';

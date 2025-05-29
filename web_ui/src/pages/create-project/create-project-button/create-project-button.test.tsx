@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { UseQueryResult } from '@tanstack/react-query';
 import { fireEvent, screen } from '@testing-library/react';
@@ -9,7 +10,6 @@ import { AxiosError } from 'axios';
 import { useStatus } from '../../../core/status/hooks/use-status.hook';
 import { TOO_LOW_FREE_DISK_SPACE_IN_BYTES } from '../../../core/status/hooks/utils';
 import { StatusProps } from '../../../core/status/status.interface';
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
 import { DatasetImportToNewProjectProvider } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { ProjectsImportProvider } from '../../../providers/projects-import-provider/projects-import-provider.component';
 import { applicationRender } from '../../../test-utils/application-provider-render';

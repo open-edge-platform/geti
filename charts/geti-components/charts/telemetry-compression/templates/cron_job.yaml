@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "telemetry-compression.labels" . | nindent 4 }}
+spec:
+  schedule: "*/15 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+          initContainers:
+            - name: volume-permissions
+              image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+              imagePullPolicy: {{ .Values.init.imagePullPolicy }}
+              command:
+                - /bin/sh
+              args:
+                - -c
+                - |
+                  find {{ .Values.global.logs_dir }} -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+              volumeMounts:
+                - name: data-storage
+                  mountPath: {{ .Values.global.logs_dir }}
+                  readOnly: false
+                  subPath: logs
+              resources:
+                {{- toYaml .Values.init.resources | nindent 16 }}
+              securityContext:
+                {{ toYaml .Values.volumeSecurityContext | nindent 16 }}
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+            imagePullPolicy: IfNotPresent
+            command: [ "/bin/sh", "-c" ]
+            args:
+              - >-
+                echo "Compress telemetry backup files" &&
+                find "$PATH_LOGS_DIR"
+                -type f
+                -regex '^\(.\+\)\/\([A-Za-z0-9_\-]\+-[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}-[0-9]\{2\}-[0-9]\{2\}\.[0-9]\{3\}\.json\)$'
+                {{- if not .Values.global.istio_ambient_mesh }}
+                -exec gzip --verbose --best {} \+ &&
+                until wget --post-data="" -q -O/dev/null 127.0.0.1:15020/quitquitquit; do sleep 3; done; echo Istio sidecar has been stopped
+                {{- else }}
+                -exec gzip --verbose --best {}
+                {{- end }}
+            env:
+              - name: PATH_LOGS_DIR
+                value: {{ .Values.global.logs_dir }}
+            volumeMounts:
+            - name: data-storage
+              mountPath: {{ .Values.global.logs_dir }}
+              readOnly: false
+              subPath: logs
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            resources:
+{{ toYaml .Values.resources | indent 13 }}
+          restartPolicy: OnFailure
+          volumes:
+          - name: data-storage
+            persistentVolumeClaim:
+              claimName: data-storage-volume-claim

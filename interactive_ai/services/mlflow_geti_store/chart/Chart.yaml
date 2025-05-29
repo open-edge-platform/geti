@@ -1,6 +1,0 @@
----
-name: mlflow-geti-store
-version: 0.0.1
-apiVersion: v2
-description: MLflow geti store
-appVersion: v0.0.1

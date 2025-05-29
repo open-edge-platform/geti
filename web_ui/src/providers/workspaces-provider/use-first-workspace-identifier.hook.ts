@@ -3,10 +3,10 @@
 
 import { useMemo } from 'react';
 
+import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { useParams } from 'react-router-dom';
 
-import { useWorkspacesApi } from '../../core/workspaces/hooks/use-workspaces.hook';
-import { WorkspaceIdentifier } from '../../core/workspaces/services/workspaces.interface';
 import { useOrganizationIdentifier } from '../../hooks/use-organization-identifier/use-organization-identifier.hook';
 
 export const useFirstWorkspaceIdentifier = () => {

@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '../../../packages/core/src/workspaces/services/workspaces.interface';
 import { DatasetImportSupportedProjectType, DatasetImportWarning } from '../datasets/dataset.interface';
 import { Dataset } from '../projects/dataset.interface';
-import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
 import { JobState, JobStepState, JobType } from './jobs.const';
 
 export interface JobStep {

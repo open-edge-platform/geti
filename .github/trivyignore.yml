@@ -1,0 +1,6 @@
+misconfigurations:
+  - id: AVD-DS-0002
+    statement: This is not a production/runtime image
+    paths:
+      - web_ui/dex_templates/Dockerfile
+      - platform/services/account/Dockerfile.protoc

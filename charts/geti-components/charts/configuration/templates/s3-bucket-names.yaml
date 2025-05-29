@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-s3-bucket-names
+  namespace: {{ .Release.Namespace }}
+data:
+  BUCKET_NAME_IMAGES: "{{ .Values.bucket_name_images }}"
+  BUCKET_NAME_MODELMESH: "{{ .Values.bucket_name_modelmesh }}"
+  BUCKET_NAME_MODELS: "{{ .Values.bucket_name_models }}"
+  BUCKET_NAME_TENSORS: "{{ .Values.bucket_name_tensors }}"
+  BUCKET_NAME_THUMBNAILS: "{{ .Values.bucket_name_thumbnails }}"
+  BUCKET_NAME_VIDEOS: "{{ .Values.bucket_name_videos }}"
+  BUCKET_NAME_TEMPORARYFILES: "{{ .Values.bucket_name_temporaryfiles }}"
+  BUCKET_NAME_CODEDEPLOYMENTS: "{{ .Values.bucket_name_codedeployments }}"
+  BUCKET_NAME_MLFLOWEXPERIMENTS: "{{ .Values.bucket_name_mlflowexperiments }}"
+  BUCKET_NAME_PRETRAINEDWEIGHTS: "{{ .Values.bucket_name_pretrainedweights }}"

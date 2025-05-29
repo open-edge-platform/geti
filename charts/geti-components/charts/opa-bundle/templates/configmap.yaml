@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "opaBundle.labels" . | nindent 4 }}
+binaryData:
+  all.tar.gz: |-
+    {{ .Files.Get "all.tar.gz" | b64enc }}

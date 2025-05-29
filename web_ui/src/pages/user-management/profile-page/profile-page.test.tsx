@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { screen } from '@testing-library/react';
 
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
 import { MediaUploadProvider } from '../../../providers/media-upload-provider/media-upload-provider.component';
 import { getMockedUser } from '../../../test-utils/mocked-items-factory/mocked-users';
 import { providersRender as render } from '../../../test-utils/required-providers-render';

@@ -14,12 +14,34 @@ import {
 } from './utils';
 
 interface ModelPerformanceProps {
-    performance: ModelPerformanceInterface;
+    performance?: ModelPerformanceInterface;
     genericId: string;
     isDisabled?: boolean;
+    isModelTraining?: boolean;
 }
 
-export const ModelPerformance = ({ performance, genericId, isDisabled }: ModelPerformanceProps) => {
+export const ModelPerformance = ({
+    performance,
+    genericId,
+    isDisabled,
+    isModelTraining = false,
+}: ModelPerformanceProps) => {
+    if (isModelTraining) {
+        return (
+            <AccuracyContainer
+                isDisabled={isDisabled}
+                tooltip={'Model score will be available after model validation finished'}
+                value={null}
+                id={genericId}
+                heading='Score'
+            />
+        );
+    }
+
+    if (performance === undefined) {
+        return;
+    }
+
     if (performance.type === PerformanceType.DEFAULT) {
         return (
             <AccuracyContainer

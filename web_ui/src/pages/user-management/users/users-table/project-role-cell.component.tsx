@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RESOURCE_TYPE, Role } from '../../../../core/users/users.interface';
+import { RESOURCE_TYPE, Role } from '@geti/core/src/users/users.interface';
+
 import { CasualCell } from '../../../../shared/components/table/components/casual-cell/casual-cell.component';
 import { TableCellProps } from '../../../../shared/components/table/table.interface';
 

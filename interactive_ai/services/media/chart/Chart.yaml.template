@@ -1,0 +1,6 @@
+---
+name: media-ms
+version: '{{VERSION}}'
+apiVersion: v2
+description: media
+appVersion: '{{VERSION}}'

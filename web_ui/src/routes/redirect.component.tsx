@@ -5,12 +5,12 @@ import { ReactNode } from 'react';
 
 import { paths } from '@geti/core';
 import { useDeploymentConfigQuery } from '@geti/core/src/services/use-deployment-config-query.hook';
+import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
 import { invoke } from 'lodash-es';
 import { Navigate } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
 import { Task } from '../core/projects/task.interface';
-import { useWorkspacesApi } from '../core/workspaces/hooks/use-workspaces.hook';
 import { useModelIdentifier } from '../hooks/use-model-identifier/use-model-identifier.hook';
 import { useOrganizationIdentifier } from '../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useDatasetIdentifier } from '../pages/annotator/hooks/use-dataset-identifier.hook';
