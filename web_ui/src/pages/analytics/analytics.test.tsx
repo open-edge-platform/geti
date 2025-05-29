@@ -3,8 +3,8 @@
 
 import { fireEvent, screen } from '@testing-library/react';
 
-import { Environment, GPUProvider } from '../../core/platform-utils/dto/utils.interface';
 import { createInMemoryPlatformUtilsService } from '../../core/platform-utils/services/create-in-memory-platform-utils-service';
+import { getMockedProductInfo } from '../../test-utils/mocked-items-factory/mocked-product-info';
 import { providersRender as render } from '../../test-utils/required-providers-render';
 import { Analytics } from './analytics.component';
 import { ExportServerType } from './downloadable-item.component';
@@ -21,15 +21,9 @@ describe('Analytics', () => {
     it('should display card for external analytics dashboard', async () => {
         const platformUtilsService = createInMemoryPlatformUtilsService();
         platformUtilsService.getProductInfo = async () => {
-            return {
-                productVersion: '1.6.0',
+            return getMockedProductInfo({
                 grafanaEnabled: true,
-                gpuProvider: GPUProvider.INTEL,
-                buildVersion: '1.6.0.test.123123',
-                isSmtpDefined: true,
-                intelEmail: 'support@geti.com',
-                environment: Environment.ON_PREM,
-            };
+            });
         };
 
         render(<Analytics />, { services: { platformUtilsService } });
@@ -40,7 +34,7 @@ describe('Analytics', () => {
     it.each(ANALYTICS_ITEMS)('should show dialog with date range picker for exporting %o', async (itemProps) => {
         render(<Analytics />);
 
-        const downloadAnalyticsDataBtn = screen.getByRole('button', {
+        const downloadAnalyticsDataBtn = await screen.findByRole('button', {
             name: `Download ${itemProps.header.toLocaleLowerCase()}`,
         });
 
@@ -60,7 +54,7 @@ describe('Analytics', () => {
         render(<Analytics />);
 
         expect(
-            screen.getByRole('button', {
+            await screen.findByRole('button', {
                 name: `Download ${SERVER_ITEM.header.toLocaleLowerCase()}`,
             })
         ).toBeInTheDocument();

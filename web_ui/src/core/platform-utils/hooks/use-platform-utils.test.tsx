@@ -62,6 +62,7 @@ describe('useProductInfo', () => {
                 intelEmail: 'support@geti.com',
                 isSmtpDefined: true,
                 productVersion: '1.6.0',
+                installationMode: 'standard',
             });
         });
     });

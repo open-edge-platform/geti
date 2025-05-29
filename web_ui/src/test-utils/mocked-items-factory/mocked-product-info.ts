@@ -12,5 +12,6 @@ export const getMockedProductInfo = (productInfo: Partial<ProductInfoEntity> = {
     gpuProvider: GPUProvider.INTEL,
     intelEmail: 'support@geti.com',
     environment: Environment.ON_PREM,
+    installationMode: 'standard',
     ...productInfo,
 });

@@ -24,6 +24,7 @@ export const createApiPlatformUtilsService: CreateApiService<PlatformUtilsServic
             environment: data?.environment || Environment.ON_PREM,
             grafanaEnabled: data?.grafana_enabled,
             gpuProvider: data['gpu-provider'],
+            installationMode: data['installation-profile'],
         };
     };
 

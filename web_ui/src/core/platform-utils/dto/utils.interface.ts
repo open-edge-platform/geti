@@ -12,6 +12,8 @@ export enum GPUProvider {
     NVIDIA = 'nvidia',
 }
 
+export type InstallationMode = 'standard' | 'lite';
+
 export interface ProductInfoEntityDTO {
     'intel-email': string;
     'product-version': string;
@@ -20,4 +22,5 @@ export interface ProductInfoEntityDTO {
     'gpu-provider': GPUProvider;
     grafana_enabled: boolean;
     environment?: Environment;
+    'installation-profile': InstallationMode;
 }

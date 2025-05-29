@@ -1,12 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getMockedProductInfo } from '../../../test-utils/mocked-items-factory/mocked-product-info';
 import { Environment, GPUProvider } from '../dto/utils.interface';
 import { PlatformUtilsService, ProductInfoEntity } from './utils.interface';
 
 export const createInMemoryPlatformUtilsService = (): PlatformUtilsService => {
     const getProductInfo = async (): Promise<ProductInfoEntity> => {
-        return {
+        return getMockedProductInfo({
             productVersion: '1.6.0',
             grafanaEnabled: false,
             gpuProvider: GPUProvider.INTEL,
@@ -14,7 +15,7 @@ export const createInMemoryPlatformUtilsService = (): PlatformUtilsService => {
             isSmtpDefined: true,
             intelEmail: 'support@geti.com',
             environment: Environment.ON_PREM,
-        };
+        });
     };
 
     return {
