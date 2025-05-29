@@ -47,7 +47,11 @@ spec:
           {{- toYaml .Values.securityContext | nindent 12 }}
           env:
             - name: GOMAXPROCS
-              value: "{{ .Values.resources.requests.cpu }}"
+              {{- if (eq .Values.global.installation_profile "lite") }}
+              value: "{{ .Values.liteResources.requests.cpu }}"
+              {{- else }}
+              value: "{{ .Values.standardResources.requests.cpu }}"
+              {{- end }}
             - name: GOMEMLIMIT
               value: "{{ .Values.global.mem_limit }}"
             - name: WORKDIR
