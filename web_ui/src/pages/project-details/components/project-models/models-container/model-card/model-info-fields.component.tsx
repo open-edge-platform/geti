@@ -7,10 +7,57 @@ import { ThreeDotsFlashing } from '../../../../../../shared/components/three-dot
 
 import classes from './model-card.module.scss';
 
-export const ModelInfoFields = ({
+const ModelInfoTraining = () => (
+    <>
+        <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
+            Model weight size: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
+        </Text>
+        <Text marginX={'size-50'}>|</Text>
+        <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
+            Total size: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
+        </Text>
+        <Text marginX={'size-50'}>|</Text>
+        <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
+            Complexity: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
+        </Text>
+    </>
+);
+
+const ModelInfoReady = ({
     modelSize,
     totalDiskSize,
     complexity,
+}: {
+    modelSize?: string;
+    totalDiskSize?: string;
+    complexity?: number;
+}) => (
+    <>
+        {modelSize !== undefined && (
+            <>
+                <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
+                    Model weight size: {modelSize}
+                </Text>
+                <Text marginX={'size-50'}>|</Text>
+            </>
+        )}
+        {totalDiskSize !== undefined && (
+            <>
+                <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
+                    Total size: {totalDiskSize}
+                </Text>
+                <Text marginX={'size-50'}>|</Text>
+            </>
+        )}
+        {complexity !== undefined && (
+            <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
+                Complexity: {complexity} GFlops
+            </Text>
+        )}
+    </>
+);
+
+export const ModelInfoFields = ({
     isModelTraining,
 }: {
     modelSize?: string;
@@ -18,47 +65,5 @@ export const ModelInfoFields = ({
     complexity?: number;
     isModelTraining: boolean;
 }) => {
-    return (
-        <>
-            {isModelTraining ? (
-                <>
-                    <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
-                        Model weight size: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                    </Text>
-                    <Text marginX={'size-50'}>|</Text>
-                    <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
-                        Total size: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                    </Text>
-                    <Text marginX={'size-50'}>|</Text>
-                    <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
-                        Complexity: <ThreeDotsFlashing className={classes.threeDotsFlashing} />
-                    </Text>
-                </>
-            ) : (
-                <>
-                    {modelSize !== undefined && (
-                        <>
-                            <Text UNSAFE_className={classes.modelInfo} data-testid={'model-size-id'}>
-                                Model weight size: {modelSize}
-                            </Text>
-                            <Text marginX={'size-50'}>|</Text>
-                        </>
-                    )}
-                    {totalDiskSize !== undefined && (
-                        <>
-                            <Text UNSAFE_className={classes.modelInfo} data-testid={'total-disk-size-id'}>
-                                Total size: {totalDiskSize}
-                            </Text>
-                            <Text marginX={'size-50'}>|</Text>
-                        </>
-                    )}
-                    {complexity !== undefined && (
-                        <Text UNSAFE_className={classes.modelInfo} data-testid={'complexity-id'}>
-                            Complexity: {complexity} GFlops
-                        </Text>
-                    )}
-                </>
-            )}
-        </>
-    );
+    return <>{isModelTraining ? <ModelInfoTraining /> : <ModelInfoReady />}</>;
 };
