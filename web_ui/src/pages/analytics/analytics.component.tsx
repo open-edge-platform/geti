@@ -8,7 +8,7 @@ import { View } from '@geti/ui';
 import { DatabaseIcon, LogsIcon, MetricsIcon, TracesIcon } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { usePlatformUtils } from '../../core/platform-utils/hooks/use-platform-utils.hook';
+import { useProductInfo } from '../../core/platform-utils/hooks/use-platform-utils.hook';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';
 import { AnalyticsDashboardCard } from './analytics-dashboard-card.component';
 import { DownloadableItem, ExportServerType } from './downloadable-item.component';
@@ -16,9 +16,8 @@ import { ExportAnalyticsType } from './export-logs.component';
 
 export const Analytics = (): JSX.Element => {
     const { router } = useApplicationServices();
-    const { useProductInfo } = usePlatformUtils();
-    const productInfo = useProductInfo();
-    const isGrafanaEnabled = productInfo.data?.grafanaEnabled;
+    const { data } = useProductInfo();
+    const isGrafanaEnabled = data.grafanaEnabled;
 
     const ITEMS: ComponentProps<typeof DownloadableItem>[] = useMemo(() => {
         return [

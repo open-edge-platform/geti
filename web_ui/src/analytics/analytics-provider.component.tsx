@@ -7,7 +7,7 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { Meter } from '@opentelemetry/api';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 
-import { usePlatformUtils } from '../core/platform-utils/hooks/use-platform-utils.hook';
+import { useWorkflowId } from '../core/platform-utils/hooks/use-platform-utils.hook';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
 import { createPeriodicMetricExporter, initializeMetrics } from './metrics';
 import { initializeTracing } from './traces';
@@ -27,7 +27,6 @@ const AnalyticsContext = createContext<AnalyticsContextProps | undefined>(undefi
 const AnalyticsProvider = ({ children }: AnalyticsProviderProps): JSX.Element => {
     const [isWindowFocus, setIsWindowFocus] = useState<boolean>(true);
     const [isDocumentContentVisible, setIsDocumentContentVisible] = useState<boolean>(true);
-    const { useWorkflowId } = usePlatformUtils();
     const { data: workflowId } = useWorkflowId();
 
     const tracingRef = useRef<{ getTrace: (name: string) => void } | null>(null);

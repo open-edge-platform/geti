@@ -4,14 +4,13 @@
 import { FC, ReactNode } from 'react';
 
 import { AnalyticsProvider } from '../analytics/analytics-provider.component';
-import { usePlatformUtils } from '../core/platform-utils/hooks/use-platform-utils.hook';
+import { useProductInfo } from '../core/platform-utils/hooks/use-platform-utils.hook';
 
 interface InstallationModeProviderProps {
     children: ReactNode;
 }
 
 export const InstallationModeProvider: FC<InstallationModeProviderProps> = ({ children }) => {
-    const { useProductInfo } = usePlatformUtils();
     const { data } = useProductInfo();
 
     if (data.installationMode === 'standard') {
