@@ -5,7 +5,9 @@ required:
   - y
 properties:
   label:
-    $ref: '../../../mongo_id.yaml'
+    anyOf:
+      - type: string
+      - $ref: '../../../mongo_id.yaml'
   x:
     type: number
     format: float

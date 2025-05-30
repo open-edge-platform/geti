@@ -146,6 +146,7 @@ class ProjectValidator(Generic[ParserT], metaclass=abc.ABCMeta):
                     raise ReservedLabelNameException(label_name=empty_label_name)
 
     @classmethod
+    @abstractmethod
     def _validate_keypoint_structure(cls, parser: ParserT) -> None:
         """
         Validates that a user defined label graph edge has exactly 2 nodes, node names match with existing labels,
@@ -160,29 +161,6 @@ class ProjectValidator(Generic[ParserT], metaclass=abc.ABCMeta):
         :raises NodeNameNotInLabelsException: if a node name does not match any of the label names
         :raises NodePositionIsOutOfBoundsException: if a node is out of bounds (not in the range [0.0, 1.0])
         """
-        duplicate_list = []
-        for task_name in parser.get_tasks_names():
-            keypoint_structure = parser.get_keypoint_structure_data(task_name=task_name)
-            if not keypoint_structure:
-                continue
-            label_names = parser.get_custom_labels_names_by_task(task_name=task_name)
-            edges = keypoint_structure["edges"]
-            for edge in edges:
-                nodes = edge["nodes"]
-                if len(nodes) != 2:
-                    raise WrongNumberOfNodesException
-                if nodes[0] not in label_names or nodes[1] not in label_names:
-                    raise IncorrectNodeNameInGraphException
-                if set(nodes) in duplicate_list:
-                    raise DuplicateEdgeInGraphException
-                duplicate_list.append(set(nodes))
-
-            positions = keypoint_structure["positions"]
-            for position in positions:
-                if position["label"] not in label_names:
-                    raise NodeNameNotInLabelsException
-                if not 0 <= position["x"] <= 1 or not 0 <= position["y"] <= 1:
-                    raise NodePositionIsOutOfBoundsException
 
     @classmethod
     @abstractmethod
@@ -416,6 +394,45 @@ class ProjectCreationValidator(ProjectValidator[ProjectParser]):
                         if not is_found
                     ),
                 )
+
+    @classmethod
+    def _validate_keypoint_structure(cls, parser: ProjectParser) -> None:
+        """
+        Validates that a user defined label graph edge has exactly 2 nodes, node names match with existing labels,
+        and has no duplicate edges
+
+        This method must be run after labels validation since it assumes that its labels param is valid.
+
+        :param parser: A parser instance that can read and decode the information necessary to create a project
+        :raises WrongNumberOfNodesException: if an edge does not have 2 vertices
+        :raises IncorrectNodeNameInGraphException: if an edge has an incorrect name
+        :raises DuplicateEdgeInGraphException: if the graph contains a duplicate edge
+        :raises NodeNameNotInLabelsException: if a node name does not match any of the label names
+        :raises NodePositionIsOutOfBoundsException: if a node is out of bounds (not in the range [0.0, 1.0])
+        """
+        duplicate_list = []
+        for task_name in parser.get_tasks_names():
+            keypoint_structure = parser.get_keypoint_structure_data(task_name=task_name)
+            if not keypoint_structure:
+                continue
+            label_names = parser.get_custom_labels_names_by_task(task_name=task_name)
+            edges = keypoint_structure["edges"]
+            for edge in edges:
+                nodes = edge["nodes"]
+                if len(nodes) != 2:
+                    raise WrongNumberOfNodesException
+                if nodes[0] not in label_names or nodes[1] not in label_names:
+                    raise IncorrectNodeNameInGraphException
+                if set(nodes) in duplicate_list:
+                    raise DuplicateEdgeInGraphException
+                duplicate_list.append(set(nodes))
+
+            positions = keypoint_structure["positions"]
+            for position in positions:
+                if position["label"] not in label_names:
+                    raise NodeNameNotInLabelsException
+                if not 0 <= position["x"] <= 1 or not 0 <= position["y"] <= 1:
+                    raise NodePositionIsOutOfBoundsException
 
 
 class ProjectUpdateValidator(ProjectValidator[ProjectUpdateParser]):
@@ -726,3 +743,47 @@ class ProjectUpdateValidator(ProjectValidator[ProjectUpdateParser]):
                         if not is_found
                     ),
                 )
+
+    @classmethod
+    def _validate_keypoint_structure(cls, parser: ProjectUpdateParser) -> None:
+        """
+        Validates that a user defined label graph edge has exactly 2 nodes, node names match with existing labels,
+        and has no duplicate edges
+
+        This method must be run after labels validation since it assumes that its labels param is valid.
+
+        :param parser: A parser instance that can read and decode the information necessary to create a project
+        :raises WrongNumberOfNodesException: if an edge does not have 2 vertices
+        :raises IncorrectNodeNameInGraphException: if an edge has an incorrect name
+        :raises DuplicateEdgeInGraphException: if the graph contains a duplicate edge
+        :raises NodeNameNotInLabelsException: if a node name does not match any of the label names
+        :raises NodePositionIsOutOfBoundsException: if a node is out of bounds (not in the range [0.0, 1.0])
+        """
+        duplicate_list = []
+        for task_name in parser.get_tasks_names():
+            keypoint_structure = parser.get_keypoint_structure_data(task_name=task_name)
+            if not keypoint_structure:
+                continue
+            label_names = list(parser.get_custom_labels_names_by_task(task_name=task_name))
+            label_ids = [
+                str(parser.get_label_id_by_name(task_name=task_name, label_name=label_name))
+                for label_name in label_names
+            ]
+            labels = label_names + label_ids
+            edges = keypoint_structure["edges"]
+            for edge in edges:
+                nodes = edge["nodes"]
+                if len(nodes) != 2:
+                    raise WrongNumberOfNodesException
+                if nodes[0] not in labels or nodes[1] not in labels:
+                    raise IncorrectNodeNameInGraphException
+                if set(nodes) in duplicate_list:
+                    raise DuplicateEdgeInGraphException
+                duplicate_list.append(set(nodes))
+
+            positions = keypoint_structure["positions"]
+            for position in positions:
+                if position["label"] not in labels:
+                    raise NodeNameNotInLabelsException
+                if not 0 <= position["x"] <= 1 or not 0 <= position["y"] <= 1:
+                    raise NodePositionIsOutOfBoundsException
