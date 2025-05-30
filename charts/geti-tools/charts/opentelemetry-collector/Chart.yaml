@@ -1,0 +1,10 @@
+apiVersion: v2
+name: opentelemetry-collector
+version: 0.0.4
+description: OpenTelemetry Collector Helm chart for Kubernetes
+type: application
+appVersion: 0.64.1
+dependencies:
+  - name: tools-common
+    version: 0.0.1
+    repository: "file://../tools-common"

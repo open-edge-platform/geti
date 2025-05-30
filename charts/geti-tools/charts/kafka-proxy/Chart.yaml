@@ -1,0 +1,5 @@
+apiVersion: v2
+name: kafka-proxy
+description: A Helm chart for kafka-proxy
+type: application
+version: v0.1.13

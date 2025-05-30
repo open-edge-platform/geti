@@ -1,0 +1,42 @@
+image:
+  registry: docker.io
+  repository: intel
+  name: xpumanager:v1.2.27
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 29999
+
+xpumdSecurityContext:
+  privileged: false
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 0
+  capabilities:
+    drop: [ "ALL" ]
+    add:  [ "SYS_ADMIN" ]
+
+pythonExporterSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsUser: 0
+  capabilities:
+    drop: [ "ALL" ]
+
+xpumdResources:
+  limits:
+    memory: 128Mi
+    # maps all GPUs to container
+    gpu.intel.com/i915_monitoring: 1
+  requests:
+    cpu: 100m
+    memory: 128Mi
+    gpu.intel.com/i915_monitoring: 1
+
+pythonExporterResources:
+  limits:
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
