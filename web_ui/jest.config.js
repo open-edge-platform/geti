@@ -7,7 +7,7 @@ export default {
     projects: [
         {
             ...sharedConfig,
-            displayName: 'main',
+            displayName: '@geti/main',
             roots: ['<rootDir>/src'],
             testMatch: ['<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}'],
             setupFilesAfterEnv: ['<rootDir>/src/setupTests.tsx'],
