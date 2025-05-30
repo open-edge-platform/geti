@@ -32,12 +32,20 @@ ingress:
     - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/pipelines/(.*):batch_predict_stream
     - /api/v(.*)/organizations/(.*)/workspaces/(.*)/projects/(.*)/models/(.*):batch_predict_stream
 
-resources:
+standardResources:
   requests:
     cpu: 1000m
     memory: 1Gi
   limits:
     memory: 1Gi # if you change this value, remember to update 'global.mem_limit' too
+
+liteResources:
+  requests:
+    cpu: 300m
+    memory: 300Mi
+  limits:
+    memory: 1Gi # if you change this value, remember to update 'global.mem_limit' too
+
 
 initResources:
   requests:
