@@ -121,15 +121,15 @@ async def calculate_training_resources() -> tuple[dict, str]:
         requests_cpu = k8s_cpu_to_millicpus(RESOURCES_CONFIGURATION["VM"]["requests"]["cpu"])
         limits_cpu = max(limits_cpu, requests_cpu)
 
-        limits_memory = shrink_value(int(max(available_memory)))
+        limits_memory_int = shrink_value(int(max(available_memory)))
         requests_memory = k8s_memory_to_kibibytes(RESOURCES_CONFIGURATION["VM"]["requests"]["memory"])
-        limits_memory = max(limits_memory, requests_memory)
+        limits_memory_int = max(limits_memory_int, requests_memory)
 
         return (
             fill_resources_with_values(
                 requests_cpu=RESOURCES_CONFIGURATION["VM"]["requests"]["cpu"],
                 requests_memory=RESOURCES_CONFIGURATION["VM"]["requests"]["memory"],
-                limits_memory=f"{limits_memory}Ki",
+                limits_memory=f"{limits_memory_int}Ki",
                 limits_cpu=f"{limits_cpu}m",
             ),
             accelerator_name,
