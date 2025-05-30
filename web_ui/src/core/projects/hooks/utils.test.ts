@@ -29,6 +29,7 @@ describe('Projects hooks utils', () => {
                                 hotkey: '',
                                 behaviour: LABEL_BEHAVIOUR.LOCAL,
                                 isEmpty: false,
+                                isBackground: false,
                                 open: true,
                                 children: [],
                                 inEditMode: false,
@@ -45,6 +46,7 @@ describe('Projects hooks utils', () => {
                                 hotkey: '',
                                 behaviour: LABEL_BEHAVIOUR.LOCAL,
                                 isEmpty: false,
+                                isBackground: false,
                                 open: true,
                                 children: [],
                                 inEditMode: false,
@@ -92,6 +94,7 @@ describe('Projects hooks utils', () => {
                                                 type: LabelItemType.LABEL,
                                                 relation: LabelsRelationType.SINGLE_SELECTION,
                                                 isEmpty: false,
+                                                isBackground: false,
                                             },
                                         ],
                                         inEditMode: true,
@@ -106,6 +109,7 @@ describe('Projects hooks utils', () => {
                                 type: LabelItemType.LABEL,
                                 relation: LabelsRelationType.SINGLE_SELECTION,
                                 isEmpty: false,
+                                isBackground: false,
                             },
                         ],
                         inEditMode: false,
@@ -126,6 +130,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         id: '6737565966acc5575c413a83',
@@ -136,6 +141,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         revisitAffectedAnnotations: true,
@@ -145,6 +151,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         revisitAffectedAnnotations: true,
@@ -154,6 +161,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: 'Lz',
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                 ];
                 expect(getEditLabelsPayload(labels, relation, shouldRevisit)).toEqual(expectedLabels);
@@ -179,6 +187,7 @@ describe('Projects hooks utils', () => {
                                 hotkey: '',
                                 behaviour: LABEL_BEHAVIOUR.LOCAL,
                                 isEmpty: false,
+                                isBackground: false,
                                 open: true,
                                 children: [],
                                 inEditMode: false,
@@ -195,6 +204,7 @@ describe('Projects hooks utils', () => {
                                 hotkey: '',
                                 behaviour: LABEL_BEHAVIOUR.LOCAL,
                                 isEmpty: false,
+                                isBackground: false,
                                 open: true,
                                 children: [],
                                 inEditMode: false,
@@ -224,6 +234,7 @@ describe('Projects hooks utils', () => {
                                 hotkey: '',
                                 behaviour: LABEL_BEHAVIOUR.LOCAL,
                                 isEmpty: false,
+                                isBackground: false,
                                 open: true,
                                 children: [
                                     {
@@ -244,6 +255,7 @@ describe('Projects hooks utils', () => {
                                                 hotkey: '',
                                                 behaviour: LABEL_BEHAVIOUR.LOCAL,
                                                 isEmpty: false,
+                                                isBackground: false,
                                                 open: true,
                                                 children: [],
                                                 inEditMode: false,
@@ -276,6 +288,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         id: '6737565966acc5575c413a83',
@@ -286,6 +299,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         id: '673b0f6c66acc5575c413b33',
@@ -297,6 +311,7 @@ describe('Projects hooks utils', () => {
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isDeleted: true,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         id: '673b0f6c66acc5575c413b34',
@@ -308,6 +323,7 @@ describe('Projects hooks utils', () => {
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isDeleted: true,
                         isEmpty: false,
+                        isBackground: false,
                     },
                 ];
                 const relation = LabelsRelationType.MIXED;
@@ -328,6 +344,7 @@ describe('Projects hooks utils', () => {
                         hotkey: '',
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                         open: true,
                         children: [],
                         inEditMode: false,
@@ -344,6 +361,7 @@ describe('Projects hooks utils', () => {
                         hotkey: '',
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                         open: true,
                         children: [],
                         inEditMode: false,
@@ -365,6 +383,7 @@ describe('Projects hooks utils', () => {
                         type: LabelItemType.LABEL,
                         relation: LabelsRelationType.SINGLE_SELECTION,
                         isEmpty: false,
+                        isBackground: false,
                     },
                 ];
                 const relation = LabelsRelationType.SINGLE_SELECTION;
@@ -378,6 +397,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         revisitAffectedAnnotations: false,
@@ -388,6 +408,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         revisitAffectedAnnotations: false,
@@ -397,6 +418,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                 ];
 
@@ -414,6 +436,7 @@ describe('Projects hooks utils', () => {
                         hotkey: '',
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                         open: true,
                         children: [],
                         inEditMode: false,
@@ -430,6 +453,7 @@ describe('Projects hooks utils', () => {
                         hotkey: '',
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                         open: true,
                         children: [],
                         inEditMode: false,
@@ -451,6 +475,7 @@ describe('Projects hooks utils', () => {
                         type: LabelItemType.LABEL,
                         relation: LabelsRelationType.SINGLE_SELECTION,
                         isEmpty: false,
+                        isBackground: false,
                     },
                 ];
                 const relation = LabelsRelationType.SINGLE_SELECTION;
@@ -464,6 +489,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                     },
                     {
                         id: '673b126766acc5575c413b44',
@@ -474,6 +500,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                         isDeleted: true,
                     },
                     {
@@ -484,6 +511,7 @@ describe('Projects hooks utils', () => {
                         parentLabelId: null,
                         behaviour: LABEL_BEHAVIOUR.LOCAL,
                         isEmpty: false,
+                        isBackground: false,
                         isDeleted: true,
                     },
                 ];

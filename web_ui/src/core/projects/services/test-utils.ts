@@ -114,6 +114,7 @@ const FLAT_LABELS_BODY = [
         hotkey: 'ctrl+1',
         is_empty: false,
         is_anomalous: false,
+        is_background: false,
     },
     {
         id: '2',
@@ -124,6 +125,7 @@ const FLAT_LABELS_BODY = [
         hotkey: 'ctrl+2',
         is_empty: false,
         is_anomalous: false,
+        is_background: false,
     },
 ];
 
@@ -291,6 +293,7 @@ const HIERARCHY_LABELS_BODY = [
         hotkey: 'ctrl+1',
         is_empty: false,
         is_anomalous: false,
+        is_background: false,
     },
     {
         id: 'label2',
@@ -301,6 +304,7 @@ const HIERARCHY_LABELS_BODY = [
         hotkey: 'ctrl+2',
         is_empty: false,
         is_anomalous: false,
+        is_background: false,
     },
     {
         id: 'label3',
@@ -311,6 +315,7 @@ const HIERARCHY_LABELS_BODY = [
         hotkey: 'ctrl+3',
         is_empty: false,
         is_anomalous: false,
+        is_background: false,
     },
     {
         id: 'label4',
@@ -321,6 +326,7 @@ const HIERARCHY_LABELS_BODY = [
         hotkey: 'ctrl+4',
         is_empty: false,
         is_anomalous: false,
+        is_background: false,
     },
 ];
 
@@ -614,6 +620,7 @@ export const PROJECT_RESPONSE = (): ProjectDTO => {
                             hotkey: 'ctrl+1',
                             is_empty: false,
                             is_anomalous: false,
+                            is_background: false,
                         },
                     ],
                     title: 'Detection',

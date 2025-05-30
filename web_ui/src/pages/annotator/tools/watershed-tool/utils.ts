@@ -33,6 +33,7 @@ export const BACKGROUND_LABEL: Label = {
     behaviour: LABEL_BEHAVIOUR.LOCAL,
     hotkey: 'ctrl+b',
     isEmpty: false,
+    isBackground: false,
 };
 
 const SENSITIVITY_CONFIG: number[] = [484, 1024, 1764, 2704, 4900];
