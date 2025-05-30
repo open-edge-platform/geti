@@ -370,7 +370,10 @@ const updateToTaskDTO = (task: Task, anomalyRevampFlagEnabled: boolean) => {
 const updateToKeypointTaskDTO = (task: KeypointTask, anomalyRevampFlagEnabled: boolean) => {
     return {
         ...updateToTaskDTO(task, anomalyRevampFlagEnabled),
-        keypoint_structure: task.keypointStructure,
+        keypoint_structure: {
+            ...task.keypointStructure,
+            positions: task.keypointStructure.positions.map((position) => ({ ...position, label: position.label.id })),
+        },
     };
 };
 

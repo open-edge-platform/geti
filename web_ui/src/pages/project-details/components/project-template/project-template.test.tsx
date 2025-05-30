@@ -123,7 +123,10 @@ describe('ProjectTemplate', () => {
                         keypointStructure: {
                             edges: keypointStructure.edges,
                             positions: expect.arrayContaining([
-                                { label: point1.label.name, ...point1Position.newNormalized },
+                                {
+                                    label: expect.objectContaining({ id: point1.label.id, name: point1.label.name }),
+                                    ...point1Position.newNormalized,
+                                },
                             ]),
                         },
                     }),
@@ -154,8 +157,10 @@ describe('ProjectTemplate', () => {
                 tasks: [
                     expect.objectContaining({
                         keypointStructure: {
-                            edges: [{ nodes: [newLabelName, 'label 2'] }],
-                            positions: expect.arrayContaining([{ label: newLabelName, x: point1.x, y: point1.y }]),
+                            edges: [{ nodes: [point1.label.id, 'label 2'] }],
+                            positions: expect.arrayContaining([
+                                { label: expect.objectContaining({ name: newLabelName }), x: point1.x, y: point1.y },
+                            ]),
                         },
                         labels: expect.arrayContaining([
                             expect.objectContaining({ id: 'label 1', name: newLabelName }),

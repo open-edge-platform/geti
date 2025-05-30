@@ -3,7 +3,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { Flex, Grid, type DimensionValue, type Responsive } from '@geti/ui';
+import { Button, Flex, Grid, type DimensionValue, type Responsive } from '@geti/ui';
 import { Delete } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
@@ -108,6 +108,15 @@ export const TemplateManager = ({
                                     <Delete />
                                 </ButtonWithSpectrumTooltip>
                             )}
+
+                            <Button
+                                variant={'secondary'}
+                                marginStart={'auto'}
+                                isDisabled={isEmpty(state.points)}
+                                onPress={() => setState({ points: [], edges: [] })}
+                            >
+                                Reset template
+                            </Button>
                         </Flex>
 
                         <Grid
