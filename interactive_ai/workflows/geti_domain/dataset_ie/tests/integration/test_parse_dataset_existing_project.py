@@ -8,7 +8,6 @@ from geti_types import ID
 from iai_core.entities.label import Domain
 from iai_core.entities.project import Project
 from iai_core.utils.deletion_helpers import DeletionHelpers
-from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import CHAINED_PROJECT_TYPES, GetiProjectType
 
 from job.repos.data_repo import ImportDataRepo
@@ -152,15 +151,10 @@ class TestParseDatasetExistingProject:
             possible_domains_from_cross=possible_domains_from_cross,
         )
 
-        if (
-            FeatureFlagProvider.is_enabled(feature_flag=FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            and project_type == GetiProjectType.ANOMALY_CLASSIFICATION
-            and dataset_info.exported_project_type
-            in [
-                GetiProjectType.ANOMALY_DETECTION,
-                GetiProjectType.ANOMALY_SEGMENTATION,
-            ]
-        ):
+        if project_type == GetiProjectType.ANOMALY and dataset_info.exported_project_type in [
+            GetiProjectType.ANOMALY_DETECTION,
+            GetiProjectType.ANOMALY_SEGMENTATION,
+        ]:
             warnings.add(warning_local_annotations_lost())
 
         self._check_label_names_from_parse_dataset_for_import_to_existing_project(
@@ -227,15 +221,11 @@ class TestParseDatasetExistingProject:
         request,
         anomaly_dataset_id,
         fxt_annotated_anomaly_cls_project,
-        fxt_enable_feature_flag_name,
         fxt_import_data_repo,
     ):
         """
         Test if warning is generated for mapping from anomaly det/seg -> anomaly cls.
-        if FEATURE_FLAG_ANOMALY_REDUCTION is enabled.
         """
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
-
         dataset_id = request.getfixturevalue(anomaly_dataset_id)
         dataset_info = get_dataset_info(anomaly_dataset_id)
         project_str = "fxt_annotated_anomaly_cls_project"

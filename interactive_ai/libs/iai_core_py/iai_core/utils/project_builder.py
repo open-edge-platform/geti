@@ -54,7 +54,6 @@ from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier
 
 logger = logging.getLogger(__name__)
 
-FEATURE_FLAG_ANOMALY_REDUCTION = "FEATURE_FLAG_ANOMALY_REDUCTION"
 FEATURE_FLAG_KEYPOINT_DETECTION = "FEATURE_FLAG_KEYPOINT_DETECTION"
 
 
@@ -286,10 +285,8 @@ class ProjectBuilder:
             )
             labels = [normal_label, anomalous_label]
 
-            is_anomaly_reduced = FeatureFlagProvider.is_enabled(FEATURE_FLAG_ANOMALY_REDUCTION)
-            domain_name = "anomaly" if is_anomaly_reduced else domain.name.lower()
             label_group = LabelGroup(
-                name=f"default - {domain_name}",
+                name=f"default - {domain.name.lower()}",
                 labels=labels,
                 group_type=LabelGroupType.EXCLUSIVE,
             )
@@ -482,7 +479,6 @@ class ProjectBuilder:
         ordered_tasks: tuple[TaskNode, ...] = project.task_graph.ordered_tasks
         previous_task_labels: list[Label] = []
         previous_task: TaskNode | NullTaskNode = NullTaskNode()
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FEATURE_FLAG_ANOMALY_REDUCTION)
         for task in ordered_tasks:
             if not task.task_properties.is_trainable:
                 continue
@@ -514,10 +510,7 @@ class ProjectBuilder:
                 id_=LabelSchemaRepo.generate_id(),
                 previous_schema_revision_id=task_to_schema_revision_id,
             )
-            task_name = task.title
-            if is_anomaly_reduced and task.task_properties.is_anomaly:
-                task_name = "Anomaly"
-            task_title_to_label_schema[task_name] = task_label_schema
+            task_title_to_label_schema[task.title] = task_label_schema
 
             if previous_task.task_properties.task_type.is_trainable:
                 add_previous_task_label_as_parent = (
@@ -560,7 +553,6 @@ class ProjectBuilder:
         :param parser_kwargs: arguments to pass to the parser for initialization
         :return: the project, the label schema, and a mapping of task to label schema view
         """
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FEATURE_FLAG_ANOMALY_REDUCTION)
         is_keypoint_detection_enabled = FeatureFlagProvider.is_enabled(FEATURE_FLAG_KEYPOINT_DETECTION)
         parser = parser_class(**parser_kwargs)
         ProjectCreationValidator().validate(parser=parser)
@@ -580,15 +572,7 @@ class ProjectBuilder:
         child_to_parent_id: dict[Label, str] = {}
         keypoint_structure: KeypointStructure | None = None
         for task_name in tasks_names:
-            if is_anomaly_reduced and task_name.upper() in [
-                "ANOMALY",
-                TaskType.ANOMALY_CLASSIFICATION.name,
-                TaskType.ANOMALY_DETECTION.name,
-                TaskType.ANOMALY_SEGMENTATION.name,
-            ]:
-                task_type = TaskType.ANOMALY_CLASSIFICATION
-            else:
-                task_type = parser.get_task_type_by_name(task_name=task_name)
+            task_type = parser.get_task_type_by_name(task_name=task_name)
             custom_labels_names = parser.get_custom_labels_names_by_task(
                 task_name=task_name,
             )
@@ -901,12 +885,9 @@ class ProjectBuilder:
         modified_scene_ids_by_storage: dict[ID, set[ID]] = {
             storage.id_: set() for storage in project.get_dataset_storages()
         }
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FEATURE_FLAG_ANOMALY_REDUCTION)
         is_keypoint_detection_enabled = FeatureFlagProvider.is_enabled(FEATURE_FLAG_KEYPOINT_DETECTION)
         for task_node in ordered_trainable_tasks:
             task_name = task_node.title
-            if is_anomaly_reduced and task_node.task_properties.is_anomaly:
-                task_name = "Anomaly"
             label_schema_view = label_schema_repo.get_latest_view_by_task(task_node_id=task_node.id_)
             if isinstance(label_schema_view, NullLabelSchema):
                 raise ProjectUpdateError(f"Cannot find the label schema view for task with ID '{task_node.id_}'")

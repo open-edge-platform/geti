@@ -7,7 +7,6 @@ import logging
 from enum import IntEnum, auto
 
 from iai_core.entities.model_template import task_type_to_label_domain
-from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common.tasks import flyte_multi_container_task as task
 from jobs_common.tasks.utils.logging import init_logger
 from jobs_common.tasks.utils.progress import publish_metadata_update, task_progress
@@ -106,9 +105,8 @@ def _parse_dataset_for_import_to_existing_project(import_id: str, project_id: st
         project_identifier=project.identifier,
     )
     need_warning_local_annotations_will_be_lost = (
-        FeatureFlagProvider.is_enabled(feature_flag=FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        and label_names
-        and project_type == GetiProjectType.ANOMALY_CLASSIFICATION
+        label_names
+        and project_type == GetiProjectType.ANOMALY
         and ImportUtils.get_exported_project_type(dm_dataset.infos())
         in [GetiProjectType.ANOMALY_DETECTION, GetiProjectType.ANOMALY_SEGMENTATION]
     )

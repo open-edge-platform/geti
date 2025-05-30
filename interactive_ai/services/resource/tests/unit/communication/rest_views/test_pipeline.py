@@ -7,7 +7,6 @@ import pytest
 from testfixtures import compare
 
 from communication.rest_views.pipeline import CONNECTIONS, TASKS, PipelineRESTViews
-from features.feature_flags import FeatureFlag
 
 from iai_core.entities.label_schema import LabelSchema
 from iai_core.entities.model_template import TaskType
@@ -72,17 +71,6 @@ class TestPipelineRESTViews:
                 task_label_schema=fxt_label_schema,
                 keypoint_structure=keypoint_structure,
             )
-
-        compare(result, task_rest, ignore_eq=True)
-
-    def test_reduced_anomaly_task_node_to_rest(self, fxt_anomaly_detection_task, fxt_enable_feature_flag_name):
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
-        task_rest = {
-            "id": fxt_anomaly_detection_task.id_,
-            "title": "Anomaly",
-            "task_type": "anomaly",
-        }
-        result = PipelineRESTViews.task_node_to_rest(node=fxt_anomaly_detection_task)
 
         compare(result, task_rest, ignore_eq=True)
 

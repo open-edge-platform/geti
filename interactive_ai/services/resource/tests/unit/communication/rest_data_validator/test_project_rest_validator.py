@@ -1656,10 +1656,9 @@ class TestProjectRestValidator:
     )
     # fmt: on
     def test_validate_creation_data_statically(
-        self, lazyfxt_project_rest, expected_exception, fxt_enable_feature_flag_name, request: FixtureRequest
+        self, lazyfxt_project_rest, expected_exception, request: FixtureRequest
     ) -> None:
         # Arrange
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         fxt_project_rest = request.getfixturevalue(lazyfxt_project_rest)
         context: Any
         if expected_exception is None:
@@ -1737,10 +1736,9 @@ class TestProjectRestValidator:
     )
     # fmt: on
     def test_validate_update_data_statically(
-        self, lazyfxt_project_rest, expected_exception, fxt_enable_feature_flag_name, request: FixtureRequest
+        self, lazyfxt_project_rest, expected_exception, request: FixtureRequest
     ) -> None:
         # Arrange
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         fxt_project_rest = request.getfixturevalue(lazyfxt_project_rest)
         context: Any
         if expected_exception is None:

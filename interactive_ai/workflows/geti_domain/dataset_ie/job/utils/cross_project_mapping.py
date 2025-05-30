@@ -13,7 +13,6 @@ from datumaro.components.transformer import ItemTransform
 from geti_types import ProjectIdentifier
 from iai_core.entities.model_template import TaskType
 from iai_core.entities.project import Project
-from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from jobs_common_extras.datumaro_conversion.definitions import GetiProjectType
 
 from job.utils.datumaro_parser import DatumaroProjectParser
@@ -358,13 +357,16 @@ SUPPORTED_CROSS_PROJECT_MAPPINGS: dict[GetiProjectType, dict[GetiProjectType, An
         GetiProjectType.CHAINED_DETECTION_SEGMENTATION: CrossProjectConverterSegToDetSeg,
     },
     GetiProjectType.ANOMALY_CLASSIFICATION: {
+        GetiProjectType.ANOMALY: CrossProjectConverterBase,
         GetiProjectType.CLASSIFICATION: CrossProjectConverterBase,
     },
     GetiProjectType.ANOMALY_DETECTION: {
+        GetiProjectType.ANOMALY: CrossProjectConverterBase,
         GetiProjectType.CLASSIFICATION: CrossProjectConverterAnomalyDetSegToCls,
         GetiProjectType.ANOMALY_CLASSIFICATION: CrossProjectConverterAnomalyDetSegToCls,
     },
     GetiProjectType.ANOMALY_SEGMENTATION: {
+        GetiProjectType.ANOMALY: CrossProjectConverterBase,
         GetiProjectType.CLASSIFICATION: CrossProjectConverterAnomalyDetSegToCls,
         GetiProjectType.ANOMALY_CLASSIFICATION: CrossProjectConverterAnomalyDetSegToCls,
         GetiProjectType.ANOMALY_DETECTION: CrossProjectConverterSegToDet,
@@ -412,11 +414,7 @@ class CrossProjectMapper:
             for dst in SUPPORTED_CROSS_PROJECT_MAPPINGS[src]:
                 if exists_in_candidates(dst):
                     continue
-
-                if (
-                    FeatureFlagProvider.is_enabled(feature_flag=FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-                    and dst == GetiProjectType.ANOMALY_DETECTION
-                ):
+                if dst == GetiProjectType.ANOMALY:
                     # all anomaly datasets can be mapped to anomaly cls. or cls. only.
                     continue
 

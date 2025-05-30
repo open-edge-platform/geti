@@ -659,11 +659,6 @@ class ImportUtils:
         :param task_type: OTX task type identifier
         :return: task name for REST API
         """
-        if (
-            FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            and task_type == TaskType.ANOMALY_CLASSIFICATION
-        ):
-            return "anomaly"
         return task_type.name.lower() if task_type != TaskType.ROTATED_DETECTION else STR_DETECTION_ORIENTED
 
     @staticmethod
@@ -680,8 +675,6 @@ class ImportUtils:
             GetiProjectType.CHAINED_DETECTION_SEGMENTATION: "detection_segmentation",
             GetiProjectType.ROTATED_DETECTION: STR_DETECTION_ORIENTED,
         }
-        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION):
-            exceptions[GetiProjectType.ANOMALY_CLASSIFICATION] = "anomaly"
         return exceptions.get(geti_project_type, geti_project_type.name.lower())
 
     @staticmethod
@@ -748,6 +741,7 @@ class ImportUtils:
             GetiProjectType.ANOMALY_CLASSIFICATION: [TaskType.ANOMALY_CLASSIFICATION],
             GetiProjectType.ANOMALY_DETECTION: [TaskType.ANOMALY_DETECTION],
             GetiProjectType.ANOMALY_SEGMENTATION: [TaskType.ANOMALY_SEGMENTATION],
+            GetiProjectType.ANOMALY: [TaskType.ANOMALY],
             GetiProjectType.INSTANCE_SEGMENTATION: [TaskType.INSTANCE_SEGMENTATION],
             GetiProjectType.ROTATED_DETECTION: [TaskType.ROTATED_DETECTION],
             GetiProjectType.CHAINED_DETECTION_CLASSIFICATION: [
@@ -834,7 +828,7 @@ class ImportUtils:
         """
         Validate project valid for dataset import and return the task type of the project
 
-        :param project_id: str project id
+        :param project: Geti project object
         :return: task type of the (only) trainable task in the project
         """
         supported_types = [
@@ -845,6 +839,7 @@ class ImportUtils:
             TaskType.ANOMALY_CLASSIFICATION,
             TaskType.ANOMALY_DETECTION,
             TaskType.ANOMALY_SEGMENTATION,
+            TaskType.ANOMALY,
             TaskType.ROTATED_DETECTION,
             TaskType.KEYPOINT_DETECTION,
         ]

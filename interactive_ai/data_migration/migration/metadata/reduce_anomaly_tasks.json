@@ -1,0 +1,9 @@
+{
+  "description": "Performs the anomaly reduction process of: Anomaly Classification, Anomaly Detection, and Anomaly segmentation, to Anomaly.",
+  "supports_downgrade": false,
+  "skip_on_project_import": false,
+  "new_collections": [],
+  "updated_collections": ["annotation_scene","project", "label", "label_schema", "task_node"],
+  "deprecated_collections": [],
+  "affects_binary_data": false
+}

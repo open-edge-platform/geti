@@ -5,7 +5,6 @@
 import pytest
 
 from communication.rest_views.performance_rest_views import PerformanceRESTViews
-from features.feature_flags import FeatureFlag
 
 from iai_core.entities.project_performance import (
     GlobalLocalTaskPerformance,
@@ -62,14 +61,6 @@ class TestPerformanceRESTViews:
                         "value": 0.9,
                         "metric_type": "accuracy",
                     },
-                    "global_score": {
-                        "value": 0.9,
-                        "metric_type": "accuracy",
-                    },
-                    "local_score": {
-                        "value": 0.2,
-                        "metric_type": "dice_average",
-                    },
                 },
             ],
         }
@@ -84,43 +75,6 @@ class TestPerformanceRESTViews:
         self,
         fxt_task_performance_global,
     ) -> None:
-        # Arrange
-        project_performance = ProjectPerformance(task_performances=[fxt_task_performance_global], score=0.9)
-        expected_result = {
-            "score": 0.9,
-            "global_score": 0.9,
-            "local_score": 0.2,
-            "task_performances": [
-                {
-                    "task_id": "60d31793d5f1fb7e6e3c1a50",
-                    "score": {
-                        "value": 0.9,
-                        "metric_type": "accuracy",
-                    },
-                    "global_score": {
-                        "value": 0.9,
-                        "metric_type": "accuracy",
-                    },
-                    "local_score": {
-                        "value": 0.2,
-                        "metric_type": "dice_average",
-                    },
-                },
-            ],
-        }
-
-        # Act
-        result = PerformanceRESTViews.project_performance_to_rest(project_performance=project_performance)
-
-        # Assert
-        assert result == expected_result
-
-    def test_performance_to_rest_global_reduced_anomaly(
-        self,
-        fxt_task_performance_global,
-        fxt_enable_feature_flag_name,
-    ) -> None:
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         # Arrange
         project_performance = ProjectPerformance(task_performances=[fxt_task_performance_global], score=0.9)
         expected_result = {

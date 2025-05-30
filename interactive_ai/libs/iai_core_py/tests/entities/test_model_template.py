@@ -878,6 +878,7 @@ class TestTaskTypesConstants:
         Test passes if ANOMALY_TASK_TYPES and TRAINABLE_TASK_TYPES constants return expected values
         """
         assert ANOMALY_TASK_TYPES == (
+            TaskType.ANOMALY,
             TaskType.ANOMALY_DETECTION,
             TaskType.ANOMALY_CLASSIFICATION,
             TaskType.ANOMALY_SEGMENTATION,
@@ -887,6 +888,7 @@ class TestTaskTypesConstants:
             TaskType.DETECTION,
             TaskType.SEGMENTATION,
             TaskType.INSTANCE_SEGMENTATION,
+            TaskType.ANOMALY,
             TaskType.ANOMALY_DETECTION,
             TaskType.ANOMALY_CLASSIFICATION,
             TaskType.ANOMALY_SEGMENTATION,

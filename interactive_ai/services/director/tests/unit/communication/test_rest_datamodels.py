@@ -8,7 +8,6 @@ from testfixtures import compare
 from communication.views.job_rest_views import JobRestViews
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.performance_rest_views import PerformanceRESTViews
-from features.feature_flag_provider import FeatureFlag
 
 from geti_types import ID
 from iai_core.entities.dataset_storage import NullDatasetStorage
@@ -29,12 +28,10 @@ class TestRestDataModels:
         "lazyfxt_performance, lazyfxt_performance_rest",
         [
             ("fxt_project_performance", "fxt_project_performance_rest"),
-            ("fxt_anomaly_performance", "fxt_anomaly_performance_rest"),
             ("fxt_anomaly_performance", "fxt_anomaly_reduced_performance_rest"),
         ],
         ids=[
             "Performance",
-            "Anomaly localization performance",
             "Reduced Anomaly localization performance",
         ],
     )
@@ -42,12 +39,8 @@ class TestRestDataModels:
         self,
         lazyfxt_performance,
         lazyfxt_performance_rest,
-        fxt_enable_feature_flag_name,
         request,
     ):
-        if lazyfxt_performance_rest == "fxt_anomaly_reduced_performance_rest":
-            fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
-
         # Arrange
         performance = request.getfixturevalue(lazyfxt_performance)
         performance_rest = request.getfixturevalue(lazyfxt_performance_rest)

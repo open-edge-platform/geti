@@ -4,9 +4,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from communication.rest_views.keypoint_structure_rest_views import KeypointStructureRESTViews
 from communication.rest_views.label_rest_views import LabelRESTViews
-from features.feature_flags import FeatureFlag
 
-from geti_feature_tools import FeatureFlagProvider
 from geti_types import ID
 from iai_core.entities.keypoint_structure import KeypointStructure
 from iai_core.entities.label_schema import LabelSchemaView, NullLabelSchema
@@ -60,21 +58,11 @@ class PipelineRESTViews:
         :return: dict of rest representation of task node
         """
 
-        if (
-            FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            and node.task_properties.is_anomaly
-        ):
-            output: dict[str, Any] = {
-                ID_: str(node.id_),
-                TITLE: "Anomaly",
-                TASK_TYPE: "anomaly",
-            }
-        else:
-            output = {
-                ID_: str(node.id_),
-                TITLE: node.title,
-                TASK_TYPE: str(node.task_properties.task_type).lower(),
-            }
+        output: dict[str, Any] = {
+            ID_: str(node.id_),
+            TITLE: node.title,
+            TASK_TYPE: str(node.task_properties.task_type).lower(),
+        }
 
         # For tasks with a label schema, include their labels in the REST view
         if task_label_schema and not isinstance(task_label_schema, NullLabelSchema):
