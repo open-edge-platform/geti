@@ -1,0 +1,19 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-kubelet-csr-approver
+version: 2.9.0
+description: Kubelet CSR Approver for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: kubelet-csr-approver
+chartVersion: 2.9.0
+
+profiles:
+  - name: default
+    displayName: "Default"
+    valuesFileName: "geti-kubelet-csr-approver-values.yaml"
