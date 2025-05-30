@@ -105,4 +105,9 @@ const useAnalytics = (): AnalyticsContextProps => {
     return context;
 };
 
-export { AnalyticsProvider, useAnalytics };
+const useIsAnalyticsEnabled = (): boolean => {
+    // TODO: Implement a more robust check for analytics enablement
+    return true;
+};
+
+export { AnalyticsProvider, useAnalytics, useIsAnalyticsEnabled };

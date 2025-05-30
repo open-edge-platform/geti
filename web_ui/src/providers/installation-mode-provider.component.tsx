@@ -3,19 +3,16 @@
 
 import { FC, ReactNode } from 'react';
 
-import { AnalyticsProvider } from '../analytics/analytics-provider.component';
+import { AnalyticsProvider, useIsAnalyticsEnabled } from '../analytics/analytics-provider.component';
 
 interface InstallationModeProviderProps {
     children: ReactNode;
 }
 
-type InstallationMode = 'standard' | 'lite';
-
-const installationMode: InstallationMode = 'lite';
-
 export const InstallationModeProvider: FC<InstallationModeProviderProps> = ({ children }) => {
+    const isAnalyticsEnabled = useIsAnalyticsEnabled();
 
-    if (installationMode === 'standard') {
+    if (isAnalyticsEnabled) {
         return <AnalyticsProvider>{children}</AnalyticsProvider>;
     }
 
