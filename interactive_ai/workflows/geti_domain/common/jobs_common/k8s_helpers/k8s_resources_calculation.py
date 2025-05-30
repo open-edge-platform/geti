@@ -138,7 +138,7 @@ async def calculate_training_resources() -> tuple[dict, str]:
         gpu_request = RESOURCES_CONFIGURATION["BM"]["requests"][accelerator_name] = "1"
         gpu_limit = RESOURCES_CONFIGURATION["BM"]["limits"][accelerator_name] = "1"
 
-        if installation_profile.casefold() == "lite"
+        if installation_profile.casefold() == "lite":
             requests_cpu = RESOURCES_CONFIGURATION["LITE"]["requests"]["cpu"]
             requests_memory = RESOURCES_CONFIGURATION["LITE"]["requests"]["memory"]
             limits_memory = RESOURCES_CONFIGURATION["LITE"]["limits"]["memory"]
