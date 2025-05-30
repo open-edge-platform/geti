@@ -11,8 +11,6 @@ spec:
     - name: {{ .Values.global.istio_gateway_name }}
       kind: Gateway
       namespace: {{ .Values.global.istio_ingress_namespace }}
-#  hostnames:
-#    - "*.intel.com"  # only for SaaS
   rules:
     - matches:
         - path:
