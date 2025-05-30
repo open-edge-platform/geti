@@ -8,7 +8,7 @@ import { useAuth } from 'react-oidc-context';
 
 import { createInMemoryPlatformUtilsService } from '../services/create-in-memory-platform-utils-service';
 import { RequiredProviders } from './../../../test-utils/required-providers-render';
-import { usePlatformUtils } from './use-platform-utils.hook';
+import { useProductInfo, useWorkflowId } from './use-platform-utils.hook';
 
 jest.mock('react-oidc-context', () => ({
     ...jest.requireActual('react-oidc-context'),
@@ -39,8 +39,7 @@ describe('useWorkflowId', () => {
             },
         });
 
-        const { result } = renderHook(() => usePlatformUtils(), { wrapper });
-        const { result: workflowId } = renderHook(() => result.current.useWorkflowId(), { wrapper });
+        const { result: workflowId } = renderHook(() => useWorkflowId(), { wrapper });
 
         await waitFor(() => {
             expect(workflowId.current.data).toStrictEqual('test-workflow-id-from-oidc');
@@ -50,11 +49,10 @@ describe('useWorkflowId', () => {
 
 describe('useProductInfo', () => {
     it('Returns the product info from the api', async () => {
-        const { result } = renderHook(() => usePlatformUtils(), { wrapper });
-        const { result: workflowId } = renderHook(() => result.current.useProductInfo(), { wrapper });
+        const { result } = renderHook(() => useProductInfo(), { wrapper });
 
         await waitFor(() => {
-            expect(workflowId.current.data).toStrictEqual({
+            expect(result.current.data).toStrictEqual({
                 buildVersion: '1.6.0.test.123123',
                 environment: 'on-prem',
                 gpuProvider: 'intel',
