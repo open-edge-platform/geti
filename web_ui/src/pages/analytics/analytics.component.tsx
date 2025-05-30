@@ -108,7 +108,7 @@ export const Analytics: FC = () => {
     return (
         <View>
             <DisabledAnalyticsContent />
-            <View UNSAFE_className={styles.notAvailableContent}>
+            <View UNSAFE_className={styles.notAvailableContent} data-testid={'not-available-id'}>
                 <AnalyticsContent />
             </View>
         </View>
