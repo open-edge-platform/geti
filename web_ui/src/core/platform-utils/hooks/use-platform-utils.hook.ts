@@ -16,12 +16,12 @@ const placeholderUuid = uuid();
 export const useProductInfo = (): UseQueryResult<ProductInfoEntity, AxiosError> => {
     const { platformUtilsService } = useApplicationServices();
 
-        return useQuery<ProductInfoEntity, AxiosError>({
-            queryKey: QUERY_KEYS.PLATFORM_UTILS_KEYS.VERSION_ENTITY_KEY,
-            queryFn: platformUtilsService.getProductInfo,
-            meta: { notifyOnError: true },
-        });
-    };
+    return useQuery<ProductInfoEntity, AxiosError>({
+        queryKey: QUERY_KEYS.PLATFORM_UTILS_KEYS.VERSION_ENTITY_KEY,
+        queryFn: platformUtilsService.getProductInfo,
+        meta: { notifyOnError: true },
+    });
+};
 
 export const useWorkflowId = (): UseQueryResult<WorkflowId, AxiosError> => {
     const { FEATURE_FLAG_ANALYTICS_WORKFLOW_ID = false } = useFeatureFlags();
