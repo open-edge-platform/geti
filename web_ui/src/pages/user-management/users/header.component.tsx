@@ -18,8 +18,8 @@ export const Header = () => {
     const { data: productInfo } = useProductInfo();
     const isSaasEnvironment = useIsSaasEnv();
 
-    const shouldShowAddUserButton = !isSaasEnvironment && productInfo.isSmtpDefined === false;
-    const shouldShowInviteUserButton = isSaasEnvironment || productInfo.isSmtpDefined === true;
+    const shouldShowAddUserButton = !isSaasEnvironment && productInfo?.isSmtpDefined === false;
+    const shouldShowInviteUserButton = isSaasEnvironment || productInfo?.isSmtpDefined === true;
 
     const sendInviteId = 'send-invite-btn-id';
 

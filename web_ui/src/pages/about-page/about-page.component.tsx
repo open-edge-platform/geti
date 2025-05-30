@@ -15,7 +15,7 @@ import { PageLayout } from '../../shared/components/page-layout/page-layout.comp
 import classes from './about-page.module.scss';
 
 const AboutPage = (): JSX.Element => {
-    const { data } = useProductInfo();
+    const { data, isPending } = useProductInfo();
     const isSaasEnvironment = useIsSaasEnv();
 
     const [forceOpenLicenseModal, setForceOpenLicenseModal] = useState(false);
@@ -25,7 +25,7 @@ const AboutPage = (): JSX.Element => {
             <>
                 <View>
                     <Text UNSAFE_className={classes.productTitle} id={'product-version-id'}>
-                        Intel® Geti™ {!isSaasEnvironment && data?.productVersion}
+                        Intel® Geti™ {!isSaasEnvironment && `- ${isPending ? ' -- --' : data?.productVersion}`}
                     </Text>
                 </View>
                 <Text UNSAFE_className={classes.productDescription} marginY={'size-250'}>
@@ -76,7 +76,7 @@ const AboutPage = (): JSX.Element => {
 
                     {!isSaasEnvironment && data?.buildVersion && (
                         <Text marginTop={'size-400'} id={'build-version-id'}>
-                            Build: {data.buildVersion}
+                            Build: {isPending ? '-- ' : data.buildVersion}
                         </Text>
                     )}
 

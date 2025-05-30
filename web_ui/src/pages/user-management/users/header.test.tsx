@@ -2,19 +2,17 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Resource, RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
-import { screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 
 import { Environment, GPUProvider } from '../../../core/platform-utils/dto/utils.interface';
 import { createInMemoryPlatformUtilsService } from '../../../core/platform-utils/services/create-in-memory-platform-utils-service';
-import { PlatformUtilsService } from '../../../core/platform-utils/services/utils.interface';
 import { useIsSaasEnv } from '../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { getMockedWorkspaceIdentifier } from '../../../test-utils/mocked-items-factory/mocked-identifiers';
-import { getMockedProductInfo } from '../../../test-utils/mocked-items-factory/mocked-product-info';
 import {
     getMockedAdminUser,
     getMockedOrganizationAdminUser,
 } from '../../../test-utils/mocked-items-factory/mocked-users';
-import { providersRender } from '../../../test-utils/required-providers-render';
+import { providersRender as render } from '../../../test-utils/required-providers-render';
 import { Header } from './header.component';
 
 const { workspaceId, organizationId } = getMockedWorkspaceIdentifier();
@@ -58,12 +56,6 @@ jest.mock('react-router-dom', () => ({
     }),
 }));
 
-const render = async (platformUtilsService?: PlatformUtilsService) => {
-    providersRender(<Header />, platformUtilsService ? { services: { platformUtilsService } } : {});
-
-    await waitForElementToBeRemoved(screen.getByRole('progressbar'));
-};
-
 describe('Users table header', () => {
     beforeEach(() => {
         mockedGetUsersQuery.mockImplementation(() => ({
@@ -83,12 +75,12 @@ describe('Users table header', () => {
     });
 
     it('Check if Invite User button is visible on saas environment', async () => {
-        await render();
+        await render(<Header />);
         expect(screen.getByRole('button', { name: 'Send invite' })).toBeInTheDocument();
     });
 
     it('Do not show add user button when environment is saas ', async () => {
-        await render();
+        await render(<Header />);
         expect(screen.queryByRole('button', { name: 'Add user' })).not.toBeInTheDocument();
     });
 
@@ -97,7 +89,7 @@ describe('Users table header', () => {
 
         const platformUtilsService = createInMemoryPlatformUtilsService();
         platformUtilsService.getProductInfo = async () => {
-            return getMockedProductInfo({
+            return {
                 productVersion: '1.6.0',
                 buildVersion: '1.6.0.test.123123',
                 intelEmail: 'support@geti.com',
@@ -105,9 +97,9 @@ describe('Users table header', () => {
                 grafanaEnabled: false,
                 environment: Environment.ON_PREM,
                 gpuProvider: GPUProvider.INTEL,
-            });
+            };
         };
-        await render(platformUtilsService);
+        await render(<Header />, { services: { platformUtilsService } });
         expect(await screen.findByRole('button', { name: 'Add user' })).toBeInTheDocument();
     });
 
@@ -116,7 +108,7 @@ describe('Users table header', () => {
 
         const platformUtilsService = createInMemoryPlatformUtilsService();
         platformUtilsService.getProductInfo = async () => {
-            return getMockedProductInfo({
+            return {
                 productVersion: '1.6.0',
                 buildVersion: '1.6.0.test.123123',
                 intelEmail: 'support@geti.com',
@@ -124,9 +116,9 @@ describe('Users table header', () => {
                 grafanaEnabled: false,
                 environment: Environment.ON_PREM,
                 gpuProvider: GPUProvider.INTEL,
-            });
+            };
         };
-        await render(platformUtilsService);
+        await render(<Header />, { services: { platformUtilsService } });
 
         expect(screen.queryByRole('button', { name: 'Add user' })).not.toBeInTheDocument();
     });

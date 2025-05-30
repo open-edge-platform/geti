@@ -17,7 +17,7 @@ import { ExportAnalyticsType } from './export-logs.component';
 export const Analytics = (): JSX.Element => {
     const { router } = useApplicationServices();
     const { data } = useProductInfo();
-    const isGrafanaEnabled = data.grafanaEnabled;
+    const isGrafanaEnabled = data?.grafanaEnabled;
 
     const ITEMS: ComponentProps<typeof DownloadableItem>[] = useMemo(() => {
         return [

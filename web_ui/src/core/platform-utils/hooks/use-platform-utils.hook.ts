@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
-import { useQuery, UseQueryResult, useSuspenseQuery, UseSuspenseQueryResult } from '@tanstack/react-query';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useAuth } from 'react-oidc-context';
 import { v4 as uuid } from 'uuid';
@@ -13,17 +13,15 @@ import { ProductInfoEntity, WorkflowId } from '../services/utils.interface';
 
 const placeholderUuid = uuid();
 
-export const useProductInfo = (): UseSuspenseQueryResult<ProductInfoEntity, AxiosError> => {
+export const useProductInfo = (): UseQueryResult<ProductInfoEntity, AxiosError> => {
     const { platformUtilsService } = useApplicationServices();
 
-    return useSuspenseQuery<ProductInfoEntity, AxiosError>({
-        queryKey: QUERY_KEYS.PLATFORM_UTILS_KEYS.VERSION_ENTITY_KEY,
-        queryFn: platformUtilsService.getProductInfo,
-        meta: { notifyOnError: true },
-        staleTime: Infinity,
-        gcTime: Infinity,
-    });
-};
+        return useQuery<ProductInfoEntity, AxiosError>({
+            queryKey: QUERY_KEYS.PLATFORM_UTILS_KEYS.VERSION_ENTITY_KEY,
+            queryFn: platformUtilsService.getProductInfo,
+            meta: { notifyOnError: true },
+        });
+    };
 
 export const useWorkflowId = (): UseQueryResult<WorkflowId, AxiosError> => {
     const { FEATURE_FLAG_ANALYTICS_WORKFLOW_ID = false } = useFeatureFlags();
