@@ -16,7 +16,8 @@ from typing import TYPE_CHECKING, ClassVar
 
 import requests
 from tqdm import tqdm
-from utils import BASE_MODEL_FILENAME, logging_elapsed_time
+
+from .utils import BASE_MODEL_FILENAME, logging_elapsed_time
 
 if TYPE_CHECKING:
     import io
