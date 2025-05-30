@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { FC } from 'react';
+
 import { Content, Heading, Text } from '@geti/ui';
 
 import { ConnectionLost } from '../../../assets/images';
@@ -8,7 +10,7 @@ import { CustomerSupportLink } from '../../../shared/components/customer-support
 
 import classes from '../error-layout/error-layout.module.scss';
 
-export const ServiceUnavailable = (): JSX.Element => {
+export const ServiceUnavailable: FC = () => {
     return (
         <>
             <ConnectionLost />

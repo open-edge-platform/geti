@@ -5,11 +5,8 @@ import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspac
 
 export enum LOCAL_STORAGE_KEYS {
     ALL = 'all',
-    UPLOADS = 'uploads',
     PINNED_LABELS = 'pinnedLabels',
-    UNAUTHORIZED = 'unauthorized',
     INTENDED_PATH_BEFORE_AUTHENTICATION = 'intended-path-before-authentication',
-    SERVICE_UNAVAILABLE = 'service-unavailable',
     EXPORTING_DATASETS = 'exportingDatasets',
     EXPORTING_PROJECT = 'exportingProject',
     IMPORTING_PROJECT = 'importingProject',
@@ -17,8 +14,6 @@ export enum LOCAL_STORAGE_KEYS {
     IMPORT_DATASET_TO_NEW_PROJECT = 'importDatasetToNewProject',
     IMPORT_DATASET_TO_EXISTING_PROJECT = 'importDatasetToExistingProject',
     COPY_ANNOTATION = 'copy-annotation',
-    PROJECT_ACCESS_DENIED = 'projectAccessDenied',
-    SELECTED_ORGANIZATION = 'selectedOrganization',
     LAST_LOGIN_INFO = 'lastLoginInfo',
     MEDIA_VIEW_MODE = 'media-view-mode',
 }

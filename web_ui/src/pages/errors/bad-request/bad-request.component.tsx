@@ -1,6 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { FC } from 'react';
+
 import { paths } from '@geti/core';
 import { Button, Content, Heading, Text } from '@geti/ui';
 
@@ -10,7 +12,11 @@ import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';
 
-export const BadRequest = (): JSX.Element => {
+interface BadRequestProps {
+    onReset: () => void;
+}
+
+export const BadRequest: FC<BadRequestProps> = ({ onReset }): JSX.Element => {
     return (
         <>
             <LinkExpiredImage aria-label={'Bad request'} />
@@ -29,6 +35,7 @@ export const BadRequest = (): JSX.Element => {
                 variant={'accent'}
                 marginTop={'size-200'}
                 onPress={() => {
+                    onReset();
                     redirectTo(paths.root({}));
                 }}
             >

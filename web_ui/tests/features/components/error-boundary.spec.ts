@@ -14,43 +14,42 @@ const annotatorUrl = paths.project.annotator.image({
 });
 
 // We show a loading indicator while loading the user, and if the query fails we retry 3 times
-const RETRY_TIMEMOUT = { timeout: 30_000 };
+const RETRY_TIMEOUT = { timeout: 30_000 };
 
-test('project layout', async ({ page, registerApiExample, baseURL }) => {
-    registerApiExample('GetProjectInfo', 'Project not found response', 404);
+test.describe('Error boundary', () => {
+    test('project layout', async ({ page, registerApiExample, baseURL }) => {
+        registerApiExample('GetProjectInfo', 'Project not found response', 404);
 
-    // check that error handling works when project isn't loaded
-    await page.goto(
-        // eslint-disable-next-line max-len
-        '/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/60ec6bbfb98caeb87e34306e/projects/x/datasets/6101254defba22ca453f11cc/media'
-    );
+        // check that error handling works when project isn't loaded
+        await page.goto(
+            // eslint-disable-next-line max-len
+            '/organizations/5b1f89f3-aba5-4a5f-84ab-de9abb8e0633/workspaces/60ec6bbfb98caeb87e34306e/projects/x/datasets/6101254defba22ca453f11cc/media'
+        );
 
-    await expect(
-        page.getByRole('heading', { name: /Could not find project with id 60ec6bbfb98caeb87e34306e/i })
-    ).toBeVisible(RETRY_TIMEMOUT);
-    await page.getByRole('link', { name: /go back to home/i }).click();
-    expect(page.url()).toBe(`${baseURL}/`);
-});
+        await expect(
+            page.getByRole('heading', { name: /Could not find project with id 60ec6bbfb98caeb87e34306e/i })
+        ).toBeVisible(RETRY_TIMEOUT);
+        await page.getByRole('button', { name: /go back to home/i }).click();
+        expect(page.url()).toBe(`${baseURL}/`);
+    });
 
-test('annotator layout', async ({ page, registerApiExample }) => {
-    registerApiExample('GetImageAnnotation', '', 404);
-    registerApiExample('DownloadFullImage', '', 404);
+    test('annotator layout', async ({ page, registerApiExample }) => {
+        registerApiExample('GetImageAnnotation', '', 404);
+        registerApiExample('DownloadFullImage', '', 404);
 
-    await page.goto(annotatorUrl);
+        await page.goto(annotatorUrl);
 
-    await expect(page.getByRole('heading', { name: /failed loading media item/i })).toBeVisible(RETRY_TIMEMOUT);
-});
+        await expect(page.getByRole('heading', { name: /failed loading media item/i })).toBeVisible(RETRY_TIMEOUT);
+    });
 
-test.describe('storage', () => {
     test('forbidden', async ({ page, registerApiResponse }) => {
-        registerApiResponse('GetImageAnnotation', (_, res, ctx) => {
+        registerApiResponse('GetProjectInfo', (_, res, ctx) => {
             return res(ctx.status(403));
         });
 
         await page.goto(annotatorUrl);
 
-        await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10000 });
-        await expect(page.getByRole('heading', { name: /Forbidden/i })).toBeVisible(RETRY_TIMEMOUT);
+        await expect(page.getByRole('heading', { name: /Forbidden/i })).toBeVisible(RETRY_TIMEOUT);
     });
 
     test('it does not show a forbidden modal when fetching user info', async ({ page, registerApiResponse }) => {
@@ -69,20 +68,62 @@ test.describe('storage', () => {
         await page.mouse.move(0, 0);
         await image.hover();
 
-        await expect(page.getByText('Owner: Unknown user')).toBeVisible(RETRY_TIMEMOUT);
-        await expect(page.getByText('Last annotator: Unknown user')).toBeVisible(RETRY_TIMEMOUT);
+        await expect(page.getByText('Owner: Unknown user')).toBeVisible(RETRY_TIMEOUT);
+        await expect(page.getByText('Last annotator: Unknown user')).toBeVisible(RETRY_TIMEOUT);
         await expect(page.getByRole('dialog')).toBeHidden();
     });
 
     test('service unavailable', async ({ page, registerApiResponse }) => {
-        registerApiResponse('GetImageAnnotation', (_, res, ctx) => {
+        registerApiResponse('GetProjectInfo', (_, res, ctx) => {
             return res(ctx.status(503));
         });
 
         await page.goto(annotatorUrl);
 
         await expect(page.getByRole('heading', { name: /We are experiencing technical difficulties/i })).toBeVisible(
-            RETRY_TIMEMOUT
+            RETRY_TIMEOUT
         );
+    });
+
+    test('too many requests', async ({ page, registerApiResponse }) => {
+        registerApiResponse('GetProjectInfo', (_, res, ctx) => {
+            return res(ctx.status(429));
+        });
+
+        await page.goto(annotatorUrl);
+
+        await expect(page.getByRole('heading', { name: /We are experiencing technical difficulties/i })).toBeVisible(
+            RETRY_TIMEOUT
+        );
+    });
+
+    test('bad request', async ({ page, registerApiResponse }) => {
+        registerApiResponse('GetProjectInfo', (_, res, ctx) => {
+            return res(ctx.status(400));
+        });
+
+        await page.goto(annotatorUrl);
+
+        await expect(page.getByRole('heading', { name: /bad request/i })).toBeVisible(RETRY_TIMEOUT);
+    });
+
+    test('internal server error', async ({ page, registerApiResponse }) => {
+        registerApiResponse('GetProjectInfo', (_, res, ctx) => {
+            return res(ctx.status(500));
+        });
+
+        await page.goto(annotatorUrl);
+
+        await expect(page.getByRole('heading', { name: /Internal server error/i })).toBeVisible(RETRY_TIMEOUT);
+    });
+
+    test('Unauthenticated', async ({ page, registerApiResponse }) => {
+        registerApiResponse('GetProjectInfo', (_, res, ctx) => {
+            return res(ctx.status(401));
+        });
+
+        await page.goto(annotatorUrl);
+
+        await expect(page.getByRole('heading', { name: /Unauthenticated/i })).toBeVisible(RETRY_TIMEOUT);
     });
 });
