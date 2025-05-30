@@ -29,7 +29,7 @@ export const useLocalStorageDatasetImport = <T extends DatasetImport>(
     };
 
     const putLsDatasetImport = (item: T): void => {
-        setLsDatasetImports([...(getParsedLocalStorage(storageKey) as T[]).filter(hasDifferentId(item.id)), item]);
+        setLsDatasetImports([...lsDatasetImports.filter(hasDifferentId(item.id)), item]);
     };
 
     const patchLsDatasetImport = (partialItem: Partial<T>): void => {

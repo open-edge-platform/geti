@@ -129,33 +129,37 @@ export const DatasetImportPanels = ({
             {!isEmpty(datasetImports) ? (
                 <View position={'relative'} UNSAFE_className={classes.datasetImportPanels}>
                     {!areProjectsLoading &&
-                        datasetImports.map((datasetImportItem: DatasetImportItem) => (
-                            <Fragment key={datasetImportItem.id}>
-                                <DatasetImportJobStatus
-                                    workspaceId={workspaceId}
-                                    organizationId={organizationId}
-                                    datasetImportItem={datasetImportItem}
-                                    patchDatasetImport={patchDatasetImport}
-                                    deleteDatasetImport={deleteDatasetImport}
-                                />
-                                <DatasetImportPanel
-                                    isReady={isReady}
-                                    isDeleting={isDeleting}
-                                    primaryActionName={'Create'}
-                                    prepareDataset={prepareDataset}
-                                    datasetImportItem={datasetImportItem}
-                                    prepareDatasetAction={prepareDatasetActionJob}
-                                    datasetImportDialogTrigger={datasetImportDialogTrigger}
-                                    datasetImportDeleteDialogTrigger={datasetImportDeletionDialogTrigger}
-                                    onPrimaryAction={() => {
-                                        importDatasetJob(datasetImportItem.id);
-                                    }}
-                                    setActiveDatasetImportId={setActiveDatasetImportId}
-                                    abortDatasetImportAction={() => abortDatasetImportActionHandler(datasetImportItem)}
-                                    onDeleteAction={() => deleteTemporallyDatasetImport(datasetImportItem)}
-                                />
-                            </Fragment>
-                        ))}
+                        datasetImports
+                            .sort((a, b) => b.startAt - a.startAt)
+                            .map((datasetImportItem: DatasetImportItem) => (
+                                <Fragment key={datasetImportItem.id}>
+                                    <DatasetImportJobStatus
+                                        workspaceId={workspaceId}
+                                        organizationId={organizationId}
+                                        datasetImportItem={datasetImportItem}
+                                        patchDatasetImport={patchDatasetImport}
+                                        deleteDatasetImport={deleteDatasetImport}
+                                    />
+                                    <DatasetImportPanel
+                                        isReady={isReady}
+                                        isDeleting={isDeleting}
+                                        primaryActionName={'Create'}
+                                        prepareDataset={prepareDataset}
+                                        datasetImportItem={datasetImportItem}
+                                        prepareDatasetAction={prepareDatasetActionJob}
+                                        datasetImportDialogTrigger={datasetImportDialogTrigger}
+                                        datasetImportDeleteDialogTrigger={datasetImportDeletionDialogTrigger}
+                                        onPrimaryAction={() => {
+                                            importDatasetJob(datasetImportItem.id);
+                                        }}
+                                        setActiveDatasetImportId={setActiveDatasetImportId}
+                                        abortDatasetImportAction={() =>
+                                            abortDatasetImportActionHandler(datasetImportItem)
+                                        }
+                                        onDeleteAction={() => deleteTemporallyDatasetImport(datasetImportItem)}
+                                    />
+                                </Fragment>
+                            ))}
                 </View>
             ) : null}
 
