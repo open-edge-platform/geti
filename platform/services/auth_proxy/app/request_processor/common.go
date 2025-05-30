@@ -68,7 +68,7 @@ func (h *RequestHandler) getUserDataFromCacheOrService(subject, jwtExternalStrin
 	h.Logger.Debugf("Cache MISS for UserData related to JWT %q", jwtExternalString)
 	currentUser, err := h.dispatchGetUserRequest(subject)
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get user information (external ID %s) from the account service: %v", subject, err)
+		return nil, false, fmt.Errorf("failed to get user information (external ID %s): %v", subject, err)
 	}
 	return currentUser, false, nil
 }
