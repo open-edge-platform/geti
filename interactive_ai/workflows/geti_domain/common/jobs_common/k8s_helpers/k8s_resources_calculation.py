@@ -26,6 +26,10 @@ RESOURCES_CONFIGURATION: dict = {
         "requests": {"cpu": "2", "memory": "20GB"},
         "limits": {"cpu": "100", "memory": "50GB"},
     },
+    "LITE": {
+        "requests": {"cpu": "2", "memory": "1GB"},
+        "limits": {"cpu": "100", "memory": "50GB"},
+    },
 }
 
 
@@ -107,6 +111,7 @@ async def calculate_training_resources() -> tuple[dict, str]:
         memory_capacity,
         accelerator_type,
         accelerator_name,
+        installation_profile
     ) = await calculate_available_resources_per_node()
 
     if accelerator_type == "cpu":
@@ -132,12 +137,21 @@ async def calculate_training_resources() -> tuple[dict, str]:
     if accelerator_type == "gpu":
         gpu_request = RESOURCES_CONFIGURATION["BM"]["requests"][accelerator_name] = "1"
         gpu_limit = RESOURCES_CONFIGURATION["BM"]["limits"][accelerator_name] = "1"
+
+        if installation_profile.casefold() == "lite"
+            requests_cpu = RESOURCES_CONFIGURATION["LITE"]["requests"]["cpu"]
+            requests_memory = RESOURCES_CONFIGURATION["LITE"]["requests"]["memory"]
+            limits_memory = RESOURCES_CONFIGURATION["LITE"]["limits"]["memory"]
+        else:
+            requests_cpu = RESOURCES_CONFIGURATION["BM"]["requests"]["cpu"]
+            requests_memory = RESOURCES_CONFIGURATION["BM"]["requests"]["memory"]
+            limits_memory = RESOURCES_CONFIGURATION["BM"]["limits"]["memory"]
         # GPU training task calculation
         return (
             fill_resources_with_values(
-                requests_cpu=RESOURCES_CONFIGURATION["BM"]["requests"]["cpu"],
-                requests_memory=RESOURCES_CONFIGURATION["BM"]["requests"]["memory"],
-                limits_memory=RESOURCES_CONFIGURATION["BM"]["limits"]["memory"],
+                requests_cpu=requests_cpu,
+                requests_memory=requests_memory,
+                limits_memory=limits_memory,
                 requests_gpu=gpu_request,
                 limits_gpu=gpu_limit,
                 accelerator_name=accelerator_name,
