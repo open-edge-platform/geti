@@ -111,7 +111,7 @@ async def calculate_training_resources() -> tuple[dict, str]:
         memory_capacity,
         accelerator_type,
         accelerator_name,
-        installation_profile
+        installation_profile,
     ) = await calculate_available_resources_per_node()
 
     if accelerator_type == "cpu":
