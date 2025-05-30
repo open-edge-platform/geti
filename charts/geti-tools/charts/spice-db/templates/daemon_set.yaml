@@ -1,0 +1,129 @@
+{{- if eq .Values.mode "daemonset" -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "spice-db.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "spice-db.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels: {{- include "spice-db.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "spice-db.selectorLabels" . | nindent 8 }}
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      namespace: {{ .Release.Namespace }}
+    spec:
+      dnsPolicy: "ClusterFirst"
+      restartPolicy: "Always"
+      terminationGracePeriodSeconds: 30
+      serviceAccountName: {{ include "spice-db.fullname" . }}
+      volumes:
+        - name: tls-secrets
+          secret:
+            secretName: {{ .Release.Namespace }}-{{ .Chart.Name }}-tls
+      {{- if not .Values.postgres.readonly }}
+      initContainers:
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s
+              --for=condition=complete 
+              --namespace {{ .Release.Namespace }}
+              {{ include "spice-db.fullname" . }}-init-job
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}  
+      {{- end }}
+      containers:
+        - name: "spicedb"
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          command:
+            {{- range $command := .Values.command }}
+            - {{ $command }}
+            {{- end }}
+            {{- if .Values.postgres.readonly }}
+            - --datastore-readonly=true
+            {{- end }}
+            {{- if .Values.additional_args }}
+            {{- range $args := .Values.additional_args }}
+            - {{ $args }}
+            {{- end }}
+            {{- end }}
+          volumeMounts:
+          - name: tls-secrets
+            mountPath: "/etc/tls-secrets"
+            readOnly: true
+          env:
+            - name: "SPICEDB_LOG_LEVEL"
+              value: {{ .Values.log_level }}
+            - name: "SPICEDB_DATASTORE_ENGINE"
+              value: "postgres"
+            - name: "SPICEDB_HTTP_ENABLED"
+              value: "true"
+            - name: "SPICEDB_GRPC_SHUTDOWN_GRACE_PERIOD"
+              value: "1s"
+            - name: "SPICEDB_GRPC_PRESHARED_KEY"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "spice-db.fullname" . }}
+                  key: "SPICEDB_GRPC_PRESHARED_KEY"
+            - name: POSTGRES_HOST
+              value: {{ .Release.Namespace }}-postgresql
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: spicedb-postgresql-password
+            - name: POSTGRES_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: spicedb-postgresql-username
+            - name: POSTGRES_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: postgresql-db
+            - name: POSTGRES_SSLMODE
+              value: {{ .Values.postgres.sslmode }}
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          ports:
+            - name: "grpc"
+              containerPort: {{ .Values.ports.grpc }}
+              protocol: "TCP"
+            - name: "http"
+              containerPort: {{ .Values.ports.http }}
+              protocol: "TCP"
+          readinessProbe:
+            exec:
+              command: ["grpc_health_probe", "-v", "-addr=localhost:50051", "-tls", "-tls-ca-cert",
+                        "/etc/tls-secrets/ca.crt", "-tls-client-cert", "/etc/tls-secrets/tls.crt",
+                        "-tls-client-key", "/etc/tls-secrets/tls.key"]
+            failureThreshold: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["grpc_health_probe", "-v", "-addr=localhost:50051", "-tls", "-tls-ca-cert",
+                        "/etc/tls-secrets/ca.crt", "-tls-client-cert", "/etc/tls-secrets/tls.crt",
+                        "-tls-client-key", "/etc/tls-secrets/tls.key"]
+            failureThreshold: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+{{- end }}

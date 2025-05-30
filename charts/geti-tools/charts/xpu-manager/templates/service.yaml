@@ -1,0 +1,21 @@
+#
+# Copyright (C) 2021-2023 Intel Corporation
+# SPDX-License-Identifier: MIT
+# @file service-intel-xpum.yaml
+#
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    {{- include "xpu-manager.labels" . | nindent 4 }}
+  name: {{ include "xpu-manager.name" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - name: metrics
+    port: {{ .Values.service.port }}
+    protocol: TCP
+  selector:
+    {{- include "xpu-manager.selectorLabels" . | nindent 4 }}
+  sessionAffinity: None

@@ -1,0 +1,145 @@
+---
+{{- if not .Values.postgres.readonly }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "spice-db.fullname" . }}-init-job
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  backoffLimit: {{ .Values.jobs.backoffLimit }}
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      serviceAccountName: {{ include "spice-db.fullname" . }}
+      restartPolicy: Never
+      volumes:
+        - name: create-db
+          configMap:
+            name: create-db-sh
+            defaultMode: 0755
+        - name: "init"
+          emptyDir: {}
+      initContainers:
+        - name: init-postgresql
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: [ 'sh', '-c', "until nc -w 5 -z $POSTGRES_HOST $POSTGRES_PORT; do echo wait...; sleep 2; done;" ]
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: "POSTGRES_HOST"
+              value: "{{ .Release.Namespace }}-postgresql"
+            - name: "POSTGRES_PORT"
+              value: "5432"
+      containers:
+        - name: "db-and-users"
+          image: "{{ .Values.postgresql.image.registry }}/{{ if .Values.postgresql.image.repository }}{{ .Values.postgresql.image.repository }}/{{ end }}{{ .Values.postgresql.image.name }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              /opt/psql-script/create-db.sh;
+              retVal=$?;
+              echo "done" > /init/1; 
+              exit $retVal
+          volumeMounts:
+            - name: create-db
+              mountPath: "/opt/psql-script"
+            - name: "init"
+              mountPath: "/init"
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          env:
+            - name: "PGHOST"
+              value: "{{ .Release.Namespace }}-postgresql"
+            - name: "PGPORT"
+              value: "5432"
+            - name: "POSTGRES_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-username"
+            - name: "PGPASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "postgresql-password"
+            - name: "POSTGRES_DB"
+              valueFrom:
+                configMapKeyRef:
+                  key: "postgresql-db"
+                  name: "{{ .Release.Namespace }}-postgresql"
+            - name: "TARGET_POSTGRES_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "spicedb-postgresql-username"
+            - name: "TARGET_POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-postgresql"
+                  key: "spicedb-postgresql-password"
+            - name: TARGET_POSTGRES_DB
+              value: "spicedb"
+        - name: "spicedb-migrate"
+          image: "{{ .Values.debug.image.registry }}/{{ if .Values.debug.image.repository }}{{ .Values.debug.image.repository }}/{{ end }}{{ .Values.debug.image.name }}"
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ]; do
+                sleep 1
+              done;
+              spicedb migrate head
+              --skip-release-check
+              --datastore-engine
+              postgres
+              --datastore-conn-uri
+              postgres://$(POSTGRES_USERNAME):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DATABASE)?sslmode=disable;
+              retVal=$?;
+              echo "done" > /init/2; 
+              exit $retVal
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+          env:
+            - name: "POSTGRES_HOST"
+              value: "{{ .Release.Namespace }}-postgresql"
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "spicedb-postgresql-password"
+                  name: "{{ .Release.Namespace }}-postgresql"
+            - name: "POSTGRES_USERNAME"
+              valueFrom:
+                secretKeyRef:
+                  key: "spicedb-postgresql-username"
+                  name: "{{ .Release.Namespace }}-postgresql"
+            - name: "POSTGRES_DATABASE"
+              valueFrom:
+                configMapKeyRef:
+                  key: "postgresql-db"
+                  name: "{{ .Release.Namespace }}-postgresql"
+        {{- if not .Values.global.istio_ambient_mesh }}
+        - name: "istio-sidecar-quit"
+          image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ] || [ ! -f /init/2 ]; do
+                sleep 1
+              done;
+              curl -XPOST 127.0.0.1:15020/quitquitquit
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- end }}
+{{- end }}

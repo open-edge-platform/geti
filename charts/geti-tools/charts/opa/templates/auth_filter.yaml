@@ -1,0 +1,50 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+############################################################
+# Envoy External Authorization filter that will query OPA.
+############################################################
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: ext-authz
+  namespace: {{ .Values.namespace.istio }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  workloadSelector:
+    labels:
+      opa_envoy_filter: enabled
+  configPatches:
+    - applyTo: HTTP_FILTER
+      match:
+        context: SIDECAR_INBOUND
+        listener:
+          filterChain:
+            filter:
+              name: envoy.filters.network.http_connection_manager
+              subFilter:
+                name: envoy.filters.http.router
+      patch:
+        operation: INSERT_BEFORE
+        value:
+          name: envoy.filters.http.ext_authz
+          typed_config:
+            '@type': type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+            transport_api_version: V3
+            status_on_error:
+              code: ServiceUnavailable
+            grpc_service:
+              # NOTE(tsandall): when this was tested with the envoy_grpc client the gRPC
+              # server was receiving check requests over HTTP 1.1. The gRPC server in
+              # OPA-Istio would immediately close the connection and log that a bogus
+              # preamble was sent by the client (it expected HTTP 2). Switching to the
+              # google_grpc client resolved this issue.
+              google_grpc:
+                target_uri: 127.0.0.1:9191
+                stat_prefix: "ext_authz"
+              timeout: 10s
+            with_request_body:
+              allow_partial_message: true
+              max_request_bytes: 1024
+{{- end }}

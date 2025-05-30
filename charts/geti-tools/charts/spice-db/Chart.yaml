@@ -1,0 +1,10 @@
+---
+name: spice-db
+version: 0.0.5
+description: spice-db chart
+apiVersion: v2
+appVersion: 1.23.1
+dependencies:
+  - name: tools-common
+    version: 0.0.1
+    repository: "file://../tools-common"

@@ -1,0 +1,159 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-dex
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dex.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "dex.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+        rollme: {{ randAlphaNum 5 | quote }}
+      labels:
+        app: {{ .Chart.Name }}
+        ip_change_applicable: "true"
+        {{- include "dex.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-dex
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              echo 'Copying dex templates from init Container'
+              cp -rf /dex_templates/* /web
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/dex-templates-init-copy:{{ .Values.global.tag | default .Chart.Version }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          name: copy-dex-templates
+          securityContext:
+            {{- toYaml .Values.volumeSecurityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          volumeMounts:
+            - mountPath: /web
+              name: data-storage
+              subPath: dex_templates
+              readOnly: false
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - dex
+            - serve
+            - --web-http-addr
+            - 0.0.0.0:5556
+            {{- if .Values.https.enabled }}
+            - --web-https-addr
+            - 0.0.0.0:5554
+            {{- end }}
+            {{- if .Values.grpc.enabled }}
+            - --grpc-addr
+            - 0.0.0.0:5557
+            {{- end }}
+            - --telemetry-addr
+            - 0.0.0.0:5558
+            - /etc/dex/config.yaml
+          env:
+            - name: LDAP_READONLY_USER_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: readonly_username
+                  name: {{ .Values.global.ldap_service_user_secret_name }}
+            - name: LDAP_READONLY_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: readonly_password
+                  name: {{ .Values.global.ldap_service_user_secret_name }}
+            - name: KUBERNETES_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 5556
+              protocol: TCP
+            {{- if .Values.https.enabled }}
+            - name: https
+              containerPort: 5554
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.grpc.enabled }}
+            - name: grpc
+              containerPort: 5557
+              protocol: TCP
+            {{- end }}
+            - name: telemetry
+              containerPort: 5558
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz/live
+              port: telemetry
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: telemetry
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data-storage
+              mountPath: /web
+              subPath: dex_templates
+              readOnly: true
+            - name: config
+              mountPath: /etc/dex
+              readOnly: true
+            - name: temp
+              mountPath: /tmp
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      volumes:
+        {{- if .Values.global.storage_volume_claim_name_dex }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_dex }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          secret:
+            secretName: {{ include "dex.componentname" (list . "config") }}
+        - name: temp
+          emptyDir: {}
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

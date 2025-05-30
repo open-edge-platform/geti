@@ -1,0 +1,111 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mongodb.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "mongodb.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "mongodb.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "mongodb.selectorLabels" . | nindent 8 }}
+    spec:
+      terminationGracePeriodSeconds: 120
+      serviceAccountName: {{ .Release.Namespace }}-mongodb
+      initContainers:
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              find /data/db -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} + || true
+          volumeMounts:
+            - name: data-storage
+              mountPath: /data/db
+              subPath: mongodb
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.volumeSecurityContext | nindent 12 }}
+      containers:
+        - name: mongodb
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          args: ["--noscripting"]
+          env:
+          {{- if .Values.auth.init_database }}
+            - name: MONGO_INITDB_DATABASE
+              value: {{ .Values.auth.init_database }}
+          {{- end }}
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: mongodb-username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-mongodb
+                  key: mongodb-password
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - mountPath: /data/db
+              readOnly: false
+              name: data-storage
+              subPath: mongodb
+            - mountPath: /tmp
+              name: temp
+          ports:
+            - name: mongodb
+              containerPort: {{ .Values.service.ports.mongodb.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.ports.mongodb.port }}
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.ports.mongodb.port }}
+              scheme: HTTP
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - mongosh
+                  - --username
+                  - $MONGO_INITDB_ROOT_USERNAME
+                  - --password
+                  - $MONGO_INITDB_ROOT_PASSWORD
+                  - admin
+                  - --eval
+                  - 'db.shutdownServer({force: false})'
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_mongodb }}
+        - name: temp
+          emptyDir: {}

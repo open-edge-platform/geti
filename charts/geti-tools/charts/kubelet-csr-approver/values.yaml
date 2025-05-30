@@ -1,0 +1,117 @@
+# Required configuration item
+providerRegex: ""
+# optional, specified as a string (enclosed with ""). if left empty, defaults to 367 days
+maxExpirationSeconds: ""
+# optional, permits to bypass dns resolution checks. default: false
+bypassDnsResolution: false
+# number of DNS SAN names allowed in a certificate request. defaults to 1
+allowedDnsNames: 1
+# optional, permits ignoring CSRs with another Username than `system:node:...`
+ignoreNonSystemNode: false
+# set this parameter to true to ignore mismatching DNS name and hostname
+bypassHostnameCheck: false
+# optional, list of IP (IPv4, IPv6) subnets that are allowed to submit CSRs
+providerIpPrefixes: []
+#   - 192.168.8.0/22
+#   - fc00::/7
+
+# logging level ranges from -5 (Fatal) to 10 (Verbose). default level is 0
+loggingLevel: 0
+
+leaderElection: false
+replicas: 1
+
+namespace: ""
+
+image:
+  registry: ghcr.io
+  repository: postfinance
+  pullPolicy: IfNotPresent
+  name: kubelet-csr-approver
+
+imagePullSecrets:
+  - name: regcred
+nameOverride: ""
+fullnameOverride: ""
+
+metrics:
+  enable: false
+  serviceType: ClusterIP
+  port: 8080
+  annotations: {}
+  serviceMonitor:
+    enabled: false
+    additionalLabels: {}
+    interval: 1m
+    scrapeTimeout: 10s
+    metricRelabelings: []
+    relabelings: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podLabels: {}
+
+# PriorityClass indicates the importance of a Pod relative to other Pods.
+priorityClassName: ""
+
+podSecurityContext: {}
+  # fsGroup: 65532
+
+securityContext:
+  runAsUser: 65532
+  runAsGroup: 65532
+  runAsNonRoot: true
+  privileged: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  seccompProfile:
+    type: RuntimeDefault
+  capabilities:
+    drop: ["all"]
+
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "100m"
+  limits:
+    memory: "128Mi"
+    cpu: "500m"
+
+nodeSelector: {}
+
+tolerations:
+  - effect: NoSchedule
+    key: node-role.kubernetes.io/control-plane
+    operator: Equal
+
+affinity: {}
+
+rbac:
+  manage: true
+
+# Additional environment variables
+env: []
+#   - name: FOO
+#     value: bar
+
+dnsPolicy: ""
+dnsConfig: {}
+
+# Include additional objects within the chart
+extraObjects: []
+# - |
+#   apiVersion: v1
+#   kind: Secret
+#   metadata:
+#     name: my-special-secret
+#   data:
+#     key: value

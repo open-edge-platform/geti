@@ -1,0 +1,6 @@
+---
+name: postgresql
+version: 0.0.3
+description: postgresql chart
+apiVersion: v1
+appVersion: "14.8"
