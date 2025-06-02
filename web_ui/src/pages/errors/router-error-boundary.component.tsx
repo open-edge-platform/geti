@@ -22,7 +22,7 @@ export const RouterErrorBoundary = () => {
 
     if (
         isAxiosError(error) &&
-        error.status === HttpStatusCode.Unauthorized &&
+        error.response?.status === HttpStatusCode.Unauthorized &&
         error.request.responseURL.endsWith(API_URLS.USER_PROFILE)
     ) {
         return <InvalidOrganizationsScreen />;
