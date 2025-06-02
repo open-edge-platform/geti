@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
@@ -11,3 +12,4 @@ spec:
       tcp:
         maxConnections: 5000
         connectTimeout: 900s
+  {{- end }}

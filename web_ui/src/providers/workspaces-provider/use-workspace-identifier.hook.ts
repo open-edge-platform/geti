@@ -3,9 +3,9 @@
 
 import { useMemo } from 'react';
 
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { useParams } from 'react-router-dom';
 
-import { WorkspaceIdentifier } from '../../core/workspaces/services/workspaces.interface';
 import { useOrganizationIdentifier } from '../../hooks/use-organization-identifier/use-organization-identifier.hook';
 
 export const useWorkspaceIdentifier = (): WorkspaceIdentifier => {

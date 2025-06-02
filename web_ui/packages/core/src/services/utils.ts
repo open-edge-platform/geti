@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 import { get } from 'lodash-es';
 
@@ -14,8 +14,6 @@ import { isNonEmptyString } from '../../../../src/shared/utils';
 export const NETWORK_ERROR_MESSAGE = 'Network error: Please check your connection and try again';
 export const UNPROCESSABLE_ENTITY_MESSAGE = 'Unable to process request';
 export const FORBIDDEN_MESSAGE = "You don't have permissions to perform this operation";
-export const SERVICE_UNAVAILABLE_MESSAGE =
-    "The inference server isn't ready yet to process your request. Please try again.";
 export const BAD_REQUEST_MESSAGE = 'The server cannot or will not process the current request due to invalid syntax';
 export const INTERNAL_SERVER_ERROR_MESSAGE = 'The server encountered an error and could not complete your request';
 export const BAD_GATEWAY_MESSAGE = 'Bad gateway - The server returned an invalid response';
@@ -43,7 +41,7 @@ export const getErrorMessageByStatusCode = (error: AxiosError): string => {
     const message = (get(error, 'response.data.message') || get(error, 'response.data')) as string | undefined;
 
     if (message && typeof message === 'string') {
-        return `Error: ${message}`;
+        return message;
     }
 
     switch (statusCode) {
@@ -106,16 +104,6 @@ export const addVideoPaginationSearchParams = (
     }
 
     return searchParams;
-};
-
-export const isAuthenticationResponseUrl = (response?: AxiosResponse) => {
-    const { responseURL } = response?.request;
-    const contentType = response?.headers['content-type'];
-
-    return (
-        response?.status === StatusCodes.UNAUTHORIZED ||
-        (contentType?.includes('text/html') && responseURL?.includes('/dex/auth/'))
-    );
 };
 
 export const is404Error = (error: AxiosError) => {

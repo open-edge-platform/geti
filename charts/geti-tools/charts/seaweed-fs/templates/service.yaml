@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "seaweed-fs.fullname" . }}
+  labels:
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "true"
+    {{- end }}
+    {{- include "seaweed-fs.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: s3
+      port: {{ .Values.s3.port }}
+      targetPort: {{ .Values.s3.port }}
+      protocol: TCP
+  selector:
+    {{- include "seaweed-fs.selectorLabels" . | nindent 4 }}

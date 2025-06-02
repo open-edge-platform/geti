@@ -1,0 +1,127 @@
+image: 
+  registry: docker.io
+  repository: 
+  name: mongo:6
+imagePullPolicy: IfNotPresent
+
+auth:
+  init_database: init
+
+resources:
+  requests:
+    cpu: 400m
+    memory: 2Gi
+  limits:
+    memory: 2Gi
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+service:
+  type: ClusterIP
+  ports:
+    mongodb:
+      port: 27017
+
+serviceAccount:
+  create: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  timeoutSeconds: 10
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  timeoutSeconds: 10
+  failureThreshold: 6
+  successThreshold: 1
+
+dir_init_users_mongodb_secret: "/mnt/mongodb_secret"
+
+mongo:
+  services:
+    - dataset-ie
+    - resource
+    - director
+    - gateway
+    - project-ie
+    - visual-prompt
+    - spice-db
+    - inference-job
+    - jobs-ms
+    - jobs-scheduler
+    - jobs-scheduling-policy
+    - jobs
+    - auto-train-controller
+    - inference-gateway
+  secret_data: |
+    {{- $backward_mongodb_username := randAlpha 6 | b64enc | quote }}
+    {{- $backward_mongodb_password := randAlphaNum 12 | b64enc | quote }}
+    {{- $mongodb_username := randAlpha 6 | b64enc | quote }}
+    {{- $mongodb_password := randAlphaNum 12 | b64enc | quote }}
+    {{- $previous := lookup "v1" "Secret" .Release.Namespace (include "mongodb.secretName" .) }}
+    # Backward compatibility snippet start, remove with CVS-90144
+    {{- if $previous }}
+    # `index` function is necessary because the property name contains a dash.
+    # Otherwise $previous.data.mongodb_password would have worked too.
+    mongodb-password: {{ index $previous.data "mongodb-password" }}
+    mongodb-username: {{ index $previous.data "mongodb-username" }}
+    {{ else }}
+    mongodb-username: {{ $backward_mongodb_username }}
+    mongodb-password: {{ $backward_mongodb_password }}
+    {{- end }}
+    # Backward compatibility snippet end, remove with CVS-90144
+    {{- range .Values.mongo.services }}
+    {{- if $previous }}
+    {{- if (index $previous.data (printf "%s-%s" . "mongodb-password")) }}
+    {{ . }}-mongodb-password: {{ index $previous.data (printf "%s-%s" . "mongodb-password") }}
+    {{ . }}-mongodb-username: {{ index $previous.data (printf "%s-%s" . "mongodb-username") }}
+    {{ else }}
+    {{ . }}-mongodb-username: {{ randAlpha 6 | b64enc | quote }}
+    {{ . }}-mongodb-password: {{ randAlphaNum 12 | b64enc | quote }}
+    {{- end }}
+    {{ else }}
+    {{ . }}-mongodb-username: {{ randAlpha 6 | b64enc | quote }}
+    {{ . }}-mongodb-password: {{ randAlphaNum 12 | b64enc | quote }}
+    {{- end }}
+    {{- end }}
+
+main_namespace: impt
+flyte_workflows:
+  name: "jobs"
+  domain: "production"
+
+global:
+  enable_master_node_selector: true
+  storage_volume_claim_name_mongodb: data-storage-volume-claim
+  enable_local_image_pull_secret: true
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc

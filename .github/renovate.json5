@@ -16,8 +16,9 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
 
-  extends: ["config:base", ":gitSignOff"],
+  extends: ["config:base", ":gitSignOff", "helpers:pinGitHubActionDigests"],
   // https://docs.renovatebot.com/presets-default/#gitsignoff
+  // https://docs.renovatebot.com/presets-helpers/#helperspingithubactiondigests
 
   // if necessary, add supported releases branches here
   // it is possible to enable/disable specific upgrades per branch with
@@ -39,6 +40,10 @@
   // Set limit to 5
   ignorePresets: [":prHourlyLimit2"],
   prHourlyLimit: 5,
+  ignorePaths: [], // to include tests folders as well as `config:base` ignores it
+
+  // https://docs.renovatebot.com/golang/
+  postUpdateOptions: ["gomodTidy"],
 
   packageRules: [
     // Enable pinning for container images
@@ -51,11 +56,11 @@
       groupSlug: "pin-deps",
     },
 
-    // Disable non-security upgrades for go, python, npm and github-actions.
+    // Disable non-security upgrades for go, python, npm.
     // We will enable it in the next phase
     {
       enabled: false,
-      matchManagers: ["github-actions", "gomod", "pep621", "npm"],
+      matchManagers: ["gomod", "pep621", "npm"],
     },
 
     // Disable non-security upgrades for playwright and Dockerfile syntax (docker/dockerfile)
@@ -123,15 +128,47 @@
       matchDatasources: ["docker"],
       matchFileNames: ["**/Dockerfile.protoc"],
     },
+
+    // Group minor/patch/digest GitHub Actions updates
+    {
+      enabled: true,
+      groupName: "GitHub Actions",
+      matchManagers: ["github-actions"],
+      matchPackagePatterns: ["*"],
+      matchUpdateTypes: ["minor", "patch", "digest", "pinDigest"],
+      schedule: ["every 4 weeks on Sunday"],
+    },
+
+    // Group major GitHub Actions updates
+    {
+      enabled: true,
+      groupName: "GitHub Actions major",
+      matchManagers: ["github-actions"],
+      matchPackagePatterns: ["*"],
+      matchUpdateTypes: ["major"],
+      schedule: ["every 4 weeks on Sunday"],
+    },
+
+    // Go version used in GitHub Actions is updated manually
+    {
+      enabled: false,
+      matchDatasources: ["github-releases"],
+      matchDepNames: ["go"],
+      matchDepTypes: ["uses-with"],
+    },
+
+    // Node version used in GitHub Actions is updated manually
+    {
+      enabled: false,
+      matchDatasources: ["github-releases"],
+      matchDepNames: ["node"],
+      matchDepTypes: ["uses-with"],
+    },
   ],
 
-  // Enable security upgrades, group it in one PR
+  // Enable security upgrades
   vulnerabilityAlerts: {
-    groupName: "Security upgrades",
-    groupSlug: "security-fix-deps",
     enabled: true,
-    separateMajorMinor: false,
-    separateMinorPatch: false,
   },
   osvVulnerabilityAlerts: true,
   dependencyDashboard: true,

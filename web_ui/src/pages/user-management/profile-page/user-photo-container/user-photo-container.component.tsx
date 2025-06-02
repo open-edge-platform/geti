@@ -3,10 +3,10 @@
 
 import { useRef } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';

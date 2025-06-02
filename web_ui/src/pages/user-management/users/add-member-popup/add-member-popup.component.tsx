@@ -4,6 +4,10 @@
 import { FormEvent, useState } from 'react';
 
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { getRoleDTO } from '@geti/core/src/users/services/utils';
+import { RESOURCE_TYPE, USER_ROLE, UserCreationDTO } from '@geti/core/src/users/users.interface';
+import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
 import {
     Button,
     ButtonGroup,
@@ -19,10 +23,6 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { ValidationError } from 'yup';
 
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
-import { getRoleDTO } from '../../../../core/users/services/utils';
-import { RESOURCE_TYPE, USER_ROLE, UserCreationDTO } from '../../../../core/users/users.interface';
-import { WorkspaceIdentifier } from '../../../../core/workspaces/services/workspaces.interface';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { CONFIRM_PASSWORD_ERROR_MESSAGE, encodeToBase64 } from '../../../../shared/utils';
 import { EditFullName } from '../../profile-page/edit-full-name.component';

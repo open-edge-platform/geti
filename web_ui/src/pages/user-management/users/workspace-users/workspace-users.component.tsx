@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';
+import { RESOURCE_TYPE, User } from '@geti/core/src/users/users.interface';
+
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { USERS_TABLE_COLUMNS } from '../users-table/users-table.component';
 import { Users } from '../users.component';

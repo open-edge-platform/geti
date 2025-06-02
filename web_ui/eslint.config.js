@@ -42,6 +42,10 @@ export default [
                             group: ['@spectrum-icons'],
                             message: 'Use icons from the @geti/ui/icons folder instead.',
                         },
+                        {
+                            group: ['react-aria-components'],
+                            message: 'Use components from the @geti/ui folder instead.',
+                        },
                     ],
                 },
             ],

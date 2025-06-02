@@ -1,0 +1,6 @@
+---
+name: visual-prompt
+version: '{{VERSION}}'
+apiVersion: v2
+description: visual prompt service
+appVersion: '{{VERSION}}'

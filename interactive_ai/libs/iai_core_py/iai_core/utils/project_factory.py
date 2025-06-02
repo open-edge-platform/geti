@@ -22,7 +22,7 @@ from iai_core.entities.model_storage import ModelStorage
 from iai_core.entities.model_template import ModelTemplate, NullModelTemplate
 from iai_core.entities.project import Project
 from iai_core.entities.task_graph import TaskEdge, TaskGraph
-from iai_core.entities.task_node import TaskNode, TaskProperties
+from iai_core.entities.task_node import TaskNode, TaskProperties, TaskType
 from iai_core.repos import (
     ActiveModelStateRepo,
     ConfigurableParametersRepo,
@@ -109,6 +109,7 @@ class ProjectFactory:
         project_id: ID | None = None,
         user_names: list[str] | None = None,
         hidden: bool = False,
+        keypoint_structure: KeypointStructure | None = None,
     ) -> Project:
         """
         Create a project given a task graph
@@ -122,6 +123,7 @@ class ProjectFactory:
         :param model_templates: List of model templates to create the model storages for each task
         :param user_names: User names to assign to the project
         :param hidden: Whether to keep the project as hidden after creation
+        :param keypoint_structure: Keypoint structure to assign to the project, only for Keypoint Detection projects
         :return: created project
         """
         if project_id is None:
@@ -146,8 +148,8 @@ class ProjectFactory:
             _id=DatasetStorageRepo.generate_id(),
         )
         DatasetStorageRepo(project_identifier).save(dataset_storage)
-        keypoint_structure = None
-        if FeatureFlagProvider.is_enabled(FEATURE_FLAG_KEYPOINT_DETECTION):
+
+        if FeatureFlagProvider.is_enabled(FEATURE_FLAG_KEYPOINT_DETECTION) and keypoint_structure is None:
             keypoint_structure = KeypointStructure(
                 edges=[KeypointEdge(node_1=ID("node_1"), node_2=ID("node_2"))],
                 positions=[
@@ -155,6 +157,7 @@ class ProjectFactory:
                     KeypointPosition(node=ID("node_2"), x=1, y=1),
                 ],
             )
+
         # Create graph with one task
         project = Project(
             id=project_id,
@@ -252,6 +255,7 @@ class ProjectFactory:
         empty_label_name: str | None = None,
         is_multi_label_classification: bool | None = False,
         hidden: bool = False,
+        keypoint_structure: KeypointStructure | None = None,
     ) -> Project:
         """
         Create a project with one task in the pipeline.
@@ -267,19 +271,19 @@ class ProjectFactory:
             This attribute is ignored when label_schema is provided.
         :param model_template_id: Model template for the project
             (either the model template ID or the model template itself)
-        :param user_names: User names to assign to the project
-        :param configurable_parameters: Optional, configurable parameters to assign
-            to the task node in the Project.
-        :param workspace: Optional, workspace
+        :param user_names: Usernames to assign to the project
         :param label_schema: Optional, label schema relative to the project.
             If provided, then label_names is ignored
             If unspecified, the default workspace is used.
+        :param label_groups: Optional. label group metadata
+        :param labelname_to_parent: Optional. label tree structure
+        :param configurable_parameters: Optional, configurable parameters to assign
+            to the task node in the Project.
         :param empty_label_name: Optional. If an empty label needs to be created,
             this parameter is used to customize its name.
         :param is_multi_label_classification: Optional. True if created project is multi-label classification
         :param hidden: Whether to keep the project as hidden after creation.
-        :param label_groups: Optional. label group metadata
-        :param labelname_to_parent: Optional. label tree structure
+        :param keypoint_structure: Keypoint structure to assign to the project, only for Keypoint Detection projects
         :return: Created project
         """
         logger.warning("Method `create_project_single_task` is deprecated.")
@@ -293,7 +297,6 @@ class ProjectFactory:
         if isinstance(model_template, NullModelTemplate):
             raise ModelTemplateError("A NullModelTemplate was created.")
 
-        CTX_SESSION_VAR.get().workspace_id
         project_id = ProjectRepo.generate_id()
         dataset_template = ModelTemplateList().get_by_id("dataset")
         task_node_id = TaskNodeRepo.generate_id()
@@ -323,6 +326,9 @@ class ProjectFactory:
         task_edge = TaskEdge(from_task=image_dataset_task_node, to_task=task_node)
         task_graph.add_task_edge(task_edge)
 
+        if task_node.task_properties.task_type == TaskType.KEYPOINT_DETECTION and not keypoint_structure:
+            raise ValueError("Please provide a keypoint structure for keypoint detection projects.")
+
         project = ProjectFactory.create_project_with_task_graph(
             project_id=project_id,
             name=name,
@@ -332,6 +338,7 @@ class ProjectFactory:
             task_graph=task_graph,
             model_templates=model_templates,
             hidden=hidden,
+            keypoint_structure=keypoint_structure,
         )
 
         project_labels: list[Label]
@@ -374,7 +381,7 @@ class ProjectFactory:
                 label_groups=label_groups, labelname_to_label=labelname_to_label
             )
 
-            # labels not have an explicite grouping should be included to an exclusive_group
+            # labels not have an explicit grouping should be included to an exclusive_group
             ungrouped_label_names = [label for label in project_labels if label.name not in grouped_label_names]
             exclusive_group = LabelGroup(
                 name="labels",

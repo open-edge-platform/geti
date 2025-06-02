@@ -32,7 +32,7 @@ func TestLoadVideo(t *testing.T) {
 	videoRepo := NewVideoRepositoryImpl()
 	v, err := videoRepo.LoadVideoByID(ctx, fullVideoID)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Regexp(t, regexp.MustCompile(`http://localhost:(\d*)/.*`), v.FilePath)
 	assert.Equal(t, float64(30), v.FPS)
 }

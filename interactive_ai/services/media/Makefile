@@ -4,3 +4,4 @@
 include ../../../Makefile.shared-go
 
 DOCKER_BUILD_CONTEXT := --build-context iai_core=$(CWD)/interactive_ai/libs/iai_core_go
+DOCKER_IMAGE_DESCRIPTION := Media Service for Geti

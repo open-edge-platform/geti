@@ -195,6 +195,15 @@ def generated_rotated_rectangle_shape() -> Polygon:
     return Polygon(points=points)
 
 
+def generate_keypoint_shape() -> Keypoint:
+    """
+    Generate keypoint shape
+
+    :return: polygon entity
+    """
+    return Keypoint(x=0.2, y=0.3, is_visible=True)
+
+
 def generate_images_and_annotation_scenes(
     project: Project,
     num_annotated_images: int,

@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 {{- if .Values.microservice.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -31,4 +32,5 @@ spec:
       target:
         type: Utilization
         averageUtilization: {{ .Values.microservice.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}
 {{- end }}

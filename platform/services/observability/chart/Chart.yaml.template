@@ -1,0 +1,6 @@
+---
+name: observability
+version: '{{VERSION}}'
+description: observability chart
+apiVersion: v2
+appVersion: '{{VERSION}}'

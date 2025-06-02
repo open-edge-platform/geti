@@ -1,0 +1,27 @@
+annotations:
+  artifacthub.io/changes: |
+    - Use tagged Dex version
+  artifacthub.io/images: |
+    - name: dex
+      image: ghcr.io/dexidp/dex:v2.41.1@sha256:bc7cfce7c17f52864e2bb2a4dc1d2f86a41e3019f6d42e81d92a301fad0c8a1d
+apiVersion: v2
+appVersion: 2.37.0
+description: OpenID Connect (OIDC) identity and OAuth 2.0 provider with pluggable connectors
+home: https://dexidp.io/
+icon: https://dexidp.io/favicon.png
+keywords:
+- oidc
+- oauth
+- identity-provider
+- saml
+kubeVersion: '>=1.14.0-0'
+maintainers:
+- email: mark.sagikazar@gmail.com
+  name: sagikazarmark
+  url: https://sagikazarmark.hu
+name: dex
+sources:
+- https://github.com/dexidp/dex
+- https://github.com/dexidp/helm-charts/tree/master/charts/dex
+type: application
+version: 0.0.10

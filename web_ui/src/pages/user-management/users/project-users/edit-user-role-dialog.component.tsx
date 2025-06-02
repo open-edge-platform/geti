@@ -3,13 +3,13 @@
 
 import { FormEvent, useState } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { getRoleCreationPayload, getRoleDeletionPayload } from '@geti/core/src/users/services/utils';
+import { isOrganizationAdmin, isWorkspaceAdmin } from '@geti/core/src/users/user-role-utils';
+import { RESOURCE_TYPE, User, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
-import { getRoleCreationPayload, getRoleDeletionPayload } from '../../../../core/users/services/utils';
-import { isOrganizationAdmin, isWorkspaceAdmin } from '../../../../core/users/user-role-utils';
-import { RESOURCE_TYPE, User, USER_ROLE } from '../../../../core/users/users.interface';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { RolePicker } from '../old-project-users/role-picker.component';
 import { UserSummary } from '../workspace-users/actions/user-summary.component';

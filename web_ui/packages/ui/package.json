@@ -6,6 +6,7 @@
   "type": "module",
   "dependencies": {
     "@adobe/react-spectrum": "^3.41.0",
+    "react-aria-components": "^1.8.0",
     "@spectrum-icons/illustrations": "^3.6.17",
     "@spectrum-icons/workflow": "^4.2.16"
   },

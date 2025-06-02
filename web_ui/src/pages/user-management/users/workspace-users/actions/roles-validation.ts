@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { isWorkspaceAdmin, isWorkspaceContributor } from '../../../../../core/users/user-role-utils';
-import { User, USER_ROLE, WorkspaceRole } from '../../../../../core/users/users.interface';
+import { isWorkspaceAdmin, isWorkspaceContributor } from '@geti/core/src/users/user-role-utils';
+import { User, USER_ROLE, WorkspaceRole } from '@geti/core/src/users/users.interface';
 
 export const getAvailableRoles = ({
     activeMember,

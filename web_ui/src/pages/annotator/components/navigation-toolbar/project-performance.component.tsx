@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
-import { Flex, Tooltip, TooltipTrigger } from '@geti/ui';
-import { Pressable } from 'react-aria-components';
+import { Flex, Pressable, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Link } from 'react-router-dom';
 
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';

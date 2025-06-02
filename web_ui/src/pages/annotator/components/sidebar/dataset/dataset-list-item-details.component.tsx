@@ -3,12 +3,12 @@
 
 import { ComponentProps, useMemo } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { Divider, Flex, Grid, minmax, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { usePress } from 'react-aria';
 
 import { isVideo } from '../../../../../core/media/video.interface';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { MediaItemView } from '../../../../../shared/components/media-item-view/media-item-view.component';
 import { TruncatedTextWithTooltip } from '../../../../../shared/components/truncated-text/truncated-text.component';

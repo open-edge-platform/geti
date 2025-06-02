@@ -1,0 +1,54 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/v1/metrics
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /v1/metrics
+      backendRefs:
+        - name: {{ include "opentelemetry-collector.fullname" . }}
+          port: {{ index (index .Values.ports "otlp-http") "servicePort" }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/v1/traces
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /v1/traces
+      backendRefs:
+        - name: {{ include "opentelemetry-collector.fullname" . }}
+          port: {{ index (index .Values.ports "otlp-http") "servicePort" }}
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/v1/otel_logs
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /v1/logs
+      backendRefs:
+        - name: {{ include "opentelemetry-collector.fullname" . }}
+          port: {{ index (index .Values.ports "otlp-http") "servicePort" }}
+{{- end}}

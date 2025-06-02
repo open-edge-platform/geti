@@ -4,6 +4,7 @@
 import { ComponentProps, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Flex, Text } from '@geti/ui';
+import { isFunction } from 'lodash-es';
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { trimText } from '../../../utils';
@@ -33,6 +34,7 @@ interface BarHorizontalChartProps extends ChartProps {
     formatTooltipMessage?: FormatTooltipMessage;
     xTickFormatter?: XTickFormatter;
     ariaLabel?: string;
+    onCellClick?: (labelId: string | undefined) => void;
 }
 
 const LEFT_MARGIN = -70;
@@ -61,11 +63,13 @@ export const BarHorizontalChart = ({
     ariaLabel,
     allowDecimals = true,
     formatTooltipMessage = displayMessage,
+    onCellClick,
 }: BarHorizontalChartProps): JSX.Element => {
     const [labelColors, setLabelColors] = useState<Colors[]>(colors || []);
     const [margin, setMargin] = useState<number>(0);
     const container = useRef<HTMLDivElement | null>(null);
     const prevHoveredLabel = useRef<string | null>(null);
+    const cellStyles = isFunction(onCellClick) ? { cursor: 'pointer' } : undefined;
 
     const yAxisFormatter = (label: string | number | undefined): string => {
         if (typeof label === 'string') {
@@ -143,7 +147,7 @@ export const BarHorizontalChart = ({
 
                     <Bar dataKey='value' radius={[0, 2, 2, 0]}>
                         {data.length ? (
-                            data.map(({ name, value }, index) => (
+                            data.map(({ id, name, value }, index) => (
                                 <Cell
                                     key={name}
                                     fill={
@@ -152,6 +156,8 @@ export const BarHorizontalChart = ({
                                     id={`${name}-id`}
                                     aria-label={name}
                                     aria-valuenow={value}
+                                    onClick={isFunction(onCellClick) ? () => onCellClick(id) : undefined}
+                                    style={cellStyles}
                                 />
                             ))
                         ) : (

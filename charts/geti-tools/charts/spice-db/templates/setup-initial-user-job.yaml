@@ -1,0 +1,92 @@
+---
+{{- if not .Values.postgres.readonly }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "spice-db.fullname" . }}-init-user
+  namespace: {{.Release.Namespace}}
+  labels: {{- include "spice-db.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "post-install"
+    "helm.sh/hook-weight": "-4"
+    "helm.sh/hook-delete-policy": "hook-succeeded"
+spec:
+  backoffLimit: {{ .Values.jobs.backoffLimit }}
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+    spec:
+      restartPolicy: Never
+      serviceAccountName: {{ include "spice-db.fullname" . }}
+      volumes:
+        - name: tls-secrets
+          secret:
+            secretName: {{ include "spice-db.tlsSecretName" . }}
+            items:
+              - key: ca.crt
+                path: ca.crt
+        - name: token
+          secret:
+            secretName: {{ include "spice-db.fullname" . }}
+            defaultMode: 0755
+        - name: "init"
+          emptyDir: {}
+        - name: temp
+          emptyDir: {}
+      initContainers:
+        - name: init-mongodb
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: [ 'sh', '-c', "until nc -w 5 -z {{ .Release.Namespace }}-mongodb 27017; do echo wait...; sleep 2; done;" ]
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}     
+      containers:
+        - name: init-mongodb-user
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.Version }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              mongodb_create_service_user;
+              retVal=$?;
+              {{- if not .Values.global.istio_ambient_mesh }}
+              curl -XPOST 127.0.0.1:15020/quitquitquit;
+              {{- end }}
+              exit $retVal
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
+          env:
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-username"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-password"
+            - name: DATABASE_USERNAME_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-mongodb-username"
+            - name: DATABASE_PASSWORD_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-mongodb-password"
+            - name: SERVICE_USER_ALL_DB_ROLES
+              value: "readWriteAnyDatabase"
+{{- end }}

@@ -27,7 +27,8 @@ export const reorderObjectsLabels = (objectsPerLabel: ObjectsPerLabelInterface[]
 
 export const formatToChartData = (objectsPerLabel: ObjectsPerLabelInterface[]) =>
     objectsPerLabel.map(
-        ({ name, value }): ChartData => ({
+        ({ id, name, value }): ChartData => ({
+            id,
             name,
             value,
         })

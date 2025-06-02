@@ -1,0 +1,10 @@
+{{- if .Values.feature_flags_data -}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-feature-flags
+  namespace: {{ .Release.Namespace }}
+data:
+{{- include "modelmesh-serving.featureFlags" . }}
+{{- end }}

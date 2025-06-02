@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
+import { UsersService } from '@geti/core/src/users/services/users-service.interface';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { screen } from '@testing-library/react';
 
 import { ProjectSortingOptions } from '../../../core/projects/services/project-service.interface';
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
-import { UsersService } from '../../../core/users/services/users-service.interface';
 import { DatasetImportToNewProjectProvider } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { ProjectsImportProvider } from '../../../providers/projects-import-provider/projects-import-provider.component';
 import { applicationRender as render } from '../../../test-utils/application-provider-render';

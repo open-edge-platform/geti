@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { User } from '@geti/core/src/users/users.interface';
 import { Flex } from '@geti/ui';
 import { Email } from '@geti/ui/icons';
 
-import { User } from '../../../../../core/users/users.interface';
 import { StatusCell } from '../../../../../shared/components/table/status-cell/status-cell.component';
 import { LastLoginCell } from '../../users-table/last-login-cell.component';
 

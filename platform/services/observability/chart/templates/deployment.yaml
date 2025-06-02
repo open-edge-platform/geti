@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -88,3 +89,4 @@ spec:
         - name: config
           configMap:
             name: {{ .Release.Namespace }}-logging-config
+  {{- end }}

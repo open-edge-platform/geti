@@ -1,0 +1,202 @@
+# This is a temporary solution
+# TODO: remove this proxy and setup Flyte to use Kafka directly in scope of CVS-105288
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+   name: {{ .Release.Namespace }}-kafka-proxy
+   namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Namespace }}-kafka-proxy
+  replicas: 1
+  serviceName: {{ .Release.Namespace }}-kafka-proxy
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Namespace }}-kafka-proxy
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-kafka-proxy
+      containers:
+        - name: kafka-proxy
+          image: "{{ .Values.kafka_proxy.image.registry }}/{{ if .Values.kafka_proxy.image.repository }}{{ .Values.kafka_proxy.image.repository }}/{{ end }}{{ .Values.kafka_proxy.image.name }}"
+          command:
+            - /bin/sh
+          args:
+            - -ec
+            - |
+              # If there are multiple Kafka bootstrap server, add one --bootstrap-server-mapping parameter per server. Assign listener ports starting at 32400
+              bootstrap_server_mapping=$(echo $KAFKA_ADDRESS | awk 'BEGIN { RS = ","; ORS = " " } { print "--bootstrap-server-mapping="$1",0.0.0.0:"(NR+32400-1)",{{ .Release.Namespace }}-kafka-proxy.{{ .Release.Namespace }}.svc.cluster.local:"(NR+32400-1) }')
+
+              if [ "$KAFKA_SECURITY_PROTOCOL" = "SASL_SSL" ]; then
+                tls_opts="--tls-enable --tls-ca-chain-cert-file=/etc/ssl/certs/ca-certificates.crt"
+              fi
+              
+              /opt/kafka-proxy/bin/kafka-proxy \
+              server \
+              --log-format=json \
+              $bootstrap_server_mapping \
+              --dynamic-advertised-listener={{ .Release.Namespace }}-kafka-proxy.{{ .Release.Namespace }}.svc.cluster.local \
+              --dynamic-sequential-min-port=32500 \
+              $tls_opts \
+              --sasl-enable \
+              --sasl-username=$SASL_USERNAME \
+              --sasl-password=$SASL_PASSWORD \
+              --sasl-method=SCRAM-SHA-512 \
+              --proxy-request-buffer-size=32768 \
+              --proxy-response-buffer-size=32768 \
+              --proxy-listener-read-buffer-size=32768 \
+              --proxy-listener-write-buffer-size=131072 \
+              --kafka-connection-read-buffer-size=131072 \
+              --kafka-connection-write-buffer-size=32768
+          env:
+          - name: KAFKA_ADDRESS
+            value: {{ .Release.Namespace }}-kafka:9092
+          - name: SASL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Namespace }}-kafka-jaas-flyte
+                key: user
+          - name: SASL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Namespace }}-kafka-jaas-flyte
+                key: password
+          - name: KAFKA_SECURITY_PROTOCOL
+            value: {{ .Values.kafka_security_protocol }}
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - KILL
+                - NET_BIND_SERVICE
+          ports:
+          - name: metrics
+            containerPort: 9080
+          - name: kafka-0
+            containerPort: 32400
+          - name: kafka-1
+            containerPort: 32401
+          - name: kafka-2
+            containerPort: 32402
+          - name: kafka-3
+            containerPort: 32403
+          - name: kafka-4
+            containerPort: 32404
+          - name: kafka-5
+            containerPort: 32405
+          - name: kafka-6
+            containerPort: 32406
+          - name: kafka-adv-0
+            containerPort: 32500
+          - name: kafka-adv-1
+            containerPort: 32501
+          - name: kafka-adv-2
+            containerPort: 32502
+          - name: kafka-adv-3
+            containerPort: 32503
+          - name: kafka-adv-4
+            containerPort: 32504
+          - name: kafka-adv-5
+            containerPort: 32505
+          - name: kafka-adv-6
+            containerPort: 32506
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 9080
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 9080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 2
+            failureThreshold: 5
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 200m
+      restartPolicy: Always
+---
+# This is a temporary solution
+# TODO: remove this proxy and setup Flyte to use Kafka directly in scope of CVS-105288
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Namespace }}-kafka-proxy
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - name: metrics
+    port: 9080
+    protocol: TCP
+    targetPort: metrics
+  - name: kafka-0
+    port: 32400
+    protocol: TCP
+    targetPort: kafka-0
+  - name: kafka-1
+    port: 32401
+    protocol: TCP
+    targetPort: kafka-1
+  - name: kafka-2
+    port: 32402
+    protocol: TCP
+    targetPort: kafka-2
+  - name: kafka-3
+    port: 32403
+    protocol: TCP
+    targetPort: kafka-3
+  - name: kafka-4
+    port: 32404
+    protocol: TCP
+    targetPort: kafka-4
+  - name: kafka-5
+    port: 32405
+    protocol: TCP
+    targetPort: kafka-5
+  - name: kafka-6
+    port: 32406
+    protocol: TCP
+    targetPort: kafka-6
+  - name: kafka-adv-0
+    port: 32500
+    protocol: TCP
+    targetPort: kafka-adv-0
+  - name: kafka-adv-1
+    port: 32501
+    protocol: TCP
+    targetPort: kafka-adv-1
+  - name: kafka-adv-2
+    port: 32502
+    protocol: TCP
+    targetPort: kafka-adv-2
+  - name: kafka-adv-3
+    port: 32503
+    protocol: TCP
+    targetPort: kafka-adv-3
+  - name: kafka-adv-4
+    port: 32504
+    protocol: TCP
+    targetPort: kafka-adv-4
+  - name: kafka-adv-5
+    port: 32505
+    protocol: TCP
+    targetPort: kafka-adv-5
+  - name: kafka-adv-6
+    port: 32506
+    protocol: TCP
+    targetPort: kafka-adv-6
+  selector:
+    app: {{ .Release.Namespace }}-kafka-proxy
+  type: ClusterIP

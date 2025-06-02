@@ -1,0 +1,371 @@
+{{- $replicaCount := int .Values.replicaCount }}
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: kafka-provisioning
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+spec:
+  template:
+    metadata:
+      labels: {{- include "common.labels.standard" . | nindent 8 }}
+        app.kubernetes.io/component: kafka-provisioning
+        {{- if .Values.provisioning.podLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.podLabels "context" $) | nindent 8 }}
+        {{- end }}
+      annotations:
+      {{- if not .Values.global.istio_ambient_mesh }}
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+        {{- if .Values.provisioning.podAnnotations }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.podAnnotations "context" $) | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.provisioning.schedulerName }}
+      schedulerName: {{ .Values.provisioning.schedulerName | quote }}
+      {{- end }}
+      {{- if .Values.provisioning.podSecurityContext.enabled }}
+      securityContext: {{- omit .Values.provisioning.podSecurityContext "enabled" | toYaml | nindent 8 }}
+      {{- end }}
+      restartPolicy: OnFailure
+      terminationGracePeriodSeconds: 0
+      serviceAccountName: {{ include "common.names.fullname" . }}
+      initContainers:
+        {{- if .Values.provisioning.waitForKafka }}
+        - name: wait-for-available-kafka
+          image: {{ include "kafka.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          {{- if .Values.provisioning.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.provisioning.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          command:
+            - /bin/bash
+          args:
+            - -ec
+            - |
+              wait-for-port \
+                --host={{ .Values.provisioning.kafkaHost }} \
+                --state=inuse \
+                --timeout=600 \
+                {{ .Values.service.ports.client | int64 }};
+              echo "Kafka is available";
+          {{- if .Values.provisioning.resources }}
+          resources: {{- toYaml .Values.provisioning.resources | nindent 12 }}
+          {{- end }}
+        {{- if .Values.provisioning.initContainers }}
+        {{- include "common.tplvalues.render" ( dict "value" .Values.provisioning.initContainers "context" $ ) | nindent 8 }}
+        {{- end }}
+        {{- end }}
+        - name: store-credentials
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          command: [ "/bin/bash", "-c" ]
+          env:
+            - name: KAFKA_ADMIN_USERNAME
+              value: admin
+            - name: KAFKA_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-kafka-jaas
+                  key: system-user-password
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: SASL_PLAINTEXT
+            - name: KAFKA_SASL_MECHANISM
+              value: PLAIN
+          args:
+            - |
+              if [ "$KAFKA_SASL_MECHANISM" = "PLAIN" ]; then
+                login_module=org.apache.kafka.common.security.plain.PlainLoginModule
+              else
+                login_module=org.apache.kafka.common.security.scram.ScramLoginModule
+              fi
+              
+              cat - > /tmp/kafka/client.properties <<EOF
+              security.protocol=$KAFKA_SECURITY_PROTOCOL
+              sasl.mechanism=$KAFKA_SASL_MECHANISM
+              sasl.jaas.config=$login_module required username="$KAFKA_ADMIN_USERNAME" password="$KAFKA_ADMIN_PASSWORD";
+              request.timeout.ms=60000
+              EOF
+              
+              cat - > /tmp/kafka/tools-log4j.properties <<EOF
+              log4j.rootLogger=INFO, stderr
+    
+              log4j.appender.stderr=org.apache.log4j.ConsoleAppender
+              log4j.appender.stderr.layout=org.apache.log4j.PatternLayout
+              log4j.appender.stderr.layout.ConversionPattern=[%d] %p %m (%c)%n
+              log4j.appender.stderr.Target=System.err
+    
+              # for connect-plugin-path
+              log4j.logger.org.reflections=ERROR
+              EOF
+          securityContext: {{- omit .Values.provisioning.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          volumeMounts:
+            - name: client-config
+              mountPath: /tmp/kafka
+      containers:
+        - name: kafka-provisioning
+          image: {{ include "kafka.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+          {{- if .Values.provisioning.containerSecurityContext.enabled }}
+          securityContext: {{- omit .Values.provisioning.containerSecurityContext "enabled" | toYaml | nindent 12 }}
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.command "context" $) | nindent 12 }}
+          {{- else if .Values.provisioning.command }}
+          command: {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.command "context" $) | nindent 12 }}
+          {{- else }}
+          command:
+            - /bin/bash
+          {{- end }}
+          {{- if .Values.diagnosticMode.enabled }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.diagnosticMode.args "context" $) | nindent 12 }}
+          {{- else if .Values.provisioning.args }}
+          args: {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.args "context" $) | nindent 12 }}
+          {{- else }}
+          args:
+            - -c
+            - |
+              echo "Starting Kafka provisioning"
+
+              # Grant admin user read & describe permissions to be able to describe all topics
+              echo "Grant admin user read & describe permissions to be able to describe all topics"
+              /opt/bitnami/kafka/bin/kafka-acls.sh \
+                --add \
+                --bootstrap-server $KAFKA_ADDRESS \
+                --command-config /tmp/kafka/client.properties \
+                --allow-principal User:$KAFKA_ADMIN_USERNAME \
+                --allow-host '*' \
+                --operation Read --operation Describe --operation DescribeConfigs \
+                --operation Alter --operation AlterConfigs --operation Create \
+                --topic '*'
+              
+              exit_status=$?
+              if [ $exit_status -ne 0 ]; then
+                  echo "Kafka admin authorization command failed with exit status $exit_status"
+                  curl -s -XPOST 127.0.0.1:15020/quitquitquit
+                  exit 1
+              fi              
+
+              echo "Getting kafka description"
+              describe_result=$(/opt/bitnami/kafka/bin/kafka-topics.sh \
+                  --exclude-internal \
+                  --describe \
+                  --bootstrap-server $KAFKA_ADDRESS \
+                  --command-config /tmp/kafka/client.properties)
+              
+              exit_status=$?
+              if [ $exit_status -ne 0 ]; then
+                  echo "Kafka topic listing command failed with exit status $exit_status"
+                  curl -s -XPOST 127.0.0.1:15020/quitquitquit
+                  exit 1
+              fi
+              
+              declare -A TOPICS=()
+              while read -r line; do
+                [[ ! "$line" =~ ^Topic:\ *([a-z0-9\_]*).*TopicId.*PartitionCount:\ *([0-9]*).*ReplicationFactor.*$ ]] && continue
+                topic="${BASH_REMATCH[1]}"
+                partition_count="${BASH_REMATCH[2]}"
+                TOPICS[$topic]=$partition_count
+              done < <(echo "$describe_result")
+              
+              echo "Existing topics"
+              for x in "${!TOPICS[@]}"; do
+                [[ ! "$x" =~ $KAFKA_TOPIC_PREFIX.* ]] && continue
+                printf "%-100s | %s\n" "$x" "${TOPICS[$x]}" 
+              done
+                           
+              while IFS=$';' read -r topic replicationFactor numPartitions config || [ -n "$topic" ]; do
+                [[ "$topic" =~ ^#.*$ ]] && continue # Skip comment lines
+              
+                prefixedTopicName="${KAFKA_TOPIC_PREFIX}${topic}"
+                echo "Checking topic '$prefixedTopicName'"
+
+                if [[ -n "${TOPICS[$prefixedTopicName]}" ]] && [[ $numPartitions == ${TOPICS[$prefixedTopicName]} ]]; then
+                  echo "Topic '$prefixedTopicName' is already created with $numPartitions partitions, skipping"
+                elif [[ -n "${TOPICS[$prefixedTopicName]}" ]] && [[ ! $numPartitions == ${TOPICS[$prefixedTopicName]} ]]; then
+                  if [ "$numPartitions" -lt "${TOPICS[$prefixedTopicName]}" ]; then 
+                    echo "Cannot decrease number of partitions per topic, skipping topic update"
+                    continue
+                  fi
+                  echo "Updating topic '$prefixedTopicName' to $numPartitions partitions"
+                  
+                  /opt/bitnami/kafka/bin/kafka-topics.sh \
+                    --alter \
+                    --if-exists \
+                    --bootstrap-server $KAFKA_ADDRESS \
+                    --partitions $numPartitions \
+                    --command-config /tmp/kafka/client.properties \
+                    --topic $prefixedTopicName
+              
+                  exit_status=$?
+                  if [ $exit_status -ne 0 ]; then
+                      echo "Kafka topic altering command failed with exit status $exit_status"
+                      curl -s -XPOST 127.0.0.1:15020/quitquitquit
+                      exit 1
+                  fi
+                else
+                  echo "Topic '$prefixedTopicName' doesn't exist, creating it with replication factor '$replicationFactor', partitions number '$numPartitions' and config '$config'"
+            
+                  /opt/bitnami/kafka/bin/kafka-topics.sh \
+                    --create \
+                    --if-not-exists \
+                    --bootstrap-server $KAFKA_ADDRESS \
+                    --replication-factor $replicationFactor \
+                    --partitions $numPartitions \
+                    --command-config /tmp/kafka/client.properties \
+                    $config \
+                    --topic $prefixedTopicName
+                  
+                  exit_status=$?
+                  if [ $exit_status -ne 0 ]; then
+                      echo "Kafka topic creating command failed with exit status $exit_status"
+                      curl -s -XPOST 127.0.0.1:15020/quitquitquit
+                      exit 1
+                  fi
+                fi
+                                          
+              done < /tmp/topics/topics.properties
+              
+              failed=0
+
+              # Wait for all background processes to finish and check their exit status
+              wait_for_subprocesses() {
+                  pids=$*
+                  for pid in ${pids[*]}; do
+                      wait $pid
+                      exit_status=$?
+                      if [ $exit_status -ne 0 ]; then
+                          echo "Command failed with exit status $exit_status"
+                          failed=1
+                      fi
+                  done
+              }
+
+              batch_size=20
+
+              counter=0
+              pids=()
+
+              while IFS=$';' read -r topic user operations || [ -n "$topic" ]; do
+                [[ "$topic" =~ ^#.*$ ]] && continue # Skip comment lines
+              
+                prefixedTopicName="${KAFKA_TOPIC_PREFIX}${topic}"
+                echo "Setup ACL for '$user' on '$prefixedTopicName' topic for operations '$operations'"
+              
+                # Trying to update topic if it already exists
+                /opt/bitnami/kafka/bin/kafka-acls.sh \
+                  --add \
+                  --bootstrap-server $KAFKA_ADDRESS \
+                  --command-config /tmp/kafka/client.properties \
+                  --allow-principal User:$user \
+                  --allow-host '*' \
+                  $operations \
+                  --topic $prefixedTopicName &
+              
+                pid=$!
+                pids+=("$pid")
+
+                let "counter=counter+1"
+                if ((counter >= batch_size)); then
+                    echo "batch finished"
+                    wait_for_subprocesses $pids
+
+                    counter=0
+                    pids=()
+                fi
+
+              done < /tmp/topics/acl.properties              
+              
+              wait_for_subprocesses $pids
+              
+              # Check if any command failed and handle accordingly
+              if [ $failed -eq 1 ]; then
+                  echo "ACL provisioning failed"
+                  curl -s -XPOST 127.0.0.1:15020/quitquitquit
+                  exit 1
+              fi
+              
+              echo "Provisioning succeeded"
+              {{- if not .Values.global.istio_ambient_mesh }}
+              curl -s -XPOST 127.0.0.1:15020/quitquitquit
+              {{- end }}
+          {{- end }}
+          env:
+            - name: BITNAMI_DEBUG
+              value: {{ ternary "true" "false" (or .Values.image.debug .Values.diagnosticMode.enabled) | quote }}
+            - name: KAFKA_ADDRESS
+              value: {{ printf "%s:%d" (.Values.provisioning.kafkaHost) (.Values.service.ports.client | int64) }}
+            - name: KAFKA_TOPIC_PREFIX
+              value: {{ .Values.global.kafka_topic_prefix }}
+            - name: KAFKA_LOG4J_OPTS
+              value: -Dlog4j.configuration=file:/tmp/kafka/tools-log4j.properties
+            - name: KAFKA_ADMIN_USERNAME
+              value: admin
+          {{- if .Values.provisioning.resources }}
+          resources: {{- toYaml .Values.provisioning.resources | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: kafka-data
+              mountPath: {{ .Values.configDir }}
+              subPath: kafka/config
+            {{- if (include "kafka.tlsEncryption" .) }}
+            {{- if not (empty .Values.auth.tls.existingSecrets) }}
+            {{- range $index, $_ := .Values.auth.tls.existingSecrets }}
+            - name: kafka-certs-{{ $index }}
+              mountPath: /certs-{{ $index }}
+              readOnly: true
+            {{- end }}
+            {{- else if .Values.auth.tls.autoGenerated }}
+            {{- range $index := until $replicaCount }}
+            - name: kafka-certs-{{ $index }}
+              mountPath: /certs-{{ $index }}
+              readOnly: true
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if .Values.provisioning.extraVolumeMounts }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.extraVolumeMounts "context" $) | nindent 12 }}
+            {{- end }}
+            - name: client-config
+              mountPath: /tmp/kafka
+              readOnly: true
+            - name: kafka-topics
+              mountPath: /tmp/topics
+        {{- if .Values.provisioning.sidecars }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.sidecars "context" $) | nindent 8 }}
+        {{- end }}
+      volumes:
+        {{- if (include "kafka.tlsEncryption" .) }}
+        {{- if not (empty .Values.auth.tls.existingSecrets) }}
+        {{- range $index, $secret := .Values.auth.tls.existingSecrets }}
+        - name: kafka-certs-{{ $index }}
+          secret:
+            secretName: {{ tpl $secret $ }}
+            defaultMode: 256
+        {{- end }}
+        {{- else if .Values.auth.tls.autoGenerated }}
+        {{- range $index := until $replicaCount }}
+        - name: kafka-certs-{{ $index }}
+          secret:
+            secretName: {{ printf "%s-%d-tls" (include "common.names.fullname" $) $index }}
+            defaultMode: 256
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.provisioning.extraVolumes }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.provisioning.extraVolumes "context" $) | nindent 8 }}
+        {{- end }}
+        - name: kafka-data
+          emptyDir: {}
+        - name: client-config
+          emptyDir: {}
+        - name: kafka-topics
+          configMap:
+            name: {{ $.Release.Namespace }}-kafka-topics

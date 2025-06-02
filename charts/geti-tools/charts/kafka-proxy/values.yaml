@@ -1,0 +1,9 @@
+kafka_proxy:
+  image:
+    registry: docker.io
+    repository: grepplabs
+    name: kafka-proxy:0.3.6
+kafka_security_protocol: SASL_PLAINTEXT
+
+global:
+  enable_local_image_pull_secret: ""

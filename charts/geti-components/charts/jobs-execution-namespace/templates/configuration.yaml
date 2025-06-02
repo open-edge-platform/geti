@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-configuration
+  namespace: {{ include "flyteworkflow.namespace" . }}
+data:
+  kafka_topic_prefix: "{{ .Values.global.kafka_topic_prefix }}"
+  max_number_of_media_per_project: "{{ .Values.global.max_number_of_media_per_project }}"
+  max_number_of_annotation_versions_per_media: "{{ .Values.global.max_number_of_annotation_versions_per_media }}"
+  max_number_of_dataset_storages: "{{ .Values.global.max_number_of_dataset_storages }}"
+  max_number_of_pixels: "{{ .Values.global.max_number_of_pixels }}"
+  min_image_size: "{{ .Values.global.min_image_size }}"
+  max_image_size: "{{ .Values.global.max_image_size }}"
+  min_video_size: "{{ .Values.global.min_video_size }}"
+  max_video_width: "{{ .Values.global.max_video_width }}"
+  max_video_height: "{{ .Values.global.max_video_height }}"
+  max_video_length: "{{ .Values.global.max_video_length }}"
+  max_training_dataset_size: "{{ .Values.global.max_training_dataset_size }}"
+  project_ie_key_source: "{{ .Values.global.project_ie_key_source }}"
+  overwrite_resources_cpu_limits: "{{ .Values.global.overwrite_resources_cpu_limits }}"
+  num_models_to_keep_in_storage: "{{ .Values.global.num_models_to_keep_in_storage }}"
+  proxy_enabled: "{{ .Values.global.proxy_enabled }}"
+  http_proxy: "{{ .Values.global.http_proxy }}"
+  https_proxy: "{{ .Values.global.https_proxy }}"
+  no_proxy: "{{ .Values.global.no_proxy }}"

@@ -7,7 +7,7 @@ import { ActionButton, Flex, Heading, Link as SpectrumLink, Text, View } from '@
 import { Link } from 'react-router-dom';
 
 import { COOKIES_NOTICE, PRIVACY_NOTICE, TERMS_OF_USE_GETI, TERMS_OF_USE_INTEL } from '../../core/const';
-import { usePlatformUtils } from '../../core/platform-utils/hooks/use-platform-utils.hook';
+import { useProductInfo } from '../../core/platform-utils/hooks/use-platform-utils.hook';
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { LicenseModal } from '../../shared/components/license-modal/license-modal.component';
 import { PageLayout } from '../../shared/components/page-layout/page-layout.component';
@@ -15,8 +15,7 @@ import { PageLayout } from '../../shared/components/page-layout/page-layout.comp
 import classes from './about-page.module.scss';
 
 const AboutPage = (): JSX.Element => {
-    const { useProductInfo } = usePlatformUtils();
-    const { isPending, data } = useProductInfo();
+    const { data, isPending } = useProductInfo();
     const isSaasEnvironment = useIsSaasEnv();
 
     const [forceOpenLicenseModal, setForceOpenLicenseModal] = useState(false);
@@ -77,7 +76,7 @@ const AboutPage = (): JSX.Element => {
 
                     {!isSaasEnvironment && data?.buildVersion && (
                         <Text marginTop={'size-400'} id={'build-version-id'}>
-                            Build: {isPending ? '-- ' : data?.buildVersion}
+                            Build: {isPending ? '-- ' : data.buildVersion}
                         </Text>
                     )}
 

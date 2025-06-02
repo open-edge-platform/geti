@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 
 import pytest
-
 from scripts.mlflow_io import AsyncCaller
 
 
