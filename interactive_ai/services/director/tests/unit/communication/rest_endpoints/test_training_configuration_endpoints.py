@@ -64,3 +64,49 @@ class TestTrainingConfigurationEndpoints:
         result = fxt_director_app.get(f"{API_PROJECT_PATTERN}/training_configuration")
 
         assert result.status_code == HTTPStatus.FORBIDDEN
+
+        result = fxt_director_app.patch(
+            f"{API_PROJECT_PATTERN}/training_configuration",
+            json={
+                "task_id": "dummy_task_id",
+                "model_manifest_id": "dummy_model_manifest_id",
+            },
+        )
+
+        assert result.status_code == HTTPStatus.FORBIDDEN
+
+    def test_update_training_configuration(
+        self, fxt_director_app, fxt_training_configuration_task_level, fxt_enable_feature_flag_name
+    ) -> None:
+        # Arrange
+        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
+        fxt_training_configuration_task_level.model_manifest_id = "dummy_model_manifest_id"
+        training_config_dict = fxt_training_configuration_task_level.model_dump()
+        project_identifier = ProjectIdentifier(
+            workspace_id=ID(DUMMY_WORKSPACE_ID),
+            project_id=ID(DUMMY_PROJECT_ID),
+        )
+        task_id = fxt_training_configuration_task_level.task_id
+        model_manifest_id = fxt_training_configuration_task_level.model_manifest_id
+        endpoint_url = (
+            f"{API_PROJECT_PATTERN}/training_configuration?task_id={str(task_id)}&model_manifest_id={model_manifest_id}"
+        )
+
+        # Act
+        with patch.object(
+            TrainingConfigurationRESTController,
+            "update_configuration",
+            return_value=None,
+        ) as mock_update_training_config:
+            result = fxt_director_app.patch(
+                endpoint_url,
+                json=training_config_dict,
+            )
+
+        # Assert
+        mock_update_training_config.assert_called_once_with(
+            project_identifier=project_identifier,
+            update_configuration=mock_update_training_config.call_args[1]["update_configuration"],
+        )
+        assert result.status_code == HTTPStatus.NO_CONTENT
+        assert not result.content
