@@ -6,8 +6,7 @@ import { Dispatch } from 'react';
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { getErrorMessage } from '@geti/core/src/services/utils';
 import { Query, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
-import { AxiosError, AxiosResponse, isCancel } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, AxiosResponse, HttpStatusCode, isCancel } from 'axios';
 import { isArray, isEmpty } from 'lodash-es';
 
 import { AdvancedFilterOptions, SearchOptionsRule } from '../../core/media/media-filter.interface';
@@ -141,7 +140,7 @@ export const useMediaUploadMutations = ({
                 return;
             }
 
-            if (response?.status === StatusCodes.INSUFFICIENT_STORAGE) {
+            if (response?.status === HttpStatusCode.InsufficientStorage) {
                 // cancel pending media upload
                 dispatch({
                     datasetId,

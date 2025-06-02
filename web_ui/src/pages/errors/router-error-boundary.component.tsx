@@ -3,8 +3,7 @@
 
 import { API_URLS } from '@geti/core';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
-import { AxiosError, isAxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, HttpStatusCode, isAxiosError } from 'axios';
 import { isRouteErrorResponse, useNavigate, useRouteError } from 'react-router-dom';
 
 import { ErrorFallback } from './error-boundary.component';
@@ -23,7 +22,7 @@ export const RouterErrorBoundary = () => {
 
     if (
         isAxiosError(error) &&
-        error.status === StatusCodes.UNAUTHORIZED &&
+        error.status === HttpStatusCode.Unauthorized &&
         error.request.responseURL.endsWith(API_URLS.USER_PROFILE)
     ) {
         return <InvalidOrganizationsScreen />;

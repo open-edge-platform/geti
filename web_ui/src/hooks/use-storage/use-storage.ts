@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { StatusCodes } from 'http-status-codes';
+import { HttpStatusCode } from 'axios';
 import { useErrorHandler } from 'react-error-boundary';
 
 import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
@@ -20,10 +20,10 @@ export const useStorage = () => {
             'storage',
             () => {
                 if (localStorage.getItem(LOCAL_STORAGE_KEYS.UNAUTHORIZED) === 'true') {
-                    errorHandler({ message: StatusCodes.UNAUTHORIZED });
+                    errorHandler({ message: HttpStatusCode.Unauthorized });
                     removeLocalStorageKey(LOCAL_STORAGE_KEYS.UNAUTHORIZED);
                 } else if (localStorage.getItem(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE) === 'true') {
-                    errorHandler({ message: StatusCodes.SERVICE_UNAVAILABLE });
+                    errorHandler({ message: HttpStatusCode.ServiceUnavailable });
                     removeLocalStorageKey(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE);
                 } else if (localStorage.getItem(LOCAL_STORAGE_KEYS.PROJECT_ACCESS_DENIED) === 'true') {
                     setIsOpenDialogAccessDenied(true);

@@ -15,8 +15,7 @@
 import { ReactNode, useState } from 'react';
 
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { ErrorBoundary as Boundary, FallbackProps } from 'react-error-boundary';
 import { isRouteErrorResponse } from 'react-router-dom';
 
@@ -44,20 +43,20 @@ export const ErrorFallback = ({ error, resetErrorBoundary }: FallbackProps) => {
     }
 
     switch (errorType) {
-        case StatusCodes.BAD_REQUEST: // 400
+        case HttpStatusCode.BadRequest: // 400
             component = <BadRequest />;
             break;
-        case StatusCodes.NOT_FOUND: // 404
+        case HttpStatusCode.NotFound: // 404
             component = <ResourceNotFound />;
             break;
-        case StatusCodes.INTERNAL_SERVER_ERROR: // 500
+        case HttpStatusCode.InternalServerError: // 500
             component = <InternalServerError />;
             break;
-        case StatusCodes.SERVICE_UNAVAILABLE: // 503
-        case StatusCodes.TOO_MANY_REQUESTS: // 429
+        case HttpStatusCode.ServiceUnavailable: // 503
+        case HttpStatusCode.TooManyRequests: // 429
             component = <ServiceUnavailable />;
             break;
-        case StatusCodes.UNAUTHORIZED: // 401
+        case HttpStatusCode.Unauthorized: // 401
             component = <UnauthenticatedUser />;
             break;
         default:
