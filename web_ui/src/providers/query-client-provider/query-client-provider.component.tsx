@@ -11,14 +11,10 @@ import {
     QueryClientProvider as TanstackQueryClientProvider,
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { HttpStatusCode, isAxiosError } from 'axios';
-import { get } from 'lodash-es';
+import { isAxiosError } from 'axios';
 
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
-import { LOCAL_STORAGE_KEYS } from '../../shared/local-storage-keys';
-
-const SERVER_IS_UNAVAILABLE_STATUS_CODES = [HttpStatusCode.ServiceUnavailable, HttpStatusCode.TooManyRequests];
 
 export const QueryClientProvider = ({
     children,
@@ -52,22 +48,6 @@ export const QueryClientProvider = ({
                 if (query.meta && 'disableGlobalErrorHandling' in query.meta) {
                     if (query.meta.disableGlobalErrorHandling === true) {
                         return;
-                    }
-                }
-
-                if (isAxiosError(error)) {
-                    const statusCode: number | undefined = get(error, 'response.status');
-
-                    if (statusCode && SERVER_IS_UNAVAILABLE_STATUS_CODES.includes(statusCode)) {
-                        localStorage.setItem(LOCAL_STORAGE_KEYS.SERVICE_UNAVAILABLE, 'true');
-                        window.dispatchEvent(new Event('storage'));
-
-                        return Promise.reject(error);
-                    }
-
-                    if (statusCode === HttpStatusCode.Forbidden) {
-                        localStorage.setItem(LOCAL_STORAGE_KEYS.PROJECT_ACCESS_DENIED, 'true');
-                        window.dispatchEvent(new Event('storage'));
                     }
                 }
             },

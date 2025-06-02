@@ -48,9 +48,7 @@ describe('Services utils', () => {
                 toJSON: jest.fn(),
             };
 
-            expect(getErrorMessageByStatusCode(mockAxiosError)).toEqual(
-                `Error: ${mockAxiosError.response.data.message}`
-            );
+            expect(getErrorMessageByStatusCode(mockAxiosError)).toEqual(mockAxiosError.response.data.message);
         });
 
         it('returns the respective message base on the error status code', () => {

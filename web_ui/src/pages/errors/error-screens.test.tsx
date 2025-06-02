@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { AuthProvider, useAuth } from 'react-oidc-context';
 import { MemoryRouter as Router } from 'react-router-dom';
@@ -60,9 +61,9 @@ describe('Error screens', () => {
         it('goes back to home screen route correctly', () => {
             render(<ErrorScreen resetErrorBoundary={jest.fn()} errorMessage={'Something went wrong...'} />);
 
-            const goBackHomeButton = screen.getByRole('link', { name: 'Go back to home' });
+            const goBackHomeLink = screen.getByRole('link', { name: 'Go back to home' });
 
-            fireEvent.click(goBackHomeButton);
+            fireEvent.click(goBackHomeLink);
 
             expect(mockRedirectTo).toHaveBeenCalledWith('/');
         });
@@ -70,25 +71,27 @@ describe('Error screens', () => {
 
     describe('Resource not found', () => {
         it('renders resource unavailable screen correctly', () => {
-            render(<ResourceNotFound />);
+            render(<ResourceNotFound onReset={jest.fn()} />);
 
             expect(screen.getByText('Resource not found')).toBeInTheDocument();
         });
 
         it('refreshes the page correctly', () => {
-            render(<ResourceNotFound />);
+            const handleReset = jest.fn();
+            render(<ResourceNotFound onReset={handleReset} />);
 
-            const refreshButton = screen.getByRole('button', { name: 'Refresh' });
+            const goBackHomeButton = screen.getByRole('button', { name: /Go back to home/ });
 
-            fireEvent.click(refreshButton);
+            fireEvent.click(goBackHomeButton);
 
-            expect(mockRedirectTo).toHaveBeenCalledWith(window.location.href);
+            expect(mockRedirectTo).toHaveBeenCalledWith(paths.root({}));
+            expect(handleReset).toHaveBeenCalled();
         });
     });
 
     describe('Unauthenticated user', () => {
         it('renders unauthenticated user screen correctly', () => {
-            render(<UnauthenticatedUser />);
+            render(<UnauthenticatedUser onReset={jest.fn()} />);
 
             expect(screen.getByText('Unauthenticated')).toBeInTheDocument();
             expect(screen.getByText('Session expired, you probably have logged on other device.')).toBeInTheDocument();
@@ -96,13 +99,15 @@ describe('Error screens', () => {
         });
 
         it('goes back to home screen route correctly', () => {
-            render(<UnauthenticatedUser />);
+            const handleReset = jest.fn();
+            render(<UnauthenticatedUser onReset={handleReset} />);
 
             const signInButton = screen.getByRole('button', { name: 'Sign in' });
 
             fireEvent.click(signInButton);
 
             expect(mockRedirectTo).toHaveBeenCalledWith('/');
+            expect(handleReset).toHaveBeenCalled();
         });
     });
 
@@ -121,25 +126,27 @@ describe('Error screens', () => {
 
     describe('Bad request', () => {
         it('renders "bad request" screen correctly', () => {
-            render(<BadRequest />);
+            render(<BadRequest onReset={jest.fn()} />);
 
             expect(screen.getByText('The server cannot or will not process the current request.')).toBeInTheDocument();
         });
 
         it('goes back home correctly', () => {
-            render(<BadRequest />);
+            const handleReset = jest.fn();
+            render(<BadRequest onReset={handleReset} />);
 
             const goBackHomeButton = screen.getByRole('button', { name: 'Go back to home' });
 
             fireEvent.click(goBackHomeButton);
 
             expect(mockRedirectTo).toHaveBeenCalledWith('/');
+            expect(handleReset).toHaveBeenCalled();
         });
     });
 
     describe('InternalServerError', () => {
         it('renders "internal server error" screen correctly', () => {
-            render(<InternalServerError />);
+            render(<InternalServerError onReset={jest.fn()} />);
 
             expect(
                 screen.getByText('The server encountered an error and could not complete your request.')
@@ -147,13 +154,15 @@ describe('Error screens', () => {
         });
 
         it('goes back home correctly', () => {
-            render(<InternalServerError />);
+            const handleReset = jest.fn();
+            render(<InternalServerError onReset={handleReset} />);
 
             const goBackHomeButton = screen.getByRole('button', { name: 'Go back to home' });
 
             fireEvent.click(goBackHomeButton);
 
             expect(mockRedirectTo).toHaveBeenCalledWith('/');
+            expect(handleReset).toHaveBeenCalled();
         });
     });
 
