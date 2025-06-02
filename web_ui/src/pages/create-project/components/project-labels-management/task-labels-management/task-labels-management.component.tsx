@@ -20,6 +20,7 @@ import {
     getLabelsWithAddedChild,
     getLabelWithoutDeleted,
     getNextColor,
+    getReorderedTree,
     getTreeWithUpdatedItem,
 } from '../../../../../shared/components/label-tree-view/utils';
 import { isYupValidationError } from '../../../../user-management/profile-page/utils';
@@ -61,7 +62,7 @@ export const TaskLabelsManagement = ({
         setValidationError({ type: ValidationErrorType.TREE, validationError: message });
     };
 
-    const addChild = (parentId: string, groupName: string, childType: LabelItemType) => {
+    const addChild = (parentId: string | null, groupName: string, childType: LabelItemType) => {
         setLabels(getLabelsWithAddedChild(labels, labels, parentId, groupName, childType));
     };
 
@@ -85,6 +86,12 @@ export const TaskLabelsManagement = ({
     const deleteItem = (deletedItem: LabelTreeItem) => {
         const updated = getLabelWithoutDeleted(labels, deletedItem);
 
+        setLabels(updated);
+    };
+
+    const reorder = (item: LabelTreeItem, mode: 'up' | 'down') => {
+        //TODO: there is also reordering in annotations! - maybe worth to share some code!
+        const updated = getReorderedTree(labels, item, mode);
         setLabels(updated);
     };
 
@@ -143,11 +150,9 @@ export const TaskLabelsManagement = ({
                     <TaskLabelsCreationTree
                         isHierarchicalMode={relation === LabelsRelationType.MIXED}
                         labelsTree={labels}
-                        addChild={addChild}
+                        actions={{ addChild, deleteItem, save: saveHandler, reorder }}
                         projectLabels={projectLabels}
                         domains={domains}
-                        deleteItem={deleteItem}
-                        save={saveHandler}
                         setValidationError={setValidationError}
                     />
                 </Flex>
