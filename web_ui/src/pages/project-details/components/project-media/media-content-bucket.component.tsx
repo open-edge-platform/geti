@@ -3,7 +3,7 @@
 
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
-import { Divider, Flex, IllustratedMessage, useMediaQuery, View, type DimensionValue, type Responsive } from '@geti/ui';
+import { Divider, Flex, IllustratedMessage, Loading, useMediaQuery, View, type DimensionValue, type Responsive } from '@geti/ui';
 import { NotFound } from '@geti/ui/icons';
 import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
@@ -31,7 +31,6 @@ import { useProject } from '../../providers/project-provider/project-provider.co
 import { getMatchedMediaCounts, getTotalMediaCounts } from '../../utils';
 import { AnomalyMediaHeaderInformation } from './anomaly-media-header-information.component';
 import { DeletionStatusBar } from './deletion-status-bar.component';
-import { LoadingOverlay } from './loading-overlay.component';
 import { MediaItemFactory } from './media-item-factory.component';
 import { ProjectMediaControlPanel } from './project-media-control-panel.component';
 import { getUploadingStatePerBucket } from './utils';
@@ -229,17 +228,21 @@ export const MediaContentBucket = ({
                             <NotFound />
                         </IllustratedMessage>
 
-                        <LoadingOverlay
-                            id={
-                                header
-                                    ? `media-gallery-loading-overlay-${header.toLowerCase()}-id`
-                                    : 'media-gallery-loading-overlay-id'
-                            }
-                            size={'M'}
-                            backgroundColor={isFetchingNextPage ? 'transparent' : 'gray-50'}
-                            fetchingNextPage={isFetchingNextPage}
-                            visible={shouldShowLoadingOverlay || isFetchingNextPage}
-                        />
+                        {(shouldShowLoadingOverlay || isFetchingNextPage) && (
+                            <Loading
+                                id={
+                                    header
+                                        ? `media-gallery-loading-overlay-${header.toLowerCase()}-id`
+                                        : 'media-gallery-loading-overlay-id'
+                                }
+                                mode="overlay"
+                                size={'M'}
+                                overlayHeight={'auto'}
+                                top={isFetchingNextPage ? 'auto' : 0}
+                                bottom={isFetchingNextPage ? 'size-100' : 0}
+                                backgroundColor={isFetchingNextPage ? 'transparent' : 'gray-50'}
+                            />
+                        )}
                     </Flex>
                 </MediaDropBox>
 

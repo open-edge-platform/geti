@@ -9,7 +9,7 @@ import {
     ActionButton,
     Flex,
     Item,
-    LoadingIndicator,
+    Loading,
     TabList,
     TabPanels,
     Tabs,
@@ -261,7 +261,7 @@ export const WorkspacesTabs = (): JSX.Element => {
                                     onPress={handleCreateWorkspace}
                                     isDisabled={createWorkspace.isPending}
                                 >
-                                    {createWorkspace.isPending ? <LoadingIndicator size={'S'} /> : <Add />}
+                                    {createWorkspace.isPending ? <Loading mode="inline" size={'S'} /> : <Add />}
                                 </ActionButton>
                                 <Tooltip>Create a new workspace</Tooltip>
                             </TooltipTrigger>

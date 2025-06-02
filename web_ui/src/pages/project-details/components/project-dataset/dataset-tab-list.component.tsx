@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton, Flex, Item, LoadingIndicator, TabList, Tooltip, TooltipTrigger } from '@geti/ui';
+import { ActionButton, Flex, Item, Loading, TabList, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Add } from '@geti/ui/icons';
 
 import { Dataset } from '../../../../core/projects/dataset.interface';
@@ -62,7 +62,7 @@ export const DatasetTabList = () => {
                     aria-label={'Create dataset'}
                 >
                     {createDataset.isPending ? (
-                        <LoadingIndicator id='loading-indicator-id' size='S' />
+                        <Loading mode="inline" id='loading-indicator-id' size='S' />
                     ) : (
                         <Add color='white' />
                     )}
