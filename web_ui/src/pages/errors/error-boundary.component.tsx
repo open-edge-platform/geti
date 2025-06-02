@@ -15,7 +15,7 @@
 import { ReactNode, useState } from 'react';
 
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
-import { isAxiosError, HttpStatusCode } from 'axios';
+import { HttpStatusCode, isAxiosError } from 'axios';
 import { ErrorBoundary as Boundary, FallbackProps } from 'react-error-boundary';
 import { isRouteErrorResponse } from 'react-router-dom';
 

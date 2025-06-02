@@ -3,7 +3,7 @@
 
 import { API_URLS } from '@geti/core';
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
-import { isAxiosError, HttpStatusCode } from 'axios';
+import { HttpStatusCode, isAxiosError } from 'axios';
 import { useNavigate, useRouteError } from 'react-router-dom';
 
 import { ErrorFallback } from './error-boundary.component';
