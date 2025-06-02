@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useMemo } from 'react';
+import { ReactNode, useMemo } from 'react';
 
-import { Button, ButtonGroup } from '@geti/ui';
+import { Button, ButtonGroup, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { capitalize } from 'lodash-es';
 
@@ -18,15 +18,19 @@ import { useWorkspaceIdentifier } from '../../../../../providers/workspaces-prov
 import { isNonEmptyString } from '../../../../../shared/utils';
 
 interface DatasetImportToExistingProjectDialogButtonsProps {
-    deletionDialogTriggerState: OverlayTriggerState;
+    children?: ReactNode;
     datasetImportItem: DatasetImportItem | undefined;
+    isDisableWithDuplicates: boolean;
+    deletionDialogTriggerState: OverlayTriggerState;
     onDialogDismiss: () => void;
     onPrimaryAction: () => void;
 }
 
 export const DatasetImportToExistingProjectDialogButtons = ({
-    deletionDialogTriggerState,
+    children,
     datasetImportItem,
+    isDisableWithDuplicates,
+    deletionDialogTriggerState,
     onDialogDismiss,
     onPrimaryAction,
 }: DatasetImportToExistingProjectDialogButtonsProps): JSX.Element => {
@@ -102,7 +106,7 @@ export const DatasetImportToExistingProjectDialogButtons = ({
                     DATASET_IMPORT_STATUSES.READY,
                     DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT,
                 ]),
-                disabled: !isReady(datasetImportItem?.id),
+                disabled: !isReady(datasetImportItem?.id) || isDisableWithDuplicates,
                 variant: 'accent',
                 action: () => {
                     onPrimaryAction();
@@ -124,6 +128,10 @@ export const DatasetImportToExistingProjectDialogButtons = ({
 
     return (
         <ButtonGroup>
+            <View height={'100%'} marginEnd={'auto'}>
+                {children}
+            </View>
+
             {state.map((button: DatasetImportDialogButton) => (
                 <Button
                     data-testid={`testid-${button.name}`}

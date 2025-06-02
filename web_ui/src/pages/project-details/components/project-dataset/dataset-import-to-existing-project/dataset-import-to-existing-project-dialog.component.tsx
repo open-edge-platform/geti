@@ -3,11 +3,13 @@
 
 import { useMemo } from 'react';
 
-import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti/ui';
+import { Content, Dialog, DialogContainer, Divider, Flex, Heading, Text, View } from '@geti/ui';
+import { Alert } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import { DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.enum';
-import { isAnomalyDomain } from '../../../../../core/projects/domains';
+import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
+import { isAnomalyDomain, isKeypointDetection } from '../../../../../core/projects/domains';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { matchStatus } from '../../../../../providers/dataset-import-to-existing-project-provider/utils';
 import { DatasetImportDnd } from '../../../../../shared/components/dataset-import-dnd/dataset-import-dnd.component';
@@ -15,6 +17,7 @@ import { DatasetImportProgress } from '../../../../../shared/components/dataset-
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { DatasetImportToExistingProjectDialogButtons } from './dataset-import-to-existing-project-dialog-buttons.component';
 import { DatasetImportToExistingProjectMapLabels } from './dataset-import-to-existing-project-map-labels.component';
+import { hasDuplicatedValues, KEYPOINT_DUPLICATED_LABELS } from './utils';
 
 interface DatasetImportToExistingProjectDialogProps {
     datasetImportDialogState: OverlayTriggerState;
@@ -26,10 +29,13 @@ export const DatasetImportToExistingProjectDialog = ({
     datasetImportDeleteDialogState,
 }: DatasetImportToExistingProjectDialogProps) => {
     const { project } = useProject();
-    const isAnomaly = project.domains.some(isAnomalyDomain);
-
     const { setActiveDatasetImportId, activeDatasetImport, prepareDataset, importDatasetJob } =
         useDatasetImportToExistingProject();
+
+    const isAnomaly = project.domains.some(isAnomalyDomain);
+    const isKeypoint = project.domains.some(isKeypointDetection);
+    const hasDuplicatedLabels = Boolean(activeDatasetImport && hasDuplicatedValues(activeDatasetImport.labelsMap));
+    const isKeypointWithDuplicatedLabels = isKeypoint && hasDuplicatedLabels;
 
     const showProgress = useMemo<boolean>(() => {
         return matchStatus(activeDatasetImport, [
@@ -89,16 +95,25 @@ export const DatasetImportToExistingProjectDialog = ({
                             )}
                         </View>
                     </Content>
+
                     <DatasetImportToExistingProjectDialogButtons
                         onDialogDismiss={dialogDismiss}
                         datasetImportItem={activeDatasetImport}
                         deletionDialogTriggerState={datasetImportDeleteDialogState}
+                        isDisableWithDuplicates={isKeypointWithDuplicatedLabels}
                         onPrimaryAction={() => {
                             if (!activeDatasetImport) return;
 
                             importDatasetJob(activeDatasetImport.id);
                         }}
-                    />
+                    >
+                        {isKeypointWithDuplicatedLabels && (
+                            <Flex gap={'size-100'} alignContent={'center'} height={'100%'} alignItems={'center'}>
+                                <Alert style={{ fill: 'var(--brand-coral-cobalt)' }} />
+                                <Text>{KEYPOINT_DUPLICATED_LABELS}</Text>
+                            </Flex>
+                        )}
+                    </DatasetImportToExistingProjectDialogButtons>
                 </Dialog>
             )}
         </DialogContainer>

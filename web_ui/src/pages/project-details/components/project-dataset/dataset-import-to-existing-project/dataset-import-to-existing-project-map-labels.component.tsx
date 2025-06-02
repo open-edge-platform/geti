@@ -120,41 +120,39 @@ export const DatasetImportToExistingProjectMapLabels = ({
         patchActiveDatasetImport({ labelsMap: omitBy(labelsMap, (_, key) => key === labelName) });
     };
 
+    if (noLabelsInMatchingStep) {
+        return <Text>{NO_LABELS_INFORMATION}</Text>;
+    }
+
     return (
         <div aria-label='dataset-import-to-existing-project-map-labels'>
-            {noLabelsInMatchingStep ? (
-                <Text>{NO_LABELS_INFORMATION}</Text>
-            ) : (
-                <>
-                    <Flex marginBottom='size-250' gap='size-400' justifyContent='space-between' alignItems='center'>
-                        <Text id='dataset-import-to-existing-project-existing-labels' flex={1}>
-                            Existing labels
-                        </Text>
-                        <Text id='dataset-import-to-existing-project-target-labels' flex={1}>
-                            Target labels
-                        </Text>
-                    </Flex>
-                    <VisuallyHidden>
-                        {/* We're using this field to prevent a weird focus bug when the user
-                            closes a label search component this text field will be focused instead of
-                            another label search input, preventing a results panel to be opened */}
-                        <TextField aria-label='This text field is unused' />
-                    </VisuallyHidden>
-                    <Flex gap='size-10' direction='column'>
-                        {sortedLabels.map((mappingLabelName: string, index: number) => (
-                            <DatasetImportToExistingProjectMapLabel
-                                testId={`label-mapping-${index}`}
-                                key={`${mappingLabelName}-${index}`}
-                                mappingLabelName={mappingLabelName}
-                                projectLabels={projectLabels}
-                                selectedLabelId={labelsMap[mappingLabelName]}
-                                onMappingChange={onMappingChange}
-                                onMappingClear={onMappingClear}
-                            />
-                        ))}
-                    </Flex>
-                </>
-            )}
+            <Flex marginBottom='size-250' gap='size-400' justifyContent='space-between' alignItems='center'>
+                <Text id='dataset-import-to-existing-project-existing-labels' flex={1}>
+                    Existing labels
+                </Text>
+                <Text id='dataset-import-to-existing-project-target-labels' flex={1}>
+                    Target labels
+                </Text>
+            </Flex>
+            <VisuallyHidden>
+                {/* We're using this field to prevent a weird focus bug when the user
+                    closes a label search component this text field will be focused instead of
+                    another label search input, preventing a results panel to be opened */}
+                <TextField aria-label='This text field is unused' />
+            </VisuallyHidden>
+            <Flex gap='size-10' direction='column'>
+                {sortedLabels.map((mappingLabelName: string, index: number) => (
+                    <DatasetImportToExistingProjectMapLabel
+                        testId={`label-mapping-${index}`}
+                        key={`${mappingLabelName}-${index}`}
+                        mappingLabelName={mappingLabelName}
+                        projectLabels={projectLabels}
+                        selectedLabelId={labelsMap[mappingLabelName]}
+                        onMappingChange={onMappingChange}
+                        onMappingClear={onMappingClear}
+                    />
+                ))}
+            </Flex>
         </div>
     );
 };

@@ -5,6 +5,7 @@ import { fireEvent, screen } from '@testing-library/react';
 
 import { DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportToExistingProjectItem } from '../../../../../core/datasets/dataset.interface';
+import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import {
     getMockedProject,
@@ -14,6 +15,7 @@ import { getMockedTask } from '../../../../../test-utils/mocked-items-factory/mo
 import { projectListRender } from '../../../../../test-utils/projects-list-providers-render';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { DatasetImportToExistingProjectDialog } from './dataset-import-to-existing-project-dialog.component';
+import { KEYPOINT_DUPLICATED_LABELS } from './utils';
 
 const mockDatasetImportItem: DatasetImportToExistingProjectItem = {
     id: '987-654-321',
@@ -204,5 +206,35 @@ describe(DatasetImportToExistingProjectDialog, () => {
         fireEvent.click(screen.getByRole('button', { name: /import/i }));
 
         expect(mockedImportDatasetJob).toHaveBeenCalledWith(mockDatasetImportItem.id);
+    });
+
+    describe('keypoint detection', () => {
+        it('displays warning for duplicated keypoint labels', async () => {
+            jest.mocked(useDatasetImportToExistingProject).mockReturnValue({
+                ...jest.requireActual(
+                    '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                ),
+                isReady: jest.fn(),
+                activeDatasetImport: {
+                    ...mockDatasetImportItem,
+                    labelsMap: {
+                        neck: '683d4ccfd01df152c3f65ff6',
+                        head: '683d4ccfd01df152c3f65ff6',
+                    },
+                    status: DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT,
+                },
+            });
+
+            jest.mocked(useProject).mockImplementation(() =>
+                mockedProjectContextProps({
+                    project: getMockedProject({ tasks: [getMockedTask({ domain: DOMAIN.KEYPOINT_DETECTION })] }),
+                })
+            );
+
+            await renderMockedComponent({ featureFlags: { FEATURE_FLAG_KEYPOINT_DETECTION_DATASET_IE: true } });
+
+            expect(screen.getByText(KEYPOINT_DUPLICATED_LABELS)).toBeVisible();
+            expect(screen.getByRole('button', { name: /import/i })).toBeDisabled();
+        });
     });
 });
