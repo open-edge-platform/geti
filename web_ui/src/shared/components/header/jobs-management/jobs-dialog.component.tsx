@@ -1,12 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Dispatch, Key, SetStateAction, useState } from 'react';
+import { Dispatch, Key, SetStateAction, useRef, useState } from 'react';
 
-import { Content, CornerIndicator, Dialog, Flex, RangeValue, Text } from '@geti/ui';
-import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
+import { ActionButton, Content, CornerIndicator, Dialog, Flex, RangeValue, Text } from '@geti/ui';
+import { Delete } from '@geti/ui/icons';
+import { DateValue } from '@internationalized/date';
 import { keepPreviousData } from '@tanstack/react-query';
-import { isEqual } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 
 import { useJobs } from '../../../../core/jobs/hooks/use-jobs.hook';
 import { NORMAL_INTERVAL } from '../../../../core/jobs/hooks/utils';
@@ -41,18 +42,44 @@ const DEFAULT_JOBS_COUNT: JobCount = {
     numberOfFailedJobs: null,
 };
 
+//TODO: Remove after we will have filtering by creationDate available
+// - keep previous number of scheduled jobs when filter set
+const handleDataCountWhenScheduledShouldNotBeFiltered = (
+    previousJobsCount: JobCount,
+    responsedJobsCount: JobCount | undefined,
+    isDateFilterSet: boolean,
+    isNotScheduledFilter: boolean
+): JobCount => {
+    const jobsCount = isNotScheduledFilter
+        ? (responsedJobsCount ?? DEFAULT_JOBS_COUNT)
+        : {
+              ...previousJobsCount,
+              numberOfScheduledJobs: responsedJobsCount?.numberOfScheduledJobs ?? null,
+          };
+
+    if (isDateFilterSet && isNotScheduledFilter) {
+        return {
+            ...jobsCount,
+            numberOfScheduledJobs: previousJobsCount.numberOfScheduledJobs,
+        };
+    }
+
+    return jobsCount;
+};
+
 export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialogProps): JSX.Element => {
     const RANGE_FILTER_TOOLTIP =
         'This component filters jobs by start date. For example if you select a range' +
-        ' between yesterday and today it will show jobs started yesterday or today.';
+        ' between yesterday and today it will show jobs started yesterday or today. ' +
+        'Note: The filter is not applied to scheduled jobs.';
+
+    // TODO & Note: This condition will be just for now
+    // - there is already task for backend to enable filtering by creation date
+    // - scheduled jobs do not have start date so there will be always empty tab
+    const jobsCountRef = useRef(DEFAULT_JOBS_COUNT);
+
     const { organizationId, workspaceId } = useWorkspaceIdentifier();
     const { useGetJobs } = useJobs({ organizationId, workspaceId });
-
-    const TODAY = today(getLocalTimeZone());
-    const INITIAL_DATES: RangeValue<DateValue> = {
-        start: TODAY.subtract({ months: 3 }),
-        end: TODAY,
-    };
 
     const [filters, setFilters] = useState<FiltersType>({
         projectId: undefined,
@@ -60,7 +87,7 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         jobTypes: [],
     });
 
-    const [range, setRange] = useState<RangeValue<DateValue>>(INITIAL_DATES);
+    const [range, setRange] = useState<RangeValue<DateValue> | null>();
 
     const [selectedJobState, setSelectedJobState] = useState<Key>(JobState.RUNNING);
     const [sortDirection, setSortDirection] = useState<SortDirection>(SortDirection.DESC);
@@ -72,9 +99,12 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
             jobTypes: filters.jobTypes,
             author: filters.userId,
             limit: DEFAULT_LIMIT,
-            startTimeFrom: range.start.toString(),
+            // TODO & Note: This condition will be just for now
+            // - there is already task for backend to enable filtering by creation date
+            // - scheduled jobs do not have start date so there will be always empty tab
+            startTimeFrom: selectedJobState === JobState.SCHEDULED ? undefined : range?.start.toString(),
             //Filtering by date is exclusive - adding 1 day
-            startTimeTo: range.end.add({ days: 1 }).toString(),
+            startTimeTo: selectedJobState === JobState.SCHEDULED ? undefined : range?.end.add({ days: 1 }).toString(),
             sortDirection,
         },
         {
@@ -83,18 +113,26 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
         }
     );
 
-    const isInitialRange = isEqual(range, INITIAL_DATES);
+    const isInitialRange = isEmpty(range);
 
     const areFiltersChanged = !isInitialRange || !!filters.projectId || !!filters.userId || !!filters.jobTypes.length;
 
     const allJobs = getAllJobs(data);
+
+    jobsCountRef.current = handleDataCountWhenScheduledShouldNotBeFiltered(
+        jobsCountRef.current,
+        data?.pages?.at(0)?.jobsCount,
+        !isEmpty(range),
+        selectedJobState !== JobState.SCHEDULED
+    );
+
     const {
         numberOfRunningJobs,
         numberOfFinishedJobs,
         numberOfScheduledJobs,
         numberOfCancelledJobs,
         numberOfFailedJobs,
-    } = data?.pages?.at(0)?.jobsCount ?? DEFAULT_JOBS_COUNT;
+    } = jobsCountRef.current;
 
     const createTab = (state: JobState, label: string, jobsNumber: number | null, testId: string): TabItem => ({
         id: `${state.toLowerCase()}-jobs-id`,
@@ -137,11 +175,11 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
 
     const resetFilters = () => {
         setFilters({ projectId: undefined, userId: undefined, jobTypes: [] });
-        setRange(INITIAL_DATES);
+        setRange(null);
     };
 
     const handleRangeChange = (value: SetStateAction<RangeValue<DateValue>> | null) => {
-        value === null ? setRange(INITIAL_DATES) : setRange(value);
+        value === null ? setRange(undefined) : setRange(value as RangeValue<DateValue>);
     };
 
     return (
@@ -155,11 +193,13 @@ export const JobsDialog = ({ isFullScreen, onClose, setIsFullScreen }: JobsDialo
                             <DateRangePickerSmall
                                 onChange={handleRangeChange}
                                 value={range}
-                                maxValue={TODAY}
-                                defaultValue={INITIAL_DATES}
                                 hasManualEdition
+                                isDisabled={selectedJobState === JobState.SCHEDULED}
                                 headerContent={
-                                    <Flex justifyContent={'end'}>
+                                    <Flex justifyContent={'end'} alignItems={'center'}>
+                                        <ActionButton onPress={() => setRange(null)}>
+                                            <Delete />
+                                        </ActionButton>
                                         <InfoTooltip id={`range-filter-tooltip`} tooltipText={RANGE_FILTER_TOOLTIP} />
                                     </Flex>
                                 }
