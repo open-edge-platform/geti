@@ -87,7 +87,7 @@ export const useUserRegister = (): UseMutationResult<void, AxiosError, UserRegis
         },
 
         onError: (error: AxiosError) => {
-            if (error.status === HttpStatusCode.NotFound) {
+            if (error.response?.status === HttpStatusCode.NotFound) {
                 handleUserNotFoundError();
             } else {
                 handleError(error);
