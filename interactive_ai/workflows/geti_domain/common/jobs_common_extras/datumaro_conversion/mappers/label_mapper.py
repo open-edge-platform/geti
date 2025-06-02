@@ -79,17 +79,17 @@ class LabelTreeMapper:
 
         label_cat = dm.LabelCategories()
         point_cat = dm.PointsCategories()
+        joints = []
+        positions = []
         if keypoint_structure:
             label_id_to_idx = {label.id_: idx for idx, label in enumerate(labels)}
-            joints = []
             for edge in keypoint_structure._edges:
                 node_1 = label_id_to_idx[edge.node_1]
                 node_2 = label_id_to_idx[edge.node_2]
                 joints.append([node_1, node_2])
-            positions = []
             for position in keypoint_structure._positions:
                 positions.extend([position.x, position.y])
-            point_cat.add(label_id=0, labels=[str(label.id_) for label in labels], joints=joints, positions=positions)
+        point_cat.add(label_id=0, labels=[str(label.id_) for label in labels], joints=joints, positions=positions)
 
         for label in labels:
             parent = parent_map.get(label)
