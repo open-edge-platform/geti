@@ -50,7 +50,6 @@ const handleDataCountWhenScheduledShouldNotBeFiltered = (
     isDateFilterSet: boolean,
     isNotScheduledFilter: boolean
 ): JobCount => {
-    debugger;
     const jobsCount = isNotScheduledFilter
         ? (responsedJobsCount ?? DEFAULT_JOBS_COUNT)
         : {
