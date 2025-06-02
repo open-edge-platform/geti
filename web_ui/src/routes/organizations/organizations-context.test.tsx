@@ -8,8 +8,7 @@ import {
     OrganizationMetadata,
 } from '@geti/core/src/users/services/onboarding-service.interface';
 import { screen, waitForElementToBeRemoved } from '@testing-library/react';
-import { AxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, HttpStatusCode } from 'axios';
 
 import { AccountStatus } from '../../core/organizations/organizations.interface';
 import { ErrorBoundary } from '../../pages/errors/error-boundary.component';
@@ -95,7 +94,7 @@ describe('Organizations context', () => {
             Promise.reject(
                 // @ts-expect-error We mock only necessary things from AxiosError
                 new AxiosError(undefined, undefined, undefined, undefined, {
-                    status: StatusCodes.UNAUTHORIZED,
+                    status: HttpStatusCode.Unauthorized,
                     request: {
                         responseURL: 'http://localhost:3000/api/v1/user/profile',
                     },

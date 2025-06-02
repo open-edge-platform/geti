@@ -4,8 +4,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { useInfiniteQuery, useMutation, UseMutationResult, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { validate } from 'uuid';
 
 import { AccountStatusDTO } from '../../../../../src/core/organizations/dtos/organizations.interface';
@@ -88,7 +87,7 @@ export const useUserRegister = (): UseMutationResult<void, AxiosError, UserRegis
         },
 
         onError: (error: AxiosError) => {
-            if (error.status === StatusCodes.NOT_FOUND) {
+            if (error.response?.status === HttpStatusCode.NotFound) {
                 handleUserNotFoundError();
             } else {
                 handleError(error);
