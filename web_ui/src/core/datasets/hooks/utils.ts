@@ -3,7 +3,7 @@
 
 import { AxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
-import { isFunction } from 'lodash-es';
+import isFunction from 'lodash-es/isFunction';
 
 import { getFailedJobMessage } from '../../../../packages/core/src/services/utils';
 import {
@@ -24,11 +24,11 @@ export const getIntervalJobHandlers =
         onCancelOrFailed,
     }: IntervalJobHandlers<T>) =>
     (jobResponse: T) => {
-        if (isJobDone(jobResponse)) {
+        if (isFunction(onSuccess) && isJobDone(jobResponse)) {
             onSuccess(jobResponse);
         }
 
-        if (isJobFailed(jobResponse)) {
+        if (isFunction(onError) && isJobFailed(jobResponse)) {
             onError({
                 message: getFailedJobMessage(jobResponse),
                 response: { status: StatusCodes.NOT_IMPLEMENTED },

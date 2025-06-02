@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useMutation, UseMutationResult, useQuery, UseQueryResult } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
+import isFunction from 'lodash-es/isFunction';
 
 import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
 import { getErrorMessage } from '../../../../packages/core/src/services/utils';
@@ -143,7 +144,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         ...intervalHandlers
     }) => {
         const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobPrepareDatasetImportNewProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.PREPARE_DATASET_STATUS_JOB_KEY(data),
             queryFn: () => service.prepareDatasetImportNewProjectJob(data),
@@ -167,7 +167,7 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
                 return;
             }
 
-            intervalHandlersRef.current.onError(query.error);
+            isFunction(intervalHandlersRef.current.onError) && intervalHandlersRef.current.onError(query.error);
         }, [query.isError, query.error]);
 
         return query;
@@ -179,7 +179,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         ...intervalHandlers
     }) => {
         const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobImportDatasetToNewProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.IMPORT_DATASET_NEW_PROJECT_STATUS_JOB_KEY(data),
             queryFn: () => service.importDatasetToNewProjectStatusJob(data),
@@ -203,7 +202,7 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
                 return;
             }
 
-            intervalHandlersRef.current.onError(query.error);
+            isFunction(intervalHandlersRef.current.onError) && intervalHandlersRef.current.onError(query.error);
         }, [query.isError, query.error]);
 
         return query;
@@ -215,7 +214,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         ...intervalHandlers
     }) => {
         const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobPrepareDatasetToExistingProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.PREPARE_DATASET_STATUS_JOB_KEY(data),
             queryFn: () => service.prepareDatasetToExistingProjectStatusJob(data),
@@ -239,7 +237,7 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
                 return;
             }
 
-            intervalHandlersRef.current.onError(query.error);
+            isFunction(intervalHandlersRef.current.onError) && intervalHandlersRef.current.onError(query.error);
         }, [query.isError, query.error]);
 
         return query;
@@ -251,7 +249,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
         ...intervalHandlers
     }) => {
         const intervalHandlersRef = useRef(intervalHandlers);
-
         const query = useQuery<JobImportDatasetToExistingProjectStatus, AxiosError>({
             queryKey: QUERY_KEYS.IMPORT_DATASET_EXISTING_PROJECT_STATUS_JOB_KEY(data),
             queryFn: () => service.importDatasetToExistingProjectStatusJob(data),
@@ -267,7 +264,6 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
             if (!enabled || !query.isSuccess) {
                 return;
             }
-
             getIntervalJobHandlers(intervalHandlersRef.current)(query.data);
         }, [enabled, query.isSuccess, query.data]);
 
@@ -276,7 +272,7 @@ export const useDatasetImportQueries = (): UseDatasetImportQueries => {
                 return;
             }
 
-            intervalHandlersRef.current.onError(query.error);
+            isFunction(intervalHandlersRef.current.onError) && intervalHandlersRef.current.onError(query.error);
         }, [query.isError, query.error]);
 
         return query;

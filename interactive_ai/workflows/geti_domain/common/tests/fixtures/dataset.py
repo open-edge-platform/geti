@@ -11,6 +11,7 @@ from iai_core.entities.compiled_dataset_shards import (
 from iai_core.entities.dataset_item import DatasetItem
 from iai_core.entities.datasets import Dataset
 from iai_core.entities.image import Image
+from iai_core.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
 from iai_core.entities.label_schema import LabelSchema
 from iai_core.entities.subset import Subset
 from iai_core.entities.video import VideoFrame
@@ -203,6 +204,15 @@ def fxt_dataset_and_label_schema(
     request: pytest.FixtureRequest,
 ) -> tuple[DatasetStorageIdentifier, Dataset, LabelSchema]:
     model_template_id = request.param
+    keypoint_structure = None
+    if model_template_id == "keypoint_detection":
+        keypoint_structure = KeypointStructure(
+            edges=[KeypointEdge(node_1=ID("node_1"), node_2=ID("node_2"))],
+            positions=[
+                KeypointPosition(node=ID("node_1"), x=0.123, y=0.123),
+                KeypointPosition(node=ID("node_2"), x=1, y=1),
+            ],
+        )
     project, label_schema = generate_random_annotated_project(
         request,
         name="__Test dataset entities (1)",
@@ -211,13 +221,14 @@ def fxt_dataset_and_label_schema(
         number_of_images=12,
         number_of_videos=1,
         # This is required by OTX training classification task code
-        # We need to compare `Label` equivalance
+        # We need to compare `Label` equivalence
         # `color (rgba)` and `hotkey` are used to the comparison.
         label_configs=[
             {"name": "rectangle", "color": "#00ff00ee", "hotkey": "ctrl-1"},
             {"name": "ellipse", "color": "#0000ff99", "hotkey": "ctrl-2"},
             {"name": "triangle", "color": "#ff000011", "hotkey": "ctrl-3"},
         ],
+        keypoint_structure=keypoint_structure,
     )
 
     (
