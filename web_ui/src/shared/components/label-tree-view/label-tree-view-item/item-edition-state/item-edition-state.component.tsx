@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { ColorThumb, Flex, Text, View } from '@geti/ui';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 
 import { LabelItemEditionState } from '../../../../../core/labels/label-tree-view.interface';
 import { isNewState } from '../utils';

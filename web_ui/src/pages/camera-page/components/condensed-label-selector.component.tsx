@@ -4,7 +4,7 @@
 import { useRef } from 'react';
 
 import { ActionButton, CustomPopover, Flex, Text, View, type ActionButtonProps } from '@geti/ui';
-import Checkmark from '@spectrum-icons/workflow/Checkmark';
+import { Checkmark } from '@geti/ui/icons';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';

@@ -1,6 +1,6 @@
 {
   "name": "geti-ui",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "engines": {
     "node": "22.12.0",
     "npm": "10.9.0"
@@ -8,10 +8,9 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@adobe/react-spectrum": "^3.41.0",
     "@doodle3d/clipper-js": "^1.0.11",
-    "@geti/ui": "*",
     "@geti/core": "*",
+    "@geti/ui": "*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/core": "^1.26.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.53.0",
@@ -26,8 +25,6 @@
     "@react-hook/resize-observer": "^2.0.2",
     "@rsbuild/plugin-node-polyfill": "^1.3.0",
     "@scalar/api-reference-react": "^0.3.166",
-    "@spectrum-icons/illustrations": "^3.6.17",
-    "@spectrum-icons/workflow": "^4.2.16",
     "@tanstack/react-query": "^5.74.11",
     "@tanstack/react-query-devtools": "^5.74.11",
     "@wessberg/pointer-events": "^1.0.9",
@@ -54,7 +51,6 @@
     "react": "^18.3.1",
     "react-app-polyfill": "^3.0.0",
     "react-aria": "^3.39.0",
-    "react-aria-components": "^1.8.0",
     "react-colorful": "^5.6.1",
     "react-cool-virtual": "^0.7.0",
     "react-countup": "^6.5.3",
@@ -101,7 +97,7 @@
     "start": "rsbuild dev --environment dev",
     "test:component": "npx playwright test --config=playwright.config.ts",
     "test:component:ui": "npm run test:component -- --ui",
-    "test:coverage": "npm test -- --coverage",
+    "test:coverage": "npm run test:unit -- --coverage",
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
     "test:unit": "jest --config jest.config.js --watchAll=false",
     "test:unit:watch": "jest --config jest.config.js --watch",

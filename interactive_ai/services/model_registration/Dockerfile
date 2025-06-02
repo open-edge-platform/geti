@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bookworm AS base
+FROM python:3.10-slim-bookworm@sha256:49454d2bf78a48f217eb25ecbcb4b5face313fea6a6e82706465a6990303ada2 AS base
 
 FROM base AS build
 
@@ -13,7 +13,7 @@ COPY --link --from=libs . libs
 
 WORKDIR /interactive_ai/services/model_registration
 
-COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
+COPY --link --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8ea41eb4553a794195ef5803aa7ca6258653100d /uv /bin/uv
 
 COPY --link app/ .
 

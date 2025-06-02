@@ -1,0 +1,315 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "init-job-{{ .Chart.Name }}-ms"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app: {{ .Chart.Name }}-ms
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        app: {{ .Chart.Name }}-ms
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}-ms
+      restartPolicy: Never
+      initContainers:
+        - name: init-mongodb
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: [ 'sh', '-c', "until nc -w 5 -z {{ .Release.Namespace }}-mongodb 27017; do echo wait...; sleep 2; done;" ]
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.microservice.initResources | nindent 12 }}
+      containers:
+        - name: "mongodb-user"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              mongodb_create_service_user;
+              retVal=$?;
+              {{- if not .Values.global.istio_ambient_mesh }}
+              curl -XPOST 127.0.0.1:15020/quitquitquit;
+              {{- end }}
+              exit $retVal
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+          env:
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-username"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-password"
+            - name: DATABASE_USERNAME_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-ms-mongodb-username"
+            - name: DATABASE_PASSWORD_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-ms-mongodb-password"
+            - name: SERVICE_USER_ALL_DB_ROLES
+              value: "readWriteAnyDatabase"
+          volumeMounts:
+            - mountPath: /tmp
+              name: temp
+      volumes:
+        - name: temp
+          emptyDir: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "init-job-{{ .Chart.Name }}-scheduler"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    job_type: init
+    app: {{ .Chart.Name }}-scheduler
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        job_type: init
+        app: {{ .Chart.Name }}-scheduler
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduler
+      restartPolicy: Never
+      volumes:
+        - name: "init"
+          emptyDir: {}
+        - name: temp
+          emptyDir: {}
+      initContainers:
+        - name: init-mongodb
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: [ 'sh', '-c', "until nc -w 5 -z {{ .Release.Namespace }}-mongodb 27017; do echo wait...; sleep 2; done;" ]
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.scheduler.initResources | nindent 12 }}
+      containers:
+        - name: "mongodb-user-jobs"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              mongodb_create_service_user;
+              retVal=$?;
+              echo "done" > /init/1; 
+              exit $retVal
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+            - mountPath: /tmp
+              name: temp
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+          env:
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-username"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-password"
+            - name: DATABASE_USERNAME_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "jobs-mongodb-username"
+            - name: DATABASE_PASSWORD_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "jobs-mongodb-password"
+            - name: SERVICE_USER_ALL_DB_ROLES
+              value: "readWriteAnyDatabase"
+        - name: "mongodb-user-scheduler"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              mongodb_create_service_user;
+              retVal=$?;
+              echo "done" > /init/2; 
+              exit $retVal
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+            - mountPath: /tmp
+              name: temp
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+          env:
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-username"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-password"
+            - name: DATABASE_USERNAME_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-scheduler-mongodb-username"
+            - name: DATABASE_PASSWORD_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-scheduler-mongodb-password"
+            - name: SERVICE_USER_ALL_DB_ROLES
+              value: "readWriteAnyDatabase"
+        {{- if not .Values.global.istio_ambient_mesh }}
+        - name: "istio-sidecar-quit"
+          image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          resources:
+            {{- toYaml .Values.scheduler.initResources | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ] || [ ! -f /init/2 ]; do
+                sleep 1
+              done;
+              curl -XPOST 127.0.0.1:15020/quitquitquit
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- end }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "init-job-{{ .Chart.Name }}-scheduling-policy"
+  namespace: "{{ .Release.Namespace }}"
+  labels:
+    app: {{ .Chart.Name }}-scheduling-policy
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        app: {{ .Chart.Name }}-scheduling-policy
+    spec:
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}-scheduling-policy
+      restartPolicy: Never
+      initContainers:
+        - name: init-mongodb
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command: [ 'sh', '-c', "until nc -w 5 -z {{ .Release.Namespace }}-mongodb 27017; do echo wait...; sleep 2; done;" ]
+          securityContext: {{ toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.scheduling_policy.initResources | nindent 12 }}
+      containers:
+        - name: "mongodb-user"
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              mongodb_create_service_user;
+              retVal=$?;
+              {{- if not .Values.global.istio_ambient_mesh }}
+              curl -XPOST 127.0.0.1:15020/quitquitquit;
+              {{- end }}
+              exit $retVal
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 10001
+            readOnlyRootFilesystem: true
+          env:
+            - name: DATABASE_ADDRESS
+              value: mongodb://{{ .Release.Namespace }}-mongodb:27017/
+            - name: DATABASE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-username"
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "mongodb-password"
+            - name: DATABASE_USERNAME_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-scheduling-policy-mongodb-username"
+            - name: DATABASE_PASSWORD_SERVICE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-mongodb"
+                  key: "{{ .Chart.Name }}-scheduling-policy-mongodb-password"
+            - name: SERVICE_USER_ALL_DB_ROLES
+              value: "readWriteAnyDatabase"
+          volumeMounts:
+            - mountPath: /tmp
+              name: temp
+      volumes:
+        - name: temp
+          emptyDir: {}

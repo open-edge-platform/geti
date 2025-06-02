@@ -38,9 +38,33 @@ const getInitialKeypointStructure = ({ keypointStructure: { edges, positions } }
     return { edges: linkedEdged, points: positions };
 };
 
+const groupLabelsByName = (labels: Label[]) => {
+    return labels.reduce(
+        (acc, label) => {
+            acc[label.name] = label;
+            return acc;
+        },
+        {} as Record<string, Label>
+    );
+};
+
 const formatWithTaskMetadata = (metadata: TaskMetadata | null) => (task: KeypointTask | Task) => {
     if (metadata && isKeypointTask(task)) {
-        return { ...task, keypointStructure: metadata.keypointStructure, labels: metadata.labels as Label[] };
+        const labels = metadata.labels as Label[];
+        const groupedLabels = groupLabelsByName(labels);
+
+        return {
+            ...task,
+            labels,
+            keypointStructure: {
+                edges: metadata.keypointStructure?.edges.map(({ nodes }) => {
+                    return { nodes: [groupedLabels[nodes[0]].id, groupedLabels[nodes[1]].id] };
+                }),
+                positions: metadata.keypointStructure?.positions.map((positions) => {
+                    return { ...positions, label: groupedLabels[positions.label] };
+                }),
+            },
+        };
     }
 
     return task;

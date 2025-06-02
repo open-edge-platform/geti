@@ -1,0 +1,11 @@
+scan:
+  file-patterns:
+    - dockerfile:Dockerfile.*
+misconfiguration:
+  scanners:
+    - dockerfile
+severity:
+  - MEDIUM
+  - HIGH
+  - CRITICAL
+ignorefile: .github/trivyignore.yml

@@ -1,0 +1,6 @@
+---
+name: mlflow-geti-store
+version: '{{VERSION}}'
+apiVersion: v2
+description: MLflow geti store
+appVersion: '{{VERSION}}'

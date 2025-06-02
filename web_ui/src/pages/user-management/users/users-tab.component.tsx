@@ -3,13 +3,13 @@
 
 import { Key, useState } from 'react';
 
+import { paths } from '@geti/core';
+import { User } from '@geti/core/src/users/users.interface';
 import { Flex } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { paths } from '../../../core/services/routes';
-import { User } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
 import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';

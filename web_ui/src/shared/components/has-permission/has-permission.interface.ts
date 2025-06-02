@@ -3,7 +3,7 @@
 
 import { ReactNode } from 'react';
 
-import { Resource, RESOURCE_TYPE, Role } from '../../../core/users/users.interface';
+import { Resource, RESOURCE_TYPE, Role } from '@geti/core/src/users/users.interface';
 
 export interface HasPermissionProps {
     children: ReactNode;

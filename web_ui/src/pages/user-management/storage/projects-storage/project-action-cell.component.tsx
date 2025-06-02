@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 
+import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { DialogContainer } from '@geti/ui';
 
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
-import { RESOURCE_TYPE } from '../../../../core/users/users.interface';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { ActionMenu } from '../../../../shared/components/action-menu/action-menu.component';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';

@@ -1,13 +1,13 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { User } from '@geti/core/src/users/users.interface';
 import { AlertDialog } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { isFunction } from 'lodash-es';
 
-import QUERY_KEYS from '../../../../../core/requests/query-keys';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
-import { User } from '../../../../../core/users/users.interface';
 import { useHandleSignOut } from '../../../../../hooks/use-handle-sign-out/use-handle-sign-out.hook';
 
 import classes from '../workspace-user.module.scss';

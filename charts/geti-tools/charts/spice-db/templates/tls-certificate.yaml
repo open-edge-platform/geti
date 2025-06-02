@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "spice-db.fullname" . }}-tls-certificate
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ include "spice-db.fullname" . }}-tls
+  duration: {{ .Values.tls.leaf.duration }}
+  renewBefore: {{ .Values.tls.leaf.renewBefore }}
+  commonName: {{ include "spice-db.fullname" . }}
+  dnsNames:
+    - {{ include "spice-db.fullname" . }}
+    - {{ include "spice-db.fullname" . }}.{{ .Release.Namespace }}
+    - {{ include "spice-db.fullname" . }}.{{ .Release.Namespace }}.svc
+    - {{ include "spice-db.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+    - localhost
+  ipAddresses:
+    - 127.0.0.1
+  privateKey:
+    algorithm: {{ .Values.tls.algorithm }}
+    size: {{ .Values.tls.leaf.size }}
+  issuerRef:
+    name: {{ .Values.tls.ca.name }}
+    kind: ClusterIssuer
+    group: cert-manager.io

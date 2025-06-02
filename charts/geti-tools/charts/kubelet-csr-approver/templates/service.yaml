@@ -1,0 +1,24 @@
+{{- if .Values.metrics.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kubelet-csr-approver.fullname" . }}
+  namespace: {{ include "kubelet-csr-approver.namespace" . }}
+  labels:
+    {{- include "kubelet-csr-approver.labels" . | nindent 4 }}
+  annotations:
+    prometheus.io/port: '{{ .Values.metrics.port }}'
+    prometheus.io/scrape: 'true'
+  {{- with .Values.metrics.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.metrics.serviceType }}
+  ports:
+    - port: {{ .Values.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "kubelet-csr-approver.selectorLabels" . | nindent 4 }}
+{{- end }}

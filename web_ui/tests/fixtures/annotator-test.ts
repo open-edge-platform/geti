@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { expect, Page } from '@playwright/test';
 
 import { DOMAIN } from '../../src/core/projects/core.interface';
-import { paths } from '../../src/core/services/routes';
 import { clickOutsidePopover } from '../utils/mouse';
 import { test as baseTest } from './base-test';
 import { AnnotationListPage } from './page-objects/annotator/annotation-list-page';

@@ -1,0 +1,75 @@
+############################################################
+# OPA admission controller deployment for injecting OPA-Istio.
+############################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    {{- include "opa.labels" . | nindent 4 }}
+  annotations:
+    secret.reloader.stakater.com/reload: "{{ .Values.secret.name }}"
+  namespace: {{ .Values.namespace.opa }}
+  name: admission-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "opa.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{ include "opa.selectorLabels" . | nindent 8 }}
+      annotations:
+        # [mTLS STRICT] exclude incoming traffic to webhook port
+        # as non-Istio workloads (api-server here) cannot communicate to Istio services
+        traffic.sidecar.istio.io/excludeInboundPorts: "8443"
+        rollme: {{ randAlphaNum 5 | quote }} # restart to take into account new source of polices
+      name: admission-controller
+    spec:
+      serviceAccountName: {{ include "opa.name" . }}
+      containers:
+        - image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: IfNotPresent
+          name: opa
+          resources: 
+            {{ toYaml .Values.resources | nindent 12 }}
+          ports:
+          - containerPort: 8443
+          securityContext:
+            {{- toYaml .Values.securityContextAdmissionController | nindent 12 }}
+          args:
+          - "run"
+          - "--server"
+          - "--tls-cert-file=/certs/tls.crt"
+          - "--tls-private-key-file=/certs/tls.key"
+          - "--addr=0.0.0.0:8443"
+          - "--disable-telemetry"
+          - "/policies/inject.rego"
+          livenessProbe:
+            httpGet:
+              path: /health?plugins
+              scheme: HTTPS
+              port: 8443
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /health?plugins
+              scheme: HTTPS
+              port: 8443
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - readOnly: true
+              mountPath: /certs
+              name: server-cert
+            - readOnly: true
+              mountPath: /policies
+              name: inject-policy
+      volumes:
+        - name: inject-policy
+          configMap:
+            name: inject-policy
+        - name: server-cert
+          secret:
+            secretName: {{ .Values.secret.name }}

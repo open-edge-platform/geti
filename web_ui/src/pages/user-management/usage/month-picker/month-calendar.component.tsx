@@ -14,12 +14,11 @@ import {
     type DOMRefValue,
     type StyleProps,
 } from '@geti/ui';
+import { ChevronLeft, ChevronRight } from '@geti/ui/icons';
 import { createCalendar } from '@internationalized/date';
 import { CalendarProps, DateValue, useCalendar } from '@react-aria/calendar';
 import { useLocale } from '@react-aria/i18n';
 import { useCalendarState } from '@react-stately/calendar';
-import ChevronLeft from '@spectrum-icons/workflow/ChevronLeft';
-import ChevronRight from '@spectrum-icons/workflow/ChevronRight';
 import { range } from 'lodash-es';
 
 import { CalendarCell } from './calendar-cell.component';

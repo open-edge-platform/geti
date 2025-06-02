@@ -1,9 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { RESOURCE_TYPE, User } from '@geti/core/src/users/users.interface';
+
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
-import { RESOURCE_TYPE, User } from '../../../../core/users/users.interface';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { HasPermission } from '../../../../shared/components/has-permission/has-permission.component';
 import { OPERATION_NEW, OPERATION_OLD } from '../../../../shared/components/has-permission/has-permission.interface';

@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-feature-flags
+  namespace: {{ include "flyteworkflow.namespace" . }}
+data:
+{{ .Values.feature_flags_data | toYaml | indent 2 }}

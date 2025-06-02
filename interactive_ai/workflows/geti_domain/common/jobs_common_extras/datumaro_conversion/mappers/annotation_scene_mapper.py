@@ -1,6 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-"""This module implements annotation scene mapper for conversion between SC AnnotationScene and Datumaro annotations"""
+"""This module implements a mapper for conversion between Geti AnnotationScene and Datumaro annotations"""
 
 from itertools import chain
 
@@ -13,7 +13,7 @@ from iai_core.entities.shapes import Ellipse, Keypoint, Polygon, Rectangle
 
 
 class LabelMap:
-    """Map Datumaro label index (integer) to SC Label"""
+    """Map Datumaro label index (integer) to Geti Label"""
 
     def __init__(
         self,
@@ -35,7 +35,7 @@ class LabelMap:
         return self.label_map[key]
 
     def get_dm_label_by_sc_label_id(self, label_id: ID) -> int | None:
-        """Get Datumaro label id (int) from the SC label id (ID). If cannot find, return None."""
+        """Get Datumaro label id (int) from the Geti label id (ID). If cannot find, return None."""
         dm_label, _ = self.label_categories.find(str(label_id))
         return dm_label
 
@@ -64,13 +64,8 @@ class AnnotationSceneMapper:
         for sc_ann in instance.annotations:
             if not isinstance(sc_ann.shape, Keypoint):
                 # For task-chain, annotations that only contain labels from other tasks will return None and are removed
-                if (
-                    dm_ann := self._forward_ann(
-                        annotation=sc_ann,
-                        width=instance.media_width,
-                        height=instance.media_height,
-                    )
-                ) is not None:
+                dm_ann = self._forward_ann(annotation=sc_ann, width=instance.media_width, height=instance.media_height)
+                if dm_ann:
                     dm_anns.append(dm_ann)
             else:
                 sc_keypoint_anns.append(sc_ann)

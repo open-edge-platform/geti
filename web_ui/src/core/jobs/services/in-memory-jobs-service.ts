@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { JobsResponse, JobsService } from './jobs-service.interface';
 
 export const createInMemoryJobsService = (): JobsService => {

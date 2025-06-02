@@ -1,0 +1,136 @@
+#
+# Copyright (C) 2021-2023 Intel Corporation
+# SPDX-License-Identifier: MIT
+# @file daemonset-intel-xpum.yaml
+#
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    {{- include "xpu-manager.labels" . | nindent 4 }}
+  name: {{ include "xpu-manager.name" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "xpu-manager.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "xpu-manager.selectorLabels" . | nindent 8 }}
+      annotations:
+        # Using this annotation which is required for prometheus scraping
+        prometheus.io/scrape: "true"
+    spec:
+      serviceAccountName: {{ include "xpu-manager.name" . }}
+      # hostNetwork should be set true for getting xelink metrics
+      hostNetwork: true
+      containers:
+      - name: xpumd
+        image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: [ "/usr/bin/xpumd" ]
+        env:
+        - name: SPDLOG_LEVEL
+          value: info
+        - name: XPUM_REST_NO_TLS
+          value: "1"
+        - name: XPUM_EXPORTER_NO_AUTH
+          value: "1"
+        - name: XPUM_EXPORTER_ONLY
+          value: "1"
+        resources:
+          {{- toYaml .Values.xpumdResources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.xpumdSecurityContext | nindent 10 }}
+        volumeMounts:
+          # for getting pod resources
+        - mountPath: /var/lib/kubelet/pod-resources
+          name: kubeletpodres
+        - name: sockdir
+          mountPath: /tmp
+
+      - name: python-exporter
+        # - socket location for "xpumd" communication
+        # - GPU device file names for "dev_file" label
+        volumeMounts:
+        - name: sockdir
+          mountPath: /tmp
+        - name: devdri
+          mountPath: /dev/dri
+          readOnly: true
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+        # needs same user as "xpumd" to be able to access its socket
+        securityContext:
+          {{- toYaml .Values.pythonExporterSecurityContext | nindent 10 }}
+        resources:
+          {{- toYaml .Values.pythonExporterResources | nindent 10 }}
+        env:
+          # Disable need for running rest_config.py first to generate passwords
+          # (otherwise XPUM constantly logs not finding rest.conf & does not work)
+          # Other alternative would be to provide pre-generated rest.conf configMap
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: XPUM_EXPORTER_NO_AUTH
+            value: "1"
+          # Run only Prometheus exporter, not rest XPUM
+          - name: XPUM_EXPORTER_ONLY
+            value: "1"
+          # Override which metrics are exported
+          #- name: XPUM_METRICS
+          #  value: 0-29
+        # so that Gunicorn finds the Python files
+        workingDir: /usr/lib/xpum/rest
+        # There should be only single outstanding Prometheus request
+        # being handled at the time + manual debugging calls as this
+        # is cluster internal, so it does not need to scale as much
+        # as Gunicorn defaults do.  For all settings, see:
+        #   https://docs.gunicorn.org/en/stable/settings.html
+        # Add and specify certs/keys to use TLS:
+        #   "--certfile", "/path/cert.pem",
+        #   "--keyfile", "/path/key.pem",
+        command: [
+          "gunicorn",
+          "--bind", "0.0.0.0:29999",
+          "--worker-connections", "64",
+          "--worker-class", "gthread",
+          "--workers", "1",
+          "--threads", "4",
+          "xpum_rest_main:main()"
+        ]
+        # Prometheus metrics endpoint
+        ports:
+          - containerPort: {{ .Values.service.port }}
+            name: metrics
+            protocol: TCP
+        startupProbe:
+          httpGet:
+            path: /metrics
+            port: metrics
+          failureThreshold: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /healtz
+            port: metrics
+          initialDelaySeconds: 60
+          periodSeconds: 10
+      nodeSelector:
+        gpu.intel.com/i915: "true"
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/pod-resources
+          type: ""
+        name: kubeletpodres
+      - emptyDir:
+          medium: Memory
+        name: sockdir
+      - hostPath:
+          path: /dev/dri
+        name: devdri

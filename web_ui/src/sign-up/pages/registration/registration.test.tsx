@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { jwtDecode } from 'jwt-decode';
 
-import { createInMemoryUsersService } from '../../../core/users/services/in-memory-users-service';
 import { encodeToBase64 } from '../../../shared/utils';
 import { providersRender } from '../../../test-utils/required-providers-render';
 import { Registration } from './registration.component';

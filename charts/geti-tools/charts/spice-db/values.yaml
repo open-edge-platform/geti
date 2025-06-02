@@ -1,0 +1,105 @@
+ports:
+  http: 8443
+  grpc: 50051
+
+log_level: info
+
+mode: deployment
+
+image: 
+  registry: quay.io
+  repository: authzed
+  name: spicedb:v1.34.0
+debug: 
+  image:
+    registry: quay.io
+    repository: authzed
+    name: spicedb:v1.34.0-debug
+postgresql:
+  image:
+    registry: docker.io
+    repository:
+    name: postgres:14.13
+imagePullPolicy: IfNotPresent
+
+resources:
+  requests:
+    cpu: 600m
+    memory: 1Gi
+  limits:
+    memory: 2Gi
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    memory: 100Mi
+
+jobs:
+  backoffLimit: 3
+
+# These values needs to be set manually in case of standalone chart installation
+# to match registry in which spicedb_client_image is stored
+global:
+  registry_address: null
+  tag: null
+  docker_namespace: impp
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  debian:
+    registry: docker.io
+    repository: bitnami
+    name: bitnami-shell:11-debian-11-r136
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+
+# To meet Intel crypto compliance,
+# use ECDSA P-521 for the CA and P-384 for the leafs.
+# use 5y for the CA and 1y for the leafs.
+tls:
+  algorithm: ECDSA
+  ca:
+    name: ca-issuer
+  leaf:
+    size: 384
+    duration: 4380h0m0s
+    renewBefore: 24h0m0s
+
+postgres:
+  sslmode: "disable"
+  readonly: false
+
+spicedb:
+  clusterDomain: cluster.local
+
+main_namespace: impt
+flyte_workflows:
+  name: "jobs"
+  domain: "production"
+
+command:
+  - spicedb
+  - serve
+  - --skip-release-check
+  - --grpc-tls-cert-path=/etc/tls-secrets/tls.crt
+  - --grpc-tls-key-path=/etc/tls-secrets/tls.key
+  - --datastore-conn-uri=postgres://$(POSTGRES_USERNAME):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST)/$(POSTGRES_DATABASE)?sslmode=$(POSTGRES_SSLMODE)
+  - --telemetry-endpoint=
+
+
+additional_args:
+  - --dispatch-cluster-cache-max-cost=40%

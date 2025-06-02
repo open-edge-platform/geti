@@ -51,10 +51,7 @@ class DatasetStorageFilterDataToMongo(IMapperSimple[DatasetStorageFilterData, di
             media_annotation_state=(
                 AnnotationState[media_annotation_state] if media_annotation_state is not None else None
             ),
-            preprocessing=MediaPreprocessingStatus[instance["preprocessing"]]
-            # TODO: remove in scope of CVS-163688
-            if "preprocessing" in instance
-            else MediaPreprocessingStatus.FINISHED,
+            preprocessing=MediaPreprocessingStatus[instance["preprocessing"]],
             ephemeral=False,
         )
 

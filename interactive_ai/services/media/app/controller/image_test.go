@@ -13,20 +13,14 @@ import (
 	"os"
 	"testing"
 
-	"media/app/usecase"
-
-	sdk_endities "geti.com/iai_core/entities"
-
-	"geti.com/iai_core/testhelper"
-
+	sdkendities "geti.com/iai_core/entities"
 	"geti.com/iai_core/middleware"
-
+	"geti.com/iai_core/storage"
+	"geti.com/iai_core/testhelper"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 
-	mock_uc "media/app/mock/usecase"
-
-	mock_storage "geti.com/iai_core/mock/storage"
+	"media/app/usecase"
 )
 
 func readImage(t *testing.T) *os.File {
@@ -39,8 +33,8 @@ func TestImageController(t *testing.T) {
 	fullImageID := testhelper.GetFullImageID(t)
 
 	ctx := context.Background()
-	mockImageRepo := mock_storage.NewMockImageRepository(t)
-	mockGetThumbUC := mock_uc.NewMockIGetOrCreateThumbnail(t)
+	mockImageRepo := storage.NewMockImageRepository(t)
+	mockGetThumbUC := usecase.NewMockIGetOrCreateThumbnail(t)
 
 	tests := []struct {
 		name                  string
@@ -58,7 +52,7 @@ func TestImageController(t *testing.T) {
 			setupMocks: func() {
 				mockImageRepo.EXPECT().
 					LoadImageByID(ctx, fullImageID).
-					Return(readImage(t), sdk_endities.NewObjectMetadata(0, "image/jpeg"), nil).
+					Return(readImage(t), sdkendities.NewObjectMetadata(0, "image/jpeg"), nil).
 					Once()
 			},
 			wantStatusCode:        200,
@@ -100,7 +94,7 @@ func TestImageController(t *testing.T) {
 			setupMocks: func() {
 				mockGetThumbUC.EXPECT().
 					Execute(ctx, fullImageID).
-					Return(readImage(t), sdk_endities.NewObjectMetadata(0, "image/jpeg"), nil).
+					Return(readImage(t), sdkendities.NewObjectMetadata(0, "image/jpeg"), nil).
 					Once()
 			},
 			wantStatusCode:        200,
@@ -113,7 +107,7 @@ func TestImageController(t *testing.T) {
 			setupMocks: func() {
 				mockGetThumbUC.EXPECT().
 					Execute(ctx, fullImageID).
-					Return(readImage(t), sdk_endities.NewObjectMetadata(0, "image/jpeg"), nil).
+					Return(readImage(t), sdkendities.NewObjectMetadata(0, "image/jpeg"), nil).
 					Maybe()
 			},
 			assertExpectations: func() {
@@ -167,7 +161,7 @@ func TestImageController(t *testing.T) {
 				tt.setupMocks()
 			}
 
-			req, _ := http.NewRequest("GET", tt.giveRequest, nil)
+			req, _ := http.NewRequest(http.MethodGet, tt.giveRequest, nil)
 			resp := httptest.NewRecorder()
 			router.ServeHTTP(resp, req)
 

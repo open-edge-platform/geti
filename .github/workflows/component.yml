@@ -47,6 +47,9 @@ jobs:
       PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
       GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
     steps:
+      - name: Free space on runner (delete unnecessary tools)
+        run: rm -rf /opt/hostedtoolcache
+
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
@@ -67,9 +70,9 @@ jobs:
       - name: Check if Python/Go project
         id: check-python-go
         run: |
-          if [ -f "${COMPONENT_DIR}/setup.py" ] || [ -f "${COMPONENT_DIR}/pyproject.toml" ]; then
+          if [ -f "${COMPONENT_DIR}/setup.py" ] || [ -f "${COMPONENT_DIR}/pyproject.toml" ] || [ -f "${COMPONENT_DIR}/.python" ]; then
             echo "BUILDER_IMAGE=${REGISTRY}/${PYTHON_BUILDER_IMAGE}" >> $GITHUB_ENV
-          elif [ -f "${COMPONENT_DIR}/go.mod" ]; then
+          elif [ -f "${COMPONENT_DIR}/go.mod" ] || [ -f "${COMPONENT_DIR}/.go" ]; then
             echo "BUILDER_IMAGE=${REGISTRY}/${GO_BUILDER_IMAGE}" >> $GITHUB_ENV
           else
             echo "BUILDER_IMAGE=builder_image_not_set" >> $GITHUB_ENV
@@ -99,7 +102,7 @@ jobs:
 
       - name: Push image
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'
-        run: make -C "${COMPONENT_DIR}" push-image
+        run: make -C "${COMPONENT_DIR}" publish-image
 
       - name: Lint chart
         if: steps.build-image.outputs.SKIP_IMAGE != 'true'

@@ -87,10 +87,12 @@ spec:
                   name: "{{ .Release.Namespace}}-seaweed-fs"
                   key: "media_ms_s3_presigned_url_secret_key"
             {{- end }}
+            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
               value: "true"
+            {{- end}}
             - name: OTEL_SERVICE_NAME
               value: media-microservice
             - name: OTLP_TRACES_RECEIVER

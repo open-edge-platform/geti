@@ -1,0 +1,30 @@
+---
+{{- if .Values.autoscalerEnabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-modelmesh-autoscaler
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "modelmesh-serving.labels" . | nindent 4 }}
+    control-plane: modelmesh-autoscaler
+spec:
+  selector:
+    matchLabels:
+      control-plane: modelmesh-autoscaler
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        control-plane: modelmesh-autoscaler
+    spec:
+      serviceAccountName: modelmesh-autoscaler
+      containers:
+        - image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/modelmesh-autoscaler:{{ .Values.global.tag | default .Chart.Version }}"
+          name: autoscaler
+          resources:
+{{ toYaml .Values.autoscalerResources | indent 13 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+      terminationGracePeriodSeconds: 10
+{{- end }}

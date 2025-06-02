@@ -3,14 +3,14 @@
 
 import { Key, useState } from 'react';
 
+import { isOrganizationAdmin, isWorkspaceContributor } from '@geti/core/src/users/user-role-utils';
+import { User } from '@geti/core/src/users/users.interface';
 import { DialogContainer } from '@geti/ui';
 import { Delete, Edit } from '@geti/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { AccountStatus } from '../../../../../core/organizations/organizations.interface';
-import { isOrganizationAdmin, isWorkspaceContributor } from '../../../../../core/users/user-role-utils';
-import { User } from '../../../../../core/users/users.interface';
 import { useIsSaasEnv } from '../../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { ActionMenu } from '../../../../../shared/components/action-menu/action-menu.component';

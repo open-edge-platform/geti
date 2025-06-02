@@ -3,12 +3,12 @@
 
 import { ComponentProps, useState } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { RESOURCE_TYPE, User, UsersQueryParams } from '@geti/core/src/users/users.interface';
 import { Flex } from '@geti/ui';
 import { motion } from 'framer-motion';
 import { isEmpty } from 'lodash-es';
 
-import { useUsers } from '../../../core/users/hook/use-users.hook';
-import { RESOURCE_TYPE, User, UsersQueryParams } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
 import { ANIMATION_PARAMETERS } from '../../../shared/animation-parameters/animation-parameters';

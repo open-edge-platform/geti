@@ -5,7 +5,7 @@ import { FC } from 'react';
 
 import { Flex, LoadingIndicator, Text, View } from '@geti/ui';
 import { CanceledIcon, CheckCircleOutlined, ExclamationCircleOutlined, SkippedIcon, WaitingIcon } from '@geti/ui/icons';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
 import { JobStepState } from '../../../../core/jobs/jobs.const';

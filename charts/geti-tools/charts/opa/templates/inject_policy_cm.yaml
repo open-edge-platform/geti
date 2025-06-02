@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ .Values.namespace.opa }}
+  name: inject-policy
+data:
+  inject.rego: |
+    package istio
+
+    import future.keywords.in
+    import input.request.object.metadata.annotations as annotations
+    import input.request.object.metadata.labels as labels
+    
+    injectorAnnotation := "sidecar.opa-istio.io/inject"
+    lifecycleHookAnnotation := "proxy.istio.io/config"
+
+    default authorize = false
+    
+    default terminationDrainDuration = "0s"
+    terminationDrainDuration = "60s" {
+        contains(annotations[lifecycleHookAnnotation], "terminationDrainDuration")
+    }
+
+    authorize {
+        print("Annotations", annotations)
+        print("Injector", annotations[injectorAnnotation])
+        annotations[injectorAnnotation] == "enabled"
+    }
+    
+    inject = body {
+        authorize == true
+        body := {
+            "apiVersion": "admission.k8s.io/v1beta1",
+            "kind": "AdmissionReview",
+            "response": {
+                "allowed": true,
+                "patchType": "JSONPatch",
+                "patch": base64.encode(json.marshal(patch)),
+            },
+        }
+    } else = body {
+        body := {
+            "apiVersion": "admission.k8s.io/v1beta1",
+            "kind": "AdmissionReview",
+            "response": {"allowed": true},
+        }
+    }
+    
+    patch = [
+        {
+            "op": "add",
+            "path": "/spec/containers/-",
+            "value": opa_container,
+        },{
+            "op": "add",
+            "path": "/spec/volumes/-",
+            "value": opa_bundle_store_volume,
+        },
+        {
+            "op": "add",
+            "path": "/spec/volumes/-",
+            "value": opa_bundle_volume,
+        },
+    ]
+    
+    opa_container = {
+        "image": "{{ .Values.image.registry }}/{{ .Values.image.repository }}/{{ .Values.image.name }}",
+        "name": "opa-istio",
+        "securityContext": {{ .Values.securityContextSidecar | mustToJson }},
+        "workingDir": "/app",
+        "args": [
+            "run",
+            "--server",
+            "--addr=localhost:{{ .Values.ports.server }}",
+            "--diagnostic-addr=0.0.0.0:{{ .Values.ports.diagnostic }}",
+            "--set=plugins.envoy_ext_authz_grpc.addr=:9191",
+            "--set=plugins.envoy_ext_authz_grpc.path=istio/authz/result",
+            "--set=decision_logs.console=true",
+            "/opa-bundle/all.tar.gz",
+        ],
+        "resources": {
+            "requests" : {
+                "memory": "40Mi",
+                "cpu": "20m",
+            },
+        },
+        "env": [{
+            "name": "SPICEDB_GRPC_PRESHARED_KEY",
+            "valueFrom": {
+                "secretKeyRef": {
+                    "name": sprintf("%s-spice-db", [input.request.namespace]),
+                    "key": "SPICEDB_GRPC_PRESHARED_KEY"
+                }
+            }
+          },{
+          "name": "SPICEDB_ADDRESS",
+          "value": sprintf("%s-spice-db", [input.request.namespace])
+          }
+        ],
+        "envFrom": [{
+            "configMapRef": {
+                "name": sprintf("%s-feature-flags", [input.request.namespace]),
+            }
+        }],
+        "volumeMounts": [{
+            "mountPath": "/app/.opa",
+            "name": "opa-bundle-store",
+            "readOnly": false,
+        },{
+            "mountPath": "/tmp/opa",
+            "name": "opa-bundle-store",
+            "readOnly": false,
+        },
+        {
+            "mountPath": "/opa-bundle",
+            "name": "opa-bundle",
+            "readOnly": false,
+        }
+        ],
+        "lifecycle": {
+            "preStop": {
+                "exec": {
+                    "command": [
+                        "sleep",
+                        terminationDrainDuration
+                    ]
+                }
+            }
+        },
+    }
+
+    opa_bundle_store_volume = {
+        "name": "opa-bundle-store",
+        "emptyDir": {}
+    }
+    opa_bundle_volume = {
+      "name": "opa-bundle",
+      "configMap": { "name": "opa-bundle" }
+    }

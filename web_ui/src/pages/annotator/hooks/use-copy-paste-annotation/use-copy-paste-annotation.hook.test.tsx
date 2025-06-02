@@ -57,8 +57,8 @@ jest.mock('../../zoom/zoom-provider.component', () => ({
 
 const mockedUser = getMockedUser();
 
-jest.mock('../../../../core/users/hook/use-users.hook', () => ({
-    ...jest.requireActual('../../../../core/users/hook/use-users.hook'),
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
+    ...jest.requireActual('@geti/core/src/users/hook/use-users.hook'),
     useUsers: () => ({
         useActiveUser: jest.fn(() => ({ data: mockedUser })),
     }),

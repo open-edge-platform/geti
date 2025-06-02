@@ -1,6 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { isOrganizationAdmin } from '@geti/core/src/users/user-role-utils';
 import { Button, DialogContainer, dimensionValue, Flex, Heading, Text } from '@geti/ui';
 import { sum } from 'lodash-es';
 
@@ -11,9 +14,6 @@ import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-f
 import { GLOBAL_MODALS_KEYS } from '../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../../core/user-settings/utils';
-import { useProfileQuery } from '../../../core/users/hook/use-profile.hook';
-import { useUsers } from '../../../core/users/hook/use-users.hook';
-import { isOrganizationAdmin } from '../../../core/users/user-role-utils';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { WelcomingCreditsDetails } from './welcoming-credits-details.component';
 

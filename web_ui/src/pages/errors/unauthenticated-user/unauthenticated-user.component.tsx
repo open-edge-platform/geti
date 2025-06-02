@@ -1,17 +1,21 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useEffect } from 'react';
+import { FC, useEffect } from 'react';
 
+import { paths } from '@geti/core';
 import { Button, Heading, Text } from '@geti/ui';
 
 import { Unauthorized } from '../../../assets/images';
-import { paths } from '../../../core/services/routes';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';
 
-export const UnauthenticatedUser = (): JSX.Element => {
+interface UnauthenticatedUserProps {
+    onReset: () => void;
+}
+
+export const UnauthenticatedUser: FC<UnauthenticatedUserProps> = ({ onReset }): JSX.Element => {
     useEffect(() => {
         // For privacy reasons we cannot show the app name as document title for unauthenticated users
         const previousHtmlTitle = document.title;
@@ -24,6 +28,7 @@ export const UnauthenticatedUser = (): JSX.Element => {
     }, []);
 
     const handleOnPress = (): void => {
+        onReset();
         redirectTo(paths.root({}));
     };
 

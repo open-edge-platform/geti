@@ -1,0 +1,6 @@
+---
+name: resource
+version: '{{VERSION}}'
+apiVersion: v2
+description: resource
+appVersion: '{{VERSION}}'

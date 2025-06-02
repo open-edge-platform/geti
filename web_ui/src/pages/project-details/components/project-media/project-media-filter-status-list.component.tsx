@@ -3,7 +3,7 @@
 
 import { Flex } from '@geti/ui';
 import { AcceptSmall } from '@geti/ui/icons';
-import { COLOR_MODE } from '@geti/ui/icons/color-mode.enum';
+import { COLOR_MODE } from '@geti/ui/theme';
 
 import { useProject } from '../../providers/project-provider/project-provider.component';
 

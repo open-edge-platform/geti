@@ -5,8 +5,8 @@ import { apiClient } from '@geti/core';
 import { isAxiosError } from 'axios';
 import { StatusCodes } from 'http-status-codes';
 
-import { CreateApiService } from '../../services/create-api-service.interface';
-import { API_URLS } from '../../services/urls';
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { GlobalStatusDTO } from '../dtos/status.interface';
 import { StatusProps } from '../status.interface';
 import { getGlobalStatus } from '../utils';

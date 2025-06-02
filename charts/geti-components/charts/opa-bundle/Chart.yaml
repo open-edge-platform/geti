@@ -1,0 +1,7 @@
+---
+name: opa-bundle
+version: 0.0.1
+type: application
+appVersion: 0.0.1
+apiVersion: v2
+description: OPA bundle

@@ -1,20 +1,20 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
+import { createInMemoryOnboardingService } from '@geti/core/src/users/services/inmemory-onboarding-service';
+import { OrganizationMetadata } from '@geti/core/src/users/services/onboarding-service.interface';
 import { act, waitFor } from '@testing-library/react';
 import { useLocation, useParams } from 'react-router-dom';
 
+import { paths } from '../../../../packages/core/src/services/routes';
 import {
     getMockedUserGlobalSettings,
     getMockedUserGlobalSettingsObject,
 } from '../../../test-utils/mocked-items-factory/mocked-settings';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
-import { paths } from '../../services/routes';
 import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
-import { useProfileQuery } from '../../users/hook/use-profile.hook';
-import { createInMemoryOnboardingService } from '../../users/services/inmemory-onboarding-service';
-import { OrganizationMetadata } from '../../users/services/onboarding-service.interface';
 import { AccountStatus } from '../organizations.interface';
 import { useSelectedOrganization } from './use-selected-organization.hook';
 
@@ -27,7 +27,7 @@ jest.mock('react-router-dom', () => ({
     useNavigate: jest.fn(() => mockedNavigate),
 }));
 
-jest.mock('../../users/hook/use-profile.hook', () => ({ useProfileQuery: jest.fn() }));
+jest.mock('@geti/core/src/users/hook/use-profile.hook', () => ({ useProfileQuery: jest.fn() }));
 
 jest.mock('../../user-settings/hooks/use-global-settings.hook', () => ({
     ...jest.requireActual('../../user-settings/hooks/use-global-settings.hook'),
