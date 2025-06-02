@@ -34,6 +34,7 @@ const attrs = {
 
 export interface LabelTreeViewItemProps {
     item: LabelTreeItem;
+    siblings: LabelTreeItem[];
     children?: ReactNode;
     actions: TreeItemActions;
     projectLabels: LabelTreeItem[];
@@ -47,6 +48,7 @@ export interface LabelTreeViewItemProps {
 
 export const LabelTreeViewItem = ({
     item,
+    siblings,
     children,
     actions: { addChild, deleteItem, reorder, save },
     projectLabels,
@@ -141,17 +143,8 @@ export const LabelTreeViewItem = ({
     const isEditionModeOn = inEditMode || isEditable;
     const canEditItem = isCreationInNewProject || !(item.type === LabelItemType.GROUP && !isNew(item));
 
-    //TODO: this is not proper - correct this
-    const canReorderUp = true;
-    const canReorderDown = true;
-    // const canReorderUp =
-    //     (item.type === LabelItemType.LABEL ? flatProjectLabels[0] : flatProjectGroups[0]).id !== item.id;
-
-    // const canReorderDown =
-    //     (item.type === LabelItemType.LABEL
-    //         ? flatProjectLabels[flatProjectLabels.length - 1]
-    //         : flatProjectGroups[flatProjectGroups.length - 1]
-    //     ).id !== item.id;
+    const canReorderUp = siblings[0].id !== item.id;
+    const canReorderDown = siblings[siblings.length - 1].id !== item.id;
 
     const canAddGroup =
         !isAnomalyProject &&

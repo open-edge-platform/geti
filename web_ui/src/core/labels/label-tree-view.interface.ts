@@ -94,7 +94,7 @@ interface ReadonlyTreeView {
 export type LabelsTreeViewProps = EditableTreeViewProps | ReadonlyTreeView;
 
 export interface CommonTreeViewProps {
-    labels: LabelTreeItem[];
+    treeItems: LabelTreeItem[];
     isEditable: boolean;
     actions: TreeItemActions;
     projectLabels: LabelTreeItem[];

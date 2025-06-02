@@ -68,7 +68,7 @@ export const LabelTreeView = (props: LabelsTreeViewProps): JSX.Element => {
     };
 
     const parameters: CommonTreeViewProps = {
-        labels: labelsTree,
+        treeItems: labelsTree,
         isEditable,
         actions: {
             ...actions,

@@ -26,7 +26,7 @@ describe('HierarchicalTreeView', () => {
         render(
             <HierarchicalTreeView
                 actions={{ addChild: noop, deleteItem: noop, reorder: noop, save: noop }}
-                labels={labels}
+                treeItems={labels}
                 isEditable={false}
                 domains={[DOMAIN.CLASSIFICATION]}
                 projectLabels={labels}

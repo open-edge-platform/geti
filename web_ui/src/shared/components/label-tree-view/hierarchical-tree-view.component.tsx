@@ -9,7 +9,7 @@ import { LabelTreeViewItem, LabelTreeViewItemProps } from './label-tree-view-ite
 import classes from './hierarchical-tree-view.module.scss';
 
 export const HierarchicalTreeView = ({
-    labels,
+    treeItems,
     isEditable,
     actions,
     projectLabels,
@@ -27,11 +27,12 @@ export const HierarchicalTreeView = ({
                 paddingLeft: level && 'var(--spectrum-global-dimension-size-500)',
             }}
         >
-            {labels.map((item: LabelTreeItem) => {
+            {treeItems.map((item: LabelTreeItem) => {
                 const labelTreeViewItemProps: LabelTreeViewItemProps = {
                     actions,
                     setValidationError,
                     item,
+                    siblings: treeItems,
                     domains,
                     isEditable,
                     projectLabels,
@@ -47,7 +48,7 @@ export const HierarchicalTreeView = ({
                 return (
                     <LabelTreeViewItem key={item.id} {...labelTreeViewItemProps}>
                         <HierarchicalTreeView
-                            labels={item.children}
+                            treeItems={item.children}
                             isEditable={isEditable}
                             options={options}
                             actions={actions}
