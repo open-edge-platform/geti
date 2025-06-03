@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubelet-csr-approver.fullname" . }}
+  namespace: {{ include "kubelet-csr-approver.namespace" . }}
+  labels:
+    {{- include "kubelet-csr-approver.labels" . | nindent 4 }}
+spec:
+{{- if and (gt .Values.replicas 1.0) (not .Values.leaderElection) }}
+{{- fail "leaderElection needs to be enabled in order to use more than 1 replica" }}
+{{- end }}
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "kubelet-csr-approver.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kubelet-csr-approver.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.dnsPolicy }}
+      dnsPolicy: {{ .Values.dnsPolicy | quote }}
+      {{- end }}
+      {{- if .Values.dnsConfig }}
+      dnsConfig:
+        {{- .Values.dnsConfig | toYaml | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kubelet-csr-approver.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - -metrics-bind-address
+            - ":{{ .Values.metrics.port }}"
+            - -health-probe-bind-address
+            - ":8081"
+          {{- if .Values.leaderElection }}
+            - -leader-election
+          {{- end }}
+          {{- if .Values.loggingLevel }}
+            - -level
+            - {{ .Values.loggingLevel | quote }}
+          {{- end }}
+          env:
+            - name: PROVIDER_REGEX
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          {{- if .Values.providerIpPrefixes }}
+            - name: PROVIDER_IP_PREFIXES
+              value: "{{ join "," .Values.providerIpPrefixes }}"
+          {{- end }}
+          {{- if .Values.maxExpirationSeconds}}
+            - name: MAX_EXPIRATION_SECONDS
+              value: {{ .Values.maxExpirationSeconds | quote }}
+          {{- end }}
+          {{- if .Values.bypassDnsResolution}}
+            - name: BYPASS_DNS_RESOLUTION
+              value: {{ .Values.bypassDnsResolution | quote }}
+          {{- end }}
+          {{- if .Values.ignoreNonSystemNode}}
+            - name: IGNORE_NON_SYSTEM_NODE
+              value: {{ .Values.ignoreNonSystemNode | quote }}
+          {{- end }}
+          {{- if .Values.allowedDnsNames}}
+            - name: ALLOWED_DNS_NAMES
+              value: {{ .Values.allowedDnsNames | quote }}
+          {{- end }}
+          {{- if .Values.bypassHostnameCheck}}
+            - name: BYPASS_HOSTNAME_CHECK
+              value: {{ .Values.bypassHostnameCheck | quote }}
+          {{- end }}
+          {{- with .Values.env }}
+            {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.metrics.enable }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

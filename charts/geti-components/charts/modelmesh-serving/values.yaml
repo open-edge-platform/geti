@@ -1,0 +1,112 @@
+# Default values for modelmesh-serving.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  enable_local_image_pull_secret: false 
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+
+feature_flags_data: {}
+
+replicaCount: 1
+
+controller:
+  image: 
+    registry: docker.io
+    repository: kserve
+    name: modelmesh-controller:v0.12.0
+
+modelmesh: 
+  image:
+    registry: docker.io
+    repository: kserve
+    name: modelmesh
+    tag: v0.12.0
+
+restProxyImage: kserve/rest-proxy
+restProxyImageTag: v0.12.0
+
+runtimeadapter:
+  image:
+    registry: docker.io
+    repository: kserve
+    name: modelmesh-runtime-adapter
+    tag: v0.12.0
+
+modelserver:
+  image:
+    registry: docker.io
+    repository: openvino
+    name: model_server:2025.1
+
+controllerResources:
+  requests:
+    cpu: 50m
+    memory: 96Mi
+  limits:
+    memory: 512Mi
+
+ovmsMemBufferBytes: 134217728
+ovmsRuntimeResources:
+  requests:
+    cpu: 1
+    memory: 8Gi
+  limits:
+    memory: 8Gi
+
+modelRegistration:
+  namespace: impt
+  serviceAccount: impt-modelregistration
+
+ovmsRuntimeNodeSelector:
+
+ovmsRuntimeTolerations:
+
+ovmsLivenessProbe:
+  exec:
+    command:
+      - curl
+      - --fail
+      - --silent
+      - --show-error
+      - --max-time
+      - "9"
+      - http://localhost:8888/v2/health/live
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+
+autoscalerEnabled: false
+autoscalerResources:
+  requests:
+    cpu: 50m
+    memory: 256Mi
+  limits:
+    memory: 256Mi
+
+s3_endpoint_url:
+s3_default_bucket: modelmesh
+s3_region: eu-central-1
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  privileged: false
+  runAsGroup: 10001
+  runAsNonRoot: true
+  runAsUser: 10001
+
+certificate:
+  secret_name: modelmesh-webhook-server-cert
+  issuerRef:
+    name: ca-issuer

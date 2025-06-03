@@ -3,7 +3,7 @@
 [project]
 name = "weights_uploader"
 version = "1.0.0"
-description = "Wights uploader service for Geti"
+description = "Weights uploader service for Geti"
 requires-python = ">=3.10, <3.11"
 
 dependencies = [

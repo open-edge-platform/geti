@@ -1,0 +1,82 @@
+minAllocableCpu: 0.5
+domain: ""
+platformVersion:
+buildVersion:
+intelEmail:
+# Owned namespaces are populated via impt-values template.
+invite_user_expiration: 1440
+acc_svc_invite_user_expiration: 43200
+not_activated_user_expiration_in_days: 30
+max_number_of_users_per_org: ""
+password_reset_expiration: 15
+log_level: "INFO"
+desired_disk_free: "30GB"
+render_gid: 0
+accelerator:
+  type: 'cpu'
+  name: ''
+dataStoragePath: ""
+
+global:
+  serverAddress: ''
+  grafana_enabled: ''
+  s3_credentials_provider: local
+  mongodb_credentials_provider: local
+  mongodb_address: ""
+  mongodb_database_name: geti
+  max_number_of_trainable_tasks: 2
+  max_number_of_labels: 1000
+  min_image_size: 32
+  max_image_size: 20000
+  min_video_size: 32
+  max_video_width: 7680
+  max_video_height: 4320
+  max_video_length: 10800
+  kafka_topic_prefix: ""
+  num_models_to_keep_in_storage: "-1"
+  telemetry_retention_k8s: ""
+  telemetry_retention_geti: ""
+
+feature_flags_data:
+  "FEATURE_FLAG_ALLOW_EXTERNAL_KEY_PROJECT_IMPORT": "true"
+  "FEATURE_FLAG_AMBIENT_MESH": "false"
+  "FEATURE_FLAG_ANALYTICS_WORKFLOW_ID": "true"
+  "FEATURE_FLAG_ANOMALY_REDUCTION": "true"
+  "FEATURE_FLAG_CAMERA_VIDEO_UPLOAD": "false"
+  "FEATURE_FLAG_CLASSIFICATION_RANGES": "true"
+  "FEATURE_FLAG_CREDIT_SYSTEM": "false"
+  "FEATURE_FLAG_DECORD_VIDEO_DECODER": "false"
+  "FEATURE_FLAG_KEYPOINT_DETECTION": "false"
+  "FEATURE_FLAG_KEYPOINT_DETECTION_DATASET_IE": "false"
+  "FEATURE_FLAG_MAINTENANCE_BANNER": "false"
+  "FEATURE_FLAG_OBJECT_STORAGE_OP": "true"
+  "FEATURE_FLAG_OFFLINE_INSTALLATION": "true"
+  "FEATURE_FLAG_OIDC_CIDAAS": "false"
+  "FEATURE_FLAG_ORG_QUOTAS": "false"
+  "FEATURE_FLAG_OTX_VERSION_SELECTION": "true"
+  "FEATURE_FLAG_OVMS_DEPLOYMENT_PACKAGE": "true"
+  "FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK": "true"
+  "FEATURE_FLAG_MANAGE_USERS": "false"
+  "FEATURE_FLAG_MANAGE_USERS_ROLES": "true"
+  "FEATURE_FLAG_ACC_SVC_MOD": "false"
+  "FEATURE_FLAG_STORAGE_SIZE_COMPUTATION": "true"
+  "FEATURE_FLAG_SUPPORT_CORS": "false"
+  "FEATURE_FLAG_UPLOAD_OTE_WEIGHTS": "true"
+  "FEATURE_FLAG_USER_ONBOARDING": "false"
+  "FEATURE_FLAG_VISUAL_PROMPT_SERVICE": "true"
+  "FEATURE_FLAG_WORKSPACE_ACTIONS": "false"
+  "FEATURE_FLAG_REQ_ACCESS": "false"
+  "FEATURE_FLAG_RETAIN_TRAINING_ARTIFACTS": "false"
+  "FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "false"
+
+bucket_name_compileddatasetshards: compileddatasetshards
+bucket_name_images: images
+bucket_name_models: models
+bucket_name_tensors: tensors
+bucket_name_thumbnails: thumbnails
+bucket_name_videos: videos
+bucket_name_codedeployments: codedeployments
+bucket_name_temporaryfiles: temporaryfiles
+bucket_name_modelmesh: modelmesh
+bucket_name_mlflowexperiments: mlflowexperiments
+bucket_name_pretrainedweights: pretrainedweights

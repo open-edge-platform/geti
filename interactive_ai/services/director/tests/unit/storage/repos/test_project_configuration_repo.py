@@ -1,7 +1,13 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from geti_configuration_tools.project_configuration import NullProjectConfiguration, TaskConfig
+from geti_configuration_tools.project_configuration import (
+    AutoTrainingParameters,
+    NullProjectConfiguration,
+    TaskConfig,
+    TrainConstraints,
+    TrainingParameters,
+)
 
 from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
@@ -67,3 +73,37 @@ class TestProjectConfigurationRepo:
         assert isinstance(retrieved_config, NullProjectConfiguration)
         assert retrieved_config.id_ == ID()
         assert retrieved_config.task_configs == []
+
+    def test_create_default_configuration(self, request, fxt_project_identifier):
+        # Arrange
+        repo = ProjectConfigurationRepo(fxt_project_identifier)
+        request.addfinalizer(lambda: repo.delete_all())
+
+        # Make sure no configurations exist
+        repo.delete_all()
+        initial_config = repo.get_project_configuration()
+        assert isinstance(initial_config, NullProjectConfiguration)
+
+        # Prepare task IDs
+        task_ids = [ID("task_1"), ID("task_2"), ID("task_3")]
+        expected_default_configurations = [
+            TaskConfig(
+                task_id=task_id,
+                training=TrainingParameters(
+                    constraints=TrainConstraints(),
+                ),
+                auto_training=AutoTrainingParameters(),
+            )
+            for task_id in task_ids
+        ]
+
+        # Act - Create default configuration
+        repo.create_default_configuration(task_ids)
+
+        # Assert - Verify the configuration was created
+        created_config = repo.get_project_configuration()
+        assert not isinstance(created_config, NullProjectConfiguration)
+        assert created_config.project_id == fxt_project_identifier.project_id
+
+        # Verify task configs
+        assert created_config.task_configs == expected_default_configurations

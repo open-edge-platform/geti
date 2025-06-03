@@ -1,0 +1,28 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
+{{- if .Values.global.istio_ambient_mesh }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+spec:
+  parentRefs:
+    - name: {{ .Values.global.istio_gateway_name }}
+      kind: Gateway
+      namespace: {{ .Values.global.istio_ingress_namespace }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api/v1/fileservice/
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: {{ include "seaweed-fs.fullname" . }}
+          port: {{ .Values.service.port }}
+{{- end}}

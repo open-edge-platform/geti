@@ -1,0 +1,6 @@
+apiVersion: v2
+name: opa
+description: Open Policy Agent
+type: application
+version: 0.0.5
+appVersion: "0.66.0"

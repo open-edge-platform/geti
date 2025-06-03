@@ -1,0 +1,37 @@
+# Copyright 2021 IBM Corporation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# The following manifests contain a self-signed issuer CR and a certificate CR.
+# More document can be found at https://docs.cert-manager.io
+# WARNING: Targets CertManager 0.11 check https://docs.cert-manager.io/en/latest/tasks/upgrading/index.html for
+# breaking changes
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: modelmesh-webhook-server-cert # this name should match the one appeared in kustomizeconfig.yaml
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "modelmesh-serving.labels" . | nindent 4 }}
+spec:
+  # SERVICE_NAME_PLACEHOLDER and SERVICE_NAMESPACE_PLACEHOLDER will be substituted by kustomize
+  dnsNames:
+    - modelmesh-webhook-server-service.{{ .Release.Namespace }}.svc
+    - modelmesh-webhook-server-service.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    kind: ClusterIssuer
+    name: {{ .Values.certificate.issuerRef.name }}
+    group: cert-manager.io
+  secretName: {{ .Values.certificate.secret_name }} # this secret will not be prefixed, since it's not managed by kustomize
+  duration: 4380h0m0s
+  renewBefore: 24h0m0s

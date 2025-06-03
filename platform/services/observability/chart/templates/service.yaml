@@ -1,3 +1,4 @@
+{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 ---
 apiVersion: v1
 kind: Service
@@ -18,3 +19,4 @@ spec:
       port: {{ .Values.port }}
       protocol: TCP
       appProtocol: http
+{{- end }}

@@ -1,0 +1,49 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: modelmesh-serving-auth-policy
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  {{- if not .Values.global.istio_ambient_mesh }}
+  selector:
+    matchLabels:
+      modelmesh-service: modelmesh-serving
+{{/*  {{- else }}*/}}
+{{/*  targetRefs:*/}}
+{{/*    - kind: Gateway*/}}
+{{/*      group: gateway.networking.k8s.io*/}}
+{{/*      name: {{ .Values.global.waypoint.name }}*/}}
+  {{- end }}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/impt/sa/impt-inference-gateway"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/impt/sa/impt-modelmesh"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/impt/sa/modelmesh-controller"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/impt/sa/modelmesh"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/impt/sa/impt-opentelemetry-collector"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/impt/sa/impt-etcd"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/impt/sa/modelmesh-autoscaler"]
+        namespaces: ["impt"]
+{{/*    to:*/}}
+{{/*      paths:*/}}
+{{/*        - "?????"  # TODO*/}}
+{{- end }}

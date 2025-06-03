@@ -127,5 +127,5 @@ class KeypointDetectionCounterConfig(DatasetCounterConfig):
         description="The minimum number of new annotations required "
         "before auto-train is triggered. Auto-training will start every time "
         "that this number of annotations is created.",
-        visible_in_ui=False,
+        visible_in_ui=True,
     )

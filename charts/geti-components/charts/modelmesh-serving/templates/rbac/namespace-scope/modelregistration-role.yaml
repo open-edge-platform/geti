@@ -1,0 +1,19 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: modelregistration
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+    - serving.kserve.io
+  resources:
+    - inferenceservices
+  verbs:
+    - create
+    - get
+    - update
+    - patch
+    - delete
+    - watch
+    - list

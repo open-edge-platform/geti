@@ -1,0 +1,32 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svcPort := .Values.service.ports.http.port -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+    - uri:
+        prefix: "/dex"
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    route:
+    - destination:
+        host: {{ .Release.Namespace }}-{{ .Chart.Name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svcPort }}
+{{- end }}

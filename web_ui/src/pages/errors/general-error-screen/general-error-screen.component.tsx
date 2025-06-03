@@ -25,6 +25,7 @@ export const ErrorScreen = ({ errorMessage, resetErrorBoundary }: ErrorScreenPro
                     variant='overBackground'
                     onPress={() => {
                         // hard refresh
+                        resetErrorBoundary();
                         redirectTo(window.location.href);
                     }}
                 >

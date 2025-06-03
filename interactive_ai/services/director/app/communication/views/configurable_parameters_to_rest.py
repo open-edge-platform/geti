@@ -5,12 +5,13 @@ from typing import Any
 
 from pydantic import BaseModel
 
-PYDANTIC_TYPES_MAPPING = {
+PYDANTIC_BASE_TYPES_MAPPING = {
     "integer": "int",
     "number": "float",
     "boolean": "bool",
     "string": "str",
 }
+PYDANTIC_ANY_OF = "anyOf"
 
 
 class ConfigurableParametersRESTViews:
@@ -22,28 +23,39 @@ class ConfigurableParametersRESTViews:
     """
 
     @staticmethod
-    def _parameter_to_rest(key: str, value: float | str | bool, json_schema: dict) -> dict[str, Any]:
+    def _parameter_to_rest(key: str, rest_type: str, value: float | str | bool, json_schema: dict) -> dict[str, Any]:
         """
         Convert a single parameter to its REST representation.
 
         :param key: The parameter name/key
+        :param rest_type: The parameter type (int, float, string, or boolean)
         :param value: The parameter value (int, float, string, or boolean)
         :param json_schema: The JSON schema for the parameter from the Pydantic model
         :return: Dictionary containing the REST representation of the parameter
         """
+        default = json_schema.get("default")
+        default_value = default if default is not None else json_schema.get("default_value")
         rest_view = {
             "key": key,
             "name": json_schema.get("title"),
+            "type": rest_type,
             "description": json_schema.get("description"),
             "value": value,
-            "default_value": json_schema.get("default"),
+            "default_value": default_value,
         }
         # optional parameter may contain `'anyOf': [{'exclusiveMinimum': 0, 'type': 'integer'}, {'type': 'null'}]`
-        type_any_of = json_schema.get("anyOf", [{}])[0]
-        rest_view["type"] = PYDANTIC_TYPES_MAPPING.get(json_schema.get("type", type_any_of.get("type")))
+        type_any_of = json_schema.get(PYDANTIC_ANY_OF, [{}])[0]
+        rest_view["type"] = PYDANTIC_BASE_TYPES_MAPPING.get(json_schema.get("type", type_any_of.get("type")))
         if rest_view["type"] in ["int", "float"]:
-            rest_view["min_value"] = json_schema.get("minimum", type_any_of.get("exclusiveMinimum"))
-            rest_view["max_value"] = json_schema.get("maximum", type_any_of.get("exclusiveMaximum"))
+            # min/max values can be contained in "minimum", "exclusiveMinimum" or 'anyOf.*'
+            rest_view["min_value"] = json_schema.get(
+                "minimum",
+                json_schema.get("exclusiveMinimum", type_any_of.get("minimum", type_any_of.get("exclusiveMinimum"))),
+            )
+            rest_view["max_value"] = json_schema.get(
+                "maximum",
+                json_schema.get("exclusiveMaximum", type_any_of.get("maximum", type_any_of.get("exclusiveMaximum"))),
+            )
         return rest_view
 
     @classmethod
@@ -72,21 +84,32 @@ class ConfigurableParametersRESTViews:
         nested_params: dict[str, Any] = {}
         list_params: list[dict[str, Any]] = []
 
+        json_model = configurable_parameters.model_json_schema()
         for field_name in configurable_parameters.model_fields:
             field = getattr(configurable_parameters, field_name)
-            if isinstance(field, BaseModel):
-                # If the field is a nested Pydantic model, process it recursively
-                nested_params[field_name] = cls.configurable_parameters_to_rest(field)
-            else:
+
+            schema = json_model["properties"][field_name]
+            # optional parameter may contain `'anyOf': [{'exclusiveMinimum': 0, 'type': 'integer'}, {'type': 'null'}]`
+            type_any_of = schema.get(PYDANTIC_ANY_OF, [{}])[0]
+            pydantic_type = schema.get("type", type_any_of.get("type"))
+
+            if field is None:
+                # Do not show None values in the REST view. None parameters means they are not supported
+                continue
+
+            if pydantic_type in PYDANTIC_BASE_TYPES_MAPPING:
                 # If the field is a simple type, convert directly to REST view
-                json_model = configurable_parameters.model_json_schema()
                 list_params.append(
                     cls._parameter_to_rest(
                         key=field_name,
+                        rest_type=PYDANTIC_BASE_TYPES_MAPPING[pydantic_type],
                         value=field,
-                        json_schema=json_model["properties"][field_name],
+                        json_schema=schema,
                     )
                 )
+            else:
+                # If the field is a nested Pydantic model, process it recursively
+                nested_params[field_name] = cls.configurable_parameters_to_rest(configurable_parameters=field)
 
         # Return combined or individual results based on content
         if nested_params and list_params:

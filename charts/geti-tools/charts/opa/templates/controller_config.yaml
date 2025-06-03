@@ -1,0 +1,31 @@
+############################################################
+# OPA admission controller configuration.
+############################################################
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: opa-istio-admission-controller
+  annotations:
+    cert-manager.io/inject-ca-from: opa-istio/opa-tls-certificate
+webhooks:
+  - name: istio.openpolicyagent.org
+    clientConfig:
+      service:
+        name: admission-controller
+        namespace: {{ .Values.namespace.opa }}
+        path: "/v0/data/istio/inject"
+      caBundle: cGxhY2Vob2xkZXI=
+    rules:
+      - operations: ["CREATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+    namespaceSelector:
+      matchLabels:
+        opa-istio-injection: enabled
+    objectSelector:
+      matchLabels:
+        opa_envoy_filter: enabled
+    failurePolicy: Fail
+    admissionReviewVersions: ["v1beta1"]
+    sideEffects: None

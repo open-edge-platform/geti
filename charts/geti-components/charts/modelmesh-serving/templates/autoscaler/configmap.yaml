@@ -1,0 +1,20 @@
+---
+{{- if .Values.autoscalerEnabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: modelmesh-autoscaler-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "modelmesh-serving.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    namespace: {{ .Release.Namespace }}
+    min_modelserver_instances: 1
+    max_modelserver_instances: 100
+    downscale_interval_seconds: 3600
+    max_percentage_memory_usage_threshold: 70.0
+    min_percentage_cpu_usage_threshold: 0.05
+    modelmesh_label_selector: "modelmesh-service=modelmesh-serving"
+    modelmesh_config_map: "model-serving-config-defaults"
+{{- end }}

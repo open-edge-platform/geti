@@ -1,0 +1,96 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+{{- $svc_name := printf "%s-%s" .Release.Namespace .Chart.Name -}}
+{{- $svc_port := index (index .Values.ports "otlp-http") "servicePort" -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+    - uri:
+        prefix: "/api/v1/metrics"
+    rewrite:
+      uri: "/v1/metrics"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "tools-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "tools-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "tools-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+  - match:
+    - uri:
+        prefix: "/api/v1/traces"
+    rewrite:
+      uri: "/v1/traces"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "tools-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "tools-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "tools-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+  - match:
+    - uri:
+        prefix: "/api/v1/otel_logs"
+    rewrite:
+      uri: "/v1/logs"
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "tools-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "tools-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "tools-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ .Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ .Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 8 }}
+    timeout: 360s
+    route:
+    - destination:
+        host: {{ $svc_name }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ $svc_port }}
+{{- end }}

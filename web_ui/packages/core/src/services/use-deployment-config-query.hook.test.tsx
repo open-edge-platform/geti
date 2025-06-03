@@ -58,7 +58,7 @@ describe('useDeploymentConfigQuery', () => {
             const { result } = renderDeploymentConfigHook();
 
             await waitFor(() => {
-                expect(result.current).not.toBeNull();
+                expect(result.current.data).not.toBeUndefined();
             });
 
             const data = result.current.data;
@@ -74,7 +74,7 @@ describe('useDeploymentConfigQuery', () => {
             const { result } = renderDeploymentConfigHook({ isAdmin: true });
 
             await waitFor(() => {
-                expect(result.current).not.toBeNull();
+                expect(result.current.data).not.toBeUndefined();
             });
 
             const data = result.current.data;
@@ -99,7 +99,7 @@ describe('useDeploymentConfigQuery', () => {
         const { result } = renderDeploymentConfigHook();
 
         await waitFor(() => {
-            expect(result.current).not.toBeUndefined();
+            expect(result.current.data).not.toBeUndefined();
         });
 
         const data = result.current.data;
@@ -133,7 +133,7 @@ describe('useDeploymentConfigQuery', () => {
         const { result } = renderDeploymentConfigHook({ isAdmin: true });
 
         await waitFor(() => {
-            expect(result.current).not.toBeUndefined();
+            expect(result.current.data).not.toBeUndefined();
         });
 
         const data = result.current.data;
@@ -168,7 +168,7 @@ describe('useDeploymentConfigQuery', () => {
         const { result } = renderDeploymentConfigHook({ isAdmin: true });
 
         await waitFor(() => {
-            expect(result.current).not.toBeUndefined();
+            expect(result.current.data).not.toBeUndefined();
         });
 
         const data = result.current.data;
@@ -201,7 +201,7 @@ describe('useDeploymentConfigQuery', () => {
         const { result } = renderDeploymentConfigHook({ isAdmin: true });
 
         await waitFor(() => {
-            expect(result.current).not.toBeUndefined();
+            expect(result.current.data).not.toBeUndefined();
         });
 
         const data = result.current.data;
@@ -238,7 +238,7 @@ describe('useDeploymentConfigQuery', () => {
         const { result } = renderDeploymentConfigHook({ isAdmin: true });
 
         await waitFor(() => {
-            expect(result.current).not.toBeUndefined();
+            expect(result.current.data).not.toBeUndefined();
         });
 
         const data = result.current.data;
@@ -261,7 +261,7 @@ describe('useDeploymentConfigQuery', () => {
         const { result } = renderDeploymentConfigHook();
 
         await waitFor(() => {
-            expect(result.current).not.toBeUndefined();
+            expect(result.current.data).not.toBeUndefined();
         });
 
         const data = result.current.data;
@@ -285,7 +285,7 @@ describe('useDeploymentConfigQuery', () => {
             const { result } = renderDeploymentConfigHook();
 
             await waitFor(() => {
-                expect(result.current).not.toBeUndefined();
+                expect(result.current.data).not.toBeUndefined();
             });
 
             const data = result.current.data;
@@ -307,7 +307,7 @@ describe('useDeploymentConfigQuery', () => {
             const { result } = renderDeploymentConfigHook();
 
             await waitFor(() => {
-                expect(result.current).not.toBeUndefined();
+                expect(result.current.data).not.toBeUndefined();
             });
 
             const data = result.current.data;

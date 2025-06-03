@@ -42,6 +42,9 @@
   prHourlyLimit: 5,
   ignorePaths: [], // to include tests folders as well as `config:base` ignores it
 
+  // https://docs.renovatebot.com/golang/
+  postUpdateOptions: ["gomodTidy"],
+
   packageRules: [
     // Enable pinning for container images
     // https://docs.renovatebot.com/presets-docker/#dockerpindigests
@@ -126,14 +129,40 @@
       matchFileNames: ["**/Dockerfile.protoc"],
     },
 
-    // Group all GitHub Actions dependencies
+    // Group minor/patch/digest GitHub Actions updates
     {
       enabled: true,
       groupName: "GitHub Actions",
       matchManagers: ["github-actions"],
       matchPackagePatterns: ["*"],
-      matchUpdateTypes: ["minor", "patch", "major"],
+      matchUpdateTypes: ["minor", "patch", "digest", "pinDigest"],
       schedule: ["every 4 weeks on Sunday"],
+    },
+
+    // Group major GitHub Actions updates
+    {
+      enabled: true,
+      groupName: "GitHub Actions major",
+      matchManagers: ["github-actions"],
+      matchPackagePatterns: ["*"],
+      matchUpdateTypes: ["major"],
+      schedule: ["every 4 weeks on Sunday"],
+    },
+
+    // Go version used in GitHub Actions is updated manually
+    {
+      enabled: false,
+      matchDatasources: ["github-releases"],
+      matchDepNames: ["go"],
+      matchDepTypes: ["uses-with"],
+    },
+
+    // Node version used in GitHub Actions is updated manually
+    {
+      enabled: false,
+      matchDatasources: ["github-releases"],
+      matchDepNames: ["node"],
+      matchDepTypes: ["uses-with"],
     },
   ],
 

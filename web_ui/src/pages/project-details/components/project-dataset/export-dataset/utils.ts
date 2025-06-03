@@ -54,6 +54,7 @@ export const AVAILABLE_FORMATS: ExportFormatDetails[] = [
             DOMAIN.DETECTION_ROTATED_BOUNDING_BOX,
             DOMAIN.SEGMENTATION,
             DOMAIN.SEGMENTATION_INSTANCE,
+            DOMAIN.KEYPOINT_DETECTION,
         ],
     },
     {
