@@ -353,6 +353,7 @@ class JobManager(metaclass=Singleton):
         key: str | None = None,
         author_uid: str | None = None,
         start_time: TimestampFilter | None = None,
+        creation_time: TimestampFilter | None = None,
         acl: JobsAcl | None = None,
     ) -> int:
         """
@@ -365,6 +366,7 @@ class JobManager(metaclass=Singleton):
         :param key: job's key
         :param author_uid: job's author UID
         :param start_time: job's start time from/to range
+        :param creation_time: job's creation time from/to range
         :param acl: jobs ACL (access control list)
         :return number of jobs found
         """
@@ -376,6 +378,7 @@ class JobManager(metaclass=Singleton):
             acl_filter=self._get_acl_filter(acl=acl),
             author_uid=author_uid,
             start_time=start_time,
+            creation_time=creation_time,
             project_id=project_id,
         )
         job_repo: SessionBasedRepo[Job] = (
@@ -390,6 +393,7 @@ class JobManager(metaclass=Singleton):
         project_id: ID | None = None,
         author_uid: str | None = None,
         start_time: TimestampFilter | None = None,
+        creation_time: TimestampFilter | None = None,
         acl: JobsAcl | None = None,
     ) -> JobsCount:
         """
@@ -399,6 +403,7 @@ class JobManager(metaclass=Singleton):
         :param project_id: job's project ID
         :param author_uid: job's author UID
         :param start_time: job's start time from/to range
+        :param creation_time: job's creation time from/to range
         :param acl: jobs ACL (access control list)
         :return: JobCount object
         """
@@ -407,6 +412,7 @@ class JobManager(metaclass=Singleton):
             acl_filter=self._get_acl_filter(acl=acl),
             author_uid=author_uid,
             start_time=start_time,
+            creation_time=creation_time,
             project_id=project_id,
         )
         aggr_pipeline = [{"$match": job_filter}] if job_filter else []
@@ -433,6 +439,7 @@ class JobManager(metaclass=Singleton):
         key: str | None = None,
         author_uid: str | None = None,
         start_time: TimestampFilter | None = None,
+        creation_time: TimestampFilter | None = None,
         acl: JobsAcl | None = None,
         pagination: Pagination | None = None,
         sort_by: JobSortingField | None = None,
@@ -447,6 +454,7 @@ class JobManager(metaclass=Singleton):
         :param key: job's key
         :param author_uid: job's author UID
         :param start_time: job's start time from/to range
+        :param creation_time: job's creation time from/to range
         :param acl: jobs ACL (access control list)
         :param pagination: query pagination
         :param sort_by: Sorting field to sort by
@@ -462,6 +470,7 @@ class JobManager(metaclass=Singleton):
             normalized_key=normalized_key,
             author_uid=author_uid,
             start_time=start_time,
+            creation_time=creation_time,
             project_id=project_id,
         )
         aggr_pipeline: list[dict] = [{"$match": job_filter}]
@@ -495,6 +504,7 @@ class JobManager(metaclass=Singleton):
         normalized_key: str | None = None,
         author_uid: str | None = None,
         start_time: TimestampFilter | None = None,
+        creation_time: TimestampFilter | None = None,
         project_id: ID | None = None,
     ) -> dict:
         job_filter: dict[Any, Any] = {}
@@ -515,6 +525,9 @@ class JobManager(metaclass=Singleton):
         start_time_filter = JobManager._get_timestamp_filter(start_time)
         if start_time_filter is not None:
             job_filter["start_time"] = start_time_filter
+        creation_time_filter = JobManager._get_timestamp_filter(creation_time)
+        if creation_time_filter is not None:
+            job_filter["start_time"] = creation_time_filter
         return job_filter
 
     @staticmethod

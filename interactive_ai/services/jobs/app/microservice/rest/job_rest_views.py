@@ -28,6 +28,8 @@ class FindJobsQuery:
     author_uid: str | None = None
     start_time_from: datetime | None = None
     start_time_to: datetime | None = None
+    creation_time_from: datetime | None = None
+    creation_time_to: datetime | None = None
     sort_by: JobSortingField | None = None
     sort_direction: SortDirection | None = None
 
@@ -134,27 +136,36 @@ class JobRestViews:
         :param find_query: query information
         :return: URL for the next page
         """
-        next_page = (
+        base_url = (
             f"/api/v1/organizations/{str(find_query.organization_id)}/workspaces/{str(find_query.workspace_id)}/jobs"
-            f"?limit={str(find_query.pagination.limit)}&skip={str(offset)}"
         )
-        if find_query.project_id is not None:
-            next_page += f"&project_id={find_query.project_id}"
-        if find_query.state_group is not None:
-            next_page += f"&state={find_query.state_group.name}"
-        for job_type in find_query.job_types or []:
-            next_page += f"&job_type={job_type}"
-        if find_query.key is not None:
-            next_page += f"&key={find_query.key}"
-        if find_query.author_uid is not None:
-            next_page += f"&author_uid={find_query.author_uid}"
-        if find_query.start_time_from is not None:
-            next_page += f"&start_time_from={find_query.start_time_from.isoformat()}"
-        if find_query.start_time_to is not None:
-            next_page += f"&start_time_to={find_query.start_time_to.isoformat()}"
-        if find_query.sort_by is not None:
-            next_page += f"&sort_by={find_query.sort_by.name}"
-        if find_query.sort_direction is not None:
-            next_page += f"&sort_direction={find_query.sort_direction.name}"
 
-        return next_page
+        # Map query attributes to URL parameters with transformers
+        params = [
+            ("limit", find_query.pagination.limit, str),
+            ("skip", offset, str),
+            ("project_id", find_query.project_id, str),
+            ("state", find_query.state_group, lambda x: x.name),
+            ("key", find_query.key, None),
+            ("author_uid", find_query.author_uid, None),
+            ("start_time_from", find_query.start_time_from, lambda x: x.isoformat()),
+            ("start_time_to", find_query.start_time_to, lambda x: x.isoformat()),
+            ("creation_time_from", find_query.creation_time_from, lambda x: x.isoformat()),
+            ("creation_time_to", find_query.creation_time_to, lambda x: x.isoformat()),
+            ("sort_by", find_query.sort_by, lambda x: x.name),
+            ("sort_direction", find_query.sort_direction, lambda x: x.name),
+        ]
+
+        # Build query parameters
+        query_params = []
+        for param_name, value, transformer in params:
+            if value is not None:
+                transformed_value = transformer(value) if transformer else value
+                query_params.append(f"{param_name}={transformed_value}")
+
+        # Handle job_types separately as it's a sequence
+        for job_type in find_query.job_types or []:
+            query_params.append(f"job_type={job_type}")
+
+        # Combine URL with query parameters
+        return f"{base_url}?{'&'.join(query_params)}"

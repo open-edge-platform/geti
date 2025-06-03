@@ -99,11 +99,11 @@ class TestJobRESTViews:
             f"?limit={str(pagination.limit)}&skip={str(offset)}"
             f"&project_id={project_id}"
             f"&state={JobStateGroup.SCHEDULED.name}"
-            f"&job_type=train"
             f"&key={DUMMY_JOB_KEY}"
             f"&author_uid={DUMMY_AUTHOR}"
             f"&start_time_from={DUMMY_TIME.isoformat()}"
             f"&start_time_to={DUMMY_TIME.isoformat()}"
+            f"&job_type=train"
         )
 
         # Act
