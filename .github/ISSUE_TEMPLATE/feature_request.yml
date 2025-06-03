@@ -28,7 +28,7 @@ body:
       description: Describe this feature from the user’s perspective.
       placeholder: "As a <type of user>, I want to <do something> so that <benefit>."
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: requirements
