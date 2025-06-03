@@ -194,8 +194,9 @@ export const DatasetImportToNewProjectProvider = ({ children }: DatasetImportToN
                 onError: (error) => {
                     if (error.response?.status === HttpStatusCode.NotFound) {
                         deleteLsDatasetImport(datasetImport.id);
+                    } else {
+                        addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
                     }
-                    addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
                 },
             }
         );
