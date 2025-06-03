@@ -9,6 +9,8 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum, auto
 
+from geti_configuration_tools.training_configuration import TrainingConfiguration
+
 from communication.exceptions import JobCreationFailedException
 
 from geti_types import ID, ProjectIdentifier
@@ -107,6 +109,7 @@ class TrainTaskJobData:
     workspace_id: ID
     max_training_dataset_size: int | None
     dataset_storage: DatasetStorage
+    training_configuration: TrainingConfiguration
     hyper_parameters_id: ID | None
     min_annotation_size: int | None = None
     max_number_of_annotations: int | None = None
@@ -155,6 +158,7 @@ class TrainTaskJobData:
             "max_number_of_annotations": self.max_number_of_annotations,
             "reshuffle_subsets": self.reshuffle_subsets,
             "keep_mlflow_artifacts": self.keep_mlflow_artifacts,
+            "hyperparameters": self.training_configuration.hyperparameters.model_dump(),
         }
 
     def create_metadata(self) -> dict:

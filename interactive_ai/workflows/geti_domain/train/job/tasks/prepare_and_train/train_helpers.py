@@ -81,6 +81,7 @@ class _ModelBuilder:
         label_schema: LabelSchema,
         hyper_parameters: HyperParameters,
         model_version: int,
+        revamped_hyperparameters: dict,
     ):
         self._model_repo = model_repo
         self._project = project
@@ -89,6 +90,7 @@ class _ModelBuilder:
         self._model_configuration = ModelConfiguration(
             configurable_parameters=hyper_parameters.data,
             label_schema=label_schema,
+            display_only_configuration=revamped_hyperparameters,
         )
         self._model_version = model_version
 
@@ -230,6 +232,7 @@ def prepare_train(train_data: TrainWorkflowData, dataset: Dataset) -> TrainOutpu
         label_schema=label_schema,
         hyper_parameters=hyper_parameters,
         model_version=model_version,
+        revamped_hyperparameters=train_data.hyperparameters,
     )
 
     output_base_model = model_builder.create_model(
