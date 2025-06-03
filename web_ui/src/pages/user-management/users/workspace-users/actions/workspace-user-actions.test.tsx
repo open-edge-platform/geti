@@ -43,9 +43,7 @@ const mockedResourceIdentifier: Resource = {
 
 jest.mock('../../../../../core/platform-utils/hooks/use-platform-utils.hook', () => ({
     ...jest.requireActual('../../../../../core/platform-utils/hooks/use-platform-utils.hook'),
-    usePlatformUtils: jest.fn(() => ({
-        useProductInfo: mockedUseProductInfo,
-    })),
+    useProductInfo: mockedUseProductInfo,
 }));
 
 jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({

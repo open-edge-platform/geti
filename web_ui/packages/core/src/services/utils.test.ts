@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AxiosError, AxiosResponse } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, AxiosResponse, HttpStatusCode } from 'axios';
 
 import { JobStepState } from '../../../../src/core/jobs/jobs.const';
 import { getMockedJob, getMockedJobStep } from '../../../../src/test-utils/mocked-items-factory/mocked-jobs';
@@ -14,13 +13,13 @@ import {
     UNPROCESSABLE_ENTITY_MESSAGE,
 } from './utils';
 
-const SUPPORTED_HTTP_CODES: (StatusCodes.UNPROCESSABLE_ENTITY | StatusCodes.FORBIDDEN)[] = [
-    StatusCodes.UNPROCESSABLE_ENTITY,
-    StatusCodes.FORBIDDEN,
+const SUPPORTED_HTTP_CODES: (HttpStatusCode.UnprocessableEntity | HttpStatusCode.Forbidden)[] = [
+    HttpStatusCode.UnprocessableEntity,
+    HttpStatusCode.Forbidden,
 ];
 const mapStatusCodeToMessage = {
-    [StatusCodes.UNPROCESSABLE_ENTITY]: UNPROCESSABLE_ENTITY_MESSAGE,
-    [StatusCodes.FORBIDDEN]: FORBIDDEN_MESSAGE,
+    [HttpStatusCode.UnprocessableEntity]: UNPROCESSABLE_ENTITY_MESSAGE,
+    [HttpStatusCode.Forbidden]: FORBIDDEN_MESSAGE,
 };
 
 describe('Services utils', () => {
@@ -49,9 +48,7 @@ describe('Services utils', () => {
                 toJSON: jest.fn(),
             };
 
-            expect(getErrorMessageByStatusCode(mockAxiosError)).toEqual(
-                `Error: ${mockAxiosError.response.data.message}`
-            );
+            expect(getErrorMessageByStatusCode(mockAxiosError)).toEqual(mockAxiosError.response.data.message);
         });
 
         it('returns the respective message base on the error status code', () => {

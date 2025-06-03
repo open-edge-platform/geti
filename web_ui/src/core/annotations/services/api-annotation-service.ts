@@ -2,8 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { apiClient } from '@geti/core';
-import { isAxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { HttpStatusCode, isAxiosError } from 'axios';
 
 import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { API_URLS } from '../../../../packages/core/src/services/urls';
@@ -45,7 +44,7 @@ export const createApiAnnotationService: CreateApiService<AnnotationService> = (
 
             return getAnnotationsFromDTO(data.annotations, projectLabels);
         } catch (error) {
-            if (isAxiosError(error) && error.response?.status === StatusCodes.NOT_FOUND) {
+            if (isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound) {
                 return [];
             }
 

@@ -5,4 +5,6 @@ properties:
   nodes:
     type: array
     items:
-      $ref: '../../../mongo_id.yaml'
+      anyOf:
+        - type: string
+        - $ref: '../../../mongo_id.yaml'

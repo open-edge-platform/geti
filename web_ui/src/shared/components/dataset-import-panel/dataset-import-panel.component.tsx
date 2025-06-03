@@ -6,7 +6,6 @@ import { FC, PropsWithChildren, useRef } from 'react';
 import { ActionButton, Divider, Flex, Loading, Text, View } from '@geti/ui';
 import { Alert, InfoOutline } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
-import { noop } from 'lodash-es';
 import { useParams } from 'react-router-dom';
 
 import { DATASET_IMPORT_MESSAGE } from '../../../core/datasets/dataset.const';
@@ -135,15 +134,11 @@ export const DatasetImportPanel: FC<DatasetImportPanelProps> = ({
     const preparingStatusJob = usePreparingStatusJob({
         data: { organizationId, workspaceId, jobId: String(datasetImportItem.preparingJobId) },
         enabled: isPreparing,
-        onError: noop,
-        onSuccess: noop,
     });
 
     const importingStatusJob = useImportingStatusJob({
         data: { organizationId, workspaceId, jobId: String(datasetImportItem.importingJobId) },
         enabled: isImporting,
-        onError: noop,
-        onSuccess: noop,
     });
 
     const onFileInputChange = onValidFileList(([file]: File[]) => {

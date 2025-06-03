@@ -10,9 +10,7 @@ import AboutPage from './about-page.component';
 
 jest.mock('../../core/platform-utils/hooks/use-platform-utils.hook', () => ({
     ...jest.requireActual('../../core/platform-utils/hooks/use-platform-utils.hook'),
-    usePlatformUtils: jest.fn(() => ({
-        useProductInfo: jest.fn(() => ({ data: { productVersion: '1.15.0-test-20240227114821' } })),
-    })),
+    useProductInfo: jest.fn(() => ({ data: { productVersion: '1.15.0-test-20240227114821' } })),
 }));
 
 jest.mock('../../hooks/use-is-saas-env/use-is-saas-env.hook', () => ({

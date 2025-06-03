@@ -1,0 +1,34 @@
+{{- if eq .Values.mode "deployment" -}}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "spice-db.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "spice-db.fullname" . }}
+  {{- if .Values.global.running_on_vm }}
+  minReplicas: 1
+  maxReplicas: 1
+  {{- else }}
+  minReplicas: 2
+  maxReplicas: 20
+  {{- end }}
+  metrics:
+    - type: ContainerResource
+      containerResource:
+        name: cpu
+        container: "spicedb"
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: ContainerResource
+      containerResource:
+        name: memory
+        container: "spicedb"
+        target:
+          type: Utilization
+          averageUtilization: 70
+{{- end }}

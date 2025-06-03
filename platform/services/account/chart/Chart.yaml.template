@@ -1,0 +1,6 @@
+---
+name: account-service
+version: '{{VERSION}}'
+appVersion: '{{VERSION}}'
+apiVersion: v2
+description: account service

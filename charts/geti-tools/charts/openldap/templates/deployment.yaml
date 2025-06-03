@@ -1,0 +1,188 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "openldap.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "openldap.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "openldap.selectorLabels" . | nindent 8 }}
+    spec:
+      terminationGracePeriodSeconds: 120
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
+      initContainers:
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              find /bitnami/openldap/data -type d -exec chown -v {{ .Values.ldapSecurityContext.runAsUser }} {} +
+              find /bitnami/openldap/slapd.d -type d -exec chown -v {{ .Values.ldapSecurityContext.runAsUser }} {} +
+          volumeMounts:
+            - name: data-storage
+              mountPath: /bitnami/openldap/slapd.d
+              readOnly: false
+              subPath: openldap-config
+            - name: data-storage
+              mountPath: /bitnami/openldap/data
+              readOnly: false
+              subPath: openldap-data
+          resources:
+            {{ toYaml .Values.initResources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.volumeSecurityContext | nindent 12 }}
+      containers:
+        - name: openldap
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          env:
+            {{- if .Values.debug }}
+            - name: BITNAMI_DEBUG
+              value: "true"
+            # https://www.openldap.org/doc/admin26/slapdconfig.html
+            - name: LDAP_LOGLEVEL
+              value: "4"
+            {{- end }}
+            - name: LDAP_CONFIG_ADMIN_ENABLED
+              value: "yes"
+            - name: LDAP_CONFIGURE_PPOLICY
+              value: "yes"
+            - name: LDAP_PPOLICY_HASH_CLEARTEXT
+              value: "yes"
+            - name: LDAP_READONLY_USER_ENABLED
+              value: "yes"
+            - name: LDAP_CONFIG_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: config_username
+                  name: "{{ .Values.global.ldap_service_user_secret_name }}"
+            - name: LDAP_CONFIG_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: config_password
+                  name: "{{ .Values.global.ldap_service_user_secret_name }}"
+            - name: LDAP_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: "{{ .Values.global.ldap_service_user_secret_name }}"
+            - name: LDAP_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: "{{ .Values.global.ldap_service_user_secret_name }}"
+            - name: LDAP_READONLY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: readonly_username
+                  name: "{{ .Values.global.ldap_service_user_secret_name }}"
+            - name: LDAP_READONLY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: readonly_password
+                  name: "{{ .Values.global.ldap_service_user_secret_name }}"
+          securityContext:
+            {{ toYaml .Values.ldapSecurityContext | nindent 12 }}
+          resources:
+            {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data-storage
+              mountPath: /bitnami/openldap/slapd.d
+              readOnly: false
+              subPath: openldap-config
+            - name: data-storage
+              mountPath: /bitnami/openldap/data
+              readOnly: false
+              subPath: openldap-data
+            - name: config
+              mountPath: /ldifs/impt.ldif
+              subPath: impt.ldif
+              readOnly: true
+            - name: config
+              mountPath: /opt/bitnami/scripts/libopenldap.sh 
+              subPath: libopenldap.sh
+              readOnly: true
+            {{- if not .Values.global.enable_local_image_pull_secret }}
+            - name: config
+              mountPath: /opt/bitnami/openldap/lib/openldap/pw-pbkdf2.so.0.0.0
+              subPath: pw-pbkdf2.so.0.0.0
+              readOnly: true
+            - name: config
+              mountPath: /opt/bitnami/openldap/lib/openldap/pw-pbkdf2.so.0
+              subPath: pw-pbkdf2.so.0.0.0
+              readOnly: true
+            - name: config
+              mountPath: /opt/bitnami/openldap/lib/openldap/pw-pbkdf2.so
+              subPath: pw-pbkdf2.so.0.0.0
+              readOnly: true
+            - name: config
+              mountPath: /configldifs/pbkdf2.ldif
+              subPath: pbkdf2.ldif
+              readOnly: true
+            - name: config
+              mountPath: /configldifs/ppolicy_module.ldif
+              subPath: ppolicy_module.ldif
+              readOnly: true
+            - name: config
+              mountPath: /configldifs/ppolicy_overlay.ldif
+              subPath: ppolicy_overlay.ldif
+              readOnly: true
+            - name: config
+              mountPath: /configldifs/db_max_size.ldif
+              subPath: db_max_size.ldif
+              readOnly: true
+            {{- end }}
+            - name: config
+              mountPath: /ldifs/ppolicy_container.ldif
+              subPath: ppolicy_container.ldif
+              readOnly: true
+            - name: config
+              mountPath: /ldifs/ppolicy_rules.ldif
+              subPath: ppolicy_rules.ldif
+              readOnly: true
+          ports:
+            - name: ldap
+              containerPort: {{ .Values.service.ports.ldap.targetport }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: ldap
+            initialDelaySeconds: 35
+            periodSeconds: 5
+            timeoutSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: ldap
+            initialDelaySeconds: 35
+            periodSeconds: 5
+            timeoutSeconds: 10
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - pkill
+                  - -INT
+                  - slapd
+      volumes:
+        {{- if .Values.global.storage_volume_claim_name_openldap }}
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: {{ .Values.global.storage_volume_claim_name_openldap }}
+        {{- else }}
+        - name: data-storage
+          emptyDir: {}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ .Release.Namespace }}-{{ .Chart.Name }}-config

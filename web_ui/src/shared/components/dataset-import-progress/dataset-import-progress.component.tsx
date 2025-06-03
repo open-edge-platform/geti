@@ -2,7 +2,6 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Loading, Text } from '@geti/ui';
-import { noop } from 'lodash-es';
 
 import {
     DATASET_IMPORT_DESCRIPTION,
@@ -31,8 +30,6 @@ export const DatasetImportProgress = ({ progressItem }: DatasetImportProgressPro
     const preparingStatusJob = usePreparingStatusJob({
         data: { organizationId, workspaceId, jobId: String(progressItem.preparingJobId) },
         enabled: isPreparing,
-        onError: noop,
-        onSuccess: noop,
     });
 
     const { description, progress } = isPreparing

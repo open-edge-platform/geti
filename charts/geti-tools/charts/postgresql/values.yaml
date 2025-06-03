@@ -1,0 +1,86 @@
+image: 
+  registry: docker.io
+  repository: 
+  name: postgres:14.13
+imagePullPolicy: IfNotPresent
+
+auth:
+  init_database: spicedb
+  spicedb_database: spicedb
+
+accountservice_postgresql_db: accountservice
+creditsystem_postgresql_db: creditsystem
+
+flyte_db_enabled: true
+flyte_postgresql_db: flyte
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+
+service:
+  type: ClusterIP
+  ports:
+    postgresql:
+      port: 5432
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+livenessProbe:
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+data_path: /var/lib/postgresql/data
+
+global:
+  storage_volume_claim_name_postgresql: data-storage-volume-claim
+  enable_master_node_selector: true
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+
+config:
+  max_connections: 1000
+  shared_buffers: 512MB
+
+postgresql:
+  auth:
+    init_database: spicedb
+  accountservice_postgresql_db: accountservice
+  creditsystem_postgresql_db: creditsystem
+  flyte_db_enabled: true
+  flyte_db_config:
+    port: 5432
+    host: impt-postgresql.impt
+    dbname: flyte
+    options: "sslmode=disable"

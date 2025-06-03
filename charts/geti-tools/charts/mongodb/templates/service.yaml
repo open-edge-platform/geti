@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "mongodb.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "mongodb.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: mongodb
+      port: {{ .Values.service.ports.mongodb.port }}
+      targetPort: mongodb
+      protocol: TCP
+      # Istio support for mongo is experimental;
+      # therefore, stick with tcp for now.
+      appProtocol: tcp
+  selector:
+    {{- include "mongodb.selectorLabels" . | nindent 4 }}

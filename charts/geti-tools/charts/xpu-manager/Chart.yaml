@@ -1,0 +1,18 @@
+apiVersion: v2
+name: xpu-manager
+description: A Helm chart for XPU Manager
+version: 0.0.1
+kubeVersion: ">= 1.19.0-0"
+appVersion: "v1.2.27"
+sources:
+- https://github.com/intel/xpumanager/
+- https://github.com/intel/intel-device-plugins-for-kubernetes/tree/main/deployments/gpu_plugin/overlays/monitoring_shared-dev_nfd
+- https://github.com/intel/intel-device-plugins-for-kubernetes/blob/main/cmd/gpu_plugin/monitoring.md
+home: https://github.com/intel/xpumanager/
+keywords:
+  - gpu
+  - cuda
+  - compute
+  - monitoring
+  - telemetry
+  - max

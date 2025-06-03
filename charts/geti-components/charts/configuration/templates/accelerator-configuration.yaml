@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: accelerator-configuration
+  namespace: {{ .Release.Namespace }}
+data:
+  accelerator_type: "{{ .Values.accelerator.type }}"
+  accelerator_name: "{{ .Values.accelerator.name }}"

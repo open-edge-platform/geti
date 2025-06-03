@@ -1,0 +1,161 @@
+# Copyright (c) 2020, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+global:
+  enable_local_image_pull_secret: true
+
+image:
+  registry: nvcr.io
+  repository: nvidia/k8s
+  name: dcgm-exporter
+  pullPolicy: IfNotPresent
+  # Image tag defaults to AppVersion, but you can use the tag key
+  # for the image tag, e.g:
+  tag: 3.3.8-3.6.0-ubuntu22.04
+# Change the following reference to "/etc/dcgm-exporter/default-counters.csv"
+# to stop profiling metrics from DCGM
+arguments: ["-f", "/etc/dcgm-exporter/dcp-metrics-included.csv"]
+# NOTE: in general, add any command line arguments to arguments above
+# and they will be passed through.
+# Use "-r", "<HOST>:<PORT>" to connect to an already running hostengine
+# Example arguments: ["-r", "host123:5555"]
+# Use "-n" to remove the hostname tag from the output.
+# Example arguments: ["-n"]
+# Use "-d" to specify the devices to monitor. -d must be followed by a string
+# in the following format: [f] or [g[:numeric_range][+]][i[:numeric_range]]
+# Where a numeric range is something like 0-4 or 0,2,4, etc.
+# Example arguments: ["-d", "g+i"] to monitor all GPUs and GPU instances or
+# ["-d", "g:0-3"] to monitor GPUs 0-3.
+# Use "-m" to specify the namespace and name of a configmap containing
+# the watched exporter fields.
+# Example arguments: ["-m", "default:exporter-metrics-config-map"]
+
+# Image pull secrets for container images
+imagePullSecrets: []
+
+# Overrides the chart's name
+nameOverride: ""
+
+# Overrides the chart's computed fullname
+fullnameOverride: ""
+
+# Overrides the deployment namespace
+namespaceOverride: ""
+
+# Defines the runtime class that will be used by the pod
+runtimeClassName: nvidia
+# Defines serviceAccount names for components.
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+rollingUpdate:
+  # Specifies maximum number of DaemonSet pods that can be unavailable during the update
+  maxUnavailable: 1
+  # Specifies maximum number of nodes with an existing available DaemonSet pod that can have an updated DaemonSet pod during during an update
+  maxSurge: 0
+
+# Labels to be added to dcgm-exporter pods
+podLabels: {}
+
+# Annotations to be added to dcgm-exporter pods
+podAnnotations:
+# Using this annotation which is required for prometheus scraping
+  prometheus.io/scrape: "true"
+ # prometheus.io/port: "9400"
+
+# The SecurityContext for the dcgm-exporter pods
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# The SecurityContext for the dcgm-exporter containers
+securityContext:
+  runAsNonRoot: false
+  runAsUser: 0
+  capabilities:
+     add: ["SYS_ADMIN"]
+  # readOnlyRootFilesystem: true
+
+# Defines the dcgm-exporter service
+service:
+  # When enabled, the helm chart will create service
+  enable: true
+  type: ClusterIP
+  port: 9400
+  address: ":9400"
+  # Annotations to add to the service
+  annotations: {}
+
+# Allows to control pod resources
+resources:
+   limits:
+     memory: 512Mi
+     nvidia.com/gpu: "0"
+   requests:
+     cpu: 100m
+     memory: 512Mi
+     nvidia.com/gpu: "0"
+serviceMonitor:
+  enabled: false
+  interval: 15s
+  honorLabels: false
+  additionalLabels: {}
+    #monitoring: prometheus
+  relabelings: []
+    # - sourceLabels: [__meta_kubernetes_pod_node_name]
+    #   separator: ;
+    #   regex: ^(.*)$
+    #   targetLabel: nodename
+    #   replacement: $1
+    #   action: replace
+
+nodeSelector: {}
+  #node: gpu
+
+tolerations: []
+#- operator: Exists
+
+affinity: {}
+  #nodeAffinity:
+  #  requiredDuringSchedulingIgnoredDuringExecution:
+  #    nodeSelectorTerms:
+  #    - matchExpressions:
+  #      - key: nvidia-gpu
+  #        operator: Exists
+
+extraHostVolumes: []
+#- name: host-binaries
+#  hostPath: /opt/bin
+
+extraConfigMapVolumes: []
+#- name: exporter-metrics-volume
+#  configMap:
+#    name: exporter-metrics-config-map
+
+extraVolumeMounts: []
+#- name: host-binaries
+#  mountPath: /opt/bin
+#  readOnly: true
+
+extraEnv: []
+#- name: EXTRA_VAR
+#  value: "TheStringValue"
+
+# Path to the kubelet socket for /pod-resources
+kubeletPath: "/var/lib/kubelet/pod-resources"

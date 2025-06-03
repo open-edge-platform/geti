@@ -1,6 +1,0 @@
----
-apiVersion: v2
-name: onboarding-service
-version: 0.0.1
-appVersion: v0.0.1
-description: A Helm chart for the Onboarding Service

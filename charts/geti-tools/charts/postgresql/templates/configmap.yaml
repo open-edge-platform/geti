@@ -1,0 +1,50 @@
+# Default values - for fresh installation
+{{- $postgresqlDb     := .Values.auth.init_database  }}
+{{- $accountserviceDb := .Values.accountservice_postgresql_db }}
+{{- $creditsystemDb   := .Values.creditsystem_postgresql_db }}
+{{- $flyteDb          := .Values.flyte_postgresql_db }}
+
+{{- $previousCm := lookup "v1" "ConfigMap" .Release.Namespace (include "postgresql.secretName" .) }}
+{{- $previousSecret := lookup "v1" "Secret" .Release.Namespace (include "postgresql.secretName" .) }}
+
+{{- if $previousCm }} # upgrade from data already in CM (or use data from Values file if missing)
+  {{- $postgresqlDb     = default ($postgresqlDb) (index $previousCm.data "postgresql-db") }}
+  {{- $accountserviceDb = default ($accountserviceDb) (index $previousCm.data "accountservice-postgresql-db") }}
+  {{- $creditsystemDb   = default ($creditsystemDb) (index $previousCm.data "creditsystem-postgresql-db") }}
+  {{- $flyteDb          = default ($flyteDb) (index $previousCm.data "flyte-postgresql-db") }}
+{{- else if $previousSecret }} # upgrade from data already in Secret - copy it to CM (or use data from Values file if missing)
+  {{- $postgresqlDb     = (default ($postgresqlDb | b64enc) (index $previousSecret.data "postgresql-db")) | b64dec }}
+  {{- $accountserviceDb = (default ($accountserviceDb | b64enc) (index $previousSecret.data "accountservice-postgresql-db")) | b64dec }}
+  {{- $creditsystemDb   = (default ($creditsystemDb | b64enc) (index $previousSecret.data "creditsystem-postgresql-db")) | b64dec }}
+  {{- $flyteDb          = (default ($flyteDb | b64enc) (index $previousSecret.data "flyte-postgresql-db")) | b64dec }}
+{{- end }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postgresql.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+data:
+    postgresql-db: {{ $postgresqlDb }}
+    accountservice-postgresql-db: {{ $accountserviceDb }}
+    {{- if .Values.global.credit_system_enabled }}
+    creditsystem-postgresql-db: {{ $creditsystemDb | quote }}
+    {{- end }}
+    flyte-postgresql-db: {{ $flyteDb }}
+
+{{- if .Values.flyte_db_enabled }}
+# CM for flyte namespace
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "postgresql.secretName" . }}
+  namespace: "flyte"
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+data:
+  postgresql-db: {{ $postgresqlDb }}
+  flyte-postgresql-db: {{ $flyteDb }}
+{{- end }}

@@ -1,0 +1,43 @@
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+      - DAC_READ_SEARCH
+
+resources:
+    requests:
+        cpu: 50m
+        memory: 100Mi
+    limits:
+        cpu: 100m
+        memory: 500Mi
+
+init:
+  imagePullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      memory: 100Mi
+
+global:
+  logs_dir: ""
+  istio_ambient_mesh: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc

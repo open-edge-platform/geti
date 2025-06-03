@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-configuration
+  namespace: {{ .Release.Namespace }}
+data:
+  # Percent of CPUs on a single machine that can be allocated for training
+  serverAddress: "{{ .Values.global.serverAddress }}"
+  registry_address: "{{ .Values.global.registry_address }}"
+  tag: "{{ .Chart.AppVersion }}"
+  mlflow_sidecar_image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/mlflow-geti-store:{{ .Values.global.tag | default .Chart.AppVersion }}"
+  {{- if contains "intel" .Values.accelerator.name }}
+  otx2_image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/otx2-intel:{{ .Values.global.tag | default .Chart.AppVersion }}"
+  render_gid: "{{ .Values.render_gid }}"
+  {{- else }}
+  otx2_image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/otx2-training:{{ .Values.global.tag | default .Chart.AppVersion }}"
+  {{- end }}
+  minAllocableCpu: "{{ .Values.minAllocableCpu }}"
+  domain: "{{ .Values.domain }}"
+  platformVersion: "{{ .Values.platformVersion }}"
+  buildVersion: "{{ .Values.buildVersion }}"
+  intelEmail: "{{ .Values.intelEmail }}"
+  dataStoragePath: "{{ .Values.dataStoragePath }}"
+  password_reset_expiration: "{{ .Values.password_reset_expiration }}"
+  max_number_of_users_per_org: "{{ .Values.max_number_of_users_per_org }}"
+  invite-user-expiration: "{{ .Values.acc_svc_invite_user_expiration }}"
+  not_activated_user_expiration_in_days: "{{ .Values.not_activated_user_expiration_in_days }}"
+  max_number_of_projects_per_organization: "{{ .Values.global.max_number_of_projects_per_organization }}"
+  max_number_of_annotation_versions_per_media: "{{ .Values.global.max_number_of_annotation_versions_per_media }}"
+  max_number_of_dataset_storages: "{{ .Values.global.max_number_of_dataset_storages }}"
+  max_number_of_trainable_tasks: "{{ .Values.global.max_number_of_trainable_tasks }}"
+  max_number_of_media_per_project: "{{ .Values.global.max_number_of_media_per_project }}"
+  max_number_of_labels: "{{ .Values.global.max_number_of_labels }}"
+  max_number_of_pixels: "{{ .Values.global.max_number_of_pixels }}"
+  min_image_size: "{{ .Values.global.min_image_size }}"
+  max_image_size: "{{ .Values.global.max_image_size }}"
+  min_video_size: "{{ .Values.global.min_video_size }}"
+  max_video_width: "{{ .Values.global.max_video_width }}"
+  max_video_height: "{{ .Values.global.max_video_height }}"
+  max_video_length: "{{ .Values.global.max_video_length }}"
+  min_free_disk_space_gib: "{{ .Values.global.min_free_disk_space_gib }}"
+  grafana_enabled: "{{ .Values.global.grafana_enabled }}"
+  workflow_versions: "{{ .Values.global.workflow_versions | default .Chart.AppVersion }}"
+  mongodb_credentials_provider: "{{ .Values.global.mongodb_credentials_provider }}"
+  s3_credentials_provider: "{{ .Values.global.s3_credentials_provider }}"
+  {{ if .Values.global.enable_object_storage }}
+  s3_endpoint: "{{ .Values.global.s3_endpoint }}"
+  s3_endpoint_accsvc: "http://{{ .Values.global.s3_endpoint }}"
+  mongodb_address: "{{ .Values.global.mongodb_address | default (printf "mongodb://%s-mongodb:27017/" .Release.Namespace ) }}"
+  mongodb_database_name: "{{ .Values.global.mongodb_database_name }}"
+  {{ end }}
+  kafka_topic_prefix: "{{ .Values.global.kafka_topic_prefix }}"
+  num_models_to_keep_in_storage: "{{ .Values.global.num_models_to_keep_in_storage }}"

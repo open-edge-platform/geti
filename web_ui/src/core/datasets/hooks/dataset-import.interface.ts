@@ -4,8 +4,8 @@
 import { AxiosError } from 'axios';
 
 export interface IntervalJobHandlers<T> {
-    onError: (error: AxiosError) => void;
-    onSuccess: (data: T) => void;
+    onError?: (error: AxiosError) => void;
+    onSuccess?: (data: T) => void;
     onSettled?: (data: T) => void;
     onCancelOrFailed?: () => void;
     onCancel?: () => void;

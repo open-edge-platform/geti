@@ -106,7 +106,7 @@ export const MediaContentBucket = ({
     const hasMediaItems = !isEmpty(media);
     const bucketId = idMatchingFormat(mediaBucket);
     const shouldShowMediaDrop = isMediaDropVisible(isMediaFetching, hasMediaItems, isMediaFilterEmpty);
-    const shouldShowLoadingOverlay = isLoadingOverlayVisible(isMediaFetching || isLoading);
+    const shouldShowLoadingOverlay = !hasMediaItems && isLoadingOverlayVisible(isMediaFetching || isLoading);
 
     const { uploadProgress, isUploadInProgress } = uploadMediaMetadata.mediaUploadState;
 

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "kubelet-csr-approver.fullname" . }}-test-connection"
+  labels:
+    {{- include "kubelet-csr-approver.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command:
+        - /bin/sh
+        - -c
+        - |
+          sleep 10 ; wget -O- -S {{ include "kubelet-csr-approver.fullname" . }}:{{ .Values.metrics.port }}/metrics
+  restartPolicy: Never

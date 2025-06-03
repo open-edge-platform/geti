@@ -1,0 +1,20 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "opa.name" . }}-tls-certificate
+  namespace: {{ .Values.namespace.opa }}
+spec:
+  secretName: {{ .Values.secret.name }}
+  duration: {{ .Values.tls.leaf.duration }}
+  renewBefore: {{ .Values.tls.leaf.renewBefore }}
+  commonName: opa-envoy
+  dnsNames:
+    - admission-controller.{{ .Values.namespace.opa }}.svc
+  privateKey:
+    algorithm: {{ .Values.tls.algorithm }}
+    size: {{ .Values.tls.leaf.size }}
+    rotationPolicy: Always
+  issuerRef:
+    name: {{ .Values.tls.ca.name }}
+    kind: ClusterIssuer
+    group: cert-manager.io

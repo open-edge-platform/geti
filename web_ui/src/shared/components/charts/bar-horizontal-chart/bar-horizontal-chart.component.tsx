@@ -69,6 +69,7 @@ export const BarHorizontalChart = ({
     const [margin, setMargin] = useState<number>(0);
     const container = useRef<HTMLDivElement | null>(null);
     const prevHoveredLabel = useRef<string | null>(null);
+    const cellStyles = isFunction(onCellClick) ? { cursor: 'pointer' } : undefined;
 
     const yAxisFormatter = (label: string | number | undefined): string => {
         if (typeof label === 'string') {
@@ -156,6 +157,7 @@ export const BarHorizontalChart = ({
                                     aria-label={name}
                                     aria-valuenow={value}
                                     onClick={isFunction(onCellClick) ? () => onCellClick(id) : undefined}
+                                    style={cellStyles}
                                 />
                             ))
                         ) : (
