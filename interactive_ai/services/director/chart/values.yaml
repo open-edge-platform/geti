@@ -43,6 +43,7 @@ ingress:
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*):optimize
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/supported_algorithms
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/project_configuration
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/training_configuration
 
 serviceAccount:
   create: true
