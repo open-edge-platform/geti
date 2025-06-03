@@ -168,7 +168,10 @@
     "typescript": "^5.7.2"
   },
   "overrides": {
-    "lz-string": "github:pieroxy/lz-string#573d8e6ab49cab839143953f0970930c57bc0782"
+    "lz-string": "github:pieroxy/lz-string#573d8e6ab49cab839143953f0970930c57bc0782",
+    "msw": {
+      "cookie": "0.7.0"
+    }
   },
   "workspaces": [
     "packages/*"
