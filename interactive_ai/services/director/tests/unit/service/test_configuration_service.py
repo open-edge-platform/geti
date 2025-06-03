@@ -1,6 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration
+from geti_types import ID
 
 from service.configuration_service import ConfigurationService
 from service.utils import delete_none_from_dict, merge_deep_dict
@@ -105,7 +106,11 @@ class TestConfigurationService:
             fxt_training_configuration_task_level.model_dump(),
             delete_none_from_dict(fxt_partial_training_configuration_manifest_level.model_dump()),
         )
-        overlay_config["id_"] = fxt_training_configuration_task_level.id_
+        overlay_config["id_"] = ID(
+            f"full_training_configuration_{fxt_partial_training_configuration_manifest_level.model_manifest_id}"
+        )
+
+        expected_config = TrainingConfiguration.model_validate(overlay_config)
 
         # Act & Assert
         full_config = ConfigurationService.get_full_training_configuration(
@@ -114,4 +119,4 @@ class TestConfigurationService:
             model_manifest_id=fxt_partial_training_configuration_manifest_level.model_manifest_id,
             strict_validation=True,
         )
-        assert full_config == TrainingConfiguration.model_validate(overlay_config)
+        assert full_config == expected_config

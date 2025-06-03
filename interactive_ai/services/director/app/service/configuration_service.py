@@ -1,5 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+from geti_configuration_tools.hyperparameters import Hyperparameters, DatasetPreparationParameters, \
+    AugmentationParameters, CenterCrop, TrainingHyperParameters, EarlyStopping, EvaluationParameters
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration
 
 from service.utils import delete_none_from_dict, merge_deep_dict
@@ -65,11 +67,25 @@ class ConfigurationService:
         :return: The combined and validated training configuration
         """
         # TODO after ITEP-32190: Load model manifest hyperparameters when model manifests are added
+        base_hyperparameters = Hyperparameters(
+            dataset_preparation=DatasetPreparationParameters(
+                augmentation=AugmentationParameters()
+            ),
+            training=TrainingHyperParameters(),
+            evaluation=EvaluationParameters(),
+        )
+        base_config = PartialTrainingConfiguration.model_validate(
+            {
+                "id_": ID(f"full_training_configuration_{model_manifest_id}"),
+                "task_id": str(task_id),
+                "hyperparameters": base_hyperparameters.model_dump(),
+            }
+        )
         training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)
         task_level_config = training_configuration_repo.get_task_only_configuration(task_id)
         algo_level_config = (
             training_configuration_repo.get_by_model_manifest_id(model_manifest_id) if model_manifest_id else None
         )
         return cls.overlay_training_configurations(
-            task_level_config, algo_level_config, validate_full_config=strict_validation
+            base_config, task_level_config, algo_level_config, validate_full_config=strict_validation
         )
