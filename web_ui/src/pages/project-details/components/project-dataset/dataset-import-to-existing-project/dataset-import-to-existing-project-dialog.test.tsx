@@ -7,6 +7,7 @@ import { DATASET_IMPORT_STATUSES } from '../../../../../core/datasets/dataset.en
 import { DatasetImportToExistingProjectItem } from '../../../../../core/datasets/dataset.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { useDatasetImportToExistingProject } from '../../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
+import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import {
     getMockedProject,
     mockedProjectContextProps,
@@ -227,13 +228,20 @@ describe(DatasetImportToExistingProjectDialog, () => {
 
             jest.mocked(useProject).mockImplementation(() =>
                 mockedProjectContextProps({
-                    project: getMockedProject({ tasks: [getMockedTask({ domain: DOMAIN.KEYPOINT_DETECTION })] }),
+                    project: getMockedProject({
+                        tasks: [
+                            getMockedTask({
+                                domain: DOMAIN.KEYPOINT_DETECTION,
+                                labels: [getMockedLabel({ name: 'neck', id: '683d4ccfd01df152c3f65ff6' })],
+                            }),
+                        ],
+                    }),
                 })
             );
 
             await renderMockedComponent({ featureFlags: { FEATURE_FLAG_KEYPOINT_DETECTION_DATASET_IE: true } });
 
-            expect(screen.getByText(KEYPOINT_DUPLICATED_LABELS)).toBeVisible();
+            expect(screen.getByText(new RegExp(KEYPOINT_DUPLICATED_LABELS))).toBeVisible();
             expect(screen.getByRole('button', { name: /import/i })).toBeDisabled();
         });
     });

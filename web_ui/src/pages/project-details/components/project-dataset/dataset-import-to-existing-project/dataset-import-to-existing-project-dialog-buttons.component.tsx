@@ -20,7 +20,7 @@ import { isNonEmptyString } from '../../../../../shared/utils';
 interface DatasetImportToExistingProjectDialogButtonsProps {
     children?: ReactNode;
     datasetImportItem: DatasetImportItem | undefined;
-    isDisableWithDuplicates: boolean;
+    isImportDisabled: boolean;
     deletionDialogTriggerState: OverlayTriggerState;
     onDialogDismiss: () => void;
     onPrimaryAction: () => void;
@@ -29,7 +29,7 @@ interface DatasetImportToExistingProjectDialogButtonsProps {
 export const DatasetImportToExistingProjectDialogButtons = ({
     children,
     datasetImportItem,
-    isDisableWithDuplicates,
+    isImportDisabled,
     deletionDialogTriggerState,
     onDialogDismiss,
     onPrimaryAction,
@@ -106,7 +106,7 @@ export const DatasetImportToExistingProjectDialogButtons = ({
                     DATASET_IMPORT_STATUSES.READY,
                     DATASET_IMPORT_STATUSES.LABELS_MAPPING_TO_EXISTING_PROJECT,
                 ]),
-                disabled: !isReady(datasetImportItem?.id) || isDisableWithDuplicates,
+                disabled: !isReady(datasetImportItem?.id) || isImportDisabled,
                 variant: 'accent',
                 action: () => {
                     onPrimaryAction();
