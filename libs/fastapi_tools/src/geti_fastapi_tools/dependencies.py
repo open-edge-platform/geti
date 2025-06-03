@@ -284,11 +284,6 @@ def get_source_fastapi(request: Request) -> RequestSource:
             return RequestSource.UNKNOWN
 
 
-def parse_time(t: str | None) -> datetime.datetime | None:
-    """Parse ISO format time string to datetime object."""
-    return datetime.datetime.fromisoformat(t) if t else None
-
-
 async def setup_session_fastapi(
     organization_id: str,
     workspace_id: str,
