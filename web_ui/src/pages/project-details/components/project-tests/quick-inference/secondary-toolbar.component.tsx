@@ -23,9 +23,14 @@ import classes from '../project-tests.module.scss';
 interface SecondaryToolbarProps {
     labels: Label[];
     shouldShowExplanation: boolean;
+    isUploadAllowed?: boolean;
 }
 
-export const SecondaryToolbar = ({ labels, shouldShowExplanation }: SecondaryToolbarProps): JSX.Element => {
+export const SecondaryToolbar = ({
+    labels,
+    shouldShowExplanation,
+    isUploadAllowed = true,
+}: SecondaryToolbarProps): JSX.Element => {
     const {
         isDisabled,
         explanation,
@@ -123,10 +128,12 @@ export const SecondaryToolbar = ({ labels, shouldShowExplanation }: SecondaryToo
                 )}
             </Flex>
             <Flex direction='row' gap='size-150'>
-                <TooltipTrigger placement={'bottom'}>
-                    <UploadImageButton isDisabled={isDisabled} handleUploadImage={handleUploadImage} />
-                    <Tooltip>Upload image</Tooltip>
-                </TooltipTrigger>
+                {isUploadAllowed && (
+                    <TooltipTrigger placement={'bottom'}>
+                        <UploadImageButton isDisabled={isDisabled} handleUploadImage={handleUploadImage} />
+                        <Tooltip>Upload image</Tooltip>
+                    </TooltipTrigger>
+                )}
 
                 <TooltipTrigger placement={'bottom'}>
                     <ToggleVisibilityButton

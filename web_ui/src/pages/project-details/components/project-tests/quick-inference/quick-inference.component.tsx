@@ -67,7 +67,7 @@ const ContentContainer = ({
     );
 };
 
-const useIsExplanationEnabled = (imageWasUploaded: boolean) => {
+export const useIsExplanationEnabled = (imageWasUploaded: boolean) => {
     const { isTaskChainProject, isSingleDomainProject } = useProject();
     if (imageWasUploaded === false) {
         return false;

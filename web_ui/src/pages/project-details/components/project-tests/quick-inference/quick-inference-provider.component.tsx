@@ -46,6 +46,7 @@ export interface QuickInferenceContextProps {
     dismissWarningCard: () => void;
     explanationOpacity: number;
     setExplanationOpacity: Dispatch<SetStateAction<number>>;
+    onResetImage: () => void;
 }
 
 interface QuickInferenceProviderProps {
@@ -189,6 +190,7 @@ export const QuickInferenceProvider = ({ isDisabled, children }: QuickInferenceP
                 annotations,
                 image: imageData,
                 dismissWarningCard,
+                onResetImage: () => setImageData(undefined),
             }}
         >
             {children}
