@@ -124,6 +124,7 @@ def prepare_optimize(
         configuration=ModelConfiguration(
             configurable_parameters=hyper_parameters,
             label_schema=label_schema,  # type: ignore
+            display_only_configuration=model.configuration.display_only_configuration,
         ),
         id_=ModelRepo.generate_id(),
         previous_trained_revision=model.get_base_model(),
