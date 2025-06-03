@@ -160,7 +160,7 @@ class JobRestViews:
         query_params = []
         for param_name, value, transformer in params:
             if value is not None:
-                transformed_value = transformer(value) if transformer else value
+                transformed_value = transformer(value) if transformer else value  # type: ignore
                 query_params.append(f"{param_name}={transformed_value}")
 
         # Handle job_types separately as it's a sequence

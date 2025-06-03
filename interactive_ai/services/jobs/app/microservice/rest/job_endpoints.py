@@ -67,7 +67,7 @@ def get_jobs_endpoint(  # noqa: PLR0913
         job_types=job_type,
         key=key,
         author_uid=author_id,
-        start_time_from=datetime.fromisoformat(start_time_from) if start_time_to else None,
+        start_time_from=datetime.fromisoformat(start_time_from) if start_time_from else None,
         start_time_to=datetime.fromisoformat(start_time_to) if start_time_to else None,
         creation_time_from=datetime.fromisoformat(creation_time_from) if creation_time_from else None,
         creation_time_to=datetime.fromisoformat(creation_time_to) if creation_time_to else None,
