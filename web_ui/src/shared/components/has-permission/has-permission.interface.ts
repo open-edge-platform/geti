@@ -16,7 +16,6 @@ export interface HasPermissionProps {
 export enum OPERATION_NEW {
     ADD_USER_TO_WORKSPACE,
     ADD_USER_TO_PROJECT,
-    ADD_WORKSPACE,
     ANALYTICS_TAB,
     CAN_SEE_PROJECT,
     CAN_SEE_WORKSPACE,
@@ -29,6 +28,7 @@ export enum OPERATION_NEW {
     PROJECT_NAME_EDITION,
     USAGE_TAB,
     WORKSPACE_MANAGEMENT,
+    WORKSPACE_CREATION,
 }
 
 export enum OPERATION_OLD {

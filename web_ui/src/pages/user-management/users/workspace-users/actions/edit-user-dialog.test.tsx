@@ -186,7 +186,10 @@ describe('EditUserDialog', () => {
                         ]}
                     />,
                     {
-                        featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: false, FEATURE_FLAG_MANAGE_USERS_ROLES: true },
+                        featureFlags: {
+                            FEATURE_FLAG_WORKSPACE_ACTIONS: false,
+                            FEATURE_FLAG_MANAGE_USERS_ROLES: true,
+                        },
                         services: {
                             usersService,
                         },

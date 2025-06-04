@@ -39,7 +39,7 @@ const usePermission = (): UsePermissionType => {
 
         return (
             activeUser?.roles.some((userRole) =>
-                requiredPermissions.some((permission) => {
+                requiredPermissions?.some((permission) => {
                     const resourceId = resources[permission.resourceType as RESOURCE_TYPE];
                     const isResourceIdEqual = resourceId === userRole.resourceId;
 
@@ -76,7 +76,6 @@ export const HasPermission = ({
     Fallback = <></>,
     specialCondition = false,
 }: HasPermissionProps): JSX.Element => {
-    //debugger;
     const isPermitted = useCheckPermission(operations, resources, specialCondition);
 
     if (isPermitted) {

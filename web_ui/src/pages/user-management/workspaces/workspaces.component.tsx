@@ -14,14 +14,12 @@ export const Workspaces = (): JSX.Element => {
     const { workspaces } = useWorkspaces();
     const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
-    // NIe to miejsce, znalexc taby!!!
-    debugger;
     return (
-        <Flex direction={'column'} height={'100%'} gap={'size-300'} UNSAFE_style={{ border: '1px solid red' }}>
+        <Flex direction={'column'} height={'100%'} gap={'size-300'}>
             <HasPermission
                 operations={
                     FEATURE_FLAG_WORKSPACE_ACTIONS
-                        ? [OPERATION_NEW.ADD_WORKSPACE]
+                        ? [OPERATION_NEW.WORKSPACE_CREATION]
                         : [OPERATION_OLD.WORKSPACE_MANAGEMENT]
                 }
             >

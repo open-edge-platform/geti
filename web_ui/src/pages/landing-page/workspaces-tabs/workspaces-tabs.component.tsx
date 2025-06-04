@@ -252,7 +252,7 @@ export const WorkspacesTabs = (): JSX.Element => {
                     )}
 
                     {FEATURE_FLAG_WORKSPACE_ACTIONS && (
-                        <HasPermission operations={[OPERATION_NEW.WORKSPACE_MANAGEMENT]}>
+                        <HasPermission operations={[OPERATION_NEW.WORKSPACE_CREATION]}>
                             <TooltipTrigger placement={'bottom'}>
                                 <ActionButton
                                     isQuiet
@@ -268,7 +268,19 @@ export const WorkspacesTabs = (): JSX.Element => {
                         </HasPermission>
                     )}
                 </Flex>
-                <TabPanels>{(item: TabItem) => <Item key={item.key}>{item.children}</Item>}</TabPanels>
+                <TabPanels>
+                    {(item: TabItem) => (
+                        <Item key={item.key}>
+                            <HasPermission
+                                operations={[OPERATION_NEW.CAN_SEE_WORKSPACE]}
+                                specialCondition={!FEATURE_FLAG_WORKSPACE_ACTIONS || undefined}
+                                Fallback={<div data-testid='no-permission-to-tab'>TODO: no permission</div>}
+                            >
+                                {item.children}
+                            </HasPermission>
+                        </Item>
+                    )}
+                </TabPanels>
             </Tabs>
         </Flex>
     );
