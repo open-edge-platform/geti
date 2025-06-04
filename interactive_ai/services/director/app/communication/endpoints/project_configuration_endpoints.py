@@ -12,7 +12,7 @@ from communication.controllers.project_configuration_controller import ProjectCo
 from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
-from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi, get_request_json
+from geti_fastapi_tools.dependencies import get_project_identifier, get_request_json, setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import ProjectIdentifier
 

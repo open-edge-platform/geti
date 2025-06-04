@@ -16,14 +16,9 @@ class TestProjectConfigurationRESTViews:
                 {
                     "task_id": "detection_1",
                     "training": {
-                        "constraints": [
-                            {
-                                "key": "min_images_per_label",
-                                "value": 15,
-                                "type": "int",
-                                "name": "Minimum images per label",
-                            }
-                        ]
+                        "constraints": {
+                            "min_images_per_label": 15  # direct dict mapping instead of {key, value} should also work
+                        }
                     },
                     "auto_training": [
                         {"key": "enable", "value": False, "type": "bool", "name": "Enable auto training"},
