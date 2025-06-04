@@ -1,5 +1,5 @@
 ---
-name: ${COMPONENT}
+name: ${COMPONENT_NAME}
 version: ${TAG}
 description: user-directory chart
 apiVersion: v2
