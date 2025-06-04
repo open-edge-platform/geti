@@ -44,6 +44,10 @@ class InsufficientBalanceException(CommunicationError):
     """Exception for when organization doesn't have enough credits for job submission."""
 
 
+class DuplicateFoundException(CommunicationError):
+    """Exception for when duplicate policy is set to REJECT and duplicate job is found during submission."""
+
+
 def grpc_requester(acquire_lock: bool = True):  # noqa: ANN201
     """
     Decorator for methods of GRPCJobsClient which handles GRPC requests.
@@ -357,6 +361,8 @@ class GRPCJobsClient:
 
         if "Insufficient balance" in details:
             raise InsufficientBalanceException(details) from error
+        if "An identical job was found in the job queue" in details:
+            raise DuplicateFoundException(details) from error
 
         if not details:
             details = "Request failed due to unknown issues. Please try again later."

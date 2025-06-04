@@ -172,6 +172,22 @@ class JobInsufficientBalanceException(GetiBaseException):
         )
 
 
+class JobDuplicateFoundException(GetiBaseException):
+    """
+    This error can be raised if there is a running duplicate job is found during submission and job policy is set
+    to REJECT
+
+    :param message: str containing a custom error message
+    """
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            message=message,
+            error_code="job_duplicate_found",
+            http_status=http.HTTPStatus.PRECONDITION_FAILED,
+        )
+
+
 class NotReadyForTrainingException(GetiBaseException):
     """
     Exception raised when a manual training trigger is received for a task that is not
