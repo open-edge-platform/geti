@@ -61,37 +61,7 @@ class TestProjectConfigurationEndpoints:
 
         assert result.status_code == HTTPStatus.FORBIDDEN
 
-    def test_update_project_configuration(
-        self, fxt_director_app, fxt_project_configuration, fxt_enable_feature_flag_name
-    ) -> None:
-        # Arrange
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
-        project_config_dict = fxt_project_configuration.model_dump()
-        project_identifier = ProjectIdentifier(
-            workspace_id=ID(DUMMY_WORKSPACE_ID),
-            project_id=ID(DUMMY_PROJECT_ID),
-        )
-
-        # Act
-        with patch.object(
-            ProjectConfigurationRESTController,
-            "update_configuration",
-            return_value=None,
-        ) as mock_update_project_config:
-            result = fxt_director_app.patch(
-                f"{API_PROJECT_PATTERN}/project_configuration",
-                json=project_config_dict,
-            )
-
-        # Assert
-        mock_update_project_config.assert_called_once_with(
-            project_identifier=project_identifier,
-            update_configuration=mock_update_project_config.call_args[1]["update_configuration"],
-        )
-        assert result.status_code == HTTPStatus.NO_CONTENT
-        assert not result.content  # 204 responses must not include a response body
-
-    def test_update_project_configuration_rest_conversion(self, fxt_director_app, fxt_enable_feature_flag_name) -> None:
+    def test_update_project_configuration(self, fxt_director_app, fxt_enable_feature_flag_name) -> None:
         # Arrange
         fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
 

@@ -1,5 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+from typing import Any
+
 import pydantic
 import pytest
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
@@ -8,7 +10,7 @@ from communication.views.project_configuration_rest_views import ProjectConfigur
 
 
 class TestProjectConfigurationRESTViews:
-    def test_project_configuration_from_rest(self):
+    def test_project_configuration_from_rest(self) -> None:
         """Test converting a project configuration from REST to a ProjectConfiguration object."""
         # Arrange - Create a sample REST view of a project configuration
         project_config_rest = {
@@ -80,10 +82,10 @@ class TestProjectConfigurationRESTViews:
         assert task2.auto_training.min_images_per_label == 10
         assert task2.auto_training.enable_dynamic_required_annotations is False
 
-    def test_project_configuration_from_rest_empty_task_configs(self):
+    def test_project_configuration_from_rest_empty_task_configs(self) -> None:
         """Test converting a project configuration from REST with empty task_configs."""
         # Arrange
-        project_config_rest = {"task_configs": []}
+        project_config_rest: dict[str, Any] = {"task_configs": []}
 
         # Act
         result = ProjectConfigurationRESTViews.project_configuration_from_rest(project_config_rest)
@@ -92,10 +94,10 @@ class TestProjectConfigurationRESTViews:
         assert isinstance(result, PartialProjectConfiguration)
         assert len(result.task_configs) == 0
 
-    def test_project_configuration_from_rest_missing_task_configs(self):
+    def test_project_configuration_from_rest_missing_task_configs(self) -> None:
         """Test converting a project configuration from REST without task_configs field."""
         # Arrange
-        project_config_rest = {}
+        project_config_rest: dict[str, Any] = {}
 
         # Act
         result = ProjectConfigurationRESTViews.project_configuration_from_rest(project_config_rest)
@@ -104,7 +106,7 @@ class TestProjectConfigurationRESTViews:
         assert isinstance(result, PartialProjectConfiguration)
         assert len(result.task_configs) == 0
 
-    def test_project_configuration_from_rest_malformed_task_config(self):
+    def test_project_configuration_from_rest_malformed_task_config(self) -> None:
         """Test converting a project configuration from REST with malformed task config."""
         # Arrange - Missing required fields in task config
         project_config_rest = {
@@ -172,7 +174,18 @@ class TestProjectConfigurationRESTViews:
             "invalid_value_type",
         ],
     )
-    def test_project_configuration_from_rest_validation(self, rest_input):
+    def test_project_configuration_from_rest_validation(self, rest_input) -> None:
         # Act
         with pytest.raises(pydantic.ValidationError):
             ProjectConfigurationRESTViews.project_configuration_from_rest(rest_input)
+
+    def test_rest_view_bidirectional_conversion(
+        self, fxt_project_configuration, fxt_project_configuration_rest_view
+    ) -> None:
+        rest_view = ProjectConfigurationRESTViews.project_configuration_to_rest(fxt_project_configuration)
+
+        assert rest_view == fxt_project_configuration_rest_view
+
+        project_configuration = ProjectConfigurationRESTViews.project_configuration_from_rest(rest_view)
+
+        assert project_configuration.model_dump() == fxt_project_configuration.model_dump()

@@ -1,12 +1,18 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+from collections import defaultdict
 from typing import Any
 
-from geti_configuration_tools.hyperparameters import Hyperparameters
+from geti_configuration_tools.hyperparameters import (
+    DatasetPreparationParameters as HyperparametersDatasetPreparationParameters,
+)
+from geti_configuration_tools.hyperparameters import EvaluationParameters, Hyperparameters, TrainingHyperParameters
 from geti_configuration_tools.training_configuration import (
+    GlobalDatasetPreparationParameters,
     GlobalParameters,
     NullTrainingConfiguration,
+    PartialTrainingConfiguration,
     TrainingConfiguration,
 )
 
@@ -77,3 +83,48 @@ class TrainingConfigurationRESTViews(ConfigurableParametersRESTViews):
         if training_configuration.model_manifest_id:
             rest_view["model_manifest_id"] = training_configuration.model_manifest_id
         return rest_view
+
+    @classmethod
+    def training_configuration_from_rest(cls, rest_input: dict[str, Any]) -> PartialTrainingConfiguration:
+        """
+        Convert REST input to a PartialTrainingConfiguration object.
+
+        :param rest_input: REST input dictionary
+        :return: TrainingConfiguration object
+        """
+        dataset_preparation = cls.configurable_parameters_from_rest(rest_input.pop(DATASET_PREPARATION, {}))
+        training = cls.configurable_parameters_from_rest(rest_input.pop(TRAINING, {}))
+        evaluation = cls.configurable_parameters_from_rest(rest_input.pop(EVALUATION, {}))
+
+        global_parameters: dict = defaultdict(dict)
+        hyperparameters: dict = defaultdict(dict)
+
+        for field, _ in GlobalDatasetPreparationParameters.model_fields.items():
+            global_parameters[DATASET_PREPARATION][field] = dataset_preparation.pop(field, None)
+
+        for field, _ in HyperparametersDatasetPreparationParameters.model_fields.items():
+            hyperparameters[DATASET_PREPARATION][field] = dataset_preparation.pop(field, None)
+
+        for field, _ in TrainingHyperParameters.model_fields.items():
+            hyperparameters[TRAINING][field] = training.pop(field, None)
+
+        for field, _ in EvaluationParameters.model_fields.items():
+            hyperparameters[EVALUATION][field] = evaluation.pop(field, None)
+
+        # add remaining parameters for validation (extra parameters should not be present)
+        global_parameters[DATASET_PREPARATION].update(dataset_preparation)
+        hyperparameters[TRAINING].update(training)
+        hyperparameters[EVALUATION].update(evaluation)
+
+        # Convert defaultdict to regular dicts for the model validation
+        global_parameters = dict(global_parameters)
+        hyperparameters = dict(hyperparameters)
+        global_parameters.pop("default_factory", None)
+        hyperparameters.pop("default_factory", None)
+
+        dict_model = {
+            "global_parameters": global_parameters,
+            "hyperparameters": hyperparameters,
+        }
+
+        return PartialTrainingConfiguration.model_validate(dict_model | rest_input)
