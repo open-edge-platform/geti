@@ -4,5 +4,6 @@
 include ../../../Makefile.shared-python
 
 COMPONENT_NAME := user-directory
+
 DOCKER_BUILD_CONTEXT := --build-context libs=../../../libs \
 						--build-context platform_libs=../../libs \
