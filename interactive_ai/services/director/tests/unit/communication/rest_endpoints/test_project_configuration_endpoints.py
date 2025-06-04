@@ -11,6 +11,7 @@ from communication.controllers.project_configuration_controller import ProjectCo
 from features.feature_flag_provider import FeatureFlag
 
 from geti_types import ID, ProjectIdentifier
+from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 
 DUMMY_ORGANIZATION_ID = "000000000000000000000001"
 DUMMY_WORKSPACE_ID = "567890123456789012340000"
@@ -87,5 +88,64 @@ class TestProjectConfigurationEndpoints:
             project_identifier=project_identifier,
             update_configuration=mock_update_project_config.call_args[1]["update_configuration"],
         )
+        assert result.status_code == HTTPStatus.NO_CONTENT
+        assert not result.content  # 204 responses must not include a response body
+
+    def test_update_project_configuration_rest_conversion(
+        self, fxt_director_app, fxt_enable_feature_flag_name
+    ) -> None:
+        # Arrange
+        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
+
+        # Create a sample REST input payload
+        rest_input = {
+            "task_configs": [
+                {
+                    "task_id": "detection_1",
+                    "training": {
+                        "constraints": [
+                            {
+                                "key": "min_images_per_label",
+                                "value": 15,
+                                "type": "int",
+                                "name": "Minimum images per label"
+                            }
+                        ]
+                    },
+                    "auto_training": [
+                        {"key": "enable", "value": False, "type": "bool", "name": "Enable auto training"},
+                        {"key": "min_images_per_label", "value": 8, "type": "int", "name": "Minimum images per label"}
+                    ]
+                }
+            ]
+        }
+
+        # Act
+        with patch.object(
+            ProjectConfigurationRESTController,
+            "update_configuration",
+            return_value=None,
+        ) as mock_update_project_config:
+            result = fxt_director_app.patch(
+                f"{API_PROJECT_PATTERN}/project_configuration",
+                json=rest_input,
+            )
+
+        # Assert
+        mock_update_project_config.assert_called_once()
+
+        # Capture the update_configuration argument
+        update_config = mock_update_project_config.call_args[1]["update_configuration"]
+
+        # Verify it's a PartialProjectConfiguration with expected values
+        assert isinstance(update_config, PartialProjectConfiguration)
+        assert len(update_config.task_configs) == 1
+
+        task_config = update_config.task_configs[0]
+        assert task_config.task_id == "detection_1"
+        assert task_config.training.constraints.min_images_per_label == 15
+        assert task_config.auto_training.enable is False
+        assert task_config.auto_training.min_images_per_label == 8
+
         assert result.status_code == HTTPStatus.NO_CONTENT
         assert not result.content  # 204 responses must not include a response body

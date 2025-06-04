@@ -1,7 +1,8 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+from pydantic import BaseModel, ValidationError
 
-from geti_configuration_tools.project_configuration import ProjectConfiguration, TaskConfig
+from geti_configuration_tools.project_configuration import ProjectConfiguration, TaskConfig, PartialProjectConfiguration
 
 from communication.views.configurable_parameters_to_rest import ConfigurableParametersRESTViews
 
@@ -38,3 +39,17 @@ class ProjectConfigurationRESTViews(ConfigurableParametersRESTViews):
                 cls.task_config_to_rest(task_config) for task_config in project_configuration.task_configs
             ],
         }
+
+    @classmethod
+    def project_configuration_from_rest(cls, rest_input: dict) -> PartialProjectConfiguration:
+        """
+        Convert a REST input to a ProjectConfiguration object.
+
+        :param rest_input: REST input dictionary
+        :return: ProjectConfiguration object
+        """
+        task_configs = []
+        for task_data in rest_input.pop("task_configs", {}):
+            task_configs.append(cls.configurable_parameters_from_rest(task_data))
+
+        return PartialProjectConfiguration.model_validate({"task_configs": task_configs} | rest_input)
