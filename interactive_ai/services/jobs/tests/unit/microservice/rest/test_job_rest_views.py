@@ -91,6 +91,8 @@ class TestJobRESTViews:
             author_uid=DUMMY_AUTHOR,
             start_time_from=DUMMY_TIME,
             start_time_to=DUMMY_TIME,
+            creation_time_from=DUMMY_TIME,
+            creation_time_to=DUMMY_TIME,
         )
         offset = pagination.skip + page_num_jobs
         expected_next_page = (
@@ -103,6 +105,8 @@ class TestJobRESTViews:
             f"&author_uid={DUMMY_AUTHOR}"
             f"&start_time_from={DUMMY_TIME.isoformat()}"
             f"&start_time_to={DUMMY_TIME.isoformat()}"
+            f"&creation_time_from={DUMMY_TIME.isoformat()}"
+            f"&creation_time_to={DUMMY_TIME.isoformat()}"
             f"&job_type=train"
         )
 

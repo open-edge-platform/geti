@@ -14,6 +14,8 @@ get:
     - $ref: '../../parameters/query/author_id.yaml'
     - $ref: '../../parameters/query/start_time_from.yaml'
     - $ref: '../../parameters/query/start_time_to.yaml'
+    - $ref: '../../parameters/query/creation_time_from.yaml'
+    - $ref: '../../parameters/query/creation_time_to.yaml'
     - $ref: '../../parameters/query/skip.yaml'
     - $ref: '../../parameters/query/limit.yaml'
     - $ref: '../../parameters/query/jobs_sort_by.yaml'
