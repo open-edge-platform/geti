@@ -30,32 +30,27 @@ import { SecondaryToolbar } from './secondary-toolbar.component';
 import classes from '../project-tests.module.scss';
 
 interface ContentContainerProps {
-    containerHeight?: string;
     imageWasUploaded: boolean;
     shouldShowExplanation: boolean;
 }
 
-const ContentContainer = ({
-    imageWasUploaded,
-    shouldShowExplanation,
-    containerHeight = '100%',
-}: ContentContainerProps): JSX.Element => {
+const ContentContainer = ({ imageWasUploaded, shouldShowExplanation }: ContentContainerProps): JSX.Element => {
     // We want to show a warning card to the user when the inference request is not working
     // We will only do this when the request is not successful yet
     const labels = useTaskLabels();
 
     return (
-        <>
-            <View
-                height={containerHeight}
-                borderColor={imageWasUploaded ? 'gray-50' : undefined}
-                borderRadius={imageWasUploaded ? 'regular' : undefined}
-                borderWidth={imageWasUploaded ? 'thin' : undefined}
-            >
+        <View
+            height={'100%'}
+            borderColor={imageWasUploaded ? 'gray-50' : undefined}
+            borderRadius={imageWasUploaded ? 'regular' : undefined}
+            borderWidth={imageWasUploaded ? 'thin' : undefined}
+        >
+            <Flex direction={'column'} height={'100%'}>
                 {imageWasUploaded && <SecondaryToolbar labels={labels} shouldShowExplanation={shouldShowExplanation} />}
                 <Contents />
-            </View>
-        </>
+            </Flex>
+        </View>
     );
 };
 
@@ -72,7 +67,7 @@ const LiveFileInference = ({ imageWasUploaded }: { imageWasUploaded: boolean }) 
     const shouldShowExplanation = useIsExplanationEnabled(imageWasUploaded);
 
     return (
-        <>
+        <Flex height={'100%'} direction={'column'}>
             {imageWasUploaded && (
                 <HeaderOptions
                     title={'Live prediction'}
@@ -84,13 +79,10 @@ const LiveFileInference = ({ imageWasUploaded }: { imageWasUploaded: boolean }) 
                     }
                 />
             )}
-            <ContentContainer
-                // 100% - height of the Header Options
-                containerHeight={imageWasUploaded ? 'calc(100% - 32px - size-100)' : '100%'}
-                imageWasUploaded={imageWasUploaded}
-                shouldShowExplanation={shouldShowExplanation}
-            />
-        </>
+            <View flex={1} minHeight={0}>
+                <ContentContainer imageWasUploaded={imageWasUploaded} shouldShowExplanation={shouldShowExplanation} />
+            </View>
+        </Flex>
     );
 };
 

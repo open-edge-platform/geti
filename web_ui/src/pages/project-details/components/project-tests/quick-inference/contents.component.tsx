@@ -51,8 +51,7 @@ export const Contents = () => {
     // we don't want to allow user to reupload if inference is running
     // we hide a drop media box if we already have uploaded image
     return (
-        // 100% - height of the secondary toolbar
-        <Flex direction='column' height={'calc(100% - 48px)'}>
+        <Flex direction='column' flex={1} minHeight={0}>
             <View backgroundColor={'gray-50'} width={'100%'} height={'100%'} position='relative' minHeight={0}>
                 <MediaDropBox
                     showUploadButton={!imageWasUploaded}
