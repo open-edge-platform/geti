@@ -527,7 +527,7 @@ class JobManager(metaclass=Singleton):
             job_filter["start_time"] = start_time_filter
         creation_time_filter = JobManager._get_timestamp_filter(creation_time)
         if creation_time_filter is not None:
-            job_filter["start_time"] = creation_time_filter
+            job_filter["creation_time"] = creation_time_filter
         return job_filter
 
     @staticmethod
