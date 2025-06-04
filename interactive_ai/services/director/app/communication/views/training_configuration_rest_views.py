@@ -7,7 +7,7 @@ from geti_configuration_tools.hyperparameters import Hyperparameters
 from geti_configuration_tools.training_configuration import (
     GlobalParameters,
     NullTrainingConfiguration,
-    TrainingConfiguration, PartialTrainingConfiguration,
+    TrainingConfiguration,
 )
 
 from communication.views.configurable_parameters_to_rest import ConfigurableParametersRESTViews
@@ -61,7 +61,7 @@ class TrainingConfigurationRESTViews(ConfigurableParametersRESTViews):
                 configurable_parameters=training_configuration.hyperparameters.training,
             )
             if training_configuration.hyperparameters and training_configuration.hyperparameters.training
-            else {}
+            else []
         )
 
         rest_view = {

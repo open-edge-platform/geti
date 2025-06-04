@@ -2,12 +2,75 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from unittest.mock import patch
 
+import pytest
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
 
+from geti_types import ID
 from iai_core.repos import TaskNodeRepo
+
+
+@pytest.fixture
+def fxt_partial_training_configuration():
+    config = {
+        "id_": ID("partial_training_configuration_id"),
+        "task_id": "partial_training_configuration_task_id",
+        "global_parameters": {
+            "dataset_preparation": {
+                "subset_split": {
+                    "training": 80,
+                    "validation": 10,
+                    "test": 10,
+                }
+            }
+        },
+    }
+    yield PartialTrainingConfiguration.model_validate(config)
+
+
+@pytest.fixture
+def fxt_partial_training_configuration_rest_view(fxt_partial_training_configuration):
+    yield {
+        "task_id": fxt_partial_training_configuration.task_id,
+        "dataset_preparation": {
+            "subset_split": [
+                {
+                    "default_value": 70,
+                    "description": "Percentage of data to use for training",
+                    "key": "training",
+                    "max_value": None,
+                    "min_value": 1,
+                    "name": "Training percentage",
+                    "type": "int",
+                    "value": 80,
+                },
+                {
+                    "default_value": 20,
+                    "description": "Percentage of data to use for validation",
+                    "key": "validation",
+                    "max_value": None,
+                    "min_value": 1,
+                    "name": "Validation percentage",
+                    "type": "int",
+                    "value": 10,
+                },
+                {
+                    "default_value": 10,
+                    "description": "Percentage of data to use for testing",
+                    "key": "test",
+                    "max_value": None,
+                    "min_value": 1,
+                    "name": "Test percentage",
+                    "type": "int",
+                    "value": 10,
+                },
+            ],
+        },
+        "training": [],
+        "evaluation": [],
+    }
 
 
 class TestTrainingConfigurationController:
@@ -45,6 +108,31 @@ class TestTrainingConfigurationController:
 
         # check that both task level and manifest level configuration are present
         assert config_rest == fxt_training_configuration_full_rest_view
+
+    @patch.object(TaskNodeRepo, "exists", return_value=True)
+    def test_partial_configurable_parameters_to_rest(
+        self,
+        request,
+        fxt_project_identifier,
+        fxt_partial_training_configuration,
+        fxt_partial_training_configuration_rest_view,
+    ) -> None:
+        # Arrange
+        repo = PartialTrainingConfigurationRepo(fxt_project_identifier)
+        request.addfinalizer(lambda: repo.delete_all())
+
+        repo.save(fxt_partial_training_configuration)
+
+        # Act & Assert
+        # check that only task level configuration is present
+        config_rest = TrainingConfigurationRESTController.get_configuration(
+            project_identifier=fxt_project_identifier,
+            task_id=ID(fxt_partial_training_configuration.task_id),
+            model_manifest_id=fxt_partial_training_configuration.model_manifest_id,
+        )
+
+        # check that both task level and manifest level configuration are present
+        assert config_rest == fxt_partial_training_configuration_rest_view
 
     @patch.object(TaskNodeRepo, "exists", return_value=True)
     def test_update_configuration(
