@@ -1,11 +1,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration
-from geti_types import ID
 
 from service.configuration_service import ConfigurationService
 from service.utils import delete_none_from_dict, merge_deep_dict
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
+
+from geti_types import ID
 
 
 class TestConfigurationService:

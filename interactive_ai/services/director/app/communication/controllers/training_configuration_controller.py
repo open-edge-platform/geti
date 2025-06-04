@@ -4,7 +4,7 @@ from typing import Any
 
 from geti_configuration_tools.training_configuration import NullTrainingConfiguration, PartialTrainingConfiguration
 
-from communication.exceptions import TaskNodeNotFoundException
+from communication.exceptions import MissingTaskIDException, TaskNodeNotFoundException
 from communication.views.training_configuration_rest_views import TrainingConfigurationRESTViews
 from service.configuration_service import ConfigurationService
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
@@ -19,7 +19,7 @@ class TrainingConfigurationRESTController:
     @unified_tracing
     def get_configuration(
         project_identifier: ProjectIdentifier,
-        task_id: ID,
+        task_id: ID | None = None,
         model_manifest_id: str | None = None,
         model_id: ID | None = None,
     ) -> dict[str, Any]:
@@ -35,6 +35,13 @@ class TrainingConfigurationRESTController:
         :return: Dictionary representation of the training configuration
         :raises TaskNotFoundException: If the task does not exist
         """
+        # task_id can be None if the project is single-task
+        if task_id is None:
+            task_ids = list(TaskNodeRepo(project_identifier).get_trainable_task_ids())
+            if len(task_ids) != 1:
+                raise MissingTaskIDException
+            task_id = task_ids[0]
+
         if not TaskNodeRepo(project_identifier).exists(task_id):
             raise TaskNodeNotFoundException(task_node_id=task_id)
 

@@ -1,7 +1,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from geti_configuration_tools.hyperparameters import Hyperparameters, DatasetPreparationParameters, \
-    AugmentationParameters, CenterCrop, TrainingHyperParameters, EarlyStopping, EvaluationParameters
+from geti_configuration_tools.hyperparameters import (
+    AugmentationParameters,
+    DatasetPreparationParameters,
+    EvaluationParameters,
+    Hyperparameters,
+    TrainingHyperParameters,
+)
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration
 
 from service.utils import delete_none_from_dict, merge_deep_dict
@@ -68,9 +73,7 @@ class ConfigurationService:
         """
         # TODO after ITEP-32190: Load model manifest hyperparameters when model manifests are added
         base_hyperparameters = Hyperparameters(
-            dataset_preparation=DatasetPreparationParameters(
-                augmentation=AugmentationParameters()
-            ),
+            dataset_preparation=DatasetPreparationParameters(augmentation=AugmentationParameters()),
             training=TrainingHyperParameters(),
             evaluation=EvaluationParameters(),
         )

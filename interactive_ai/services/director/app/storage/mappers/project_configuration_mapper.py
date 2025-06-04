@@ -17,6 +17,11 @@ class TaskConfigToMongo(IMapperSimple[TaskConfig, dict]):
         doc["task_id"] = IDToMongo.forward(instance.task_id)
         return doc
 
+    @staticmethod
+    def backward(instance: dict) -> TaskConfig:
+        instance["task_id"] = str(IDToMongo.backward(instance["task_id"]))  # Convert ObjectId back to string
+        return TaskConfig.model_validate(instance)
+
 
 class ProjectConfigurationToMongo(IMapperSimple[ProjectConfiguration, dict]):
     """MongoDB mapper for `TrainingConfiguration` entities"""
@@ -32,5 +37,5 @@ class ProjectConfigurationToMongo(IMapperSimple[ProjectConfiguration, dict]):
     def backward(instance: dict) -> ProjectConfiguration:
         return ProjectConfiguration(
             project_id=IDToMongo.backward(instance["_id"]),
-            task_configs=[TaskConfig.model_validate(task_config) for task_config in instance["task_configs"]],
+            task_configs=[TaskConfigToMongo.backward(task_config) for task_config in instance["task_configs"]],
         )
