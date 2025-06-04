@@ -1,0 +1,19 @@
+apiVersion: v2
+appVersion: v1.2.1
+description: Reloader chart that runs on kubernetes
+home: https://github.com/stakater/Reloader
+icon: https://raw.githubusercontent.com/stakater/Reloader/master/assets/web/reloader-round-100px.png
+keywords:
+- Reloader
+- kubernetes
+maintainers:
+- email: hello@stakater.com
+  name: Stakater
+- email: rasheed@stakater.com
+  name: rasheedamir
+- email: faizan.ahmad55@outlook.com
+  name: faizanahmad055
+name: reloader
+sources:
+- https://github.com/stakater/Reloader
+version: 1.2.1

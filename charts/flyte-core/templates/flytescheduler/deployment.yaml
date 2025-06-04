@@ -1,0 +1,117 @@
+{{- if .Values.workflow_scheduler.enabled}}
+  {{- if eq .Values.workflow_scheduler.type "native" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flytescheduler.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytescheduler.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{ include "flytescheduler.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/admin/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flytescheduler.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if not .Values.global.istio_ambient_mesh }}
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels: {{ include "flytescheduler.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 10001
+        fsGroupChangePolicy: "Always"
+      {{- if .Values.flytescheduler.priorityClassName }}
+      priorityClassName: {{ .Values.flytescheduler.priorityClassName }}
+      {{- end }}
+      {{- if .Values.flytescheduler.runPrecheck }}
+      initContainers:
+        - name: init-flyte-db-config
+          volumeMounts:
+            - mountPath: /config-source
+              name: config-projected-volume
+            - mountPath: /config-destination
+              name: config-volume
+          {{- include "flyte.init-flyte-db-container" . | nindent 10 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s
+              --for=condition=complete
+              --namespace {{ template "flyte.namespace" . }}
+              init-job-{{ template "flytescheduler.name" . }}
+      {{- end }}
+      containers:
+      - command:
+        - flytescheduler
+        - run
+        - --config
+        - {{ .Values.flytescheduler.configPath }}
+        image: "{{ .Values.flytescheduler.image.registry }}/{{ if .Values.flytescheduler.image.repository }}{{ .Values.flytescheduler.image.repository }}/{{ end }}{{ .Values.flytescheduler.image.name }}"
+        imagePullPolicy: "{{ .Values.flytescheduler.imagePullPolicy }}"
+        name: flytescheduler
+        ports:
+          - containerPort: {{ .Values.configmap.schedulerConfig.scheduler.profilerPort }}
+        resources: {{ toYaml .Values.flytescheduler.resources | nindent 10 }}
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
+          - mountPath: /etc/flyte/config
+            name: config-volume
+            readOnly: true
+          - name: auth
+            mountPath: /etc/secrets/
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+      serviceAccountName: {{ template "flytescheduler.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
+        - emptyDir: {}
+          name: shared-data
+        - name: config-volume
+          emptyDir: {}
+        - name: config-projected-volume
+          projected:
+            sources:
+              - configMap:
+                  name: flyte-scheduler-config
+              - secret:
+                  name: "{{ .Release.Namespace }}-postgresql"
+        - name: auth
+          secret:
+            secretName: flyte-secret-auth
+      {{- with .Values.flytescheduler.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytescheduler.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytescheduler.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}
+  {{- end }}

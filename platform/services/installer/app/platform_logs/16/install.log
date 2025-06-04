@@ -1,0 +1,15 @@
+11:01:34,983 cli_utils.checks INFO Running check: check_user_id
+11:01:34,983 cli_utils.checks DEBUG The installer can be run only by a user with root permissions. Run the installer with 'sudo' as described in the installation manual.
+11:01:34,983 cli_utils.checks INFO Running check: check_os_version
+11:01:34,983 checks.os DEBUG Checking OS version with `grep ^PRETTY /etc/os-release`
+11:01:34,986 checks.os DEBUG Local OS: Ubuntu 24.04.1 LTS, required OS: Ubuntu 20.04, Ubuntu 22.04, Ubuntu 24.04, Ubuntu 24.10, Red Hat Enterprise Linux 9.
+11:01:34,986 cli_utils.checks INFO Running check: check_internet_connection
+11:01:34,986 checks.internet INFO Checking Internet access.
+11:01:34,986 checks.internet DEBUG Sending request to http://example.com...
+11:01:34,988 urllib3.connectionpool DEBUG Starting new HTTP connection (1): proxy-igk.intel.com:912
+11:01:35,389 urllib3.connectionpool DEBUG http://proxy-igk.intel.com:912 "HEAD http://example.com/ HTTP/1.1" 200 0
+11:01:35,390 checks.internet DEBUG Internet is accessible.
+11:01:35,390 cli_utils.checks INFO Running check: check_dns_ipv4_handling
+11:01:35,390 checks.dns INFO Checking IPv4 DNS resolve.
+11:01:35,390 checks.dns DEBUG Resolving DNS to example.com
+11:01:35,421 checks.dns DEBUG DNS did resolve to example.com

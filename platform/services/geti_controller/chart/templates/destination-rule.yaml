@@ -1,0 +1,18 @@
+{{- if .Values.global.ingress_enabled }}
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: {{ include "geti-controller.name" . }}
+  namespace: {{ .Values.global.istio_ingress_namespace }}
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  host: {{ include "geti-controller.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 500
+        connectTimeout: 900s
+{{- end }}

@@ -1,0 +1,18 @@
+{{- if .Values.webhook.config -}}
+{{- $_ := .Values.webhook.config.apiVersion | required ".Values.webhook.config.apiVersion must be set !" -}}
+{{- $_ := .Values.webhook.config.kind | required ".Values.webhook.config.kind must be set !" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "webhook.fullname" . }}
+  namespace: {{ include "cert-manager.namespace" . }}
+  labels:
+    app: {{ include "webhook.name" . }}
+    app.kubernetes.io/name: {{ include "webhook.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: "webhook"
+    {{- include "labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    {{- .Values.webhook.config | toYaml | nindent 4 }}
+{{- end -}}

@@ -1,0 +1,28 @@
+13:41:41,826 __main__ ERROR is_filepath_valid() missing 2 required positional arguments: 'param' and 'value'
+Traceback (most recent call last):
+  File "/opt/src/geti/installer/app/platform_installer.py", line 35, in <module>
+    cli()
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/rich_click/rich_group.py", line 21, in main
+    return super().main(*args, standalone_mode=False, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1688, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/installer/app/commands/install.py", line 185, in install
+    _check_tls_certificate(cert_file=tls_cert_file, key_file=tls_key_file)
+  File "/opt/src/geti/installer/app/commands/install.py", line 129, in _check_tls_certificate
+    if not is_filepath_valid(cert_file):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: is_filepath_valid() missing 2 required positional arguments: 'param' and 'value'

@@ -1,0 +1,26 @@
+annotations:
+  artifacthub.io/alternativeName: istio-csr
+  artifacthub.io/category: security
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/prerelease: "true"
+  artifacthub.io/recommendations: |
+    - url: https://artifacthub.io/packages/helm/cert-manager/cert-manager
+    - url: https://artifacthub.io/packages/helm/cert-manager/trust-manager
+apiVersion: v2
+appVersion: v0.13.0
+description: istio-csr enables the use of cert-manager for issuing certificates in
+  Istio service meshes
+home: https://cert-manager.io/docs/usage/istio-csr
+icon: https://raw.githubusercontent.com/cert-manager/community/4d35a69437d21b76322157e6284be4cd64e6d2b7/logo/logo-small.png
+keywords:
+- cert-manager
+- istio
+maintainers:
+- email: cert-manager-maintainers@googlegroups.com
+  name: cert-manager-maintainers
+  url: https://cert-manager.io
+name: cert-manager-istio-csr
+sources:
+- https://github.com/cert-manager/istio-csr
+type: application
+version: v0.13.0

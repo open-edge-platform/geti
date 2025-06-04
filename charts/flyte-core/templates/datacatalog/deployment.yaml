@@ -1,0 +1,120 @@
+{{- if .Values.datacatalog.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "datacatalog.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "datacatalog.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.datacatalog.replicaCount }}
+  selector:
+    matchLabels: {{ include "datacatalog.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/datacatalog/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.datacatalog.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if not .Values.global.istio_ambient_mesh }}
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+        # using this param as it is being used on on-prem only
+        {{- if and (not (eq .Values.global.seaweed_fs_enabled nil)) .Values.global.seaweed_fs_enabled }}
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- end }}
+      labels: {{ include "datacatalog.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 10001
+        fsGroupChangePolicy: "OnRootMismatch"
+      {{- if .Values.datacatalog.priorityClassName }}
+      priorityClassName: {{ .Values.datacatalog.priorityClassName }}
+      {{- end }}
+      initContainers:
+        - name: init-datacatalog-db-config
+          volumeMounts:
+            - mountPath: /config-source
+              name: config-projected-volume
+            - mountPath: /config-destination
+              name: config-volume
+          {{- include "flyte.init-flyte-db-container" . | nindent 10 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s
+              --for=condition=complete
+              --namespace {{ template "flyte.namespace" . }}
+              init-job-{{ template "datacatalog.name" . }}
+      containers:
+      - command:
+        - datacatalog
+        - --config
+        - {{ .Values.datacatalog.configPath }}
+        - serve
+        {{- with .Values.datacatalog.extraArgs }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        image: "{{ .Values.datacatalog.image.registry }}/{{ if .Values.datacatalog.image.repository }}{{ .Values.datacatalog.image.repository }}/{{ end }}{{ .Values.datacatalog.image.name }}"
+        imagePullPolicy: "{{ .Values.datacatalog.imagePullPolicy }}"
+        name: datacatalog
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
+        resources: {{ toYaml .Values.datacatalog.resources | nindent 10 }}
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /etc/datacatalog/config
+          name: config-volume
+          readOnly: true
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+      serviceAccountName: {{ template "datacatalog.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      - emptyDir: {}
+        name: shared-data
+      - name: config-volume
+        emptyDir: {}
+      - name: config-projected-volume
+        projected:
+          sources:
+            - configMap:
+                name: datacatalog-config
+            - secret:
+                name: flyte-storage-yaml
+                items:
+                  - key: storage.yaml
+                    path: ./storage.yaml
+      {{- with .Values.datacatalog.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.datacatalog.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.datacatalog.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}

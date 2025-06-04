@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "geti-controller.name" . }}
+  labels:
+    {{- if .Values.global.istio_ambient_mesh }}
+    istio.io/ingress-use-waypoint: "true"
+    {{- end }}
+    {{- include "geti-controller.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.ports.https }}
+      targetPort: http
+      protocol: TCP
+  selector:
+    {{- include "geti-controller.selectorLabels" . | nindent 4 }}

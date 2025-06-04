@@ -1,0 +1,176 @@
+{{- if .Values.flyteadmin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.flyteadmin.replicaCount }}
+  selector:
+    matchLabels: {{ include "flyteadmin.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/admin/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flyteadmin.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- if not .Values.global.istio_ambient_mesh }}
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+        # using this param as it is being used on on-prem only
+        {{- if and (not (eq .Values.global.seaweed_fs_enabled nil)) .Values.global.seaweed_fs_enabled }}
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- end }}
+      labels: {{ include "flyteadmin.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 10001
+        fsGroupChangePolicy: "Always"
+      {{- if .Values.flyteadmin.priorityClassName }}
+      priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
+      {{- end }}
+      initContainers:
+        - name: init-clusters-config
+          volumeMounts:
+            - mountPath: /config-source
+              name: clusters-config-projected-volume
+            - mountPath: /config-destination
+              name: clusters-config-volume
+          {{- include "flyte.init-flyte-db-container" . | nindent 10 }}
+        # [mTLS STRICT] The kubectl-wait init container is used to wait for the init job that is related to this specific component.
+        # This is a workaround to address the issue that arises when using Istio mTLS strict mode and init containers
+        # that do not have the Istio proxy sidecar
+        - name: "kubectl-wait"
+          image: "{{ .Values.global.kubectl.registry }}/{{ if .Values.global.kubectl.repository }}{{ .Values.global.kubectl.repository }}/{{ end }}{{ .Values.global.kubectl.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}                
+          command: [ "/bin/bash", "-c" ]
+          args:
+            - >-
+              kubectl wait jobs
+              --timeout=1200s
+              --for=condition=complete
+              --namespace {{ template "flyte.namespace" . }}
+              init-job-{{ template "flyteadmin.name" . }}
+        - name: wait-for-kafka
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          command: [ 'sh', '-c', "until nc -w 5 -z $KAFKA_HOST $KAFKA_PORT; do echo wait...; sleep 2; done;" ]
+          env:
+            - name: "KAFKA_HOST"
+              value: "{{ .Release.Namespace }}-kafka.{{ .Release.Namespace }}.svc.cluster.local"
+            - name: "KAFKA_PORT"
+              value: "9092"
+      containers:
+      - command:
+        - flyteadmin
+        - --config
+        - {{ .Values.flyteadmin.configPath }}
+        - serve
+        {{- with .Values.flyteadmin.extraArgs }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        {{- if .Values.flyteadmin.env }}
+        env:
+        {{- with .Values.flyteadmin.env -}}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        {{- end }}
+        image: "{{ .Values.flyteadmin.image.registry }}/{{ if .Values.flyteadmin.image.repository }}{{ .Values.flyteadmin.image.repository }}/{{ end }}{{ .Values.flyteadmin.image.name }}"
+        imagePullPolicy: "{{ .Values.flyteadmin.imagePullPolicy }}"
+        name: flyteadmin
+        ports:
+        - containerPort: 8088
+        - containerPort: 8089
+        - containerPort: {{ .Values.configmap.adminServer.flyteadmin.profilerPort }}
+        readinessProbe:
+          exec:
+            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          initialDelaySeconds: 15
+        livenessProbe:
+          exec:
+            command: [ "sh", "-c", "reply=$(curl -s -o /dev/null -w %{http_code} http://127.0.0.1:8088/healthcheck); if [ \"$reply\" -lt 200 -o \"$reply\" -ge 400 ]; then exit 1; fi;","grpc_health_probe", "-addr=:8089"]
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        resources: {{ toYaml .Values.flyteadmin.resources | nindent 10 }}
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+        volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+        - mountPath: /srv/flyte
+          name: shared-data
+        - mountPath: /etc/flyte/config
+          name: clusters-config-volume
+          readOnly: true
+        - mountPath: /etc/secrets/
+          name: admin-secrets
+        {{- with .Values.flyteadmin.additionalVolumeMounts -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.flyteadmin.additionalContainers -}}
+      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- end }}
+      serviceAccountName: {{ template "flyteadmin.name" . }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
+        - name: clusters-config-volume
+          emptyDir: {}
+        - emptyDir: {}
+          name: shared-data
+        - emptyDir: {}
+          name: scratch
+        - projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - configMap:
+                  name: flyte-admin-clusters-config
+              - secret:
+                  name: flyte-storage-yaml
+                  items:
+                    - key: storage.yaml
+                      path: ./storage.yaml
+          name: clusters-config-projected-volume
+        {{- if .Values.cluster_resource_manager.enabled }}
+        - configMap:
+            name: clusterresource-template
+          name: resource-templates
+        {{- end }}
+        - name: admin-secrets
+          secret:
+            secretName: flyte-admin-secrets
+        {{- with .Values.flyteadmin.additionalVolumes -}}
+        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+      {{- with .Values.flyteadmin.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteadmin.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteadmin.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}

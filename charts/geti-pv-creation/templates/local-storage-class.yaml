@@ -1,0 +1,10 @@
+{{- if eq .Values.storageClassName "local-storage" }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.storageClassName }}
+  labels:
+    {{- include "geti-pv-creation.labels" . | nindent 4 }}
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+{{- end }}

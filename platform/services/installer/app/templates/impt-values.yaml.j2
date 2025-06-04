@@ -1,0 +1,435 @@
+---
+#  INTEL CONFIDENTIAL
+#
+#  Copyright (C) 2023 Intel Corporation
+#
+#  This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+#  the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+#  you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+#  without Intel's prior written permission.
+#
+#  This software and the related documents are provided as is, with no express or implied warranties,
+#  other than those that are expressly stated in the License.
+
+enabled:
+  dcgm-exporter: {{ 'nvidia' in gpu_label | default('') }}
+  lgtm-stack: {{ grafana_enabled }}
+  xpu-manager: {{ 'i915' in gpu_label | default('') }}
+
+{% if registry %}
+reloader:
+  global:
+    imageRegistry: {{ registry }}
+    imagePullSecrets:
+      - name: regcred
+  reloader:
+    deployment:
+      image:
+        base: third-party/reloader
+        tag: v1.2.1.1
+
+dcgm-exporter:
+  image:
+    registry: {{ registry }}
+    repository: third-party
+    name: nvidia/dcgm-exporter
+    tag: 3.3.8.1-3.6.0-ubi9
+  imagePullSecrets:
+    - name: regcred
+{% endif %}
+
+impt-configuration:
+  serverAddress: {{ k8s_server_address }}
+  data_folder: {{ data_folder }}
+  platformVersion: {{ product_version }}
+  buildVersion: {{ product_build }}
+  intelEmail: {{ intel_email }}
+  feature_flags_data:
+{{ feature_flags_data | indent(6,True) | safe }}
+  render_gid: {{ render_gid }}
+  accelerator:
+{% if not gpu_support %}
+    type: cpu
+{%  else %}
+    type: gpu
+    name: {{ gpu_label }}
+{% endif %}
+
+global:
+  data_folder: {{ data_folder }}
+  manage_users: {{ ff_manage_users }}
+  serverAddress: {{ k8s_server_address }}
+  registry_address: {{ geti_registry }}
+  docker_namespace: open-edge-platform/geti
+  tag: {{ product_build }}
+  mlflow_sidecar_image: "{{ geti_registry }}/open-edge-platform/geti/mlflow-geti-store:{{ product_build }}"
+  ote_image: "{{ geti_registry }}/open-edge-platform/geti/ote:{{ product_build }}"
+  otx2_image: "{{ geti_registry }}/open-edge-platform/geti/otx2-training:{{ product_build }}"
+  security_headers: |
+    X-Frame-Options: "DENY"
+    Content-Security-Policy: "frame-ancestors 'none'; default-src 'self'; media-src 'self' https://docs.geti.intel.com/on-prem/2.6/; connect-src 'self' data: https://consumerdev.intel.com/ https://login.microsoftonline.com/; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' blob:; img-src 'self' data:; frame-src 'none'; object-src 'none'; form-action 'self'; worker-src 'self' blob:"
+    cross-origin-embedder-policy: require-corp
+    cross-origin-opener-policy: same-origin
+    X-Content-Type-Options: "nosniff"
+  stripped_headers: |
+    - "X-Envoy-Decorator-Operation"
+  istio_ambient_mesh: {{ ff_ambient_mesh }}
+{% if ff_ambient_mesh %}
+  istio_gateway_name: "istio-ingress-gateway"
+  istio_ingress_namespace: "istio-ingress"
+{% else %}
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+{% endif %}
+  grafana_enabled: {{ grafana_enabled }}
+  grafana_tmp_sub_path: grafana_tmp
+  dcgm_dashboard: {{ 'nvidia' in gpu_label | default('') }}
+  xpum_dashboard: {{ 'i915' in gpu_label | default('') }}
+  logging_config_dir: "/mnt/logging_config"
+  logs_dir: "/mnt/logs"
+  ldap_service_user_secret_name: "impt-ldap-service-user"
+  min_free_disk_space_gib: {{ min_free_disk_space_gib }}
+  running_on_vm: {{ running_on_vm }}
+  workflow_versions: {{ product_build }}
+  forceNamespace:
+    flyte: flyte
+  telemetry_retention_geti: 30
+  telemetry_retention_k8s: 10
+  enable_mongodb_credentials: true
+  oidc_cidaas : {{ ff_oidc_cidaas }}
+  credit_system_enabled: {{ ff_credit_system }}
+  seaweed_fs_enabled: true
+  {% if registry %}
+  enable_local_image_pull_secret: true
+  kubectl:
+    registry: {{ registry }}
+    repository: local-third-party
+    name: kubectl:1.31.0.5-debian-12-r4
+  busybox:
+    registry: {{ registry }}
+    repository: base-images
+    name: debian:12.8.1
+  debian:
+    registry: {{ registry }}
+    repository: base-images
+    name: debian:12.8.1
+  {% endif %}
+  s3_endpoint: impt-seaweed-fs.impt:8333
+  cors_policy:
+    enabled: true
+    allowed_origins:
+      - exact: "https://docs.geti.intel.com"
+{% if ff_support_cors %}
+      - exact: "https://public-docs.geti-dev.infra-host.com"
+      - regex: "^http://localhost:?[0-9]*$"
+      - regex: "^https://10\\.55\\.252\\.[0-9]{1,3}$"
+      - regex: "^https://[0-9.-]+\\.iotg\\.sclab\\.intel\\.com$"
+      - regex: "^https://10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:?[0-9]*$"
+      - regex: "^http://10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:?[0-9]*$"
+{% endif %}
+    allowed_headers:
+      - Authorization
+      - Content-Type
+      - tus-resumable
+      - upload-length
+      - upload-length
+      - x-geti-csrf-protection
+      - cookie
+      - x-api-key
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+    max_age: 86400s
+    allow_credentials: true
+
+{% if registry %}
+mongodb:
+  image: 
+    registry: {{ registry }}
+    repository: third-party
+    name: mongo-dockerhub:6.0.16.1
+       
+xpu-manager:
+  image:
+    registry: {{ registry }}
+    repository: third-party
+    
+cert-manager-istio-csr:
+  image:
+    registry: {{ registry }}
+    repository: third-party
+{% endif %}
+
+gateway:
+  dex_name: "impt-dex"
+  configuration_cm_name: "impt-configuration"
+
+opentelemetry-collector:
+  config:
+    receivers:
+      k8s_events:
+        namespaces:
+        - "impt"
+        - "opa-istio"
+        - "istio-system"
+  {% if registry %}
+  imagePullSecrets:
+    - name: regcred
+  image:
+    registry: {{ registry }}
+    repository: third-party
+    name: opentelemetry-collector:0.101.0.1
+  initContainers:
+    - name: volume-permissions
+      command: [ "sh", "-c", "mkdir -p /logs/checkpoints && find /logs -type d -exec chown -v 10001 {} +"]
+      image:
+        registry: {{ registry }}
+        repository: base-images
+        name: debian:12.8.1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 100m
+          memory: 256Mi
+      volumeMounts:
+        - mountPath: /logs
+          name: data-storage
+          subPath: logs
+          readOnly: false
+      securityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+  {% endif %}
+
+oidc-stack:
+  openldap:
+    {% if registry %}
+    image: 
+      registry: {{ registry }}
+      repository: local-third-party
+      name: openldap:2.6.8.5-debian-12-r9
+    {% endif %}
+    config:
+      impt_ldif: |-
+
+        # Group definitions.
+        dn: ou=Groups,dc=example,dc=org
+        objectClass: organizationalUnit
+        ou: Groups
+
+        dn: cn=Admins,ou=Groups,dc=example,dc=org
+        cn: Admins
+        gidnumber: 500
+        objectclass: posixGroup
+        objectclass: top
+
+        dn: cn=Users,ou=Groups,dc=example,dc=org
+        cn: Users
+        gidnumber: 501
+        objectclass: posixGroup
+        objectclass: top
+
+        dn: cn=ServiceAccounts,ou=Groups,dc=example,dc=org
+        cn: ServiceAccounts
+        gidnumber: 502
+        objectclass: posixGroup
+        objectclass: top
+  dex:
+    {% if registry %}
+    image: 
+      registry: {{ registry }}
+      repository: local-third-party
+      name: dex:v2.41.1.4
+    {% endif %}
+    isSMTPDefined: {{ smtp_address | default("", true) | length > 0 }}
+
+{% if registry %}
+postgresql:
+  image: 
+    registry: {{ registry }}
+    repository: third-party
+{% endif %}
+
+kubernetes-image-puller:
+  {% if registry %}
+  image: 
+    registry: {{ registry }}
+    repository: third-party
+    name: kubernetes-image-puller:b56091f
+  {% endif %}
+  flyte_db_enabled: true
+
+{% if registry %}
+kafka:
+  image:
+    registry: {{ registry }}
+    repository: third-party
+    name: kafka:3.7.1.2-debian-12-r7
+  volumePermissions:
+    image:
+      registry: {{ registry }}
+      repository: base-images
+      name: debian:12.8.1
+  
+kafka-proxy:
+  kafka_proxy:
+    image:
+      registry: {{ registry }}
+      repository: local-third-party
+      name: kafka-proxy:0.3.11.4
+
+kafka-provisioning:
+  image:
+    registry: {{ registry }}
+    repository: third-party
+    name: kafka:3.7.1.2-debian-12-r7
+  global:
+    imagePullSecrets:
+      - regcred
+{% endif %}
+
+secrets:
+  smtp:
+      smtp_enabled: {{ smtp_address | default("", true) | length > 0 }}
+      smtp_login: "{{ smtp_login | default('') }}"
+      smtp_password: "{{ smtp_password | default('') }}"
+      smtp_host: "{{ smtp_address | default('') }}"
+      smtp_port: "{{ smtp_port | default('') }}"
+      from_mail: "{{ sender_address | default('') }}"
+      from_name: "{{ sender_name | default('') }}"
+
+{% if registry %}
+spice-db:
+  image: 
+    registry: {{ registry }}
+    repository: local-third-party
+    name: spicedb:v1.34.0.4
+  debug: 
+    image:
+      registry: {{ registry }}
+      repository: local-third-party
+      name: spicedb:v1.34.0.4
+  postgresql:
+    image:
+      registry: {{ registry }}
+      repository: third-party
+
+{% endif %}
+flyte-core:
+  {% if registry %}
+  postgresql:
+    image:
+      registry: {{ registry }}
+      repository: third-party
+  jobs:
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+  {% endif %}
+  forceNamespace: flyte
+  flyteadmin:
+    {% if registry %}
+    image:
+      registry: {{ registry }}
+      repository: local-third-party/flyte
+      name: flyteadmin:v1.13.1.3
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+    {% endif %}
+    initialProjects:
+      - impt-jobs
+  {% if registry %}
+  flytescheduler:
+    image:
+      registry: {{ registry }}
+      repository: local-third-party/flyte
+      name: flytescheduler:v1.13.1.3
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+  datacatalog:
+    image:
+      registry: {{ registry }}
+      repository: local-third-party/flyte
+      name: datacatalog:v1.13.1.3
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+  flytepropeller:
+    image:
+      registry: {{ registry }}
+      repository: local-third-party/flyte
+      name: flytepropeller:v1.13.1.3
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+  flyteconsole:
+    image:
+      registry: {{ registry }}
+      repository: local-third-party/flyte
+      name: flyteconsole:v1.17.1.1
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+  webhook:
+    serviceAccount:
+      imagePullSecrets:
+        - name: regcred
+  {% endif %}
+  storage:
+    s3:
+      endpoint: http://impt-seaweed-fs.impt:8333
+
+jobs-execution-namespace:
+  dataStoragePath: {{ data_folder }}
+  feature_flags_data:
+{{ feature_flags_data | indent(6,True) | safe }}
+
+modelmesh-serving:
+  {% if registry %}
+  modelmesh:
+    image:
+      registry: {{ registry }}
+      repository: third-party
+      tag: v0.12.0.2
+  controller:
+    image:
+      registry: {{ registry }}
+      repository: third-party
+      name: modelmesh-controller:v0.12.0.2
+  runtimeadapter:
+    image:
+      registry: {{ registry }}
+      repository: third-party
+      name: modelmesh-runtime-adapter
+      tag: v0.12.0.1
+  modelserver:
+    image:
+      registry: {{ registry }}
+      repository: local-third-party
+      name: model_server:2025.1.1
+  modelmeshImageTag: 'v0.12.0.2'
+  {% endif %}
+  s3_endpoint_url: "http://impt-seaweed-fs.impt.svc.cluster.local:8333"
+
+{% if registry %}
+etcd:
+  global:
+    imagePullSecrets:
+      - regcred
+  image:
+    registry: {{ registry }}
+    repository: third-party
+    name: etcd:3.5.16.2-debian-12-r2
+  volumePermissions:
+    image:
+      registry: {{ registry }}
+      repository: base-images
+      name: debian:12.8.1
+{% endif %}

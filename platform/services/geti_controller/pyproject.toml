@@ -1,0 +1,103 @@
+# Copyright (C) 2022-2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+[project]
+name = "geti-controller"
+version = "1.0.0"
+description = "Geti Controller service for installation and upgrades"
+requires-python = ">=3.10, <3.14"
+
+dependencies = [
+    "fastapi~=0.109",
+    "uvicorn~=0.27.1",
+    "geti-types",
+    "geti-telemetry-tools[fastapi,grpc,logger,telemetry]"
+]
+
+[tool.uv.sources]
+geti-telemetry-tools = { path = "../../../libs/telemetry_tools", editable = true }
+geti-types = { path = "../../../libs/types", editable = true }
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "mypy~=1.15",
+    "pytest-cov==2.11.1",
+    "click==8.1.7",
+    "pytest-html~=4.0.0",
+    "httpx~=0.23",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["app"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [
+    ".venv*",
+]
+src = ["app"]
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+
+# Covers any pytest
+"*test*.py" = ["E741", "E402", "E501",
+    "S",
+    "RET",
+    "PL",
+    "RUF",
+    "SIM",
+    "D103",
+    "ARG",
+    "PYI024",
+    "ANN"]
+
+# Covers BDD tests
+"*features*.py" = ["E741", "E402", "E501",
+    "S",
+    "RET",
+    "PL",
+    "RUF",
+    "SIM",
+    "D103",
+    "ARG",
+    "PYI024",
+    "ANN"]
+
+[tool.ruff.lint.isort]
+# First-party = self-contained packages defined within Geti
+known-first-party = [
+    "geti_logger_tools", "datumaro_helper", "jobs_common", "grpc_interfaces",
+    "k8s_custom_resources", "load_tests", "microservices", "nodes_resource",
+    "platform_models", "iai_core", "geti_telemetry_tools", "users_handler", "account_service_client", "migration", "geti_kafka_tools"
+]
+# Local folder = Geti folder that often appears as base in import statements, but that doesn't qualify as a package logically
+known-local-folder = [
+    "application", "common", "communication", "config", "job", "migration_job", "tests", "platform_cleaner", "weights_uploader"
+]
+# Third-party = self-contained packages defined and maintained outside Geti
+known-third-party = ["grpc", "kafka", "kubernetes", "kubernetes_asyncio", "minio", "otx", "starlette", "sqlalchemy"]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+exclude = "^.*/tests/.*\\.py|app/alembic/.*\\.py"
+show_error_codes = true

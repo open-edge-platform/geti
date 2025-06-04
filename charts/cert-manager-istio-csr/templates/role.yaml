@@ -1,0 +1,28 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    {{- include "cert-manager-istio-csr.labels" . | nindent 4 }}
+  name: {{ include "cert-manager-istio-csr.name" . }}
+  namespace: {{ .Values.app.certmanager.namespace }}
+rules:
+- apiGroups:
+  - "cert-manager.io"
+  resources:
+  - "certificaterequests"
+  verbs:
+  - "get"
+  - "list"
+  - "create"
+  - "update"
+  - "delete"
+  - "watch"
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
+{{- with ( include "cert-manager-istio-csr.runtimeConfigurationName" . ) }}
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+  resourceNames: [{{ . | quote }}]
+{{- end }}

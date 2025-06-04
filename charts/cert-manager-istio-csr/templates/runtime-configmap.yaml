@@ -1,0 +1,14 @@
+{{- if .Values.app.runtimeConfiguration.create }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "cert-manager-istio-csr.runtimeConfigurationName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "cert-manager-istio-csr.name" . }}
+    {{- include "cert-manager-istio-csr.labels" . | nindent 4 }}
+data:
+  issuer-name: {{ .Values.app.runtimeConfiguration.issuer.name | quote }}
+  issuer-kind: {{ .Values.app.runtimeConfiguration.issuer.kind | quote }}
+  issuer-group: {{ .Values.app.runtimeConfiguration.issuer.group | quote }}
+{{- end }}

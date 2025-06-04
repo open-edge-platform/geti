@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "jobs.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "jobs.labels" . | nindent 4 }}
+  {{- with .Values.jobs.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- if .Values.global.enable_local_image_pull_secret }}
+  {{- with .Values.jobs.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
+{{- end }}

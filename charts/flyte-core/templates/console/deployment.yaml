@@ -1,0 +1,68 @@
+{{- if .Values.flyteconsole.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flyteconsole.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteconsole.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.flyteconsole.replicaCount }}
+  selector:
+    matchLabels: {{ include "flyteconsole.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/console/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flyteconsole.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flyteconsole.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ template "flyteconsole.name" . }}
+      securityContext:
+        runAsUser: 10001
+        fsGroupChangePolicy: "OnRootMismatch"
+      {{- if .Values.flyteconsole.priorityClassName }}
+      priorityClassName: {{ .Values.flyteconsole.priorityClassName }}
+      {{- end }}
+      containers:
+      - image: "{{ .Values.flyteconsole.image.registry }}/{{ if .Values.flyteconsole.image.repository }}{{ .Values.flyteconsole.image.repository }}/{{ end }}{{ .Values.flyteconsole.image.name }}"
+        imagePullPolicy: "{{ .Values.flyteconsole.imagePullPolicy }}"
+        name: flyteconsole
+        envFrom:
+        - configMapRef:
+            name: flyte-console-config
+        ports:
+        - containerPort: 8080
+        {{- if .Values.flyteconsole.ga.enabled }}
+        env:
+        - name: ENABLE_GA
+          value: "{{ .Values.flyteconsole.ga.enabled }}"
+        - name: GA_TRACKING_ID
+          value: "{{ .Values.flyteconsole.ga.tracking_id }}"
+        {{- end }}
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+        resources: {{ toYaml .Values.flyteconsole.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /srv/flyte
+          name: shared-data
+      volumes:
+      - emptyDir: {}
+        name: shared-data
+      {{- with .Values.flyteconsole.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteconsole.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteconsole.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}

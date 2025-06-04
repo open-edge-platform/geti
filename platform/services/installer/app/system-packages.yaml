@@ -1,0 +1,42 @@
+shared:
+  packages:
+    - name: helm
+      destination: tools
+      urls:
+        - https://get.helm.sh/helm-v3.16.1-linux-amd64.tar.gz
+    - name: k3s
+      destination: tools/k3s
+      urls:
+        - https://github.com/k3s-io/k3s/releases/download/v1.31.0+k3s1/k3s
+        - https://github.com/k3s-io/k3s/releases/download/v1.31.0+k3s1/k3s-airgap-images-amd64.tar.gz
+        - https://raw.githubusercontent.com/k3s-io/k3s/refs/tags/v1.31.0+k3s1/install.sh
+ubuntu:
+  packages:
+    - name: pigz
+      destination: tools/Ubuntu
+      urls:
+        - https://archive.ubuntu.com/ubuntu/pool/universe/p/pigz/pigz_2.4-1_amd64.deb
+    - name: nvidia
+      destination: tools/Ubuntu/nvidia
+      urls:
+        - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/nvidia-container-toolkit-base_1.16.2-1_amd64.deb
+        - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/nvidia-container-toolkit_1.16.2-1_amd64.deb
+        - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/libnvidia-container1_1.16.2-1_amd64.deb
+        - https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/libnvidia-container-tools_1.16.2-1_amd64.deb
+redhat:
+  packages:
+    - name: pigz
+      destination: tools/RedHat
+      urls:
+        - https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pigz-2.5-4.el9.x86_64.rpm
+    - name: nvidia
+      destination: tools/RedHat/nvidia
+      urls:
+        - https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/nvidia-container-toolkit-base-1.16.2-1.x86_64.rpm
+        - https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/nvidia-container-toolkit-1.16.2-1.x86_64.rpm
+        - https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/libnvidia-container1-1.16.2-1.x86_64.rpm
+        - https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/libnvidia-container-tools-1.16.2-1.x86_64.rpm
+    - name: k3s-selinux
+      destination: tools/RedHat/k3s-selinux
+      urls:
+        - https://github.com/k3s-io/k3s-selinux/releases/download/v1.6.stable.1/k3s-selinux-1.6-1.el9.noarch.rpm

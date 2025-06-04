@@ -1,0 +1,31 @@
+13:24:56,723 __main__ ERROR [Errno 13] Permission denied: '/data'
+Traceback (most recent call last):
+  File "/opt/src/geti/installer/app/platform_installer.py", line 35, in <module>
+    cli()
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1157, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/rich_click/rich_group.py", line 21, in main
+    return super().main(*args, standalone_mode=False, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1078, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1688, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 1434, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/src/installer/platform_installer/.venv-platform-installer/lib/python3.12/site-packages/click/core.py", line 783, in invoke
+    return __callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/installer/app/commands/install.py", line 151, in install
+    directory = check_data_folder(directory=data_folder)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/src/geti/installer/app/commands/install.py", line 129, in check_data_folder
+    create_default_data_folder()
+  File "/opt/src/geti/installer/app/platform_utils/path.py", line 25, in create_default_data_folder
+    os.makedirs(DATA_FOLDER, mode=0o750)
+  File "<frozen os>", line 225, in makedirs
+PermissionError: [Errno 13] Permission denied: '/data'

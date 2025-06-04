@@ -1,0 +1,130 @@
+---
+#  INTEL CONFIDENTIAL
+#
+#  Copyright (C) 2024 Intel Corporation
+#
+#  This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+#  the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+#  you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+#  without Intel's prior written permission.
+#
+#  This software and the related documents are provided as is, with no express or implied warranties,
+#  other than those that are expressly stated in the License.
+
+enabled:
+  account-service: true
+  notifier: {{ smtp_address | default("", true) | length > 0 }}
+  onboarding-service: {{ ff_user_onboarding }}
+  credit-system: {{ ff_credit_system }}
+  auth-proxy: true
+  initial-user: true
+
+{% if registry %}
+account-service:
+  postgresql:
+    image: 
+      registry: {{ registry }}
+      repository: third-party
+      
+credit-system:
+  postgresql:
+    image: 
+      registry: {{ registry }}
+      repository: third-party
+{% endif %}
+
+geti-controller:
+  configuration:
+    login: "{{ login }}"
+    passwordHash: "{{ password_hash }}"
+    dataFolder: {{ data_folder }}
+    tlsCert: {{ tls_cert | default("") }}
+    tlsKey: {{ tls_key | default("") }}
+
+notifier:
+  kafka:
+    topic: project_notifications
+    security_protocol: "SASL_PLAINTEXT"
+    address: impt-kafka.impt:9092
+
+global:
+  enable_local_image_pull_secret: true
+  manage_users: {{ ff_manage_users }}
+  manage_users_roles: {{ ff_manage_users_roles }}
+  acc_svc_mod: {{ ff_acc_svc_mod }}
+  smtp_host: {{ smtp_address | default('') }}
+  smtp_port: {{ smtp_port | default('') }}
+  s3_endpoint: impt-seaweed-fs.impt:8333
+  registry_address: {{ geti_registry }}
+  docker_namespace: open-edge-platform/geti
+  tag: {{ product_build }}
+  ldap_service_user_secret_name: "impt-ldap-service-user"
+  istio_ambient_mesh: {{ ff_ambient_mesh }}
+{% if ff_ambient_mesh %}
+  istio_gateway_name: "istio-ingress-gateway"
+  istio_ingress_namespace: "istio-ingress"
+{% else %}
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+{% endif %}
+  logging_config_dir: "/mnt/logging_config"
+  running_on_vm: {{ running_on_vm }}
+  initial_admin_user_login: "{{ user_login | default('') }}"
+{% if user_password is defined %}
+  initial_admin_user_password: "{{ user_password }}"
+  account_service_mode: "setup"
+{% elif user_password is not defined %}
+  initial_admin_user_password: ""
+  account_service_mode: "migration"
+{% endif %}
+  security_headers: |
+    X-Frame-Options: "DENY"
+    Content-Security-Policy: "frame-ancestors 'none'; default-src 'self'; media-src 'self' https://docs.geti.intel.com/on-prem/2.6/; connect-src 'self' data: https://consumerdev.intel.com/ https://login.microsoftonline.com/; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' blob:; img-src 'self' data:; frame-src 'none'; object-src 'none'; form-action 'self'; worker-src 'self' blob:"
+    cross-origin-embedder-policy: require-corp
+    cross-origin-opener-policy: same-origin
+    X-Content-Type-Options: "nosniff"
+  stripped_headers: |
+    - "X-Envoy-Decorator-Operation"
+  {% if registry %}
+  kubectl:
+    registry: {{ registry }}
+    repository: local-third-party
+    name: kubectl:1.31.0.5-debian-12-r4
+  busybox: 
+    registry: {{ registry }}
+    repository: base-images
+    name: debian:12.8.1
+  debian:
+    registry: {{ registry }}
+    repository: base-images
+    name: debian:12.8.1
+  {% endif %}
+  cors_policy:
+    enabled: true
+    allowed_origins:
+      - exact: "https://docs.geti.intel.com"
+{% if ff_support_cors %}
+      - exact: "https://public-docs.geti-dev.infra-host.com"
+      - regex: "^http://localhost:?[0-9]*$"
+      - regex: "^https://10\\.55\\.252\\.[0-9]{1,3}$"
+      - regex: "^https://[0-9.-]+\\.iotg\\.sclab\\.intel\\.com$"
+      - regex: "^https://10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:?[0-9]*$"
+      - regex: "^http://10\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}:?[0-9]*$"
+{% endif %}
+    allowed_headers:
+      - Authorization
+      - Content-Type
+      - tus-resumable
+      - upload-length
+      - upload-length
+      - x-geti-csrf-protection
+      - cookie
+      - x-api-key
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+    max_age: 86400s
+    allow_credentials: true

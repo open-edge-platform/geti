@@ -1,0 +1,142 @@
+k3s_version: "1.1"
+nvidia_drivers_version: "1.2"
+intel_drivers_version: "1.3"
+nvidia_device_plugin_version: "1.4"
+intel_device_plugin_version: "1.5"
+is_upgrade_required: false
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: geti-namespaces
+  namespace: default
+spec:
+  version: $VERSION
+  chart: $REGISTRY/geti/helm/geti-namespaces
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: reloader
+  namespace: kube-system
+spec:
+  chart: $REGISTRY/geti/helm/reloader
+  version: $VERSION
+  targetNamespace: kube-system
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: geti-pv-creation
+  namespace: impt
+spec:
+  chart: $REGISTRY/geti/helm/geti-pv-creation
+  version: $VERSION
+  valuesContent: |-
+    dataStoragePath: {{ data_folder }}
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  chart: $REGISTRY/geti/helm/cert-manager
+  version: $VERSION
+  targetNamespace: cert-manager
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: cert-manager-istio-csr
+  namespace: cert-manager
+spec:
+  chart: $REGISTRY/geti/helm/cert-manager-istio-csr
+  version: $VERSION
+  targetNamespace: cert-manager
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-base
+  namespace: istio-system
+spec:
+  chart: $REGISTRY/geti/helm/istio-base
+  version: $VERSION
+  targetNamespace: istio-system
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-istiod
+  namespace: istio-system
+spec:
+  chart: $REGISTRY/geti/helm/istio-istiod
+  version: $VERSION
+  targetNamespace: istio-system
+  valuesContent: |-
+    global:
+      proxy:
+        excludeIPRanges: "10.43.0.1/32"
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: istio-gateway
+  namespace: istio-system
+spec:
+  chart: $REGISTRY/geti/helm/istio-gateway
+  version: $VERSION
+  targetNamespace: istio-system
+  valuesContent: |-
+    env:
+      WASM_INSECURE_REGISTRIES: "$REGISTRY"
+    global:
+      registry_address: "$REGISTRY"
+    tls:
+      key_file: {{ tls_key_file }}
+      cert_file: {{ tls_cert_file }}
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: geti-tools
+  namespace: impt
+spec:
+  chart: $REGISTRY/geti/helm/geti-tools
+  version: $VERSION
+  targetNamespace: impt
+  timeout: 20m
+  valuesContent: |-
+    global:
+      registry_address: "$REGISTRY"
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: geti-components
+  namespace: impt
+spec:
+  chart: $REGISTRY/geti/helm/geti-components
+  version: $VERSION
+  targetNamespace: impt
+  timeout: 60m
+  valuesContent: |-
+    dataStoragePath: {{ data_folder }}
+    global:
+      registry_address: "$REGISTRY"
+      initial_admin_user_login: "{{ username }}"
+      initial_admin_user_password: "{{ password }}"
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: flyte-core
+  namespace: flyte
+spec:
+  chart: $REGISTRY/geti/helm/flyte-core
+  version: $VERSION
+  targetNamespace: flyte
+  valuesContent: |-
+    global:
+      registry_address: "$REGISTRY"

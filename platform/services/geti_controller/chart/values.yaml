@@ -1,0 +1,100 @@
+# Default values for geti-controller.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  registry_address: ""
+  tag: ""
+  docker_namespace: "open-edge-platform/geti"
+  enable_local_image_pull_secret: false
+  security_headers: ""
+  stripped_headers: ""
+  ingress_enabled: true
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+  istio_ambient_mesh: false
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+
+replicaCount: 1
+
+imagePullPolicy: IfNotPresent
+image: geti-controller
+
+nameOverride: ""
+fullnameOverride: ""
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+      - DAC_READ_SEARCH
+
+service:
+  type: ClusterIP
+  ports:
+    https: 9200
+
+initialDelaySeconds: 5
+periodSeconds: 45
+
+resources:
+  requests:
+    cpu: 400m
+    memory: 500Mi
+  limits:
+    cpu: 400m
+    memory: 500Mi
+
+initResources:
+  requests:
+    cpu: 50m
+    memory: 100Mi
+  limits:
+    cpu: 50m
+    memory: 100Mi
+
+timeout: 360s
+
+configuration:
+  secretName: geti-install-data
+  login: ""
+  passwordHash: ""
+  dataFolder: "/data"
+  tlsCert: ""
+  tlsKey: ""
+
+mountPath: "/data"
+
+endpoints:
+  - matches:
+      - /api/v(.*)/platform/(?:versions|check_installation_upgrade_progress|check_backup)/?
+    methods:
+      - GET
+  - matches:
+      - /api/v(.*)/platform/(?:install|upgrade)/?
+    methods:
+      - POST

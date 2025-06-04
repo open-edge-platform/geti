@@ -1,0 +1,41 @@
+global:
+  registry_address: {{ geti_registry }}
+  docker_namespace: open-edge-platform/geti
+  enable_local_image_pull_secret: true
+  istio_ambient_mesh: {{ ff_ambient_mesh }}
+{% if ff_ambient_mesh %}
+  istio_gateway_name: "istio-ingress-gateway"
+  istio_ingress_namespace: "istio-ingress"
+{% else %}
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+{% endif %}
+  security_headers: |
+    X-Frame-Options: "DENY"
+    Content-Security-Policy: "frame-ancestors 'none'; default-src 'self'; connect-src 'self' data: https://consumerdev.intel.com/ https://login.microsoftonline.com/; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' blob:; img-src 'self' data:; frame-src 'none'; object-src 'none'; form-action 'self'; worker-src 'self' blob:"
+    cross-origin-embedder-policy: require-corp
+    cross-origin-opener-policy: same-origin
+    X-Content-Type-Options: "nosniff"
+  stripped_headers: |
+    - "X-Envoy-Decorator-Operation"
+  weights_url: "{{ weights_url }}"
+  proxy:
+    enabled: {{ proxy_enabled | default(false) }}
+    http_proxy: "{{ proxy_http }}"
+    https_proxy: "{{ proxy_https }}"
+    no_proxy: "{{ proxy_no_proxy }}"
+{% if registry %}
+  busybox:
+    registry: {{ registry }}
+    repository: base-images
+    name: debian:12.8.1
+  kubectl:
+    registry: {{ registry }}
+    repository: local-third-party
+    name: kubectl:1.31.0.5-debian-12-r4
+
+image:
+  registry: {{ registry }}
+  repository: local-third-party
+  name: seaweedfs:3.69.7
+{% endif %}

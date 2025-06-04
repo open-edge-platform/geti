@@ -1,0 +1,55 @@
+{{- if .Values.global.ingress_enabled }}
+{{- if not .Values.global.istio_ambient_mesh }}
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ include "geti-controller.name" . }}-admin
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - {{ .Values.global.istio_ingress_namespace }}/{{ .Values.global.istio_gateway_name }}
+  http:
+  - match:
+  {{- range $section := $.Values.endpoints }}
+    {{- range $url := $section.matches }}
+      {{- $methods := $section.methods }}
+      {{- if $.Values.global.cors_policy.enabled }}
+        {{- $methods = append $methods "OPTIONS" }}
+      {{- end }}
+      {{- range $method := $methods }}
+    - uri:
+        regex: {{ tpl $url $ | quote }}
+      method:
+        exact: {{ $method }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
+    {{- if $.Values.global.cors_policy.enabled }}
+    corsPolicy:
+      allowHeaders: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_headers) | indent 6 }}
+      allowOrigins: {{- include "control-plane-common.formatKeyValuePair" (dict "sourceDict" $.Values.global.cors_policy.allowed_origins) | indent 6 }}
+      allowMethods: {{- include "control-plane-common.appendToArray" (dict "sourceArray" $.Values.global.cors_policy.allowed_methods) | indent 6 }}
+      maxAge: {{ $.Values.global.cors_policy.max_age | quote }}
+      allowCredentials: {{ $.Values.global.cors_policy.allow_credentials }}
+    {{- end }}
+    headers:
+      response:
+        set:
+          Cache-Control: "no-cache, no-store, max-age=0, must-revalidate"
+{{ .Values.global.security_headers | indent 10 }}
+        remove:
+{{ .Values.global.stripped_headers | indent 10 }}
+    timeout: {{ .Values.timeout }}
+    route:
+    - destination:
+        host: {{ include "geti-controller.name" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port:
+          number: {{ .Values.service.ports.https }}
+{{- end }}
+{{- end }}

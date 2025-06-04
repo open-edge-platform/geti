@@ -1,0 +1,6 @@
+apiVersion: v2
+name: geti-pv-creation
+type: application
+description: system volume based on local storage to create pv and pvc
+version: 1.0.0
+appVersion: v1.0.0

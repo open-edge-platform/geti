@@ -1,0 +1,319 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-job-{{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    app: {{ template "flyteadmin.name" . }}
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        app: {{ template "flyteadmin.name" . }}
+    spec:
+      serviceAccountName: {{ template "flyteadmin.name" . }}-init-job
+      restartPolicy: Never
+      volumes:
+        - name: create-db
+          configMap:
+            name: create-db-sh
+            defaultMode: 0755
+        - name: base-config-volume
+          emptyDir: {}
+        - name: base-config-projected-volume
+          projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - secret:
+                  name: flyte-storage-yaml
+                  items:
+                    - key: storage.yaml
+                      path: ./storage.yaml
+        - name: "init"
+          emptyDir: {}
+        - emptyDir: {}
+          name: scratch
+        - projected:
+            sources:
+              - configMap:
+                  name: flyte-admin-base-config
+              - configMap:
+                  name: flyte-admin-clusters-config
+              - secret:
+                  name: flyte-storage-yaml
+                  items:
+                    - key: storage.yaml
+                      path: ./storage.yaml
+          name: clusters-config-projected-volume
+        - name: clusters-config-volume
+          emptyDir: {}
+        {{- if .Values.cluster_resource_manager.enabled }}
+        - configMap:
+            name: clusterresource-template
+          name: resource-templates
+        {{- end }}
+        - name: admin-secrets
+          secret:
+            secretName: flyte-admin-secrets
+      initContainers:
+        - name: init-flyte-base-config
+          volumeMounts:
+            - mountPath: /config-source
+              name: base-config-projected-volume
+            - mountPath: /config-destination
+              name: base-config-volume
+          {{- include "flyte.init-flyte-db-container" . | nindent 10 }}
+        - name: init-flyte-clusters-config
+          volumeMounts:
+            - mountPath: /config-source
+              name: clusters-config-projected-volume
+            - mountPath: /config-destination
+              name: clusters-config-volume
+          {{- include "flyte.init-flyte-db-container" . | nindent 10 }}
+        - name: init-postgresql
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          command: [ 'sh', '-c', "until nc -w 5 -z $POSTGRES_HOST $POSTGRES_PORT; do echo wait...; sleep 2; done;" ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          env:
+            - name: "POSTGRES_HOST"
+              value: "{{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}"
+            - name: "POSTGRES_PORT"
+              value: "5432"
+      containers:
+        - command: [ "/bin/sh", "-c" ]
+          args:
+            - |
+              /opt/psql-script/create-db.sh;
+              retVal=$?;
+              echo "done" > /init/1; 
+              exit $retVal
+          image: "{{ .Values.postgresql.image.registry }}/{{ if .Values.postgresql.image.repository }}{{ .Values.postgresql.image.repository }}/{{ end }}{{ .Values.postgresql.image.name }}"
+          name: init-flyte-db
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+            - name: create-db
+              mountPath: "/opt/psql-script"
+          env:
+            - name: PGHOST
+              value: {{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}
+            - name: PGPORT
+              value: "5432"
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: postgresql-db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: postgresql-username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: postgresql-password
+            - name: TARGET_POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: flyte-postgresql-username
+            - name: TARGET_POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: flyte-postgresql-password
+            - name: TARGET_POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Release.Namespace }}-postgresql
+                  key: flyte-postgresql-db
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+        - command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ]; do
+                sleep 1
+              done;
+              flyteadmin
+              --config={{ .Values.flyteadmin.configPath }}
+              migrate run;
+              retVal=$?;
+              echo "done" > /init/2; 
+              exit $retVal
+          image: "{{ .Values.flyteadmin.image.registry }}/{{ if .Values.flyteadmin.image.repository }}{{ .Values.flyteadmin.image.repository }}/{{ end }}{{ .Values.flyteadmin.image.name }}"
+          imagePullPolicy: "{{ .Values.flyteadmin.imagePullPolicy }}"
+          name: run-migrations
+          volumeMounts:
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+              readOnly: true
+            - name: "init"
+              mountPath: "/init"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+        - command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/2 ]; do
+                sleep 1
+              done;
+              flyteadmin
+              --config={{ .Values.flyteadmin.configPath }}
+              migrate seed-projects
+              {{- range .Values.flyteadmin.initialProjects }}
+              {{ . }}
+              {{- end }};
+              retVal=$?;
+              echo "done" > /init/3; 
+              exit $retVal
+          image: "{{ .Values.flyteadmin.image.registry }}/{{ if .Values.flyteadmin.image.repository }}{{ .Values.flyteadmin.image.repository }}/{{ end }}{{ .Values.flyteadmin.image.name }}"
+          imagePullPolicy: "{{ .Values.flyteadmin.imagePullPolicy }}"
+          name: seed-projects
+          volumeMounts:
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+              readOnly: true
+            - name: "init"
+              mountPath: "/init"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+        - command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/2 ]; do
+                sleep 1
+              done;
+              flyteadmin 
+              --config={{ .Values.flyteadmin.configPath }}
+              secrets init 
+              --localPath=/etc/scratch/secrets
+              && flyteadmin
+              --config={{ .Values.flyteadmin.configPath }}
+              secrets create 
+              --name flyte-admin-secrets
+              --fromPath=/etc/scratch/secrets;
+              retVal=$?;
+              echo "done" > /init/4; 
+              exit $retVal
+          image: "{{ .Values.flyteadmin.image.registry }}/{{ if .Values.flyteadmin.image.repository }}{{ .Values.flyteadmin.image.repository }}/{{ end }}{{ .Values.flyteadmin.image.name }}"
+          imagePullPolicy: "{{ .Values.flyteadmin.imagePullPolicy }}"
+          name: generate-secrets
+          volumeMounts:
+            - mountPath: /etc/flyte/config
+              name: base-config-volume
+              readOnly: true
+            - mountPath: /etc/scratch
+              name: scratch
+            - name: "init"
+              mountPath: "/init"
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+        {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
+        - command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/3 ]; do
+                sleep 1
+              done;
+              flyteadmin
+              --config={{ .Values.flyteadmin.configPath }}
+              clusterresource sync;
+              retVal=$?;
+              echo "done" > /init/5; 
+              exit $retVal
+          image: "{{ .Values.flyteadmin.image.registry }}/{{ if .Values.flyteadmin.image.repository }}{{ .Values.flyteadmin.image.repository }}/{{ end }}{{ .Values.flyteadmin.image.name }}"
+          imagePullPolicy: "{{ .Values.flyteadmin.imagePullPolicy }}"
+          name: sync-cluster-resources
+          volumeMounts:
+            - mountPath: /etc/flyte/clusterresource/templates
+              name: resource-templates
+            - mountPath: /etc/flyte/config
+              name: clusters-config-volume
+              readOnly: true
+            - mountPath: /etc/secrets/
+              name: admin-secrets
+            - name: "init"
+              mountPath: "/init"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+        {{- end }}
+        {{- if not .Values.global.istio_ambient_mesh }}
+        - name: "istio-sidecar-quit"
+          image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
+              while [ ! -f /init/1 ] || [ ! -f /init/2 ] || [ ! -f /init/3 ] || [ ! -f /init/4 ] || [ ! -f /init/5 ]; do
+              {{- else }}
+              while [ ! -f /init/1 ] || [ ! -f /init/2 ] || [ ! -f /init/3 ] || [ ! -f /init/4 ]; do
+              {{- end }}
+                sleep 1
+              done;
+              curl -XPOST 127.0.0.1:15020/quitquitquit
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- end }}

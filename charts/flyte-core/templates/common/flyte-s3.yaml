@@ -1,0 +1,162 @@
+{{- $seaweedFS := lookup "v1" "Secret" "impt" "impt-seaweed-fs" }}
+# `index` function is necessary because the property name contains a dash.
+# Otherwise $previous.data.postgresql_password would have worked too.
+{{ if $seaweedFS }}
+{{- $flyteAccessKey :=  $seaweedFS.data.flyte_access_key | b64dec }}
+{{- $flyteSecretKey := $seaweedFS.data.flyte_secret_key | b64dec }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-storage-yaml
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    {{- include "flyteadmin.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  storage.yaml: |
+    storage:
+      type: minio
+      container: {{ .Values.storage.bucketName | quote }}
+      stow:
+        kind: s3
+        config:
+          access_key_id: {{ $flyteAccessKey }}
+          auth_type: accesskey
+          secret_key: {{ $flyteSecretKey }}
+          disable_ssl: true
+          endpoint: {{ .Values.storage.s3.endpoint }}
+          region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://localhost:8333
+      enable-multicontainer: {{ .Values.storage.enableMultiContainer }}
+      limits:
+        maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-k8s-yaml
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    {{- include "flytepropeller.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  k8s.yaml: |
+    plugins:
+      k8s:
+        default-cpus: 100m
+        default-memory: 100Mi
+        delete-resource-on-finalize: true
+        default-env-vars:
+        - FLYTE_AWS_ENDPOINT: http://impt-seaweed-fs.{{ .Values.main_namespace }}:8333
+        - FLYTE_AWS_ACCESS_KEY_ID: {{ $flyteAccessKey }}
+        - FLYTE_AWS_SECRET_ACCESS_KEY: {{ $flyteSecretKey }}
+        - KAFKA_ADDRESS: impt-kafka.{{ .Values.main_namespace }}:9092
+        - SPICEDB_ADDRESS: impt-spice-db.{{ .Values.main_namespace }}:50051
+        - SPICEDB_CREDENTIALS: "token_and_ca"
+        - JOBS_SCHEDULER: impt-jobs-scheduler.{{ .Values.main_namespace }}:50051
+        - DATABASE_ADDRESS: mongodb://impt-mongodb.{{ .Values.main_namespace }}:27017/
+        - WORKDIR: '/binary_data'
+        - S3_CREDENTIALS_PROVIDER: "local"
+        - MONGODB_CREDENTIALS_PROVIDER: "local"
+        - BUCKET_NAME_MLFLOWEXPERIMENTS: "mlflowexperiments"
+        - BUCKET_NAME_IMAGES: "images"
+        - BUCKET_NAME_MODELMESH: "modelmesh"
+        - BUCKET_NAME_MODELS: "models"
+        - BUCKET_NAME_TENSORS: "tensors"
+        - BUCKET_NAME_THUMBNAILS: "thumbnails"
+        - BUCKET_NAME_VIDEOS: "videos"
+        - BUCKET_NAME_CODEDEPLOYMENTS: "codedeployments"
+        - BUCKET_NAME_TEMPORARYFILES: "temporaryfiles"
+        - MAX_IMPORTABLE_DATASET_SIZE_GB: "200"
+        - MAX_NUM_FILES_ZIPPED_ARCHIVE: "10000000"
+        - UNZIP_BUFFER_SIZE_BYTES: "512"
+        - MODEL_REGISTRATION_SERVICE: impt-modelregistration.{{ .Values.main_namespace }}:5555
+        - S3_HOST: impt-seaweed-fs.{{ .Values.main_namespace }}:8333
+        - OTLP_TRACES_RECEIVER: impt-opentelemetry-collector.{{ .Values.main_namespace }}:4317
+        - OTLP_METRICS_RECEIVER: impt-opentelemetry-collector.{{ .Values.main_namespace }}:4317
+        - OTLP_TRACES_PROTOCOL: "grpc"
+        - OTLP_PROCESSOR_DO_NOT_SEND_SPANS: "job_step_details send,PATCH"
+        - ENABLE_TRACING: true
+        - ENABLE_METRICS: true
+{{- else }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-storage-yaml
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    {{- include "flyteadmin.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  storage.yaml: |
+    storage:
+      type: minio
+      container: {{ .Values.storage.bucketName | quote }}
+      stow:
+        kind: s3
+        config:
+          access_key_id: {{ randAlphaNum 20 }}
+          auth_type: accesskey
+          secret_key: {{ randAlphaNum 40 }}
+          disable_ssl: true
+          endpoint: {{ .Values.storage.s3.endpoint }}
+          region: us-east-1
+      signedUrl:
+        stowConfigOverride:
+          endpoint: http://localhost:8333
+      enable-multicontainer: {{ .Values.storage.enableMultiContainer }}
+      limits:
+        maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-k8s-yaml
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    {{- include "flytepropeller.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  k8s.yaml: |
+    plugins:
+      k8s:
+        default-cpus: 100m
+        default-memory: 100Mi
+        delete-resource-on-finalize: false
+        default-env-vars:
+        - FLYTE_AWS_ENDPOINT: http://localhost:8333
+        - FLYTE_AWS_ACCESS_KEY_ID: {{ randAlphaNum 20 }}
+        - FLYTE_AWS_SECRET_ACCESS_KEY: {{ randAlphaNum 40 }}
+        - KAFKA_ADDRESS: impt-kafka.{{ .Values.main_namespace }}:9092
+        - SPICEDB_ADDRESS: impt-spice-db.{{ .Values.main_namespace }}:50051
+        - SPICEDB_CREDENTIALS: "token_and_ca"
+        - JOBS_SCHEDULER: impt-jobs-scheduler.{{ .Values.main_namespace }}:50051
+        - DATABASE_ADDRESS: mongodb://impt-mongodb.{{ .Values.main_namespace }}:27017/
+        - WORKDIR: '/binary_data'
+        - S3_CREDENTIALS_PROVIDER: "local"
+        - MONGODB_CREDENTIALS_PROVIDER: "local"
+        - BUCKET_NAME_MLFLOWEXPERIMENTS: "mlflowexperiments"
+        - BUCKET_NAME_IMAGES: "images"
+        - BUCKET_NAME_MODELMESH: "modelmesh"
+        - BUCKET_NAME_MODELS: "models"
+        - BUCKET_NAME_TENSORS: "tensors"
+        - BUCKET_NAME_THUMBNAILS: "thumbnails"
+        - BUCKET_NAME_VIDEOS: "videos"
+        - BUCKET_NAME_CODEDEPLOYMENTS: "codedeployments"
+        - BUCKET_NAME_TEMPORARYFILES: "temporaryfiles"
+        - BUCKET_NAME_PRETRAINEDWEIGHTS: "pretrainedweights"
+        - MAX_IMPORTABLE_DATASET_SIZE_GB: "200"
+        - MAX_NUM_FILES_ZIPPED_ARCHIVE: "10000000"
+        - UNZIP_BUFFER_SIZE_BYTES: "512"
+        - MODEL_REGISTRATION_SERVICE: impt-modelregistration.{{ .Values.main_namespace }}:5555
+        - S3_HOST: localhost:8333
+        - OTLP_TRACES_RECEIVER: impt-opentelemetry-collector.{{ .Values.main_namespace }}:4317
+        - OTLP_METRICS_RECEIVER: impt-opentelemetry-collector.{{ .Values.main_namespace }}:4317
+        - OTLP_TRACES_PROTOCOL: "grpc"
+        - OTLP_PROCESSOR_DO_NOT_SEND_SPANS: "job_step_details send,PATCH"
+        - ENABLE_TRACING: true
+        - ENABLE_METRICS: true
+{{- end }}

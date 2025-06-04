@@ -1,0 +1,21 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    {{- include "cert-manager-istio-csr.labels" . | nindent 4 }}
+  name: {{ include "cert-manager-istio-csr.name" . }}-leases
+  namespace: {{ .Values.app.controller.leaderElectionNamespace }}
+rules:
+- apiGroups:
+  - "coordination.k8s.io"
+  resources:
+  - "leases"
+  verbs:
+  - "get"
+  - "create"
+  - "update"
+  - "watch"
+  - "list"
+- apiGroups: [""]
+  resources: ["events"]
+  verbs: ["create"]
