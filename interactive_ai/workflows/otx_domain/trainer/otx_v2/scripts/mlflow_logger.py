@@ -389,7 +389,7 @@ def _get_resolve_tags() -> Callable:
 
     # before v1.1.0
     if hasattr(context, "resolve_tags"):
-        from mlflow.tracking.context import resolve_tags
+        from mlflow.tracking.context import resolve_tags  # type: ignore
     # since v1.1.0
     elif hasattr(context, "registry"):
         from mlflow.tracking.context.registry import resolve_tags
