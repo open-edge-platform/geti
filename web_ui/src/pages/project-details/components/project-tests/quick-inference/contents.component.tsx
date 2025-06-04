@@ -1,21 +1,18 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { paths } from '@geti/core';
-import { Button, Flex, Loading, View } from '@geti/ui';
+import { Flex, Loading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
-import { NoTrainedModels } from '../../../../../assets/images';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
-import { EmptyData } from '../../../../../shared/components/empty-data/empty-data.component';
 import { MediaDropBoxHeader } from '../../../../../shared/components/media-drop/media-drop-box-header.component';
 import { MediaDropBox } from '../../../../../shared/components/media-drop/media-drop-box.component';
 import { VALID_IMAGE_TYPES } from '../../../../../shared/media-utils';
 import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useCameraStorage } from '../../../../camera-page/hooks/use-camera-storage.hook';
-import { CameraLiveInferenceDialog } from './camera-live-inference/camera-live-inference.component';
 import { ImageSection } from './image-section.component';
 import { useQuickInference } from './quick-inference-provider.component';
 import { WaitingInference } from './waiting-inference.component';
@@ -45,20 +42,8 @@ export const Contents = () => {
     const datasetIdentifier = useDatasetIdentifier();
     const { useHasActiveModels } = useModels();
     const { hasActiveModels } = useHasActiveModels();
-    const [isLiveCameraInferenceOpen, setIsLiveCameraInferenceOpen] = useState<boolean>(false);
 
-    const { handleUploadImage, imageWasUploaded, isDisabled, isLoading, showWarningCard, dismissWarningCard } =
-        useQuickInference();
-
-    if (isDisabled) {
-        return (
-            <EmptyData
-                title={'No trained models'}
-                text={'Upload media and annotate to train a new model'}
-                beforeText={<NoTrainedModels />}
-            />
-        );
-    }
+    const { handleUploadImage, imageWasUploaded, isLoading, showWarningCard, dismissWarningCard } = useQuickInference();
 
     const acceptedFormats = VALID_IMAGE_TYPES;
     const isMultipleUpload = false;
@@ -100,21 +85,9 @@ export const Contents = () => {
                         </>
                     )}
                 </MediaDropBox>
-                <Button
-                    variant={'secondary'}
-                    position={'absolute'}
-                    top={'size-300'}
-                    onPress={() => setIsLiveCameraInferenceOpen(true)}
-                >
-                    Camera live
-                </Button>
                 <LoadFileFromLiveInferenceCamera onFileLoaded={handleUploadImage} />
             </View>
             <WaitingInference isVisible={showWarningCard} dismiss={dismissWarningCard} />
-            <CameraLiveInferenceDialog
-                onClose={() => setIsLiveCameraInferenceOpen(false)}
-                isOpen={isLiveCameraInferenceOpen}
-            />
         </Flex>
     );
 };
