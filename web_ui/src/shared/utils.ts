@@ -4,12 +4,11 @@
 import { getFailedJobMessage } from '@geti/core/src/services/utils';
 import { type LoadingState, type KeyboardEvent as ReactKeyboardEvent } from '@geti/ui';
 import { CalendarDate, CalendarDateTime, DateValue } from '@internationalized/date';
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import utc from 'dayjs/plugin/utc.js';
 import { filesize, FileSizeOptionsBase } from 'filesize';
-import { StatusCodes } from 'http-status-codes';
 import { isEmpty, isEqual, isFunction, isNil, isString, negate } from 'lodash-es';
 import * as yup from 'yup';
 
@@ -313,7 +312,7 @@ export const getIntervalJobHandlers =
             isFunction(onError) &&
                 onError({
                     message: getFailedJobMessage(jobResponse),
-                    response: { status: StatusCodes.NOT_IMPLEMENTED },
+                    response: { status: HttpStatusCode.NotImplemented },
                 } as AxiosError);
 
             isFunction(onCancelOrFailed) && onCancelOrFailed();
