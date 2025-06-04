@@ -10,7 +10,12 @@ import { UserCameraPermission } from '../camera-support/camera.interface';
 import { ActionButtons } from './components/action-buttons/action-buttons.component';
 import { CameraFactory } from './components/camera-factory.component';
 import { useDeviceSettings } from './providers/device-settings-provider.component';
-import { hasPermissionsDenied, TOO_LOW_FREE_STORAGE_IN_BYTES, TOO_LOW_FREE_STORAGE_MESSAGE } from './util';
+import {
+    hasPermissionsDenied,
+    isPermissionPending,
+    TOO_LOW_FREE_STORAGE_IN_BYTES,
+    TOO_LOW_FREE_STORAGE_MESSAGE,
+} from './util';
 
 const COLUMNS = ['auto'];
 const GRID_AREAS = ['header', 'content'];
@@ -35,8 +40,8 @@ export const CameraPage = (): JSX.Element => {
 
     useLowStorage();
 
-    const isPermissionDenied = hasPermissionsDenied(userPermissions);
-    const isPermissionPending = userPermissions === UserCameraPermission.PENDING;
+    const permissionDenied = hasPermissionsDenied(userPermissions);
+    const permissionPending = isPermissionPending(userPermissions);
 
     return (
         <View padding={'size-250'} backgroundColor={'gray-75'}>
@@ -48,10 +53,10 @@ export const CameraPage = (): JSX.Element => {
                         </Heading>
                         <Text>Capture images with your camera</Text>
                     </Flex>
-                    <ActionButtons isDisabled={isPermissionDenied || isPermissionPending} />
+                    <ActionButtons isDisabled={permissionDenied || permissionPending} />
                 </Flex>
 
-                <CameraFactory isPermissionDenied={isPermissionDenied} isPermissionPending={isPermissionPending} />
+                <CameraFactory isPermissionDenied={permissionDenied} isPermissionPending={permissionPending} />
             </Grid>
         </View>
     );

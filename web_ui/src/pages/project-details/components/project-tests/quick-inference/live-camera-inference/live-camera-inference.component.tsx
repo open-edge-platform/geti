@@ -1,58 +1,66 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Button, Flex, Grid, Loading, minmax, View } from '@geti/ui';
-import axios from 'axios';
+import { useState } from 'react';
+
+import { ActionButton, Button, Flex, Grid, Loading, minmax, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ChevronDoubleLeft, ChevronDoubleRight } from '@geti/ui/icons';
+import { clsx } from 'clsx';
 import { v4 as uuid } from 'uuid';
 
 import { Label } from '../../../../../../core/labels/label.interface';
+import { fetchMediaAndConvertToFile } from '../../../../../../webworkers/utils';
 import { useTaskLabels } from '../../../../../annotator/annotation/annotation-filter/use-task-labels.hook';
 import { CaptureButtonAnimation } from '../../../../../camera-page/components/action-buttons/capture-button-animation.component';
 import { CameraView } from '../../../../../camera-page/components/camera/camera-view.component';
+import { PermissionError } from '../../../../../camera-page/components/camera/permissions-error.component';
 import { DeviceSettings } from '../../../../../camera-page/components/sidebar/device-settings.component';
 import {
     DeviceSettingsProvider,
     useDeviceSettings,
 } from '../../../../../camera-page/providers/device-settings-provider.component';
+import { hasPermissionsDenied, isPermissionPending } from '../../../../../camera-page/util';
 import { HeaderOptions } from '../header-options.component';
 import { ImageSection } from '../image-section.component';
 import { useQuickInference } from '../quick-inference-provider.component';
 import { useIsExplanationEnabled } from '../quick-inference.component';
 import { SecondaryToolbar } from '../secondary-toolbar.component';
 
-const getBlobFromDataUrl = async (dataUrl: string): Promise<Blob> => {
-    const response = await axios.get(dataUrl, {
-        responseType: 'blob',
-    });
+import styles from './live-camera-interface.module.scss';
 
-    return response.data;
-};
-
-/*
-    1) Gets the blob from the source data url
-    2) Converts the .webp blob to .jpeg blob if necessary
-    3) Creates and returns a new file based on the blob
-*/
-const fetchMediaAndConvertToFile = async (id: string, dataUrl: string) => {
-    const blob = await getBlobFromDataUrl(dataUrl);
-
-    if (blob === undefined) {
-        return;
-    }
-
-    const fileType = blob.type.split('/').pop();
-    const fileName = `${id}.${fileType}`;
-
-    return new File([blob], fileName, { type: blob.type });
-};
-
-interface LiveCameraInferenceContentProps {
+interface LiveCameraInferenceLayoutProps {
     shouldShowExplanation: boolean;
     labels: Label[];
 }
 
-const Sidebar = () => {
-    return <DeviceSettings />;
+const Sidebar = ({ isInferencedImageVisible }: { isInferencedImageVisible: boolean }) => {
+    const [isOpen, setIsOpen] = useState(true);
+
+    return (
+        <Flex direction={'column'} height={'100%'} minHeight={0}>
+            <View
+                flex={1}
+                minHeight={0}
+                UNSAFE_className={clsx({ [styles.disabled]: isInferencedImageVisible })}
+                padding={'size-250'}
+                overflow={'hidden auto'}
+                isHidden={!isOpen}
+            >
+                <DeviceSettings />
+            </View>
+            <TooltipTrigger placement={'bottom'}>
+                <ActionButton
+                    isQuiet
+                    onPress={() => setIsOpen((prev) => !prev)}
+                    aria-label={'Toggle camera settings'}
+                    height={isOpen ? undefined : '100%'}
+                >
+                    {isOpen ? <ChevronDoubleRight size='XS' /> : <ChevronDoubleLeft size='XS' />}
+                </ActionButton>
+                <Tooltip>{isOpen ? 'Collapse camera settings' : 'Open camera settings'}</Tooltip>
+            </TooltipTrigger>
+        </Flex>
+    );
 };
 
 const InferencedImage = () => {
@@ -77,7 +85,7 @@ const InferencedImage = () => {
     );
 };
 
-const LiveCameraInferenceContent = ({ shouldShowExplanation, labels }: LiveCameraInferenceContentProps) => {
+const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCameraInferenceLayoutProps) => {
     const { webcamRef } = useDeviceSettings();
     const { handleUploadImage } = useQuickInference();
     const { image, onResetImage } = useQuickInference();
@@ -115,12 +123,12 @@ const LiveCameraInferenceContent = ({ shouldShowExplanation, labels }: LiveCamer
         >
             <Grid
                 areas={['toolbar toolbar', 'camera sidebar', 'button sidebar']}
-                columns={['1fr', 'size-3400']}
+                columns={['1fr', 'max-content']}
                 rows={['max-content', minmax('size-3400', '1fr'), 'size-1000']}
                 height={'100%'}
                 width={'100%'}
             >
-                <View gridArea={'toolbar'}>
+                <View gridArea={'toolbar'} UNSAFE_className={clsx({ [styles.disabled]: !isInferencedImageVisible })}>
                     <SecondaryToolbar
                         labels={labels}
                         shouldShowExplanation={shouldShowExplanation}
@@ -148,38 +156,51 @@ const LiveCameraInferenceContent = ({ shouldShowExplanation, labels }: LiveCamer
                         )}
                     </Flex>
                 </View>
-                <View
-                    gridArea={'sidebar'}
-                    backgroundColor={'gray-200'}
-                    padding={'size-250'}
-                    UNSAFE_style={{ boxSizing: 'border-box' }}
-                    overflow={'hidden auto'}
-                >
-                    <Sidebar />
+                <View gridArea={'sidebar'} backgroundColor={'gray-200'}>
+                    <Sidebar isInferencedImageVisible={isInferencedImageVisible} />
                 </View>
             </Grid>
         </View>
     );
 };
 
-export const LiveCameraInference = () => {
+const LiveCameraInferenceContent = () => {
     const { imageWasUploaded } = useQuickInference();
     const labels = useTaskLabels();
     const shouldShowExplanation = useIsExplanationEnabled(imageWasUploaded);
+    const { userPermissions } = useDeviceSettings();
+
+    const permissionPending = isPermissionPending(userPermissions);
+
+    if (permissionPending) {
+        return <Loading aria-label='permissions pending' />;
+    }
+
+    const permissionDenied = hasPermissionsDenied(userPermissions);
+
+    if (permissionDenied) {
+        return <PermissionError />;
+    }
 
     return (
+        <Flex direction={'column'} height={'100%'}>
+            <HeaderOptions
+                title={`Live camera inference`}
+                fullscreenComponent={
+                    <LiveCameraInferenceLayout shouldShowExplanation={shouldShowExplanation} labels={labels} />
+                }
+            />
+            <View flex={1} minHeight={0}>
+                <LiveCameraInferenceLayout shouldShowExplanation={shouldShowExplanation} labels={labels} />
+            </View>
+        </Flex>
+    );
+};
+
+export const LiveCameraInference = () => {
+    return (
         <DeviceSettingsProvider>
-            <Flex direction={'column'}>
-                <HeaderOptions
-                    title={`Live camera inference`}
-                    fullscreenComponent={
-                        <LiveCameraInferenceContent shouldShowExplanation={shouldShowExplanation} labels={labels} />
-                    }
-                />
-                <View flex={1}>
-                    <LiveCameraInferenceContent shouldShowExplanation={shouldShowExplanation} labels={labels} />
-                </View>
-            </Flex>
+            <LiveCameraInferenceContent />
         </DeviceSettingsProvider>
     );
 };

@@ -126,7 +126,7 @@ const QuickInferencePage = (): JSX.Element => {
                         )}
                     </AnimatePresence>
 
-                    <Flex flex={1} width={'100%'} direction={'column'} gap={'size-125'}>
+                    <Flex flex={1} width={'100%'} direction={'column'} gap={'size-125'} minHeight={0}>
                         <ToggleButtons
                             options={['Use file', 'Use camera']}
                             selectedOption={liveInferenceMode}
