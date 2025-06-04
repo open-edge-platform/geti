@@ -1178,7 +1178,7 @@ requires-dist = [
     { name = "geti-types", marker = "extra == 'job-submission'", editable = "../../../../libs/types" },
     { name = "google-api-python-client", marker = "extra == 'account-service'", specifier = "==2.90.0" },
     { name = "grpc-interfaces", extras = ["account-service", "credit-system", "job-submission", "job-update", "model-registration"], marker = "extra == 'all'" },
-    { name = "grpcio", specifier = "~=1.62" },
+    { name = "grpcio", specifier = "==1.62.*" },
     { name = "protobuf", marker = "extra == 'model-registration'", specifier = "~=4.24" },
     { name = "pydantic", marker = "extra == 'account-service'", specifier = "==2.6.1" },
     { name = "readerwriterlock", marker = "extra == 'job-submission'", specifier = "~=1.0" },
