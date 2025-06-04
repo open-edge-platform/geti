@@ -2,14 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import pydantic
 import pytest
-from geti_configuration_tools.project_configuration import (
-    AutoTrainingParameters,
-    ProjectConfiguration,
-    TaskConfig,
-    TrainConstraints,
-    TrainingParameters, PartialProjectConfiguration,
-)
-from geti_types import ID
+from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 
 from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
 
@@ -28,7 +21,7 @@ class TestProjectConfigurationRESTViews:
                                 "key": "min_images_per_label",
                                 "value": 15,
                                 "type": "int",
-                                "name": "Minimum images per label"
+                                "name": "Minimum images per label",
                             }
                         ]
                     },
@@ -39,9 +32,9 @@ class TestProjectConfigurationRESTViews:
                             "key": "enable_dynamic_required_annotations",
                             "value": True,
                             "type": "bool",
-                            "name": "Enable dynamic required annotations"
-                        }
-                    ]
+                            "name": "Enable dynamic required annotations",
+                        },
+                    ],
                 },
                 {
                     "task_id": "classification_1",
@@ -51,7 +44,7 @@ class TestProjectConfigurationRESTViews:
                                 "key": "min_images_per_label",
                                 "value": 20,
                                 "type": "int",
-                                "name": "Minimum images per label"
+                                "name": "Minimum images per label",
                             }
                         ]
                     },
@@ -62,10 +55,10 @@ class TestProjectConfigurationRESTViews:
                             "key": "enable_dynamic_required_annotations",
                             "value": False,
                             "type": "bool",
-                            "name": "Enable dynamic required annotations"
-                        }
-                    ]
-                }
+                            "name": "Enable dynamic required annotations",
+                        },
+                    ],
+                },
             ]
         }
 
@@ -95,9 +88,7 @@ class TestProjectConfigurationRESTViews:
     def test_project_configuration_from_rest_empty_task_configs(self):
         """Test converting a project configuration from REST with empty task_configs."""
         # Arrange
-        project_config_rest = {
-            "task_configs": []
-        }
+        project_config_rest = {"task_configs": []}
 
         # Act
         result = ProjectConfigurationRESTViews.project_configuration_from_rest(project_config_rest)
@@ -128,7 +119,7 @@ class TestProjectConfigurationRESTViews:
                     # missing training field
                     "auto_training": [
                         {"key": "enable", "value": False, "type": "bool"},
-                    ]
+                    ],
                 }
             ]
         }
@@ -148,16 +139,9 @@ class TestProjectConfigurationRESTViews:
     @pytest.mark.parametrize(
         "rest_input",
         [
+            {"another_unknown_field": "should be ignored"},
             {
-                "another_unknown_field": "should be ignored"
-            },
-            {
-                "task_configs": [
-                    {
-                        "task_id": "detection_1",
-                        "unknown_field": "this field doesn't exist in the model"
-                    }
-                ],
+                "task_configs": [{"task_id": "detection_1", "unknown_field": "this field doesn't exist in the model"}],
             },
             {
                 "task_configs": [
@@ -178,20 +162,20 @@ class TestProjectConfigurationRESTViews:
                                 {
                                     "key": "min_images_per_label",
                                     "value": "not_an_integer",  # String instead of int
-                                    "type": "int"
+                                    "type": "int",
                                 }
                             ]
-                        }
+                        },
                     }
                 ]
-            }
+            },
         ],
         ids=[
             "unknown_top_level_field",
             "unknown_task_config_field",
             "unknown_auto_training_parameter",
             "invalid_value_type",
-        ]
+        ],
     )
     def test_project_configuration_from_rest_validation(self, rest_input):
         # Act

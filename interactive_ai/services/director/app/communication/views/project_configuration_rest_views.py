@@ -1,8 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
-from pydantic import BaseModel, ValidationError
 
-from geti_configuration_tools.project_configuration import ProjectConfiguration, TaskConfig, PartialProjectConfiguration
+from geti_configuration_tools.project_configuration import PartialProjectConfiguration, ProjectConfiguration, TaskConfig
 
 from communication.views.configurable_parameters_to_rest import ConfigurableParametersRESTViews
 

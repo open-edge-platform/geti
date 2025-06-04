@@ -6,11 +6,10 @@ from http import HTTPStatus
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
-
-from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
+from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi
@@ -46,7 +45,9 @@ def get_project_configuration(
 @project_configuration_router.patch("/project_configuration", status_code=HTTPStatus.NO_CONTENT)
 def update_project_configuration(
     project_identifier: Annotated[ProjectIdentifier, Depends(get_project_identifier)],
-    update_configuration: Annotated[PartialProjectConfiguration, Depends(ProjectConfigurationRESTViews.project_configuration_from_rest)],
+    update_configuration: Annotated[
+        PartialProjectConfiguration, Depends(ProjectConfigurationRESTViews.project_configuration_from_rest)
+    ],
 ) -> None:
     """Update the configuration for a specific project."""
     if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):

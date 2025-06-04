@@ -5,13 +5,13 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
+from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 from testfixtures import compare
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
 from features.feature_flag_provider import FeatureFlag
 
 from geti_types import ID, ProjectIdentifier
-from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 
 DUMMY_ORGANIZATION_ID = "000000000000000000000001"
 DUMMY_WORKSPACE_ID = "567890123456789012340000"
@@ -91,9 +91,7 @@ class TestProjectConfigurationEndpoints:
         assert result.status_code == HTTPStatus.NO_CONTENT
         assert not result.content  # 204 responses must not include a response body
 
-    def test_update_project_configuration_rest_conversion(
-        self, fxt_director_app, fxt_enable_feature_flag_name
-    ) -> None:
+    def test_update_project_configuration_rest_conversion(self, fxt_director_app, fxt_enable_feature_flag_name) -> None:
         # Arrange
         fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
 
@@ -108,14 +106,14 @@ class TestProjectConfigurationEndpoints:
                                 "key": "min_images_per_label",
                                 "value": 15,
                                 "type": "int",
-                                "name": "Minimum images per label"
+                                "name": "Minimum images per label",
                             }
                         ]
                     },
                     "auto_training": [
                         {"key": "enable", "value": False, "type": "bool", "name": "Enable auto training"},
-                        {"key": "min_images_per_label", "value": 8, "type": "int", "name": "Minimum images per label"}
-                    ]
+                        {"key": "min_images_per_label", "value": 8, "type": "int", "name": "Minimum images per label"},
+                    ],
                 }
             ]
         }

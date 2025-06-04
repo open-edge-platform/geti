@@ -150,12 +150,12 @@ class ConfigurableParametersRESTViews:
             return result
 
         # If the input is a dictionary (of nested models or other fields)
-        elif isinstance(configurable_parameters_rest, dict):
+        if isinstance(configurable_parameters_rest, dict):
             result = {}
 
             for key, value in configurable_parameters_rest.items():
                 # If the value is a complex structure, process it recursively
-                if isinstance(value, (dict, list)):
+                if isinstance(value, dict | list):
                     result[key] = cls.configurable_parameters_from_rest(value)
                 else:
                     # Simple value, keep as is

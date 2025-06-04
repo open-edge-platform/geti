@@ -1,7 +1,6 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import pytest
 
 from communication.views.configurable_parameters_to_rest import ConfigurableParametersRESTViews
 
@@ -17,16 +16,16 @@ class TestConfigurableParametersFromRest:
             {"key": "enable", "value": True, "type": "bool", "name": "Enable auto training"},
             {"key": "threshold", "value": 0.75, "type": "float", "name": "Confidence threshold"},
         ]
-        
+
         expected_output = {
             "min_images_per_label": 5,
             "enable": True,
             "threshold": 0.75,
         }
-        
+
         # Act
         result = ConfigurableParametersRESTViews.configurable_parameters_from_rest(rest_input)
-        
+
         # Assert
         assert result == expected_output
 
@@ -42,9 +41,9 @@ class TestConfigurableParametersFromRest:
             "auto_training": [
                 {"key": "enable", "value": True, "type": "bool"},
                 {"key": "min_images_per_label", "value": 5, "type": "int"},
-            ]
+            ],
         }
-        
+
         expected_output = {
             "training": {
                 "constraints": {
@@ -54,12 +53,12 @@ class TestConfigurableParametersFromRest:
             "auto_training": {
                 "enable": True,
                 "min_images_per_label": 5,
-            }
+            },
         }
-        
+
         # Act
         result = ConfigurableParametersRESTViews.configurable_parameters_from_rest(rest_input)
-        
+
         # Assert
         assert result == expected_output
 
@@ -74,10 +73,10 @@ class TestConfigurableParametersFromRest:
                 ],
                 "auto_training": [
                     {"key": "enable", "value": True, "type": "bool"},
-                ]
-            }
+                ],
+            },
         ]
-        
+
         expected_output = {
             "task_id": "detection_1",
             "training": {
@@ -85,12 +84,12 @@ class TestConfigurableParametersFromRest:
             },
             "auto_training": {
                 "enable": True,
-            }
+            },
         }
-        
+
         # Act
         result = ConfigurableParametersRESTViews.configurable_parameters_from_rest(rest_input)
-        
+
         # Assert
         assert result == expected_output
 
@@ -98,7 +97,7 @@ class TestConfigurableParametersFromRest:
         """Test with empty inputs."""
         # Empty list
         assert ConfigurableParametersRESTViews.configurable_parameters_from_rest([]) == {}
-        
+
         # Empty dict
         assert ConfigurableParametersRESTViews.configurable_parameters_from_rest({}) == {}
 
@@ -106,6 +105,6 @@ class TestConfigurableParametersFromRest:
         """Test with non-dictionary, non-list input."""
         # String input should be returned as is
         assert ConfigurableParametersRESTViews.configurable_parameters_from_rest("test") == "test"
-        
+
         # Number input should be returned as is
         assert ConfigurableParametersRESTViews.configurable_parameters_from_rest(42) == 42
