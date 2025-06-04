@@ -1,6 +1,6 @@
 ---
-name: mlflow-geti-store
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 apiVersion: v2
 description: MLflow geti store
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

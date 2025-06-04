@@ -3,6 +3,8 @@
 
 include ../../../Makefile.shared-go
 
+COMPONENT_NAME := account-service
+
 DOCKER_BUILD_CONTEXT := --build-context credit_system=$(CWD)/libs/grpc_interfaces/src/grpc_interfaces/credit_system/go \
 						--build-context account_service_grpc=$(CWD)/libs/grpc_interfaces/src/grpc_interfaces/account_service/go
 DOCKER_IMAGE_DESCRIPTION := Account Service for Geti

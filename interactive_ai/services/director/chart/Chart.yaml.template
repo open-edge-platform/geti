@@ -1,6 +1,6 @@
 ---
-name: director
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 apiVersion: v2
 description: director
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}
