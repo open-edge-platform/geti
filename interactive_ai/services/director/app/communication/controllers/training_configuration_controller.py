@@ -95,7 +95,9 @@ class TrainingConfigurationRESTController:
         # configuration is saved as "task level"
         if not update_configuration.model_manifest_id:
             task_config = training_configuration_repo.get_task_only_configuration(task_id)
-            new_config = ConfigurationService.overlay_training_configurations(task_config, update_configuration)
+            new_config = ConfigurationService.overlay_training_configurations(
+                task_config, update_configuration, validate_full_config=False
+            )
             training_configuration_repo.save(new_config)
             return
 
