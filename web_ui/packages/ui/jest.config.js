@@ -5,6 +5,7 @@ import sharedConfig from '@geti/config/test';
 
 export default {
     ...sharedConfig,
+    displayName: '@geti/ui',
     roots: ['<rootDir>/src'],
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
     setupFilesAfterEnv: ['<rootDir>/src/setupTests.tsx'],

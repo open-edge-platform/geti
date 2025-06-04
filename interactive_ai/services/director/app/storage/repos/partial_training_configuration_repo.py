@@ -1,9 +1,19 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
-from geti_configuration_tools.training_configuration import NullTrainingConfiguration, PartialTrainingConfiguration
+from geti_configuration_tools.training_configuration import (
+    Filtering,
+    GlobalDatasetPreparationParameters,
+    GlobalParameters,
+    MaxAnnotationObjects,
+    MaxAnnotationPixels,
+    MinAnnotationPixels,
+    NullTrainingConfiguration,
+    PartialTrainingConfiguration,
+    SubsetSplit,
+)
 from pymongo import DESCENDING, IndexModel
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
@@ -78,3 +88,45 @@ class PartialTrainingConfigurationRepo(ProjectBasedSessionRepo[PartialTrainingCo
         """
         manifest_filter = {"model_manifest_id": model_manifest_id}
         return self.get_one(extra_filter=manifest_filter)
+
+    def create_default_task_only_configuration(self, task_id: ID) -> None:
+        """
+        Create a default training configuration for a specific task if one doesn't already exist.
+
+        This method checks if a task-specific configuration already exists and creates
+        a new configuration with default parameters only if no configuration is found.
+
+        :param task_id: The ID of the task for which to create a configuration
+        """
+        exists = not isinstance(self.get_task_only_configuration(task_id=task_id), NullTrainingConfiguration)
+        if exists:
+            return
+        default_global_parameters = GlobalParameters(
+            dataset_preparation=GlobalDatasetPreparationParameters(
+                subset_split=SubsetSplit(),
+                filtering=Filtering(
+                    min_annotation_pixels=MinAnnotationPixels(),
+                    max_annotation_pixels=MaxAnnotationPixels(),
+                    max_annotation_objects=MaxAnnotationObjects(),
+                ),
+            )
+        )
+        default_configuration_dict = {
+            "id_": self.generate_id(),
+            "task_id": str(task_id),
+            "global_parameters": default_global_parameters.model_dump(),
+        }
+        default_configuration = PartialTrainingConfiguration.model_validate(default_configuration_dict)
+        self.save(default_configuration)
+
+    def create_default_configuration(self, task_ids: Sequence[ID]) -> None:
+        """
+        Create default training configurations for multiple tasks.
+
+        This method iterates through the provided task IDs and creates a default
+        configuration for each task by calling create_default_task_only_configuration.
+
+        :param task_ids: Sequence of task IDs for which to create default configurations
+        """
+        for task_id in task_ids:
+            self.create_default_task_only_configuration(task_id=task_id)

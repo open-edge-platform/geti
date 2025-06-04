@@ -33,13 +33,15 @@ class ConfigurableParametersRESTViews:
         :param json_schema: The JSON schema for the parameter from the Pydantic model
         :return: Dictionary containing the REST representation of the parameter
         """
+        default = json_schema.get("default")
+        default_value = default if default is not None else json_schema.get("default_value")
         rest_view = {
             "key": key,
             "name": json_schema.get("title"),
             "type": rest_type,
             "description": json_schema.get("description"),
             "value": value,
-            "default_value": json_schema.get("default"),
+            "default_value": default_value,
         }
         # optional parameter may contain `'anyOf': [{'exclusiveMinimum': 0, 'type': 'integer'}, {'type': 'null'}]`
         type_any_of = json_schema.get(PYDANTIC_ANY_OF, [{}])[0]

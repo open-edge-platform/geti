@@ -4,7 +4,7 @@
 import { Fragment, useMemo, useRef } from 'react';
 
 import { Content, Flex, Grid, Loading, useUnwrapDOMRef } from '@geti/ui';
-import { StatusCodes } from 'http-status-codes';
+import { HttpStatusCode } from 'axios';
 import { isEmpty } from 'lodash-es';
 
 import { useModelStatistics } from '../../../../../core/statistics/hooks/use-model-statistics.hook';
@@ -29,7 +29,7 @@ export const ModelStatistics = (): JSX.Element => {
         [modelStatisticsData]
     );
 
-    if (error?.response?.status === StatusCodes.NOT_FOUND) {
+    if (error?.response?.status === HttpStatusCode.NotFound) {
         return <ModelStatisticsNotFound />;
     }
 

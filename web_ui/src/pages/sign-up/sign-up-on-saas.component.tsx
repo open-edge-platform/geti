@@ -7,9 +7,8 @@ import { paths } from '@geti/core';
 import { useOnboardUserMutation } from '@geti/core/src/users/hook/use-onboard-user-mutation.hook';
 import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
 import { Item, Picker, TextField } from '@geti/ui';
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import dayjs from 'dayjs';
-import { StatusCodes } from 'http-status-codes';
 import { jwtDecode } from 'jwt-decode';
 import { isEmpty, isObject } from 'lodash-es';
 import { useAuth } from 'react-oidc-context';
@@ -102,7 +101,7 @@ const isMaliciousTokenError = (error: AxiosError | null): boolean => {
         error?.response != null &&
         error.response.data != null &&
         isObject(error.response.data) &&
-        error.response.status === StatusCodes.UNAUTHORIZED &&
+        error.response.status === HttpStatusCode.Unauthorized &&
         'detail' in error.response.data &&
         error.response.data.detail === 'Invalid sign-up token'
     );
