@@ -24,21 +24,21 @@ class TrainingConfigurationRESTViews(ConfigurableParametersRESTViews):
 
     @classmethod
     def _dataset_preparation_to_rest(
-        cls, global_parameters: GlobalParameters, hyperparameters: Hyperparameters
+        cls, global_parameters: GlobalParameters | None, hyperparameters: Hyperparameters | None
     ) -> dict[str, Any]:
         # Return a combined view of global and hyperparameters for dataset preparation
         global_parameters_rest = (
             cls.configurable_parameters_to_rest(
                 configurable_parameters=global_parameters.dataset_preparation,
             )
-            if global_parameters.dataset_preparation
+            if global_parameters and global_parameters.dataset_preparation
             else {}
         )
         hyperparameters_rest = (
             cls.configurable_parameters_to_rest(
                 configurable_parameters=hyperparameters.dataset_preparation,
             )
-            if hyperparameters.dataset_preparation
+            if hyperparameters and hyperparameters.dataset_preparation
             else {}
         )
         if not isinstance(global_parameters_rest, dict) or not isinstance(hyperparameters_rest, dict):
