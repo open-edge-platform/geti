@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getFailedJobMessage } from '@geti/core/src/services/utils';
 import { type LoadingState, type KeyboardEvent as ReactKeyboardEvent } from '@geti/ui';
 import { CalendarDate, CalendarDateTime, DateValue } from '@internationalized/date';
 import { AxiosError } from 'axios';
@@ -15,7 +16,6 @@ import * as yup from 'yup';
 import { JobGeneralProps } from '../core/jobs/jobs.interface';
 import { DOMAIN } from '../core/projects/core.interface';
 import { Task } from '../core/projects/task.interface';
-import { getFailedJobMessage } from '../core/services/utils';
 import { IntervalJobHandlers } from '../features/dataset-import/types/dataset-import.interface';
 import { GetElementType } from '../types-utils/types';
 import { isJobCancel, isJobDone, isJobFailed, isJobSettled } from './components/header/jobs-management/utils';
@@ -306,14 +306,15 @@ export const getIntervalJobHandlers =
     }: IntervalJobHandlers<T>) =>
     (jobResponse: T) => {
         if (isJobDone(jobResponse)) {
-            onSuccess(jobResponse);
+            isFunction(onSuccess) && onSuccess(jobResponse);
         }
 
         if (isJobFailed(jobResponse)) {
-            onError({
-                message: getFailedJobMessage(jobResponse),
-                response: { status: StatusCodes.NOT_IMPLEMENTED },
-            } as AxiosError);
+            isFunction(onError) &&
+                onError({
+                    message: getFailedJobMessage(jobResponse),
+                    response: { status: StatusCodes.NOT_IMPLEMENTED },
+                } as AxiosError);
 
             isFunction(onCancelOrFailed) && onCancelOrFailed();
         }
