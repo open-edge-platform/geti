@@ -28,7 +28,7 @@ interface JobsDiscardActionProps {
 
 const ButtonIcon = ({ isLoading, isCancel }: { isLoading: boolean; isCancel: boolean }) => {
     if (isLoading) {
-        return <Loading mode="inline" size='S' marginX='size-100' />;
+        return <Loading mode='inline' size='S' marginX='size-100' />;
     }
 
     if (isCancel) {

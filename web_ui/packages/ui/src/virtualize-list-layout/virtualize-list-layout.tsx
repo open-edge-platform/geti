@@ -40,7 +40,7 @@ export const VirtualizedListLayout = <T,>({
     ariaLabel,
     layoutOptions,
     containerHeight,
-    renderLoading = () => <Loading mode="inline" size={'M'} />,
+    renderLoading = () => <Loading mode='inline' size={'M'} />,
     renderItem,
     onLoadMore,
     idFormatter,

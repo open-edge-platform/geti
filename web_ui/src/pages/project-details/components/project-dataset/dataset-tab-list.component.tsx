@@ -62,7 +62,7 @@ export const DatasetTabList = () => {
                     aria-label={'Create dataset'}
                 >
                     {createDataset.isPending ? (
-                        <Loading mode="inline" id='loading-indicator-id' size='S' />
+                        <Loading mode='inline' id='loading-indicator-id' size='S' />
                     ) : (
                         <Add color='white' />
                     )}

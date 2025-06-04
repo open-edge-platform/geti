@@ -124,7 +124,7 @@ export const VideoPlayerDialog = ({
 
             {rangesQuery.isFetching ? (
                 <Content UNSAFE_style={{ overflowY: 'visible' }} height='size-4600'>
-                    <Loading mode="inline" />
+                    <Loading mode='inline' />
                 </Content>
             ) : (
                 <Content UNSAFE_style={{ overflowY: 'visible' }}>
@@ -162,7 +162,7 @@ export const VideoPlayerDialog = ({
                     Cancel
                 </Button>
                 <Button variant='accent' onPress={handleSaveSelection} isDisabled={!undoRedoState.canUndo}>
-                    {rangesMutation.isPending ? <Loading mode="inline" size='S' marginEnd='size-100' /> : <></>}
+                    {rangesMutation.isPending ? <Loading mode='inline' size='S' marginEnd='size-100' /> : <></>}
                     Save ranges
                 </Button>
             </ButtonGroup>

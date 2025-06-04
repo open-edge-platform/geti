@@ -45,7 +45,7 @@ export const ProjectCreationStatus = ({ importItem }: ProjectCreationStatusProps
         <>
             <ProjectStatusHeader fileName={fileName} fileSize={fileSize} />
             <Flex gap={'size-300'} alignItems='center' UNSAFE_className={classes.importContent}>
-                <Loading mode="inline" size={'S'} />
+                <Loading mode='inline' size={'S'} />
                 <Text>Creating...</Text>
             </Flex>
         </>

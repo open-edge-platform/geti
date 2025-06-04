@@ -125,7 +125,7 @@ export const ProjectNameDomain = ({
                                 aria-label={'Edit project name field'}
                             />
                             {editProjectMutation.isPending ? (
-                                <Loading mode="inline" marginStart={'size-75'} size={'S'} />
+                                <Loading mode='inline' marginStart={'size-75'} size={'S'} />
                             ) : (
                                 <></>
                             )}

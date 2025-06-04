@@ -3,7 +3,16 @@
 
 import { Dispatch, FC, ReactNode, SVGProps } from 'react';
 
-import { Divider, Flex, IllustratedMessage, Loading, useMediaQuery, View, type DimensionValue, type Responsive } from '@geti/ui';
+import {
+    Divider,
+    Flex,
+    IllustratedMessage,
+    Loading,
+    useMediaQuery,
+    View,
+    type DimensionValue,
+    type Responsive,
+} from '@geti/ui';
 import { NotFound } from '@geti/ui/icons';
 import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
@@ -235,7 +244,7 @@ export const MediaContentBucket = ({
                                         ? `media-gallery-loading-overlay-${header.toLowerCase()}-id`
                                         : 'media-gallery-loading-overlay-id'
                                 }
-                                mode="overlay"
+                                mode='overlay'
                                 size={'M'}
                                 overlayHeight={'auto'}
                                 top={isFetchingNextPage ? 'auto' : 0}

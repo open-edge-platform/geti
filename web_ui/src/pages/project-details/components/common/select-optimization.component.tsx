@@ -34,7 +34,7 @@ export const SelectOptimization = ({
         <View>
             {isLoading ? (
                 <View marginY={'size-225'}>
-                    <Loading mode="inline" size={'M'} />
+                    <Loading mode='inline' size={'M'} />
                 </View>
             ) : (
                 <Picker

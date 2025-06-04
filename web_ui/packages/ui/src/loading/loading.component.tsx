@@ -3,11 +3,8 @@
 
 import { DimensionValue, Flex, ProgressCircle, View } from '@adobe/react-spectrum';
 import { SpectrumProgressCircleProps } from '@react-types/progress';
+import { BoxAlignmentStyleProps, StyleProps } from '@react-types/shared';
 import { Responsive } from '@react-types/shared/src/style';
-import {
-    BoxAlignmentStyleProps,
-    StyleProps
-} from '@react-types/shared';
 
 /**
  * Props for the Loading component.
@@ -113,9 +110,9 @@ export const Loading = ({
             UNSAFE_style={{
                 cursor: 'default',
                 // Use modal overlay background for overlay mode, or custom/default background for fullscreen
-                backgroundColor: backgroundColor || (
-                    mode === 'overlay' ? 'var(--spectrum-alias-background-color-modal-overlay)' : 'gray-50'
-                ),
+                backgroundColor:
+                    backgroundColor ||
+                    (mode === 'overlay' ? 'var(--spectrum-alias-background-color-modal-overlay)' : 'gray-50'),
             }}
             UNSAFE_className={className}
         >

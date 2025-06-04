@@ -21,7 +21,7 @@ const SubmitButtonBody = ({ status }: { status: MutationStatus }) => {
         case 'pending':
             return (
                 <>
-                    <Loading mode="inline" size='S' marginEnd='size-100' />
+                    <Loading mode='inline' size='S' marginEnd='size-100' />
                     Submit
                 </>
             );

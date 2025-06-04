@@ -54,7 +54,7 @@ const getStepStateColor = (state: string): string => {
 const getStepStateIcon = (state: string): JSX.Element => {
     switch (state) {
         case JobStepState.RUNNING:
-            return <Loading mode="inline" size='S' />;
+            return <Loading mode='inline' size='S' />;
         case JobStepState.FINISHED:
             return <CheckCircleOutlined className={classes.iconFinished} />;
         case JobStepState.FAILED:

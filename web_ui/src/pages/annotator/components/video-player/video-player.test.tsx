@@ -63,7 +63,7 @@ const renderVideoPlayer = async (videoFrame: VideoFrame) => {
             );
         }
 
-        return <Loading mode="inline" />;
+        return <Loading mode='inline' />;
     };
 
     await render(<App />, {

@@ -157,7 +157,7 @@ const TestDetailsPreviewContent = ({
                 />
 
                 <Flex direction='column' height='100%' position='relative' minHeight={0}>
-                    {isLoading && <Loading mode="overlay" />}
+                    {isLoading && <Loading mode='overlay' />}
 
                     <PreviewCanvasContent
                         annotations={annotations}

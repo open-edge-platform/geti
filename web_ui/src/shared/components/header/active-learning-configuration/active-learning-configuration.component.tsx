@@ -52,7 +52,7 @@ const ActiveLearningConfigurationDialog = ({ selectedTask }: { selectedTask: Tas
                 {isLoadingData ? (
                     <View height='size-1600'>
                         <Flex height='100%' alignItems='center' justifyContent={'center'}>
-                            <Loading mode="inline" />
+                            <Loading mode='inline' />
                         </Flex>
                     </View>
                 ) : (

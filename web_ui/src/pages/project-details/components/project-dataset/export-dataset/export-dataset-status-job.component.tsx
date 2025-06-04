@@ -95,7 +95,7 @@ export const ExportDatasetStatusJob = ({
             >
                 <View padding={'size-200'}>
                     <Flex alignItems={'center'} gap={'size-200'}>
-                        <Loading mode="inline" size={'S'} />
+                        <Loading mode='inline' size={'S'} />
                         <Text>Dataset - Processing data, please wait...</Text>
                     </Flex>
                 </View>

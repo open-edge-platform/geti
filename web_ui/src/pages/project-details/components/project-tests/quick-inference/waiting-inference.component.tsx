@@ -30,7 +30,7 @@ export const WaitingInference = ({ isVisible, dismiss }: WaitingInferenceProps) 
                         position={'relative'}
                         UNSAFE_className={classes.waitingWraper}
                     >
-                        <Loading mode="inline" size={'S'} marginEnd={'size-200'} />
+                        <Loading mode='inline' size={'S'} marginEnd={'size-200'} />
                         <Text>Retrieving inference results may take some time</Text>
                         <ActionButton isQuiet UNSAFE_className={classes.cancelInference} onPress={dismiss}>
                             Dismiss

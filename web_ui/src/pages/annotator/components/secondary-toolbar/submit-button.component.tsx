@@ -162,7 +162,7 @@ export const SubmitButton = ({
             id='secondary-toolbar-submit'
             aria-label='Submit annotations'
         >
-            {submitAnnotationsMutation.isPending ? <Loading mode="inline" size='S' marginEnd='size-100' /> : <></>}
+            {submitAnnotationsMutation.isPending ? <Loading mode='inline' size='S' marginEnd='size-100' /> : <></>}
             {buttonText} {!isNil(nextMediaItem) && '»'}
         </Button>
     );

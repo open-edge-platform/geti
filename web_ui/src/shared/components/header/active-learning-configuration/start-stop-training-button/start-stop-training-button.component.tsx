@@ -56,7 +56,7 @@ export const ToggleTrainingButton = ({
                     isDisabled={trainModel.isPending || isAutotraining}
                     id={`start-training-${idMatchingFormat(task.title)}`}
                 >
-                    {trainModel.isPending && <Loading mode="inline" size={'S'} marginX={'size-100'} />}
+                    {trainModel.isPending && <Loading mode='inline' size={'S'} marginX={'size-100'} />}
                     Start training now
                 </Button>
             )}
@@ -68,7 +68,7 @@ export const ToggleTrainingButton = ({
                     onPress={() => setIsCancelDialogOpen(true)}
                     id={`stop-training-${idMatchingFormat(task.title)}`}
                 >
-                    {useCancelJob.isPending && <Loading mode="inline" size={'S'} marginX={'size-100'} />}
+                    {useCancelJob.isPending && <Loading mode='inline' size={'S'} marginX={'size-100'} />}
                     Stop training
                 </Button>
             )}

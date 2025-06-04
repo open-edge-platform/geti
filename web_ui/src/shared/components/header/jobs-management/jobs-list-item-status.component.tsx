@@ -49,7 +49,7 @@ export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: Jo
             <Flex marginX='size-250' gap={'size-100'}>
                 {!jobStepsExpanded && stepToDisplay !== undefined && (
                     <Flex flexGrow={1} flexShrink={0} alignItems='center' gap='size-100'>
-                        <Loading mode="inline" size='S' />
+                        <Loading mode='inline' size='S' />
                         <Text>{`${stepToDisplay.stepName} (${stepToDisplay.index} of ${job.steps.length})`}</Text>
                     </Flex>
                 )}

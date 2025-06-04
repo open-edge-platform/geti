@@ -46,7 +46,7 @@ export const VideoFrame = ({
     if (showBufferingIsInProgress) {
         return (
             <div style={{ position: 'absolute', inset: 0, backgroundColor: 'var(--white-hover)' }}>
-                <Loading mode="inline" size='L' />
+                <Loading mode='inline' size='L' />
             </div>
         );
     }

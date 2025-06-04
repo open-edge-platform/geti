@@ -153,7 +153,7 @@ export const TrainingDatasetDetailsPreview = ({
                             disableActionModes={!isActive && !isVisualPrompt}
                         />
                         <Flex direction='column' height='100%' position='relative' minHeight={0}>
-                            {isLoading && isPredictionsEnabled && <Loading mode="overlay" />}
+                            {isLoading && isPredictionsEnabled && <Loading mode='overlay' />}
 
                             <PreviewCanvasContent
                                 annotations={annotations}

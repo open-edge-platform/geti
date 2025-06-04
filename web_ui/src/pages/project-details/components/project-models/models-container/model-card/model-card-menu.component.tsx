@@ -196,7 +196,7 @@ export const ModelCardMenu = ({
     const menuOptions = getMenuOptions();
 
     return isActiveModelLoading ? (
-        <Loading mode="inline" size='S' />
+        <Loading mode='inline' size='S' />
     ) : (
         <>
             <MenuTrigger>

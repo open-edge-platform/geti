@@ -50,7 +50,7 @@ export const SecondaryToolbar = () => {
                     </>
                 )}
 
-                <Loading mode="inline" size={'S'} />
+                <Loading mode='inline' size={'S'} />
                 <Text>{isLoading ? 'Loading image model' : 'Extracting image features'}</Text>
             </Flex>
         );

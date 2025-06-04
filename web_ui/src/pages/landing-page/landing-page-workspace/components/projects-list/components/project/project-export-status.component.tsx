@@ -152,7 +152,7 @@ export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
                             <JobProgress idPrefix={`${projectId}-export-project-progress`} step={jobActiveStep} />
                         ) : (
                             <Flex alignItems={'center'} gap={'size-100'}>
-                                <Loading mode="inline" size={'S'} />
+                                <Loading mode='inline' size={'S'} />
                                 <Text width={'size-3000'}>Exporting project</Text>
                             </Flex>
                         )}

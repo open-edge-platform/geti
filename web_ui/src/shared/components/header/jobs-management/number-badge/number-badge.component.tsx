@@ -47,7 +47,7 @@ export const NumberBadge = ({
     const formatter = useNumberFormatter({ notation: 'compact' });
 
     if (isPending || jobsNumber === null) {
-        return <Loading mode="inline" size={'S'} />;
+        return <Loading mode='inline' size={'S'} />;
     }
 
     return (

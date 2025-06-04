@@ -18,7 +18,7 @@ export const RenewableAmount = () => {
     const recurringCredits = findPolicy(productsResponse?.products, hasRenewableAmount);
 
     if (isFetching) {
-        return <Loading mode="inline" size={'S'} height={'initial'} />;
+        return <Loading mode='inline' size={'S'} height={'initial'} />;
     }
 
     if (!recurringCredits?.renewableAmount) {
