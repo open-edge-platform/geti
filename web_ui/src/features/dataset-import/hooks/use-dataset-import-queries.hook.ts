@@ -20,6 +20,7 @@ import {
     DatasetPrepareForExistingProjectIdentifier,
     DatasetPrepareForExistingProjectResponse,
 } from '../../../core/datasets/dataset.interface';
+import { getIntervalJobHandlers } from '../../../core/datasets/hooks/utils';
 import {
     JobImportDatasetToExistingProjectStatus,
     JobImportDatasetToNewProjectStatus,
@@ -30,7 +31,6 @@ import {
 import { CreateDatasetResponse } from '../../../core/projects/dataset.interface';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { getIntervalJobHandlers } from '../../../shared/utils';
 import { IntervalJobHandlers } from '../types/dataset-import.interface';
 
 interface StatusJobProps<T> extends IntervalJobHandlers<T> {

@@ -1,23 +1,18 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { getFailedJobMessage } from '@geti/core/src/services/utils';
 import { type LoadingState, type KeyboardEvent as ReactKeyboardEvent } from '@geti/ui';
 import { CalendarDate, CalendarDateTime, DateValue } from '@internationalized/date';
-import { AxiosError, HttpStatusCode } from 'axios';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 import utc from 'dayjs/plugin/utc.js';
 import { filesize, FileSizeOptionsBase } from 'filesize';
-import { isEmpty, isEqual, isFunction, isNil, isString, negate } from 'lodash-es';
+import { isEmpty, isEqual, isNil, isString, negate } from 'lodash-es';
 import * as yup from 'yup';
 
-import { JobGeneralProps } from '../core/jobs/jobs.interface';
 import { DOMAIN } from '../core/projects/core.interface';
 import { Task } from '../core/projects/task.interface';
-import { IntervalJobHandlers } from '../features/dataset-import/types/dataset-import.interface';
 import { GetElementType } from '../types-utils/types';
-import { isJobCancel, isJobDone, isJobFailed, isJobSettled } from './components/header/jobs-management/utils';
 import { KeyMap } from './keyboard-events/keyboard.interface';
 import { LOCAL_STORAGE_KEYS } from './local-storage-keys';
 
@@ -294,37 +289,3 @@ export const getDimensionValueFinalValue = (variableName: string): string => {
 
 export const getDownloadNotificationMessage = (exportName: string): string =>
     `Your ${exportName} file is being prepared and will start downloading shortly.`;
-
-export const getIntervalJobHandlers =
-    <T extends JobGeneralProps>({
-        onSuccess,
-        onSettled,
-        onError,
-        onCancel,
-        onCancelOrFailed,
-    }: IntervalJobHandlers<T>) =>
-    (jobResponse: T) => {
-        if (isJobDone(jobResponse)) {
-            isFunction(onSuccess) && onSuccess(jobResponse);
-        }
-
-        if (isJobFailed(jobResponse)) {
-            isFunction(onError) &&
-                onError({
-                    message: getFailedJobMessage(jobResponse),
-                    response: { status: HttpStatusCode.NotImplemented },
-                } as AxiosError);
-
-            isFunction(onCancelOrFailed) && onCancelOrFailed();
-        }
-
-        if (isJobCancel(jobResponse)) {
-            isFunction(onCancel) && onCancel();
-
-            isFunction(onCancelOrFailed) && onCancelOrFailed();
-        }
-
-        if (isJobSettled(jobResponse)) {
-            isFunction(onSettled) && onSettled(jobResponse);
-        }
-    };
