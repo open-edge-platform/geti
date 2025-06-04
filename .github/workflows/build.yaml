@@ -1,0 +1,88 @@
+name: Release 
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  get-components:
+    name: Components list
+    runs-on: ubuntu-latest
+    outputs:
+      components-json: ${{ steps.components-json.outputs.components-json }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get components list
+        id: components-json
+        run: |
+          components=$(yq -r '... comments=""' ./.github/components-path-filters.yml | yq -r 'keys[]')
+          components_list=$(echo "$components" | sed ':a;N;$!ba;s/\n/, /g' )
+          components_json=$(echo "$components_list" | sed 's/[^, ]\+/"&"/g; s/, /, /g; s/^/[&/; s/$/&]/')
+          
+          echo "::group::Components to run"
+          echo $components_json
+          echo "::endgroup::"
+
+          echo "components-json=$components_json" >> "$GITHUB_OUTPUT"
+
+  prepare-components:
+    name: Prepare components
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component: ${{ fromJSON(needs.get-components.outputs.components-json) }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      REGISTRY: ${{ secrets.REGISTRY }}
+    needs: get-components
+    steps:
+      - name: Free space on runner (delete unnecessary tools)
+        run: rm -rf /opt/hostedtoolcache
+
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          # ref: ${{ inputs.branch || '' }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: Github
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Build image
+        id: build-image
+        run: |
+          OUTPUT=$(make -C "${{ matrix.component }}" build-image)
+          if echo "$OUTPUT" | grep -q "Skipping"; then
+            echo "SKIP_IMAGE=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push image
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        run: make -C "${{ matrix.component }}" publish-image
+
+      - name: Lint chart
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        run: make -C "${{ matrix.component }}" lint-chart
+
+      - name: Publish chart
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        run: make -C "${{ matrix.component }}" publish-chart
