@@ -6,7 +6,7 @@ import { negate, overSome } from 'lodash-es';
 import { idMatchingFormat } from '../../test-utils/id-utils';
 import { AnnotationLabel } from '../annotations/annotation.interface';
 import { DOMAIN } from '../projects/core.interface';
-import { isAnomalyDomain, isClassificationDomain, isKeypointDetection } from '../projects/domains';
+import { isAnomalyDomain, isClassificationDomain } from '../projects/domains';
 import { Task } from '../projects/task.interface';
 import { DeletedLabelDTO, LabelDTO, NewLabelDTO } from './dtos/label.interface';
 import { LabelItemType, LabelTreeGroupProps, LabelTreeItem, LabelTreeLabelProps } from './label-tree-view.interface';
@@ -61,7 +61,7 @@ export const isAnomalous = <T extends { behaviour: LABEL_BEHAVIOUR }>(label: T):
     return Boolean(label.behaviour & LABEL_BEHAVIOUR.ANOMALOUS);
 };
 
-export const isBackground = <T extends { behaviour: LABEL_BEHAVIOUR }>(label: T): boolean => {
+export const isBackgroundBehavior = <T extends { behaviour: LABEL_BEHAVIOUR }>(label: T): boolean => {
     return Boolean(label.behaviour & LABEL_BEHAVIOUR.BACKGROUND);
 };
 
@@ -75,7 +75,7 @@ export const isEmptyLabel = <T extends EmptyOrBackground>(label: T): boolean => 
 export const isNonEmptyLabel = negate(isEmptyLabel);
 
 export const isBackgroundLabel = <T extends EmptyOrBackground>(label: T): boolean => {
-    return isBackground(label) && label.isBackground;
+    return isBackgroundBehavior(label) && label.isBackground;
 };
 
 export const isNonBackgroundLabel = negate(isBackgroundLabel);
@@ -122,7 +122,7 @@ export const getBehaviourFromDTO = (
         return LABEL_BEHAVIOUR.GLOBAL;
     }
 
-    if (isKeypointDetection(domain)) {
+    if (label.is_background) {
         return LABEL_BEHAVIOUR.BACKGROUND;
     }
 
