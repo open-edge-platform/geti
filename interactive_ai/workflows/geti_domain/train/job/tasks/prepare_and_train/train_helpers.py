@@ -72,7 +72,7 @@ def validate_training_dataset(dataset: Dataset, task_node: TaskNode) -> None:
 class _ModelBuilder:
     """Helper class to create a new iai-core `Model` entity and save it to the repository."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         model_repo: ModelRepo,
         project: Project,

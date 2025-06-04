@@ -5,7 +5,7 @@
 Task node train workflow module
 """
 
-from typing import Optional, Any
+from typing import Optional
 
 from flytekit import workflow
 
@@ -33,7 +33,7 @@ def train_workflow(  # noqa: PLR0913
     # Training command
     command: list[str] = ["bash", "-c", "run"],
     keep_mlflow_artifacts: bool = False,
-    hyperparameters: Optional[dict] = None,
+    hyperparameters: Optional[dict] = None,  # noqa: UP007,
 ) -> None:
     """
     Task node train workflow
