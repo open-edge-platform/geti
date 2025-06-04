@@ -111,7 +111,7 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Namespace }}-configuration
                   key: platformVersion
-            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+            {{- if .Values.global.install_telemetry_stack }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
@@ -195,11 +195,7 @@ spec:
           securityContext:
             {{ toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{- if (eq .Values.global.installation_profile "lite") }}
-              {{ toYaml .Values.liteResources | nindent 12 }}
-            {{- else }}
-              {{ toYaml .Values.standardResources | nindent 12 }}
-            {{- end }}
+            {{ toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /tmp
               name: tmp

@@ -2,14 +2,7 @@ image: director
 
 imagePullPolicy: IfNotPresent
 
-standardResources:
-  requests:
-    cpu: 1000m
-    memory: 1Gi
-  limits:
-    memory: 1Gi
-
-liteResources:
+resources:
   requests:
     cpu: 300m
     memory: 500Mi

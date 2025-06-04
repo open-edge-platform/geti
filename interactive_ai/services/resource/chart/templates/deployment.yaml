@@ -218,11 +218,6 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Namespace }}-configuration
                   key: platformVersion
-            - name: INSTALLATION_PROFILE
-              valueFrom:
-                configMapKeyRef:
-                  name: {{ .Release.Namespace }}-configuration
-                  key: installation_profile
             - name: BUILD_VERSION
               valueFrom:
                 configMapKeyRef:
@@ -233,7 +228,7 @@ spec:
                 configMapKeyRef:
                   name: {{ .Release.Namespace }}-configuration
                   key: intelEmail
-            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+            {{- if .Values.global.install_telemetry_stack }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
@@ -323,11 +318,7 @@ spec:
           securityContext:
             {{ toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{- if (eq .Values.global.installation_profile "lite") }}
-              {{ toYaml .Values.liteResources | nindent 12 }}
-            {{- else }}
-              {{ toYaml .Values.standardResources | nindent 12 }}
-            {{- end }}
+            {{ toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: {{ .Values.global.logging_config_dir }}
               name: config

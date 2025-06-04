@@ -22,14 +22,7 @@ ingress:
     - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/datasets/(.*)/media/images/(.*)/display/full
     - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/datasets/(.*)/media/images/(.*)/display/thumb
 
-standardResources:
-  requests:
-    cpu: '1'
-    memory: 1Gi
-  limits:
-    memory: 1Gi # if you change this value, remember to update 'global.mem_limit' too
-
-liteResources:
+resources:
   requests:
     cpu: 300m
     memory: 500Mi

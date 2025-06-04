@@ -17,7 +17,6 @@ ClusterResources = namedtuple(  # noqa: PYI024
         "memory_capacity",
         "accelerator_type",
         "accelerator_name",
-        "installation_profile",
     ],
 )
 
@@ -141,7 +140,6 @@ async def calculate_available_resources_per_node(
     memory_capacity_per_node = []
     accelerator_type = cm.data["accelerator_type"]
     accelerator_name = cm.data["accelerator_name"]
-    installation_profile = configcm.data.get("installation_profile", "standard")
     for node in nodes.items:
         node_cpu_capacity = k8s_cpu_to_millicpus(node.status.allocatable["cpu"])
         node_cpu_usage = sum(
@@ -176,7 +174,6 @@ async def calculate_available_resources_per_node(
         memory_capacity_per_node,
         accelerator_type,
         accelerator_name,
-        installation_profile,
     )
 
 

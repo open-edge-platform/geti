@@ -1,4 +1,4 @@
-{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+{{- if .Values.global.install_telemetry_stack }}
 ---
 {{- if not .Values.global.istio_ambient_mesh }}
 apiVersion: networking.istio.io/v1beta1

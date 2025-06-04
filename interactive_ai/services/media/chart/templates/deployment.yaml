@@ -47,11 +47,7 @@ spec:
           {{- toYaml .Values.securityContext | nindent 12 }}
           env:
             - name: GOMAXPROCS
-              {{- if (eq .Values.global.installation_profile "lite") }}
-              value: "{{ .Values.liteResources.requests.cpu }}"
-              {{- else }}
-              value: "{{ .Values.standardResources.requests.cpu }}"
-              {{- end }}
+              value: "{{ .Values.resources.requests.cpu }}"
             - name: GOMEMLIMIT
               value: "{{ .Values.global.mem_limit }}"
             - name: MIN_FREE_SPACE_GIB
@@ -91,7 +87,7 @@ spec:
                   name: "{{ .Release.Namespace}}-seaweed-fs"
                   key: "media_ms_s3_presigned_url_secret_key"
             {{- end }}
-            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+            {{- if .Values.global.install_telemetry_stack }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
@@ -127,11 +123,7 @@ spec:
             - configMapRef:
                 name: {{ .Release.Namespace }}-s3-bucket-names
           resources:
-            {{- if (eq .Values.global.installation_profile "lite") }}
-              {{ toYaml .Values.liteResources | nindent 12 }}
-            {{- else }}
-              {{ toYaml .Values.standardResources | nindent 12 }}
-            {{- end }}
+            {{ toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: {{ .Values.mountPath }}
               name: data-storage

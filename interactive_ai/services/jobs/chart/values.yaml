@@ -37,14 +37,7 @@ microservice:
     limits:
       memory: 100Mi
 
-  standardResources:
-    requests:
-      cpu: 400m
-      memory: 500Mi
-    limits:
-      memory: 500Mi
-
-  liteResources:
+  resources:
     requests:
       cpu: 400m
       memory: 200Mi
@@ -78,14 +71,7 @@ scheduler:
     limits:
       memory: 100Mi
 
-  standardResources:
-    requests:
-      cpu: 300m
-      memory: 500Mi
-    limits:
-      memory: 500Mi
-
-  liteResources:
+  resources:
     requests:
       cpu: 300m
       memory: 200Mi
@@ -107,14 +93,7 @@ scheduling_policy:
     limits:
       memory: 100Mi
 
-  standardResources:
-    requests:
-      cpu: 300m
-      memory: 500Mi
-    limits:
-      memory: 500Mi
-
-  liteResources:
+  resources:
     requests:
       cpu: 300m
       memory: 200Mi

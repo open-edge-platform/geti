@@ -16,14 +16,7 @@ ingress:
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects:import
   - /api/v(.*)/organizations/([^/]*)/workspaces/([^/]*)/projects/uploads/resumable/(.*)(/|$)
 
-standardResources:
-  requests:
-    cpu: 500m
-    memory: 800Mi
-  limits:
-    memory: 800Mi
-
-liteResources:
+resources:
   requests:
     cpu: 200m
     memory: 400Mi
