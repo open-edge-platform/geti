@@ -139,9 +139,9 @@ const QuickInferencePage = (): JSX.Element => {
 
 export const QuickInference = (): JSX.Element => {
     const { useHasActiveModels } = useModels();
-    const hasModels = useHasActiveModels();
+    const { hasActiveModels } = useHasActiveModels();
 
-    if (!hasModels) {
+    if (!hasActiveModels) {
         return (
             <EmptyData
                 title={'No trained models'}
@@ -152,7 +152,7 @@ export const QuickInference = (): JSX.Element => {
     }
 
     return (
-        <QuickInferenceProvider isDisabled={!hasModels}>
+        <QuickInferenceProvider isDisabled={!hasActiveModels}>
             <QuickInferencePage />
         </QuickInferenceProvider>
     );

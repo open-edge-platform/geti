@@ -21,6 +21,7 @@ const ToggleButton = <T extends string>({
 }: ToggleButtonProps<T>) => {
     return (
         <Button
+            data-activated={selectedOption === option}
             variant={selectedOption === option ? 'accent' : 'secondary'}
             UNSAFE_className={clsx(styles.toggleButton, className)}
             onPress={() => {

@@ -18,6 +18,9 @@ import { getMockedProject } from '../../../../../test-utils/mocked-items-factory
 import { getMockedTask } from '../../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { getById } from '../../../../../test-utils/utils';
+import { useDeviceSettings } from '../../../../camera-page/providers/device-settings-provider.component';
+import { getUseCameraSettings } from '../../../../camera-page/test-utils/camera-setting';
+import { UserCameraPermission } from '../../../../camera-support/camera.interface';
 import { ProjectProvider } from '../../../providers/project-provider/project-provider.component';
 import { QuickInference } from './quick-inference.component';
 
@@ -30,6 +33,16 @@ jest.mock('react-router-dom', () => ({
         workspaceId: 'workspace_1',
         organizationId: 'organization-id',
     }),
+}));
+
+jest.mock('../../../../camera-page/providers/device-settings-provider.component', () => ({
+    ...jest.requireActual('../../../../camera-page/providers/device-settings-provider.component'),
+    useDeviceSettings: jest.fn(),
+}));
+
+jest.mock('../../../../../shared/navigator-utils', () => ({
+    ...jest.requireActual('../../../../../shared/navigator-utils'),
+    getVideoDevices: jest.fn().mockResolvedValue([]),
 }));
 
 describe('QuickInference', () => {
@@ -51,6 +64,10 @@ describe('QuickInference', () => {
             return this;
         });
     });
+
+    const expectQuickInferenceIsReadyToUpload = async () => {
+        expect(await screen.findByText('Drag and drop image')).toBeInTheDocument();
+    };
 
     const renderQuickInference = async ({
         modelsGroup,
@@ -119,6 +136,8 @@ describe('QuickInference', () => {
             return [];
         });
 
+        await expectQuickInferenceIsReadyToUpload();
+
         const file = new File(['hello'], 'hello.png', { type: 'image/png' });
 
         await uploadFile(screen.getByLabelText('upload link upload media input'), file);
@@ -129,14 +148,8 @@ describe('QuickInference', () => {
     it('upload button is disabled when no models trained', async () => {
         await renderQuickInference({ modelsGroup: [] });
 
-        const inputElement = screen.getByText('Upload media');
-        expect(inputElement).toBeEnabled();
-    });
-
-    it('should has drag and drop image text', async () => {
-        await renderQuickInference({});
-
-        expect(await screen.findByText('Drag and drop image')).toBeInTheDocument();
+        expect(screen.getByText('No trained models')).toBeInTheDocument();
+        expect(screen.getByText('Upload media and annotate to test a model')).toBeInTheDocument();
     });
 
     it('uploads an image and gets inference for it', async () => {
@@ -162,6 +175,8 @@ describe('QuickInference', () => {
         inferenceService.getPredictionsForFile = jest.fn(() => {
             throw new Error('Some 503 error from the server');
         });
+
+        await expectQuickInferenceIsReadyToUpload();
 
         const file = new File(['hello'], 'hello.png', { type: 'image/png' });
         const inputElement = getById(container, 'upload-media-button-id-input-file') as HTMLElement;
@@ -207,12 +222,14 @@ describe('QuickInference', () => {
     it('shows error notification if the user tries to upload a non-image file', async () => {
         const { inferenceService } = await renderQuickInference({});
 
+        await expectQuickInferenceIsReadyToUpload();
+
         const filesWithUnsupportedFormats = [
             new File(['hello'], 'hello.mp4', { type: 'video/mp4' }),
             new File(['hello'], 'hello.txt', { type: 'text/txt' }),
         ];
 
-        filesWithUnsupportedFormats.forEach(async (file) => {
+        filesWithUnsupportedFormats.map(async (file) => {
             await uploadFile(screen.getByLabelText('upload link upload media input'), file);
 
             await Promise.resolve();
@@ -298,5 +315,110 @@ describe('QuickInference', () => {
         expect(screen.queryByLabelText('opacity slider')).not.toBeInTheDocument();
         expect(screen.queryByLabelText('explanation-switcher')).not.toBeInTheDocument();
         expect(screen.queryByLabelText('show explanations dropdown')).not.toBeInTheDocument();
+    });
+
+    it('shows toggle buttons for "Use file" and "Use camera", "Use file" is selected by default', async () => {
+        await renderQuickInference({});
+        await expectQuickInferenceIsReadyToUpload();
+
+        const useFileButton = screen.getByRole('button', { name: 'Use file' });
+        const useCameraButton = screen.getByRole('button', { name: 'Use camera' });
+
+        expect(useFileButton).toBeInTheDocument();
+        expect(useCameraButton).toBeInTheDocument();
+
+        expect(useFileButton).toHaveAttribute('data-activated', 'true');
+        expect(useCameraButton).toHaveAttribute('data-activated', 'false');
+    });
+
+    describe('Live camera inference', () => {
+        const clickUseCameraButton = () => {
+            const useCameraButton = screen.getByRole('button', { name: 'Use camera' });
+            fireEvent.click(useCameraButton);
+            expect(useCameraButton).toHaveAttribute('data-activated', 'true');
+        };
+
+        it('shows loading when camera permission is not granted', async () => {
+            jest.mocked(useDeviceSettings).mockReturnValue(
+                getUseCameraSettings({
+                    userPermissions: UserCameraPermission.PENDING,
+                })
+            );
+
+            await renderQuickInference({});
+            await expectQuickInferenceIsReadyToUpload();
+
+            clickUseCameraButton();
+
+            expect(screen.getByLabelText('permissions pending')).toBeInTheDocument();
+        });
+
+        it('shows an error message when there is an error with camera', async () => {
+            jest.mocked(useDeviceSettings).mockReturnValue(
+                getUseCameraSettings({
+                    userPermissions: UserCameraPermission.ERRORED,
+                })
+            );
+
+            await renderQuickInference({});
+            await expectQuickInferenceIsReadyToUpload();
+
+            clickUseCameraButton();
+
+            expect(
+                screen.getAllByText('Please check your device and network settings and try again.')[0]
+            ).toBeInTheDocument();
+        });
+
+        it('shows camera view with settings', async () => {
+            jest.mocked(useDeviceSettings).mockReturnValue(
+                getUseCameraSettings({
+                    deviceConfig: [
+                        {
+                            name: 'frameRate',
+                            config: {
+                                type: 'minMax',
+                                value: 30,
+                                max: 30,
+                                min: 0,
+                            },
+                        },
+                        {
+                            name: 'height',
+                            config: {
+                                type: 'minMax',
+                                value: 480,
+                                max: 1920,
+                                min: 1,
+                            },
+                        },
+                        {
+                            name: 'resizeMode',
+                            config: {
+                                type: 'selection',
+                                value: 'none',
+                                options: ['none', 'crop-and-scale'],
+                            },
+                        },
+                        {
+                            name: 'width',
+                            config: {
+                                type: 'minMax',
+                                value: 640,
+                                max: 1920,
+                                min: 1,
+                            },
+                        },
+                    ],
+                    userPermissions: UserCameraPermission.GRANTED,
+                })
+            );
+
+            await renderQuickInference({});
+            await expectQuickInferenceIsReadyToUpload();
+
+            clickUseCameraButton();
+            expect(screen.getByRole('heading', { name: 'Camera Settings' })).toBeInTheDocument();
+        });
     });
 });

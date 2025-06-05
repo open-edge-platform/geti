@@ -53,7 +53,7 @@ const Sidebar = ({ isInferencedImageVisible }: { isInferencedImageVisible: boole
                     isQuiet
                     onPress={() => setIsOpen((prev) => !prev)}
                     aria-label={'Toggle camera settings'}
-                    height={isOpen ? undefined : '100%'}
+                    flex={isOpen ? undefined : 1}
                 >
                     {isOpen ? <ChevronDoubleRight size='XS' /> : <ChevronDoubleLeft size='XS' />}
                 </ActionButton>
