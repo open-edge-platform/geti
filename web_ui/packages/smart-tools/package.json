@@ -8,6 +8,13 @@
   "dependencies": {
     "comlink": "^4.3.1"
   },
+  "include": [
+    "utils/**/*.ts"
+  ],
+  "exclude": [
+    "opencv",
+    "opencv-types"
+  ],
   "exports": {
     ".": "./index.ts"
   },
