@@ -3,15 +3,12 @@
 
 import { useEffect } from 'react';
 
-import { paths } from '@geti/core';
 import { Flex, Loading, View } from '@geti/ui';
-import { useNavigate } from 'react-router-dom';
 
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { MediaDropBoxHeader } from '../../../../../shared/components/media-drop/media-drop-box-header.component';
 import { MediaDropBox } from '../../../../../shared/components/media-drop/media-drop-box.component';
 import { VALID_IMAGE_TYPES } from '../../../../../shared/media-utils';
-import { useDatasetIdentifier } from '../../../../annotator/hooks/use-dataset-identifier.hook';
 import { useCameraStorage } from '../../../../camera-page/hooks/use-camera-storage.hook';
 import { ImageSection } from './image-section.component';
 import { useQuickInference } from './quick-inference-provider.component';
@@ -38,8 +35,6 @@ const LoadFileFromLiveInferenceCamera = ({ onFileLoaded }: LoadFileFromLiveInfer
 };
 
 export const Contents = () => {
-    const navigate = useNavigate();
-    const datasetIdentifier = useDatasetIdentifier();
     const { useHasActiveModels } = useModels();
     const { hasActiveModels } = useHasActiveModels();
 
@@ -66,18 +61,7 @@ export const Contents = () => {
                     {imageWasUploaded && (
                         <>
                             <ImageSection />
-                            {isLoading && (
-                                <View
-                                    position='absolute'
-                                    top={0}
-                                    bottom={0}
-                                    left={0}
-                                    right={0}
-                                    UNSAFE_style={{ backgroundColor: 'rgba(36 37 40 / 60%)' }}
-                                >
-                                    <Loading />
-                                </View>
-                            )}
+                            {isLoading && <Loading overlay />}
                         </>
                     )}
                 </MediaDropBox>

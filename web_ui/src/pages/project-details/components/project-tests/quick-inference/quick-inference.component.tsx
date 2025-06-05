@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
 
-import { Flex, Heading, View } from '@geti/ui';
+import { Flex, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { NoTrainedModels } from '../../../../../assets/images';
@@ -14,7 +14,6 @@ import { useUserGlobalSettings } from '../../../../../core/user-settings/hooks/u
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
 import { EmptyData } from '../../../../../shared/components/empty-data/empty-data.component';
-import { FullscreenAction } from '../../../../../shared/components/fullscreen-action/fullscreen-action.component';
 import { useTaskLabels } from '../../../../annotator/annotation/annotation-filter/use-task-labels.hook';
 import { PreviewCanvasSettingsProvider } from '../../../../annotator/providers/preview-canvas-settings-provider/preview-canvas-settings-provider.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';

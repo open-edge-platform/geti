@@ -6,7 +6,6 @@ import { Flex, Grid, Heading, Text, View } from '@geti/ui';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 import { getEstimateFreeStorage } from '../../shared/navigator-utils';
-import { UserCameraPermission } from '../camera-support/camera.interface';
 import { ActionButtons } from './components/action-buttons/action-buttons.component';
 import { CameraFactory } from './components/camera-factory.component';
 import { useDeviceSettings } from './providers/device-settings-provider.component';

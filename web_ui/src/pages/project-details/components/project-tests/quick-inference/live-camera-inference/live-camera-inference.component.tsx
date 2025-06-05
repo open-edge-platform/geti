@@ -69,18 +69,7 @@ const InferencedImage = () => {
     return (
         <View position={'relative'} height={'100%'} width={'100%'}>
             <ImageSection />
-            {isLoading && (
-                <View
-                    position='absolute'
-                    top={0}
-                    bottom={0}
-                    left={0}
-                    right={0}
-                    UNSAFE_style={{ backgroundColor: 'rgba(36 37 40 / 60%)' }}
-                >
-                    <Loading />
-                </View>
-            )}
+            {isLoading && <Loading overlay />}
         </View>
     );
 };
