@@ -74,7 +74,7 @@ export const FineTuneParameters: FC<FineTuneParametersProps> = ({
                     <InfoTooltip
                         tooltipText={
                             // eslint-disable-next-line max-len
-                            'Reassign all dataset items to train, validation, and test subsets from scratch. Previous splits will not be retained. This option is accessible Pre-trained weights.'
+                            'Reassign all dataset items to train, validation, and test subsets from scratch. Previous splits will not be retained. This option is accessible for Pre-trained weights.'
                         }
                     />
                 </Flex>
