@@ -110,7 +110,7 @@ class TrainTaskJobData:
     workspace_id: ID
     max_training_dataset_size: int | None
     dataset_storage: DatasetStorage
-    training_configuration: TrainingConfiguration
+    training_configuration: TrainingConfiguration | None
     hyper_parameters_id: ID | None
     min_annotation_size: int | None = None
     max_number_of_annotations: int | None = None
