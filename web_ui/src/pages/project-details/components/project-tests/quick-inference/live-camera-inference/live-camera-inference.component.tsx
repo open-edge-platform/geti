@@ -74,6 +74,8 @@ const InferencedImage = () => {
     );
 };
 
+const CAMERA_ANIMATION_DELAY = 500;
+
 const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCameraInferenceLayoutProps) => {
     const { webcamRef } = useDeviceSettings();
     const { handleUploadImage } = useQuickInference();
@@ -100,7 +102,7 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
         // Note: the goal of this timeout is to ensure that camera animation finishes first and then we show predictions
         setTimeout(() => {
             handleUploadImage([screenshot]);
-        }, 500);
+        }, CAMERA_ANIMATION_DELAY);
     };
 
     return (
