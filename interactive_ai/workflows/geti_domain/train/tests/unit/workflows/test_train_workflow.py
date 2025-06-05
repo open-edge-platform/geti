@@ -113,6 +113,7 @@ class TestTrainWorkflow:
                 min_annotation_size=None,
                 max_number_of_annotations=None,
                 reshuffle_subsets=reshuffle_subsets,
+                hyperparameters=None,
             )
             mocked_evaluate_and_infer.assert_called_once_with(
                 train_data=data_task_trainer,
