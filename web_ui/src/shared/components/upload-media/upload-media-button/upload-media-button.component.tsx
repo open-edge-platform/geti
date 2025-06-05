@@ -95,7 +95,11 @@ export const UploadMediaButton = ({
                 disabled={isDisabled || isUploadMediaDisabled}
             />
             {menuItems.length === 1 && menuItems.at(0) === MenuItemsKey.FILE ? (
-                <Button variant={'secondary'} onPress={() => fileInputRef.current?.click()}>
+                <Button
+                    variant={'secondary'}
+                    onPress={() => onMenuAction(MenuItemsKey.FILE, fileInputRef)}
+                    isDisabled={isDisabled}
+                >
                     Upload file
                 </Button>
             ) : (

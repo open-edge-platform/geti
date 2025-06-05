@@ -23,8 +23,8 @@ import { hasPermissionsDenied, isPermissionPending } from '../../../../../camera
 import { HeaderOptions } from '../header-options.component';
 import { ImageSection } from '../image-section.component';
 import { useQuickInference } from '../quick-inference-provider.component';
-import { useIsExplanationEnabled } from '../quick-inference.component';
 import { SecondaryToolbar } from '../secondary-toolbar.component';
+import { useIsExplanationEnabled } from '../use-is-explanation-enabled.hook';
 
 import styles from './live-camera-interface.module.scss';
 

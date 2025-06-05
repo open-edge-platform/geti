@@ -8,7 +8,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { NoTrainedModels } from '../../../../../assets/images';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
-import { isKeypointDetection } from '../../../../../core/projects/domains';
 import { TUTORIAL_CARD_KEYS } from '../../../../../core/user-settings/dtos/user-settings.interface';
 import { useUserGlobalSettings } from '../../../../../core/user-settings/hooks/use-global-settings.hook';
 import { getSettingsOfType } from '../../../../../core/user-settings/utils';
@@ -16,7 +15,6 @@ import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters
 import { EmptyData } from '../../../../../shared/components/empty-data/empty-data.component';
 import { useTaskLabels } from '../../../../annotator/annotation/annotation-filter/use-task-labels.hook';
 import { PreviewCanvasSettingsProvider } from '../../../../annotator/providers/preview-canvas-settings-provider/preview-canvas-settings-provider.component';
-import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { AnnotatorCanvasProviders } from './annotator-canvas-providers.component';
 import { Contents } from './contents.component';
 import { HeaderOptions } from './header-options.component';
@@ -24,6 +22,7 @@ import { LiveCameraInference } from './live-camera-inference/live-camera-inferen
 import { LivePredictionNotification } from './live-prediction-notification.component';
 import { QuickInferenceProvider, useQuickInference } from './quick-inference-provider.component';
 import { SecondaryToolbar } from './secondary-toolbar.component';
+import { useIsExplanationEnabled } from './use-is-explanation-enabled.hook';
 
 import classes from '../project-tests.module.scss';
 
@@ -50,15 +49,6 @@ const ContentContainer = ({ imageWasUploaded, shouldShowExplanation }: ContentCo
             </Flex>
         </View>
     );
-};
-
-export const useIsExplanationEnabled = (imageWasUploaded: boolean) => {
-    const { isTaskChainProject, isSingleDomainProject } = useProject();
-    if (imageWasUploaded === false) {
-        return false;
-    }
-
-    return isTaskChainProject === false && isSingleDomainProject(isKeypointDetection) === false;
 };
 
 const LiveFileInference = ({ imageWasUploaded }: { imageWasUploaded: boolean }) => {
