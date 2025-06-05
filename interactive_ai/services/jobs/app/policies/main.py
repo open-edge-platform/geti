@@ -116,3 +116,6 @@ def run_resource_manager_loop() -> None:
 
 if __name__ == "__main__":
     start()
+
+    while True:
+        time.sleep(POLICY_LOOP_INTERVAL)
