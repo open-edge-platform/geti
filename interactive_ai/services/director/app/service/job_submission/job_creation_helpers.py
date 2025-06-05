@@ -141,7 +141,7 @@ class TrainTaskJobData:
 
         :returns: a dict representing the job payload
         """
-        return {
+        payload = {
             "project_id": str(self.project.id_),
             "task_id": str(self.task_node.id_),
             "from_scratch": self.from_scratch,
@@ -158,8 +158,11 @@ class TrainTaskJobData:
             "max_number_of_annotations": self.max_number_of_annotations,
             "reshuffle_subsets": self.reshuffle_subsets,
             "keep_mlflow_artifacts": self.keep_mlflow_artifacts,
-            "hyperparameters": self.training_configuration.hyperparameters.model_dump(),
         }
+        # commented out for testing
+        # if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
+        #     payload["hyperparameters"] = self.training_configuration.hyperparameters.model_dump()
+        return payload
 
     def create_metadata(self) -> dict:
         """
