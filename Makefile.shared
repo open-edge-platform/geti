@@ -82,9 +82,8 @@ publish-image:
 build-chart:
 	mkdir -p ${CHART_BUILD_DIR}
 	cp -r ${CHART_DIR}/* ${CHART_BUILD_DIR}/
-	mv ${CHART_BUILD_DIR}/Chart.yaml.template ${CHART_BUILD_DIR}/Chart.yaml
-	yq e '.version = "${TAG}"' -i ${CHART_YAML}
-	yq e '.appVersion = "${TAG}"' -i ${CHART_YAML}
+	TAG=$(TAG) COMPONENT_NAME=$(COMPONENT_NAME) envsubst < ${CHART_BUILD_DIR}/Chart.yaml.template > ${CHART_YAML}
+	rm "${CHART_BUILD_DIR}/Chart.yaml.template"
 
 lint-chart-default: build-chart
 	@echo "Running chart linter for component: ${COMPONENT_NAME}"
