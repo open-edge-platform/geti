@@ -75,6 +75,7 @@ class TestPrepareTrainingDataTask:
         # Arrange
         train_data = fxt_train_data(workspace_id=WORKSPACE_ID, project_id=PROJECT_ID, task_id=TASK_ID)
         train_data.get_compiled_dataset_shards = MagicMock()
+        hyperparameters = {"learning_rate": 0.01, "batch_size": 32}
 
         mocked_get_train_data.return_value = train_data
         dataset = Dataset(ID(DATASET_ID))
@@ -100,6 +101,7 @@ class TestPrepareTrainingDataTask:
             max_training_dataset_size=100,
             command=["bash", "-c", "run"],
             reshuffle_subsets=reshuffle_subsets,
+            hyperparameters=hyperparameters,
         )
 
         # Assert
@@ -115,6 +117,7 @@ class TestPrepareTrainingDataTask:
             max_number_of_annotations=None,
             min_annotation_size=None,
             reshuffle_subsets=reshuffle_subsets,
+            hyperparameters=hyperparameters,
         )
         mocked_create_task_train_dataset.assert_called_once_with(train_data=train_data, max_training_dataset_size=100)
 
