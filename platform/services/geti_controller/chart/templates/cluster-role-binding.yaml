@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-access-binding
+subjects:
+- kind: ServiceAccount
+  name: geti-controller
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin-access
+  apiGroup: rbac.authorization.k8s.io
