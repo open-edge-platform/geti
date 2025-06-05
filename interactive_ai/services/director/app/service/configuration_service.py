@@ -12,7 +12,11 @@ from geti_configuration_tools.training_configuration import PartialTrainingConfi
 from service.utils import delete_none_from_dict, merge_deep_dict
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
 
-from geti_types import ID, ProjectIdentifier
+from geti_fastapi_tools.exceptions import ModelNotFoundException
+from geti_types import ID, ModelStorageIdentifier, ProjectIdentifier
+from iai_core.entities.model import Model, NullModel
+from iai_core.entities.model_storage import ModelStorage
+from iai_core.repos import ModelRepo, ModelStorageRepo
 
 
 class ConfigurationService:
@@ -92,3 +96,39 @@ class ConfigurationService:
         return cls.overlay_training_configurations(
             base_config, task_level_config, algo_level_config, validate_full_config=strict_validation
         )
+
+    @staticmethod
+    def get_configuration_from_model(
+        project_identifier: ProjectIdentifier, task_id: ID, model_id: ID
+    ) -> tuple[dict, ModelStorage]:
+        """
+        Returns the hyperparameters that were used to train a model as a dictionary. This is not
+        the current configuration, but the configuration used, from the history of the
+        model. Additionally, return the ID of the model storage the model lives in.
+
+        :param project_identifier: Identifier of the project
+        :param task_id: ID of the task this model belongs to
+        :param model_id: ID of the model to get the related configuration for
+        :raises ModelNotFoundException: If the model with ID `model_id` was not found
+            in any of the model storages for the task
+        :return: Tuple containing:
+            - Dict containing training hyperparameters that were used to generate the model
+            - Model storage the model lives in
+        """
+        task_model_storages = ModelStorageRepo(project_identifier).get_by_task_node_id(task_id)
+
+        model: Model | None = None
+        found_model_storage: ModelStorage | None = None
+        for model_storage in task_model_storages:
+            model_storage_identifier = ModelStorageIdentifier(
+                workspace_id=project_identifier.workspace_id,
+                project_id=project_identifier.project_id,
+                model_storage_id=model_storage.id_,
+            )
+            model = ModelRepo(model_storage_identifier).get_by_id(model_id)
+            if not isinstance(model, NullModel):
+                found_model_storage = model_storage
+                break
+        if model is None or found_model_storage is None:
+            raise ModelNotFoundException(model_id)
+        return model.configuration.display_only_configuration, found_model_storage
