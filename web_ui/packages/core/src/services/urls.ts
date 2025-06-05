@@ -24,8 +24,8 @@ import { DatasetIdentifier } from '../../../../src/core/projects/dataset.interfa
 import { ProjectsQueryOptions } from '../../../../src/core/projects/services/project-service.interface';
 import { SortDirection } from '../../../../src/core/shared/query-parameters';
 import { TaskIdentifier } from '../../../../src/core/statistics/dtos/dataset-statistics.interface';
-import { MemberRoleDTO, ResourceTypeDTO } from '../../../../src/core/users/users.interface';
-import { WorkspaceIdentifier } from '../../../../src/core/workspaces/services/workspaces.interface';
+import { MemberRoleDTO, ResourceTypeDTO } from '../users/users.interface';
+import { WorkspaceIdentifier } from '../workspaces/services/workspaces.interface';
 import { addVideoPaginationSearchParams, buildAdvancedFilterSearchOptions } from './utils';
 
 const API = '/api';
@@ -456,8 +456,20 @@ const JOB_CANCEL = (workspaceIdentifier: WorkspaceIdentifier, jobId: string): st
     `${JOB(workspaceIdentifier, jobId)}:cancel`;
 
 const JOBS_QUERY_PARAMS = (workspaceIdentifier: WorkspaceIdentifier, queryParams: JobsQueryParams): string => {
-    const { projectId, jobState, jobTypes, key, author, startTimeFrom, startTimeTo, skip, limit, sortDirection } =
-        queryParams;
+    const {
+        projectId,
+        jobState,
+        jobTypes,
+        key,
+        author,
+        creationTimeFrom,
+        creationTimeTo,
+        startTimeFrom,
+        startTimeTo,
+        skip,
+        limit,
+        sortDirection,
+    } = queryParams;
 
     const baseUrl = `${JOBS(workspaceIdentifier)}?`;
     const params = new URLSearchParams([['sort_by', 'creation_time']]);
@@ -467,6 +479,8 @@ const JOBS_QUERY_PARAMS = (workspaceIdentifier: WorkspaceIdentifier, queryParams
     if (jobTypes) jobTypes.forEach((jobType) => params.append('job_type', JobTypePayload[jobType]));
     if (key) params.append('key', key);
     if (author) params.append('author_id', author);
+    if (creationTimeFrom) params.append('creation_time_from', creationTimeFrom);
+    if (creationTimeTo) params.append('creation_time_to', creationTimeTo);
     if (startTimeFrom) params.append('start_time_from', startTimeFrom);
     if (startTimeTo) params.append('start_time_to', startTimeTo);
     if (skip) params.append('skip', skip.toString());

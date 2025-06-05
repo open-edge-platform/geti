@@ -4,13 +4,13 @@
 import { Key } from 'react';
 
 import { paths } from '@geti/core';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { RESOURCE_TYPE, User, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { Button, Loading } from '@geti/ui';
 import { capitalize } from 'lodash-es';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useUsers } from '../../core/users/hook/use-users.hook';
-import { RESOURCE_TYPE, User, USER_ROLE } from '../../core/users/users.interface';
 import { useHandleSignOut } from '../../hooks/use-handle-sign-out/use-handle-sign-out.hook';
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useOrganizationIdentifier } from '../../hooks/use-organization-identifier/use-organization-identifier.hook';

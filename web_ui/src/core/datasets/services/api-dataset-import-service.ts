@@ -5,6 +5,7 @@ import { apiClient } from '@geti/core';
 
 import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
 import { API_URLS } from '../../../../packages/core/src/services/urls';
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import {
     JobImportDatasetToExistingProjectStatusDTO,
     JobImportDatasetToNewProjectStatusDTO,
@@ -20,7 +21,6 @@ import {
 } from '../../jobs/jobs.interface';
 import { getJobEntity } from '../../jobs/utils';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import {
     DatasetImportIdentifier,
     DatasetImportPrepareForNewProjectResponse,

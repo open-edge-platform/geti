@@ -1,0 +1,6 @@
+---
+name: project-ie
+version: '{{VERSION}}'
+apiVersion: v2
+description: project import and export
+appVersion: '{{VERSION}}'

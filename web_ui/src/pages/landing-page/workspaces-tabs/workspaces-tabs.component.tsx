@@ -4,6 +4,7 @@
 import { Key } from 'react';
 
 import { paths } from '@geti/core';
+import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
 import {
     ActionButton,
     Flex,
@@ -19,7 +20,6 @@ import { Add } from '@geti/ui/icons';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
-import { useWorkspacesApi } from '../../../core/workspaces/hooks/use-workspaces.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { usePinnedCollapsedItems } from '../../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.hook';
 import { PinnedCollapsedItemsAction } from '../../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.interface';

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { User } from '../../../core/users/users.interface';
+import { User } from '@geti/core/src/users/users.interface';
 
 const Fullname = ({ user }: { user: User }) => {
     const firstName = user.firstName;

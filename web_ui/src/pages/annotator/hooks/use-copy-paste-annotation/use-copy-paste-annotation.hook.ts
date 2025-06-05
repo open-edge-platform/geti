@@ -3,6 +3,7 @@
 
 import { useEffect, useRef } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useLocalStorage } from 'usehooks-ts';
@@ -14,7 +15,6 @@ import { Label } from '../../../../core/labels/label.interface';
 import { isPrediction } from '../../../../core/labels/utils';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { isClassificationDomain, isKeypointDetection } from '../../../../core/projects/domains';
-import { useUsers } from '../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';

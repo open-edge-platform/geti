@@ -1,16 +1,12 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+from typing import Any
 
 from geti_types import ID, PersistentEntity
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .hyperparameters import (
-    AugmentationParameters,
-    DatasetPreparationParameters,
-    EvaluationParameters,
-    Hyperparameters,
-    TrainingHyperParameters,
-)
+from .hyperparameters import Hyperparameters
+from .utils import partial_model
 
 
 class SubsetSplit(BaseModel):
@@ -38,17 +34,59 @@ class SubsetSplit(BaseModel):
         return self
 
 
-class Filtering(BaseModel):
-    """Parameters for filtering annotations in the dataset."""
+class MinAnnotationPixels(BaseModel):
+    """Parameters for minimum annotation pixels."""
 
+    enable: bool = Field(
+        default=False,
+        title="Enable minimum annotation pixels filtering",
+        description="Whether to apply minimum annotation pixels filtering",
+    )
     min_annotation_pixels: int = Field(
         gt=0, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
     )
-    max_annotation_pixels: int | None = Field(
-        ge=1, default=None, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+
+
+class MaxAnnotationPixels(BaseModel):
+    """Parameters for maximum annotation pixels."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable maximum annotation pixels filtering",
+        description="Whether to apply maximum annotation pixels filtering",
     )
-    max_annotation_objects: int | None = Field(
-        gt=1, default=None, title="Maximum annotation objects", description="Maximum number of objects in an annotation"
+    max_annotation_pixels: int = Field(
+        gt=0, default=10000, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    )
+
+
+class MaxAnnotationObjects(BaseModel):
+    """Parameters for maximum annotation objects."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable maximum annotation objects filtering",
+        description="Whether to apply maximum annotation objects filtering",
+    )
+    max_annotation_objects: int = Field(
+        gt=0,
+        default=10000,
+        title="Maximum annotation objects",
+        description="Maximum number of objects in an annotation",
+    )
+
+
+class Filtering(BaseModel):
+    """Parameters for filtering annotations in the dataset."""
+
+    min_annotation_pixels: MinAnnotationPixels = Field(
+        title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+    )
+    max_annotation_pixels: MaxAnnotationPixels = Field(
+        title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    )
+    max_annotation_objects: MaxAnnotationObjects = Field(
+        title="Maximum annotation objects", description="Maximum number of objects in an annotation"
     )
 
 
@@ -76,18 +114,15 @@ class GlobalParameters(BaseModel):
 class TrainingConfiguration(BaseModel, PersistentEntity):
     """Configuration for model training"""
 
-    def __init__(self, id_: ID, task_id: ID, ephemeral: bool = True, **data):
+    def __init__(self, id_: ID, ephemeral: bool = True, **data):
         # first initialize the Pydantic BaseModel with all arguments
         BaseModel.__init__(self, **data)
 
         # then initialize PersistentEntity with id and ephemeral parameters
         PersistentEntity.__init__(self, id_=id_, ephemeral=ephemeral)
-        self.task_id = task_id
 
-    model_config = ConfigDict(  # allows the class to have "extra" field such as task_id
-        extra="allow", protected_namespaces=()
-    )
-
+    task_id: str = Field(title="Task ID", description="Unique identifier for the task")
+    model_config = ConfigDict(protected_namespaces=())  # avoid conflict with "model_" namespace
     model_manifest_id: str | None = Field(
         default=None,
         title="Model manifest ID",
@@ -115,6 +150,7 @@ class TrainingConfiguration(BaseModel, PersistentEntity):
         return self.global_parameters == other.global_parameters and self.hyperparameters == other.hyperparameters
 
 
+@partial_model
 class NullTrainingConfiguration(TrainingConfiguration):
     """
     Null object implementation for TrainingConfiguration.
@@ -127,20 +163,37 @@ class NullTrainingConfiguration(TrainingConfiguration):
             self,
             id_=ID(),
             task_id=ID(),
-            global_parameters=GlobalParameters(
-                dataset_preparation=GlobalDatasetPreparationParameters(
-                    subset_split=SubsetSplit(), filtering=Filtering()
-                )
-            ),
-            hyperparameters=Hyperparameters(
-                dataset_preparation=DatasetPreparationParameters(
-                    augmentation=AugmentationParameters(),
-                ),
-                training=TrainingHyperParameters(
-                    max_epochs=1,
-                    learning_rate=0.001,
-                ),
-                evaluation=EvaluationParameters(metric=None),
-            ),
             ephemeral=True,
         )
+
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:  # noqa: ARG002
+        return {}
+
+
+@partial_model
+class PartialTrainingConfiguration(TrainingConfiguration):
+    """
+    A partial version of `TrainingConfiguration` with all fields optional.
+
+    Enables flexible updates and partial validation, making it suitable for scenarios
+    where only a subset of the configuration needs to be specified or changed.
+    """
+
+    def __init__(self, id_: ID = ID(), ephemeral: bool = True, **data):
+        super().__init__(id_, ephemeral, **data)
+
+    @model_validator(mode="after")
+    def validate_identifiers(self) -> "PartialTrainingConfiguration":
+        if not self.task_id:
+            raise ValueError("task_id must be provided in the configuration.")
+        return self
+
+
+@partial_model
+class PartialGlobalParameters(GlobalParameters):
+    """
+    A partial version of `GlobalParameters` with all fields optional.
+
+    Enables flexible updates and partial validation, making it suitable for scenarios
+    where only a subset of the configuration needs to be specified or changed.
+    """

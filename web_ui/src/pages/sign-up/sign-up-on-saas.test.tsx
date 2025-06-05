@@ -2,15 +2,15 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
+import { createInMemoryOnboardingService } from '@geti/core/src/users/services/inmemory-onboarding-service';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
+import { HttpStatusCode } from 'axios';
 import dayjs from 'dayjs';
-import { StatusCodes } from 'http-status-codes';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from 'react-oidc-context';
 import { useParams } from 'react-router-dom';
 
 import { AccountStatus } from '../../core/organizations/organizations.interface';
-import { createInMemoryOnboardingService } from '../../core/users/services/inmemory-onboarding-service';
 import { getMockedOrganizationMetadata } from '../../test-utils/mocked-items-factory/mocked-organization';
 import { providersRender as render } from '../../test-utils/required-providers-render';
 import { SignUpOnSaas } from './sign-up-on-saas.component';
@@ -78,7 +78,7 @@ describe('SignUpOnSaas', () => {
         onboardingService.onboardUser = () => {
             return Promise.reject({
                 response: {
-                    status: StatusCodes.UNAUTHORIZED,
+                    status: HttpStatusCode.Unauthorized,
                     data: { detail: 'Invalid sign-up token' },
                 },
             });

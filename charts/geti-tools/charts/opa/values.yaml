@@ -1,0 +1,74 @@
+namespace:
+  istio: istio-system
+  opa: opa-istio
+
+image: 
+  registry: docker.io
+  repository: openpolicyagent
+  name: opa:0.66.0-istio
+
+clusterDomain: cluster.local
+
+ports:
+  server: 8181
+  diagnostic: 8282
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "1000Mi"
+  limits:
+    memory: "2000Mi"
+
+secret:
+  name: server-cert
+
+securityContextAdmissionController:
+  privileged: false
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
+securityContextSidecar:
+  privileged: false
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  runAsNonRoot: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
+global:
+  registry_address: ""
+  istio_revision_name: ""
+
+imagePullSecrets: {}
+
+# To meet Intel crypto compliance,
+# use ECDSA P-521 for the CA and P-384 for the leafs.
+# use 5y for the CA and 1y for the leafs.
+tls:
+  algorithm: ECDSA
+  ca:
+    name: ca-issuer
+  leaf:
+    size: 384
+    duration: 4380h0m0s
+    renewBefore: 24h0m0s
+opa_config:
+  oci:
+    name: impt-internal-registry
+    url: https://impt-internal-registry:5000
+  bundles:
+    oci:
+      resource: impt-internal-registry/impp/opa-bundle
+  mount_path: /rego

@@ -3,6 +3,7 @@
 
 import { FC, useState } from 'react';
 
+import { useGenerateOnboardingTokenMutation } from '@geti/core/src/users/hook/use-generate-onboarding-token.hook';
 import {
     Button,
     ButtonGroup,
@@ -17,7 +18,6 @@ import {
 import { DateValue, getLocalTimeZone, today } from '@internationalized/date';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import { useGenerateOnboardingTokenMutation } from '../../../../core/users/hook/use-generate-onboarding-token.hook';
 import { CopyOnboardingInvitationLink } from './copy-onboarding-invitation-link.component';
 
 enum GenerateTokenSteps {

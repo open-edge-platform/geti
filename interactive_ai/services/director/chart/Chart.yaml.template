@@ -1,0 +1,6 @@
+---
+name: director
+version: '{{VERSION}}'
+apiVersion: v2
+description: director
+appVersion: '{{VERSION}}'

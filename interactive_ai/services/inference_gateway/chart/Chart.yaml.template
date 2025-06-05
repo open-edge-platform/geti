@@ -1,0 +1,6 @@
+---
+name: inference-gateway
+version: '{{VERSION}}'
+apiVersion: v2
+description: Inference gateway
+appVersion: '{{VERSION}}'

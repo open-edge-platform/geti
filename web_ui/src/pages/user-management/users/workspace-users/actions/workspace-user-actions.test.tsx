@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { Resource, RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { fireEvent, screen } from '@testing-library/react';
 
 import { AccountStatus } from '../../../../../core/organizations/organizations.interface';
-import { Resource, RESOURCE_TYPE } from '../../../../../core/users/users.interface';
 import { applicationRender as render } from '../../../../../test-utils/application-provider-render';
 import { getMockedWorkspaceIdentifier } from '../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import {
@@ -43,12 +43,11 @@ const mockedResourceIdentifier: Resource = {
 
 jest.mock('../../../../../core/platform-utils/hooks/use-platform-utils.hook', () => ({
     ...jest.requireActual('../../../../../core/platform-utils/hooks/use-platform-utils.hook'),
-    usePlatformUtils: jest.fn(() => ({
-        useProductInfo: mockedUseProductInfo,
-    })),
+    useProductInfo: mockedUseProductInfo,
 }));
 
-jest.mock('../../../../../core/users/hook/use-users.hook', () => ({
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
+    ...jest.requireActual('@geti/core/src/users/hook/use-users.hook'),
     useResource: jest.fn(() => mockedResourceIdentifier),
     useUsers: jest.fn(() => ({
         useActiveUser: mockedUseActiveUser,

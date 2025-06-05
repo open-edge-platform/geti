@@ -1,24 +1,27 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ComponentProps, useMemo } from 'react';
+import { ComponentProps, FC, useMemo } from 'react';
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
-import { View } from '@geti/ui';
+import { Heading, View } from '@geti/ui';
 import { DatabaseIcon, LogsIcon, MetricsIcon, TracesIcon } from '@geti/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
-import { usePlatformUtils } from '../../core/platform-utils/hooks/use-platform-utils.hook';
+import { useIsAnalyticsEnabled } from '../../analytics/analytics-provider.component';
+import { useProductInfo } from '../../core/platform-utils/hooks/use-platform-utils.hook';
 import { ANIMATION_PARAMETERS } from '../../shared/animation-parameters/animation-parameters';
 import { AnalyticsDashboardCard } from './analytics-dashboard-card.component';
 import { DownloadableItem, ExportServerType } from './downloadable-item.component';
 import { ExportAnalyticsType } from './export-logs.component';
 
-export const Analytics = (): JSX.Element => {
+import styles from './analytics.module.scss';
+
+const AnalyticsContent: FC = () => {
     const { router } = useApplicationServices();
-    const { useProductInfo } = usePlatformUtils();
-    const productInfo = useProductInfo();
-    const isGrafanaEnabled = productInfo.data?.grafanaEnabled;
+    const { data } = useProductInfo();
+    const isGrafanaEnabled = data?.grafanaEnabled;
 
     const ITEMS: ComponentProps<typeof DownloadableItem>[] = useMemo(() => {
         return [
@@ -71,6 +74,42 @@ export const Analytics = (): JSX.Element => {
                         </motion.div>
                     ))}
                 </AnimatePresence>
+            </View>
+        </View>
+    );
+};
+
+const DisabledAnalyticsContent: FC = () => {
+    return (
+        <View>
+            <Heading>
+                Please note that Analytics feature available in the Standard Geti version is not supported in the Lite
+                Intel® Geti™ version. For a detailed comparison of the features available in each version, please
+                refer to our{' '}
+                <Link
+                    to={'https://docs.geti.intel.com/docs/user-guide/getting-started/installation/using-geti-installer'}
+                    className={styles.docsLink}
+                >
+                    documentation
+                </Link>
+                .
+            </Heading>
+        </View>
+    );
+};
+
+export const Analytics: FC = () => {
+    const isAnalyticsEnabled = useIsAnalyticsEnabled();
+
+    if (isAnalyticsEnabled) {
+        return <AnalyticsContent />;
+    }
+
+    return (
+        <View>
+            <DisabledAnalyticsContent />
+            <View UNSAFE_className={styles.notAvailableContent} data-testid={'not-available-id'}>
+                <AnalyticsContent />
             </View>
         </View>
     );

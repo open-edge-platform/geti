@@ -6,6 +6,7 @@ from geti_types import ID
 
 from geti_configuration_tools.project_configuration import (
     AutoTrainingParameters,
+    PartialTaskConfig,
     ProjectConfiguration,
     TaskConfig,
     TrainConstraints,
@@ -66,7 +67,7 @@ class TestProjectConfiguration:
                             "auto_training": {
                                 "enable": False,
                                 "enable_dynamic_required_annotations": False,
-                                "min_images_per_label": None,
+                                "min_images_per_label": 0,
                             },
                         },
                     ],
@@ -89,7 +90,7 @@ class TestProjectConfiguration:
                             auto_training=AutoTrainingParameters(
                                 enable=False,
                                 enable_dynamic_required_annotations=False,
-                                min_images_per_label=None,
+                                min_images_per_label=0,
                             ),
                         ),
                     ],
@@ -97,12 +98,12 @@ class TestProjectConfiguration:
             ),
         ],
     )
-    def test_project_configuration(self, project_config_dict, expected_config):
+    def test_project_configuration(self, project_config_dict, expected_config) -> None:
         # Create configuration from dict
         config = ProjectConfiguration(**project_config_dict)
 
         # Basic validation
-        assert config.id_ == expected_config.id_
+        assert config.project_id == expected_config.project_id
         assert config.task_configs
         assert len(config.task_configs) == len(expected_config.task_configs)
 
@@ -121,3 +122,16 @@ class TestProjectConfiguration:
             assert task_config.auto_training.min_images_per_label == (
                 expected_task_config.auto_training.min_images_per_label
             )
+
+    def test_partial_task_config(self) -> None:
+        # Test partial model creation
+        partial_task_config = PartialTaskConfig.model_validate(
+            {
+                "task_id": "partial_task",
+                "training": {"constraints": {"min_images_per_label": 5}},
+            }
+        )
+
+        assert partial_task_config.task_id == "partial_task"
+        assert partial_task_config.training.constraints.min_images_per_label == 5
+        assert partial_task_config.auto_training is None

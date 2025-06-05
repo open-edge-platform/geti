@@ -1,33 +1,29 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
+import { createInMemoryOnboardingService } from '@geti/core/src/users/services/inmemory-onboarding-service';
+import { OrganizationMetadata } from '@geti/core/src/users/services/onboarding-service.interface';
 import { act, waitFor } from '@testing-library/react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import * as usehooks from 'usehooks-ts';
 
 import { paths } from '../../../../packages/core/src/services/routes';
-import {
-    getMockedUserGlobalSettings,
-    getMockedUserGlobalSettingsObject,
-} from '../../../test-utils/mocked-items-factory/mocked-settings';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
-import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
-import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
-import { useProfileQuery } from '../../users/hook/use-profile.hook';
-import { createInMemoryOnboardingService } from '../../users/services/inmemory-onboarding-service';
-import { OrganizationMetadata } from '../../users/services/onboarding-service.interface';
 import { AccountStatus } from '../organizations.interface';
 import { useSelectedOrganization } from './use-selected-organization.hook';
 
+jest.mock('usehooks-ts');
+
 const mockedLocation = { state: undefined, key: '', hash: '', search: '', pathname: '' };
-const mockedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
     useParams: jest.fn(() => ({})),
     useLocation: jest.fn(() => mockedLocation),
-    useNavigate: jest.fn(() => mockedNavigate),
+    useNavigate: jest.fn(() => jest.fn()),
 }));
 
-jest.mock('../../users/hook/use-profile.hook', () => ({ useProfileQuery: jest.fn() }));
+jest.mock('@geti/core/src/users/hook/use-profile.hook', () => ({ useProfileQuery: jest.fn() }));
 
 jest.mock('../../user-settings/hooks/use-global-settings.hook', () => ({
     ...jest.requireActual('../../user-settings/hooks/use-global-settings.hook'),
@@ -87,9 +83,17 @@ const renderSelectedOrganizationHook = (onboardingService = createInMemoryOnboar
 describe('useSelectedOrganization', () => {
     const mockedOrganizationTwo = { ...mockedOrganization, id: '222' };
 
+    function mockNavigate(location = { state: undefined, key: '', hash: '', search: '', pathname: '' }) {
+        const mockedNavigate = jest.fn();
+        jest.mocked(useLocation).mockReturnValue(location);
+        jest.mocked(useNavigate).mockReturnValue(mockedNavigate);
+
+        return mockedNavigate;
+    }
+
     beforeEach(() => {
         jest.clearAllMocks();
-        jest.mocked(useUserGlobalSettings).mockReturnValue(getMockedUserGlobalSettingsObject({}));
+        jest.mocked(usehooks.useLocalStorage).mockReturnValue([null, jest.fn(), jest.fn()]);
     });
 
     describe('single organization is selected by default', () => {
@@ -97,6 +101,7 @@ describe('useSelectedOrganization', () => {
         onboardingService.onboardUser = jest.fn(() => Promise.resolve());
 
         it('if the organization ID is valid, the selectedOrganization is returned', async () => {
+            const mockedNavigate = mockNavigate();
             jest.mocked(useParams).mockReturnValue({ organizationId: mockedOrganization.id });
             updateOrganizationQuery([mockedOrganization]);
 
@@ -108,6 +113,7 @@ describe('useSelectedOrganization', () => {
         });
 
         it('if the organization ID is invalid, it redirects to a valid organization', async () => {
+            const mockedNavigate = mockNavigate();
             jest.mocked(useParams).mockReturnValue({ organizationId: '000' });
             updateOrganizationQuery([mockedOrganization]);
 
@@ -124,7 +130,7 @@ describe('useSelectedOrganization', () => {
 
         it('append a valid organization ID to the current URL while preserving backwards compatibility', async () => {
             const mockedPathname = '/test';
-            jest.mocked(useLocation).mockReturnValueOnce({ ...mockedLocation, pathname: mockedPathname });
+            const mockedNavigate = mockNavigate({ ...mockedLocation, pathname: mockedPathname });
             jest.mocked(useParams).mockReturnValue({ organizationId: undefined });
             updateOrganizationQuery([mockedOrganization]);
 
@@ -140,6 +146,8 @@ describe('useSelectedOrganization', () => {
         });
 
         it('onboard users with the status "invited"', async () => {
+            const mockedNavigate = mockNavigate();
+
             updateOrganizationQuery([mockedOrganizationUserInvited]);
             renderSelectedOrganizationHook(onboardingService);
 
@@ -160,13 +168,10 @@ describe('useSelectedOrganization', () => {
         });
 
         it('redirects to stored organization ID from settings', async () => {
-            jest.mocked(useUserGlobalSettings).mockReturnValue(
-                getMockedUserGlobalSettingsObject({
-                    config: getMockedUserGlobalSettings({
-                        [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: mockedOrganizationTwo.id },
-                    }),
-                })
-            );
+            const mockedNavigate = mockNavigate();
+
+            jest.mocked(usehooks.useLocalStorage).mockReturnValue([mockedOrganizationTwo.id, jest.fn(), jest.fn()]);
+
             updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
             renderSelectedOrganizationHook(onboardingService);
 
@@ -184,13 +189,7 @@ describe('useSelectedOrganization', () => {
             ['suspended', mockedSuspendedOrganization],
             ['requested access', mockedRequestedOrganization],
         ])('avoids redirection when the chosen organization has a status: %s', async (_, organization) => {
-            jest.mocked(useUserGlobalSettings).mockReturnValue(
-                getMockedUserGlobalSettingsObject({
-                    config: getMockedUserGlobalSettings({
-                        [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: organization.id },
-                    }),
-                })
-            );
+            const mockedNavigate = mockNavigate();
             updateOrganizationQuery([mockedOrganization, organization]);
             renderSelectedOrganizationHook(onboardingService);
 
@@ -202,6 +201,7 @@ describe('useSelectedOrganization', () => {
 
     describe('multiple organizations', () => {
         it('if the organization ID is valid, the selectedOrganization is returned', async () => {
+            const mockedNavigate = mockNavigate();
             jest.mocked(useParams).mockReturnValue({ organizationId: mockedOrganizationTwo.id });
             updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
 
@@ -212,6 +212,7 @@ describe('useSelectedOrganization', () => {
         });
 
         it('if the organization ID is invalid, the selectedOrganization returned null', async () => {
+            const mockedNavigate = mockNavigate();
             jest.mocked(useParams).mockReturnValue({ organizationId: '000' });
             updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
 
@@ -224,11 +225,11 @@ describe('useSelectedOrganization', () => {
 
     describe('select new organization', () => {
         it('valid organization id', async () => {
+            const mockedNavigate = mockNavigate();
+
             const mockedSaveConfig = jest.fn();
+            jest.mocked(usehooks.useLocalStorage).mockReturnValue([null, mockedSaveConfig, jest.fn()]);
             jest.mocked(useParams).mockReturnValue({ organizationId: undefined });
-            jest.mocked(useUserGlobalSettings).mockReturnValue(
-                getMockedUserGlobalSettingsObject({ saveConfig: mockedSaveConfig })
-            );
 
             updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
             const { result } = renderSelectedOrganizationHook();
@@ -241,14 +242,11 @@ describe('useSelectedOrganization', () => {
             expect(mockedNavigate).toHaveBeenCalledWith(
                 paths.organization.index({ organizationId: mockedOrganizationTwo.id })
             );
-            expect(mockedSaveConfig).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: mockedOrganizationTwo.id },
-                })
-            );
+            expect(mockedSaveConfig).toHaveBeenCalledWith(mockedOrganizationTwo.id);
         });
 
         it('invalid organization id', async () => {
+            const mockedNavigate = mockNavigate();
             jest.mocked(useParams).mockReturnValue({ organizationId: undefined });
             updateOrganizationQuery([mockedOrganization, mockedOrganizationTwo]);
             const { result } = renderSelectedOrganizationHook();

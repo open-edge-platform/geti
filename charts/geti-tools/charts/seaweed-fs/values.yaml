@@ -1,0 +1,484 @@
+# Default values for seaweed-fs.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+  s3_endpoint: impt-seaweed-fs.impt:8333
+  docker_namespace: impp
+  enable_local_image_pull_secret: false
+  istio_ambient_mesh: false
+  busybox:
+    registry: quay.io
+    repository: prometheus
+    name: busybox:glibc
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0
+  istio_revision_name: ""
+  security_headers: ""
+  stripped_headers: ""
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+  weights_url: "https://storage.geti.intel.com/weights"
+  proxy:
+    enabled: false
+    http_proxy: ""
+    https_proxy: ""
+    no_proxy: ""
+
+replicaCount: 1
+
+main_namespace: impt
+flyte_workflows:
+  name: "jobs"
+  domain: "production"
+
+jobs:
+  backoffLimit: 3
+
+init:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10Mi
+    limits:
+      memory: 20Mi
+
+image:
+  registry: docker.io
+  repository: chrislusf
+  name: seaweedfs:3.69
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: regcred
+
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations:
+  kubectl.kubernetes.io/default-container: "main"
+
+podSecurityContext: {}
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+volumeSecurityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - CHOWN
+
+master:
+  port: 9333
+
+s3:
+  port: &port 8333
+
+loggingLevel: 1
+
+resources:
+  limits:
+    memory: 2Gi
+  requests:
+    cpu: 100m
+    memory: 1Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+ingress:
+  endpoints:
+    - /api/v(.*)/fileservice/(.*)
+
+service:
+  type: ClusterIP
+  port: *port
+
+buckets_to_create: "models;images;videos;thumbnails;tensors;resultmedia;compileddatasetshards;modelmesh;codedeployments;mlflowexperiments;pretrainedweights;vpsreferencefeatures"
+
+services:
+  - name: admin
+    actions:
+      - "Read"
+      - "Write"
+      - "List"
+      - "Tagging"
+      - "Admin"
+  - name: auto_train_controller
+  - name: flyte
+    actions:
+      - "Read:flyte"
+      - "List:flyte"
+      - "Write:flyte"
+      - "Tagging:flyte"
+  - name: gateway
+    actions: []
+  - name: jobs_scheduler
+    actions: []
+  - name: loki
+    actions:
+      - "List:loki-chunks"
+      - "Read:loki-chunks"
+      - "Write:loki-chunks"
+      - "List:loki-ruler"
+      - "Read:loki-ruler"
+      - "List:loki-ruler"
+  - name: mimir
+    actions:
+      - "Write:mimir-ruler"
+      - "List:mimir-ruler"
+      - "Read:mimir-ruler"
+      - "Write:mimir-tsdb"
+      - "List:mimir-tsdb"
+      - "Read:mimir-tsdb"
+  - name: modelmesh
+    actions:
+      - "Read:modelmesh"
+      - "List:modelmesh"
+      - "Write:modelmesh"
+      - "Tagging:modelmesh"
+  - name: tempo
+    actions:
+      - "Read:tempo"
+      - "List:tempo"
+      - "Write:tempo"
+      - "Tagging:tempo"
+  - name: accountservice
+    actions:
+      - "Write:userphotos"
+      - "List:userphotos"
+      - "Read:userphotos"
+  - name: accountservice_presigned_url
+    actions:
+      - "Write:userphotos"
+      - "List:userphotos"
+      - "Read:userphotos"
+  - name: dataset_ie
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "Write:temporaryfiles"
+      - "List:temporaryfiles"
+      - "Read:temporaryfiles"
+  - name: dataset_ie_s3_presigned_url
+    actions:
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+  - name: director
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+  - name: director_s3_presigned_url
+    actions:
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+  - name: flyte_workflows
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "Write:compileddatasetshards"
+      - "List:compileddatasetshards"
+      - "Read:compileddatasetshards"
+      - "Write:temporaryfiles"
+      - "List:temporaryfiles"
+      - "Read:temporaryfiles"
+      - "Write:mlflowexperiments"
+      - "List:mlflowexperiments"
+      - "Read:mlflowexperiments"
+      - "Write:vpsreferencefeatures"
+      - "List:vpsreferencefeatures"
+      - "Read:vpsreferencefeatures"
+      - "Read:pretrainedweights"
+      - "Write:pretrainedweights"
+      - "List:pretrainedweights"
+  - name: flyte_workflows_s3_presigned_url
+    actions:
+      - "List:models"
+      - "Read:models"
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "List:tensors"
+      - "Read:tensors"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "List:compileddatasetshards"
+      - "Read:compileddatasetshards"
+      - "List:temporaryfiles"
+      - "Read:temporaryfiles"
+      - "Write:mlflowexperiments"
+      - "List:mlflowexperiments"
+      - "List:vpsreferencefeatures"
+      - "Read:vpsreferencefeatures"
+      - "Read:pretrainedweights"
+      - "Write:pretrainedweights"
+      - "List:pretrainedweights"
+  - name: inference_gateway
+    actions:
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+  - name: inference_gateway_s3_presigned_url
+  - name: jobs_ms
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "Write:temporaryfiles"
+      - "List:temporaryfiles"
+      - "Read:temporaryfiles"
+  - name: jobs_ms_s3_presigned_url
+    actions:
+      - "List:models"
+      - "Read:models"
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "List:tensors"
+      - "Read:tensors"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "List:temporaryfiles"
+      - "Read:temporaryfiles"
+  - name: visual_prompt
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:vpsreferencefeatures"
+      - "List:vpsreferencefeatures"
+      - "Read:vpsreferencefeatures"
+      - "Read:pretrainedweights"
+      - "List:pretrainedweights"
+  - name: visual_prompt_s3_presigned_url
+    actions:
+      - "List:models"
+      - "Read:models"
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:vpsreferencefeatures"
+      - "Read:vpsreferencefeatures"
+      - "Read:pretrainedweights"
+      - "List:pretrainedweights"
+  - name: media_ms
+    actions:
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+  - name: media_ms_s3_presigned_url
+  - name: project_ie
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "Write:temporaryfiles"
+      - "List:temporaryfiles"
+      - "Read:temporaryfiles"
+  - name: project_ie_s3_presigned_url
+  - name: resource
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "Write:codedeployments"
+      - "List:codedeployments"
+      - "Read:codedeployments"
+      - "Write:compileddatasetshards"
+      - "List:compileddatasetshards"
+      - "Read:compileddatasetshards"
+      - "Write:mlflowexperiments"
+      - "List:mlflowexperiments"
+      - "Read:mlflowexperiments"
+  - name: resource_s3_presigned_url
+    actions:
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:codedeployments"
+      - "List:codedeployments"
+      - "Read:codedeployments"
+  - name: training_operator
+    actions:
+      - "Write:models"
+      - "List:models"
+      - "Read:models"
+      - "Write:images"
+      - "List:images"
+      - "Read:images"
+      - "Write:videos"
+      - "List:videos"
+      - "Read:videos"
+      - "Write:thumbnails"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "Write:tensors"
+      - "List:tensors"
+      - "Read:tensors"
+      - "Write:resultmedia"
+      - "List:resultmedia"
+      - "Read:resultmedia"
+      - "Write:compileddatasetshards"
+      - "List:compileddatasetshards"
+      - "Read:compileddatasetshards"
+      - "Write:mlflowexperiments"
+      - "List:mlflowexperiments"
+      - "Read:mlflowexperiments"
+  - name: training_operator_s3_presigned_url
+    actions:
+      - "List:images"
+      - "Read:images"
+      - "List:videos"
+      - "Read:videos"
+      - "List:thumbnails"
+      - "Read:thumbnails"
+      - "List:mlflowexperiments"
+      - "Read:mlflowexperiments"

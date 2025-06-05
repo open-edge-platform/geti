@@ -4,7 +4,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 
 import { CSRF_HEADERS } from '@geti/core/src/services/security';
-import { StatusCodes } from 'http-status-codes';
+import { HttpStatusCode } from 'axios';
 import { isEmpty } from 'lodash-es';
 import { PreviousUpload, Upload, UploadOptions } from 'tus-js-client';
 
@@ -64,7 +64,7 @@ export const TusUploadProvider = ({ children }: TusUploadProps): JSX.Element => 
                 if ('originalResponse' in error) {
                     const status = error.originalResponse?.getStatus() ?? 0;
 
-                    if ([StatusCodes.FORBIDDEN, StatusCodes.UNAUTHORIZED].includes(status)) {
+                    if ([HttpStatusCode.Forbidden, HttpStatusCode.Unauthorized].includes(status)) {
                         return false;
                     }
                 }

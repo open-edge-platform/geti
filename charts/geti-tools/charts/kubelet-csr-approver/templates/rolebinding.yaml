@@ -1,0 +1,15 @@
+{{- if .Values.rbac.manage }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "kubelet-csr-approver.fullname" . }}
+  namespace: {{ include "kubelet-csr-approver.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "kubelet-csr-approver.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "kubelet-csr-approver.serviceAccountName" . }}
+  namespace: {{ include "kubelet-csr-approver.namespace" . }}
+{{- end }}

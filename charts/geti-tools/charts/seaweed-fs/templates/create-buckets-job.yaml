@@ -1,0 +1,54 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Namespace }}-{{ .Chart.Name }}-create-buckets"
+  namespace: "{{ .Release.Namespace }}"
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": "hook-succeeded"
+spec:
+  backoffLimit: {{ .Values.jobs.backoffLimit }}
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "seaweed-fs.fullname" . }}
+      restartPolicy: Never
+      containers:
+        - name: create-microservices-buckets
+          image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/migration-job:{{ .Values.global.tag | default .Chart.Version }}"
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              create_s3_bucket;
+              retVal=$?;
+              {{- if not .Values.global.istio_ambient_mesh }}
+              curl -XPOST 127.0.0.1:15020/quitquitquit;
+              {{- end }}
+              exit $retVal
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          env:
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "admin_access_key"
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Release.Namespace }}-seaweed-fs"
+                  key: "admin_secret_key"
+            - name: S3_ADDRESS
+              value: "http://{{ .Values.global.s3_endpoint }}"
+            - name: S3_BUCKET
+              value: "{{ .Values.buckets_to_create }}"

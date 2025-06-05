@@ -563,3 +563,47 @@ class NotEnoughSpaceHTTPException(HTTPException):
             status_code=status.HTTP_507_INSUFFICIENT_STORAGE,
             detail=message,
         )
+
+
+class ProjectConfigurationNotFoundException(GetiBaseException):
+    """Exception raised when the project configuration could not be found in the database"""
+
+    def __init__(self, project_id: ID, task_id: ID | None = None) -> None:
+        message = (
+            f"The requested project configuration could not be found. Project ID: `{project_id}`, task ID: `{task_id}`"
+            if task_id
+            else ""
+        )
+        super().__init__(
+            http_status=http.HTTPStatus.NOT_FOUND,
+            error_code="project_configuration_not_found",
+            message=message,
+        )
+
+
+class TaskNodeNotFoundException(GetiBaseException):
+    """
+    Exception raised when task node could not be found in database.
+
+    :param task_node_id: ID of the task node
+    """
+
+    def __init__(self, task_node_id: ID) -> None:
+        super().__init__(
+            message=f"The requested task node could not be found. Task Node ID: `{task_node_id}`.",
+            error_code="task_node_not_found",
+            http_status=http.HTTPStatus.NOT_FOUND,
+        )
+
+
+class MissingTaskIDException(GetiBaseException):
+    """
+    Exception raised when a task ID is required but not provided in the request.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            message="The required task ID was not provided in the request.",
+            error_code="missing_task_id",
+            http_status=http.HTTPStatus.BAD_REQUEST,
+        )

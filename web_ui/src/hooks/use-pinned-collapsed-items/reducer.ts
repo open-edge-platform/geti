@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { isEmpty } from 'lodash-es';
 
 import { Dataset } from '../../core/projects/dataset.interface';
-import { WorkspaceEntity } from '../../core/workspaces/services/workspaces.interface';
 import { hasDifferentId, hasEqualId } from '../../shared/utils';
 import {
     PinnedCollapsedItems,

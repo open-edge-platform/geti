@@ -1,0 +1,25 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Values.spicedb.fullname }}-tls-certificate
+  namespace: {{ include "flyteworkflow.namespace" . }}
+spec:
+  secretName: {{ .Values.spicedb.fullname }}-tls
+  duration: {{ .Values.spicedb.tls.leaf.duration }}
+  renewBefore: {{ .Values.spicedb.tls.leaf.renewBefore }}
+  commonName: {{ .Values.spicedb.fullname }}
+  dnsNames:
+    - {{ .Values.spicedb.fullname }}
+    - {{ .Values.spicedb.fullname }}.{{ .Release.Namespace }}
+    - {{ .Values.spicedb.fullname }}.{{ .Release.Namespace }}.svc
+    - {{ .Values.spicedb.fullname }}.{{ .Release.Namespace }}.svc.cluster.local
+    - localhost
+  ipAddresses:
+    - 127.0.0.1
+  privateKey:
+    algorithm: {{ .Values.spicedb.tls.algorithm }}
+    size: {{ .Values.spicedb.tls.leaf.size }}
+  issuerRef:
+    name: {{ .Values.spicedb.tls.ca.name }}
+    kind: ClusterIssuer
+    group: cert-manager.io

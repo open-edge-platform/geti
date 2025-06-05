@@ -58,7 +58,11 @@ spec:
       containers:
         - name: &containerName {{ .Chart.Name }}-ms
           resources:
-            {{ toYaml .Values.microservice.resources | nindent 12 }}
+            {{- if (eq .Values.global.installation_profile "lite") }}
+              {{ toYaml .Values.microservice.liteResources | nindent 12 }}
+            {{- else }}
+              {{ toYaml .Values.microservice.standardResources | nindent 12 }}
+            {{- end }}
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           securityContext:
@@ -262,9 +266,13 @@ spec:
             initialDelaySeconds: 2
             timeoutSeconds: 2
             failureThreshold: 20
-          resources:
-            {{ toYaml .Values.scheduler.resources | nindent 12 }}
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
+          resources:
+            {{- if (eq .Values.global.installation_profile "lite") }}
+              {{ toYaml .Values.scheduler.liteResources | nindent 12 }}
+            {{- else }}
+              {{ toYaml .Values.scheduler.standardResources | nindent 12 }}
+            {{- end }}
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           command:
             - python
@@ -540,7 +548,11 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{ toYaml .Values.scheduling_policy.resources | nindent 12 }}
+            {{- if (eq .Values.global.installation_profile "lite") }}
+              {{ toYaml .Values.scheduling_policy.liteResources | nindent 12 }}
+            {{- else }}
+              {{ toYaml .Values.scheduling_policy.standardResources | nindent 12 }}
+            {{- end }}
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           command:

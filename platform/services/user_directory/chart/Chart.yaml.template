@@ -1,0 +1,6 @@
+---
+name: user-directory
+version: '{{VERSION}}'
+description: user-directory chart
+apiVersion: v2
+appVersion: '{{VERSION}}'

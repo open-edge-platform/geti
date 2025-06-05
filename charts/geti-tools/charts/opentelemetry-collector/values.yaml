@@ -1,0 +1,565 @@
+global:
+  security_headers: ''
+  stripped_headers: ''
+  cors_policy:
+    enabled: false
+    allowed_origins: []
+    allowed_headers: []
+    allowed_methods: []
+    max_age: 86400s
+    allow_credentials: false
+
+# Default values for opentelemetry-collector.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Valid values are "daemonset", "deployment", and "statefulset".
+mode: "deployment"
+
+# Handles basic configuration of components that
+# also require k8s modifications to work correctly.
+# .Values.config can be used to modify/add to a preset
+# component configuration, but CANNOT be used to remove
+# preset configuration. If you require removal of any
+# sections of a preset configuration, you cannot use
+# the preset. Instead, configure the component manually in
+# .Values.config and use the other fields supplied in the
+# values.yaml to configure k8s as necessary.
+presets:
+  # Configures the collector to collect logs.
+  # Adds the filelog receiver to the logs pipeline
+  # and adds the necessary volumes and volume mounts.
+  # Best used with mode = daemonset.
+  logsCollection:
+    enabled: true
+    includeCollectorLogs: true
+  # Configures the collector to collect host metrics.
+  # Adds the hostmetrics receiver to the metrics pipeline
+  # and adds the necessary volumes and volume mounts.
+  # Best used with mode = daemonset.
+  hostMetrics:
+    enabled: false
+  # Configures the Kubernetes Processor to add Kubernetes metadata.
+  # Adds the k8sattributes processor to all the pipelines
+  # and adds the necessary rules to ClusteRole.
+  # Best used with mode = daemonset.
+  kubernetesAttributes:
+    enabled: true
+  # Configures the Kubernetes Cluster Receiver to collect cluster-level metrics.
+  # Adds the k8s_cluster receiver to the metrics pipeline
+  # and adds the necessary rules to ClusteRole.
+  # Best used with mode = deployment or statefulset.
+  clusterMetrics:
+    enabled: false
+  # Configures the collector to collect Kubelet metrics.
+  # Adds the kubeletstats receiver to the metrics pipeline
+  # and adds the necessary rules to ClusteRole.
+  # Best used with mode = daemonset.
+  kubeletMetrics:
+    enabled: false
+
+configMap:
+  # Specifies whether a configMap should be created (true by default)
+  create: true
+
+# Base collector configuration.
+# Supports templating. To escape existing instances of {{ }}, use {{` <original content> `}}.
+# For example, {{ REDACTED_EMAIL }} becomes {{` {{ REDACTED_EMAIL }} `}}.
+config:
+  exporters:
+    file/logs_geti:
+      path: /logs/geti/logs/logs.json
+      rotation:
+        max_backups: 0  # Infinite backups
+        max_megabytes: 100
+    file/logs_k8s:
+      path: /logs/k8s/logs/logs.json
+      rotation:
+        max_backups: 0  # Infinite backups
+        max_megabytes: 100
+
+    file/metrics_geti:
+      path: /logs/geti/metrics/metrics.json
+      rotation:
+        max_backups: 0  # Infinite backups
+        max_megabytes: 100
+    file/metrics_k8s:
+      path: /logs/k8s/metrics/metrics.json
+      rotation:
+        max_backups: 0  # Infinite backups
+        max_megabytes: 100
+
+    file/traces_geti:
+      path: /logs/geti/traces/traces.json
+      rotation:
+        max_backups: 0  # Infinite backups
+        max_megabytes: 100
+
+    # Grafana stack exporters are applied conditionally via templates in _config.tpl
+
+  extensions:
+    # The health_check extension is mandatory for this chart.
+    # Without the health_check extension the collector will fail the readiness and liveliness probes.
+    # The health_check extension can be modified, but should never be removed.
+    health_check:
+      check_collector_pipeline:
+        enabled: true
+        interval: 1m
+        exporter_failure_threshold: 10
+    file_storage/log_checkpoints:
+      directory: /logs/checkpoints
+      timeout: 1s
+      compaction:
+        directory: /tmp/
+        max_transaction_size: 65_536
+  processors:
+    batch/logs_geti:
+      send_batch_size: 1000
+      send_batch_max_size: 2000
+      timeout: 1s
+    batch/logs_k8s:
+      send_batch_size: 1000
+      send_batch_max_size: 2000
+      timeout: 1s
+
+    batch/metrics_geti:
+      send_batch_size: 500
+      send_batch_max_size: 1000
+      timeout: 1s
+    batch/metrics_k8s:
+      send_batch_size: 5000
+      send_batch_max_size: 10000
+      timeout: 1s
+
+    batch/traces_geti:
+      send_batch_size: 100
+      send_batch_max_size: 200
+      timeout: 1s
+
+    memory_limiter:
+      check_interval: 1s
+      limit_percentage: 80
+      spike_limit_percentage: 20
+    resource/logs:
+      attributes:
+        - key: k8s_deployment_name
+          from_attribute: k8s.deployment.name
+          action: insert
+        - key: k8s_pod_name
+          from_attribute: k8s.pod.name
+          action: insert
+        - key: loki.resource.labels
+          value: k8s_deployment_name
+          action: insert
+    attributes/logs:
+      actions:
+      # Insert missing node name
+      - action: insert
+        key: k8s_node_name
+        value: ${K8S_NODE_NAME}
+      - action: insert
+        key: k8s_deployment_name
+        from_attribute: k8s.deployment.name
+      - key: k8s_pod_name
+        from_attribute: k8s.pod.name
+        action: insert
+      # Convert restart count to int
+      - action: convert
+        key: k8s_restart_count
+        converted_type: int
+      # Insert into loki labels
+      - key: loki.attribute.labels
+        action: insert
+        value: stream, k8s_deployment_name, k8s_container_name, k8s_pod_name
+      # Delete attributes that are not needed anymore
+      - action: delete
+        key: time
+      - action: delete
+        key: log.file.path
+
+    resource/geti:
+      attributes:
+        - key: k8s_pod_uid
+          action: delete
+        - key: k8s.pod.uid
+          action: delete
+
+    transform/logs_ip:
+      log_statements:
+        - context: log
+          statements:
+            - replace_pattern(body, "\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b", "{ip_address}")
+
+    transform/logs_emails:
+      log_statements:
+        - context: log
+          statements:
+            - replace_pattern(body, "\\b[A-Za-z0-9._%+-]+(:(<=/)|%40)[A-Za-z0-9.-]+\\.[A-Za-z]{2,}\\b", "{email}")
+            - replace_pattern(body, "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b", "{email}")
+
+    filter/traces:
+      traces:
+        span:
+          # Any matching span is dropped.
+          - 'IsMatch(attributes["http.user_agent"], "kube-probe/*") == true'
+    redaction/traces_email:
+      allow_all_keys: true
+      blocked_values:
+        - '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9.-]{2,}'
+      summary: silent
+    redaction/traces_ip:
+      allow_all_keys: true
+      blocked_values:
+        - '(?:\d{1,3}\.){3}\d{1,3}'
+      summary: silent
+
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+    prometheus/otelcol:
+      config:
+        scrape_configs:
+          - job_name: opentelemetry-collector
+            scrape_interval: 90s
+            scrape_timeout: 30s
+            static_configs:
+              - targets:
+                  - ${K8S_POD_IP}:8888
+    k8s_events:
+      namespaces: []
+  service:
+    telemetry:
+      metrics:
+        address: ${K8S_POD_IP}:8888
+    extensions:
+      - health_check
+      - file_storage/log_checkpoints
+    pipelines:
+      logs/geti/file:
+        exporters:
+          - file/logs_geti
+        processors:
+          - memory_limiter
+          - k8sattributes
+          - batch/logs_geti
+          - resource/logs
+          - attributes/logs
+          - transform/logs_ip
+          - transform/logs_emails
+        receivers:
+          # filelog receiver is applied conditionally via _config.tpl
+          - otlp
+          - filelog
+      logs/k8s/file:
+        exporters:
+          - file/logs_k8s
+        processors:
+          - memory_limiter
+          - k8sattributes
+          - batch/logs_k8s
+          - attributes/logs
+          - transform/logs_ip
+          - transform/logs_emails
+        receivers:
+          - k8s_events
+
+      metrics/geti:
+        exporters:
+          - file/metrics_geti
+          # Mimir exporter is applied conditionally via _config.tpl
+        processors:
+          - memory_limiter
+          - k8sattributes
+          - batch/metrics_geti
+          - resource/geti
+        receivers:
+          - otlp
+      metrics/k8s:
+        exporters:
+          - file/metrics_k8s
+          # Mimir exporter is applied conditionally via _config.tpl
+        processors:
+          - memory_limiter
+          - k8sattributes
+          - batch/metrics_k8s
+        receivers:
+          - prometheus/otelcol
+          - prometheus/kubernetes_pods
+          # kubeletstats receiver is applied via _config.tpl
+
+      traces/geti/file:
+        exporters:
+          - file/traces_geti
+        processors:
+          - memory_limiter
+          - k8sattributes
+          - batch/traces_geti
+          - filter/traces
+          - redaction/traces_email
+          - redaction/traces_ip
+        receivers:
+          - otlp
+      # Tempo pipeline is applied conditionally via _config.tpl
+
+image:
+  # If you want to use the core image `otel/opentelemetry-collector`, you also need to change `command.name` value to `otelcol`.
+  registry: docker.io
+  repository: otel
+  name: opentelemetry-collector-contrib:0.101.0
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+
+# OpenTelemetry Collector executable
+command:
+  name: otelcol-contrib
+  extraArgs: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+clusterRole:
+  # Specifies whether a clusterRole should be created
+  create: true
+  # Annotations to add to the clusterRole
+  annotations: {}
+  # The name of the clusterRole to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  # A set of rules as documented here : https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  #  rules: []
+  # - apiGroups:
+  #   - ''
+  #   resources:
+  #   - 'pods'
+  #   - 'nodes'
+  #   verbs:
+  #   - 'get'
+  #   - 'list'
+  #   - 'watch'
+
+  clusterRoleBinding:
+    # Annotations to add to the clusterRoleBinding
+    annotations: {}
+    # The name of the clusterRoleBinding to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+podSecurityContext: {}
+securityContext:
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - "ALL"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Allows for pod scheduler prioritisation
+priorityClassName: ""
+
+extraEnvs:
+  # 80% of the hard memory limit of the collector
+  # https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md#best-practices
+  - name: GOMEMLIMIT
+    value: 800MiB
+extraVolumes:
+  - name: varlog
+    hostPath:
+      path: /var/log
+  - name: data-storage
+    persistentVolumeClaim:
+      claimName: data-storage-volume-claim
+  - name: tmp
+    emptyDir: {}
+extraVolumeMounts:
+  - name: varlog
+    mountPath: /var/log
+  - mountPath: /logs
+    name: data-storage
+    subPath: logs
+    readOnly: false
+  - mountPath: /tmp
+    name: tmp
+    readOnly: false
+
+# Configuration for ports
+ports:
+  otlp:
+    enabled: true
+    containerPort: 4317
+    servicePort: 4317
+    hostPort: 4317
+    protocol: TCP
+  otlp-http:
+    enabled: true
+    containerPort: 4318
+    servicePort: 4318
+    hostPort: 4318
+    protocol: TCP
+  jaeger-compact:
+    enabled: false
+    containerPort: 6831
+    servicePort: 6831
+    hostPort: 6831
+    protocol: UDP
+  jaeger-thrift:
+    enabled: false
+    containerPort: 14268
+    servicePort: 14268
+    hostPort: 14268
+    protocol: TCP
+  jaeger-grpc:
+    enabled: false
+    containerPort: 14250
+    servicePort: 14250
+    hostPort: 14250
+    protocol: TCP
+  zipkin:
+    enabled: false
+    containerPort: 9411
+    servicePort: 9411
+    hostPort: 9411
+    protocol: TCP
+  metrics:
+    # The metrics port is disabled by default. However you need to enable the port
+    # in order to use the ServiceMonitor (serviceMonitor.enabled) or PodMonitor (podMonitor.enabled).
+    enabled: false
+    containerPort: 8888
+    servicePort: 8888
+    protocol: TCP
+
+# Resource limits & requests. Update according to your own use case as these values might be too low for a typical deployment.
+resources:
+  requests:
+    cpu: 256m
+    memory: 1Gi
+  limits:
+    memory: 1Gi
+podAnnotations:
+  proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+
+podLabels: {}
+
+# Host networking requested for this pod. Use the host's network namespace.
+hostNetwork: false
+
+# Pod DNS policy ClusterFirst, ClusterFirstWithHostNet, None, Default, None
+dnsPolicy: ""
+
+# only used with deployment mode
+replicaCount: 1
+
+annotations: {}
+
+# List of init container specs, e.g. for copying a binary to be executed as a lifecycle hook.
+initContainers:
+  - name: volume-permissions
+    command: [ "sh", "-c", "mkdir -p /logs/checkpoints && find /logs -type d -exec chown -v 10001 {} +"]
+    image: 
+      registry: quay.io
+      repository: prometheus
+      name: busybox:glibc
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    volumeMounts:
+      - mountPath: /logs
+        name: data-storage
+        subPath: logs
+        readOnly: false
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+
+# Pod lifecycle policies.
+lifecycleHooks: {}
+# lifecycleHooks:
+#   preStop:
+#     exec:
+#       command:
+#       - /test/sleep
+#       - "5"
+
+service:
+  type: ClusterIP
+  annotations: {}
+
+podMonitor:
+  # The pod monitor by default scrapes the metrics port.
+  # The metrics port needs to be enabled as well.
+  enabled: false
+  metricsEndpoints:
+  - port: metrics
+    # interval: 15s
+
+  # additional labels for the PodMonitor
+  extraLabels: {}
+  #   release: kube-prometheus-stack
+
+serviceMonitor:
+  # The service monitor by default scrapes the metrics port.
+  # The metrics port needs to be enabled as well.
+  enabled: false
+  metricsEndpoints:
+  - port: metrics
+    # interval: 15s
+
+  # additional labels for the ServiceMonitor
+  extraLabels: {}
+  #  release: kube-prometheus-stack
+
+# PodDisruptionBudget is used only if deployment enabled
+podDisruptionBudget:
+  enabled: false
+#   minAvailable: 2
+#   maxUnavailable: 1
+
+# autoscaling is used only if deployment enabled
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+rollout:
+  rollingUpdate: {}
+    # When 'mode: daemonset', maxSurge cannot be used when hostPort is set for any of the ports
+    # maxSurge: 25%
+    # maxUnavailable: 0
+  strategy: RollingUpdate
+
+prometheusRule:
+  enabled: false
+  groups: []
+  # Create default rules for monitoring the collector
+  defaultRules:
+    enabled: false
+
+  # additional labels for the PrometheusRule
+  extraLabels: {}
+
+statefulset:
+  # volumeClaimTemplates for a statefulset
+  volumeClaimTemplates: []
+  podManagementPolicy: "Parallel"
