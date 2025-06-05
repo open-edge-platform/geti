@@ -1,5 +1,5 @@
 .PHONY: clean deps tests test-unit test-integration coverage static-code-analysis lint lint-install mocks mocks-install
-
+# TRIGGER AND TEST CI
 GOPATH ?= $(HOME)/go
 GOBIN ?= $(GOPATH)/bin
 GOLANGCI_LINT_VERSION = v2.1.6
