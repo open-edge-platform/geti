@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Flex, View } from '@geti/ui';
+import { Flex, ToggleButtons, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { NoTrainedModels } from '../../../../../assets/images';
@@ -17,7 +17,6 @@ import { EmptyData } from '../../../../../shared/components/empty-data/empty-dat
 import { useTaskLabels } from '../../../../annotator/annotation/annotation-filter/use-task-labels.hook';
 import { PreviewCanvasSettingsProvider } from '../../../../annotator/providers/preview-canvas-settings-provider/preview-canvas-settings-provider.component';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
-import { ToggleButtons } from '../../project-models/train-model-dialog/advanced-settings/ui/toggle-buttons/toggle-buttons.component';
 import { AnnotatorCanvasProviders } from './annotator-canvas-providers.component';
 import { Contents } from './contents.component';
 import { HeaderOptions } from './header-options.component';
