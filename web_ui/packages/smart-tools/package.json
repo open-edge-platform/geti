@@ -1,0 +1,19 @@
+{
+  "name": "@geti/smart-tools",
+  "version": "1.0.0",
+  "description": "Contains geti smart tools, dependencies, utils and interfaces",
+  "author": "Intel corporation",
+  "main": "index.ts",
+  "type": "module",
+  "dependencies": {
+    "comlink": "^4.3.1"
+  },
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit -p tsconfig.json",
+    "lint": "eslint \"./**/*.ts*\" --max-warnings 0",
+    "lint:fix": "eslint --fix \"./**/*.ts*\""
+  }
+}
