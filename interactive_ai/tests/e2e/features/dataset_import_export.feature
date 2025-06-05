@@ -39,11 +39,11 @@ Feature: dataset import and export
     @xfail
     Examples:
       | dataset_format | annotation_type       | project_type                |
-      # Issue: CVS-161846
+      # Issue: ITEP-36161
       | VOC            | multi label           | multilabel classification   |
-      # Issue: CVS-68811
+      # Issue: ITEP-68811
       | COCO           | bounding box          | detection                   |
-      # Issue: CVS-68813
+      # Issue: ITEP-68813
       | COCO           | polygon               | instance segmentation       |
-      # Issue: CVS-68810
+      # Issue: ITEP-68810
       | YOLO           | bounding box          | detection                   |
