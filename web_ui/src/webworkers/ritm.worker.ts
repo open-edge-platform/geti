@@ -4,11 +4,11 @@
 // Dependencies get bundled into the worker
 
 import { OpenCVLoader } from '@geti/smart-tools';
+import * as OpenCVTypes from '@geti/smart-tools/opencv-types';
 import { expose } from 'comlink';
 import ndarray from 'ndarray';
 import ops from 'ndarray-ops';
 import * as ort from 'onnxruntime-web';
-import OpenCVTypes from 'OpenCVTypes';
 
 import { RegionOfInterest } from '../core/annotations/annotation.interface';
 import { Point, Shape } from '../core/annotations/shapes.interface';

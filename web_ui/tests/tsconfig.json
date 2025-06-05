@@ -16,5 +16,5 @@
         ]
     },
     "include": ["**/*"],
-    "exclude": ["./datasets/**/*", "../src/opencv-types/**"]
+    "exclude": ["./datasets/**/*"]
 }
