@@ -161,7 +161,9 @@ class TrainTaskJobData:
             "keep_mlflow_artifacts": self.keep_mlflow_artifacts,
         }
         if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
-            payload["hyperparameters"] = self.training_configuration.hyperparameters.model_dump()
+            payload["hyperparameters"] = (
+                self.training_configuration.hyperparameters.model_dump() if self.training_configuration else None
+            )
         return payload
 
     def create_metadata(self) -> dict:
