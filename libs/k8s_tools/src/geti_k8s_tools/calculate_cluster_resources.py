@@ -130,7 +130,6 @@ async def calculate_available_resources_per_node(
         nodes = await core_api.list_node()
         pods = await core_api.list_pod_for_all_namespaces()
         cm = await core_api.read_namespaced_config_map(namespace="impt", name="accelerator-configuration")
-        configcm = await core_api.read_namespaced_config_map(namespace="impt", name="impt-configuration")
 
     pods = [pod for pod in pods.items if pod.status.phase == "Running"]
 

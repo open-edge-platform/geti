@@ -47,7 +47,7 @@ spec:
           {{- toYaml .Values.securityContext | nindent 12 }}
           env:
             - name: GOMAXPROCS
-              value: "{{ .Values.resources.requests.cpu }}"
+              value: "1"
             - name: GOMEMLIMIT
               value: "{{ .Values.global.mem_limit }}"
             - name: MIN_FREE_SPACE_GIB

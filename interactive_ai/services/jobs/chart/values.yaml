@@ -54,7 +54,7 @@ microservice:
     enabled: true
     minReplicas: 1
     maxReplicas: 20
-    targetCPUUtilizationPercentage: 70
+    targetCPUUtilizationPercentage: 90
     targetMemoryUtilizationPercentage: 70
 
   ingress:
