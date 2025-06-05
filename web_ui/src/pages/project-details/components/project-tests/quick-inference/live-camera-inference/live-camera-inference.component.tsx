@@ -97,6 +97,7 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
             return;
         }
 
+        // Note: the goal of this timeout is to ensure that camera animation finishes first and then we show predictions
         setTimeout(() => {
             handleUploadImage([screenshot]);
         }, 500);
