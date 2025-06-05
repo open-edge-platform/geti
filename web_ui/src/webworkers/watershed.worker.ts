@@ -3,13 +3,13 @@
 
 // Dependencies get bundled into the worker
 
+import { OpenCVLoader } from '@geti/smart-tools';
 import { expose } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
 import { Point } from '../core/annotations/shapes.interface';
 import { Marker } from '../pages/annotator/tools/marker-tool/marker-tool.interface';
 import { WatershedPolygon } from '../pages/annotator/tools/watershed-tool/watershed-tool.interface';
-import cv from './opencv-loader';
 import { approximateShape, formatContourToPoints } from './utils';
 
 declare const self: DedicatedWorkerGlobalScope;
@@ -24,7 +24,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
+        return OpenCVLoader(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;
