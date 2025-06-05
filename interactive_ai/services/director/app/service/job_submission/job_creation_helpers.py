@@ -9,10 +9,10 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum, auto
 
-from features.feature_flag_provider import FeatureFlagProvider, FeatureFlag
 from geti_configuration_tools.training_configuration import TrainingConfiguration
 
 from communication.exceptions import JobCreationFailedException
+from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
 from geti_types import ID, ProjectIdentifier
 from iai_core.entities.dataset_storage import DatasetStorage

@@ -81,7 +81,7 @@ class _ModelBuilder:
         label_schema: LabelSchema,
         hyper_parameters: HyperParameters,
         model_version: int,
-        revamped_hyperparameters: dict,
+        revamped_hyperparameters: dict | None,
     ):
         self._model_repo = model_repo
         self._project = project
