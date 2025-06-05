@@ -8,15 +8,9 @@
   "dependencies": {
     "comlink": "^4.3.1"
   },
-  "include": [
-    "utils/**/*.ts"
-  ],
-  "exclude": [
-    "opencv",
-    "opencv-types"
-  ],
   "exports": {
-    ".": "./index.ts"
+    ".": "./index.ts",
+    "./types": "./opencv-types/index.d.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit -p tsconfig.json",
