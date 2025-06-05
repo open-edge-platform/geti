@@ -69,7 +69,6 @@ export enum GLOBAL_MODALS_KEYS {
 
 export enum GENERAL_SETTINGS_KEYS {
     MAINTENANCE_BANNER = 'maintenanceBanner',
-    CHOSEN_ORGANIZATION = 'chosenOrganization',
 }
 
 export type TutorialKeys = TUTORIAL_CARD_KEYS | FUX_NOTIFICATION_KEYS | FUX_SETTINGS_KEYS;
@@ -88,7 +87,6 @@ interface CanvasSettingsValues<T extends boolean | number> {
 
 export type GeneralSettingsConfig = {
     [GENERAL_SETTINGS_KEYS.MAINTENANCE_BANNER]: { wasDismissed: boolean; window: { start: number; end: number } };
-    [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: null | string };
 };
 
 export type GlobalModalsConfig = Record<GLOBAL_MODALS_KEYS, { isEnabled: boolean }>;

@@ -9,13 +9,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as usehooks from 'usehooks-ts';
 
 import { paths } from '../../../../packages/core/src/services/routes';
-import {
-    getMockedUserGlobalSettings,
-    getMockedUserGlobalSettingsObject,
-} from '../../../test-utils/mocked-items-factory/mocked-settings';
 import { renderHookWithProviders } from '../../../test-utils/render-hook-with-providers';
-import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
-import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
 import { AccountStatus } from '../organizations.interface';
 import { useSelectedOrganization } from './use-selected-organization.hook';
 
@@ -196,13 +190,6 @@ describe('useSelectedOrganization', () => {
             ['requested access', mockedRequestedOrganization],
         ])('avoids redirection when the chosen organization has a status: %s', async (_, organization) => {
             const mockedNavigate = mockNavigate();
-            jest.mocked(useUserGlobalSettings).mockReturnValue(
-                getMockedUserGlobalSettingsObject({
-                    config: getMockedUserGlobalSettings({
-                        [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: organization.id },
-                    }),
-                })
-            );
             updateOrganizationQuery([mockedOrganization, organization]);
             renderSelectedOrganizationHook(onboardingService);
 

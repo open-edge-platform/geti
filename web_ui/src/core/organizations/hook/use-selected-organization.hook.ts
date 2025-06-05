@@ -17,9 +17,6 @@ import { useNotification } from '../../../notification/notification.component';
 import { isActiveOrganization, isUserActivatedInOrg, isUserInvitedInOrg } from '../../../routes/organizations/util';
 import { LOCAL_STORAGE_KEYS } from '../../../shared/local-storage-keys';
 import { hasEqualId } from '../../../shared/utils';
-import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
-import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
-import { getSettingsOfType } from '../../user-settings/utils';
 
 const removeLastForwardSlash = (text: string) => text.replace(/\/$/, '');
 
