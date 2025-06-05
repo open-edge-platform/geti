@@ -10,6 +10,17 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      push:
+        description: "Enable pushing Docker images and Helm charts"
+        type: boolean
+        default: true
+      ref:
+        description: 'The branch, tag or SHA to checkout'
+        required: true
+        default: ""
+
 
 concurrency:
   group: ${{ github.head_ref || github.ref_name }}
@@ -26,7 +37,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       image-tag: "${{ steps.image-tag.outputs.image-tag }}"
-      components-list: ${{ steps.components-list.outputs.changes }}
+      components-list: ${{ steps.components-list.outputs.components-list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
       libs-list: ${{ steps.libs-list.outputs.libs-list }}
     steps:
@@ -35,6 +46,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - name: Prepare image tag
         id: image-tag
@@ -42,17 +54,18 @@ jobs:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_EVENT_NUMBER: ${{ github.event.number }}
           GITHUB_REF_NAME: ${{ github.ref_name }}
+          REF: ${{ inputs.ref }}
         run: |
           short_sha=$(git rev-parse --short HEAD)
           product_version=$(sed -ne 's/^.*PRODUCT_VERSION.*?= //p' Makefile.shared)
           if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
               ref=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
-
           elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
               ref=pr-"${GITHUB_EVENT_NUMBER}"
-
           elif [[ "${GITHUB_EVENT_NAME}" == "merge_group" ]]; then
               ref=mr
+          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+              ref=$(echo "${REF}" | tr '/_' '-')
           else
               echo "unknown event ${github_event_name}!"
               exit 1
@@ -71,11 +84,19 @@ jobs:
         env:
           CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
         run: |
-          changes=$(python3 -c "print('$CHANGED_KEYS'.split())")
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            components=$(yq -r '... comments=""' ./.github/components-path-filters.yml | yq -r 'keys[]')
+            components_changes=$(echo "$components" | sed ':a;N;$!ba;s/\n/, /g' )
+            components_list=$(echo "$components_changes" | sed 's/[^, ]\+/"&"/g; s/, /, /g; s/^/[&/; s/$/&]/')
+          else
+            components_list=$(python3 -c "print('$CHANGED_KEYS'.split())")
+          fi
+
           echo "::group::Components to run"
-          echo $changes
+          echo $components_list
           echo "::endgroup::"
-          echo "changes=$changes" >> "$GITHUB_OUTPUT"
+
+          echo "components-list=$components_list" >> "$GITHUB_OUTPUT"
 
       - name: Get changed libs
         id: changed-libs
@@ -87,21 +108,35 @@ jobs:
         id: libs-list
         env:
           CHANGED_LIBS: ${{ steps.changed-libs.outputs.changed_keys }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
         run: |
-          libs_changes=$(python3 -c "print('$CHANGED_LIBS'.split())")
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            libs=$(yq -r '... comments=""' ./.github/libs-path-filters.yml | yq -r 'keys[]')
+            libs_changes=$(echo "$libs" | sed ':a;N;$!ba;s/\n/, /g' )
+            libs_list=$(echo "$libs_changes" | sed 's/[^, ]\+/"&"/g; s/, /, /g; s/^/[&/; s/$/&]/')
+          else
+              libs_list=$(python3 -c "print('$CHANGED_LIBS'.split())")
+          fi
+
           echo "::group::Libriaries to run"
-          echo $libs_changes
+          echo $libs_list
           echo "::endgroup::"
-          echo "libs-list=$libs_changes" >> "$GITHUB_OUTPUT"
+
+          echo "libs-list=$libs_list" >> "$GITHUB_OUTPUT"
 
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
         run: |
           components=$(echo ${CHANGES} | sed "s/'/\"/g")
           filtered=$(echo $components | jq -c '[.[] | select(. != "web_ui")]')
+
+          echo "::group::Components to run"
+          echo $filtered
+          echo "::endgroup::"
+
           echo "filtered-list=$filtered" >> $GITHUB_OUTPUT
         env:
-          CHANGES: ${{ steps.components-list.outputs.changes }}
+          CHANGES: ${{ steps.components-list.outputs.components-list }}
 
   lib_test_workflow:
     name: Lib test workflow
@@ -116,6 +151,7 @@ jobs:
         component: ${{ fromJSON(needs.get-vars.outputs.libs-list) }}
     with:
       component-dir: ${{ matrix.component }}
+      ref: ${{ inputs.ref || '' }}
 
   component-workflow:
     name: Component workflow
@@ -138,6 +174,8 @@ jobs:
     with:
       image-tag: ${{ needs.get-vars.outputs.image-tag }}
       component-dir: ${{ matrix.component }}
+      push: ${{ inputs.push || false }}
+      ref: ${{ inputs.ref || '' }}
 
   web-ui-workflow:
     name: Web UI workflow
@@ -153,6 +191,8 @@ jobs:
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
       image-tag: ${{ needs.get-vars.outputs.image-tag }}
+      push: ${{ inputs.push || false }}
+      ref: ${{ inputs.ref || '' }}
 
   success:
     name: Required status checks

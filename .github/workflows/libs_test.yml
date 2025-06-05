@@ -7,10 +7,14 @@ on:
         description: 'Dir in root directory'
         type: string
         required: true
+      ref:
+        description: "Ref to checkout"
+        type: string
+        default: ""
   workflow_dispatch:
     inputs:
-      branch:
-        description: 'Branch to checkout'
+      ref:
+        description: 'The branch, tag or SHA to checkout'
         required: true
         default: 'main'
       component-dir:
@@ -34,7 +38,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
-          ref: ${{ inputs.branch || '' }}
+          ref: ${{ inputs.ref || '' }}
 
       - name: Install missing dependencies
         run: |
