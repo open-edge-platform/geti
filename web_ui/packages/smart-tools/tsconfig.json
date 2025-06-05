@@ -1,10 +1,3 @@
 {
-  "extends": "@geti/config/typescript",
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "OpenCVTypes": ["./opencv-types/index.d.ts"],
-      "opencv": ["./opencv/4.9.0/opencv.js"]
-    }
-  }
+  "extends": "@geti/config/typescript"
 }

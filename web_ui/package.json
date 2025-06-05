@@ -90,8 +90,8 @@
     "find-deadcode": "npx knip",
     "format": "prettier --write --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\" \"packages/**/*.ts*\"",
     "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\" \"tests/**/*.ts*\" \"packages/**/*.ts*\"",
-    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0 && npm run lint --workspace=@geti/ui --workspace=@geti/core --workspace=@geti/smart-tools",
-    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\" && npm run lint:fix --workspace=@geti/ui --workspace=@geti/core --workspace=@geti/smart-tools",
+    "lint": "eslint \"src/**/*.ts*\" \"tests/**/*.ts*\" --max-warnings 0 && npm run lint --workspaces --if-present",
+    "lint:fix": "eslint --fix \"./src/**/*.ts*\" \"tests/**/*.ts*\" && npm run lint:fix --workspaces --if-present",
     "preview": "rsbuild preview",
     "start": "rsbuild dev --environment dev",
     "test:component": "npx playwright test --config=playwright.config.ts",
@@ -100,7 +100,7 @@
     "test:e2e": "npx playwright test --config=playwright.config.ts --project=e2e",
     "test:unit": "jest --config jest.config.js --watchAll=false",
     "test:unit:watch": "jest --config jest.config.js --watch",
-    "type-check": "tsc --noEmit && npm run type-check --workspace=@geti/ui --workspace=@geti/core --workspace=@geti/smart-tools"
+    "type-check": "tsc --noEmit && npm run type-check --workspaces --if-present"
   },
   "browserslist": {
     "production": [
