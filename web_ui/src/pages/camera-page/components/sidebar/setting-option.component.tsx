@@ -35,7 +35,7 @@ export const SettingOption = ({ label, config, onChange }: SettingOptionProps) =
                 justifyContent={'space-between'}
                 alignItems={'center'}
             >
-                <Heading level={4} margin={0}>
+                <Heading level={4} margin={0} UNSAFE_style={{ fontWeight: 400 }}>
                     {capitalize(unFormatText(label))}
                 </Heading>
 

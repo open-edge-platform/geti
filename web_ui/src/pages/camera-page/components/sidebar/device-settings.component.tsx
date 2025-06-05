@@ -1,23 +1,42 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Heading, Item, Key, Picker, View } from '@geti/ui';
-import { orderBy } from 'lodash-es';
+import { useEffect } from 'react';
+
+import { Disclosure, DisclosurePanel, DisclosureTitle, Flex, Heading, Item, Key, Picker, View } from '@geti/ui';
 
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
-import { applySettings } from '../../providers/util';
+import { checkIfDisplaySetting } from '../../providers/util';
+import { DeviceSettingsConfig } from './device-settings-config.interface';
+import deviceSettingsConfig from './device-settings-config.json';
 import { SettingOption } from './setting-option.component';
 
+import classes from './device-settings.module.css';
+
+const Header = ({ text }: { text: string }) => (
+    <Flex alignItems={'center'} justifyContent={'space-between'}>
+        <Heading level={3}>{text}</Heading>
+    </Flex>
+);
+
+//TODO:
+//fixbug dependencies - changed
+//show after the standup!
+//add tests!
+
 export const DeviceSettings = () => {
-    const { webcamRef, videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId, isMirrored, setIsMirrored } =
-        useDeviceSettings();
-    const sortedByOptions = orderBy(deviceConfig, ['config.options'], 'desc');
+    const { categories, defaultCategory, dependencies } = deviceSettingsConfig as DeviceSettingsConfig;
+    const deviceSettingsConfigFields = categories.reduce(
+        (list, category) => [...list, ...category.attributesKeys],
+        [] as string[]
+    );
+
+    const { videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId } = useDeviceSettings();
+    const otherConfigAttributes = deviceConfig?.filter(({ name }) => !deviceSettingsConfigFields.includes(name));
 
     return (
         <View position={'relative'}>
-            <Flex alignItems={'center'} justifyContent={'space-between'}>
-                <Heading level={3}>Camera Settings</Heading>
-            </Flex>
+            <Header text={'Camera Settings'} />
 
             <Picker
                 width={'100%'}
@@ -31,28 +50,35 @@ export const DeviceSettings = () => {
                 {({ deviceId, label }) => <Item key={deviceId}>{label}</Item>}
             </Picker>
 
-            <Divider size={'S'} marginTop={'size-250'} marginBottom={'size-250'} />
+            {categories.map(({ categoryName, attributesKeys }) => (
+                <Disclosure key={categoryName}>
+                    <DisclosureTitle UNSAFE_className={classes.sectionHeader}>{categoryName}</DisclosureTitle>
+                    <DisclosurePanel>
+                        {attributesKeys.map((key) => {
+                            const currentOption = deviceConfig.find((option) => option.name === key);
+                            if (currentOption) {
+                                const shouldDisplay = checkIfDisplaySetting(currentOption, deviceConfig, dependencies);
+                                const { name, config, onChange } = currentOption;
 
-            <SettingOption
-                label='Mirror camera'
-                config={{ type: 'selection', options: ['Off', 'On'], value: isMirrored ? 'On' : 'Off' }}
-                onChange={(value) => {
-                    setIsMirrored(value === 'On');
-                }}
-            />
-
-            {sortedByOptions.map(({ name, config }) => (
-                <SettingOption
-                    key={name}
-                    label={name}
-                    config={config}
-                    onChange={(value) => {
-                        if (webcamRef.current?.stream) {
-                            applySettings(webcamRef.current?.stream, { [name]: value });
-                        }
-                    }}
-                />
+                                return (
+                                    shouldDisplay && (
+                                        <SettingOption key={name} label={name} config={config} onChange={onChange} />
+                                    )
+                                );
+                            }
+                        })}
+                    </DisclosurePanel>
+                </Disclosure>
             ))}
+
+            <Disclosure isHidden={!otherConfigAttributes.length}>
+                <DisclosureTitle UNSAFE_className={classes.sectionHeader}>{defaultCategory}</DisclosureTitle>
+                <DisclosurePanel>
+                    {otherConfigAttributes.map(({ name, config, onChange }) => (
+                        <SettingOption key={name} label={name} config={config} onChange={onChange} />
+                    ))}
+                </DisclosurePanel>
+            </Disclosure>
         </View>
     );
 };
