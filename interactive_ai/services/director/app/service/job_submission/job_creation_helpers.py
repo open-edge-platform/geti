@@ -9,6 +9,7 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from enum import Enum, auto
 
+from features.feature_flag_provider import FeatureFlagProvider, FeatureFlag
 from geti_configuration_tools.training_configuration import TrainingConfiguration
 
 from communication.exceptions import JobCreationFailedException
@@ -159,9 +160,8 @@ class TrainTaskJobData:
             "reshuffle_subsets": self.reshuffle_subsets,
             "keep_mlflow_artifacts": self.keep_mlflow_artifacts,
         }
-        # commented out for testing
-        # if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
-        #     payload["hyperparameters"] = self.training_configuration.hyperparameters.model_dump()
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
+            payload["hyperparameters"] = self.training_configuration.hyperparameters.model_dump()
         return payload
 
     def create_metadata(self) -> dict:
